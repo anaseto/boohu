@@ -11,7 +11,7 @@ Install
 + Install the [go compiler](https://golang.org/).
 + Set `$GOPATH` variable (for example `export GOPATH=$HOME/go`).
 + Add `$GOPATH/bin` to your `$PATH`.
-+ Use the command `go get github.com/anaseto/gofrundis/bin/frundis`.
++ Use the command `go get github.com/anaseto/boohu`.
   
 The `boohu` command should now be available.
 
