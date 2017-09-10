@@ -29,8 +29,8 @@ func (np *normalPath) Cost(from, to position) int {
 
 func (g *game) drawDijkstra(nm nodeMap) string {
 	b := &bytes.Buffer{}
-	for y := 0; y < 25; y++ {
-		for x := 0; x < 70; x++ {
+	for y := 0; y < g.Dungeon.Heigth; y++ {
+		for x := 0; x < g.Dungeon.Width; x++ {
 			pos := position{x, y}
 			n, ok := nm[pos]
 			if ok {
