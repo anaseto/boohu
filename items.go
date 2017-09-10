@@ -158,7 +158,6 @@ func (g *game) QuaffDescent(ev event) error {
 		return errors.New("You cannot descend while lignified.")
 	}
 	if g.Depth >= g.MaxDepth() {
-		g.Depth++
 		return errors.New("You cannot descend more!")
 	}
 	g.Print("You feel falling through de ground")
