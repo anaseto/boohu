@@ -1,0 +1,322 @@
+package main
+
+import (
+	"errors"
+	"fmt"
+)
+
+type player struct {
+	LOS         map[position]bool
+	Rays        rayMap
+	Pos         position
+	HP          int
+	MP          int
+	Consumables map[consumable]int
+	Gold        int
+	Target      position
+	Statuses    map[status]int
+	Armour      armour
+	Weapon      weapon
+	Shield      shield
+	Aptitudes   map[aptitude]bool
+	Rods        map[rod]*rodProps
+}
+
+func (p *player) HPMax() int {
+	hpmax := 40
+	if p.Aptitudes[AptHealthy] {
+		hpmax += 10
+	}
+	return hpmax
+}
+
+func (p *player) MPMax() int {
+	mpmax := 10
+	if p.Aptitudes[AptMagic] {
+		mpmax += 5
+	}
+	return mpmax
+}
+
+func (p *player) Accuracy() int {
+	acc := 15
+	if p.Aptitudes[AptAccurate] {
+		acc += 3
+	}
+	return acc
+}
+
+func (p *player) Armor() int {
+	ar := 0
+	switch p.Armour {
+	case LeatherArmour:
+		ar += 3
+	case ChainMail:
+		ar += 5
+	case PlateArmour:
+		ar += 8
+	}
+	if p.Aptitudes[AptScales] {
+		ar += 2
+	}
+	if p.HasStatus(StatusLignification) {
+		ar = 9 + ar/2
+	}
+	return ar
+}
+
+func (p *player) Attack() int {
+	attack := p.Weapon.Attack()
+	if p.Aptitudes[AptStrong] {
+		attack += attack / 5
+	}
+	return attack
+}
+
+func (p *player) Evasion() int {
+	ev := 15
+	if p.Aptitudes[AptAgile] {
+		ev += 3
+	}
+	if p.HasStatus(StatusEvasion) {
+		ev += 5
+	}
+	return ev
+}
+
+func (p *player) HasStatus(st status) bool {
+	return p.Statuses[st] > 0
+}
+
+func (p *player) AptitudeCount() int {
+	count := 0
+	for _, b := range p.Aptitudes {
+		if b {
+			count++
+		}
+	}
+	return count
+}
+
+func (g *game) MoveToTarget(ev event) bool {
+	if g.MonsterInLOS() == nil {
+		path := g.PlayerPath(g.Player.Pos, *g.AutoTarget)
+		if len(path) > 1 {
+			g.MovePlayer(path[len(path)-2], ev)
+			return true
+		}
+	}
+	g.AutoTarget = nil
+	return false
+}
+
+func (g *game) WaitTurn(ev event) {
+	// XXX Really wait for 10 ?
+	ev.Renew(g, 10)
+}
+
+func (g *game) Rest(ev event) error {
+	if g.MonsterInLOS() != nil {
+		return fmt.Errorf("You cannot sleep while monsters are in view.")
+	}
+	if g.Player.HP == g.Player.HPMax() && !g.Player.HasStatus(StatusExhausted) {
+		return errors.New("You do not need to rest.")
+	}
+	g.WaitTurn(ev)
+	g.Resting = true
+	return nil
+}
+
+func (g *game) Equip(ev event) error {
+	if eq, ok := g.Equipables[g.Player.Pos]; ok {
+		eq.Equip(g)
+		ev.Renew(g, 10)
+		return nil
+	}
+	return errors.New("Found nothing to equip here.")
+}
+
+func (g *game) MonsterInLOS() *monster {
+	for _, mons := range g.Monsters {
+		if mons.Exists() && g.Player.LOS[mons.Pos] {
+			return mons
+		}
+	}
+	return nil
+}
+
+func (g *game) Teleportation(ev event) {
+	var pos position
+	i := 0
+	count := 0
+	for {
+		count++
+		if count > 1000 {
+			panic("Teleportation")
+		}
+		pos = g.FreeCell()
+		if pos.Distance(g.Player.Pos) < 15 && i < 1000 {
+			i++
+			continue
+		}
+		break
+
+	}
+	g.Player.Statuses[StatusTele]--
+	if g.Dungeon.Valid(pos) {
+		// should always happen
+		g.Player.Pos = pos
+		g.Print("You feel yourself teleported away.")
+		g.ComputeLOS()
+		g.MakeMonstersAware()
+	} else {
+		g.Print("Something went wrong with the teleportation.")
+	}
+}
+
+func (g *game) MovePlayer(pos position, ev event) error {
+	if !g.Dungeon.Valid(pos) || g.Dungeon.Cell(pos).T == WallCell {
+		return errors.New("You cannot move there.")
+	}
+	if g.Player.HasStatus(StatusConfusion) {
+		switch pos.Dir(g.Player.Pos) {
+		case E, N, W, S:
+		default:
+			return errors.New("You cannot use diagonal movements while confused.")
+		}
+	}
+	delay := 10
+	switch g.Dungeon.Cell(pos).T {
+	case FreeCell:
+		mons, _ := g.MonsterAt(pos)
+		if !mons.Exists() {
+			if g.Player.HasStatus(StatusLignification) {
+				return errors.New("You cannot move while lignified")
+			}
+			g.Player.Pos = pos
+			if g.Gold[pos] > 0 {
+				g.Player.Gold += g.Gold[pos]
+				delete(g.Gold, pos)
+			}
+			if c, ok := g.Collectables[pos]; ok && c != nil {
+				g.Player.Consumables[c.Consumable] += c.Quantity
+				delete(g.Collectables, pos)
+				g.Print(fmt.Sprintf("You take a %s.", c.Consumable))
+			}
+			if r, ok := g.Rods[pos]; ok {
+				g.Player.Rods[r] = &rodProps{Charge: r.MaxCharge() - 1}
+				delete(g.Rods, pos)
+				g.Print(fmt.Sprintf("You take a %s.", r))
+			}
+			g.ComputeLOS()
+			if g.Autoexploring {
+				mons := g.MonsterInLOS()
+				if mons != nil {
+					g.Print(fmt.Sprintf("You see a %v (%v).", mons.Kind, mons.State))
+				}
+			}
+			g.MakeMonstersAware()
+			if g.Player.Aptitudes[AptFast] {
+				// only fast for movement
+				delay -= 2
+			}
+			if g.Player.HasStatus(StatusHaste) {
+				// only fast for movement
+				delay -= 3
+			}
+		} else {
+			g.AttackMonster(mons)
+		}
+	}
+	if g.Player.HasStatus(StatusBerserk) {
+		delay -= 3
+	}
+	if g.Player.HasStatus(StatusSlow) {
+		delay += 3
+	}
+	ev.Renew(g, delay)
+	return nil
+}
+
+func (g *game) AttackMonster(mons *monster) {
+	switch {
+	case g.Player.Weapon.Cleave():
+		var neighbors []position
+		if g.Player.HasStatus(StatusConfusion) {
+			neighbors = g.Dungeon.CardinalFreeNeighbors(g.Player.Pos)
+		} else {
+			neighbors = g.Dungeon.FreeNeighbors(g.Player.Pos)
+		}
+		for _, pos := range neighbors {
+			mons, _ := g.MonsterAt(pos)
+			if mons.Exists() {
+				g.HitMonster(mons)
+			}
+		}
+	case g.Player.Weapon.Pierce():
+		g.HitMonster(mons)
+		deltaX := mons.Pos.X - g.Player.Pos.X
+		deltaY := mons.Pos.Y - g.Player.Pos.Y
+		behind := position{g.Player.Pos.X + 2*deltaX, g.Player.Pos.Y + 2*deltaY}
+		if g.Dungeon.Valid(behind) {
+			mons, _ := g.MonsterAt(behind)
+			if mons.Exists() {
+				g.HitMonster(mons)
+			}
+		}
+	default:
+		g.HitMonster(mons)
+		if (g.Player.Weapon == Sword || g.Player.Weapon == DoubleSword) && RandInt(4) == 0 {
+			g.HitMonster(mons)
+		}
+	}
+}
+
+func (g *game) HitMonster(mons *monster) {
+	acc := RandInt(g.Player.Accuracy())
+	ev := RandInt(mons.Evasion)
+	if acc > ev {
+		g.MakeNoise(12, mons.Pos)
+		bonus := 0
+		if g.Player.HasStatus(StatusBerserk) {
+			bonus += RandInt(5)
+		}
+		attack := g.HitDamage(g.Player.Attack()+bonus, mons.Armor)
+		if mons.State == Resting {
+			if g.Player.Weapon == Dagger {
+				attack *= 5
+			} else {
+				attack *= 2
+			}
+		}
+		mons.HP -= attack
+		if mons.HP > 0 {
+			g.Print(fmt.Sprintf("You hit the %v (%d damage).", mons.Kind, attack))
+		} else {
+			g.Print(fmt.Sprintf("You kill the %v (%d damage).", mons.Kind, attack))
+			g.Killed++
+		}
+		mons.MakeHuntIfHurt(g)
+	} else {
+		g.Print(fmt.Sprintf("You miss the %v.", mons.Kind))
+	}
+}
+
+func (g *game) HealPlayer(ev event) {
+	if g.Player.HP < g.Player.HPMax() {
+		g.Player.HP++
+	}
+	delay := 50
+	if g.Player.Aptitudes[AptRegen] {
+		delay = 25
+	}
+	ev.Renew(g, delay)
+}
+
+func (g *game) MPRegen(ev event) {
+	if g.Player.MP < g.Player.MPMax() {
+		g.Player.MP++
+	}
+	delay := 100
+	ev.Renew(g, delay)
+}
