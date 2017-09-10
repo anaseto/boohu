@@ -189,6 +189,9 @@ func (g *game) SortedProjectiles() consumableSlice {
 
 func (g *game) Dump() string {
 	buf := &bytes.Buffer{}
+	if g.Wizard {
+		fmt.Fprintf(buf, "**WIZARD MODE**\n")
+	}
 	if g.Player.HP > 0 && g.Depth > 12 {
 		fmt.Fprintf(buf, "You escaped from Hareka's Underground alive!\n")
 	} else if g.Player.HP <= 0 {
@@ -250,6 +253,9 @@ func (g *game) Dump() string {
 
 func (g *game) SimplifedDump() string {
 	buf := &bytes.Buffer{}
+	if g.Wizard {
+		fmt.Fprintf(buf, "**WIZARD MODE**\n")
+	}
 	if g.Player.HP > 0 && g.Depth > 12 {
 		fmt.Fprintf(buf, "You escaped from Hareka's Underground alive!\n")
 	} else if g.Player.HP <= 0 {
