@@ -539,7 +539,7 @@ func (g *game) InitLevel() {
 	g.Gold = make(map[position]int)
 	for i := 0; i < 5; i++ {
 		pos := g.FreeCellForStatic()
-		g.Gold[pos] = 1 + RandInt(g.Depth)
+		g.Gold[pos] = 1 + RandInt(g.Depth+g.Depth*g.Depth/10)
 	}
 
 	// initialize LOS
