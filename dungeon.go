@@ -198,7 +198,7 @@ func (d *dungeon) Neighbors(pos position) []position {
 }
 
 func (d *dungeon) CardinalNeighbors(pos position) []position {
-	neighbors := [8]position{pos.E(), pos.W(), pos.N(), pos.S()}
+	neighbors := [4]position{pos.E(), pos.W(), pos.N(), pos.S()}
 	validNeighbors := []position{}
 	for _, pos := range neighbors {
 		if d.Valid(pos) {

@@ -16,7 +16,7 @@ func (d *dungeon) FreeNeighbors(pos position) []position {
 }
 
 func (d *dungeon) CardinalFreeNeighbors(pos position) []position {
-	neighbors := [8]position{pos.E(), pos.W(), pos.N(), pos.S()}
+	neighbors := [4]position{pos.E(), pos.W(), pos.N(), pos.S()}
 	freeNeighbors := []position{}
 	for _, c := range neighbors {
 		if d.Valid(c) && d.Cell(c).T != WallCell {
