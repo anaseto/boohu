@@ -5,7 +5,7 @@ inventory management.
 
 It is a work in progress, but is already a quite complete game.
 
-![boohu intro screen](https://raw.githubusercontent.com/anaseto/boohu/img/intro-screen.png)
+![boohu intro screen](https://raw.githubusercontent.com/anaseto/boohu/master/img/intro-screen.png)
 
 Install
 -------
