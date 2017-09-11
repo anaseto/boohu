@@ -195,21 +195,13 @@ getKey:
 			if tev.Ch == 0 {
 				switch tev.Key {
 				case termbox.KeyArrowUp:
-					err = g.MovePlayer(g.Player.Pos.N(), ev)
-					g.Print(err.Error())
-					continue getKey
+					tev.Ch = 'k'
 				case termbox.KeyArrowRight:
-					err = g.MovePlayer(g.Player.Pos.E(), ev)
-					g.Print(err.Error())
-					continue getKey
+					tev.Ch = 'l'
 				case termbox.KeyArrowDown:
-					err = g.MovePlayer(g.Player.Pos.S(), ev)
-					g.Print(err.Error())
-					continue getKey
+					tev.Ch = 'j'
 				case termbox.KeyArrowLeft:
-					err = g.MovePlayer(g.Player.Pos.W(), ev)
-					g.Print(err.Error())
-					continue getKey
+					tev.Ch = 'h'
 				case termbox.KeyCtrlW:
 					if ui.Wizard(g) {
 						g.Wizard = true
