@@ -412,11 +412,13 @@ func (ui *termui) ChooseTarget(g *game, targ Targetter) bool {
 
 func (ui *termui) CursorAction(g *game, targ Targetter) error {
 	pos := g.Player.Pos
+	minDist := 999
 	for _, mons := range g.Monsters {
 		if mons.Exists() && g.Player.LOS[mons.Pos] {
-			pos = mons.Pos
-			if mons.Pos == g.Player.Target {
-				break
+			dist := mons.Pos.Distance(g.Player.Pos)
+			if minDist > dist {
+				minDist = dist
+				pos = mons.Pos
 			}
 		}
 	}
@@ -481,7 +483,7 @@ loop:
 						nmonster = 0
 					}
 					mons := g.Monsters[nmonster]
-					if mons.Exists() && g.Player.LOS[mons.Pos] {
+					if mons.Exists() && g.Player.LOS[mons.Pos] && pos != mons.Pos {
 						npos = mons.Pos
 						break
 					}
