@@ -244,33 +244,17 @@ func (p projectile) Use(g *game, ev event) error {
 		// should not happen
 		return errors.New("internal error: no monster")
 	}
-	var err error
-	var hit bool
 	switch p {
 	case Javeline:
-		hit, err = g.ThrowJaveline(mons, ev)
+		g.ThrowJaveline(mons, ev)
 	case ConfusingDart:
-		hit, err = g.ThrowConfusingDart(mons, ev)
+		g.ThrowConfusingDart(mons, ev)
 	}
-	if !hit {
-		g.Print(fmt.Sprintf("Your %s missed.", p))
-	} else {
-		if mons.HP > 0 {
-			g.Print(fmt.Sprintf("Your %s hits the %s.", p, mons.Kind))
-			mons.MakeHuntIfHurt(g)
-		} else {
-			g.Print(fmt.Sprintf("Your %s kills the %s.", p, mons.Kind))
-			g.Killed++
-		}
-	}
-	if err == nil {
-		g.UseConsumable(p)
-	}
-	return err
+	g.UseConsumable(p)
+	return nil
 }
 
-func (g *game) ThrowJaveline(mons *monster, ev event) (bool, error) {
-	hit := false
+func (g *game) ThrowJaveline(mons *monster, ev event) {
 	acc := RandInt(g.Player.Accuracy())
 	evasion := RandInt(mons.Evasion)
 	if acc > evasion {
@@ -290,15 +274,20 @@ func (g *game) ThrowJaveline(mons *monster, ev event) (bool, error) {
 			attack = 0
 		}
 		mons.HP -= attack
-		hit = true
-		mons.MakeHuntIfHurt(g)
+		if mons.HP > 0 {
+			g.Print(fmt.Sprintf("Your %s hits the %s (%d).", Javeline, mons.Kind, attack))
+			mons.MakeHuntIfHurt(g)
+		} else {
+			g.Print(fmt.Sprintf("Your %s kills the %s.", Javeline, mons.Kind))
+			g.Killed++
+		}
+	} else {
+		g.Print(fmt.Sprintf("Your %s missed the %s.", Javeline, mons.Kind))
 	}
 	ev.Renew(g, 10)
-	return hit, nil
 }
 
-func (g *game) ThrowConfusingDart(mons *monster, ev event) (bool, error) {
-	hit := false
+func (g *game) ThrowConfusingDart(mons *monster, ev event) {
 	acc := RandInt(g.Player.Accuracy())
 	evasion := RandInt(mons.Evasion)
 	if acc > evasion {
@@ -307,10 +296,11 @@ func (g *game) ThrowConfusingDart(mons *monster, ev event) (bool, error) {
 		heap.Push(g.Events, &monsterEvent{
 			ERank: ev.Rank() + 50 + RandInt(100), NMons: mons.Index(g), EAction: MonsConfusionEnd})
 		mons.MakeHuntIfHurt(g)
-		hit = true
+		g.Print(fmt.Sprintf("Your %s hits the %s. The %s appears confused.", ConfusingDart, mons.Kind, mons.Kind))
+	} else {
+		g.Print(fmt.Sprintf("Your %s missed the %s.", ConfusingDart, mons.Kind))
 	}
 	ev.Renew(g, 10)
-	return hit, nil
 }
 
 type collectable struct {
