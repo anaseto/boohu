@@ -15,6 +15,7 @@ import (
 type consumable interface {
 	Use(*game, event) error
 	String() string
+	Desc() string
 	Letter() rune
 	Int() int
 }
@@ -56,14 +57,40 @@ func (p potion) String() (text string) {
 		text = "potion of magic mapping"
 	case MagicPotion:
 		text = "potion of refill magic"
-	case ResistancePotion:
-		text = "potion of resistance"
 	case BerserkPotion:
 		text = "potion of berserk"
 	case RunningPotion:
 		text = "potion of running"
 	case LignificationPotion:
 		text = "potion of lignification"
+	case ResistancePotion:
+		text = "potion of resistance"
+	}
+	return text
+}
+
+func (p potion) Desc() (text string) {
+	switch p {
+	case HealWoundsPotion:
+		text = "It heals you a good deal."
+	case TeleportationPotion:
+		text = "It teleports you away after a short delay."
+	case DescentPotion:
+		text = "It makes you go to deeper in the Underground."
+	case EvasionPotion:
+		text = "It makes you better at avoiding blows."
+	case MagicMappingPotion:
+		text = "It shows you the map."
+	case MagicPotion:
+		text = "It replenishes your magical reserves."
+	case BerserkPotion:
+		text = "It makes you enter a crazy rage. You cannot drink potions while berserk, and afterwards it leaves you slow and exhausted."
+	case RunningPotion:
+		text = "It makes you move faster."
+	case LignificationPotion:
+		text = "It makes you more resistant to physical blows, but you are attached to the ground while the effect lasts."
+	case ResistancePotion:
+		text = "It makes you resistent to the elements."
 	}
 	return text
 }
@@ -221,6 +248,19 @@ func (p projectile) String() (text string) {
 		text = "dart of confusion"
 	case Net:
 		text = "throwing net"
+	}
+	return text
+}
+
+func (p projectile) Desc() (text string) {
+	switch p {
+	case Javeline:
+		// XXX
+		text = "It can be thrown to ennemies, dealing up to 11 damage."
+	case ConfusingDart:
+		text = "It can be thrown to confuse foes."
+	case Net:
+		text = "It can be thrown to emprison your ennemies."
 	}
 	return text
 }

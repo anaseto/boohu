@@ -723,11 +723,19 @@ func (ui *termui) DrawPreviousLogs(g *game) {
 }
 
 func (ui *termui) DrawMonsterDescription(g *game, mons *monster) {
-	termbox.Clear(ColorFg, ColorBg)
 	s := mons.Kind.Desc()
 	s += " " + fmt.Sprintf("They can hit for up to %d damage.", MonsData[mons.Kind].baseAttack)
 	s += " " + fmt.Sprintf("They have around %d HP.", MonsData[mons.Kind].maxHP)
-	ui.DrawText(formatText(s, 79), 0, 0)
+	ui.DrawDescription(g, s)
+}
+
+func (ui *termui) DrawConsumableDescription(g *game, c consumable) {
+	ui.DrawDescription(g, c.Desc())
+}
+
+func (ui *termui) DrawDescription(g *game, desc string) {
+	termbox.Clear(ColorFg, ColorBg)
+	ui.DrawText(formatText(desc, 79), 0, 0)
 	termbox.Flush()
 	ui.WaitForContinue(g)
 }
@@ -775,7 +783,7 @@ func (ui *termui) SelectProjectile(g *game, ev event) error {
 		ui.DrawText(fmt.Sprintf("%c - %s (%d available)", rune(i+97), c, g.Player.Consumables[c]), 0, i+1)
 	}
 	termbox.Flush()
-	index, noAction := ui.Select(g, ev, len(cs))
+	index, _, noAction := ui.Select(g, ev, len(cs))
 	if noAction == nil {
 		b := ui.ChooseTarget(g, &chooser{single: true})
 		if b {
@@ -796,13 +804,28 @@ func (ui *termui) SelectPotion(g *game, ev event) error {
 		ui.DrawText(fmt.Sprintf("%c - %s (%d available)", rune(i+97), c, g.Player.Consumables[c]), 0, i+1)
 	}
 	termbox.Flush()
-	index, noAction := ui.Select(g, ev, len(cs))
+	index, _, noAction := ui.Select(g, ev, len(cs))
 	if noAction == nil {
 		noAction = cs[index].Use(g, ev)
 	}
 	ui.DrawDungeonView(g)
 	return noAction
 }
+
+// func (ui *termui) DescribePotion(g *game, ev event) error {
+// 	termbox.Clear(ColorFg, ColorBg)
+// 	cs := g.SortedPotions()
+// 	ui.DrawText("Describe which potion?", 0, 0)
+// 	for i, c := range cs {
+// 		ui.DrawText(fmt.Sprintf("%c - %s (%d available)", rune(i+97), c, g.Player.Consumables[c]), 0, i+1)
+// 	}
+// 	termbox.Flush()
+// 	index, _, noAction := ui.Select(g, ev, len(cs))
+// 	if noAction == nil {
+// 		noAction = cs[index].Desc()
+// 	}
+// 	return noAction
+// }
 
 func (ui *termui) SelectRod(g *game, ev event) error {
 	termbox.Clear(ColorFg, ColorBg)
@@ -813,7 +836,7 @@ func (ui *termui) SelectRod(g *game, ev event) error {
 			rune(i+97), c, g.Player.Rods[c].Charge, c.MaxCharge(), c.MPCost()), 0, i+1)
 	}
 	termbox.Flush()
-	index, noAction := ui.Select(g, ev, len(rs))
+	index, _, noAction := ui.Select(g, ev, len(rs))
 	if noAction == nil {
 		noAction = rs[index].Use(g, ev)
 	}
@@ -821,18 +844,21 @@ func (ui *termui) SelectRod(g *game, ev event) error {
 	return noAction
 }
 
-func (ui *termui) Select(g *game, ev event, l int) (int, error) {
+func (ui *termui) Select(g *game, ev event, l int) (index int, help bool, err error) {
 	for {
 		switch tev := termbox.PollEvent(); tev.Type {
 		case termbox.EventKey:
 			if tev.Ch == 0 {
 				switch tev.Key {
 				case termbox.KeyEsc:
-					return -1, errors.New("Ok, then.")
+					return -1, false, errors.New("Ok, then.")
 				}
 			}
 			if 97 <= tev.Ch && int(tev.Ch) < 97+l {
-				return int(tev.Ch - 97), nil
+				return int(tev.Ch - 97), false, nil
+			}
+			if tev.Ch == '?' {
+				return -1, true, nil
 			}
 		}
 	}
@@ -854,9 +880,9 @@ func (ui *termui) Death(g *game) {
 
 func (ui *termui) Win(g *game) {
 	if g.Wizard {
-		g.Print("You escape! **WIZARD** -- press esc or space to continue --")
+		g.Print("You escape by the magic stairs! **WIZARD** --press esc or space to continue--")
 	} else {
-		g.Print("You escape! You win. -- press esc or space to continue --")
+		g.Print("You escape by the magic stairs! You win. --press esc or space to continue--")
 	}
 	ui.DrawDungeonView(g)
 	ui.WaitForContinue(g)
