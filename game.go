@@ -59,7 +59,12 @@ func init() {
 }
 
 func (g *game) DataDir() (string, error) {
-	xdg := os.Getenv("XDG_DATA_HOME")
+	var xdg string
+	if os.Getenv("GOOS") == "windows" {
+		xdg = os.Getenv("LOCALAPPDATA")
+	} else {
+		xdg = os.Getenv("XDG_DATA_HOME")
+	}
 	if xdg == "" {
 		xdg = filepath.Join(os.Getenv("HOME"), ".local", "share")
 	}
