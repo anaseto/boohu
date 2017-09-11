@@ -7,7 +7,7 @@ import (
 
 func (g *game) Autoexplore(ev event) error {
 	if mons := g.MonsterInLOS(); mons.Exists() {
-		return fmt.Errorf("You cannot auto-explore while there are monsters are in view.")
+		return fmt.Errorf("You cannot auto-explore while there are monsters in view.")
 	}
 	g.BuildAutoexploreMap()
 	n, _ := g.NextAuto()
