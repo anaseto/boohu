@@ -865,9 +865,9 @@ func (ui *termui) Select(g *game, ev event, l int) (index int, help bool, err er
 			if 97 <= tev.Ch && int(tev.Ch) < 97+l {
 				return int(tev.Ch - 97), false, nil
 			}
-			if tev.Ch == '?' {
-				return -1, true, nil
-			}
+			//if tev.Ch == '?' {
+			//return -1, true, nil
+			//}
 		}
 	}
 }
