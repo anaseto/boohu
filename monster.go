@@ -87,6 +87,10 @@ func (mk monsterKind) Ranged() bool {
 	}
 }
 
+func (mk monsterKind) Desc() string {
+	return monsDesc[mk]
+}
+
 type monsterData struct {
 	movementDelay int
 	baseAttack    int
@@ -114,6 +118,22 @@ var MonsData = []monsterData{
 	MonsSpider:          {8, 7, 10, 12, 17, 0, 15, 's', "spider", 6},
 	MonsLich:            {10, 10, 10, 23, 15, 3, 12, 'L', "lich", 17},
 	MonsEarthDragon:     {10, 14, 10, 40, 14, 7, 8, 'D', "earth dragon", 20},
+}
+
+var monsDesc = []string{
+	MonsGoblin:          "Goblins are little humanoid creatures. They often appear in group.",
+	MonsOgre:            "Ogres are big clunky humanoids that can hit really hard.",
+	MonsCyclop:          "Cyclops are very similar to ogres, but they also like to throw rocks at their foes, sometimes confusing them.",
+	MonsWorm:            "Worms are ugly slow moving creatures, but surprisingly hardy at times.",
+	MonsHound:           "Hounds are fast moving carnivore quadrupeds. They sometimes attack in group.",
+	MonsYack:            "Yacks are quite large herbivorous quadrupeds. They tend to form large groups.",
+	MonsGiantBee:        "Giant Bees are fragile, but extremely fast moving creatures.",
+	MonsGoblinWarrior:   "Goblin warriors are goblins that learned to fight, and got equipped with a leather armour.",
+	MonsHydra:           "Hydras are enormous creatures with several heads that can hit you each at once.",
+	MonsSkeletonWarrior: "Skeleton warriors are good fighters, and are equipped with a chain mail.",
+	MonsSpider:          "Spiders are fast moving fragile creatures, whose bite can confuse you.",
+	MonsLich:            "Liches are non-living mages wearing a leather armour. They can throw a bolt of torment at you.",
+	MonsEarthDragon:     "Earth dragons are big and hardy creatures that wander in the Underground. It is said they are to credit for many tunnels.",
 }
 
 type monsterBand int

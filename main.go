@@ -488,6 +488,15 @@ loop:
 						break
 					}
 				}
+			case 'v', 'd':
+				mons, _ := g.MonsterAt(pos)
+				if mons.Exists() {
+					termbox.HideCursor()
+					ui.DrawMonsterDescription(g, mons)
+					termbox.SetCursor(pos.X, pos.Y)
+				} else {
+					g.Print("Nothing worth of description here.")
+				}
 			case '.':
 				err = targ.Action(g, pos)
 				if err != nil {
@@ -683,6 +692,16 @@ func (ui *termui) DrawPreviousLogs(g *game) {
 	for i := min; i < len(g.Log); i++ {
 		ui.DrawText(g.Log[i], 0, i-min)
 	}
+	termbox.Flush()
+	ui.WaitForContinue(g)
+}
+
+func (ui *termui) DrawMonsterDescription(g *game, mons *monster) {
+	termbox.Clear(ColorFg, ColorBg)
+	s := mons.Kind.Desc()
+	s += " " + fmt.Sprintf("They can hit for up to %d damage.", MonsData[mons.Kind].baseAttack)
+	s += " " + fmt.Sprintf("They have around %d HP.", MonsData[mons.Kind].maxHP)
+	ui.DrawText(formatText(s, 79), 0, 0)
 	termbox.Flush()
 	ui.WaitForContinue(g)
 }
