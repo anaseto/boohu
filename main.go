@@ -367,7 +367,7 @@ func (ui *termui) DescribePosition(g *game, pos position, targ Targetter) {
 		desc = "You do not know what is in there."
 	case !targ.Reachable(g, pos):
 		desc = "This is out of reach."
-	case mons != nil && g.Player.LOS[pos]:
+	case mons.Exists() && g.Player.LOS[pos]:
 		desc += fmt.Sprintf("You see a %s (%s).", mons.Kind, ui.MonsterInfo(mons))
 	case g.Gold[pos] > 0:
 		desc += fmt.Sprintf("You see some gold (%d).", g.Gold[pos])
@@ -730,7 +730,7 @@ func (ui *termui) SelectProjectile(g *game, ev event) error {
 	termbox.Flush()
 	index, noAction := ui.Select(g, ev, len(cs))
 	if noAction == nil {
-		b := ui.ChooseTarget(g, &chooser{})
+		b := ui.ChooseTarget(g, &chooser{single: true})
 		if b {
 			noAction = cs[index].Use(g, ev)
 		} else {

@@ -211,7 +211,7 @@ func (g *game) MovePlayer(pos position, ev event) error {
 			g.ComputeLOS()
 			if g.Autoexploring {
 				mons := g.MonsterInLOS()
-				if mons != nil {
+				if mons.Exists() {
 					g.Print(fmt.Sprintf("You see a %v (%v).", mons.Kind, mons.State))
 				}
 			}

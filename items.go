@@ -270,14 +270,6 @@ func (p projectile) Use(g *game, ev event) error {
 }
 
 func (g *game) ThrowJaveline(mons *monster, ev event) (bool, error) {
-	// XXX This should go in the chooser stuff, perhaps
-	ray := g.Ray(g.Player.Target)
-	for _, pos := range ray {
-		m, _ := g.MonsterAt(pos)
-		if m != nil {
-			mons = m
-		}
-	}
 	hit := false
 	acc := RandInt(g.Player.Accuracy())
 	evasion := RandInt(mons.Evasion)
@@ -306,16 +298,6 @@ func (g *game) ThrowJaveline(mons *monster, ev event) (bool, error) {
 }
 
 func (g *game) ThrowConfusingDart(mons *monster, ev event) (bool, error) {
-	// XXX This should go in the chooser stuff, perhaps
-	ray := g.Ray(g.Player.Target)
-	index := 0
-	for _, pos := range ray {
-		m, i := g.MonsterAt(pos)
-		if m != nil {
-			mons = m
-			index = i
-		}
-	}
 	hit := false
 	acc := RandInt(g.Player.Accuracy())
 	evasion := RandInt(mons.Evasion)
@@ -323,7 +305,7 @@ func (g *game) ThrowConfusingDart(mons *monster, ev event) (bool, error) {
 		mons.Statuses[MonsConfused]++
 		mons.Path = nil
 		heap.Push(g.Events, &monsterEvent{
-			ERank: ev.Rank() + 50 + RandInt(100), NMons: index, EAction: MonsConfusionEnd})
+			ERank: ev.Rank() + 50 + RandInt(100), NMons: mons.Index(g), EAction: MonsConfusionEnd})
 		mons.MakeHuntIfHurt(g)
 		hit = true
 	}

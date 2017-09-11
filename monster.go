@@ -321,7 +321,7 @@ func (m *monster) AlternatePlacement(g *game) *position {
 			continue
 		}
 		mons, _ := g.MonsterAt(pos)
-		if mons != nil {
+		if mons.Exists() {
 			continue
 		}
 		return &pos

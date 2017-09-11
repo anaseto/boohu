@@ -143,7 +143,7 @@ func (g *game) EvokeRodBlink(ev event) error {
 			continue
 		}
 		mons, _ := g.MonsterAt(pos)
-		if mons != nil {
+		if mons.Exists() {
 			continue
 		}
 		losPos = append(losPos, pos)

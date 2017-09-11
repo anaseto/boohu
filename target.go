@@ -38,6 +38,7 @@ type chooser struct {
 	done    bool
 	area    bool
 	minDist bool
+	single  bool
 }
 
 func (ch *chooser) ComputeHighlight(g *game, pos position) {
@@ -64,7 +65,10 @@ func (ch *chooser) Action(g *game, pos position) error {
 	}
 	if c := g.Dungeon.Cell(pos); c.Explored && c.T == FreeCell {
 		mons, _ := g.MonsterAt(pos)
-		if mons != nil {
+		if (ch.area || ch.single) && !ch.freeWay(g, pos) {
+			return errors.New("Invalid target: there are monsters in the way.")
+		}
+		if mons.Exists() {
 			g.Player.Target = pos
 			ch.done = true
 			return nil
@@ -72,22 +76,10 @@ func (ch *chooser) Action(g *game, pos position) error {
 		if !ch.area {
 			return errors.New("You must target a monster.")
 		}
-		ray := g.Ray(pos)
-		tpos := pos
-		for _, rpos := range ray {
-			mons, _ := g.MonsterAt(rpos)
-			if mons == nil {
-				continue
-			}
-			tpos = mons.Pos
-		}
-		if tpos != pos {
-			return errors.New("Invalid target: there are monsters in the way.")
-		}
 		neighbors := g.Dungeon.FreeNeighbors(pos)
 		for _, npos := range neighbors {
 			mons, _ := g.MonsterAt(npos)
-			if mons != nil {
+			if mons.Exists() {
 				g.Player.Target = pos
 				ch.done = true
 				return nil
@@ -103,6 +95,19 @@ func (ch *chooser) Action(g *game, pos position) error {
 
 func (ch *chooser) Done() bool {
 	return ch.done
+}
+
+func (ch *chooser) freeWay(g *game, pos position) bool {
+	ray := g.Ray(pos)
+	tpos := pos
+	for _, rpos := range ray {
+		mons, _ := g.MonsterAt(rpos)
+		if !mons.Exists() {
+			continue
+		}
+		tpos = mons.Pos
+	}
+	return tpos == pos
 }
 
 type wallChooser struct {
@@ -134,7 +139,7 @@ func (ch *wallChooser) Action(g *game, pos position) error {
 	}
 	for _, pos := range ray[1:] {
 		mons, _ := g.MonsterAt(pos)
-		if mons != nil {
+		if mons.Exists() {
 			return errors.New("There are monsters in the way.")
 		}
 	}
