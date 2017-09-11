@@ -200,6 +200,7 @@ type projectile int
 const (
 	Javeline projectile = iota
 	ConfusingDart
+	// unimplemented
 	Net
 )
 
