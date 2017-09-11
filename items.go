@@ -109,7 +109,6 @@ func (p potion) Use(g *game, ev event) error {
 	if err != nil {
 		return err
 	}
-	g.Print(fmt.Sprintf("You quaff a %s.", p))
 	ev.Renew(g, 5)
 	g.UseConsumable(p)
 	return nil
@@ -125,6 +124,7 @@ func (g *game) QuaffTeleportation(ev event) error {
 	delay := 20 + RandInt(30)
 	g.Player.Statuses[StatusTele]++
 	heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + delay, EAction: Teleportation})
+	g.Print(fmt.Sprintf("You quaff a %s. You feel instable.", TeleportationPotion))
 	return nil
 }
 
@@ -134,22 +134,27 @@ func (g *game) QuaffBerserk(ev event) error {
 	}
 	g.Player.Statuses[StatusBerserk]++
 	heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 75, EAction: BerserkEnd})
+	g.Print(fmt.Sprintf("You quaff a %s. You feel a sudden urge to kill things.", BerserkPotion))
 	return nil
 }
 
 func (g *game) QuaffHealWounds(ev event) error {
+	hp := g.Player.HP
 	g.Player.HP += 2 * g.Player.HPMax() / 3
 	if g.Player.HP > g.Player.HPMax() {
 		g.Player.HP = g.Player.HPMax()
 	}
+	g.Print(fmt.Sprintf("You quaff a %s (%d -> %d).", HealWoundsPotion, hp, g.Player.HP))
 	return nil
 }
 
 func (g *game) QuaffMagic(ev event) error {
+	mp := g.Player.MP
 	g.Player.MP += 2 * g.Player.MPMax() / 3
 	if g.Player.MP > g.Player.MPMax() {
 		g.Player.MP = g.Player.MPMax()
 	}
+	g.Print(fmt.Sprintf("You quaff the %s (%d -> %d).", MagicPotion, mp, g.Player.MP))
 	return nil
 }
 
@@ -160,7 +165,7 @@ func (g *game) QuaffDescent(ev event) error {
 	if g.Depth >= g.MaxDepth() {
 		return errors.New("You cannot descend more!")
 	}
-	g.Print("You feel falling through de ground")
+	g.Print(fmt.Sprintf("You quaff the %s. You feel yourself falling through the ground.", DescentPotion))
 	g.Depth++
 	g.InitLevel()
 	g.Save()
@@ -170,18 +175,21 @@ func (g *game) QuaffDescent(ev event) error {
 func (g *game) QuaffHaste(ev event) error {
 	g.Player.Statuses[StatusHaste]++
 	heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 90, EAction: HasteEnd})
+	g.Print(fmt.Sprintf("You quaff the %s. You feel speedy.", RunningPotion))
 	return nil
 }
 
 func (g *game) QuaffEvasion(ev event) error {
 	g.Player.Statuses[StatusEvasion]++
 	heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 100, EAction: EvasionEnd})
+	g.Print(fmt.Sprintf("You quaff the %s. You feel agile.", EvasionPotion))
 	return nil
 }
 
 func (g *game) QuaffLignification(ev event) error {
 	g.Player.Statuses[StatusLignification]++
 	heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 200, EAction: LignificationEnd})
+	g.Print(fmt.Sprintf("You quaff the %s. You feel attuned with the ground.", LignificationPotion))
 	return nil
 }
 
@@ -192,6 +200,7 @@ func (g *game) QuaffMagicMapping(ev event) error {
 			g.Dungeon.SetExplored(pos)
 		}
 	}
+	g.Print(fmt.Sprintf("You quaff the %s. You feel wiser.", MagicMappingPotion))
 	return nil
 }
 
