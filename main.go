@@ -300,7 +300,7 @@ getKey:
 
 func (ui *termui) KeysHelp(g *game) {
 	termbox.Clear(ColorFg, ColorBg)
-	help := `┌────────────── Keys ────────────────────────────────────
+	help := `┌────────────── Keys ────────────────────────────────────────────────────────
 │
 │ Movement: h/j/k/l/y/u/b/n or numpad
 │ Rest: r
@@ -309,7 +309,7 @@ func (ui *termui) KeysHelp(g *game) {
 │ Quaff potion: q or a
 │ Equip weapon/armour/...: e or g
 │ Autoexplore: o
-│ Examine: x (+/> cycle through monsters/stairs, “.” to target)
+│ Examine: x (+/> cycle through monsters/stairs, “.” to target, "d" to describe)
 │ Throw item: t or f (“.” to target)
 │ Evoke rod: v or z (“.” to target)
 │ View Aptitudes: %
@@ -318,7 +318,7 @@ func (ui *termui) KeysHelp(g *game) {
 │ Save and Quit: S
 | Quit without saving: Ctrl-Q
 │
-└──── press esc or space to return to the game ──────────
+└──── press esc or space to return to the game ──────────────────────────────
 `
 	ui.DrawText(help, 0, 0)
 	termbox.Flush()
