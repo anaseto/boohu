@@ -21,8 +21,8 @@ var (
 	ColorBgDark        termbox.Attribute = 235
 	ColorBg            termbox.Attribute = 235
 	ColorBgCloud       termbox.Attribute = 236
-	ColorFgLOS         termbox.Attribute = 12
-	ColorFgDark        termbox.Attribute = 242
+	ColorFgLOS         termbox.Attribute = 242
+	ColorFgDark        termbox.Attribute = 241
 	ColorFg            termbox.Attribute = 246
 	ColorFgPlayer      termbox.Attribute = 34
 	ColorFgMonster     termbox.Attribute = 161
