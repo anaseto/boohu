@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"errors"
 	"flag"
 	"fmt"
@@ -298,32 +299,49 @@ getKey:
 	}
 }
 
-func (ui *termui) KeysHelp(g *game) {
+func (ui *termui) DrawKeysDescription(g *game, actions []string) {
 	termbox.Clear(ColorFg, ColorBg)
-	help := `┌────────────── Keys ────────────────────────────────────────────────────────
-│
-│ Movement: h/j/k/l/y/u/b/n or numpad
-│ Rest: r
-│ Wait: “.” or 5
-│ Use stairs: >
-│ Quaff potion: q or a
-│ Equip weapon/armour/...: e or g
-│ Autoexplore: o
-│ Examine: x (+/> cycle through monsters/stairs, “.” to target, "d" to describe)
-│ Throw item: t or f (“.” to target)
-│ Evoke rod: v or z (“.” to target)
-│ View Aptitudes: %
-│ View previous messages: m
-| Write character dump to file: #
-│ Save and Quit: S
-| Quit without saving: Ctrl-Q
-│
-└──── press esc or space to return to the game ──────────────────────────────
-`
-	ui.DrawText(help, 0, 0)
+	help := &bytes.Buffer{}
+	help.WriteString("┌────────────── Keys ────────────────────────────────────────────────────────\n")
+	help.WriteString("│\n")
+	for i := 0; i < len(actions)-1; i += 2 {
+		fmt.Fprintf(help, "│ %s: %s\n", actions[i], actions[i+1])
+	}
+	help.WriteString("│\n")
+	help.WriteString("└──── press esc or space to return to the game ──────────────────────────────\n")
+	ui.DrawText(help.String(), 0, 0)
 	termbox.Flush()
 	ui.WaitForContinue(g)
-	ui.DrawDungeonView(g)
+}
+
+func (ui *termui) KeysHelp(g *game) {
+	ui.DrawKeysDescription(g, []string{
+		"Movement", "h/j/k/l/y/u/b/n or numpad",
+		"Rest", "r",
+		"Wait", "“.” or 5",
+		"Use stairs", ">",
+		"Quaff potion", "q or a",
+		"Equip weapon/armour/...", "e or g",
+		"Autoexplore", "o",
+		"Examine", "x (? for help)",
+		"Throw item", "t or f (? for help)",
+		"Evoke rod", "v or z (? for help)",
+		"View Aptitudes", "%",
+		"View previous messages", "m",
+		"Write character dump to file", "#",
+		"Save and Quit", "S",
+		"Quit without saving", "Ctrl-Q",
+	})
+}
+
+func (ui *termui) ExamineHelp(g *game) {
+	ui.DrawKeysDescription(g, []string{
+		"Move cursor", "h/j/k/l/y/u/b/n or numpad",
+		"Cycle through monsters", "+",
+		"Cycle through stairs", ">",
+		"Go to/select target", "“.” or enter",
+		"View target description", "v or d",
+	})
 }
 
 func (ui *termui) Equip(g *game, ev event) error {
@@ -501,6 +519,10 @@ loop:
 				} else {
 					g.Print("Nothing worth of description here.")
 				}
+			case '?':
+				termbox.HideCursor()
+				ui.ExamineHelp(g)
+				termbox.SetCursor(pos.X, pos.Y)
 			case '.':
 				err = targ.Action(g, pos)
 				if err != nil {
