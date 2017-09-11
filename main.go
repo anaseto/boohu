@@ -425,10 +425,14 @@ func (ui *termui) CursorAction(g *game, targ Targetter) error {
 	var err error
 	var nstatic position
 	nmonster := 0
+	opos := position{-1, -1}
 loop:
 	for {
 		err = nil
-		ui.DescribePosition(g, pos, targ)
+		if pos != opos {
+			ui.DescribePosition(g, pos, targ)
+		}
+		opos = pos
 		targ.ComputeHighlight(g, pos)
 		termbox.SetCursor(pos.X, pos.Y)
 		ui.DrawDungeonView(g)
