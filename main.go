@@ -277,8 +277,8 @@ getKey:
 			case '?':
 				ui.KeysHelp(g)
 				continue getKey
-			case '%':
-				ui.Aptitudes(g)
+			case '%', 'C':
+				ui.CharacterInfo(g)
 				continue getKey
 			case 'm':
 				ui.DrawPreviousLogs(g)
@@ -334,7 +334,7 @@ func (ui *termui) KeysHelp(g *game) {
 		"Examine", "x (? for help)",
 		"Throw item", "t or f (? for help)",
 		"Evoke rod", "v or z (? for help)",
-		"View Aptitudes", "%",
+		"View Character Information", "%% or C",
 		"View previous messages", "m",
 		"Write character dump to file", "#",
 		"Save and Quit", "S",
@@ -356,15 +356,25 @@ func (ui *termui) Equip(g *game, ev event) error {
 	return g.Equip(ev)
 }
 
-func (ui *termui) Aptitudes(g *game) {
+func (ui *termui) CharacterInfo(g *game) {
 	termbox.Clear(ColorFg, ColorBg)
-	ui.DrawAptitudes(g, 0)
+	b := bytes.Buffer{}
+	b.WriteString(formatText(fmt.Sprintf("You are wielding a %s. %s", g.Player.Weapon, g.Player.Weapon.Desc()), 79))
+	b.WriteString("\n\n")
+	b.WriteString(formatText(fmt.Sprintf("You are wearing a %s. %s", g.Player.Armour, g.Player.Armour.Desc()), 79))
+	b.WriteString("\n\n")
+	if g.Player.Shield != NoShield {
+		b.WriteString(formatText(fmt.Sprintf("You are wearing a %s. %s", g.Player.Armour, g.Player.Armour.Desc()), 79))
+		b.WriteString("\n\n")
+	}
+	b.WriteString(ui.AptitudesText(g))
+	ui.DrawText(b.String(), 0, 0)
 	termbox.Flush()
 	ui.WaitForContinue(g)
 	ui.DrawDungeonView(g)
 }
 
-func (ui *termui) DrawAptitudes(g *game, line int) {
+func (ui *termui) AptitudesText(g *game) string {
 	apts := []string{}
 	for apt, b := range g.Player.Aptitudes {
 		if b {
@@ -373,10 +383,9 @@ func (ui *termui) DrawAptitudes(g *game, line int) {
 	}
 	sort.Strings(apts)
 	if len(apts) > 0 {
-		ui.DrawText("Aptitudes:\n"+strings.Join(apts, "\n"), 0, line)
-	} else {
-		ui.DrawText("You do not have any special aptitudes.", 0, line)
+		return "Aptitudes:\n" + strings.Join(apts, "\n")
 	}
+	return "You do not have any special aptitudes."
 }
 
 func (ui *termui) DescribePosition(g *game, pos position, targ Targetter) {
