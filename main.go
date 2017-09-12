@@ -527,14 +527,7 @@ loop:
 					}
 				}
 			case 'v', 'd':
-				mons, _ := g.MonsterAt(pos)
-				if mons.Exists() {
-					termbox.HideCursor()
-					ui.DrawMonsterDescription(g, mons)
-					termbox.SetCursor(pos.X, pos.Y)
-				} else {
-					g.Print("Nothing worth of description here.")
-				}
+				ui.ViewPositionDescription(g, pos)
 			case '?':
 				termbox.HideCursor()
 				ui.ExamineHelp(g)
@@ -557,6 +550,26 @@ loop:
 	g.Highlight = nil
 	termbox.HideCursor()
 	return err
+}
+
+func (ui *termui) ViewPositionDescription(g *game, pos position) {
+	mons, _ := g.MonsterAt(pos)
+	if mons.Exists() {
+		termbox.HideCursor()
+		ui.DrawMonsterDescription(g, mons)
+		termbox.SetCursor(pos.X, pos.Y)
+	} else if c, ok := g.Collectables[pos]; ok {
+		ui.DrawDescription(g, c.Consumable.Desc())
+	} else if r, ok := g.Rods[pos]; ok {
+		ui.DrawDescription(g, r.Desc())
+	} else if eq, ok := g.Equipables[pos]; ok {
+		ui.DrawDescription(g, eq.Desc())
+	} else if g.Stairs[pos] {
+		ui.DrawDescription(g, "Stairs lead to the next level of the Underground. There's no way back.")
+	} else {
+		g.Print("Nothing worth of description here.")
+	}
+
 }
 
 func (ui *termui) MonsterInfo(m *monster) string {

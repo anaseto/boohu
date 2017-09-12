@@ -256,13 +256,13 @@ func (p projectile) Desc() (text string) {
 	switch p {
 	case Javeline:
 		// XXX
-		text = "It can be thrown to ennemies, dealing up to 11 damage."
+		text = "can be thrown to ennemies, dealing up to 11 damage."
 	case ConfusingDart:
-		text = "It can be thrown to confuse foes."
+		text = "can be thrown to confuse foes. Confused monsters cannot move diagonally."
 	case Net:
-		text = "It can be thrown to emprison your ennemies."
+		text = "can be thrown to emprison your ennemies."
 	}
-	return text
+	return fmt.Sprintf("The %s %s", p, text)
 }
 
 func (p projectile) Letter() rune {
@@ -371,6 +371,7 @@ type equipable interface {
 	Equip(g *game)
 	String() string
 	Letter() rune
+	Desc() string
 }
 
 type armour int
@@ -402,6 +403,21 @@ func (ar armour) String() string {
 		// should not happen
 		return "some piece of armour"
 	}
+}
+
+func (ar armour) Desc() string {
+	var text string
+	switch ar {
+	case Robe:
+		text = "A robe provides no special protection, and will not help you much in your journey."
+	case LeatherArmour:
+		text = "A leather armour provides some protection against blows."
+	case ChainMail:
+		text = "A chain mail provides more protection than a leather armour, but the blows you receive are louder."
+	case PlateArmour:
+		text = "A plate armour provides great protection against blows, but blows you receive are quite noisy."
+	}
+	return text
 }
 
 func (ar armour) Letter() rune {
@@ -446,6 +462,27 @@ func (wp weapon) String() string {
 		// should not happen
 		return "some weapon"
 	}
+}
+
+func (wp weapon) Desc() string {
+	var text string
+	switch wp {
+	case Dagger:
+		text = "A dagger is the most basic weapon. Great against sleeping monsters, but that's all."
+	case Axe:
+		text = "An axe is a one-handed weapon that can hit at once any foes adjacent to you."
+	case BattleAxe:
+		text = "A battle axe is a big two-handed weapon that can hit at once any foes adjacent to you."
+	case Spear:
+		text = "A spear is a one-handed weapon that can hit two opponents in a row at once. Useful in corridors."
+	case Halberd:
+		text = "An halberd is a big two-handed weapon that can hit two opponents in a row at once. Useful in corridors."
+	case Sword:
+		text = "A sword is a one-handed weapon that occasionally gets additional free hits."
+	case DoubleSword:
+		text = "A double sword is a big two-handed weapon that occasionally gets additional free hits."
+	}
+	return fmt.Sprintf("%s It can hit up to %d damage.", text, wp.Attack())
 }
 
 func (wp weapon) Attack() int {
@@ -516,6 +553,16 @@ func (sh shield) String() (text string) {
 		text = "buckler"
 	case Shield:
 		text = "shield"
+	}
+	return text
+}
+
+func (sh shield) Desc() (text string) {
+	switch sh {
+	case Buckler:
+		text = "A buckler is a small shield that can sometimes block attacks, including some magical attacks. You cannot use it if you are wielding a two-handed weapon."
+	case Shield:
+		text = "A shield can block attacks, including some magical attacks. You cannot use it if you are wielding a two-handed weapon."
 	}
 	return text
 }
