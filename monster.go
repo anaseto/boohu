@@ -499,7 +499,11 @@ func (m *monster) RangedAttack(g *game, ev event) bool {
 	if !m.Kind.Ranged() {
 		return false
 	}
-	if m.Pos.Distance(g.Player.Pos) <= 1 || m.Pos.Distance(g.Player.Pos) > 5 || !g.Player.LOS[m.Pos] {
+	rdist := 5
+	if g.Player.Aptitudes[AptStealthyLOS] {
+		rdist = 4
+	}
+	if m.Pos.Distance(g.Player.Pos) <= 1 || m.Pos.Distance(g.Player.Pos) > rdist || !g.Player.LOS[m.Pos] {
 		return false
 	}
 	if m.Status(MonsExhausted) {
