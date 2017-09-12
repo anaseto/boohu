@@ -467,6 +467,14 @@ loop:
 			npos := pos
 			if tev.Ch == 0 {
 				switch tev.Key {
+				case termbox.KeyArrowUp:
+					tev.Ch = 'k'
+				case termbox.KeyArrowRight:
+					tev.Ch = 'l'
+				case termbox.KeyArrowDown:
+					tev.Ch = 'j'
+				case termbox.KeyArrowLeft:
+					tev.Ch = 'h'
 				case termbox.KeyEsc:
 					break loop
 				case termbox.KeyEnter:
