@@ -304,6 +304,13 @@ func (g *game) Print(s string) {
 	}
 }
 
+func (g *game) Printf(format string, a ...interface{}) {
+	g.Log = append(g.Log, fmt.Sprintf(format, a...))
+	if len(g.Log) > 1000 {
+		g.Log = g.Log[500:]
+	}
+}
+
 type Renderer interface {
 	AutoExploreStep(*game)
 	HandlePlayerTurn(*game, event) bool

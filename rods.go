@@ -224,7 +224,7 @@ func (g *game) EvokeRodTeleportOther(ev event) error {
 		mons.Target = mons.Pos
 	}
 	mons.Pos = pos
-	g.Print(fmt.Sprintf("The %s teleports away.", mons.Kind))
+	g.Printf("The %s teleports away.", mons.Kind)
 	return nil
 }
 
@@ -241,7 +241,7 @@ func (g *game) EvokeRodLightningBolt(ev event) error {
 		}
 		mons.HP -= RandInt(21)
 		if mons.HP <= 0 {
-			g.Print(fmt.Sprintf("A %s is killed by the bolt.", mons.Kind))
+			g.Printf("A %s is killed by the bolt.", mons.Kind)
 			g.Killed++
 		}
 		g.MakeNoise(12, mons.Pos)
@@ -263,7 +263,7 @@ func (g *game) EvokeRodFireball(ev event) error {
 		}
 		mons.HP -= RandInt(21)
 		if mons.HP <= 0 {
-			g.Print(fmt.Sprintf("A %s is killed by the fireball.", mons.Kind))
+			g.Printf("A %s is killed by the fireball.", mons.Kind)
 			g.Killed++
 		}
 		g.MakeNoise(12, mons.Pos)
@@ -334,7 +334,7 @@ func (g *game) EvokeRodShatter(ev event) error {
 		}
 		mons.HP -= RandInt(30)
 		if mons.HP <= 0 {
-			g.Print(fmt.Sprintf("A %s is killed by the explosion.", mons.Kind))
+			g.Printf("A %s is killed by the explosion.", mons.Kind)
 			g.Killed++
 		}
 		g.MakeNoise(12, mons.Pos)

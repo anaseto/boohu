@@ -1,9 +1,6 @@
 package main
 
-import (
-	"container/heap"
-	"fmt"
-)
+import "container/heap"
 
 type monsterState int
 
@@ -476,7 +473,7 @@ func (m *monster) HitPlayer(g *game, ev event) {
 	acc := RandInt(m.Accuracy)
 	if acc > evasion {
 		if m.Blocked(g) {
-			g.Print(fmt.Sprintf("You block the %s's attack with your %s.", m.Kind, g.Player.Shield))
+			g.Printf("You block the %s's attack with your %s.", m.Kind, g.Player.Shield)
 			return
 		}
 		noise := 12
@@ -484,14 +481,14 @@ func (m *monster) HitPlayer(g *game, ev event) {
 		g.MakeNoise(noise, g.Player.Pos)
 		attack := g.HitDamage(m.Attack, g.Player.Armor())
 		g.Player.HP -= attack
-		g.Print(fmt.Sprintf("The %s hits you (%d damage).", m.Kind, attack))
+		g.Printf("The %s hits you (%d damage).", m.Kind, attack)
 		if m.Kind == MonsSpider && RandInt(2) == 0 {
 			g.Player.Statuses[StatusConfusion]++
 			heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 100 + RandInt(100), EAction: ConfusionEnd})
 			g.Print("You feel confused.")
 		}
 	} else {
-		g.Print(fmt.Sprintf("The %s misses you.", m.Kind))
+		g.Printf("The %s misses you.", m.Kind)
 	}
 }
 
@@ -554,9 +551,9 @@ func (m *monster) TormentBolt(g *game, ev event) bool {
 	if hit {
 		g.MakeNoise(12, g.Player.Pos)
 		g.Player.HP = g.Player.HP / 2
-		g.Print(fmt.Sprintf("The %s throws a bolt of torment at you.", m.Kind))
+		g.Printf("The %s throws a bolt of torment at you.", m.Kind)
 	} else {
-		g.Print(fmt.Sprintf("You block the %s's bolt of torment.", m.Kind))
+		g.Printf("You block the %s's bolt of torment.", m.Kind)
 	}
 	m.Statuses[MonsExhausted]++
 	heap.Push(g.Events, &monsterEvent{ERank: ev.Rank() + 100 + RandInt(150), NMons: m.Index(g), EAction: MonsExhaustionEnd})
@@ -607,14 +604,14 @@ func (m *monster) ThrowRock(g *game, ev event) bool {
 		g.MakeNoise(noise, g.Player.Pos)
 		attack := g.HitDamage(15, g.Player.Armor())
 		g.Player.HP -= attack
-		g.Print(fmt.Sprintf("The %s throws a rock at you (%d damage).", m.Kind, attack))
+		g.Printf("The %s throws a rock at you (%d damage).", m.Kind, attack)
 		if RandInt(4) == 0 {
 			g.Player.Statuses[StatusConfusion]++
 			heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 100 + RandInt(100), EAction: ConfusionEnd})
 			g.Print("You feel confused.")
 		}
 	} else {
-		g.Print(fmt.Sprintf("You block the %s's rock.", m.Kind))
+		g.Printf("You block the %s's rock.", m.Kind)
 	}
 	ev.Renew(g, 2*m.Kind.AttackDelay())
 	return true
@@ -625,7 +622,7 @@ func (m *monster) MakeHuntIfHurt(g *game) {
 		m.Target = g.Player.Pos
 		m.State = Hunting
 		if m.State == Resting {
-			g.Print(fmt.Sprintf("The %s awakes.", m.Kind))
+			g.Printf("The %s awakes.", m.Kind)
 		}
 	}
 }
@@ -650,10 +647,10 @@ func (m *monster) MakeAware(g *game) {
 		}
 	}
 	if m.State == Resting {
-		g.Print(fmt.Sprintf("The %s awakes.", m.Kind))
+		g.Printf("The %s awakes.", m.Kind)
 	}
 	if m.State == Wandering {
-		g.Print(fmt.Sprintf("The %s notices you.", m.Kind))
+		g.Printf("The %s notices you.", m.Kind)
 	}
 	m.Target = g.Player.Pos
 	m.State = Hunting

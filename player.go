@@ -201,18 +201,18 @@ func (g *game) MovePlayer(pos position, ev event) error {
 			if c, ok := g.Collectables[pos]; ok && c != nil {
 				g.Player.Consumables[c.Consumable] += c.Quantity
 				delete(g.Collectables, pos)
-				g.Print(fmt.Sprintf("You take a %s.", c.Consumable))
+				g.Printf("You take a %s.", c.Consumable)
 			}
 			if r, ok := g.Rods[pos]; ok {
 				g.Player.Rods[r] = &rodProps{Charge: r.MaxCharge() - 1}
 				delete(g.Rods, pos)
-				g.Print(fmt.Sprintf("You take a %s.", r))
+				g.Printf("You take a %s.", r)
 			}
 			g.ComputeLOS()
 			if g.Autoexploring {
 				mons := g.MonsterInLOS()
 				if mons.Exists() {
-					g.Print(fmt.Sprintf("You see a %v (%v).", mons.Kind, mons.State))
+					g.Printf("You see a %v (%v).", mons.Kind, mons.State)
 				}
 			}
 			g.MakeMonstersAware()
@@ -291,14 +291,14 @@ func (g *game) HitMonster(mons *monster) {
 		}
 		mons.HP -= attack
 		if mons.HP > 0 {
-			g.Print(fmt.Sprintf("You hit the %v (%d damage).", mons.Kind, attack))
+			g.Printf("You hit the %v (%d damage).", mons.Kind, attack)
 		} else {
-			g.Print(fmt.Sprintf("You kill the %v (%d damage).", mons.Kind, attack))
+			g.Printf("You kill the %v (%d damage).", mons.Kind, attack)
 			g.Killed++
 		}
 		mons.MakeHuntIfHurt(g)
 	} else {
-		g.Print(fmt.Sprintf("You miss the %v.", mons.Kind))
+		g.Printf("You miss the %v.", mons.Kind)
 	}
 }
 
