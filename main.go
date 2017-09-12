@@ -533,7 +533,9 @@ loop:
 					}
 				}
 			case 'v', 'd':
+				termbox.HideCursor()
 				ui.ViewPositionDescription(g, pos)
+				termbox.SetCursor(pos.X, pos.Y)
 			case '?':
 				termbox.HideCursor()
 				ui.ExamineHelp(g)
