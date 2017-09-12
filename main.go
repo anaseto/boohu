@@ -220,9 +220,6 @@ getKey:
 					continue getKey
 				case termbox.KeyCtrlP:
 					tev.Ch = 'm'
-					//case termbox.KeyCtrlB:
-					//ioutil.WriteFile("/tmp/roguedebug", []byte(fmt.Sprintf("%+v\n", g)), 0644)
-					//continue getKey
 				}
 			}
 			switch tev.Ch {
