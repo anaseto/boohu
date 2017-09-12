@@ -482,7 +482,7 @@ func (wp weapon) Desc() string {
 	case DoubleSword:
 		text = "A double sword is a big two-handed weapon that occasionally gets additional free hits."
 	}
-	return fmt.Sprintf("%s It can hit up to %d damage.", text, wp.Attack())
+	return fmt.Sprintf("%s It can hit for up to %d damage.", text, wp.Attack())
 }
 
 func (wp weapon) Attack() int {
