@@ -62,6 +62,33 @@ func (r rod) String() string {
 	return text
 }
 
+func (r rod) Desc() string {
+	var text string
+	switch r {
+	case RodDigging:
+		text = "digs through walls."
+	case RodBlink:
+		text = "makes you blink away within your line of sight."
+	case RodTeleportOther:
+		text = "teleports away one of your foes."
+	case RodFog:
+		text = "creates a dense fog that reduces your (and monster's) line of sight."
+	case RodFireball:
+		text = "throws a 1-radius fireball at your foes."
+	case RodLightningBolt:
+		text = "throws a lightning bolt through one or more ennemies."
+	case RodShatter:
+		text = "induces an explosion around a wall. The wall can disintegrate."
+	case RodFear:
+		text = "TODO"
+	case RodFreezingClouds:
+		text = "TODO"
+	case RodConfusingClouds:
+		text = "TODO"
+	}
+	return fmt.Sprintf("The %s %s", r, text)
+}
+
 type rodProps struct {
 	Charge int
 }

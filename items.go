@@ -72,27 +72,27 @@ func (p potion) String() (text string) {
 func (p potion) Desc() (text string) {
 	switch p {
 	case HealWoundsPotion:
-		text = "It heals you a good deal."
+		text = "heals you a good deal."
 	case TeleportationPotion:
-		text = "It teleports you away after a short delay."
+		text = "teleports you away after a short delay."
 	case DescentPotion:
-		text = "It makes you go to deeper in the Underground."
+		text = "makes you go to deeper in the Underground."
 	case EvasionPotion:
-		text = "It makes you better at avoiding blows."
+		text = "makes you better at avoiding blows."
 	case MagicMappingPotion:
-		text = "It shows you the map."
+		text = "shows you the map."
 	case MagicPotion:
-		text = "It replenishes your magical reserves."
+		text = "replenishes your magical reserves."
 	case BerserkPotion:
-		text = "It makes you enter a crazy rage. You cannot drink potions while berserk, and afterwards it leaves you slow and exhausted."
+		text = "makes you enter a crazy rage. You cannot drink potions while berserk, and afterwards it leaves you slow and exhausted."
 	case RunningPotion:
-		text = "It makes you move faster."
+		text = "makes you move faster."
 	case LignificationPotion:
-		text = "It makes you more resistant to physical blows, but you are attached to the ground while the effect lasts."
+		text = "makes you more resistant to physical blows, but you are attached to the ground while the effect lasts."
 	case ResistancePotion:
-		text = "It makes you resistent to the elements."
+		text = "makes you resistent to the elements."
 	}
-	return text
+	return fmt.Sprintf("The %s %s", p, text)
 }
 
 func (p potion) Letter() rune {

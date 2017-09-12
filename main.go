@@ -784,75 +784,103 @@ func (sts statusSlice) Swap(i, j int)      { sts[i], sts[j] = sts[j], sts[i] }
 func (sts statusSlice) Less(i, j int) bool { return sts[i] < sts[j] }
 
 func (ui *termui) SelectProjectile(g *game, ev event) error {
-	termbox.Clear(ColorFg, ColorBg)
-	cs := g.SortedProjectiles()
-	ui.DrawText("Use which item?", 0, 0)
-	for i, c := range cs {
-		ui.DrawText(fmt.Sprintf("%c - %s (%d available)", rune(i+97), c, g.Player.Consumables[c]), 0, i+1)
-	}
-	termbox.Flush()
-	index, _, noAction := ui.Select(g, ev, len(cs))
-	if noAction == nil {
-		b := ui.ChooseTarget(g, &chooser{single: true})
-		if b {
-			noAction = cs[index].Use(g, ev)
+	desc := false
+	for {
+		termbox.Clear(ColorFg, ColorBg)
+		cs := g.SortedProjectiles()
+		if desc {
+			ui.DrawText("Describe which projectile? (press ? for throwing menu)", 0, 0)
 		} else {
-			noAction = errors.New("Ok, then.")
+			ui.DrawText("Throw which projectile? (press ? for description menu)", 0, 0)
 		}
+		for i, c := range cs {
+			ui.DrawText(fmt.Sprintf("%c - %s (%d available)", rune(i+97), c, g.Player.Consumables[c]), 0, i+1)
+		}
+		termbox.Flush()
+		index, alternate, noAction := ui.Select(g, ev, len(cs))
+		if alternate {
+			desc = !desc
+			continue
+		}
+		if noAction == nil {
+			if desc {
+				ui.DrawDescription(g, cs[index].Desc())
+				continue
+			}
+			b := ui.ChooseTarget(g, &chooser{single: true})
+			if b {
+				noAction = cs[index].Use(g, ev)
+			} else {
+				noAction = errors.New("Ok, then.")
+			}
+		}
+		return noAction
 	}
-	ui.DrawDungeonView(g)
-	return noAction
 }
 
 func (ui *termui) SelectPotion(g *game, ev event) error {
-	termbox.Clear(ColorFg, ColorBg)
-	cs := g.SortedPotions()
-	ui.DrawText("Drink which potion?", 0, 0)
-	for i, c := range cs {
-		ui.DrawText(fmt.Sprintf("%c - %s (%d available)", rune(i+97), c, g.Player.Consumables[c]), 0, i+1)
+	desc := false
+	for {
+		termbox.Clear(ColorFg, ColorBg)
+		cs := g.SortedPotions()
+		if desc {
+			ui.DrawText("Describe which potion? (press ? for quaff menu)", 0, 0)
+		} else {
+			ui.DrawText("Drink which potion? (press ? for describe menu)", 0, 0)
+		}
+		for i, c := range cs {
+			ui.DrawText(fmt.Sprintf("%c - %s (%d available)", rune(i+97), c, g.Player.Consumables[c]), 0, i+1)
+		}
+		termbox.Flush()
+		index, alternate, noAction := ui.Select(g, ev, len(cs))
+		if alternate {
+			desc = !desc
+			continue
+		}
+		if noAction == nil {
+			if desc {
+				ui.DrawDescription(g, cs[index].Desc())
+				continue
+			}
+			noAction = cs[index].Use(g, ev)
+		}
+		return noAction
 	}
-	termbox.Flush()
-	index, _, noAction := ui.Select(g, ev, len(cs))
-	if noAction == nil {
-		noAction = cs[index].Use(g, ev)
-	}
-	ui.DrawDungeonView(g)
-	return noAction
 }
-
-// func (ui *termui) DescribePotion(g *game, ev event) error {
-// 	termbox.Clear(ColorFg, ColorBg)
-// 	cs := g.SortedPotions()
-// 	ui.DrawText("Describe which potion?", 0, 0)
-// 	for i, c := range cs {
-// 		ui.DrawText(fmt.Sprintf("%c - %s (%d available)", rune(i+97), c, g.Player.Consumables[c]), 0, i+1)
-// 	}
-// 	termbox.Flush()
-// 	index, _, noAction := ui.Select(g, ev, len(cs))
-// 	if noAction == nil {
-// 		noAction = cs[index].Desc()
-// 	}
-// 	return noAction
-// }
 
 func (ui *termui) SelectRod(g *game, ev event) error {
-	termbox.Clear(ColorFg, ColorBg)
-	rs := g.SortedRods()
-	ui.DrawText("Evoke which rod?", 0, 0)
-	for i, c := range rs {
-		ui.DrawText(fmt.Sprintf("%c - %s (%d/%d charges, %d mana cost)",
-			rune(i+97), c, g.Player.Rods[c].Charge, c.MaxCharge(), c.MPCost()), 0, i+1)
+	desc := false
+	for {
+		termbox.Clear(ColorFg, ColorBg)
+		rs := g.SortedRods()
+		if desc {
+			ui.DrawText("Describe which rod? (press ? for evocation menu)", 0, 0)
+		} else {
+			ui.DrawText("Evoke which rod? (press ? for description menu)", 0, 0)
+		}
+		for i, c := range rs {
+			ui.DrawText(fmt.Sprintf("%c - %s (%d/%d charges, %d mana cost)",
+				rune(i+97), c, g.Player.Rods[c].Charge, c.MaxCharge(), c.MPCost()), 0, i+1)
+		}
+		termbox.Flush()
+		index, alternate, noAction := ui.Select(g, ev, len(rs))
+		if alternate {
+			desc = !desc
+			continue
+		}
+		if noAction == nil {
+			if desc {
+				ui.DrawDescription(g, rs[index].Desc())
+				continue
+			}
+			noAction = rs[index].Use(g, ev)
+		}
+		ui.DrawDungeonView(g)
+		return noAction
 	}
-	termbox.Flush()
-	index, _, noAction := ui.Select(g, ev, len(rs))
-	if noAction == nil {
-		noAction = rs[index].Use(g, ev)
-	}
-	ui.DrawDungeonView(g)
-	return noAction
 }
 
-func (ui *termui) Select(g *game, ev event, l int) (index int, help bool, err error) {
+func (ui *termui) Select(g *game, ev event, l int) (index int, alternate bool, err error) {
 	for {
 		switch tev := termbox.PollEvent(); tev.Type {
 		case termbox.EventKey:
@@ -865,9 +893,9 @@ func (ui *termui) Select(g *game, ev event, l int) (index int, help bool, err er
 			if 97 <= tev.Ch && int(tev.Ch) < 97+l {
 				return int(tev.Ch - 97), false, nil
 			}
-			//if tev.Ch == '?' {
-			//return -1, true, nil
-			//}
+			if tev.Ch == '?' {
+				return -1, true, nil
+			}
 		}
 	}
 }
