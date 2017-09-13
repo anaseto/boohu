@@ -766,9 +766,9 @@ loop:
 		for i := n; i < to; i++ {
 			ui.DrawText(g.Log[i], 0, i-n)
 		}
-		s := fmt.Sprintf("──────────(%d/%d)──press esc or space to return to game─────────────────────────\n", len(g.Log)-to, len(g.Log))
+		s := fmt.Sprintf("─────────(%d/%d)───────────────────────────────────────────────────────────────\n", len(g.Log)-to, len(g.Log))
 		ui.DrawText(s, 0, to-n)
-		ui.DrawText("Keys: half-page up (u), half-page down (d)", 0, to+1-n)
+		ui.DrawText("Keys: half-page up (u), half-page down (d), quit (esc or space)", 0, to+1-n)
 		termbox.Flush()
 		switch tev := termbox.PollEvent(); tev.Type {
 		case termbox.EventKey:
