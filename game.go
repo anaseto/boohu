@@ -272,7 +272,10 @@ func (g *game) SimplifedDump() string {
 	fmt.Fprintf(buf, "You killed %d monsters.\n", g.Killed)
 	fmt.Fprintf(buf, "You spent %.1f turns in the Underground.\n", float64(g.Turn)/10)
 	fmt.Fprintf(buf, "\n")
-	fmt.Fprintf(buf, "Full dump written to file.")
+	dataDir, err := g.DataDir()
+	if err == nil {
+		fmt.Fprintf(buf, "Full dump written to %s.\n", filepath.Join(dataDir, "dump"))
+	}
 	fmt.Fprintf(buf, "\n\n")
 	fmt.Fprintf(buf, "───Press esc or space to quit───")
 	return buf.String()

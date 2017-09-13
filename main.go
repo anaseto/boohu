@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"path/filepath"
 	"sort"
 	"strings"
 	"time"
@@ -289,7 +290,8 @@ getKey:
 				if err != nil {
 					g.Print("Error writting dump to file.")
 				} else {
-					g.Print("Dump written to file.")
+					dataDir, _ := g.DataDir()
+					g.Printf("Dump written to %s.", filepath.Join(dataDir, "dump"))
 				}
 				continue getKey
 			default:
@@ -972,8 +974,8 @@ func (ui *termui) Death(g *game) {
 	ui.DrawDungeonView(g)
 	ui.WaitForContinue(g)
 	ui.Dump(g)
-	ui.WaitForContinue(g)
 	g.WriteDump()
+	ui.WaitForContinue(g)
 }
 
 func (ui *termui) Win(g *game) {
@@ -985,8 +987,8 @@ func (ui *termui) Win(g *game) {
 	ui.DrawDungeonView(g)
 	ui.WaitForContinue(g)
 	ui.Dump(g)
-	ui.WaitForContinue(g)
 	g.WriteDump()
+	ui.WaitForContinue(g)
 }
 
 func (ui *termui) Dump(g *game) {
