@@ -25,6 +25,7 @@ func (g *game) UseConsumable(c consumable) {
 	if g.Player.Consumables[c] <= 0 {
 		delete(g.Player.Consumables, c)
 	}
+	g.FairAction()
 }
 
 type potion int
@@ -201,21 +202,21 @@ func (g *game) QuaffDescent(ev event) error {
 
 func (g *game) QuaffHaste(ev event) error {
 	g.Player.Statuses[StatusHaste]++
-	heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 90, EAction: HasteEnd})
+	heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 80 + RandInt(20), EAction: HasteEnd})
 	g.Printf("You quaff the %s. You feel speedy.", RunningPotion)
 	return nil
 }
 
 func (g *game) QuaffEvasion(ev event) error {
 	g.Player.Statuses[StatusEvasion]++
-	heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 100, EAction: EvasionEnd})
+	heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 90 + RandInt(20), EAction: EvasionEnd})
 	g.Printf("You quaff the %s. You feel agile.", EvasionPotion)
 	return nil
 }
 
 func (g *game) QuaffLignification(ev event) error {
 	g.Player.Statuses[StatusLignification]++
-	heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 200, EAction: LignificationEnd})
+	heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 150 + RandInt(100), EAction: LignificationEnd})
 	g.Printf("You quaff the %s. You feel attuned with the ground.", LignificationPotion)
 	return nil
 }
@@ -290,7 +291,6 @@ func (p projectile) Use(g *game, ev event) error {
 	case ConfusingDart:
 		g.ThrowConfusingDart(mons, ev)
 	}
-	g.FairAction()
 	g.UseConsumable(p)
 	return nil
 }

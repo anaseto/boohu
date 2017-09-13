@@ -1,6 +1,7 @@
 package main
 
 import (
+	"container/heap"
 	"errors"
 	"fmt"
 )
@@ -112,17 +113,23 @@ func (g *game) MoveToTarget(ev event) bool {
 
 func (g *game) WaitTurn(ev event) {
 	// XXX Really wait for 10 ?
-	g.ScummingAction()
+	g.ScummingAction(ev)
 	ev.Renew(g, 10)
 }
 
-func (g *game) ScummingAction() {
+func (g *game) ScummingAction(ev event) {
 	if g.Player.HP == g.Player.HPMax() {
 		g.Scumming++
 	}
-	if g.Scumming > 100 {
+	if g.Scumming == 100 {
+		g.Print("You feel a little bored.")
+	}
+	if g.Scumming > 120 {
 		g.MakeNoise(100, g.Player.Pos)
-		g.Print("You hear a terrible noise. Monters come. You feel you should get out of there.")
+		g.Print("You hear a terrible explosion coming from the ground. You are lignified.")
+		g.Player.Statuses[StatusLignification]++
+		g.Player.HP = g.Player.HP / 2
+		heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 240 + RandInt(10), EAction: LignificationEnd})
 		g.Scumming = 0
 	}
 }
@@ -233,8 +240,9 @@ func (g *game) MovePlayer(pos position, ev event) error {
 				if mons.Exists() {
 					g.Printf("You see a %v (%v).", mons.Kind, mons.State)
 				}
+				g.FairAction()
 			} else {
-				g.ScummingAction()
+				g.ScummingAction(ev)
 			}
 			g.MakeMonstersAware()
 			if g.Player.Aptitudes[AptFast] {
