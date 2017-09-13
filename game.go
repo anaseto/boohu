@@ -45,6 +45,7 @@ type game struct {
 	Log                 []string
 	Turn                int
 	Killed              int
+	Scumming            int
 }
 
 func init() {

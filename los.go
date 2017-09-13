@@ -87,6 +87,7 @@ func (g *game) ComputeLOS() {
 					g.AutoHalt = true
 					g.Printf("You see a %s.", rod)
 				}
+				g.FairAction()
 			}
 			g.Dungeon.SetExplored(pos)
 		}

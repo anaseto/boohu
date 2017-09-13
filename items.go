@@ -290,6 +290,7 @@ func (p projectile) Use(g *game, ev event) error {
 	case ConfusingDart:
 		g.ThrowConfusingDart(mons, ev)
 	}
+	g.FairAction()
 	g.UseConsumable(p)
 	return nil
 }

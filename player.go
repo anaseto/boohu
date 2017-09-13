@@ -112,14 +112,33 @@ func (g *game) MoveToTarget(ev event) bool {
 
 func (g *game) WaitTurn(ev event) {
 	// XXX Really wait for 10 ?
+	g.ScummingAction()
 	ev.Renew(g, 10)
+}
+
+func (g *game) ScummingAction() {
+	if g.Player.HP == g.Player.HPMax() {
+		g.Scumming++
+	}
+	if g.Scumming > 100 {
+		g.MakeNoise(100, g.Player.Pos)
+		g.Print("You hear a terrible noise. Monters come. You feel you should get out of there.")
+		g.Scumming = 0
+	}
+}
+
+func (g *game) FairAction() {
+	g.Scumming -= 10
+	if g.Scumming < 0 {
+		g.Scumming = 0
+	}
 }
 
 func (g *game) Rest(ev event) error {
 	if g.MonsterInLOS() != nil {
 		return fmt.Errorf("You cannot sleep while monsters are in view.")
 	}
-	if g.Player.HP == g.Player.HPMax() && !g.Player.HasStatus(StatusExhausted) {
+	if g.Player.HP == g.Player.HPMax() && g.Player.MP == g.Player.MPMax() && !g.Player.HasStatus(StatusExhausted) {
 		return errors.New("You do not need to rest.")
 	}
 	g.WaitTurn(ev)
@@ -214,6 +233,8 @@ func (g *game) MovePlayer(pos position, ev event) error {
 				if mons.Exists() {
 					g.Printf("You see a %v (%v).", mons.Kind, mons.State)
 				}
+			} else {
+				g.ScummingAction()
 			}
 			g.MakeMonstersAware()
 			if g.Player.Aptitudes[AptFast] {
@@ -225,6 +246,7 @@ func (g *game) MovePlayer(pos position, ev event) error {
 				delay -= 3
 			}
 		} else {
+			g.FairAction()
 			g.AttackMonster(mons)
 		}
 	}
