@@ -578,7 +578,7 @@ func (g *game) InitLevel() {
 		g.Print("You're in Hareka's Underground. Good luck! Press ? for help.")
 	}
 	if g.Depth == g.MaxDepth() {
-		g.Print("You feel you are close to escaping.")
+		g.Print("You feel magic in the air. The way out is close.")
 	}
 	g.ComputeLOS()
 	g.MakeMonstersAware()
