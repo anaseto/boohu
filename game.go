@@ -346,6 +346,15 @@ func (g *game) FreeCell() position {
 	}
 }
 
+func (g *game) FreeCellForImportantStair() position {
+	for {
+		pos := g.FreeCellForStatic()
+		if pos.Distance(g.Player.Pos) > 12 {
+			return pos
+		}
+	}
+}
+
 func (g *game) FreeCellForStatic() position {
 	m := g.Dungeon
 	count := 0
@@ -544,9 +553,16 @@ func (g *game) InitLevel() {
 	nstairs := 1 + RandInt(3)
 	if g.Depth == g.MaxDepth() {
 		nstairs = 1
+	} else if g.Depth == g.MaxDepth()-1 && nstairs > 2 {
+		nstairs = 2
 	}
 	for i := 0; i < nstairs; i++ {
-		pos := g.FreeCellForStatic()
+		var pos position
+		if g.Depth > 9 {
+			pos = g.FreeCellForImportantStair()
+		} else {
+			pos = g.FreeCellForStatic()
+		}
 		g.Stairs[pos] = true
 	}
 
