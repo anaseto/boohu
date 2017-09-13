@@ -747,16 +747,49 @@ func (ui *termui) DrawLog(g *game) {
 }
 
 func (ui *termui) DrawPreviousLogs(g *game) {
-	termbox.Clear(ColorFg, ColorBg)
-	min := len(g.Log) - 25
-	if min < 0 {
-		min = 0
+	lines := 23
+	nmax := len(g.Log) - lines
+	n := nmax
+loop:
+	for {
+		termbox.Clear(ColorFg, ColorBg)
+		if n >= nmax {
+			n = nmax
+		}
+		if n < 0 {
+			n = 0
+		}
+		to := n + lines
+		if to >= len(g.Log) {
+			to = len(g.Log)
+		}
+		for i := n; i < to; i++ {
+			ui.DrawText(g.Log[i], 0, i-n)
+		}
+		s := fmt.Sprintf("──────────(%d/%d)──press esc or space to return to game─────────────────────────\n", len(g.Log)-to, len(g.Log))
+		ui.DrawText(s, 0, to-n)
+		ui.DrawText("Keys: half-page up (u), half-page down (d)", 0, to+1-n)
+		termbox.Flush()
+		switch tev := termbox.PollEvent(); tev.Type {
+		case termbox.EventKey:
+			if tev.Ch == 0 {
+				switch tev.Key {
+				case termbox.KeyEsc, termbox.KeySpace:
+					break loop
+				}
+			}
+			switch tev.Ch {
+			case 'u':
+				n -= 12
+			case 'd':
+				n += 12
+			case 'j':
+				n++
+			case 'k':
+				n--
+			}
+		}
 	}
-	for i := min; i < len(g.Log); i++ {
-		ui.DrawText(g.Log[i], 0, i-min)
-	}
-	termbox.Flush()
-	ui.WaitForContinue(g)
 }
 
 func (ui *termui) DrawMonsterDescription(g *game, mons *monster) {
