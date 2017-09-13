@@ -162,6 +162,9 @@ func (r rod) Use(g *game, ev event) error {
 }
 
 func (g *game) EvokeRodBlink(ev event) error {
+	if g.Player.HasStatus(StatusLignification) {
+		return errors.New("You cannot blink while lignified.")
+	}
 	losPos := []position{}
 	for pos, b := range g.Player.LOS {
 		if !b {
