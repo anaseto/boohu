@@ -254,6 +254,61 @@ func (g *game) Dump() string {
 	fmt.Fprintf(buf, "You collected %d gold coins.\n", g.Player.Gold)
 	fmt.Fprintf(buf, "You killed %d monsters.\n", g.Killed)
 	fmt.Fprintf(buf, "You spent %.1f turns in the Underground.\n", float64(g.Turn)/10)
+	fmt.Fprintf(buf, "\n")
+	fmt.Fprintf(buf, "Last messages:\n")
+	for i := len(g.Log) - 10; i < len(g.Log) && i >= 0; i++ {
+		fmt.Fprintf(buf, "%s\n", g.Log[i])
+	}
+	fmt.Fprintf(buf, "\n")
+	fmt.Fprintf(buf, "Dungeon:\n")
+	fmt.Fprintf(buf, "\n")
+	buf.WriteString(g.DumpDungeon())
+	return buf.String()
+}
+
+func (g *game) DumpDungeon() string {
+	buf := bytes.Buffer{}
+	for i, c := range g.Dungeon.Cells {
+		if i%g.Dungeon.Width == 0 {
+			buf.WriteRune('\n')
+		}
+		pos := g.Dungeon.CellPosition(i)
+		if !c.Explored {
+			buf.WriteRune(' ')
+			continue
+		}
+		var r rune
+		switch c.T {
+		case WallCell:
+			r = '#'
+		case FreeCell:
+			switch {
+			case pos == g.Player.Pos:
+				r = '@'
+			default:
+				r = '.'
+				if _, ok := g.Clouds[pos]; ok && g.Player.LOS[pos] {
+					r = '§'
+				}
+				if c, ok := g.Collectables[pos]; ok {
+					r = c.Consumable.Letter()
+				} else if eq, ok := g.Equipables[pos]; ok {
+					r = eq.Letter()
+				} else if rod, ok := g.Rods[pos]; ok {
+					r = rod.Letter()
+				} else if _, ok := g.Stairs[pos]; ok {
+					r = '>'
+				} else if _, ok := g.Gold[pos]; ok {
+					r = '$'
+				}
+				m, _ := g.MonsterAt(pos)
+				if m.Exists() && (g.Player.LOS[m.Pos] || g.Wizard) {
+					r = m.Kind.Letter()
+				}
+			}
+		}
+		buf.WriteRune(r)
+	}
 	return buf.String()
 }
 
