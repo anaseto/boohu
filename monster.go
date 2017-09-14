@@ -625,6 +625,10 @@ func (m *monster) MakeHuntIfHurt(g *game) {
 		if m.State == Resting {
 			g.Printf("The %s awakes.", m.Kind)
 		}
+		if m.Kind == MonsHound {
+			g.Printf("The %s barks.", m.Kind)
+			g.MakeNoise(12, m.Pos)
+		}
 	}
 }
 
@@ -652,6 +656,10 @@ func (m *monster) MakeAware(g *game) {
 	}
 	if m.State == Wandering {
 		g.Printf("The %s notices you.", m.Kind)
+	}
+	if m.State != Hunting && m.Kind == MonsHound {
+		g.Printf("The %s barks.", m.Kind)
+		g.MakeNoise(12, m.Pos)
 	}
 	m.Target = g.Player.Pos
 	m.State = Hunting
