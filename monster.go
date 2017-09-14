@@ -212,7 +212,7 @@ var MonsBands = []monsterBandData{
 	LoneEarthDragon: {rarity: 80, minDepth: 10, maxDepth: 13, monster: MonsEarthDragon},
 	BandGoblins: {
 		distribution: map[monsterKind]monsInterval{MonsGoblin: monsInterval{2, 4}},
-		rarity:       10, minDepth: 1, maxDepth: 8, band: true,
+		rarity:       10, minDepth: 1, maxDepth: 7, band: true,
 	},
 	BandGoblinsWithWarriors: {
 		distribution: map[monsterKind]monsInterval{
