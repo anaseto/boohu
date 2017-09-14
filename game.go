@@ -592,7 +592,7 @@ func (g *game) InitLevel() {
 	if r < 2 {
 		r = 1
 	}
-	if RandInt(r) == 0 && g.GeneratedRodsCount() < 4 {
+	if RandInt(r) == 0 && g.GeneratedRodsCount() < 3 {
 		g.GenerateRod()
 	}
 
