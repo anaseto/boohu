@@ -552,9 +552,18 @@ func (g *game) InitLevel() {
 			Aptitudes: map[aptitude]bool{},
 		}
 		g.Player.Consumables = map[consumable]int{
-			HealWoundsPotion:    1,
-			TeleportationPotion: 1,
-			Javeline:            3,
+			HealWoundsPotion: 1,
+			Javeline:         3,
+		}
+		switch RandInt(6) {
+		case 0, 1:
+			g.Player.Consumables[TeleportationPotion] = 1
+		case 2, 3:
+			g.Player.Consumables[BerserkPotion] = 1
+		case 4:
+			g.Player.Consumables[EvasionPotion] = 1
+		case 5:
+			g.Player.Consumables[LignificationPotion] = 1
 		}
 		g.GeneratedRods = map[rod]bool{}
 		g.Player.Rods = map[rod]*rodProps{}
