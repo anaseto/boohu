@@ -687,14 +687,14 @@ func (g *game) CleanEvents() {
 }
 
 func (g *game) GenCollectables() {
-	rounds := 5
+	rounds := 10
 	for i := 0; i < rounds; i++ {
 		for c, data := range ConsumablesCollectData {
 			var r int
 			if g.CollectableScore >= 5*(g.Depth+1)/3 {
-				r = RandInt(data.rarity * rounds * 3)
+				r = RandInt(data.rarity * rounds * 4)
 			} else if g.CollectableScore < 4*(g.Depth+1)/3 {
-				r = RandInt(data.rarity * rounds / 2)
+				r = RandInt(data.rarity * rounds / 4)
 			} else {
 				r = RandInt(data.rarity * rounds)
 			}
