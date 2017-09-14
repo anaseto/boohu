@@ -27,8 +27,9 @@ type monsterStatus int
 
 const (
 	MonsConfused monsterStatus = iota
-	MonsAfraid
 	MonsExhausted
+	// unimplemented
+	MonsAfraid
 )
 
 func (st monsterStatus) String() (text string) {
