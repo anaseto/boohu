@@ -24,6 +24,7 @@ type game struct {
 	Events              *eventQueue
 	Highlight           map[position]bool // highlighted positions (e.g. targeted ray)
 	Collectables        map[position]*collectable
+	CollectableScore    int
 	Equipables          map[position]equipable
 	Rods                map[position]rod
 	Stairs              map[position]bool
@@ -568,13 +569,7 @@ func (g *game) InitLevel() {
 
 	// Collectables
 	g.Collectables = make(map[position]*collectable)
-	for c, data := range ConsumablesCollectData {
-		r := RandInt(data.rarity)
-		if r == 0 {
-			pos := g.FreeCellForStatic()
-			g.Collectables[pos] = &collectable{Consumable: c, Quantity: data.quantity}
-		}
-	}
+	g.GenCollectables()
 
 	// Equipment
 	g.Equipables = make(map[position]equipable)
@@ -680,6 +675,28 @@ func (g *game) CleanEvents() {
 		}
 	}
 	g.Events = evq
+}
+
+func (g *game) GenCollectables() {
+	rounds := 5
+	for i := 0; i < rounds; i++ {
+		for c, data := range ConsumablesCollectData {
+			var r int
+			if g.CollectableScore >= 5*(g.Depth+1)/3 {
+				r = RandInt(data.rarity * rounds * 3)
+			} else if g.CollectableScore < 4*(g.Depth+1)/3 {
+				r = RandInt(data.rarity * rounds / 2)
+			} else {
+				r = RandInt(data.rarity * rounds)
+			}
+
+			if r == 0 {
+				g.CollectableScore++
+				pos := g.FreeCellForStatic()
+				g.Collectables[pos] = &collectable{Consumable: c, Quantity: data.quantity}
+			}
+		}
+	}
 }
 
 func (g *game) GenEquip(eq equipable, data equipableData) {
