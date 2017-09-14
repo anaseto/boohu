@@ -348,6 +348,7 @@ func (ui *termui) ExamineHelp(g *game) {
 		"Move cursor", "h/j/k/l/y/u/b/n or numpad",
 		"Cycle through monsters", "+",
 		"Cycle through stairs", ">",
+		"Cycle through objects", "o",
 		"Go to/select target", "“.” or enter",
 		"View target description", "v or d",
 	})
@@ -461,6 +462,8 @@ func (ui *termui) CursorAction(g *game, targ Targetter) error {
 	var err error
 	var nstatic position
 	nmonster := 0
+	objects := []position{}
+	nobject := 0
 	opos := position{-1, -1}
 loop:
 	for {
@@ -524,15 +527,47 @@ loop:
 						nstatic.Y = 0
 					}
 				}
-			case '+':
+			case '+', '-':
 				for i := 0; i < len(g.Monsters); i++ {
-					nmonster++
+					if tev.Ch == '+' {
+						nmonster++
+					} else {
+						nmonster--
+					}
 					if nmonster > len(g.Monsters)-1 {
 						nmonster = 0
+					} else if nmonster < 0 {
+						nmonster = len(g.Monsters) - 1
 					}
 					mons := g.Monsters[nmonster]
 					if mons.Exists() && g.Player.LOS[mons.Pos] && pos != mons.Pos {
 						npos = mons.Pos
+						break
+					}
+				}
+			case 'o':
+				if len(objects) == 0 {
+					for p, _ := range g.Collectables {
+						objects = append(objects, p)
+					}
+					for p, _ := range g.Rods {
+						objects = append(objects, p)
+					}
+					for p, _ := range g.Equipables {
+						objects = append(objects, p)
+					}
+					for p, _ := range g.Gold {
+						objects = append(objects, p)
+					}
+				}
+				for i := 0; i < len(objects); i++ {
+					nobject++
+					if nobject > len(objects)-1 {
+						nobject = 0
+					}
+					p := objects[nobject]
+					if g.Dungeon.Cell(p).Explored {
+						npos = p
 						break
 					}
 				}

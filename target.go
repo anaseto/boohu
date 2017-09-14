@@ -18,6 +18,9 @@ func (ex *examiner) ComputeHighlight(g *game, pos position) {
 }
 
 func (ex *examiner) Action(g *game, pos position) error {
+	if g.MonsterInLOS() != nil {
+		return errors.New("You cannot travel while there are monsters in view.")
+	}
 	if c := g.Dungeon.Cell(pos); c.Explored && c.T == FreeCell {
 		g.AutoTarget = &pos
 		ex.done = true
