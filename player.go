@@ -126,10 +126,23 @@ func (g *game) ScummingAction(ev event) {
 	}
 	if g.Scumming > 120 {
 		g.MakeNoise(100, g.Player.Pos)
-		g.Print("You hear a terrible explosion coming from the ground. You are lignified.")
-		g.Player.Statuses[StatusLignification]++
 		g.Player.HP = g.Player.HP / 2
-		heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 240 + RandInt(10), EAction: LignificationEnd})
+		if RandInt(2) == 0 {
+			neighbors := g.Dungeon.Neighbors(g.Player.Pos)
+			for _, pos := range neighbors {
+				if RandInt(3) != 0 {
+					g.Dungeon.SetCell(pos, FreeCell)
+				}
+			}
+			g.Print("You hear a terrible explosion coming from the ground. You are lignified.")
+			g.Player.Statuses[StatusLignification]++
+			heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 240 + RandInt(10), EAction: LignificationEnd})
+		} else {
+			delay := 20 + RandInt(5)
+			g.Player.Statuses[StatusTele]++
+			heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + delay, EAction: Teleportation})
+			g.Print("Something hurt you! You feel unstable.")
+		}
 		g.Scumming = 0
 	}
 }
