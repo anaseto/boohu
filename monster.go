@@ -564,7 +564,7 @@ func (m *monster) TormentBolt(g *game, ev event) bool {
 		g.Printf("You block the %s's bolt of torment.", m.Kind)
 	}
 	m.Statuses[MonsExhausted]++
-	heap.Push(g.Events, &monsterEvent{ERank: ev.Rank() + 100 + RandInt(150), NMons: m.Index(g), EAction: MonsExhaustionEnd})
+	heap.Push(g.Events, &monsterEvent{ERank: ev.Rank() + 100 + RandInt(50), NMons: m.Index(g), EAction: MonsExhaustionEnd})
 	ev.Renew(g, m.Kind.AttackDelay())
 	return true
 }
