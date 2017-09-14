@@ -148,6 +148,7 @@ const (
 	LoneEarthDragon
 	BandGoblins
 	BandGoblinsWithWarriors
+	BandGoblinWarriors
 	BandHounds
 	BandYacks
 	BandSpiders
@@ -218,7 +219,13 @@ var MonsBands = []monsterBandData{
 		distribution: map[monsterKind]monsInterval{
 			MonsGoblin:        monsInterval{3, 5},
 			MonsGoblinWarrior: monsInterval{0, 2}},
-		rarity: 10, minDepth: 5, maxDepth: 10, band: true,
+		rarity: 10, minDepth: 5, maxDepth: 9, band: true,
+	},
+	BandGoblinWarriors: {
+		distribution: map[monsterKind]monsInterval{
+			MonsGoblin:        monsInterval{0, 1},
+			MonsGoblinWarrior: monsInterval{2, 4}},
+		rarity: 45, minDepth: 10, maxDepth: 13, band: true,
 	},
 	BandHounds: {
 		distribution: map[monsterKind]monsInterval{MonsHound: monsInterval{2, 3}},
@@ -288,7 +295,7 @@ var MonsBands = []monsterBandData{
 		distribution: map[monsterKind]monsInterval{
 			MonsEarthDragon: monsInterval{2, 2},
 		},
-		rarity: 80, minDepth: 12, maxDepth: 12, band: true, unique: true,
+		rarity: 60, minDepth: 12, maxDepth: 12, band: true, unique: true,
 	},
 }
 
