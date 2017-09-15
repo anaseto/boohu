@@ -103,7 +103,11 @@ func (g *game) MoveToTarget(ev event) bool {
 	if g.MonsterInLOS() == nil {
 		path := g.PlayerPath(g.Player.Pos, *g.AutoTarget)
 		if len(path) > 1 {
-			g.MovePlayer(path[len(path)-2], ev)
+			err := g.MovePlayer(path[len(path)-2], ev)
+			if err != nil {
+				g.Print(err.Error())
+				return false
+			}
 			return true
 		}
 	}
