@@ -7,9 +7,9 @@ import (
 func (d *dungeon) FreeNeighbors(pos position) []position {
 	neighbors := [8]position{pos.E(), pos.W(), pos.N(), pos.S(), pos.NE(), pos.NW(), pos.SE(), pos.SW()}
 	freeNeighbors := []position{}
-	for _, c := range neighbors {
-		if d.Valid(c) && d.Cell(c).T != WallCell {
-			freeNeighbors = append(freeNeighbors, c)
+	for _, npos := range neighbors {
+		if d.Valid(npos) && d.Cell(npos).T != WallCell {
+			freeNeighbors = append(freeNeighbors, npos)
 		}
 	}
 	return freeNeighbors
@@ -18,9 +18,9 @@ func (d *dungeon) FreeNeighbors(pos position) []position {
 func (d *dungeon) CardinalFreeNeighbors(pos position) []position {
 	neighbors := [4]position{pos.E(), pos.W(), pos.N(), pos.S()}
 	freeNeighbors := []position{}
-	for _, c := range neighbors {
-		if d.Valid(c) && d.Cell(c).T != WallCell {
-			freeNeighbors = append(freeNeighbors, c)
+	for _, npos := range neighbors {
+		if d.Valid(npos) && d.Cell(npos).T != WallCell {
+			freeNeighbors = append(freeNeighbors, npos)
 		}
 	}
 	return freeNeighbors
@@ -39,9 +39,9 @@ func (pp *playerPath) Neighbors(pos position) []position {
 		neighbors = m.FreeNeighbors(pos)
 	}
 	freeNeighbors := []position{}
-	for _, c := range neighbors {
-		if m.Cell(c).Explored && !pp.game.UnknownDig[c] {
-			freeNeighbors = append(freeNeighbors, c)
+	for _, npos := range neighbors {
+		if m.Cell(npos).Explored && !pp.game.UnknownDig[npos] {
+			freeNeighbors = append(freeNeighbors, npos)
 		}
 	}
 	return freeNeighbors

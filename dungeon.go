@@ -189,9 +189,9 @@ func (m *dungeon) connectRoomsDiagonally(r1, r2 room) {
 func (d *dungeon) Neighbors(pos position) []position {
 	neighbors := [8]position{pos.E(), pos.W(), pos.N(), pos.S(), pos.NE(), pos.NW(), pos.SE(), pos.SW()}
 	validNeighbors := []position{}
-	for _, pos := range neighbors {
-		if d.Valid(pos) {
-			validNeighbors = append(validNeighbors, pos)
+	for _, npos := range neighbors {
+		if d.Valid(npos) {
+			validNeighbors = append(validNeighbors, npos)
 		}
 	}
 	return validNeighbors
@@ -200,9 +200,9 @@ func (d *dungeon) Neighbors(pos position) []position {
 func (d *dungeon) CardinalNeighbors(pos position) []position {
 	neighbors := [4]position{pos.E(), pos.W(), pos.N(), pos.S()}
 	validNeighbors := []position{}
-	for _, pos := range neighbors {
-		if d.Valid(pos) {
-			validNeighbors = append(validNeighbors, pos)
+	for _, npos := range neighbors {
+		if d.Valid(npos) {
+			validNeighbors = append(validNeighbors, npos)
 		}
 	}
 	return validNeighbors
@@ -473,8 +473,8 @@ loop:
 func (d *dungeon) WallNeighborsCount(pos position) int {
 	neighbors := d.Neighbors(pos)
 	count := 0
-	for _, pos := range neighbors {
-		if d.Cell(pos).T == WallCell {
+	for _, npos := range neighbors {
+		if d.Cell(npos).T == WallCell {
 			count++
 		}
 	}
@@ -484,8 +484,8 @@ func (d *dungeon) WallNeighborsCount(pos position) int {
 func (d *dungeon) WallAreaCount(pos position, radius int) int {
 	neighbors := d.Area(pos, radius)
 	count := 0
-	for _, pos := range neighbors {
-		if d.Cell(pos).T == WallCell {
+	for _, npos := range neighbors {
+		if d.Cell(npos).T == WallCell {
 			count++
 		}
 	}
@@ -508,10 +508,10 @@ func (d *dungeon) Connected(pos position) (map[position]bool, int) {
 		stack = stack[:len(stack)-1]
 		count++
 		neighbors := d.FreeNeighbors(pos)
-		for _, n := range neighbors {
-			if !conn[n] {
-				conn[n] = true
-				stack = append(stack, n)
+		for _, npos := range neighbors {
+			if !conn[npos] {
+				conn[npos] = true
+				stack = append(stack, npos)
 			}
 		}
 	}
