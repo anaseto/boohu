@@ -699,6 +699,10 @@ func (ui *termui) DrawPosition(g *game, pos position) {
 	case WallCell:
 		r = '#'
 	case FreeCell:
+		if g.UnknownDig[pos] {
+			r = '#'
+			break
+		}
 		switch {
 		case pos == g.Player.Pos:
 			r = '@'

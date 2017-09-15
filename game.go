@@ -33,6 +33,7 @@ type game struct {
 	GeneratedEquipables map[equipable]bool
 	GeneratedRods       map[rod]bool
 	Gold                map[position]int
+	UnknownDig          map[position]bool
 	Resting             bool
 	Autoexploring       bool
 	AutoexploreMap      nodeMap
@@ -571,6 +572,8 @@ func (g *game) InitLevel() {
 		g.GeneratedBands = map[monsterBand]int{}
 	}
 	g.Player.Pos = g.FreeCell()
+
+	g.UnknownDig = map[position]bool{}
 
 	// Monsters
 	g.GenMonsters()

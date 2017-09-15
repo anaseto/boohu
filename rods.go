@@ -306,6 +306,9 @@ func (g *game) EvokeRodDigging(ev event) error {
 		g.Dungeon.SetCell(pos, FreeCell)
 		g.MakeNoise(17, pos)
 		pos = pos.To(pos.Dir(g.Player.Pos))
+		if !g.Player.LOS[pos] {
+			g.UnknownDig[pos] = true
+		}
 		if !g.Dungeon.Valid(pos) || g.Dungeon.Cell(pos).T != WallCell {
 			break
 		}

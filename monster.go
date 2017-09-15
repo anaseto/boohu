@@ -448,8 +448,12 @@ func (m *monster) HandleTurn(g *game, ev event) {
 		m.Pos = m.Path[len(m.Path)-2]
 		if m.Kind == MonsEarthDragon && g.Dungeon.Cell(m.Pos).T == WallCell {
 			g.Dungeon.SetCell(m.Pos, FreeCell)
+			if !g.Player.LOS[m.Pos] {
+				g.UnknownDig[m.Pos] = true
+			}
 			g.MakeNoise(18, m.Pos)
 			if g.Player.Pos.Distance(m.Pos) < 10 {
+				// XXX use dijkstra distance ?
 				g.Print("You hear an earth-breaking noise.")
 				g.AutoHalt = true
 			}

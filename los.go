@@ -89,6 +89,9 @@ func (g *game) ComputeLOS() {
 				}
 				g.FairAction()
 			}
+			if g.UnknownDig[pos] {
+				delete(g.UnknownDig, pos)
+			}
 			g.Dungeon.SetExplored(pos)
 		}
 	}
