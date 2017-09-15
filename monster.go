@@ -112,10 +112,10 @@ var MonsData = []monsterData{
 	MonsGiantBee:        {6, 10, 10, 11, 15, 0, 15, 'B', "giant bee", 6},
 	MonsGoblinWarrior:   {10, 11, 10, 25, 15, 3, 12, 'G', "goblin warrior", 8},
 	MonsHydra:           {10, 9, 10, 45, 13, 0, 6, 'H', "hydra", 15},
-	MonsSkeletonWarrior: {10, 12, 10, 25, 15, 5, 12, 'S', "skeleton warrior", 10},
+	MonsSkeletonWarrior: {10, 12, 10, 25, 15, 4, 12, 'S', "skeleton warrior", 10},
 	MonsSpider:          {8, 7, 10, 13, 17, 0, 15, 's', "spider", 6},
 	MonsLich:            {10, 10, 10, 23, 15, 3, 12, 'L', "lich", 17},
-	MonsEarthDragon:     {10, 14, 10, 40, 14, 7, 8, 'D', "earth dragon", 20},
+	MonsEarthDragon:     {10, 14, 10, 40, 14, 6, 8, 'D', "earth dragon", 20},
 }
 
 var monsDesc = []string{
@@ -572,7 +572,7 @@ func (m *monster) TormentBolt(g *game, ev event) bool {
 func (g *game) HitDamage(base int, armor int) int {
 	min := base / 2
 	attack := min + RandInt(base-min+1)
-	attack -= RandInt(armor)
+	attack -= RandInt(armor + 1)
 	if attack < 0 {
 		attack = 0
 	}

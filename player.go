@@ -53,15 +53,15 @@ func (p *player) Armor() int {
 	case LeatherArmour:
 		ar += 3
 	case ChainMail:
-		ar += 5
+		ar += 4
 	case PlateArmour:
-		ar += 8
+		ar += 6
 	}
 	if p.Aptitudes[AptScales] {
 		ar += 2
 	}
 	if p.HasStatus(StatusLignification) {
-		ar = 9 + ar/2
+		ar = 8 + ar/2
 	}
 	return ar
 }

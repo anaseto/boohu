@@ -307,13 +307,7 @@ func (g *game) ThrowJaveline(mons *monster, ev event) {
 		if g.Player.Aptitudes[AptStrong] {
 			bonus += 2
 		}
-		base := 11
-		min := base / 2
-		attack := min + RandInt(base-min+1) + bonus
-		attack -= RandInt(mons.Armor)
-		if attack <= 0 {
-			attack = 0
-		}
+		attack := g.HitDamage(11+bonus, mons.Armor)
 		mons.HP -= attack
 		if mons.HP > 0 {
 			g.Printf("Your %s hits the %s (%d).", Javeline, mons.Kind, attack)
@@ -575,9 +569,9 @@ func (sh shield) Letter() rune {
 func (sh shield) Block() (block int) {
 	switch sh {
 	case Buckler:
-		block += 5
+		block += 6
 	case Shield:
-		block += 10
+		block += 9
 	}
 	return block
 }
