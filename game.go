@@ -803,7 +803,11 @@ func (g *game) AutoPlayer(ev event) bool {
 				}
 			}
 			if n != nil {
-				g.MovePlayer(n.Pos, ev)
+				err := g.MovePlayer(n.Pos, ev)
+				if err != nil {
+					g.Print(err.Error())
+					break
+				}
 				return true
 			}
 			g.Print("You finished exploring.")
