@@ -429,6 +429,16 @@ func (g *game) GenCaveMap(h, w int) {
 	g.Dungeon = m
 }
 
+func (d *dungeon) HasFreeNeighbor(pos position) bool {
+	neighbors := d.Neighbors(pos)
+	for _, pos := range neighbors {
+		if d.Cell(pos).T == FreeCell {
+			return true
+		}
+	}
+	return false
+}
+
 func (g *game) GenCaveMapTree(h, w int) {
 	m := &dungeon{}
 	m.Cells = make([]cell, h*w)
@@ -453,12 +463,11 @@ loop:
 		block := []position{}
 		for {
 			block = append(block, pos)
+			if m.HasFreeNeighbor(pos) {
+				break
+			}
 			pos = pos.RandomNeighbor(diag)
-			if m.Valid(pos) {
-				if m.Cell(pos).T == FreeCell {
-					break
-				}
-			} else {
+			if !m.Valid(pos) {
 				continue loop
 			}
 		}
@@ -582,6 +591,42 @@ func (g *game) RunCellularAutomataCave(h, w int) bool {
 		if c.T == FreeCell && !conn[pos] {
 			m.SetCell(pos, WallCell)
 		}
+	}
+	max := m.Heigth * 1
+	cells := 1
+	diag := RandInt(2) == 0
+	digs := 0
+	i := 0
+loop:
+	for cells < max {
+		// XXX perhaps factorize this with tree-like cave
+		i++
+		if digs > 3 {
+			break
+		}
+		if i > 1000 {
+			break
+		}
+		pos := m.WallCell()
+		block := []position{}
+		for {
+			block = append(block, pos)
+			if m.HasFreeNeighbor(pos) {
+				break
+			}
+			pos = pos.RandomNeighbor(diag)
+			if !m.Valid(pos) {
+				continue loop
+			}
+		}
+		if len(block) < 5 || len(block) > 10 {
+			continue loop
+		}
+		for _, pos := range block {
+			m.SetCell(pos, FreeCell)
+			cells++
+		}
+		digs++
 	}
 	g.Dungeon = m
 	return true
