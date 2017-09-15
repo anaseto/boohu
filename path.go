@@ -32,10 +32,15 @@ type playerPath struct {
 
 func (pp *playerPath) Neighbors(pos position) []position {
 	m := pp.game.Dungeon
-	neighbors := [8]position{pos.E(), pos.W(), pos.N(), pos.S(), pos.NE(), pos.NW(), pos.SE(), pos.SW()}
+	var neighbors []position
+	if pp.game.Player.HasStatus(StatusConfusion) {
+		neighbors = m.CardinalFreeNeighbors(pos)
+	} else {
+		neighbors = m.FreeNeighbors(pos)
+	}
 	freeNeighbors := []position{}
 	for _, c := range neighbors {
-		if m.Valid(c) && m.Cell(c).T != WallCell && m.Cell(c).Explored {
+		if m.Cell(c).Explored && !pp.game.UnknownDig[c] {
 			freeNeighbors = append(freeNeighbors, c)
 		}
 	}
