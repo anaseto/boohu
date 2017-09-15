@@ -262,7 +262,6 @@ func (g *game) Dump() string {
 	}
 	fmt.Fprintf(buf, "\n")
 	fmt.Fprintf(buf, "Dungeon:\n")
-	fmt.Fprintf(buf, "\n")
 	buf.WriteString(g.DumpDungeon())
 	return buf.String()
 }
