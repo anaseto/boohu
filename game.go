@@ -631,7 +631,7 @@ func (g *game) InitLevel() {
 	if g.Depth == g.MaxDepth() {
 		nstairs = 1
 	} else if g.Depth == g.MaxDepth()-1 && nstairs > 2 {
-		nstairs = 2
+		nstairs = 1 + RandInt(2)
 	}
 	for i := 0; i < nstairs; i++ {
 		var pos position
