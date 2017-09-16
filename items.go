@@ -298,6 +298,9 @@ func (p projectile) Use(g *game, ev event) error {
 func (g *game) ThrowJaveline(mons *monster, ev event) {
 	acc := RandInt(g.Player.Accuracy())
 	evasion := RandInt(mons.Evasion)
+	if mons.State == Resting {
+		evasion /= 2 + 1
+	}
 	if acc > evasion {
 		g.MakeNoise(12, mons.Pos)
 		bonus := 0
@@ -326,6 +329,9 @@ func (g *game) ThrowJaveline(mons *monster, ev event) {
 func (g *game) ThrowConfusingDart(mons *monster, ev event) {
 	acc := RandInt(g.Player.Accuracy())
 	evasion := RandInt(mons.Evasion)
+	if mons.State == Resting {
+		evasion /= 2 + 1
+	}
 	if acc > evasion {
 		mons.Statuses[MonsConfused]++
 		mons.Path = nil
