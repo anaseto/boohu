@@ -437,6 +437,22 @@ func (d *dungeon) HasFreeNeighbor(pos position) bool {
 	return false
 }
 
+func (d *dungeon) DigBlock(diag bool) []position {
+	pos := d.WallCell()
+	block := []position{}
+	for {
+		block = append(block, pos)
+		if d.HasFreeNeighbor(pos) {
+			break
+		}
+		pos = pos.RandomNeighbor(diag)
+		if !d.Valid(pos) {
+			return nil
+		}
+	}
+	return block
+}
+
 func (g *game) GenCaveMapTree(h, w int) {
 	d := &dungeon{}
 	d.Cells = make([]cell, h*w)
@@ -457,17 +473,9 @@ func (g *game) GenCaveMapTree(h, w int) {
 	diag := RandInt(2) == 0
 loop:
 	for cells < max {
-		pos := d.WallCell()
-		block := []position{}
-		for {
-			block = append(block, pos)
-			if d.HasFreeNeighbor(pos) {
-				break
-			}
-			pos = pos.RandomNeighbor(diag)
-			if !d.Valid(pos) {
-				continue loop
-			}
+		block := d.DigBlock(diag)
+		if len(block) == 0 {
+			continue loop
 		}
 		for _, pos := range block {
 			d.SetCell(pos, FreeCell)
@@ -605,19 +613,11 @@ loop:
 		if i > 1000 {
 			break
 		}
-		pos := d.WallCell()
-		block := []position{}
-		for {
-			block = append(block, pos)
-			if d.HasFreeNeighbor(pos) {
-				break
-			}
-			pos = pos.RandomNeighbor(diag)
-			if !d.Valid(pos) {
-				continue loop
-			}
+		block := d.DigBlock(diag)
+		if len(block) == 0 {
+			continue loop
 		}
-		if len(block) < 5 || len(block) > 10 {
+		if len(block) < 4 || len(block) > 10 {
 			continue loop
 		}
 		for _, pos := range block {
