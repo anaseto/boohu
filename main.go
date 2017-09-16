@@ -324,7 +324,7 @@ func (ui *termui) DrawKeysDescription(g *game, actions []string) {
 		fmt.Fprintf(help, "│ %s: %s\n", actions[i], actions[i+1])
 	}
 	help.WriteString("│\n")
-	help.WriteString("└─────press esc or space to return to the game───────────────────────────────\n")
+	help.WriteString("└──── press esc or space to return to the game ──────────────────────────────\n")
 	ui.DrawText(help.String(), 0, 0)
 	termbox.Flush()
 	ui.WaitForContinue(g)
