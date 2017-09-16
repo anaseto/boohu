@@ -605,7 +605,6 @@ func (g *game) RunCellularAutomataCave(h, w int) bool {
 	i := 0
 loop:
 	for cells < max {
-		// XXX perhaps factorize this with tree-like cave
 		i++
 		if digs > 3 {
 			break
