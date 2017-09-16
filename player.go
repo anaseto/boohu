@@ -129,9 +129,9 @@ func (g *game) ScummingAction(ev event) {
 		g.Print("You feel a little bored.")
 	}
 	if g.Scumming > 120 {
-		g.MakeNoise(100, g.Player.Pos)
 		g.Player.HP = g.Player.HP / 2
 		if RandInt(2) == 0 {
+			g.MakeNoise(100, g.Player.Pos)
 			neighbors := g.Dungeon.Neighbors(g.Player.Pos)
 			for _, pos := range neighbors {
 				if RandInt(3) != 0 {
