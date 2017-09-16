@@ -43,6 +43,7 @@ var (
 	ColorFgStatusBad       termbox.Attribute = 161
 	ColorFgStatusOther     termbox.Attribute = 137
 	ColorFgExcluded        termbox.Attribute = 161
+	ColorFgTargetMode      termbox.Attribute = 38
 )
 
 func SolarizedPalette() {
@@ -69,7 +70,7 @@ func SolarizedPalette() {
 	ColorFgStatusGood = 5
 	ColorFgStatusBad = 2
 	ColorFgStatusOther = 4
-	ColorFgExcluded = 2
+	ColorFgTargetMode = 7
 }
 
 func main() {
@@ -195,7 +196,7 @@ func (ui *termui) DrawLight(text string, x, y int, fg termbox.Attribute) {
 func (ui *termui) HandlePlayerTurn(g *game, ev event) bool {
 getKey:
 	for {
-		ui.DrawDungeonView(g)
+		ui.DrawDungeonView(g, false)
 		var err error
 		switch tev := termbox.PollEvent(); tev.Type {
 		case termbox.EventKey:
@@ -213,7 +214,7 @@ getKey:
 					if ui.Wizard(g) {
 						g.Wizard = true
 						g.Print("You are now in wizard mode and cannot obtain winner status.")
-						ui.DrawDungeonView(g)
+						ui.DrawDungeonView(g, false)
 						continue getKey
 					}
 					g.Print("Ok, then.")
@@ -256,7 +257,7 @@ getKey:
 						ui.Win(g)
 						return true
 					}
-					ui.DrawDungeonView(g)
+					ui.DrawDungeonView(g, false)
 				} else {
 					err = errors.New("No stairs here.")
 				}
@@ -272,7 +273,7 @@ getKey:
 				err = g.Autoexplore(ev)
 			case 'x':
 				b := ui.Examine(g)
-				ui.DrawDungeonView(g)
+				ui.DrawDungeonView(g, false)
 				if !b {
 					continue getKey
 				} else if !g.MoveToTarget(ev) {
@@ -378,7 +379,7 @@ func (ui *termui) CharacterInfo(g *game) {
 	ui.DrawText(b.String(), 0, 0)
 	termbox.Flush()
 	ui.WaitForContinue(g)
-	ui.DrawDungeonView(g)
+	ui.DrawDungeonView(g, false)
 }
 
 func (ui *termui) AptitudesText(g *game) string {
@@ -479,7 +480,7 @@ loop:
 		opos = pos
 		targ.ComputeHighlight(g, pos)
 		termbox.SetCursor(pos.X, pos.Y)
-		ui.DrawDungeonView(g)
+		ui.DrawDungeonView(g, true)
 		switch tev := termbox.PollEvent(); tev.Type {
 		case termbox.EventKey:
 			npos := pos
@@ -645,7 +646,7 @@ func (ui *termui) MonsterInfo(m *monster) string {
 	return strings.Join(infos, ", ")
 }
 
-func (ui *termui) DrawDungeonView(g *game) {
+func (ui *termui) DrawDungeonView(g *game, targetting bool) {
 	err := termbox.Clear(ColorFg, ColorBg)
 	if err != nil {
 		log.Println(err)
@@ -670,6 +671,9 @@ func (ui *termui) DrawDungeonView(g *game) {
 		} else {
 			ui.DrawText(fmt.Sprintf("] %v (%d)", g.Player.Shield, g.Player.Shield.Block()), 81, 2)
 		}
+	}
+	if targetting {
+		ui.DrawColoredText("Targetting", 81, 20, ColorFgTargetMode)
 	}
 	ui.DrawStatusLine(g)
 	ui.DrawLog(g)
@@ -1001,7 +1005,7 @@ func (ui *termui) SelectRod(g *game, ev event) error {
 			}
 			noAction = rs[index].Use(g, ev)
 		}
-		ui.DrawDungeonView(g)
+		ui.DrawDungeonView(g, false)
 		return noAction
 	}
 }
@@ -1028,12 +1032,12 @@ func (ui *termui) Select(g *game, ev event, l int) (index int, alternate bool, e
 
 func (ui *termui) ExploreStep(g *game) {
 	time.Sleep(10 * time.Millisecond)
-	ui.DrawDungeonView(g)
+	ui.DrawDungeonView(g, false)
 }
 
 func (ui *termui) Death(g *game) {
 	g.Print("You die... -- press esc or space to continue --")
-	ui.DrawDungeonView(g)
+	ui.DrawDungeonView(g, false)
 	ui.WaitForContinue(g)
 	ui.Dump(g)
 	g.WriteDump()
@@ -1046,7 +1050,7 @@ func (ui *termui) Win(g *game) {
 	} else {
 		g.Print("You escape by the magic stairs! You win. --press esc or space to continue--")
 	}
-	ui.DrawDungeonView(g)
+	ui.DrawDungeonView(g, false)
 	ui.WaitForContinue(g)
 	ui.Dump(g)
 	g.WriteDump()
@@ -1076,13 +1080,13 @@ loop:
 
 func (ui *termui) Quit(g *game) bool {
 	g.Print("Do you really want to quit without saving? [Y/n]")
-	ui.DrawDungeonView(g)
+	ui.DrawDungeonView(g, false)
 	return ui.PromptConfirmation(g)
 }
 
 func (ui *termui) Wizard(g *game) bool {
 	g.Print("Do you really want to enter wizard mode (no return)? [Y/n]")
-	ui.DrawDungeonView(g)
+	ui.DrawDungeonView(g, false)
 	return ui.PromptConfirmation(g)
 }
 
