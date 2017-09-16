@@ -208,6 +208,8 @@ func (g *game) Dump() string {
 		fmt.Fprintf(buf, "You are exploring depth %d of Hareka's Underground.\n", g.Depth)
 	}
 	fmt.Fprintf(buf, "\n")
+	fmt.Fprintf(buf, "You have %d/%d HP, and %d/%d MP.\n", g.Player.HP, g.Player.HPMax(), g.Player.MP, g.Player.MPMax())
+	fmt.Fprintf(buf, "\n")
 	fmt.Fprintf(buf, g.DumpAptitudes())
 	fmt.Fprintf(buf, "\n\n")
 	fmt.Fprintf(buf, "Equipment:\n")
@@ -215,7 +217,7 @@ func (g *game) Dump() string {
 	fmt.Fprintf(buf, "You are wielding a %v.\n", g.Player.Weapon)
 	if g.Player.Shield != NoShield {
 		if g.Player.Weapon.TwoHanded() {
-			fmt.Fprintf(buf, "You had a %v.\n", g.Player.Shield)
+			fmt.Fprintf(buf, "You have a %v (unused).\n", g.Player.Shield)
 		} else {
 			fmt.Fprintf(buf, "You are wearing a %v.\n", g.Player.Shield)
 		}
@@ -263,7 +265,9 @@ func (g *game) Dump() string {
 	}
 	fmt.Fprintf(buf, "\n")
 	fmt.Fprintf(buf, "Dungeon:\n")
+	fmt.Fprintf(buf, "┌%s┐\n", strings.Repeat("─", g.Dungeon.Width))
 	buf.WriteString(g.DumpDungeon())
+	fmt.Fprintf(buf, "└%s┘\n", strings.Repeat("─", g.Dungeon.Width))
 	return buf.String()
 }
 
@@ -271,11 +275,18 @@ func (g *game) DumpDungeon() string {
 	buf := bytes.Buffer{}
 	for i, c := range g.Dungeon.Cells {
 		if i%g.Dungeon.Width == 0 {
-			buf.WriteRune('\n')
+			if i == 0 {
+				buf.WriteRune('│')
+			} else {
+				buf.WriteString("│\n│")
+			}
 		}
 		pos := g.Dungeon.CellPosition(i)
 		if !c.Explored {
 			buf.WriteRune(' ')
+			if i == len(g.Dungeon.Cells)-1 {
+				buf.WriteString("│\n")
+			}
 			continue
 		}
 		var r rune
@@ -309,6 +320,9 @@ func (g *game) DumpDungeon() string {
 			}
 		}
 		buf.WriteRune(r)
+		if i == len(g.Dungeon.Cells)-1 {
+			buf.WriteString("│\n")
+		}
 	}
 	return buf.String()
 }
