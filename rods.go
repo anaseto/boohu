@@ -157,7 +157,7 @@ func (r rod) Use(g *game, ev event) error {
 	rods[r].Charge--
 	g.Player.MP -= r.MPCost()
 	g.FairAction()
-	ev.Renew(g, 5)
+	ev.Renew(g, 7)
 	return nil
 }
 
