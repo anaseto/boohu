@@ -63,12 +63,17 @@ func (g *game) buildRayMap(from position, distance int) rayMap {
 	return rm
 }
 
-func (g *game) ComputeLOS() {
-	m := map[position]bool{}
+func (g *game) LosRange() int {
 	losRange := 6
 	if g.Player.Aptitudes[AptStealthyLOS] {
 		losRange -= 1
 	}
+	return losRange
+}
+
+func (g *game) ComputeLOS() {
+	m := map[position]bool{}
+	losRange := g.LosRange()
 	g.Player.Rays = g.buildRayMap(g.Player.Pos, losRange)
 	for pos, n := range g.Player.Rays {
 		if n.Cost < 50 {
@@ -103,10 +108,7 @@ func (g *game) ComputeLOS() {
 }
 
 func (g *game) ComputeExclusion(pos position, toggle bool) {
-	exclusionRange := 6
-	if g.Player.Aptitudes[AptStealthyLOS] {
-		exclusionRange -= 1
-	}
+	exclusionRange := g.LosRange()
 	rays := g.buildRayMap(pos, exclusionRange)
 	for pos, n := range rays {
 		if n.Cost < 50 {

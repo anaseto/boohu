@@ -318,6 +318,7 @@ func (g *game) ThrowJaveline(mons *monster, ev event) {
 		}
 	} else {
 		g.Printf("Your %s missed the %s.", Javeline, mons.Kind)
+		mons.MakeHuntIfHurt(g)
 	}
 	ev.Renew(g, 10)
 }
@@ -330,11 +331,11 @@ func (g *game) ThrowConfusingDart(mons *monster, ev event) {
 		mons.Path = nil
 		heap.Push(g.Events, &monsterEvent{
 			ERank: ev.Rank() + 50 + RandInt(100), NMons: mons.Index(g), EAction: MonsConfusionEnd})
-		mons.MakeHuntIfHurt(g)
 		g.Printf("Your %s hits the %s. The %s appears confused.", ConfusingDart, mons.Kind, mons.Kind)
 	} else {
 		g.Printf("Your %s missed the %s.", ConfusingDart, mons.Kind)
 	}
+	mons.MakeHuntIfHurt(g)
 	ev.Renew(g, 10)
 }
 

@@ -19,31 +19,32 @@ type termui struct {
 
 // colors: http://ethanschoonover.com/solarized
 var (
-	ColorBgLOS             termbox.Attribute = 231
-	ColorBgDark            termbox.Attribute = 235
-	ColorBg                termbox.Attribute = 235
-	ColorBgCloud           termbox.Attribute = 236
-	ColorFgLOS             termbox.Attribute = 242
-	ColorFgDark            termbox.Attribute = 241
-	ColorFg                termbox.Attribute = 246
-	ColorFgPlayer          termbox.Attribute = 34
-	ColorFgMonster         termbox.Attribute = 161
-	ColorFgSleepingMonster termbox.Attribute = 62
-	ColorFgConfusedMonster termbox.Attribute = 167
-	ColorFgCollectable     termbox.Attribute = 137
-	ColorFgStairs          termbox.Attribute = 126
-	ColorFgGold            termbox.Attribute = 137
-	ColorFgHPok            termbox.Attribute = 65
-	ColorFgHPwounded       termbox.Attribute = 137
-	ColorFgHPcritical      termbox.Attribute = 161
-	ColorFgMPok            termbox.Attribute = 34
-	ColorFgMPpartial       termbox.Attribute = 62
-	ColorFgMPcritical      termbox.Attribute = 126
-	ColorFgStatusGood      termbox.Attribute = 34
-	ColorFgStatusBad       termbox.Attribute = 161
-	ColorFgStatusOther     termbox.Attribute = 137
-	ColorFgExcluded        termbox.Attribute = 161
-	ColorFgTargetMode      termbox.Attribute = 38
+	ColorBgLOS              termbox.Attribute = 231
+	ColorBgDark             termbox.Attribute = 235
+	ColorBg                 termbox.Attribute = 235
+	ColorBgCloud            termbox.Attribute = 236
+	ColorFgLOS              termbox.Attribute = 242
+	ColorFgDark             termbox.Attribute = 241
+	ColorFg                 termbox.Attribute = 246
+	ColorFgPlayer           termbox.Attribute = 34
+	ColorFgMonster          termbox.Attribute = 161
+	ColorFgSleepingMonster  termbox.Attribute = 62
+	ColorFgWanderingMonster termbox.Attribute = 167
+	ColorFgConfusedMonster  termbox.Attribute = 65
+	ColorFgCollectable      termbox.Attribute = 137
+	ColorFgStairs           termbox.Attribute = 126
+	ColorFgGold             termbox.Attribute = 137
+	ColorFgHPok             termbox.Attribute = 65
+	ColorFgHPwounded        termbox.Attribute = 137
+	ColorFgHPcritical       termbox.Attribute = 161
+	ColorFgMPok             termbox.Attribute = 34
+	ColorFgMPpartial        termbox.Attribute = 62
+	ColorFgMPcritical       termbox.Attribute = 126
+	ColorFgStatusGood       termbox.Attribute = 34
+	ColorFgStatusBad        termbox.Attribute = 161
+	ColorFgStatusOther      termbox.Attribute = 137
+	ColorFgExcluded         termbox.Attribute = 161
+	ColorFgTargetMode       termbox.Attribute = 38
 )
 
 func SolarizedPalette() {
@@ -57,7 +58,8 @@ func SolarizedPalette() {
 	ColorFgPlayer = 5
 	ColorFgMonster = 2
 	ColorFgSleepingMonster = 14
-	ColorFgConfusedMonster = 10
+	ColorFgWanderingMonster = 10
+	ColorFgConfusedMonster = 3
 	ColorFgCollectable = 4
 	ColorFgStairs = 6
 	ColorFgGold = 4
@@ -755,6 +757,8 @@ func (ui *termui) DrawPosition(g *game, pos position) {
 					fgColor = ColorFgConfusedMonster
 				} else if m.State == Resting {
 					fgColor = ColorFgSleepingMonster
+				} else if m.State == Wandering {
+					fgColor = ColorFgWanderingMonster
 				} else {
 					fgColor = ColorFgMonster
 				}

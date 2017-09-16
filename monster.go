@@ -382,7 +382,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	mpos := m.Pos
 	m.MakeAware(g)
 	if m.State == Resting {
-		wander := RandInt(1000)
+		wander := RandInt(1500)
 		if wander == 0 {
 			m.Target = g.FreeCell()
 			m.State = Wandering
@@ -416,18 +416,14 @@ func (m *monster) HandleTurn(g *game, ev event) {
 		switch m.State {
 		case Wandering:
 			keepWandering := RandInt(100)
-			if keepWandering > 10 {
-				if keepWandering > 75 && MonsBands[g.Bands[m.Band]].band {
-					for _, mons := range g.Monsters {
-						m.Target = mons.Pos
-					}
-				} else {
-					m.Target = g.FreeCell()
+			if keepWandering > 75 && MonsBands[g.Bands[m.Band]].band {
+				for _, mons := range g.Monsters {
+					m.Target = mons.Pos
 				}
-				m.GatherBand(g)
 			} else {
-				m.State = Resting
+				m.Target = g.FreeCell()
 			}
+			m.GatherBand(g)
 		case Hunting:
 			if RandInt(5) == 0 && m.Pos.Distance(g.Player.Pos) < 10 {
 				// make hunting monsters sometimes smart
@@ -648,17 +644,21 @@ func (m *monster) MakeAware(g *game) {
 		return
 	}
 	if m.State == Resting {
-		r := RandInt(100)
+		adjust := (m.Pos.Distance(g.Player.Pos) - g.LosRange()/2 + 1)
+		adjust *= adjust
+		r := RandInt(25 + 3*adjust)
 		if g.Player.Aptitudes[AptStealthyMovement] {
-			r += 10
+			r *= 2
 		}
-		if r > 20 {
+		if r > 5 {
 			return
 		}
 	}
 	if m.State == Wandering {
-		r := RandInt(100)
-		if r > 80 {
+		adjust := (m.Pos.Distance(g.Player.Pos) - g.LosRange()/2 + 1)
+		adjust *= adjust
+		r := RandInt(30 + adjust)
+		if r >= 25 {
 			return
 		}
 	}
@@ -746,7 +746,11 @@ func (g *game) MakeNoise(noise int, at position) {
 		}
 		if v > r {
 			m.Target = at
-			m.State = Wandering
+			if g.Player.LOS[m.Pos] {
+				m.State = Hunting
+			} else {
+				m.State = Wandering
+			}
 			m.GatherBand(g)
 		}
 	}

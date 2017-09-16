@@ -326,6 +326,9 @@ func (g *game) AttackMonster(mons *monster) {
 func (g *game) HitMonster(mons *monster) {
 	acc := RandInt(g.Player.Accuracy())
 	ev := RandInt(mons.Evasion)
+	if mons.State == Resting {
+		ev /= 2 + 1
+	}
 	if acc > ev {
 		g.MakeNoise(12, mons.Pos)
 		bonus := 0
@@ -335,7 +338,7 @@ func (g *game) HitMonster(mons *monster) {
 		attack := g.HitDamage(g.Player.Attack()+bonus, mons.Armor)
 		if mons.State == Resting {
 			if g.Player.Weapon == Dagger {
-				attack *= 5
+				attack *= 4
 			} else {
 				attack *= 2
 			}
@@ -347,10 +350,10 @@ func (g *game) HitMonster(mons *monster) {
 			g.Printf("You kill the %v (%d damage).", mons.Kind, attack)
 			g.Killed++
 		}
-		mons.MakeHuntIfHurt(g)
 	} else {
 		g.Printf("You miss the %v.", mons.Kind)
 	}
+	mons.MakeHuntIfHurt(g)
 }
 
 func (g *game) HealPlayer(ev event) {
