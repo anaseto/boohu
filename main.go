@@ -342,7 +342,7 @@ func (ui *termui) KeysHelp(g *game) {
 		"Examine", "x (? for help)",
 		"Throw item", "t or f (? for help)",
 		"Evoke rod", "v or z (? for help)",
-		"View Character Information", "%% or C",
+		"View Character Information", `% or C`,
 		"View previous messages", "m",
 		"Write character dump to file", "#",
 		"Save and Quit", "S",
