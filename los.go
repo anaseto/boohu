@@ -107,7 +107,6 @@ func (g *game) ComputeExclusion(pos position, toggle bool) {
 	if g.Player.Aptitudes[AptStealthyLOS] {
 		exclusionRange -= 1
 	}
-	// XXX: not ideal, a little leak, perhaps better to just use a disk
 	rays := g.buildRayMap(pos, exclusionRange)
 	for pos, n := range rays {
 		if n.Cost < 50 {

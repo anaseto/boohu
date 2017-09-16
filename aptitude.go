@@ -50,7 +50,7 @@ func (ap aptitude) String() string {
 }
 
 func (g *game) RandomApt() (aptitude, bool) {
-	// XXX not ideal
+	// XXX use less uniform probability ?
 	max := int(AptStrong)
 	count := 0
 	var apt aptitude
