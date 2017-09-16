@@ -40,6 +40,7 @@ type game struct {
 	AutoTarget          *position
 	AutoHalt            bool
 	AutoNext            bool
+	ExclusionsMap       map[position]bool
 	Quit                bool
 	ui                  Renderer
 	Depth               int
@@ -371,7 +372,7 @@ func (g *game) Printf(format string, a ...interface{}) {
 }
 
 type Renderer interface {
-	AutoExploreStep(*game)
+	ExploreStep(*game)
 	HandlePlayerTurn(*game, event) bool
 	Death(*game)
 	ChooseTarget(*game, Targetter) bool
@@ -573,6 +574,7 @@ func (g *game) InitLevel() {
 	g.Player.Pos = g.FreeCell()
 
 	g.UnknownDig = map[position]bool{}
+	g.ExclusionsMap = map[position]bool{}
 
 	// Monsters
 	g.GenMonsters()
@@ -774,7 +776,7 @@ func (g *game) AutoPlayer(ev event) bool {
 		}
 		g.Resting = false
 	} else if g.Autoexploring {
-		g.ui.AutoExploreStep(g)
+		g.ui.ExploreStep(g)
 		mons := g.MonsterInLOS()
 		switch {
 		case mons.Exists():
@@ -790,16 +792,24 @@ func (g *game) AutoPlayer(ev event) bool {
 				count++
 				if count > 100 {
 					// should not happen
-					g.Print("Hm… something went wrong with auto-explore.")
+					g.Print("Hm… something went wrong with auto-explore. You stop.")
 					n = nil
 					break
 				}
 				n, b = g.NextAuto()
-				if b {
-					g.BuildAutoexploreMap()
-				} else {
+				if !b {
+					if n == nil {
+						g.Print("You could not reach safely some places.")
+					}
 					break
 				}
+				sources := g.AutoexploreSources()
+				if len(sources) == 0 {
+					g.Print("You finished exploring.")
+					n = nil
+					break
+				}
+				g.BuildAutoexploreMap(sources)
 			}
 			if n != nil {
 				err := g.MovePlayer(n.Pos, ev)
@@ -809,10 +819,10 @@ func (g *game) AutoPlayer(ev event) bool {
 				}
 				return true
 			}
-			g.Print("You finished exploring.")
 		}
 		g.Autoexploring = false
 	} else if g.AutoTarget != nil {
+		g.ui.ExploreStep(g)
 		if g.MoveToTarget(ev) {
 			return true
 		}

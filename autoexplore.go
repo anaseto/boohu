@@ -1,18 +1,22 @@
 package main
 
-import (
-	"errors"
-	"fmt"
-)
+import "errors"
 
 func (g *game) Autoexplore(ev event) error {
 	if mons := g.MonsterInLOS(); mons.Exists() {
-		return fmt.Errorf("You cannot auto-explore while there are monsters in view.")
+		return errors.New("You cannot auto-explore while there are monsters in view.")
 	}
-	g.BuildAutoexploreMap()
+	if g.ExclusionsMap[g.Player.Pos] {
+		return errors.New("You cannot auto-explore while in an excluded area.")
+	}
+	sources := g.AutoexploreSources()
+	if len(sources) == 0 {
+		return errors.New("Nothing left to explore.")
+	}
+	g.BuildAutoexploreMap(sources)
 	n, _ := g.NextAuto()
 	if n == nil {
-		return errors.New("Nothing left to explore.")
+		return errors.New("Some unexplored parts not safely reachable remain.")
 	}
 	g.Autoexploring = true
 	g.AutoHalt = false
@@ -39,23 +43,25 @@ func (g *game) AutoexploreSources() []position {
 	return sources
 }
 
-func (g *game) BuildAutoexploreMap() {
-	sources := g.AutoexploreSources()
-	np := &normalPath{game: g}
-	g.AutoexploreMap = Dijkstra(np, sources, 9999)
+func (g *game) BuildAutoexploreMap(sources []position) {
+	ap := &autoexplorePath{game: g}
+	g.AutoexploreMap = Dijkstra(ap, sources, 9999)
 }
 
 func (g *game) NextAuto() (*node, bool) {
 	rebuild := false
-	np := &normalPath{game: g}
-	neighbors := np.Neighbors(g.Player.Pos)
+	ap := &autoexplorePath{game: g}
+	neighbors := ap.Neighbors(g.Player.Pos)
+	if len(neighbors) == 0 || g.ExclusionsMap[g.Player.Pos] {
+		return nil, false
+	}
 	next, ok := g.AutoexploreMap[neighbors[0]]
 	if !ok {
 		return nil, rebuild
 	}
 	for _, pos := range neighbors[1:] {
 		n := g.AutoexploreMap[pos]
-		if n.Cost < next.Cost {
+		if n != nil && n.Cost < next.Cost {
 			next = n
 		}
 	}

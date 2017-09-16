@@ -11,21 +11,6 @@ type Dijkstrer interface {
 	Cost(position, position) int
 }
 
-type normalPath struct {
-	game *game
-}
-
-func (np *normalPath) Neighbors(pos position) []position {
-	if np.game.Player.HasStatus(StatusConfusion) {
-		return np.game.Dungeon.CardinalFreeNeighbors(pos)
-	}
-	return np.game.Dungeon.FreeNeighbors(pos)
-}
-
-func (np *normalPath) Cost(from, to position) int {
-	return 1
-}
-
 func (g *game) drawDijkstra(nm nodeMap) string {
 	b := &bytes.Buffer{}
 	for y := 0; y < g.Dungeon.Heigth; y++ {

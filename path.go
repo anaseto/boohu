@@ -1,9 +1,5 @@
 package main
 
-import (
-	"log"
-)
-
 func (d *dungeon) FreeNeighbors(pos position) []position {
 	neighbors := [8]position{pos.E(), pos.W(), pos.N(), pos.S(), pos.NE(), pos.NW(), pos.SE(), pos.SW()}
 	freeNeighbors := []position{}
@@ -40,7 +36,7 @@ func (pp *playerPath) Neighbors(pos position) []position {
 	}
 	freeNeighbors := []position{}
 	for _, npos := range neighbors {
-		if m.Cell(npos).Explored && !pp.game.UnknownDig[npos] {
+		if m.Cell(npos).Explored && !pp.game.UnknownDig[npos] && !pp.game.ExclusionsMap[npos] {
 			freeNeighbors = append(freeNeighbors, npos)
 		}
 	}
@@ -53,6 +49,48 @@ func (pp *playerPath) Cost(from, to position) int {
 
 func (pp *playerPath) Estimation(from, to position) int {
 	return from.Distance(to)
+}
+
+type normalPath struct {
+	game *game
+}
+
+func (np *normalPath) Neighbors(pos position) []position {
+	if np.game.Player.HasStatus(StatusConfusion) {
+		return np.game.Dungeon.CardinalFreeNeighbors(pos)
+	}
+	return np.game.Dungeon.FreeNeighbors(pos)
+}
+
+func (np *normalPath) Cost(from, to position) int {
+	return 1
+}
+
+type autoexplorePath struct {
+	game *game
+}
+
+func (ap *autoexplorePath) Neighbors(pos position) []position {
+	if ap.game.ExclusionsMap[pos] {
+		return nil
+	}
+	var neighbors []position
+	if ap.game.Player.HasStatus(StatusConfusion) {
+		neighbors = ap.game.Dungeon.CardinalFreeNeighbors(pos)
+	} else {
+		neighbors = ap.game.Dungeon.FreeNeighbors(pos)
+	}
+	var suitableNeighbors []position
+	for _, pos := range neighbors {
+		if !ap.game.ExclusionsMap[pos] {
+			suitableNeighbors = append(suitableNeighbors, pos)
+		}
+	}
+	return suitableNeighbors
+}
+
+func (ap *autoexplorePath) Cost(from, to position) int {
+	return 1
 }
 
 type monPath struct {
@@ -106,8 +144,6 @@ func (g *game) PlayerPath(from, to position) []position {
 	pp := &playerPath{game: g}
 	path, _, found := AstarPath(pp, from, to)
 	if !found {
-		log.Printf("no path from %+v to %+v\n", from, to)
-		g.Print("No path found to there.")
 		return nil
 	}
 	return path

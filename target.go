@@ -21,6 +21,19 @@ func (ex *examiner) Action(g *game, pos position) error {
 	if g.MonsterInLOS() != nil {
 		return errors.New("You cannot travel while there are monsters in view.")
 	}
+	if g.ExclusionsMap[g.Player.Pos] {
+		return errors.New("You cannot travel while in an excluded area.")
+	}
+	if !g.Dungeon.Cell(pos).Explored {
+		return errors.New("You do not this place.")
+	}
+	if g.ExclusionsMap[pos] {
+		return errors.New("You cannot travel to an excluded area.")
+	}
+	path := g.PlayerPath(g.Player.Pos, pos)
+	if path == nil {
+		return errors.New("There is no safe path to this place.")
+	}
 	if c := g.Dungeon.Cell(pos); c.Explored && c.T == FreeCell {
 		g.AutoTarget = &pos
 		ex.done = true

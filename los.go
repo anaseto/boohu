@@ -37,13 +37,13 @@ func (g *game) losCost(pos position) int {
 }
 
 func (g *game) buildRayMap(from position, distance int) rayMap {
-	m := g.Dungeon
+	dungeon := g.Dungeon
 	rm := rayMap{}
 	rm[from] = &raynode{Cost: 0}
 	for d := 1; d <= distance; d++ {
 		for x := -d + from.X; x <= d+from.X; x++ {
 			for _, pos := range []position{{x, from.Y + d}, {x, from.Y - d}} {
-				if !m.Valid(pos) {
+				if !dungeon.Valid(pos) {
 					continue
 				}
 				_, c := g.bestParent(rm, from, pos)
@@ -52,7 +52,7 @@ func (g *game) buildRayMap(from position, distance int) rayMap {
 		}
 		for y := -d + 1 + from.Y; y <= d-1+from.Y; y++ {
 			for _, pos := range []position{{from.X + d, y}, {from.X - d, y}} {
-				if !m.Valid(pos) {
+				if !dungeon.Valid(pos) {
 					continue
 				}
 				_, c := g.bestParent(rm, from, pos)
@@ -96,6 +96,42 @@ func (g *game) ComputeLOS() {
 		}
 	}
 	g.Player.LOS = m
+}
+
+func (g *game) ComputeExclusion(pos position, toggle bool) {
+	exclusionRange := 6
+	if g.Player.Aptitudes[AptStealthyLOS] {
+		exclusionRange -= 1
+	}
+	// XXX: not ideal, a little leak, perhaps better to just use a disk
+	rays := g.buildRayMap(pos, exclusionRange)
+	for pos, n := range rays {
+		if n.Cost < 50 {
+			g.ExclusionsMap[pos] = toggle
+		}
+	}
+	for d := 1; d <= exclusionRange; d++ {
+		for x := -d + pos.X; x <= d+pos.X; x++ {
+			for _, pos := range []position{{x, pos.Y + d}, {x, pos.Y - d}} {
+				if !g.Dungeon.Valid(pos) {
+					continue
+				}
+				if !g.Player.LOS[pos] {
+					g.ExclusionsMap[pos] = toggle
+				}
+			}
+		}
+		for y := -d + 1 + pos.Y; y <= d-1+pos.Y; y++ {
+			for _, pos := range []position{{pos.X + d, y}, {pos.X - d, y}} {
+				if !g.Dungeon.Valid(pos) {
+					continue
+				}
+				if !g.Player.LOS[pos] {
+					g.ExclusionsMap[pos] = toggle
+				}
+			}
+		}
+	}
 }
 
 func (g *game) Ray(pos position) []position {

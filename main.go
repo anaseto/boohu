@@ -36,11 +36,12 @@ var (
 	ColorFgHPwounded       termbox.Attribute = 137
 	ColorFgHPcritical      termbox.Attribute = 161
 	ColorFgMPok            termbox.Attribute = 34
-	ColorFgMPpartial       termbox.Attribute = 126
-	ColorFgMPcritical      termbox.Attribute = 161
+	ColorFgMPpartial       termbox.Attribute = 62
+	ColorFgMPcritical      termbox.Attribute = 126
 	ColorFgStatusGood      termbox.Attribute = 34
 	ColorFgStatusBad       termbox.Attribute = 161
 	ColorFgStatusOther     termbox.Attribute = 137
+	ColorFgExcluded        termbox.Attribute = 161
 )
 
 func SolarizedPalette() {
@@ -61,11 +62,12 @@ func SolarizedPalette() {
 	ColorFgHPwounded = 4
 	ColorFgHPcritical = 2
 	ColorFgMPok = 5
-	ColorFgMPpartial = 6
-	ColorFgMPcritical = 2
+	ColorFgMPpartial = 14
+	ColorFgMPcritical = 6
 	ColorFgStatusGood = 5
 	ColorFgStatusBad = 2
 	ColorFgStatusOther = 4
+	ColorFgExcluded = 2
 }
 
 func main() {
@@ -351,6 +353,7 @@ func (ui *termui) ExamineHelp(g *game) {
 		"Cycle through objects", "o",
 		"Go to/select target", "“.” or enter",
 		"View target description", "v or d",
+		"Toggle exclude area from automatic travelling", "e",
 	})
 }
 
@@ -586,6 +589,13 @@ loop:
 				} else {
 					break loop
 				}
+			case 'e':
+				if !g.Dungeon.Cell(pos).Explored {
+					g.Print("You cannot choose an unexplored cell for exclusion.")
+				} else {
+					toggle := !g.ExclusionsMap[pos]
+					g.ComputeExclusion(pos, toggle)
+				}
 			default:
 				g.Print("Invalid key.")
 			}
@@ -693,6 +703,9 @@ func (ui *termui) DrawPosition(g *game, pos position) {
 	} else {
 		fgColor = ColorFgDark
 		bgColor = ColorBgDark
+	}
+	if g.ExclusionsMap[pos] {
+		fgColor = ColorFgExcluded
 	}
 	var r rune
 	switch c.T {
@@ -1009,7 +1022,7 @@ func (ui *termui) Select(g *game, ev event, l int) (index int, alternate bool, e
 	}
 }
 
-func (ui *termui) AutoExploreStep(g *game) {
+func (ui *termui) ExploreStep(g *game) {
 	time.Sleep(10 * time.Millisecond)
 	ui.DrawDungeonView(g)
 }
