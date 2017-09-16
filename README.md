@@ -12,7 +12,7 @@ Install
 
 + Install the [go compiler](https://golang.org/).
 + Set `$GOPATH` variable (for example `export GOPATH=$HOME/go`).
-+ Add `$GOPATH/bin` to your `$PATH`.
++ Add `$GOPATH/bin` to your `$PATH` (for example `export PATH="$PATH:$GOPATH/bin"`).
 + Use the command `go get -u github.com/anaseto/boohu`.
   
 The `boohu` command should now be available.
