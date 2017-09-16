@@ -152,11 +152,10 @@ func (g *game) DumpAptitudes() string {
 		}
 	}
 	sort.Strings(apts)
-	if len(apts) > 0 {
-		return "Aptitudes:\n" + strings.Join(apts, "\n")
-	} else {
+	if len(apts) == 0 {
 		return "You do not have any special aptitudes."
 	}
+	return "Aptitudes:\n" + strings.Join(apts, "\n")
 }
 
 func (g *game) SortedRods() rodSlice {
@@ -173,7 +172,7 @@ func (g *game) SortedRods() rodSlice {
 
 func (g *game) SortedPotions() consumableSlice {
 	var cs consumableSlice
-	for k, _ := range g.Player.Consumables {
+	for k := range g.Player.Consumables {
 		switch k := k.(type) {
 		case potion:
 			cs = append(cs, k)
@@ -185,7 +184,7 @@ func (g *game) SortedPotions() consumableSlice {
 
 func (g *game) SortedProjectiles() consumableSlice {
 	var cs consumableSlice
-	for k, _ := range g.Player.Consumables {
+	for k := range g.Player.Consumables {
 		switch k := k.(type) {
 		case projectile:
 			cs = append(cs, k)
@@ -668,7 +667,7 @@ func (g *game) InitLevel() {
 	} else {
 		g.CleanEvents()
 	}
-	for i, _ := range g.Monsters {
+	for i := range g.Monsters {
 		heap.Push(g.Events, &monsterEvent{ERank: g.Turn + 1, EAction: MonsterTurn, NMons: i})
 		heap.Push(g.Events, &monsterEvent{ERank: g.Turn + 50, EAction: HealMonster, NMons: i})
 	}

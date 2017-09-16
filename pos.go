@@ -185,9 +185,8 @@ func (pos position) Parents(from position) []position {
 func (pos position) RandomNeighbor(diag bool) position {
 	if diag {
 		return pos.RandomNeighborDiagonals()
-	} else {
-		return pos.RandomNeighborCardinal()
 	}
+	return pos.RandomNeighborCardinal()
 }
 
 func (pos position) RandomNeighborDiagonals() position {

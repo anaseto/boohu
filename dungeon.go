@@ -30,20 +30,20 @@ type room struct {
 	h   int
 }
 
-func (m *dungeon) Cell(pos position) cell {
-	return m.Cells[pos.Y*m.Width+pos.X]
+func (d *dungeon) Cell(pos position) cell {
+	return d.Cells[pos.Y*d.Width+pos.X]
 }
 
-func (m *dungeon) Valid(pos position) bool {
-	return pos.X < m.Width && pos.Y < m.Heigth && pos.X >= 0 && pos.Y >= 0
+func (d *dungeon) Valid(pos position) bool {
+	return pos.X < d.Width && pos.Y < d.Heigth && pos.X >= 0 && pos.Y >= 0
 }
 
-func (m *dungeon) SetCell(pos position, t terrain) {
-	m.Cells[pos.Y*m.Width+pos.X].T = t
+func (d *dungeon) SetCell(pos position, t terrain) {
+	d.Cells[pos.Y*d.Width+pos.X].T = t
 }
 
-func (m *dungeon) SetExplored(pos position) {
-	m.Cells[pos.Y*m.Width+pos.X].Explored = true
+func (d *dungeon) SetExplored(pos position) {
+	d.Cells[pos.Y*d.Width+pos.X].Explored = true
 }
 
 func roomDistance(r1, r2 room) int {
@@ -92,7 +92,7 @@ func intersectsRoom(rooms []room, r room) bool {
 	return false
 }
 
-func (m *dungeon) connectRooms(r1, r2 room) {
+func (d *dungeon) connectRooms(r1, r2 room) {
 	x := r1.pos.X
 	y := r1.pos.Y
 	count := 0
@@ -103,29 +103,29 @@ func (m *dungeon) connectRooms(r1, r2 room) {
 		}
 		if x < r2.pos.X {
 			x++
-			m.SetCell(position{x, y}, FreeCell)
+			d.SetCell(position{x, y}, FreeCell)
 			continue
 		}
 		if x > r2.pos.X {
 			x--
-			m.SetCell(position{x, y}, FreeCell)
+			d.SetCell(position{x, y}, FreeCell)
 			continue
 		}
 		if y < r2.pos.Y {
 			y++
-			m.SetCell(position{x, y}, FreeCell)
+			d.SetCell(position{x, y}, FreeCell)
 			continue
 		}
 		if y > r2.pos.Y {
 			y--
-			m.SetCell(position{x, y}, FreeCell)
+			d.SetCell(position{x, y}, FreeCell)
 			continue
 		}
 		break
 	}
 }
 
-func (m *dungeon) connectRoomsDiagonally(r1, r2 room) {
+func (d *dungeon) connectRoomsDiagonally(r1, r2 room) {
 	x := r1.pos.X
 	y := r1.pos.Y
 	count := 0
@@ -136,50 +136,50 @@ func (m *dungeon) connectRoomsDiagonally(r1, r2 room) {
 		}
 		if x < r2.pos.X && y < r2.pos.Y {
 			x++
-			m.SetCell(position{x, y}, FreeCell)
+			d.SetCell(position{x, y}, FreeCell)
 			y++
-			m.SetCell(position{x, y}, FreeCell)
+			d.SetCell(position{x, y}, FreeCell)
 			continue
 		}
 		if x > r2.pos.X && y < r2.pos.Y {
 			x--
-			m.SetCell(position{x, y}, FreeCell)
+			d.SetCell(position{x, y}, FreeCell)
 			y++
-			m.SetCell(position{x, y}, FreeCell)
+			d.SetCell(position{x, y}, FreeCell)
 			continue
 		}
 		if x > r2.pos.X && y > r2.pos.Y {
 			x--
-			m.SetCell(position{x, y}, FreeCell)
+			d.SetCell(position{x, y}, FreeCell)
 			y--
-			m.SetCell(position{x, y}, FreeCell)
+			d.SetCell(position{x, y}, FreeCell)
 			continue
 		}
 		if x < r2.pos.X && y > r2.pos.Y {
 			x++
-			m.SetCell(position{x, y}, FreeCell)
+			d.SetCell(position{x, y}, FreeCell)
 			y--
-			m.SetCell(position{x, y}, FreeCell)
+			d.SetCell(position{x, y}, FreeCell)
 			continue
 		}
 		if x < r2.pos.X {
 			x++
-			m.SetCell(position{x, y}, FreeCell)
+			d.SetCell(position{x, y}, FreeCell)
 			continue
 		}
 		if x > r2.pos.X {
 			x--
-			m.SetCell(position{x, y}, FreeCell)
+			d.SetCell(position{x, y}, FreeCell)
 			continue
 		}
 		if y < r2.pos.Y {
 			y++
-			m.SetCell(position{x, y}, FreeCell)
+			d.SetCell(position{x, y}, FreeCell)
 			continue
 		}
 		if y > r2.pos.Y {
 			y--
-			m.SetCell(position{x, y}, FreeCell)
+			d.SetCell(position{x, y}, FreeCell)
 			continue
 		}
 		break
@@ -232,43 +232,41 @@ func (dp *dungeonPath) Neighbors(pos position) []position {
 func (dp *dungeonPath) Cost(from, to position) int {
 	if dp.dungeon.Cell(to).T == WallCell {
 		return 4
-	} else {
-		return 1
 	}
+	return 1
 }
 
 func (dp *dungeonPath) Estimation(from, to position) int {
 	return from.Distance(to)
 }
 
-func (m *dungeon) ConnectRoomsShortestPath(r1, r2 room) error {
-	mp := &dungeonPath{dungeon: m}
+func (d *dungeon) ConnectRoomsShortestPath(r1, r2 room) {
+	mp := &dungeonPath{dungeon: d}
 	path, _, _ := AstarPath(mp, r1.pos, r2.pos)
 	for _, pos := range path {
-		m.SetCell(pos, FreeCell)
+		d.SetCell(pos, FreeCell)
 	}
-	return nil
 }
 
-func (m *dungeon) PutRoom(r room) {
+func (d *dungeon) PutRoom(r room) {
 	for i := r.pos.X; i < r.pos.X+r.w; i++ {
 		for j := r.pos.Y; j < r.pos.Y+r.h; j++ {
-			if m.Valid(position{i, j}) {
-				m.SetCell(position{i, j}, FreeCell)
+			if d.Valid(position{i, j}) {
+				d.SetCell(position{i, j}, FreeCell)
 			}
 		}
 	}
 }
 
-func (m *dungeon) CellPosition(i int) position {
-	return position{i - (i/m.Width)*m.Width, i / m.Width}
+func (d *dungeon) CellPosition(i int) position {
+	return position{i - (i/d.Width)*d.Width, i / d.Width}
 }
 
 func (g *game) GenRuinsMap(h, w int) {
-	m := &dungeon{}
-	m.Cells = make([]cell, h*w)
-	m.Width = w
-	m.Heigth = h
+	d := &dungeon{}
+	d.Cells = make([]cell, h*w)
+	d.Width = w
+	d.Heigth = h
 	rooms := []room{}
 	noIntersect := true
 	//if randInt(100) > 50 {
@@ -291,20 +289,20 @@ func (g *game) GenRuinsMap(h, w int) {
 			}
 		}
 
-		m.PutRoom(ro)
+		d.PutRoom(ro)
 		if len(rooms) > 0 {
 			r := RandInt(100)
 			if r > 75 {
-				m.connectRooms(nearRoom(rooms, ro), ro)
+				d.connectRooms(nearRoom(rooms, ro), ro)
 			} else if r > 25 {
-				m.ConnectRoomsShortestPath(nearRoom(rooms, ro), ro)
+				d.ConnectRoomsShortestPath(nearRoom(rooms, ro), ro)
 			} else {
-				m.connectRoomsDiagonally(nearRoom(rooms, ro), ro)
+				d.connectRoomsDiagonally(nearRoom(rooms, ro), ro)
 			}
 		}
 		rooms = append(rooms, ro)
 	}
-	g.Dungeon = m
+	g.Dungeon = d
 }
 
 type roomSlice []room
@@ -316,10 +314,10 @@ func (rs roomSlice) Less(i, j int) bool {
 }
 
 func (g *game) GenRoomMap(h, w int) {
-	m := &dungeon{}
-	m.Cells = make([]cell, h*w)
-	m.Width = w
-	m.Heigth = h
+	d := &dungeon{}
+	d.Cells = make([]cell, h*w)
+	d.Width = w
+	d.Heigth = h
 	rooms := []room{}
 	noIntersect := true
 	for i := 0; i < 35; i++ {
@@ -339,7 +337,7 @@ func (g *game) GenRoomMap(h, w int) {
 			}
 		}
 
-		m.PutRoom(ro)
+		d.PutRoom(ro)
 		rooms = append(rooms, ro)
 	}
 	sort.Sort(roomSlice(rooms))
@@ -349,44 +347,44 @@ func (g *game) GenRoomMap(h, w int) {
 		}
 		r := RandInt(100)
 		if r > 50 {
-			m.connectRooms(nearestRoom(rooms[:i], ro), ro)
+			d.connectRooms(nearestRoom(rooms[:i], ro), ro)
 		} else if r > 25 {
-			m.ConnectRoomsShortestPath(nearRoom(rooms[:i], ro), ro)
+			d.ConnectRoomsShortestPath(nearRoom(rooms[:i], ro), ro)
 		} else {
-			m.connectRoomsDiagonally(nearestRoom(rooms[:i], ro), ro)
+			d.connectRoomsDiagonally(nearestRoom(rooms[:i], ro), ro)
 		}
 	}
-	g.Dungeon = m
+	g.Dungeon = d
 }
 
-func (m *dungeon) FreeCell() position {
+func (d *dungeon) FreeCell() position {
 	count := 0
 	for {
 		count++
 		if count > 1000 {
 			panic("FreeCell")
 		}
-		x := RandInt(m.Width)
-		y := RandInt(m.Heigth)
+		x := RandInt(d.Width)
+		y := RandInt(d.Heigth)
 		pos := position{x, y}
-		c := m.Cell(pos)
+		c := d.Cell(pos)
 		if c.T == FreeCell {
 			return pos
 		}
 	}
 }
 
-func (m *dungeon) WallCell() position {
+func (d *dungeon) WallCell() position {
 	count := 0
 	for {
 		count++
 		if count > 1000 {
 			panic("WallCell")
 		}
-		x := RandInt(m.Width)
-		y := RandInt(m.Heigth)
+		x := RandInt(d.Width)
+		y := RandInt(d.Heigth)
 		pos := position{x, y}
-		c := m.Cell(pos)
+		c := d.Cell(pos)
 		if c.T == WallCell {
 			return pos
 		}
@@ -394,27 +392,27 @@ func (m *dungeon) WallCell() position {
 }
 
 func (g *game) GenCaveMap(h, w int) {
-	m := &dungeon{}
-	m.Cells = make([]cell, h*w)
-	m.Width = w
-	m.Heigth = h
+	d := &dungeon{}
+	d.Cells = make([]cell, h*w)
+	d.Width = w
+	d.Heigth = h
 	pos := position{40, 10}
 	max := 21 * 40
-	m.SetCell(pos, FreeCell)
+	d.SetCell(pos, FreeCell)
 	cells := 1
 	notValid := 0
 	lastValid := pos
 	diag := RandInt(4) == 0
 	for cells < max {
 		npos := pos.RandomNeighbor(diag)
-		if !m.Valid(pos) && m.Valid(npos) && m.Cell(npos).T == WallCell {
+		if !d.Valid(pos) && d.Valid(npos) && d.Cell(npos).T == WallCell {
 			pos = lastValid
 			continue
 		}
 		pos = npos
-		if m.Valid(pos) {
-			if m.Cell(pos).T != FreeCell {
-				m.SetCell(pos, FreeCell)
+		if d.Valid(pos) {
+			if d.Cell(pos).T != FreeCell {
+				d.SetCell(pos, FreeCell)
 				cells++
 			}
 			lastValid = pos
@@ -426,7 +424,7 @@ func (g *game) GenCaveMap(h, w int) {
 			pos = lastValid
 		}
 	}
-	g.Dungeon = m
+	g.Dungeon = d
 }
 
 func (d *dungeon) HasFreeNeighbor(pos position) bool {
@@ -440,43 +438,43 @@ func (d *dungeon) HasFreeNeighbor(pos position) bool {
 }
 
 func (g *game) GenCaveMapTree(h, w int) {
-	m := &dungeon{}
-	m.Cells = make([]cell, h*w)
-	m.Width = w
-	m.Heigth = h
+	d := &dungeon{}
+	d.Cells = make([]cell, h*w)
+	d.Width = w
+	d.Heigth = h
 	center := position{40, 10}
-	m.SetCell(center, FreeCell)
-	m.SetCell(center.E(), FreeCell)
-	m.SetCell(center.NE(), FreeCell)
-	m.SetCell(center.S(), FreeCell)
-	m.SetCell(center.SE(), FreeCell)
-	m.SetCell(center.N(), FreeCell)
-	m.SetCell(center.NW(), FreeCell)
-	m.SetCell(center.W(), FreeCell)
-	m.SetCell(center.SW(), FreeCell)
+	d.SetCell(center, FreeCell)
+	d.SetCell(center.E(), FreeCell)
+	d.SetCell(center.NE(), FreeCell)
+	d.SetCell(center.S(), FreeCell)
+	d.SetCell(center.SE(), FreeCell)
+	d.SetCell(center.N(), FreeCell)
+	d.SetCell(center.NW(), FreeCell)
+	d.SetCell(center.W(), FreeCell)
+	d.SetCell(center.SW(), FreeCell)
 	max := 21 * 50
 	cells := 1
 	diag := RandInt(2) == 0
 loop:
 	for cells < max {
-		pos := m.WallCell()
+		pos := d.WallCell()
 		block := []position{}
 		for {
 			block = append(block, pos)
-			if m.HasFreeNeighbor(pos) {
+			if d.HasFreeNeighbor(pos) {
 				break
 			}
 			pos = pos.RandomNeighbor(diag)
-			if !m.Valid(pos) {
+			if !d.Valid(pos) {
 				continue loop
 			}
 		}
 		for _, pos := range block {
-			m.SetCell(pos, FreeCell)
+			d.SetCell(pos, FreeCell)
 			cells++
 		}
 	}
-	g.Dungeon = m
+	g.Dungeon = d
 }
 
 func (d *dungeon) WallNeighborsCount(pos position) int {
@@ -528,17 +526,17 @@ func (d *dungeon) Connected(pos position) (map[position]bool, int) {
 }
 
 func (g *game) RunCellularAutomataCave(h, w int) bool {
-	m := &dungeon{}
-	m.Cells = make([]cell, h*w)
-	m.Width = w
-	m.Heigth = h
-	for i, _ := range m.Cells {
+	d := &dungeon{}
+	d.Cells = make([]cell, h*w)
+	d.Width = w
+	d.Heigth = h
+	for i := range d.Cells {
 		r := RandInt(100)
-		pos := m.CellPosition(i)
+		pos := d.CellPosition(i)
 		if r >= 45 {
-			m.SetCell(pos, FreeCell)
+			d.SetCell(pos, FreeCell)
 		} else {
-			m.SetCell(pos, WallCell)
+			d.SetCell(pos, WallCell)
 		}
 	}
 	for i := 0; i < 5; i++ {
@@ -546,53 +544,53 @@ func (g *game) RunCellularAutomataCave(h, w int) bool {
 		bufm.Cells = make([]cell, h*w)
 		bufm.Width = w
 		bufm.Heigth = h
-		copy(bufm.Cells, m.Cells)
-		for j, _ := range bufm.Cells {
-			pos := m.CellPosition(j)
-			c1 := m.WallAreaCount(pos, 1)
+		copy(bufm.Cells, d.Cells)
+		for j := range bufm.Cells {
+			pos := d.CellPosition(j)
+			c1 := d.WallAreaCount(pos, 1)
 			if c1 >= 5 {
 				bufm.SetCell(pos, WallCell)
 			} else {
 				bufm.SetCell(pos, FreeCell)
 			}
 			if i == 3 {
-				c2 := m.WallAreaCount(pos, 2)
+				c2 := d.WallAreaCount(pos, 2)
 				if c2 <= 2 {
 					bufm.SetCell(pos, WallCell)
 				}
 			}
 		}
-		m.Cells = bufm.Cells
+		d.Cells = bufm.Cells
 	}
 	var conn map[position]bool
 	var count int
 	var winner position
 	for i := 0; i < 15; i++ {
-		pos := m.FreeCell()
+		pos := d.FreeCell()
 		if conn[pos] {
 			continue
 		}
 		var ncount int
-		conn, ncount = m.Connected(pos)
+		conn, ncount = d.Connected(pos)
 		if ncount > count {
 			count = ncount
 			winner = pos
 		}
-		if count >= 37*m.Heigth*m.Width/100 {
+		if count >= 37*d.Heigth*d.Width/100 {
 			break
 		}
 	}
-	conn, count = m.Connected(winner)
-	if count <= 37*m.Heigth*m.Width/100 {
+	conn, count = d.Connected(winner)
+	if count <= 37*d.Heigth*d.Width/100 {
 		return false
 	}
-	for i, c := range m.Cells {
-		pos := m.CellPosition(i)
+	for i, c := range d.Cells {
+		pos := d.CellPosition(i)
 		if c.T == FreeCell && !conn[pos] {
-			m.SetCell(pos, WallCell)
+			d.SetCell(pos, WallCell)
 		}
 	}
-	max := m.Heigth * 1
+	max := d.Heigth * 1
 	cells := 1
 	diag := RandInt(2) == 0
 	digs := 0
@@ -607,15 +605,15 @@ loop:
 		if i > 1000 {
 			break
 		}
-		pos := m.WallCell()
+		pos := d.WallCell()
 		block := []position{}
 		for {
 			block = append(block, pos)
-			if m.HasFreeNeighbor(pos) {
+			if d.HasFreeNeighbor(pos) {
 				break
 			}
 			pos = pos.RandomNeighbor(diag)
-			if !m.Valid(pos) {
+			if !d.Valid(pos) {
 				continue loop
 			}
 		}
@@ -623,12 +621,12 @@ loop:
 			continue loop
 		}
 		for _, pos := range block {
-			m.SetCell(pos, FreeCell)
+			d.SetCell(pos, FreeCell)
 			cells++
 		}
 		digs++
 	}
-	g.Dungeon = m
+	g.Dungeon = d
 	return true
 }
 

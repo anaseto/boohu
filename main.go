@@ -547,16 +547,16 @@ loop:
 				}
 			case 'o':
 				if len(objects) == 0 {
-					for p, _ := range g.Collectables {
+					for p := range g.Collectables {
 						objects = append(objects, p)
 					}
-					for p, _ := range g.Rods {
+					for p := range g.Rods {
 						objects = append(objects, p)
 					}
-					for p, _ := range g.Equipables {
+					for p := range g.Equipables {
 						objects = append(objects, p)
 					}
-					for p, _ := range g.Gold {
+					for p := range g.Gold {
 						objects = append(objects, p)
 					}
 				}
@@ -646,7 +646,7 @@ func (ui *termui) DrawDungeonView(g *game) {
 		termbox.SetCell(g.Dungeon.Width, i, '│', ColorFg, ColorBg)
 	}
 	termbox.SetCell(g.Dungeon.Width, g.Dungeon.Heigth, '┘', ColorFg, ColorBg)
-	for i, _ := range m.Cells {
+	for i := range m.Cells {
 		pos := m.CellPosition(i)
 		ui.DrawPosition(g, pos)
 	}

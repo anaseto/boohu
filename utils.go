@@ -10,9 +10,8 @@ import (
 func Abs(x int) int {
 	if x < 0 {
 		return -x
-	} else {
-		return x
 	}
+	return x
 }
 
 func RandInt(n int) int {

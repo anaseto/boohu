@@ -18,9 +18,8 @@ type normalPath struct {
 func (np *normalPath) Neighbors(pos position) []position {
 	if np.game.Player.HasStatus(StatusConfusion) {
 		return np.game.Dungeon.CardinalFreeNeighbors(pos)
-	} else {
-		return np.game.Dungeon.FreeNeighbors(pos)
 	}
+	return np.game.Dungeon.FreeNeighbors(pos)
 }
 
 func (np *normalPath) Cost(from, to position) int {

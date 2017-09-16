@@ -285,7 +285,7 @@ const (
 func (g *game) EvokeRodFog(ev event) error {
 	dij := &normalPath{game: g}
 	nm := Dijkstra(dij, []position{g.Player.Pos}, 3)
-	for pos, _ := range nm {
+	for pos := range nm {
 		_, ok := g.Clouds[pos]
 		if !ok {
 			g.Clouds[pos] = CloudFog

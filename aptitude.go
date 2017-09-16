@@ -1,9 +1,5 @@
 package main
 
-import (
-	"errors"
-)
-
 type aptitude int
 
 const (
@@ -73,12 +69,12 @@ func (g *game) RandomApt() (aptitude, bool) {
 	return apt, false
 }
 
-func (g *game) ApplyAptitude(ap aptitude) error {
+func (g *game) ApplyAptitude(ap aptitude) {
 	if g.Player.Aptitudes[ap] {
 		// should not happen
-		return errors.New("You already have that aptitude. " + ap.String())
+		g.Print("Hm… You already have that aptitude. " + ap.String())
+		return
 	}
 	g.Player.Aptitudes[ap] = true
 	g.Print("You feel a little different. " + ap.String())
-	return nil
 }

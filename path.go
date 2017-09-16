@@ -65,16 +65,13 @@ func (mp *monPath) Neighbors(pos position) []position {
 	if mp.monster.Status(MonsConfused) {
 		if mp.wall {
 			return mp.game.Dungeon.CardinalNeighbors(pos)
-		} else {
-			return mp.game.Dungeon.CardinalFreeNeighbors(pos)
 		}
-	} else {
-		if mp.wall {
-			return mp.game.Dungeon.Neighbors(pos)
-		} else {
-			return mp.game.Dungeon.FreeNeighbors(pos)
-		}
+		return mp.game.Dungeon.CardinalFreeNeighbors(pos)
 	}
+	if mp.wall {
+		return mp.game.Dungeon.Neighbors(pos)
+	}
+	return mp.game.Dungeon.FreeNeighbors(pos)
 }
 
 func (mp *monPath) Cost(from, to position) int {
