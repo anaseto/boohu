@@ -28,6 +28,7 @@ var (
 	ColorFg                termbox.Attribute = 246
 	ColorFgPlayer          termbox.Attribute = 34
 	ColorFgMonster         termbox.Attribute = 161
+	ColorFgSleepingMonster termbox.Attribute = 62
 	ColorFgConfusedMonster termbox.Attribute = 167
 	ColorFgCollectable     termbox.Attribute = 137
 	ColorFgStairs          termbox.Attribute = 126
@@ -54,6 +55,7 @@ func SolarizedPalette() {
 	ColorFg = 13
 	ColorFgPlayer = 5
 	ColorFgMonster = 2
+	ColorFgSleepingMonster = 14
 	ColorFgConfusedMonster = 10
 	ColorFgCollectable = 4
 	ColorFgStairs = 6
@@ -746,6 +748,8 @@ func (ui *termui) DrawPosition(g *game, pos position) {
 				r = m.Kind.Letter()
 				if m.Status(MonsConfused) {
 					fgColor = ColorFgConfusedMonster
+				} else if m.State == Resting {
+					fgColor = ColorFgSleepingMonster
 				} else {
 					fgColor = ColorFgMonster
 				}
