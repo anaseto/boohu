@@ -324,7 +324,7 @@ func (ui *termui) DrawKeysDescription(g *game, actions []string) {
 		fmt.Fprintf(help, "│ %s: %s\n", actions[i], actions[i+1])
 	}
 	help.WriteString("│\n")
-	help.WriteString("└──── press esc or space to return to the game ──────────────────────────────\n")
+	help.WriteString("└─────press esc or space to return to the game───────────────────────────────\n")
 	ui.DrawText(help.String(), 0, 0)
 	termbox.Flush()
 	ui.WaitForContinue(g)
@@ -393,10 +393,14 @@ func (ui *termui) AptitudesText(g *game) string {
 		}
 	}
 	sort.Strings(apts)
+	var text string
 	if len(apts) > 0 {
-		return "Aptitudes:\n" + strings.Join(apts, "\n")
+		text = "Aptitudes:\n" + strings.Join(apts, "\n")
+	} else {
+		text = "You do not have any special aptitudes."
 	}
-	return "You do not have any special aptitudes."
+	text += "\n\n--press esc or space to continue--"
+	return text
 }
 
 func (ui *termui) DescribePosition(g *game, pos position, targ Targetter) {
@@ -1021,7 +1025,7 @@ func (ui *termui) Select(g *game, ev event, l int) (index int, alternate bool, e
 		case termbox.EventKey:
 			if tev.Ch == 0 {
 				switch tev.Key {
-				case termbox.KeyEsc:
+				case termbox.KeyEsc, termbox.KeySpace:
 					return -1, false, errors.New("Ok, then.")
 				}
 			}
@@ -1041,7 +1045,7 @@ func (ui *termui) ExploreStep(g *game) {
 }
 
 func (ui *termui) Death(g *game) {
-	g.Print("You die... -- press esc or space to continue --")
+	g.Print("You die... --press esc or space to continue--")
 	ui.DrawDungeonView(g, false)
 	ui.WaitForContinue(g)
 	ui.Dump(g)
