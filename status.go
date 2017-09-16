@@ -1,3 +1,5 @@
+// confusion idea from: https://crawl.develz.org/tavern/viewtopic.php?f=17&t=24108&sid=cb465fe78aba3b9074a32efc2a835d80#p318813
+
 package main
 
 type status int
