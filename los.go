@@ -76,16 +76,20 @@ func (g *game) ComputeLOS() {
 			if !g.Dungeon.Cell(pos).Explored {
 				if c, ok := g.Collectables[pos]; ok {
 					g.AutoHalt = true
-					g.Printf("You see a %v.", c.Consumable)
+					if c.Quantity > 1 {
+						g.Printf("You see %d %s.", c.Quantity, c.Consumable)
+					} else {
+						g.Printf("You see %s.", Indefinite(c.Consumable.String(), false))
+					}
 				} else if _, ok := g.Stairs[pos]; ok {
 					g.AutoHalt = true
 					g.Printf("You see stairs.")
 				} else if eq, ok := g.Equipables[pos]; ok {
 					g.AutoHalt = true
-					g.Printf("You see a %s.", eq)
+					g.Printf("You see %s.", Indefinite(eq.String(), false))
 				} else if rod, ok := g.Rods[pos]; ok {
 					g.AutoHalt = true
-					g.Printf("You see a %s.", rod)
+					g.Printf("You see %s.", Indefinite(rod.String(), false))
 				}
 				g.FairAction()
 			}

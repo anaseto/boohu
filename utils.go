@@ -26,6 +26,26 @@ func RandInt(n int) int {
 	return int(x.Int64())
 }
 
+func Indefinite(s string, upper bool) (text string) {
+	if len(s) > 0 {
+		switch s[0] {
+		case 'a', 'e', 'i', 'o', 'u':
+			if upper {
+				text = "An " + s
+			} else {
+				text = "an " + s
+			}
+		default:
+			if upper {
+				text = "A " + s
+			} else {
+				text = "a " + s
+			}
+		}
+	}
+	return text
+}
+
 func formatText(text string, width int) string {
 	pbuf := bytes.Buffer{}
 	wordbuf := bytes.Buffer{}

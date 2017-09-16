@@ -367,7 +367,8 @@ func (ui *termui) Equip(g *game, ev event) error {
 func (ui *termui) CharacterInfo(g *game) {
 	termbox.Clear(ColorFg, ColorBg)
 	b := bytes.Buffer{}
-	b.WriteString(formatText(fmt.Sprintf("You are wielding a %s. %s", g.Player.Weapon, g.Player.Weapon.Desc()), 79))
+	b.WriteString(formatText(
+		fmt.Sprintf("You are wielding %s. %s", Indefinite(g.Player.Weapon.String(), false), g.Player.Weapon.Desc()), 79))
 	b.WriteString("\n\n")
 	b.WriteString(formatText(fmt.Sprintf("You are wearing a %s. %s", g.Player.Armour, g.Player.Armour.Desc()), 79))
 	b.WriteString("\n\n")
@@ -411,17 +412,17 @@ func (ui *termui) DescribePosition(g *game, pos position, targ Targetter) {
 	case !targ.Reachable(g, pos):
 		desc = "This is out of reach."
 	case mons.Exists() && g.Player.LOS[pos]:
-		desc += fmt.Sprintf("You see a %s (%s).", mons.Kind, ui.MonsterInfo(mons))
+		desc += fmt.Sprintf("You see %s (%s).", Indefinite(mons.Kind.String(), false), ui.MonsterInfo(mons))
 	case g.Gold[pos] > 0:
 		desc += fmt.Sprintf("You see some gold (%d).", g.Gold[pos])
 	case okCollectable && c != nil:
 		if c.Quantity > 1 {
-			desc += fmt.Sprintf("You see %d %ss there.", c.Quantity, c.Consumable)
+			desc += fmt.Sprintf("You see %d %s there.", c.Quantity, c.Consumable)
 		} else {
-			desc += fmt.Sprintf("You see a %s there.", c.Consumable)
+			desc += fmt.Sprintf("You see %s there.", Indefinite(c.Consumable.String(), false))
 		}
 	case okEq:
-		desc += fmt.Sprintf("You see a %v.", eq)
+		desc += fmt.Sprintf("You see %s.", Indefinite(eq.String(), false))
 	case okRod:
 		desc += fmt.Sprintf("You see a %v.", rod)
 	case g.Stairs[pos]:

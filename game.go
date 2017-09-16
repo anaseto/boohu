@@ -213,13 +213,13 @@ func (g *game) Dump() string {
 	fmt.Fprintf(buf, g.DumpAptitudes())
 	fmt.Fprintf(buf, "\n\n")
 	fmt.Fprintf(buf, "Equipment:\n")
-	fmt.Fprintf(buf, "You are wearing a %v.\n", g.Player.Armour)
-	fmt.Fprintf(buf, "You are wielding a %v.\n", g.Player.Weapon)
+	fmt.Fprintf(buf, "You are wearing %s.\n", Indefinite(g.Player.Armour.String(), false))
+	fmt.Fprintf(buf, "You are wielding %s.\n", Indefinite(g.Player.Weapon.String(), false))
 	if g.Player.Shield != NoShield {
 		if g.Player.Weapon.TwoHanded() {
-			fmt.Fprintf(buf, "You have a %v (unused).\n", g.Player.Shield)
+			fmt.Fprintf(buf, "You have %s (unused).\n", Indefinite(g.Player.Shield.String(), false))
 		} else {
-			fmt.Fprintf(buf, "You are wearing a %v.\n", g.Player.Shield)
+			fmt.Fprintf(buf, "You are wearing %s.\n", Indefinite(g.Player.Shield.String(), false))
 		}
 	}
 	fmt.Fprintf(buf, "\n")

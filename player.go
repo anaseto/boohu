@@ -244,7 +244,11 @@ func (g *game) MovePlayer(pos position, ev event) error {
 			if c, ok := g.Collectables[pos]; ok && c != nil {
 				g.Player.Consumables[c.Consumable] += c.Quantity
 				delete(g.Collectables, pos)
-				g.Printf("You take a %s.", c.Consumable)
+				if c.Quantity > 1 {
+					g.Printf("You take %d %s.", c.Quantity, c.Consumable)
+				} else {
+					g.Printf("You take %s.", Indefinite(c.Consumable.String(), false))
+				}
 			}
 			if r, ok := g.Rods[pos]; ok {
 				g.Player.Rods[r] = &rodProps{Charge: r.MaxCharge() - 1}
@@ -255,7 +259,7 @@ func (g *game) MovePlayer(pos position, ev event) error {
 			if g.Autoexploring {
 				mons := g.MonsterInLOS()
 				if mons.Exists() {
-					g.Printf("You see a %v (%v).", mons.Kind, mons.State)
+					g.Printf("You see %s (%v).", Indefinite(mons.Kind.String(), false), mons.State)
 				}
 				g.FairAction()
 			} else {
