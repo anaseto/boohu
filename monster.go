@@ -712,7 +712,9 @@ func (g *game) MakeMonstersAware() {
 		}
 		if g.Player.LOS[m.Pos] {
 			m.MakeAware(g)
-			m.GatherBand(g)
+			if m.State != Resting {
+				m.GatherBand(g)
+			}
 		}
 	}
 }
