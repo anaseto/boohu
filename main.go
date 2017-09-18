@@ -1039,9 +1039,19 @@ func (ui *termui) Select(g *game, ev event, l int) (index int, alternate bool, e
 	}
 }
 
-func (ui *termui) ExploreStep(g *game) {
-	time.Sleep(10 * time.Millisecond)
+func (ui *termui) ExploreStep(g *game) bool {
+	next := make(chan bool)
+	go func() {
+		time.Sleep(10 * time.Millisecond)
+		next <- false
+	}()
+	go func() {
+		ui.PressAnyKey()
+		next <- true
+	}()
+	stop := <-next
 	ui.DrawDungeonView(g, false)
+	return stop
 }
 
 func (ui *termui) Death(g *game) {

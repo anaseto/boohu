@@ -386,7 +386,7 @@ func (g *game) Printf(format string, a ...interface{}) {
 }
 
 type Renderer interface {
-	ExploreStep(*game)
+	ExploreStep(*game) bool
 	HandlePlayerTurn(*game, event) bool
 	Death(*game)
 	ChooseTarget(*game, Targetter) bool
@@ -790,7 +790,9 @@ func (g *game) AutoPlayer(ev event) bool {
 		}
 		g.Resting = false
 	} else if g.Autoexploring {
-		g.ui.ExploreStep(g)
+		if g.ui.ExploreStep(g) {
+			g.AutoHalt = true
+		}
 		mons := g.MonsterInLOS()
 		switch {
 		case mons.Exists():
@@ -836,8 +838,7 @@ func (g *game) AutoPlayer(ev event) bool {
 		}
 		g.Autoexploring = false
 	} else if g.AutoTarget != nil {
-		g.ui.ExploreStep(g)
-		if g.MoveToTarget(ev) {
+		if !g.ui.ExploreStep(g) && g.MoveToTarget(ev) {
 			return true
 		}
 	}
