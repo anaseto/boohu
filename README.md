@@ -5,7 +5,7 @@ inventory management.
 
 You somehow ended up in Hareka's Underground, and in order to leave, you have
 to find some magical stairs deep in the Underground. Along the way, you will
-collect treasures, as well as various items to help you. You will also
+collect treasures, as well as various items to help yourself. You will also
 encounter monsters, fight against them, or run away from them when you can…
 
 It is a work in progress, but is already a quite complete game.
