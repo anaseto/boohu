@@ -56,6 +56,7 @@ const (
 	MonsHydra
 	MonsSkeletonWarrior
 	MonsSpider
+	MonsBlinkingFrog
 	MonsLich
 	MonsEarthDragon
 	MonsMirrorSpecter
@@ -124,6 +125,7 @@ var MonsData = []monsterData{
 	MonsHydra:           {10, 9, 10, 45, 13, 0, 6, 'H', "hydra", 15},
 	MonsSkeletonWarrior: {10, 12, 10, 25, 15, 4, 12, 'S', "skeleton warrior", 10},
 	MonsSpider:          {8, 7, 10, 13, 17, 0, 15, 's', "spider", 6},
+	MonsBlinkingFrog:    {10, 10, 10, 20, 15, 0, 12, 'F', "blinking frog", 7},
 	MonsLich:            {10, 10, 10, 23, 15, 3, 12, 'L', "lich", 17},
 	MonsEarthDragon:     {10, 14, 10, 40, 14, 6, 8, 'D', "earth dragon", 20},
 	MonsMirrorSpecter:   {10, 9, 10, 18, 15, 0, 17, 'm', "mirror specter", 11},
@@ -141,6 +143,7 @@ var monsDesc = []string{
 	MonsHydra:           "Hydras are enormous creatures with four heads that can hit you each at once.",
 	MonsSkeletonWarrior: "Skeleton warriors are good fighters, and are equipped with a chain mail.",
 	MonsSpider:          "Spiders are fast moving fragile creatures, whose bite can confuse you.",
+	MonsBlinkingFrog:    "Blinking frogs are big frog-like unstable creatures, whose bite can make you blink away.",
 	MonsLich:            "Liches are non-living mages wearing a leather armour. They can throw a bolt of torment at you.",
 	MonsEarthDragon:     "Earth dragons are big and hardy creatures that wander in the Underground. It is said they are to credit for many tunnels.",
 	MonsMirrorSpecter:   "Mirror specters are very insubstancial creatures. They can absorb your mana.",
@@ -155,6 +158,7 @@ const (
 	LoneHound
 	LoneHydra
 	LoneSpider
+	LoneBlinkingFrog
 	LoneCyclop
 	LoneLich
 	LoneEarthDragon
@@ -165,6 +169,7 @@ const (
 	BandHounds
 	BandYacks
 	BandSpiders
+	BandBlinkingFrogs
 	BandGiantBees
 	BandSkeletonWarrior
 	UBandWorms
@@ -215,16 +220,17 @@ func (g *game) GenBand(mbd monsterBandData, band monsterBand) []monsterKind {
 }
 
 var MonsBands = []monsterBandData{
-	LoneGoblin:      {rarity: 10, minDepth: 0, maxDepth: 5, monster: MonsGoblin},
-	LoneOgre:        {rarity: 15, minDepth: 2, maxDepth: 11, monster: MonsOgre},
-	LoneWorm:        {rarity: 10, minDepth: 0, maxDepth: 6, monster: MonsWorm},
-	LoneHound:       {rarity: 20, minDepth: 1, maxDepth: 8, monster: MonsHound},
-	LoneHydra:       {rarity: 45, minDepth: 8, maxDepth: 13, monster: MonsHydra},
-	LoneSpider:      {rarity: 20, minDepth: 3, maxDepth: 13, monster: MonsSpider},
-	LoneCyclop:      {rarity: 45, minDepth: 5, maxDepth: 13, monster: MonsCyclop},
-	LoneLich:        {rarity: 70, minDepth: 9, maxDepth: 13, monster: MonsLich},
-	LoneEarthDragon: {rarity: 80, minDepth: 10, maxDepth: 13, monster: MonsEarthDragon},
-	LoneSpecter:     {rarity: 70, minDepth: 6, maxDepth: 13, monster: MonsMirrorSpecter},
+	LoneGoblin:       {rarity: 10, minDepth: 0, maxDepth: 5, monster: MonsGoblin},
+	LoneOgre:         {rarity: 15, minDepth: 2, maxDepth: 11, monster: MonsOgre},
+	LoneWorm:         {rarity: 10, minDepth: 0, maxDepth: 6, monster: MonsWorm},
+	LoneHound:        {rarity: 20, minDepth: 1, maxDepth: 8, monster: MonsHound},
+	LoneHydra:        {rarity: 45, minDepth: 8, maxDepth: 13, monster: MonsHydra},
+	LoneSpider:       {rarity: 20, minDepth: 3, maxDepth: 13, monster: MonsSpider},
+	LoneBlinkingFrog: {rarity: 50, minDepth: 5, maxDepth: 13, monster: MonsBlinkingFrog},
+	LoneCyclop:       {rarity: 45, minDepth: 5, maxDepth: 13, monster: MonsCyclop},
+	LoneLich:         {rarity: 70, minDepth: 9, maxDepth: 13, monster: MonsLich},
+	LoneEarthDragon:  {rarity: 80, minDepth: 10, maxDepth: 13, monster: MonsEarthDragon},
+	LoneSpecter:      {rarity: 70, minDepth: 6, maxDepth: 13, monster: MonsMirrorSpecter},
 	BandGoblins: {
 		distribution: map[monsterKind]monsInterval{MonsGoblin: monsInterval{2, 4}},
 		rarity:       10, minDepth: 1, maxDepth: 7, band: true,
@@ -248,6 +254,10 @@ var MonsBands = []monsterBandData{
 	BandSpiders: {
 		distribution: map[monsterKind]monsInterval{MonsSpider: monsInterval{2, 4}},
 		rarity:       25, minDepth: 5, maxDepth: 13, band: true,
+	},
+	BandBlinkingFrogs: {
+		distribution: map[monsterKind]monsInterval{MonsBlinkingFrog: monsInterval{2, 4}},
+		rarity:       70, minDepth: 9, maxDepth: 13, band: true,
 	},
 	BandYacks: {
 		distribution: map[monsterKind]monsInterval{MonsYack: monsInterval{2, 5}},
@@ -527,6 +537,10 @@ func (m *monster) HitSideEffects(g *game, ev event) {
 			g.Player.Statuses[StatusBerserk]++
 			heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 25 + RandInt(40), EAction: BerserkEnd})
 			g.Print("You feel a sudden urge to kill things.")
+		}
+	case MonsBlinkingFrog:
+		if RandInt(2) == 0 {
+			g.Blink(ev)
 		}
 		//if RandInt(3) == 0 && !g.Player.HasStatus(StatusNausea) {
 		//g.Player.Statuses[StatusNausea]++

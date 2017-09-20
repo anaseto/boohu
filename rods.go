@@ -165,6 +165,14 @@ func (g *game) EvokeRodBlink(ev event) error {
 	if g.Player.HasStatus(StatusLignification) {
 		return errors.New("You cannot blink while lignified.")
 	}
+	g.Blink(ev)
+	return nil
+}
+
+func (g *game) Blink(ev event) {
+	if g.Player.HasStatus(StatusLignification) {
+		return
+	}
 	losPos := []position{}
 	for pos, b := range g.Player.LOS {
 		if !b {
@@ -180,7 +188,9 @@ func (g *game) EvokeRodBlink(ev event) error {
 		losPos = append(losPos, pos)
 	}
 	if len(losPos) == 0 {
-		return errors.New("Something went wrong with the blinking.")
+		// should not happen
+		g.Print("You could not blink.")
+		return
 	}
 	npos := losPos[RandInt(len(losPos))]
 	if npos.Distance(g.Player.Pos) <= 3 {
@@ -191,7 +201,6 @@ func (g *game) EvokeRodBlink(ev event) error {
 	g.Print("You blink away.")
 	g.ComputeLOS()
 	g.MakeMonstersAware()
-	return nil
 }
 
 func (g *game) EvokeRodTeleportOther(ev event) error {
