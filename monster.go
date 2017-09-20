@@ -704,6 +704,9 @@ func (m *monster) SmitingAttack(g *game, ev event) bool {
 }
 
 func (m *monster) AbsorbMana(g *game, ev event) bool {
+	if g.Player.MP == 0 {
+		return false
+	}
 	g.Player.MP = 2 * g.Player.MP / 3
 	g.Printf("The %s absorbs your mana.", m.Kind)
 	m.Statuses[MonsExhausted]++
