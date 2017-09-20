@@ -262,7 +262,7 @@ var MonsBands = []monsterBandData{
 	},
 	BandYacks: {
 		distribution: map[monsterKind]monsInterval{MonsYack: monsInterval{2, 5}},
-		rarity:       15, minDepth: 5, maxDepth: 13, band: true,
+		rarity:       15, minDepth: 5, maxDepth: 11, band: true,
 	},
 	BandGiantBees: {
 		distribution: map[monsterKind]monsInterval{MonsGiantBee: monsInterval{2, 5}},
