@@ -136,7 +136,7 @@ var monsDesc = []string{
 	MonsWorm:            "Worms are ugly slow moving creatures, but surprisingly hardy at times.",
 	MonsHound:           "Hounds are fast moving carnivore quadrupeds. They sometimes attack in group.",
 	MonsYack:            "Yacks are quite large herbivorous quadrupeds. They tend to form large groups.",
-	MonsGiantBee:        "Giant bees are fragile, but extremely fast moving creatures. Their bite can sometimes enrage in you.",
+	MonsGiantBee:        "Giant bees are fragile, but extremely fast moving creatures. Their bite can sometimes enrage you.",
 	MonsGoblinWarrior:   "Goblin warriors are goblins that learned to fight, and got equipped with a leather armour.",
 	MonsHydra:           "Hydras are enormous creatures with four heads that can hit you each at once.",
 	MonsSkeletonWarrior: "Skeleton warriors are good fighters, and are equipped with a chain mail.",
