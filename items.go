@@ -110,6 +110,9 @@ func (p potion) Use(g *game, ev event) error {
 		// should not happen
 		return errors.New("no such consumable: " + p.String())
 	}
+	if g.Player.HasStatus(StatusNausea) {
+		return errors.New("You cannot drink potions while sick.")
+	}
 	if g.Player.HasStatus(StatusBerserk) {
 		return errors.New("You cannot drink potions while berserk.")
 	}
@@ -161,7 +164,7 @@ func (g *game) QuaffBerserk(ev event) error {
 		return errors.New("You are too exhausted to berserk.")
 	}
 	g.Player.Statuses[StatusBerserk]++
-	heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 75, EAction: BerserkEnd})
+	heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 65 + RandInt(20), EAction: BerserkEnd})
 	g.Printf("You quaff a %s. You feel a sudden urge to kill things.", BerserkPotion)
 	return nil
 }

@@ -136,7 +136,7 @@ var monsDesc = []string{
 	MonsWorm:            "Worms are ugly slow moving creatures, but surprisingly hardy at times.",
 	MonsHound:           "Hounds are fast moving carnivore quadrupeds. They sometimes attack in group.",
 	MonsYack:            "Yacks are quite large herbivorous quadrupeds. They tend to form large groups.",
-	MonsGiantBee:        "Giant Bees are fragile, but extremely fast moving creatures.",
+	MonsGiantBee:        "Giant Bees are fragile, but extremely fast moving creatures. Their bite can sometimes enrage in you.",
 	MonsGoblinWarrior:   "Goblin warriors are goblins that learned to fight, and got equipped with a leather armour.",
 	MonsHydra:           "Hydras are enormous creatures with several heads that can hit you each at once.",
 	MonsSkeletonWarrior: "Skeleton warriors are good fighters, and are equipped with a chain mail.",
@@ -508,14 +508,33 @@ func (m *monster) HitPlayer(g *game, ev event) {
 		attack := g.HitDamage(m.Attack, g.Player.Armor())
 		g.Player.HP -= attack
 		g.Printf("The %s hits you (%d damage).", m.Kind, attack)
-		if m.Kind == MonsSpider && RandInt(2) == 0 {
+		m.HitSideEffects(g, ev)
+	} else {
+		g.Printf("The %s misses you.", m.Kind)
+	}
+}
+
+func (m *monster) HitSideEffects(g *game, ev event) {
+	switch m.Kind {
+	case MonsSpider:
+		if RandInt(2) == 0 && !g.Player.HasStatus(StatusConfusion) {
 			g.Player.Statuses[StatusConfusion]++
 			heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 100 + RandInt(100), EAction: ConfusionEnd})
 			g.Print("You feel confused.")
 		}
-	} else {
-		g.Printf("The %s misses you.", m.Kind)
+	case MonsGiantBee:
+		if RandInt(5) == 0 && !g.Player.HasStatus(StatusBerserk) {
+			g.Player.Statuses[StatusBerserk]++
+			heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 25 + RandInt(40), EAction: BerserkEnd})
+			g.Print("You feel a sudden urge to kill things.")
+		}
+		//if RandInt(3) == 0 && !g.Player.HasStatus(StatusNausea) {
+		//g.Player.Statuses[StatusNausea]++
+		//heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 20 + RandInt(30), EAction: NauseaEnd})
+		//g.Print("You feel sick.")
+		//}
 	}
+
 }
 
 func (m *monster) RangedAttack(g *game, ev event) bool {

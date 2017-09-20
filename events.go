@@ -49,8 +49,7 @@ const (
 	EvasionEnd
 	LignificationEnd
 	ConfusionEnd
-	// not used
-	ResistanceEnd
+	NauseaEnd
 )
 
 type simpleEvent struct {
@@ -89,8 +88,8 @@ func (sev *simpleEvent) Action(g *game) {
 		g.Player.Statuses[StatusSlow]++
 		g.Player.Statuses[StatusExhausted]++
 		g.Print("You are no longer berserk.")
-		heap.Push(g.Events, &simpleEvent{ERank: sev.Rank() + 100, EAction: SlowEnd})
-		heap.Push(g.Events, &simpleEvent{ERank: sev.Rank() + 300, EAction: ExhaustionEnd})
+		heap.Push(g.Events, &simpleEvent{ERank: sev.Rank() + 90 + RandInt(40), EAction: SlowEnd})
+		heap.Push(g.Events, &simpleEvent{ERank: sev.Rank() + 270 + RandInt(60), EAction: ExhaustionEnd})
 	case SlowEnd:
 		g.Print("You feel no longer slow.")
 		g.Player.Statuses[StatusSlow]--
@@ -103,15 +102,15 @@ func (sev *simpleEvent) Action(g *game) {
 	case EvasionEnd:
 		g.Print("You feel no longer agile.")
 		g.Player.Statuses[StatusEvasion]--
-	case ResistanceEnd:
-		g.Print("You feel no longer resistant to the elements.")
-		g.Player.Statuses[StatusResistance]--
 	case LignificationEnd:
 		g.Print("Your feel no longer attached to the ground.")
 		g.Player.Statuses[StatusLignification]--
 	case ConfusionEnd:
 		g.Print("Your feel no longer confused.")
 		g.Player.Statuses[StatusConfusion]--
+	case NauseaEnd:
+		g.Print("You feel no longer sick.")
+		g.Player.Statuses[StatusNausea]--
 	}
 }
 
