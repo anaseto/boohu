@@ -49,6 +49,7 @@ const (
 	MonsOgre
 	MonsCyclop
 	MonsWorm
+	MonsBrizzia
 	MonsHound
 	MonsYack
 	MonsGiantBee
@@ -118,6 +119,7 @@ var MonsData = []monsterData{
 	MonsOgre:            {10, 15, 12, 28, 13, 0, 8, 'O', "ogre", 5},
 	MonsCyclop:          {10, 12, 12, 28, 13, 0, 8, 'C', "cyclop", 9},
 	MonsWorm:            {12, 9, 10, 25, 13, 0, 10, 'w', "worm", 3},
+	MonsBrizzia:         {12, 10, 10, 30, 13, 0, 10, 'z', "brizzia", 7},
 	MonsHound:           {8, 9, 10, 15, 14, 0, 12, 'h', "hound", 4},
 	MonsYack:            {10, 11, 10, 21, 14, 0, 10, 'y', "yack", 5},
 	MonsGiantBee:        {6, 10, 10, 11, 15, 0, 15, 'B', "giant bee", 6},
@@ -136,6 +138,7 @@ var monsDesc = []string{
 	MonsOgre:            "Ogres are big clunky humanoids that can hit really hard.",
 	MonsCyclop:          "Cyclops are very similar to ogres, but they also like to throw rocks at their foes, sometimes confusing them.",
 	MonsWorm:            "Worms are ugly slow moving creatures, but surprisingly hardy at times.",
+	MonsBrizzia:         "Brizzias are big slow moving biped creatures. They are quite hardy, and they can cause nausea, impeding the use of potions.",
 	MonsHound:           "Hounds are fast moving carnivore quadrupeds. They sometimes attack in group.",
 	MonsYack:            "Yacks are quite large herbivorous quadrupeds. They tend to form large groups.",
 	MonsGiantBee:        "Giant bees are fragile, but extremely fast moving creatures. Their bite can sometimes enrage you.",
@@ -155,6 +158,7 @@ const (
 	LoneGoblin monsterBand = iota
 	LoneOgre
 	LoneWorm
+	LoneBrizzia
 	LoneHound
 	LoneHydra
 	LoneSpider
@@ -180,6 +184,7 @@ const (
 	UBandBeeYacks
 	UHydras
 	ULich
+	UBrizzias
 	UDragon
 )
 
@@ -224,6 +229,7 @@ var MonsBands = []monsterBandData{
 	LoneGoblin:       {rarity: 10, minDepth: 0, maxDepth: 5, monster: MonsGoblin},
 	LoneOgre:         {rarity: 15, minDepth: 2, maxDepth: 11, monster: MonsOgre},
 	LoneWorm:         {rarity: 10, minDepth: 0, maxDepth: 6, monster: MonsWorm},
+	LoneBrizzia:      {rarity: 90, minDepth: 7, maxDepth: 13, monster: MonsBrizzia},
 	LoneHound:        {rarity: 20, minDepth: 1, maxDepth: 8, monster: MonsHound},
 	LoneHydra:        {rarity: 45, minDepth: 8, maxDepth: 13, monster: MonsHydra},
 	LoneSpider:       {rarity: 20, minDepth: 3, maxDepth: 13, monster: MonsSpider},
@@ -320,6 +326,12 @@ var MonsBands = []monsterBandData{
 			MonsMirrorSpecter:   monsInterval{0, 1},
 		},
 		rarity: 50, minDepth: 11, maxDepth: 11, band: true, unique: true,
+	},
+	UBrizzias: {
+		distribution: map[monsterKind]monsInterval{
+			MonsBrizzia: monsInterval{3, 4},
+		},
+		rarity: 90, minDepth: 11, maxDepth: 11, band: true, unique: true,
 	},
 	UDragon: {
 		distribution: map[monsterKind]monsInterval{
@@ -547,11 +559,12 @@ func (m *monster) HitSideEffects(g *game, ev event) {
 		if RandInt(2) == 0 {
 			g.Blink(ev)
 		}
-		//if RandInt(3) == 0 && !g.Player.HasStatus(StatusNausea) {
-		//g.Player.Statuses[StatusNausea]++
-		//heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 20 + RandInt(30), EAction: NauseaEnd})
-		//g.Print("You feel sick.")
-		//}
+	case MonsBrizzia:
+		if RandInt(3) == 0 && !g.Player.HasStatus(StatusNausea) {
+			g.Player.Statuses[StatusNausea]++
+			heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 30 + RandInt(20), EAction: NauseaEnd})
+			g.Print("You feel sick.")
+		}
 	}
 
 }
