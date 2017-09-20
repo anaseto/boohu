@@ -174,6 +174,7 @@ const (
 	BandSkeletonWarrior
 	UBandWorms
 	UBandGoblinsEasy
+	UBandFrogs
 	UBandOgres
 	UBandGoblins
 	UBandBeeYacks
@@ -281,6 +282,10 @@ var MonsBands = []monsterBandData{
 			MonsHound:  monsInterval{1, 2},
 		},
 		rarity: 30, minDepth: 5, maxDepth: 5, band: true, unique: true,
+	},
+	UBandFrogs: {
+		distribution: map[monsterKind]monsInterval{MonsBlinkingFrog: monsInterval{2, 3}},
+		rarity:       60, minDepth: 6, maxDepth: 6, band: true, unique: true,
 	},
 	UBandOgres: {
 		distribution: map[monsterKind]monsInterval{MonsOgre: monsInterval{2, 3}, MonsCyclop: monsInterval{1, 1}},
