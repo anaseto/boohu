@@ -58,6 +58,7 @@ const (
 	MonsSpider
 	MonsLich
 	MonsEarthDragon
+	MonsMirrorSpecter
 )
 
 func (mk monsterKind) String() string {
@@ -79,6 +80,15 @@ func (mk monsterKind) AttackDelay() int {
 func (mk monsterKind) Ranged() bool {
 	switch mk {
 	case MonsLich, MonsCyclop:
+		return true
+	default:
+		return false
+	}
+}
+
+func (mk monsterKind) Smiting() bool {
+	switch mk {
+	case MonsMirrorSpecter:
 		return true
 	default:
 		return false
@@ -116,6 +126,7 @@ var MonsData = []monsterData{
 	MonsSpider:          {8, 7, 10, 13, 17, 0, 15, 's', "spider", 6},
 	MonsLich:            {10, 10, 10, 23, 15, 3, 12, 'L', "lich", 17},
 	MonsEarthDragon:     {10, 14, 10, 40, 14, 6, 8, 'D', "earth dragon", 20},
+	MonsMirrorSpecter:   {10, 9, 10, 18, 15, 0, 17, 'm', "mirror specter", 11},
 }
 
 var monsDesc = []string{
@@ -132,6 +143,7 @@ var monsDesc = []string{
 	MonsSpider:          "Spiders are fast moving fragile creatures, whose bite can confuse you.",
 	MonsLich:            "Liches are non-living mages wearing a leather armour. They can throw a bolt of torment at you.",
 	MonsEarthDragon:     "Earth dragons are big and hardy creatures that wander in the Underground. It is said they are to credit for many tunnels.",
+	MonsMirrorSpecter:   "Mirror specters are very insubstancial creatures. They can absorb your mana.",
 }
 
 type monsterBand int
@@ -146,6 +158,7 @@ const (
 	LoneCyclop
 	LoneLich
 	LoneEarthDragon
+	LoneSpecter
 	BandGoblins
 	BandGoblinsWithWarriors
 	BandGoblinWarriors
@@ -211,6 +224,7 @@ var MonsBands = []monsterBandData{
 	LoneCyclop:      {rarity: 45, minDepth: 5, maxDepth: 13, monster: MonsCyclop},
 	LoneLich:        {rarity: 70, minDepth: 9, maxDepth: 13, monster: MonsLich},
 	LoneEarthDragon: {rarity: 80, minDepth: 10, maxDepth: 13, monster: MonsEarthDragon},
+	LoneSpecter:     {rarity: 70, minDepth: 6, maxDepth: 13, monster: MonsMirrorSpecter},
 	BandGoblins: {
 		distribution: map[monsterKind]monsInterval{MonsGoblin: monsInterval{2, 4}},
 		rarity:       10, minDepth: 1, maxDepth: 7, band: true,
@@ -288,6 +302,7 @@ var MonsBands = []monsterBandData{
 		distribution: map[monsterKind]monsInterval{
 			MonsSkeletonWarrior: monsInterval{1, 3},
 			MonsLich:            monsInterval{1, 1},
+			MonsMirrorSpecter:   monsInterval{0, 1},
 		},
 		rarity: 50, minDepth: 11, maxDepth: 11, band: true, unique: true,
 	},
@@ -392,6 +407,9 @@ func (m *monster) HandleTurn(g *game, ev event) {
 		return
 	}
 	if m.RangedAttack(g, ev) {
+		return
+	}
+	if m.SmitingAttack(g, ev) {
 		return
 	}
 	if mpos.Distance(ppos) == 1 {
@@ -519,6 +537,7 @@ func (m *monster) RangedAttack(g *game, ev event) bool {
 		return m.TormentBolt(g, ev)
 	case MonsCyclop:
 		return m.ThrowRock(g, ev)
+	case MonsMirrorSpecter:
 	}
 	return false
 }
@@ -622,6 +641,36 @@ func (m *monster) ThrowRock(g *game, ev event) bool {
 		g.Printf("You block the %s's rock.", m.Kind)
 	}
 	ev.Renew(g, 2*m.Kind.AttackDelay())
+	return true
+}
+
+func (m *monster) SmitingAttack(g *game, ev event) bool {
+	if !m.Kind.Smiting() {
+		return false
+	}
+	rdist := 5
+	if g.Player.Aptitudes[AptStealthyLOS] {
+		rdist = 4
+	}
+	if m.Pos.Distance(g.Player.Pos) > rdist || !g.Player.LOS[m.Pos] {
+		return false
+	}
+	if m.Status(MonsExhausted) {
+		return false
+	}
+	switch m.Kind {
+	case MonsMirrorSpecter:
+		return m.AbsorbMana(g, ev)
+	}
+	return false
+}
+
+func (m *monster) AbsorbMana(g *game, ev event) bool {
+	g.Player.MP = 2 * g.Player.MP / 3
+	g.Printf("The %s absorbs your mana.", m.Kind)
+	m.Statuses[MonsExhausted]++
+	heap.Push(g.Events, &monsterEvent{ERank: ev.Rank() + 10 + RandInt(20), NMons: m.Index(g), EAction: MonsExhaustionEnd})
+	ev.Renew(g, m.Kind.AttackDelay())
 	return true
 }
 
