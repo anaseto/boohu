@@ -397,7 +397,7 @@ func (g *game) GenCaveMap(h, w int) {
 	d.Width = w
 	d.Heigth = h
 	pos := position{40, 10}
-	max := 21 * 40
+	max := 21 * 42
 	d.SetCell(pos, FreeCell)
 	cells := 1
 	notValid := 0
@@ -423,6 +423,33 @@ func (g *game) GenCaveMap(h, w int) {
 			notValid = 0
 			pos = lastValid
 		}
+	}
+	cells = 1
+	max = d.Heigth * 1
+	digs := 0
+	i := 0
+loop:
+	for cells < max {
+		i++
+		if digs > 3 {
+			break
+		}
+		if i > 1000 {
+			break
+		}
+		diag = RandInt(2) == 0
+		block := d.DigBlock(diag)
+		if len(block) == 0 {
+			continue loop
+		}
+		if len(block) < 4 || len(block) > 10 {
+			continue loop
+		}
+		for _, pos := range block {
+			d.SetCell(pos, FreeCell)
+			cells++
+		}
+		digs++
 	}
 	g.Dungeon = d
 }
@@ -468,7 +495,7 @@ func (g *game) GenCaveMapTree(h, w int) {
 	d.SetCell(center.NW(), FreeCell)
 	d.SetCell(center.W(), FreeCell)
 	d.SetCell(center.SW(), FreeCell)
-	max := 21 * 50
+	max := 21 * 42
 	cells := 1
 	diag := RandInt(2) == 0
 loop:
@@ -600,7 +627,6 @@ func (g *game) RunCellularAutomataCave(h, w int) bool {
 	}
 	max := d.Heigth * 1
 	cells := 1
-	diag := RandInt(2) == 0
 	digs := 0
 	i := 0
 loop:
@@ -612,6 +638,7 @@ loop:
 		if i > 1000 {
 			break
 		}
+		diag := RandInt(2) == 0
 		block := d.DigBlock(diag)
 		if len(block) == 0 {
 			continue loop
