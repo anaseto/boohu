@@ -474,6 +474,11 @@ func (d *dungeon) DigBlock(diag bool) []position {
 		}
 		pos = pos.RandomNeighbor(diag)
 		if !d.Valid(pos) {
+			block = block[:0]
+			pos = d.WallCell()
+			continue
+		}
+		if !d.Valid(pos) {
 			return nil
 		}
 	}
@@ -495,7 +500,7 @@ func (g *game) GenCaveMapTree(h, w int) {
 	d.SetCell(center.NW(), FreeCell)
 	d.SetCell(center.W(), FreeCell)
 	d.SetCell(center.SW(), FreeCell)
-	max := 21 * 42
+	max := 21 * 23
 	cells := 1
 	diag := RandInt(2) == 0
 loop:
@@ -505,8 +510,10 @@ loop:
 			continue loop
 		}
 		for _, pos := range block {
-			d.SetCell(pos, FreeCell)
-			cells++
+			if d.Cell(pos).T != FreeCell {
+				d.SetCell(pos, FreeCell)
+				cells++
+			}
 		}
 	}
 	g.Dungeon = d
