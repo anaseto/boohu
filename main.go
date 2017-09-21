@@ -676,7 +676,7 @@ func (ui *termui) DrawDungeonView(g *game, targetting bool) {
 		if g.Player.Weapon.TwoHanded() {
 			ui.DrawText(fmt.Sprintf("] %v (unusable)", g.Player.Shield), 81, 2)
 		} else {
-			ui.DrawText(fmt.Sprintf("] %v (%d)", g.Player.Shield, g.Player.Shield.Block()), 81, 2)
+			ui.DrawText(fmt.Sprintf("] %v (%d)", g.Player.Shield, g.Player.Block()), 81, 2)
 		}
 	}
 	if targetting {

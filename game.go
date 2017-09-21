@@ -567,7 +567,7 @@ func (g *game) InitLevel() {
 		}
 		g.Player.Consumables = map[consumable]int{
 			HealWoundsPotion: 1,
-			Javeline:         3,
+			Javelin:          3,
 		}
 		switch RandInt(6) {
 		case 0, 1:

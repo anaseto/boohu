@@ -238,7 +238,7 @@ func (g *game) QuaffMagicMapping(ev event) error {
 type projectile int
 
 const (
-	Javeline projectile = iota
+	Javelin projectile = iota
 	ConfusingDart
 	// unimplemented
 	Net
@@ -246,8 +246,8 @@ const (
 
 func (p projectile) String() (text string) {
 	switch p {
-	case Javeline:
-		text = "javeline"
+	case Javelin:
+		text = "javelin"
 	case ConfusingDart:
 		text = "dart of confusion"
 	case Net:
@@ -258,7 +258,7 @@ func (p projectile) String() (text string) {
 
 func (p projectile) Desc() (text string) {
 	switch p {
-	case Javeline:
+	case Javelin:
 		// XXX
 		text = "can be thrown to ennemies, dealing up to 11 damage."
 	case ConfusingDart:
@@ -289,8 +289,8 @@ func (p projectile) Use(g *game, ev event) error {
 		return errors.New("internal error: no monster")
 	}
 	switch p {
-	case Javeline:
-		g.ThrowJaveline(mons, ev)
+	case Javelin:
+		g.ThrowJavelin(mons, ev)
 	case ConfusingDart:
 		g.ThrowConfusingDart(mons, ev)
 	}
@@ -298,7 +298,7 @@ func (p projectile) Use(g *game, ev event) error {
 	return nil
 }
 
-func (g *game) ThrowJaveline(mons *monster, ev event) {
+func (g *game) ThrowJavelin(mons *monster, ev event) {
 	acc := RandInt(g.Player.Accuracy())
 	evasion := RandInt(mons.Evasion)
 	if mons.State == Resting {
@@ -316,14 +316,14 @@ func (g *game) ThrowJaveline(mons *monster, ev event) {
 		attack := g.HitDamage(11+bonus, mons.Armor)
 		mons.HP -= attack
 		if mons.HP > 0 {
-			g.Printf("Your %s hits the %s (%d).", Javeline, mons.Kind, attack)
+			g.Printf("Your %s hits the %s (%d).", Javelin, mons.Kind, attack)
 			mons.MakeHuntIfHurt(g)
 		} else {
-			g.Printf("Your %s kills the %s.", Javeline, mons.Kind)
+			g.Printf("Your %s kills the %s.", Javelin, mons.Kind)
 			g.Killed++
 		}
 	} else {
-		g.Printf("Your %s missed the %s.", Javeline, mons.Kind)
+		g.Printf("Your %s missed the %s.", Javelin, mons.Kind)
 		mons.MakeHuntIfHurt(g)
 	}
 	ev.Renew(g, 10)
@@ -368,7 +368,7 @@ var ConsumablesCollectData = map[consumable]collectData{
 	LignificationPotion: {rarity: 8, quantity: 1},
 	MagicMappingPotion:  {rarity: 15, quantity: 1},
 	MagicPotion:         {rarity: 10, quantity: 1},
-	Javeline:            {rarity: 3, quantity: 3},
+	Javelin:             {rarity: 3, quantity: 3},
 	ConfusingDart:       {rarity: 5, quantity: 2},
 }
 

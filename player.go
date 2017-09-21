@@ -74,6 +74,14 @@ func (p *player) Attack() int {
 	return attack
 }
 
+func (p *player) Block() int {
+	block := p.Shield.Block()
+	if p.HasStatus(StatusDisabledShield) {
+		block /= 3
+	}
+	return block
+}
+
 func (p *player) Evasion() int {
 	ev := 15
 	if p.Aptitudes[AptAgile] {

@@ -50,6 +50,7 @@ const (
 	LignificationEnd
 	ConfusionEnd
 	NauseaEnd
+	DisabledShieldEnd
 )
 
 type simpleEvent struct {
@@ -111,6 +112,9 @@ func (sev *simpleEvent) Action(g *game) {
 	case NauseaEnd:
 		g.Print("You feel no longer sick.")
 		g.Player.Statuses[StatusNausea]--
+	case DisabledShieldEnd:
+		g.Print("You manage to free your shield from the projectile.")
+		g.Player.Statuses[StatusDisabledShield]--
 	}
 }
 

@@ -13,9 +13,8 @@ const (
 	StatusLignification
 	StatusConfusion
 	StatusTele
-	// below unimplemented
 	StatusNausea
-	StatusResistance
+	StatusDisabledShield
 )
 
 func (st status) Good() bool {
@@ -29,7 +28,7 @@ func (st status) Good() bool {
 
 func (st status) Bad() bool {
 	switch st {
-	case StatusSlow, StatusConfusion, StatusNausea:
+	case StatusSlow, StatusConfusion, StatusNausea, StatusDisabledShield:
 		return true
 	default:
 		return false
@@ -56,6 +55,8 @@ func (st status) String() string {
 		return "Tele"
 	case StatusNausea:
 		return "Nausea"
+	case StatusDisabledShield:
+		return "-Shield"
 	default:
 		// should not happen
 		return "unknown"

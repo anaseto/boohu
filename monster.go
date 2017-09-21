@@ -81,7 +81,7 @@ func (mk monsterKind) AttackDelay() int {
 
 func (mk monsterKind) Ranged() bool {
 	switch mk {
-	case MonsLich, MonsCyclop:
+	case MonsLich, MonsCyclop, MonsGoblinWarrior:
 		return true
 	default:
 		return false
@@ -123,7 +123,7 @@ var MonsData = []monsterData{
 	MonsHound:           {8, 9, 10, 15, 14, 0, 12, 'h', "hound", 4},
 	MonsYack:            {10, 11, 10, 21, 14, 0, 10, 'y', "yack", 5},
 	MonsGiantBee:        {6, 10, 10, 11, 15, 0, 15, 'B', "giant bee", 6},
-	MonsGoblinWarrior:   {10, 11, 10, 25, 15, 3, 12, 'G', "goblin warrior", 8},
+	MonsGoblinWarrior:   {10, 11, 10, 22, 15, 3, 12, 'G', "goblin warrior", 8},
 	MonsHydra:           {10, 9, 10, 45, 13, 0, 6, 'H', "hydra", 15},
 	MonsSkeletonWarrior: {10, 12, 10, 25, 15, 4, 12, 'S', "skeleton warrior", 10},
 	MonsSpider:          {8, 7, 10, 13, 17, 0, 15, 's', "spider", 6},
@@ -588,7 +588,8 @@ func (m *monster) RangedAttack(g *game, ev event) bool {
 		return m.TormentBolt(g, ev)
 	case MonsCyclop:
 		return m.ThrowRock(g, ev)
-	case MonsMirrorSpecter:
+	case MonsGoblinWarrior:
+		return m.ThrowJavelin(g, ev)
 	}
 	return false
 }
@@ -652,10 +653,10 @@ func (g *game) HitDamage(base int, armor int) int {
 func (m *monster) Blocked(g *game) bool {
 	blocked := false
 	if g.Player.Shield != NoShield && !g.Player.Weapon.TwoHanded() {
-		block := RandInt(g.Player.Shield.Block())
+		block := RandInt(g.Player.Block())
 		acc := RandInt(m.Accuracy)
 		if block >= acc {
-			g.MakeNoise(12+g.Player.Shield.Block()/2, g.Player.Pos)
+			g.MakeNoise(12+g.Player.Block()/2, g.Player.Pos)
 			blocked = true
 		}
 	}
@@ -667,6 +668,7 @@ func (m *monster) ThrowRock(g *game, ev event) bool {
 	if blocked {
 		return false
 	}
+	block := false
 	hit := true
 	evasion := RandInt(g.Player.Evasion())
 	acc := RandInt(m.Accuracy)
@@ -674,7 +676,8 @@ func (m *monster) ThrowRock(g *game, ev event) bool {
 		// rocks are big and do not miss so often
 		hit = false
 	} else {
-		hit = !m.Blocked(g)
+		block = m.Blocked(g)
+		hit = !block
 	}
 	if hit {
 		noise := 12
@@ -688,10 +691,51 @@ func (m *monster) ThrowRock(g *game, ev event) bool {
 			heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 100 + RandInt(100), EAction: ConfusionEnd})
 			g.Print("You feel confused.")
 		}
+	} else if block {
+		g.Printf("You block %s's rock.", Indefinite(m.Kind.String(), false))
 	} else {
-		g.Printf("You block the %s's rock.", m.Kind)
+		g.Printf("You dodge %s's rock.", Indefinite(m.Kind.String(), false))
 	}
 	ev.Renew(g, 2*m.Kind.AttackDelay())
+	return true
+}
+
+func (m *monster) ThrowJavelin(g *game, ev event) bool {
+	blocked := m.RangeBlocked(g)
+	if blocked {
+		return false
+	}
+	block := false
+	hit := true
+	evasion := RandInt(g.Player.Evasion())
+	acc := RandInt(m.Accuracy)
+	if acc <= evasion {
+		hit = false
+	} else {
+		block = m.Blocked(g)
+		hit = !block
+	}
+	if hit {
+		noise := 12
+		noise += g.Player.Armor() / 2
+		g.MakeNoise(noise, g.Player.Pos)
+		attack := g.HitDamage(11, g.Player.Armor())
+		g.Player.HP -= attack
+		g.Printf("The %s throws %s at you (%d damage).", m.Kind, Indefinite(Javelin.String(), false), attack)
+	} else if block {
+		if RandInt(3) == 0 {
+			g.Printf("You block %s's %s.", Indefinite(m.Kind.String(), false), Javelin)
+		} else {
+			g.Player.Statuses[StatusDisabledShield]++
+			heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 100 + RandInt(100), EAction: DisabledShieldEnd})
+			g.Printf("%s's %s gets fixed on your shield.", Indefinite(m.Kind.String(), true), Javelin)
+		}
+	} else {
+		g.Printf("You dodge %s's %s.", Indefinite(m.Kind.String(), false), Javelin)
+	}
+	m.Statuses[MonsExhausted]++
+	heap.Push(g.Events, &monsterEvent{ERank: ev.Rank() + 50 + RandInt(50), NMons: m.Index(g), EAction: MonsExhaustionEnd})
+	ev.Renew(g, m.Kind.AttackDelay())
 	return true
 }
 
