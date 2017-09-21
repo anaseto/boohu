@@ -632,7 +632,7 @@ func (g *game) RunCellularAutomataCave(h, w int) bool {
 loop:
 	for cells < max {
 		i++
-		if digs > 3 {
+		if digs > 4 {
 			break
 		}
 		if i > 1000 {
