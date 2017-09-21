@@ -305,8 +305,8 @@ var MonsBands = []monsterBandData{
 	},
 	UBandGoblins: {
 		distribution: map[monsterKind]monsInterval{
-			MonsGoblin:        monsInterval{3, 5},
-			MonsGoblinWarrior: monsInterval{1, 2},
+			MonsGoblin:        monsInterval{2, 3},
+			MonsGoblinWarrior: monsInterval{2, 2},
 			MonsHound:         monsInterval{1, 2},
 		},
 		rarity: 30, minDepth: 8, maxDepth: 8, band: true, unique: true,
@@ -327,7 +327,7 @@ var MonsBands = []monsterBandData{
 	},
 	ULich: {
 		distribution: map[monsterKind]monsInterval{
-			MonsSkeletonWarrior: monsInterval{1, 3},
+			MonsSkeletonWarrior: monsInterval{2, 2},
 			MonsLich:            monsInterval{1, 1},
 			MonsMirrorSpecter:   monsInterval{0, 1},
 		},
@@ -337,13 +337,13 @@ var MonsBands = []monsterBandData{
 		distribution: map[monsterKind]monsInterval{
 			MonsBrizzia: monsInterval{3, 4},
 		},
-		rarity: 90, minDepth: 11, maxDepth: 11, band: true, unique: true,
+		rarity: 80, minDepth: 11, maxDepth: 11, band: true, unique: true,
 	},
 	UAcidMounds: {
 		distribution: map[monsterKind]monsInterval{
 			MonsAcidMound: monsInterval{3, 4},
 		},
-		rarity: 90, minDepth: 12, maxDepth: 12, band: true, unique: true,
+		rarity: 80, minDepth: 12, maxDepth: 12, band: true, unique: true,
 	},
 	UDragon: {
 		distribution: map[monsterKind]monsInterval{
