@@ -809,7 +809,11 @@ func (ui *termui) DrawStatusLine(g *game) {
 		} else {
 			color = ColorFgStatusOther
 		}
-		ui.DrawColoredText(st.String(), 81, 10+i, color)
+		if g.Player.Statuses[st] > 1 {
+			ui.DrawColoredText(fmt.Sprintf("%s (%d)", st, g.Player.Statuses[st]), 81, 10+i, color)
+		} else {
+			ui.DrawColoredText(st.String(), 81, 10+i, color)
+		}
 	}
 }
 

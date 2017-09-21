@@ -63,6 +63,12 @@ func (p *player) Armor() int {
 	if p.HasStatus(StatusLignification) {
 		ar = 8 + ar/2
 	}
+	if p.HasStatus(StatusCorrosion) {
+		ar -= 2 * p.Statuses[StatusCorrosion]
+		if ar < 0 {
+			ar = 0
+		}
+	}
 	return ar
 }
 
@@ -70,6 +76,13 @@ func (p *player) Attack() int {
 	attack := p.Weapon.Attack()
 	if p.Aptitudes[AptStrong] {
 		attack += attack / 5
+	}
+	if p.HasStatus(StatusCorrosion) {
+		penalty := p.Statuses[StatusCorrosion]
+		if penalty > 5 {
+			penalty = 5
+		}
+		attack -= penalty
 	}
 	return attack
 }

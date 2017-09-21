@@ -51,6 +51,7 @@ const (
 	ConfusionEnd
 	NauseaEnd
 	DisabledShieldEnd
+	CorrosionEnd
 )
 
 type simpleEvent struct {
@@ -115,6 +116,11 @@ func (sev *simpleEvent) Action(g *game) {
 	case DisabledShieldEnd:
 		g.Print("You manage to free your shield from the projectile.")
 		g.Player.Statuses[StatusDisabledShield]--
+	case CorrosionEnd:
+		g.Player.Statuses[StatusCorrosion]--
+		if g.Player.Statuses[StatusCorrosion] == 0 {
+			g.Print("Your equipment is now free from acid.")
+		}
 	}
 }
 

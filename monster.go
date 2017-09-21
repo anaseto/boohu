@@ -61,6 +61,7 @@ const (
 	MonsLich
 	MonsEarthDragon
 	MonsMirrorSpecter
+	MonsAcidMound
 )
 
 func (mk monsterKind) String() string {
@@ -120,6 +121,7 @@ var MonsData = []monsterData{
 	MonsCyclop:          {10, 12, 12, 28, 13, 0, 8, 'C', "cyclop", 9},
 	MonsWorm:            {12, 9, 10, 25, 13, 0, 10, 'w', "worm", 3},
 	MonsBrizzia:         {12, 10, 10, 30, 13, 0, 10, 'z', "brizzia", 7},
+	MonsAcidMound:       {10, 9, 10, 19, 15, 0, 8, 'a', "acid mound", 7},
 	MonsHound:           {8, 9, 10, 15, 14, 0, 12, 'h', "hound", 4},
 	MonsYack:            {10, 11, 10, 21, 14, 0, 10, 'y', "yack", 5},
 	MonsGiantBee:        {6, 10, 10, 11, 15, 0, 15, 'B', "giant bee", 6},
@@ -139,6 +141,7 @@ var monsDesc = []string{
 	MonsCyclop:          "Cyclops are very similar to ogres, but they also like to throw rocks at their foes, sometimes confusing them.",
 	MonsWorm:            "Worms are ugly slow moving creatures, but surprisingly hardy at times.",
 	MonsBrizzia:         "Brizzias are big slow moving biped creatures. They are quite hardy, and they can cause nausea, impeding the use of potions.",
+	MonsAcidMound:       "Acid mounds are acidic creatures. They can temporally corrode your armour.",
 	MonsHound:           "Hounds are fast moving carnivore quadrupeds. They sometimes attack in group.",
 	MonsYack:            "Yacks are quite large herbivorous quadrupeds. They tend to form large groups.",
 	MonsGiantBee:        "Giant bees are fragile, but extremely fast moving creatures. Their bite can sometimes enrage you.",
@@ -167,6 +170,7 @@ const (
 	LoneLich
 	LoneEarthDragon
 	LoneSpecter
+	LoneAcidMound
 	BandGoblins
 	BandGoblinsWithWarriors
 	BandGoblinWarriors
@@ -185,6 +189,7 @@ const (
 	UHydras
 	ULich
 	UBrizzias
+	UAcidMounds
 	UDragon
 )
 
@@ -238,6 +243,7 @@ var MonsBands = []monsterBandData{
 	LoneLich:         {rarity: 70, minDepth: 9, maxDepth: 13, monster: MonsLich},
 	LoneEarthDragon:  {rarity: 80, minDepth: 10, maxDepth: 13, monster: MonsEarthDragon},
 	LoneSpecter:      {rarity: 70, minDepth: 6, maxDepth: 13, monster: MonsMirrorSpecter},
+	LoneAcidMound:    {rarity: 70, minDepth: 6, maxDepth: 13, monster: MonsAcidMound},
 	BandGoblins: {
 		distribution: map[monsterKind]monsInterval{MonsGoblin: monsInterval{2, 4}},
 		rarity:       10, minDepth: 1, maxDepth: 7, band: true,
@@ -332,6 +338,12 @@ var MonsBands = []monsterBandData{
 			MonsBrizzia: monsInterval{3, 4},
 		},
 		rarity: 90, minDepth: 11, maxDepth: 11, band: true, unique: true,
+	},
+	UAcidMounds: {
+		distribution: map[monsterKind]monsInterval{
+			MonsAcidMound: monsInterval{3, 4},
+		},
+		rarity: 90, minDepth: 12, maxDepth: 12, band: true, unique: true,
 	},
 	UDragon: {
 		distribution: map[monsterKind]monsInterval{
@@ -565,6 +577,10 @@ func (m *monster) HitSideEffects(g *game, ev event) {
 			heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 30 + RandInt(20), EAction: NauseaEnd})
 			g.Print("You feel sick.")
 		}
+	case MonsAcidMound:
+		g.Player.Statuses[StatusCorrosion]++
+		heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 80 + RandInt(40), EAction: CorrosionEnd})
+		g.Print("Your equipment is corroded..")
 	}
 
 }
