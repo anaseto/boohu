@@ -204,14 +204,14 @@ func (g *game) QuaffDescent(ev event) error {
 }
 
 func (g *game) QuaffHaste(ev event) error {
-	g.Player.Statuses[StatusHaste]++
+	g.Player.Statuses[StatusSwift]++
 	heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 80 + RandInt(20), EAction: HasteEnd})
 	g.Printf("You quaff the %s. You feel speedy.", RunningPotion)
 	return nil
 }
 
 func (g *game) QuaffEvasion(ev event) error {
-	g.Player.Statuses[StatusEvasion]++
+	g.Player.Statuses[StatusAgile]++
 	heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 90 + RandInt(20), EAction: EvasionEnd})
 	g.Printf("You quaff the %s. You feel agile.", EvasionPotion)
 	return nil

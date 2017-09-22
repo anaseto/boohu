@@ -100,7 +100,7 @@ func (p *player) Evasion() int {
 	if p.Aptitudes[AptAgile] {
 		ev += 3
 	}
-	if p.HasStatus(StatusEvasion) {
+	if p.HasStatus(StatusAgile) {
 		ev += 5
 	}
 	return ev
@@ -306,7 +306,7 @@ func (g *game) MovePlayer(pos position, ev event) error {
 				// only fast for movement
 				delay -= 2
 			}
-			if g.Player.HasStatus(StatusHaste) {
+			if g.Player.HasStatus(StatusSwift) {
 				// only fast for movement
 				delay -= 3
 			}

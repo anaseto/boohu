@@ -100,10 +100,10 @@ func (sev *simpleEvent) Action(g *game) {
 		g.Player.Statuses[StatusExhausted]--
 	case HasteEnd:
 		g.Print("You feel no longer speedy.")
-		g.Player.Statuses[StatusHaste]--
+		g.Player.Statuses[StatusSwift]--
 	case EvasionEnd:
 		g.Print("You feel no longer agile.")
-		g.Player.Statuses[StatusEvasion]--
+		g.Player.Statuses[StatusAgile]--
 	case LignificationEnd:
 		g.Print("Your feel no longer attached to the ground.")
 		g.Player.Statuses[StatusLignification]--

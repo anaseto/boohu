@@ -8,8 +8,8 @@ const (
 	StatusBerserk status = iota
 	StatusSlow
 	StatusExhausted
-	StatusHaste
-	StatusEvasion
+	StatusSwift
+	StatusAgile
 	StatusLignification
 	StatusConfusion
 	StatusTele
@@ -20,7 +20,7 @@ const (
 
 func (st status) Good() bool {
 	switch st {
-	case StatusBerserk, StatusHaste, StatusEvasion:
+	case StatusBerserk, StatusSwift, StatusAgile:
 		return true
 	default:
 		return false
@@ -44,11 +44,11 @@ func (st status) String() string {
 		return "Slow"
 	case StatusExhausted:
 		return "Exhausted"
-	case StatusHaste:
+	case StatusSwift:
 		return "Swift"
 	case StatusLignification:
 		return "Lignified"
-	case StatusEvasion:
+	case StatusAgile:
 		return "Agile"
 	case StatusConfusion:
 		return "Confused"
