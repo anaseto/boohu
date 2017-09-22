@@ -567,6 +567,17 @@ func (d *dungeon) Connected(pos position) (map[position]bool, int) {
 	return conn, count
 }
 
+func (d *dungeon) connex() bool {
+	pos := d.FreeCell()
+	conn, _ := d.Connected(pos)
+	for i, c := range d.Cells {
+		if c.T == FreeCell && !conn[d.CellPosition(i)] {
+			return false
+		}
+	}
+	return true
+}
+
 func (g *game) RunCellularAutomataCave(h, w int) bool {
 	d := &dungeon{}
 	d.Cells = make([]cell, h*w)
