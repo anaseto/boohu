@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -1049,10 +1050,13 @@ func (ui *termui) ExploreStep(g *game) bool {
 		time.Sleep(10 * time.Millisecond)
 		next <- false
 	}()
-	go func() {
-		ui.PressAnyKey()
-		next <- true
-	}()
+	if os.Getenv("GOOS") != "windows" {
+		// strange bug it seems, cannot test myself, so disable on windows
+		go func() {
+			ui.PressAnyKey()
+			next <- true
+		}()
+	}
 	stop := <-next
 	ui.DrawDungeonView(g, false)
 	return stop
