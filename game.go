@@ -605,8 +605,10 @@ func (g *game) InitLevel() {
 
 	// Rods
 	g.Rods = map[position]rod{}
-	r := 5*g.GeneratedRodsCount() - g.Depth + 3
-	if r < 2 {
+	r := 7*(g.GeneratedRodsCount()+1) - 2*(g.Depth+1)
+	if r < -3 {
+		r = 0
+	} else if r < 2 {
 		r = 1
 	}
 	if RandInt(r) == 0 && g.GeneratedRodsCount() < 3 {
