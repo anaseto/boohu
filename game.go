@@ -784,6 +784,16 @@ func (g *game) Descend(ev event) bool {
 	return false
 }
 
+func (g *game) HitDamage(base int, armor int) int {
+	min := base / 2
+	attack := min + RandInt(base-min+1)
+	attack -= RandInt(armor + 1)
+	if attack < 0 {
+		attack = 0
+	}
+	return attack
+}
+
 func (g *game) AutoPlayer(ev event) bool {
 	if g.Resting {
 		if g.MonsterInLOS() == nil && (g.Player.HP < g.Player.HPMax() || g.Player.HasStatus(StatusExhausted)) {

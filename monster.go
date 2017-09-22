@@ -656,16 +656,6 @@ func (m *monster) TormentBolt(g *game, ev event) bool {
 	return true
 }
 
-func (g *game) HitDamage(base int, armor int) int {
-	min := base / 2
-	attack := min + RandInt(base-min+1)
-	attack -= RandInt(armor + 1)
-	if attack < 0 {
-		attack = 0
-	}
-	return attack
-}
-
 func (m *monster) Blocked(g *game) bool {
 	blocked := false
 	if g.Player.Shield != NoShield && !g.Player.Weapon.TwoHanded() {
