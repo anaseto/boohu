@@ -142,14 +142,29 @@ func (g *game) WaitTurn(ev event) {
 	ev.Renew(g, 10)
 }
 
+func (g *game) ExistsMonster() bool {
+	for _, mons := range g.Monsters {
+		if mons.Exists() {
+			return true
+		}
+	}
+	return false
+}
+
 func (g *game) ScummingAction(ev event) {
 	if g.Player.HP == g.Player.HPMax() {
 		g.Scumming++
 	}
 	if g.Scumming == 100 {
-		g.Print("You feel a little bored.")
+		if g.ExistsMonster() {
+			g.Print("You feel a little bored.")
+		}
 	}
 	if g.Scumming > 120 {
+		if !g.ExistsMonster() {
+			g.Scumming = 0
+			return
+		}
 		g.Player.HP = g.Player.HP / 2
 		if RandInt(2) == 0 {
 			g.MakeNoise(100, g.Player.Pos)
