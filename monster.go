@@ -152,7 +152,7 @@ var monsDesc = []string{
 	MonsBlinkingFrog:    "Blinking frogs are big frog-like unstable creatures, whose bite can make you blink away.",
 	MonsLich:            "Liches are non-living mages wearing a leather armour. They can throw a bolt of torment at you.",
 	MonsEarthDragon:     "Earth dragons are big and hardy creatures that wander in the Underground. It is said they are to credit for many tunnels.",
-	MonsMirrorSpecter:   "Mirror specters are very insubstancial creatures. They can absorb your mana.",
+	MonsMirrorSpecter:   "Mirror specters are very insubstantial creatures. They can absorb your mana.",
 }
 
 type monsterBand int
