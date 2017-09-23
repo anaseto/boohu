@@ -372,7 +372,7 @@ type monster struct {
 
 func (m *monster) Init() {
 	m.HPmax = MonsData[m.Kind].maxHP - 1 + RandInt(3)
-	m.Attack = MonsData[m.Kind].baseAttack - RandInt(2)
+	m.Attack = MonsData[m.Kind].baseAttack
 	m.HP = m.HPmax
 	m.Accuracy = MonsData[m.Kind].accuracy
 	m.Armor = MonsData[m.Kind].armor
