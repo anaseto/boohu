@@ -1090,6 +1090,13 @@ func (ui *termui) Dump(g *game) {
 	termbox.Flush()
 }
 
+func (ui *termui) CriticalHPWarning(g *game) {
+	g.Print("*** CRITICAL HP WARNING *** --press esc or space to continue--")
+	ui.DrawDungeonView(g, false)
+	ui.WaitForContinue(g)
+	g.Print("Ok. Be careful, then.")
+}
+
 func (ui *termui) WaitForContinue(g *game) {
 loop:
 	for {

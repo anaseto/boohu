@@ -533,6 +533,14 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	ev.Renew(g, m.Kind.MovementDelay())
 }
 
+func (g *game) InflictDamage(damage, max int) {
+	oldHP := g.Player.HP
+	g.Player.HP -= damage
+	if oldHP > max && g.Player.HP <= max {
+		g.ui.CriticalHPWarning(g)
+	}
+}
+
 func (m *monster) HitPlayer(g *game, ev event) {
 	evasion := RandInt(g.Player.Evasion())
 	acc := RandInt(m.Accuracy)
@@ -545,9 +553,9 @@ func (m *monster) HitPlayer(g *game, ev event) {
 		noise += g.Player.Armor() / 2
 		g.MakeNoise(noise, g.Player.Pos)
 		attack := g.HitDamage(m.Attack, g.Player.Armor())
-		g.Player.HP -= attack
 		g.Printf("The %s hits you (%d damage).", m.Kind, attack)
 		m.HitSideEffects(g, ev)
+		g.InflictDamage(attack, m.Attack)
 	} else {
 		g.Printf("The %s misses you.", m.Kind)
 	}
@@ -645,8 +653,9 @@ func (m *monster) TormentBolt(g *game, ev event) bool {
 	g.MakeNoise(9, m.Pos)
 	if hit {
 		g.MakeNoise(12, g.Player.Pos)
-		g.Player.HP = g.Player.HP / 2
+		damage := g.Player.HP - g.Player.HP/2
 		g.Printf("The %s throws a bolt of torment at you.", m.Kind)
+		g.InflictDamage(damage, 15)
 	} else {
 		g.Printf("You block the %s's bolt of torment.", m.Kind)
 	}
@@ -690,13 +699,13 @@ func (m *monster) ThrowRock(g *game, ev event) bool {
 		noise += g.Player.Armor() / 2
 		g.MakeNoise(noise, g.Player.Pos)
 		attack := g.HitDamage(15, g.Player.Armor())
-		g.Player.HP -= attack
 		g.Printf("The %s throws a rock at you (%d damage).", m.Kind, attack)
 		if RandInt(4) == 0 {
 			g.Player.Statuses[StatusConfusion]++
 			heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 100 + RandInt(100), EAction: ConfusionEnd})
 			g.Print("You feel confused.")
 		}
+		g.InflictDamage(attack, 15)
 	} else if block {
 		g.Printf("You block %s's rock.", Indefinite(m.Kind.String(), false))
 	} else {
@@ -726,8 +735,8 @@ func (m *monster) ThrowJavelin(g *game, ev event) bool {
 		noise += g.Player.Armor() / 2
 		g.MakeNoise(noise, g.Player.Pos)
 		attack := g.HitDamage(11, g.Player.Armor())
-		g.Player.HP -= attack
 		g.Printf("The %s throws %s at you (%d damage).", m.Kind, Indefinite(Javelin.String(), false), attack)
+		g.InflictDamage(attack, 11)
 	} else if block {
 		if RandInt(3) == 0 {
 			g.Printf("You block %s's %s.", Indefinite(m.Kind.String(), false), Javelin)

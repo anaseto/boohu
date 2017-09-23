@@ -390,6 +390,7 @@ type Renderer interface {
 	HandlePlayerTurn(*game, event) bool
 	Death(*game)
 	ChooseTarget(*game, Targetter) bool
+	CriticalHPWarning(*game)
 }
 
 func (g *game) FreeCell() position {
