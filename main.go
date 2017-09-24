@@ -942,7 +942,7 @@ func (ui *termui) SelectProjectile(g *game, ev event) error {
 		if desc {
 			ui.DrawText("Describe which projectile? (press ? for throwing menu, esc to return to game)", 0, 0)
 		} else {
-			ui.DrawText("Throw which projectile? (press ? for description menu, esc to return to game)", 0, 0)
+			ui.DrawText("Throw which projectile? (press ? for describe menu, esc to return to game)", 0, 0)
 		}
 		for i, c := range cs {
 			ui.DrawText(fmt.Sprintf("%c - %s (%d available)", rune(i+97), c, g.Player.Consumables[c]), 0, i+1)
