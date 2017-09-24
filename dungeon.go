@@ -464,6 +464,17 @@ func (d *dungeon) HasFreeNeighbor(pos position) bool {
 	return false
 }
 
+func (d *dungeon) HasFreeExploredNeighbor(pos position) bool {
+	neighbors := d.Neighbors(pos)
+	for _, pos := range neighbors {
+		c := d.Cell(pos)
+		if c.T == FreeCell && c.Explored {
+			return true
+		}
+	}
+	return false
+}
+
 func (d *dungeon) DigBlock(diag bool) []position {
 	pos := d.WallCell()
 	block := []position{}
