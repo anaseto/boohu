@@ -391,6 +391,7 @@ const (
 func (ar armour) Equip(g *game) {
 	oar := g.Player.Armour
 	g.Player.Armour = ar
+	g.Printf("You put the %s on and leave your %s on the ground.", ar, oar)
 	g.Equipables[g.Player.Pos] = oar
 }
 
@@ -444,6 +445,7 @@ const (
 func (wp weapon) Equip(g *game) {
 	owp := g.Player.Weapon
 	g.Player.Weapon = wp
+	g.Printf("You take the %s and leave your %s on the ground.", wp, owp)
 	g.Equipables[g.Player.Pos] = owp
 }
 
@@ -547,8 +549,10 @@ func (sh shield) Equip(g *game) {
 	g.Player.Shield = sh
 	if osh != NoShield {
 		g.Equipables[g.Player.Pos] = osh
+		g.Printf("You put the %s on and leave your %s on the ground.", sh, osh)
 	} else {
 		delete(g.Equipables, g.Player.Pos)
+		g.Printf("You put the %s on.", sh)
 	}
 }
 
