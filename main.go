@@ -536,7 +536,7 @@ loop:
 						}
 					}
 					nstatic.Y++
-					nstatic.X = 0
+					nstatic.X = -1
 					if nstatic.Y >= g.Dungeon.Heigth {
 						nstatic.Y = 0
 					}
