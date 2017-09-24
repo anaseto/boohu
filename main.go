@@ -698,6 +698,7 @@ func (ui *termui) DrawPosition(g *game, pos position) {
 	if g.Wizard {
 		if c.T == WallCell {
 			if len(g.Dungeon.FreeNeighbors(pos)) == 0 {
+				termbox.SetCell(pos.X, pos.Y, '░', ColorFgDark, ColorBgDark)
 				return
 			}
 		}
