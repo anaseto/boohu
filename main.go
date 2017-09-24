@@ -977,7 +977,7 @@ func (ui *termui) SelectPotion(g *game, ev event) error {
 		if desc {
 			ui.DrawText("Describe which potion? (press ? for quaff menu, esc to return to game)", 0, 0)
 		} else {
-			ui.DrawText("Drink which potion? (press ? for describe menu, esc to return to game)", 0, 0)
+			ui.DrawText("Drink which potion? (press ? for description menu, esc to return to game)", 0, 0)
 		}
 		for i, c := range cs {
 			ui.DrawText(fmt.Sprintf("%c - %s (%d available)", rune(i+97), c, g.Player.Consumables[c]), 0, i+1)
