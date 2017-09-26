@@ -894,7 +894,10 @@ func (ui *termui) DrawConsumableDescription(g *game, c consumable) {
 
 func (ui *termui) DrawDescription(g *game, desc string) {
 	termbox.Clear(ColorFg, ColorBg)
-	ui.DrawText(formatText(desc, 79), 0, 0)
+	desc = formatText(desc, 79)
+	lines := strings.Count(desc, "\n")
+	ui.DrawText(desc, 0, 0)
+	ui.DrawText("--press esc or space to continue--", 0, lines+2)
 	termbox.Flush()
 	ui.WaitForContinue(g)
 }
