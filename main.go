@@ -6,8 +6,8 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"os"
 	"path/filepath"
+	"runtime"
 	"sort"
 	"strings"
 	"time"
@@ -1057,7 +1057,7 @@ func (ui *termui) ExploreStep(g *game) bool {
 		time.Sleep(10 * time.Millisecond)
 		next <- false
 	}()
-	if os.Getenv("GOOS") != "windows" {
+	if runtime.GOOS != "windows" {
 		// strange bug it seems, cannot test myself, so disable on windows
 		go func() {
 			ui.PressAnyKey()
