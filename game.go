@@ -159,6 +159,20 @@ func (g *game) DumpAptitudes() string {
 	return "Aptitudes:\n" + strings.Join(apts, "\n")
 }
 
+func (g *game) DumpStatuses() string {
+	sts := sort.StringSlice{}
+	for st, c := range g.Player.Statuses {
+		if c > 0 {
+			sts = append(sts, st.String())
+		}
+	}
+	sort.Sort(sts)
+	if len(sts) == 0 {
+		return "You are free of any status effects."
+	}
+	return "Statuses:\n" + strings.Join(sts, "\n")
+}
+
 func (g *game) SortedRods() rodSlice {
 	var rs rodSlice
 	for k, p := range g.Player.Rods {
@@ -211,6 +225,8 @@ func (g *game) Dump() string {
 	fmt.Fprintf(buf, "You have %d/%d HP, and %d/%d MP.\n", g.Player.HP, g.Player.HPMax(), g.Player.MP, g.Player.MPMax())
 	fmt.Fprintf(buf, "\n")
 	fmt.Fprintf(buf, g.DumpAptitudes())
+	fmt.Fprintf(buf, "\n\n")
+	fmt.Fprintf(buf, g.DumpStatuses())
 	fmt.Fprintf(buf, "\n\n")
 	fmt.Fprintf(buf, "Equipment:\n")
 	fmt.Fprintf(buf, "You are wearing %s.\n", Indefinite(g.Player.Armour.String(), false))
