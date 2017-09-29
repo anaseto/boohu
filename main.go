@@ -76,11 +76,41 @@ func SolarizedPalette() {
 	ColorFgTargetMode = 7
 }
 
+func WindowsPalette() {
+	ColorBgLOS = termbox.ColorWhite
+	ColorBgDark = termbox.ColorBlack
+	ColorBg = termbox.ColorBlack
+	ColorBgCloud = termbox.ColorWhite
+	ColorFgLOS = termbox.ColorBlack
+	ColorFgDark = termbox.ColorWhite
+	ColorFg = termbox.ColorWhite
+	ColorFgPlayer = termbox.ColorBlue
+	ColorFgMonster = termbox.ColorRed
+	ColorFgSleepingMonster = termbox.ColorCyan
+	ColorFgWanderingMonster = termbox.ColorMagenta
+	ColorFgConfusedMonster = termbox.ColorGreen
+	ColorFgCollectable = termbox.ColorYellow
+	ColorFgStairs = termbox.ColorMagenta
+	ColorFgGold = termbox.ColorYellow
+	ColorFgHPok = termbox.ColorGreen
+	ColorFgHPwounded = termbox.ColorYellow
+	ColorFgHPcritical = termbox.ColorRed
+	ColorFgMPok = termbox.ColorBlue
+	ColorFgMPpartial = termbox.ColorMagenta
+	ColorFgMPcritical = termbox.ColorRed
+	ColorFgStatusGood = termbox.ColorBlue
+	ColorFgStatusBad = termbox.ColorRed
+	ColorFgStatusOther = termbox.ColorYellow
+	ColorFgTargetMode = termbox.ColorCyan
+}
+
 func main() {
 	opt := flag.Bool("s", false, "Use true 16-color solarized palette")
 	flag.Parse()
 	if *opt {
 		SolarizedPalette()
+	} else if runtime.GOOS == "windows" {
+		WindowsPalette()
 	}
 
 	err := termbox.Init()
