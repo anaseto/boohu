@@ -814,7 +814,8 @@ func (g *game) HitDamage(base int, armor int) int {
 func (g *game) AutoPlayer(ev event) bool {
 	if g.Resting {
 		if g.MonsterInLOS() == nil &&
-			(g.Player.HP < g.Player.HPMax() || g.Player.MP < g.Player.MPMax() || g.Player.HasStatus(StatusExhausted)) {
+			(g.Player.HP < g.Player.HPMax() || g.Player.MP < g.Player.MPMax() || g.Player.HasStatus(StatusExhausted) ||
+				g.Player.HasStatus(StatusConfusion) || g.Player.HasStatus(StatusLignification)) {
 			g.WaitTurn(ev)
 			return true
 		}
