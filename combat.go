@@ -12,10 +12,11 @@ func (g *game) HitDamage(base int, armor int) int {
 	return attack
 }
 
-func (g *game) InflictDamage(damage, max int) {
+func (m *monster) InflictDamage(g *game, damage, max int) {
 	oldHP := g.Player.HP
 	g.Player.HP -= damage
 	if oldHP > max && g.Player.HP <= max {
+		g.StoryPrintf("Critical HP: %d (hit by %s)", g.Player.HP, Indefinite(m.Kind.String(), false))
 		g.ui.CriticalHPWarning(g)
 	}
 }

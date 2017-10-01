@@ -282,6 +282,7 @@ func (g *game) MovePlayer(pos position, ev event) error {
 				g.Player.Rods[r] = &rodProps{Charge: r.MaxCharge() - 1}
 				delete(g.Rods, pos)
 				g.Printf("You take a %s.", r)
+				g.StoryPrintf("You found and took a %s.", r)
 			}
 			g.ComputeLOS()
 			if g.Autoexploring {

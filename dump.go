@@ -38,7 +38,13 @@ func (ms monsSlice) Less(i, j int) bool {
 
 func (g *game) KillStats(mons *monster) {
 	g.Killed++
+	if g.KilledMons == nil {
+		g.KilledMons = map[monsterKind]int{}
+	}
 	g.KilledMons[mons.Kind]++
+	if mons.Kind.Dangerousness() > 10 {
+		g.StoryPrintf("You killed %s.", Indefinite(mons.Kind.String(), false))
+	}
 }
 
 func (g *game) DumpAptitudes() string {
@@ -196,7 +202,14 @@ func (g *game) Dump() string {
 	fmt.Fprintf(buf, "└%s┘\n", strings.Repeat("─", g.Dungeon.Width))
 	fmt.Fprintf(buf, "\n")
 	fmt.Fprintf(buf, g.DumpedKilledMonsters())
+	fmt.Fprintf(buf, "\n")
+	fmt.Fprintf(buf, "Timeline:\n")
+	fmt.Fprintf(buf, g.DumpStory())
 	return buf.String()
+}
+
+func (g *game) DumpStory() string {
+	return strings.Join(g.Story, "\n")
 }
 
 func (g *game) DumpDungeon() string {

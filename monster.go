@@ -559,7 +559,7 @@ func (m *monster) HitPlayer(g *game, ev event) {
 		attack := g.HitDamage(m.Attack, g.Player.Armor())
 		g.Printf("The %s hits you (%d damage).", m.Kind, attack)
 		m.HitSideEffects(g, ev)
-		g.InflictDamage(attack, m.Attack)
+		m.InflictDamage(g, attack, m.Attack)
 	} else {
 		g.Printf("The %s misses you.", m.Kind)
 	}
@@ -659,7 +659,7 @@ func (m *monster) TormentBolt(g *game, ev event) bool {
 		g.MakeNoise(12, g.Player.Pos)
 		damage := g.Player.HP - g.Player.HP/2
 		g.Printf("The %s throws a bolt of torment at you.", m.Kind)
-		g.InflictDamage(damage, 15)
+		m.InflictDamage(g, damage, 15)
 	} else {
 		g.Printf("You block the %s's bolt of torment.", m.Kind)
 	}
@@ -709,7 +709,7 @@ func (m *monster) ThrowRock(g *game, ev event) bool {
 			heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 100 + RandInt(100), EAction: ConfusionEnd})
 			g.Print("You feel confused.")
 		}
-		g.InflictDamage(attack, 15)
+		m.InflictDamage(g, attack, 15)
 	} else if block {
 		g.Printf("You block %s's rock.", Indefinite(m.Kind.String(), false))
 	} else {
@@ -740,7 +740,7 @@ func (m *monster) ThrowJavelin(g *game, ev event) bool {
 		g.MakeNoise(noise, g.Player.Pos)
 		attack := g.HitDamage(11, g.Player.Armor())
 		g.Printf("The %s throws %s at you (%d damage).", m.Kind, Indefinite(Javelin.String(), false), attack)
-		g.InflictDamage(attack, 11)
+		m.InflictDamage(g, attack, 11)
 	} else if block {
 		if RandInt(3) == 0 {
 			g.Printf("You block %s's %s.", Indefinite(m.Kind.String(), false), Javelin)

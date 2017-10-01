@@ -22,6 +22,7 @@ type game struct {
 	GeneratedBands      map[monsterBand]int
 	GeneratedEquipables map[equipable]bool
 	GeneratedRods       map[rod]bool
+	FoundEquipables     map[equipable]bool
 	Gold                map[position]int
 	UnknownDig          map[position]bool
 	Resting             bool
@@ -36,6 +37,7 @@ type game struct {
 	Depth               int
 	Wizard              bool
 	Log                 []string
+	Story               []string
 	Turn                int
 	Killed              int
 	KilledMons          map[monsterKind]int
@@ -242,6 +244,7 @@ func (g *game) InitLevel() {
 		g.Player.Statuses = map[status]int{}
 		g.GeneratedEquipables = map[equipable]bool{}
 		g.GeneratedBands = map[monsterBand]int{}
+		g.FoundEquipables = map[equipable]bool{Robe: true, Dagger: true}
 		g.KilledMons = map[monsterKind]int{}
 	}
 	g.Player.Pos = g.FreeCell()

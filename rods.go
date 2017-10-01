@@ -156,6 +156,7 @@ func (r rod) Use(g *game, ev event) error {
 	}
 	rods[r].Charge--
 	g.Player.MP -= r.MPCost()
+	g.StoryPrintf("You evoked your %s.", r)
 	g.FairAction()
 	ev.Renew(g, 7)
 	return nil

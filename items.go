@@ -23,6 +23,7 @@ type consumable interface {
 
 func (g *game) UseConsumable(c consumable) {
 	g.Player.Consumables[c]--
+	g.StoryPrintf("You used %s.", Indefinite(c.String(), false))
 	if g.Player.Consumables[c] <= 0 {
 		delete(g.Player.Consumables, c)
 	}
@@ -410,6 +411,13 @@ const (
 func (ar armour) Equip(g *game) {
 	oar := g.Player.Armour
 	g.Player.Armour = ar
+	if !g.FoundEquipables[ar] {
+		if g.FoundEquipables == nil {
+			g.FoundEquipables = map[equipable]bool{}
+		}
+		g.StoryPrintf("You found and put on %s.", Indefinite(ar.String(), false))
+		g.FoundEquipables[ar] = true
+	}
 	g.Printf("You put the %s on and leave your %s on the ground.", ar, oar)
 	g.Equipables[g.Player.Pos] = oar
 }
@@ -464,6 +472,13 @@ const (
 func (wp weapon) Equip(g *game) {
 	owp := g.Player.Weapon
 	g.Player.Weapon = wp
+	if !g.FoundEquipables[wp] {
+		if g.FoundEquipables == nil {
+			g.FoundEquipables = map[equipable]bool{}
+		}
+		g.StoryPrintf("You found and took %s.", Indefinite(wp.String(), false))
+		g.FoundEquipables[wp] = true
+	}
 	g.Printf("You take the %s and leave your %s on the ground.", wp, owp)
 	g.Equipables[g.Player.Pos] = owp
 }
@@ -566,6 +581,13 @@ const (
 func (sh shield) Equip(g *game) {
 	osh := g.Player.Shield
 	g.Player.Shield = sh
+	if !g.FoundEquipables[sh] {
+		if g.FoundEquipables == nil {
+			g.FoundEquipables = map[equipable]bool{}
+		}
+		g.StoryPrintf("You found and put on %s.", Indefinite(sh.String(), false))
+		g.FoundEquipables[sh] = true
+	}
 	if osh != NoShield {
 		g.Equipables[g.Player.Pos] = osh
 		g.Printf("You put the %s on and leave your %s on the ground.", sh, osh)
