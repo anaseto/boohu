@@ -184,8 +184,10 @@ func (g *game) Dump() string {
 	fmt.Fprintf(buf, "You spent %.1f turns in the Underground.\n", float64(g.Turn)/10)
 	fmt.Fprintf(buf, "\n")
 	fmt.Fprintf(buf, "Last messages:\n")
-	for i := len(g.Log) - 10; i < len(g.Log) && i >= 0; i++ {
-		fmt.Fprintf(buf, "%s\n", g.Log[i])
+	for i := len(g.Log) - 10; i < len(g.Log); i++ {
+		if i >= 0 {
+			fmt.Fprintf(buf, "%s\n", g.Log[i])
+		}
 	}
 	fmt.Fprintf(buf, "\n")
 	fmt.Fprintf(buf, "Dungeon:\n")
