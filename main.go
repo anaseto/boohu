@@ -949,24 +949,6 @@ func (ui *termui) DrawColoredText(text string, x, y int, color termbox.Attribute
 	}
 }
 
-type rodSlice []rod
-
-func (rs rodSlice) Len() int           { return len(rs) }
-func (rs rodSlice) Swap(i, j int)      { rs[i], rs[j] = rs[j], rs[i] }
-func (rs rodSlice) Less(i, j int) bool { return int(rs[i]) < int(rs[j]) }
-
-type consumableSlice []consumable
-
-func (cs consumableSlice) Len() int           { return len(cs) }
-func (cs consumableSlice) Swap(i, j int)      { cs[i], cs[j] = cs[j], cs[i] }
-func (cs consumableSlice) Less(i, j int) bool { return cs[i].Int() < cs[j].Int() }
-
-type statusSlice []status
-
-func (sts statusSlice) Len() int           { return len(sts) }
-func (sts statusSlice) Swap(i, j int)      { sts[i], sts[j] = sts[j], sts[i] }
-func (sts statusSlice) Less(i, j int) bool { return sts[i] < sts[j] }
-
 func (ui *termui) SelectProjectile(g *game, ev event) error {
 	desc := false
 	for {
