@@ -546,6 +546,10 @@ func (m *monster) HandleTurn(g *game, ev event) {
 }
 
 func (m *monster) HitPlayer(g *game, ev event) {
+	if g.Player.HP <= 0 {
+		// for hydras
+		return
+	}
 	evasion := RandInt(g.Player.Evasion())
 	acc := RandInt(m.Accuracy)
 	if acc > evasion {

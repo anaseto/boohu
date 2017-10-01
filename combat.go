@@ -128,10 +128,12 @@ func (g *game) HitMonster(mons *monster) {
 				attack *= 2
 			}
 		}
+		oldHP := mons.HP
 		mons.HP -= attack
 		if mons.HP > 0 {
 			g.Printf("You hit the %v (%d damage).", mons.Kind, attack)
-		} else {
+		} else if oldHP > 0 {
+			// test oldHP > 0 because of sword special attack
 			g.Printf("You kill the %v (%d damage).", mons.Kind, attack)
 			g.KillStats(mons)
 		}
