@@ -35,3 +35,21 @@ will display nicely if the [solarized](http://ethanschoonover.com/solarized)
 palette, with configurations available easily for most terminal emulators, is
 used.  Otherwise, colors may have to be configured manually to one's liking in
 the terminal emulator options.
+
+Survival Tips
+-------------
+
+Basic survival tips:
+
++ Position yourself to fight one ennemy at a time whenever possible.
++ Fight far enough from unknown terrain if you can: combat is noisy, more
+  monsters will come if they hear it.
++ Use your potions, projectiles and rods. With experience you learn when you
+  can spare them, and when you should use them, but dying with a potion of heal
+  wounds in the inventory should never be a thing.
++ Avoid dead-ends if you do not have any means of escape, such as potions of
+  teleportation, unless no better options are available.
++ Use *pillar dancing*: sometimes you can turn around a block several times to
+  avoid being killed while replenishing your HP.
++ You do not have to kill every monster. You want, though, find as many items
+  as you can, but survival comes first.
