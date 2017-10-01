@@ -533,14 +533,6 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	ev.Renew(g, m.Kind.MovementDelay())
 }
 
-func (g *game) InflictDamage(damage, max int) {
-	oldHP := g.Player.HP
-	g.Player.HP -= damage
-	if oldHP > max && g.Player.HP <= max {
-		g.ui.CriticalHPWarning(g)
-	}
-}
-
 func (m *monster) HitPlayer(g *game, ev event) {
 	evasion := RandInt(g.Player.Evasion())
 	acc := RandInt(m.Accuracy)
@@ -867,59 +859,6 @@ func (m *monster) GatherBand(g *game) {
 	}
 }
 
-func (g *game) MakeMonstersAware() {
-	for _, m := range g.Monsters {
-		if m.HP <= 0 {
-			continue
-		}
-		if g.Player.LOS[m.Pos] {
-			m.MakeAware(g)
-			if m.State != Resting {
-				m.GatherBand(g)
-			}
-		}
-	}
-}
-
-func (g *game) MakeNoise(noise int, at position) {
-	dij := &normalPath{game: g}
-	nm := Dijkstra(dij, []position{at}, noise)
-	for _, m := range g.Monsters {
-		if !m.Exists() {
-			continue
-		}
-		if m.State == Hunting {
-			continue
-		}
-		n, ok := nm[m.Pos]
-		if !ok {
-			continue
-		}
-		d := n.Cost
-		v := noise - d
-		if v <= 0 {
-			continue
-		}
-		v *= 3
-		if v > 90 {
-			v = 90
-		}
-		r := RandInt(100)
-		if m.State == Resting {
-			r += 10
-		}
-		if v > r {
-			m.Target = at
-			if g.Player.LOS[m.Pos] {
-				m.State = Hunting
-			} else {
-				m.State = Wandering
-			}
-			m.GatherBand(g)
-		}
-	}
-}
-
 func (g *game) MonsterAt(pos position) (*monster, int) {
 	var mons *monster
 	var index int
@@ -971,4 +910,13 @@ func (g *game) GenMonsters() {
 			nband++
 		}
 	}
+}
+
+func (g *game) MonsterInLOS() *monster {
+	for _, mons := range g.Monsters {
+		if mons.Exists() && g.Player.LOS[mons.Pos] {
+			return mons
+		}
+	}
+	return nil
 }

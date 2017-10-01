@@ -216,15 +216,6 @@ func (g *game) Equip(ev event) error {
 	return errors.New("Found nothing to equip here.")
 }
 
-func (g *game) MonsterInLOS() *monster {
-	for _, mons := range g.Monsters {
-		if mons.Exists() && g.Player.LOS[mons.Pos] {
-			return mons
-		}
-	}
-	return nil
-}
-
 func (g *game) Teleportation(ev event) {
 	var pos position
 	i := 0
@@ -324,73 +315,6 @@ func (g *game) MovePlayer(pos position, ev event) error {
 	}
 	ev.Renew(g, delay)
 	return nil
-}
-
-func (g *game) AttackMonster(mons *monster) {
-	switch {
-	case g.Player.Weapon.Cleave():
-		var neighbors []position
-		if g.Player.HasStatus(StatusConfusion) {
-			neighbors = g.Dungeon.CardinalFreeNeighbors(g.Player.Pos)
-		} else {
-			neighbors = g.Dungeon.FreeNeighbors(g.Player.Pos)
-		}
-		for _, pos := range neighbors {
-			mons, _ := g.MonsterAt(pos)
-			if mons.Exists() {
-				g.HitMonster(mons)
-			}
-		}
-	case g.Player.Weapon.Pierce():
-		g.HitMonster(mons)
-		deltaX := mons.Pos.X - g.Player.Pos.X
-		deltaY := mons.Pos.Y - g.Player.Pos.Y
-		behind := position{g.Player.Pos.X + 2*deltaX, g.Player.Pos.Y + 2*deltaY}
-		if g.Dungeon.Valid(behind) {
-			mons, _ := g.MonsterAt(behind)
-			if mons.Exists() {
-				g.HitMonster(mons)
-			}
-		}
-	default:
-		g.HitMonster(mons)
-		if (g.Player.Weapon == Sword || g.Player.Weapon == DoubleSword) && RandInt(4) == 0 {
-			g.HitMonster(mons)
-		}
-	}
-}
-
-func (g *game) HitMonster(mons *monster) {
-	acc := RandInt(g.Player.Accuracy())
-	ev := RandInt(mons.Evasion)
-	if mons.State == Resting {
-		ev /= 2 + 1
-	}
-	if acc > ev {
-		g.MakeNoise(12, mons.Pos)
-		bonus := 0
-		if g.Player.HasStatus(StatusBerserk) {
-			bonus += RandInt(5)
-		}
-		attack := g.HitDamage(g.Player.Attack()+bonus, mons.Armor)
-		if mons.State == Resting {
-			if g.Player.Weapon == Dagger {
-				attack *= 4
-			} else {
-				attack *= 2
-			}
-		}
-		mons.HP -= attack
-		if mons.HP > 0 {
-			g.Printf("You hit the %v (%d damage).", mons.Kind, attack)
-		} else {
-			g.Printf("You kill the %v (%d damage).", mons.Kind, attack)
-			g.Killed++
-		}
-	} else {
-		g.Printf("You miss the %v.", mons.Kind)
-	}
-	mons.MakeHuntIfHurt(g)
 }
 
 func (g *game) HealPlayer(ev event) {
