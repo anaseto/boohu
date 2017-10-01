@@ -80,6 +80,18 @@ func (mk monsterKind) AttackDelay() int {
 	return MonsData[mk].attackDelay
 }
 
+func (mk monsterKind) BaseAttack() int {
+	return MonsData[mk].baseAttack
+}
+
+func (mk monsterKind) MaxHP() int {
+	return MonsData[mk].maxHP
+}
+
+func (mk monsterKind) Dangerousness() int {
+	return MonsData[mk].dangerousness
+}
+
 func (mk monsterKind) Ranged() bool {
 	switch mk {
 	case MonsLich, MonsCyclop, MonsGoblinWarrior:
@@ -895,7 +907,7 @@ func (g *game) GenMonsters() {
 			g.Bands = append(g.Bands, monsterBand(band))
 			pos := g.FreeCellForMonster()
 			for _, mk := range monsters {
-				danger -= MonsData[mk].dangerousness
+				danger -= mk.Dangerousness()
 				nmons--
 				if danger <= 0 || nmons <= 0 {
 					return

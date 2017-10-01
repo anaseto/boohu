@@ -913,8 +913,8 @@ loop:
 
 func (ui *termui) DrawMonsterDescription(g *game, mons *monster) {
 	s := mons.Kind.Desc()
-	s += " " + fmt.Sprintf("They can hit for up to %d damage.", MonsData[mons.Kind].baseAttack)
-	s += " " + fmt.Sprintf("They have around %d HP.", MonsData[mons.Kind].maxHP)
+	s += " " + fmt.Sprintf("They can hit for up to %d damage.", mons.Kind.BaseAttack())
+	s += " " + fmt.Sprintf("They have around %d HP.", mons.Kind.MaxHP())
 	ui.DrawDescription(g, s)
 }
 

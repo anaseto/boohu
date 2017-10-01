@@ -132,7 +132,7 @@ func (g *game) HitMonster(mons *monster) {
 			g.Printf("You hit the %v (%d damage).", mons.Kind, attack)
 		} else {
 			g.Printf("You kill the %v (%d damage).", mons.Kind, attack)
-			g.Killed++
+			g.KillStats(mons)
 		}
 	} else {
 		g.Printf("You miss the %v.", mons.Kind)

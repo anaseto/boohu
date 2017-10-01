@@ -255,7 +255,7 @@ func (g *game) EvokeRodLightningBolt(ev event) error {
 		mons.HP -= RandInt(21)
 		if mons.HP <= 0 {
 			g.Printf("%s is killed by the bolt.", Indefinite(mons.Kind.String(), true))
-			g.Killed++
+			g.KillStats(mons)
 		}
 		g.MakeNoise(12, mons.Pos)
 		mons.MakeHuntIfHurt(g)
@@ -277,7 +277,7 @@ func (g *game) EvokeRodFireball(ev event) error {
 		mons.HP -= RandInt(21)
 		if mons.HP <= 0 {
 			g.Printf("%s is killed by the fireball.", Indefinite(mons.Kind.String(), true))
-			g.Killed++
+			g.KillStats(mons)
 		}
 		g.MakeNoise(12, mons.Pos)
 		mons.MakeHuntIfHurt(g)
@@ -351,7 +351,7 @@ func (g *game) EvokeRodShatter(ev event) error {
 		mons.HP -= RandInt(30)
 		if mons.HP <= 0 {
 			g.Printf("%s is killed by the explosion.", Indefinite(mons.Kind.String(), true))
-			g.Killed++
+			g.KillStats(mons)
 		}
 		g.MakeNoise(12, mons.Pos)
 		mons.MakeHuntIfHurt(g)

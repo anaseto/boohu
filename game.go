@@ -38,6 +38,7 @@ type game struct {
 	Log                 []string
 	Turn                int
 	Killed              int
+	KilledMons          map[monsterKind]int
 	Scumming            int
 }
 
@@ -241,6 +242,7 @@ func (g *game) InitLevel() {
 		g.Player.Statuses = map[status]int{}
 		g.GeneratedEquipables = map[equipable]bool{}
 		g.GeneratedBands = map[monsterBand]int{}
+		g.KilledMons = map[monsterKind]int{}
 	}
 	g.Player.Pos = g.FreeCell()
 

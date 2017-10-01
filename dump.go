@@ -28,6 +28,19 @@ func (sts statusSlice) Len() int           { return len(sts) }
 func (sts statusSlice) Swap(i, j int)      { sts[i], sts[j] = sts[j], sts[i] }
 func (sts statusSlice) Less(i, j int) bool { return sts[i] < sts[j] }
 
+type monsSlice []monsterKind
+
+func (ms monsSlice) Len() int      { return len(ms) }
+func (ms monsSlice) Swap(i, j int) { ms[i], ms[j] = ms[j], ms[i] }
+func (ms monsSlice) Less(i, j int) bool {
+	return ms[i].Dangerousness() > ms[j].Dangerousness()
+}
+
+func (g *game) KillStats(mons *monster) {
+	g.Killed++
+	g.KilledMons[mons.Kind]++
+}
+
 func (g *game) DumpAptitudes() string {
 	apts := []string{}
 	for apt, b := range g.Player.Aptitudes {
@@ -66,6 +79,18 @@ func (g *game) SortedRods() rodSlice {
 	}
 	sort.Sort(rs)
 	return rs
+}
+
+func (g *game) SortedKilledMonsters() monsSlice {
+	var ms monsSlice
+	for mk, p := range g.KilledMons {
+		if p == 0 {
+			continue
+		}
+		ms = append(ms, mk)
+	}
+	sort.Sort(ms)
+	return ms
 }
 
 func (g *game) SortedPotions() consumableSlice {
@@ -167,6 +192,8 @@ func (g *game) Dump() string {
 	fmt.Fprintf(buf, "┌%s┐\n", strings.Repeat("─", g.Dungeon.Width))
 	buf.WriteString(g.DumpDungeon())
 	fmt.Fprintf(buf, "└%s┘\n", strings.Repeat("─", g.Dungeon.Width))
+	fmt.Fprintf(buf, "\n")
+	fmt.Fprintf(buf, g.DumpedKilledMonsters())
 	return buf.String()
 }
 
@@ -222,6 +249,16 @@ func (g *game) DumpDungeon() string {
 		if i == len(g.Dungeon.Cells)-1 {
 			buf.WriteString("│\n")
 		}
+	}
+	return buf.String()
+}
+
+func (g *game) DumpedKilledMonsters() string {
+	buf := &bytes.Buffer{}
+	fmt.Fprint(buf, "Killed Monsters:\n")
+	ms := g.SortedKilledMonsters()
+	for _, mk := range ms {
+		fmt.Fprintf(buf, "- %s: %d\n", mk, g.KilledMons[mk])
 	}
 	return buf.String()
 }
