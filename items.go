@@ -15,6 +15,7 @@ import (
 type consumable interface {
 	Use(*game, event) error
 	String() string
+	Plural() string
 	Desc() string
 	Letter() rune
 	Int() int
@@ -45,29 +46,35 @@ const (
 )
 
 func (p potion) String() (text string) {
+	text = "potion"
 	switch p {
 	case HealWoundsPotion:
-		text = "potion of heal wounds"
+		text += " of heal wounds"
 	case TeleportationPotion:
-		text = "potion of teleportation"
+		text += " of teleportation"
 	case DescentPotion:
-		text = "potion of descent"
+		text += " of descent"
 	case EvasionPotion:
-		text = "potion of evasion"
+		text += " of evasion"
 	case MagicMappingPotion:
-		text = "potion of magic mapping"
+		text += " of magic mapping"
 	case MagicPotion:
-		text = "potion of refill magic"
+		text += " of refill magic"
 	case BerserkPotion:
-		text = "potion of berserk"
+		text += " of berserk"
 	case RunningPotion:
-		text = "potion of running"
+		text += " of running"
 	case LignificationPotion:
-		text = "potion of lignification"
+		text += " of lignification"
 	case ResistancePotion:
-		text = "potion of resistance"
+		text += " of resistance"
 	}
 	return text
+}
+
+func (p potion) Plural() (text string) {
+	// never used for potions
+	return p.String()
 }
 
 func (p potion) Desc() (text string) {
@@ -252,6 +259,18 @@ func (p projectile) String() (text string) {
 		text = "dart of confusion"
 	case Net:
 		text = "throwing net"
+	}
+	return text
+}
+
+func (p projectile) Plural() (text string) {
+	switch p {
+	case Javelin:
+		text = "javelins"
+	case ConfusingDart:
+		text = "darts of confusion"
+	case Net:
+		text = "throwing nets"
 	}
 	return text
 }

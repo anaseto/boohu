@@ -273,7 +273,7 @@ func (g *game) MovePlayer(pos position, ev event) error {
 				g.Player.Consumables[c.Consumable] += c.Quantity
 				delete(g.Collectables, pos)
 				if c.Quantity > 1 {
-					g.Printf("You take %d %s.", c.Quantity, c.Consumable)
+					g.Printf("You take %d %s.", c.Quantity, c.Consumable.Plural())
 				} else {
 					g.Printf("You take %s.", Indefinite(c.Consumable.String(), false))
 				}

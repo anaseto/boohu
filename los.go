@@ -82,7 +82,7 @@ func (g *game) ComputeLOS() {
 				if c, ok := g.Collectables[pos]; ok {
 					g.AutoHalt = true
 					if c.Quantity > 1 {
-						g.Printf("You see %d %s.", c.Quantity, c.Consumable)
+						g.Printf("You see %d %s.", c.Quantity, c.Consumable.Plural())
 					} else {
 						g.Printf("You see %s.", Indefinite(c.Consumable.String(), false))
 					}
