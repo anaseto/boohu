@@ -51,5 +51,5 @@ Basic survival tips:
   teleportation, unless no better options are available.
 + Use *pillar dancing*: sometimes you can turn around a block several times to
   avoid being killed while replenishing your HP.
-+ You do not have to kill every monster. You want, though, find as many items
++ You do not have to kill every monster. You want, though, to find as many items
   as you can, but survival comes first.
