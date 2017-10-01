@@ -36,10 +36,8 @@ palette, with configurations available easily for most terminal emulators, is
 used.  Otherwise, colors may have to be configured manually to one's liking in
 the terminal emulator options.
 
-Survival Tips
+Basic Survival Tips
 -------------
-
-Basic survival tips:
 
 + Position yourself to fight one ennemy at a time whenever possible.
 + Fight far enough from unknown terrain if you can: combat is noisy, more
