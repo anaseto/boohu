@@ -25,7 +25,7 @@ func (ex *examiner) Action(g *game, pos position) error {
 		return errors.New("You cannot travel while in an excluded area.")
 	}
 	if !g.Dungeon.Cell(pos).Explored {
-		return errors.New("You do not this place.")
+		return errors.New("You do not know this place.")
 	}
 	if g.ExclusionsMap[pos] {
 		return errors.New("You cannot travel to an excluded area.")
