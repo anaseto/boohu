@@ -12,6 +12,11 @@ It is a work in progress, but is already a quite complete game.
 
 ![boohu intro screen](https://raw.githubusercontent.com/anaseto/boohu/master/img/intro-screen.png)
 
+Screenshot
+----------
+
+![Dragons](https://raw.githubusercontent.com/anaseto/boohu/master/img/dragons.png)
+
 Install
 -------
 
