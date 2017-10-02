@@ -1135,13 +1135,13 @@ loop:
 }
 
 func (ui *termui) Quit(g *game) bool {
-	g.Print("Do you really want to quit without saving? [Y/n]")
+	g.Print("Do you really want to quit without saving? (capital 'Y' to confirm)")
 	ui.DrawDungeonView(g, false)
 	return ui.PromptConfirmation(g)
 }
 
 func (ui *termui) Wizard(g *game) bool {
-	g.Print("Do you really want to enter wizard mode (no return)? [Y/n]")
+	g.Print("Do you really want to enter wizard mode (no return)? (capital 'Y' to confirm)")
 	ui.DrawDungeonView(g, false)
 	return ui.PromptConfirmation(g)
 }
