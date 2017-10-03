@@ -1151,13 +1151,13 @@ loop:
 }
 
 func (ui *termui) Quit(g *game) bool {
-	g.Print("Do you really want to quit without saving? (capital 'Y' to confirm)")
+	g.Print("Do you really want to quit without saving? [y/N]")
 	ui.DrawDungeonView(g, false)
 	return ui.PromptConfirmation(g)
 }
 
 func (ui *termui) Wizard(g *game) bool {
-	g.Print("Do you really want to enter wizard mode (no return)? (capital 'Y' to confirm)")
+	g.Print("Do you really want to enter wizard mode (no return)? [y/N]")
 	ui.DrawDungeonView(g, false)
 	return ui.PromptConfirmation(g)
 }
@@ -1166,7 +1166,7 @@ func (ui *termui) PromptConfirmation(g *game) bool {
 	for {
 		switch tev := termbox.PollEvent(); tev.Type {
 		case termbox.EventKey:
-			if tev.Ch == 'Y' {
+			if tev.Ch == 'Y' || tev.Ch == 'y' {
 				return true
 			}
 		}
