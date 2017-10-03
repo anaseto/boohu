@@ -264,38 +264,11 @@ getKey:
 				}
 			}
 			switch tev.Ch {
-			case 'h', '4':
-				err = g.MovePlayer(g.Player.Pos.W(), ev)
-			case 'l', '6':
-				err = g.MovePlayer(g.Player.Pos.E(), ev)
-			case 'j', '2':
-				err = g.MovePlayer(g.Player.Pos.S(), ev)
-			case 'k', '8':
-				err = g.MovePlayer(g.Player.Pos.N(), ev)
-			case 'y', '7':
-				err = g.MovePlayer(g.Player.Pos.NW(), ev)
-			case 'b', '1':
-				err = g.MovePlayer(g.Player.Pos.SW(), ev)
-			case 'u', '9':
-				err = g.MovePlayer(g.Player.Pos.NE(), ev)
-			case 'n', '3':
-				err = g.MovePlayer(g.Player.Pos.SE(), ev)
-			case 'H':
-				err = g.GoToDir(W, ev)
-			case 'L':
-				err = g.GoToDir(E, ev)
-			case 'J':
-				err = g.GoToDir(S, ev)
-			case 'K':
-				err = g.GoToDir(N, ev)
-			case 'Y':
-				err = g.GoToDir(NW, ev)
-			case 'B':
-				err = g.GoToDir(SW, ev)
-			case 'U':
-				err = g.GoToDir(NE, ev)
-			case 'N':
-				err = g.GoToDir(SE, ev)
+			case 'h', '4', 'l', '6', 'j', '2', 'k', '8',
+				'y', '7', 'b', '1', 'u', '9', 'n', '3':
+				err = g.MovePlayer(g.Player.Pos.To(KeyToDir(tev.Ch)), ev)
+			case 'H', 'L', 'J', 'K', 'Y', 'B', 'U', 'N':
+				err = g.GoToDir(KeyToDir(tev.Ch), ev)
 			case '.', '5':
 				g.WaitTurn(ev)
 			case 'r':
@@ -557,22 +530,17 @@ loop:
 				}
 			}
 			switch tev.Ch {
-			case 'h', '4':
-				npos = pos.W()
-			case 'l', '6':
-				npos = pos.E()
-			case 'j', '2':
-				npos = pos.S()
-			case 'k', '8':
-				npos = pos.N()
-			case 'y', '7':
-				npos = pos.NW()
-			case 'b', '1':
-				npos = pos.SW()
-			case 'u', '9':
-				npos = pos.NE()
-			case 'n', '3':
-				npos = pos.SE()
+			case 'h', '4', 'l', '6', 'j', '2', 'k', '8',
+				'y', '7', 'b', '1', 'u', '9', 'n', '3':
+				npos = pos.To(KeyToDir(tev.Ch))
+			case 'H', 'L', 'J', 'K', 'Y', 'B', 'U', 'N':
+				for i := 0; i < 5; i++ {
+					p := npos.To(KeyToDir(tev.Ch))
+					if !g.Dungeon.Valid(p) {
+						break
+					}
+					npos = p
+				}
 			case '>':
 			search:
 				for i := 0; i < g.Dungeon.Width*g.Dungeon.Heigth; i++ {

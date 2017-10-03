@@ -67,6 +67,28 @@ const (
 	ESE
 )
 
+func KeyToDir(r rune) (dir direction) {
+	switch r {
+	case 'h', 'H', '4':
+		dir = W
+	case 'l', 'L', '6':
+		dir = E
+	case 'j', 'J', '2':
+		dir = S
+	case 'k', 'K', '8':
+		dir = N
+	case 'y', 'Y', '7':
+		dir = NW
+	case 'b', 'B', '1':
+		dir = SW
+	case 'u', 'U', '9':
+		dir = NE
+	case 'n', 'N', '3':
+		dir = SE
+	}
+	return dir
+}
+
 func (pos position) To(dir direction) position {
 	to := pos
 	switch dir {
