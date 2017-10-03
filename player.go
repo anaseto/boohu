@@ -180,7 +180,7 @@ func (g *game) ExistsMonster() bool {
 }
 
 func (g *game) ScummingAction(ev event) {
-	if g.Player.HP == g.Player.HPMax() {
+	if g.Player.HP == g.Player.HPMax() && g.Player.MP == g.Player.MPMax() {
 		g.Scumming++
 	}
 	if g.Scumming == 100 {
