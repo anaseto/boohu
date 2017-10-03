@@ -71,6 +71,12 @@ func (g *game) LosRange() int {
 	return losRange
 }
 
+func (g *game) StopAuto() {
+	g.AutoHalt = true
+	g.AutoDir = nil
+	g.AutoTarget = nil
+}
+
 func (g *game) ComputeLOS() {
 	m := map[position]bool{}
 	losRange := g.LosRange()
@@ -80,20 +86,20 @@ func (g *game) ComputeLOS() {
 			m[pos] = true
 			if !g.Dungeon.Cell(pos).Explored {
 				if c, ok := g.Collectables[pos]; ok {
-					g.AutoHalt = true
+					g.StopAuto()
 					if c.Quantity > 1 {
 						g.Printf("You see %d %s.", c.Quantity, c.Consumable.Plural())
 					} else {
 						g.Printf("You see %s.", Indefinite(c.Consumable.String(), false))
 					}
 				} else if _, ok := g.Stairs[pos]; ok {
-					g.AutoHalt = true
+					g.StopAuto()
 					g.Printf("You see stairs.")
 				} else if eq, ok := g.Equipables[pos]; ok {
-					g.AutoHalt = true
+					g.StopAuto()
 					g.Printf("You see %s.", Indefinite(eq.String(), false))
 				} else if rod, ok := g.Rods[pos]; ok {
-					g.AutoHalt = true
+					g.StopAuto()
 					g.Printf("You see %s.", Indefinite(rod.String(), false))
 				}
 				g.FairAction()

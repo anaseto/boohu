@@ -29,6 +29,7 @@ type game struct {
 	Autoexploring       bool
 	AutoexploreMap      nodeMap
 	AutoTarget          *position
+	AutoDir             *direction
 	AutoHalt            bool
 	AutoNext            bool
 	ExclusionsMap       map[position]bool
@@ -512,6 +513,11 @@ func (g *game) AutoPlayer(ev event) bool {
 		if !g.ui.ExploreStep(g) && g.MoveToTarget(ev) {
 			return true
 		}
+	} else if g.AutoDir != nil {
+		if !g.ui.ExploreStep(g) && g.AutoToDir(ev) {
+			return true
+		}
+
 	}
 	return false
 }

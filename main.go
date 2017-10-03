@@ -280,6 +280,22 @@ getKey:
 				err = g.MovePlayer(g.Player.Pos.NE(), ev)
 			case 'n', '3':
 				err = g.MovePlayer(g.Player.Pos.SE(), ev)
+			case 'H':
+				err = g.GoToDir(W, ev)
+			case 'L':
+				err = g.GoToDir(E, ev)
+			case 'J':
+				err = g.GoToDir(S, ev)
+			case 'K':
+				err = g.GoToDir(N, ev)
+			case 'Y':
+				err = g.GoToDir(NW, ev)
+			case 'B':
+				err = g.GoToDir(SW, ev)
+			case 'U':
+				err = g.GoToDir(NE, ev)
+			case 'N':
+				err = g.GoToDir(SE, ev)
 			case '.', '5':
 				g.WaitTurn(ev)
 			case 'r':

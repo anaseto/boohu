@@ -120,6 +120,33 @@ func (p *player) AptitudeCount() int {
 	return count
 }
 
+func (g *game) AutoToDir(ev event) bool {
+	if g.MonsterInLOS() == nil {
+		err := g.MovePlayer(g.Player.Pos.To(*g.AutoDir), ev)
+		if err != nil {
+			g.Print(err.Error())
+			g.AutoDir = nil
+			return false
+		}
+		return true
+	}
+	g.AutoDir = nil
+	return false
+}
+
+func (g *game) GoToDir(dir direction, ev event) error {
+	if g.MonsterInLOS() != nil {
+		g.AutoDir = nil
+		return errors.New("You cannot travel while there are monsters in view.")
+	}
+	err := g.MovePlayer(g.Player.Pos.To(dir), ev)
+	if err != nil {
+		return err
+	}
+	g.AutoDir = &dir
+	return nil
+}
+
 func (g *game) MoveToTarget(ev event) bool {
 	if g.MonsterInLOS() == nil {
 		path := g.PlayerPath(g.Player.Pos, *g.AutoTarget)
@@ -127,6 +154,7 @@ func (g *game) MoveToTarget(ev event) bool {
 			err := g.MovePlayer(path[len(path)-2], ev)
 			if err != nil {
 				g.Print(err.Error())
+				g.AutoTarget = nil
 				return false
 			}
 			return true
