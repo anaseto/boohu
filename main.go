@@ -341,6 +341,8 @@ getKey:
 				ev.Renew(g, 0)
 				g.Save()
 				return true
+			case 's':
+				err = errors.New("Unknown key. Did you mean capital S for save and quit?")
 			case '#':
 				err := g.WriteDump()
 				if err != nil {
@@ -351,7 +353,7 @@ getKey:
 				}
 				continue getKey
 			default:
-				err = errors.New("Unknown key.")
+				err = errors.New("Unknown key. Type ? for help.")
 			}
 			if err != nil {
 				g.Print(err.Error())
@@ -654,7 +656,7 @@ loop:
 					g.ComputeExclusion(pos, toggle)
 				}
 			default:
-				g.Print("Invalid key.")
+				g.Print("Invalid key. Type ? for help.")
 			}
 			if g.Dungeon.Valid(npos) {
 				pos = npos
