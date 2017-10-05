@@ -62,6 +62,7 @@ const (
 	MonsEarthDragon
 	MonsMirrorSpecter
 	MonsAcidMound
+	MonsExplosiveNadre
 )
 
 func (mk monsterKind) String() string {
@@ -145,6 +146,7 @@ var MonsData = []monsterData{
 	MonsLich:            {10, 10, 10, 23, 15, 3, 12, 'L', "lich", 17},
 	MonsEarthDragon:     {10, 14, 10, 40, 14, 6, 8, 'D', "earth dragon", 20},
 	MonsMirrorSpecter:   {10, 9, 10, 18, 15, 0, 17, 'm', "mirror specter", 11},
+	MonsExplosiveNadre:  {10, 4, 10, 1, 14, 0, 10, 'n', "explosive nadre", 5},
 }
 
 var monsDesc = []string{
@@ -162,9 +164,10 @@ var monsDesc = []string{
 	MonsSkeletonWarrior: "Skeleton warriors are good fighters, and are equipped with a chain mail.",
 	MonsSpider:          "Spiders are fast moving fragile creatures, whose bite can confuse you.",
 	MonsBlinkingFrog:    "Blinking frogs are big frog-like unstable creatures, whose bite can make you blink away.",
-	MonsLich:            "Liches are non-living mages wearing a leather armour. They can throw a bolt of torment at you.",
+	MonsLich:            "Liches are non-living mages wearing a leather armour. They can throw a bolt of torment at you, halving your HP.",
 	MonsEarthDragon:     "Earth dragons are big and hardy creatures that wander in the Underground. It is said they are to credit for many tunnels.",
 	MonsMirrorSpecter:   "Mirror specters are very insubstantial creatures. They can absorb your mana.",
+	MonsExplosiveNadre:  "Explosive nadres are very frail creatures that explode upon dying, halving HP of any adjacent creatures.",
 }
 
 type monsterBand int
@@ -183,6 +186,7 @@ const (
 	LoneEarthDragon
 	LoneSpecter
 	LoneAcidMound
+	LoneExplosiveNadre
 	BandGoblins
 	BandGoblinsWithWarriors
 	BandGoblinWarriors
@@ -199,6 +203,7 @@ const (
 	UBandGoblins
 	UBandBeeYacks
 	UHydras
+	UExplosiveNadres
 	ULich
 	UBrizzias
 	UAcidMounds
@@ -243,22 +248,23 @@ func (g *game) GenBand(mbd monsterBandData, band monsterBand) []monsterKind {
 }
 
 var MonsBands = []monsterBandData{
-	LoneGoblin:       {rarity: 10, minDepth: 0, maxDepth: 5, monster: MonsGoblin},
-	LoneOgre:         {rarity: 15, minDepth: 2, maxDepth: 11, monster: MonsOgre},
-	LoneWorm:         {rarity: 10, minDepth: 0, maxDepth: 6, monster: MonsWorm},
-	LoneBrizzia:      {rarity: 90, minDepth: 7, maxDepth: 13, monster: MonsBrizzia},
-	LoneHound:        {rarity: 20, minDepth: 1, maxDepth: 8, monster: MonsHound},
-	LoneHydra:        {rarity: 45, minDepth: 8, maxDepth: 13, monster: MonsHydra},
-	LoneSpider:       {rarity: 20, minDepth: 3, maxDepth: 13, monster: MonsSpider},
-	LoneBlinkingFrog: {rarity: 50, minDepth: 5, maxDepth: 13, monster: MonsBlinkingFrog},
-	LoneCyclop:       {rarity: 45, minDepth: 5, maxDepth: 13, monster: MonsCyclop},
-	LoneLich:         {rarity: 70, minDepth: 9, maxDepth: 13, monster: MonsLich},
-	LoneEarthDragon:  {rarity: 80, minDepth: 10, maxDepth: 13, monster: MonsEarthDragon},
-	LoneSpecter:      {rarity: 70, minDepth: 6, maxDepth: 13, monster: MonsMirrorSpecter},
-	LoneAcidMound:    {rarity: 70, minDepth: 6, maxDepth: 13, monster: MonsAcidMound},
+	LoneGoblin:         {rarity: 10, minDepth: 0, maxDepth: 5, monster: MonsGoblin},
+	LoneOgre:           {rarity: 15, minDepth: 2, maxDepth: 11, monster: MonsOgre},
+	LoneWorm:           {rarity: 10, minDepth: 0, maxDepth: 6, monster: MonsWorm},
+	LoneBrizzia:        {rarity: 90, minDepth: 7, maxDepth: 13, monster: MonsBrizzia},
+	LoneHound:          {rarity: 20, minDepth: 1, maxDepth: 8, monster: MonsHound},
+	LoneHydra:          {rarity: 45, minDepth: 8, maxDepth: 13, monster: MonsHydra},
+	LoneSpider:         {rarity: 20, minDepth: 3, maxDepth: 13, monster: MonsSpider},
+	LoneBlinkingFrog:   {rarity: 50, minDepth: 5, maxDepth: 13, monster: MonsBlinkingFrog},
+	LoneCyclop:         {rarity: 45, minDepth: 5, maxDepth: 13, monster: MonsCyclop},
+	LoneLich:           {rarity: 70, minDepth: 9, maxDepth: 13, monster: MonsLich},
+	LoneEarthDragon:    {rarity: 80, minDepth: 10, maxDepth: 13, monster: MonsEarthDragon},
+	LoneSpecter:        {rarity: 70, minDepth: 6, maxDepth: 13, monster: MonsMirrorSpecter},
+	LoneAcidMound:      {rarity: 70, minDepth: 6, maxDepth: 13, monster: MonsAcidMound},
+	LoneExplosiveNadre: {rarity: 60, minDepth: 4, maxDepth: 13, monster: MonsExplosiveNadre},
 	BandGoblins: {
 		distribution: map[monsterKind]monsInterval{MonsGoblin: monsInterval{2, 4}},
-		rarity:       10, minDepth: 1, maxDepth: 7, band: true,
+		rarity:       10, minDepth: 1, maxDepth: 6, band: true,
 	},
 	BandGoblinsWithWarriors: {
 		distribution: map[monsterKind]monsInterval{
@@ -325,8 +331,8 @@ var MonsBands = []monsterBandData{
 	},
 	UBandBeeYacks: {
 		distribution: map[monsterKind]monsInterval{
-			MonsYack:     monsInterval{2, 5},
-			MonsGiantBee: monsInterval{1, 3},
+			MonsYack:     monsInterval{3, 4},
+			MonsGiantBee: monsInterval{2, 2},
 		},
 		rarity: 30, minDepth: 9, maxDepth: 9, band: true, unique: true,
 	},
@@ -336,6 +342,13 @@ var MonsBands = []monsterBandData{
 			MonsSpider: monsInterval{1, 2},
 		},
 		rarity: 35, minDepth: 10, maxDepth: 10, band: true, unique: true,
+	},
+	UExplosiveNadres: {
+		distribution: map[monsterKind]monsInterval{
+			MonsExplosiveNadre: monsInterval{2, 3},
+			MonsBrizzia:        monsInterval{1, 2},
+		},
+		rarity: 55, minDepth: 10, maxDepth: 10, band: true, unique: true,
 	},
 	ULich: {
 		distribution: map[monsterKind]monsInterval{
@@ -793,6 +806,25 @@ func (m *monster) AbsorbMana(g *game, ev event) bool {
 	heap.Push(g.Events, &monsterEvent{ERank: ev.Rank() + 10 + RandInt(20), NMons: m.Index(g), EAction: MonsExhaustionEnd})
 	ev.Renew(g, m.Kind.AttackDelay())
 	return true
+}
+
+func (m *monster) Explode(g *game) {
+	neighbors := g.Dungeon.FreeNeighbors(m.Pos)
+	g.MakeNoise(18, m.Pos)
+	g.Printf("The %s blows with a noisy pop.", m.Kind)
+	for _, pos := range neighbors {
+		mons, _ := g.MonsterAt(pos)
+		if mons.Exists() {
+			mons.HP /= 2
+			if mons.HP == 0 {
+				mons.HP = 1
+			}
+			g.MakeNoise(12, mons.Pos)
+			mons.MakeHuntIfHurt(g)
+		} else if g.Player.Pos == pos {
+			g.Player.HP /= 2
+		}
+	}
 }
 
 func (m *monster) MakeHuntIfHurt(g *game) {

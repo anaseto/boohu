@@ -42,6 +42,9 @@ func (g *game) KillStats(mons *monster) {
 		g.KilledMons = map[monsterKind]int{}
 	}
 	g.KilledMons[mons.Kind]++
+	if mons.Kind == MonsExplosiveNadre {
+		mons.Explode(g)
+	}
 	if mons.Kind.Dangerousness() > 10 {
 		g.StoryPrintf("You killed %s.", Indefinite(mons.Kind.String(), false))
 	}
