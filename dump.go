@@ -36,20 +36,6 @@ func (ms monsSlice) Less(i, j int) bool {
 	return ms[i].Dangerousness() > ms[j].Dangerousness()
 }
 
-func (g *game) KillStats(mons *monster) {
-	g.Killed++
-	if g.KilledMons == nil {
-		g.KilledMons = map[monsterKind]int{}
-	}
-	g.KilledMons[mons.Kind]++
-	if mons.Kind == MonsExplosiveNadre {
-		mons.Explode(g)
-	}
-	if mons.Kind.Dangerousness() > 10 {
-		g.StoryPrintf("You killed %s.", Indefinite(mons.Kind.String(), false))
-	}
-}
-
 func (g *game) DumpAptitudes() string {
 	apts := []string{}
 	for apt, b := range g.Player.Aptitudes {

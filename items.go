@@ -340,7 +340,7 @@ func (g *game) ThrowJavelin(mons *monster, ev event) {
 			mons.MakeHuntIfHurt(g)
 		} else {
 			g.Printf("Your %s kills the %s.", Javelin, mons.Kind)
-			g.KillStats(mons)
+			g.HandleKill(mons)
 		}
 	} else {
 		g.Printf("Your %s missed the %s.", Javelin, mons.Kind)

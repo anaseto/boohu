@@ -135,10 +135,24 @@ func (g *game) HitMonster(mons *monster) {
 		} else if oldHP > 0 {
 			// test oldHP > 0 because of sword special attack
 			g.Printf("You kill the %v (%d damage).", mons.Kind, attack)
-			g.KillStats(mons)
+			g.HandleKill(mons)
 		}
 	} else {
 		g.Printf("You miss the %v.", mons.Kind)
 	}
 	mons.MakeHuntIfHurt(g)
+}
+
+func (g *game) HandleKill(mons *monster) {
+	g.Killed++
+	if g.KilledMons == nil {
+		g.KilledMons = map[monsterKind]int{}
+	}
+	g.KilledMons[mons.Kind]++
+	if mons.Kind == MonsExplosiveNadre {
+		mons.Explode(g)
+	}
+	if mons.Kind.Dangerousness() > 10 {
+		g.StoryPrintf("You killed %s.", Indefinite(mons.Kind.String(), false))
+	}
 }
