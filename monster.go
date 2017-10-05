@@ -822,7 +822,8 @@ func (m *monster) Explode(g *game) {
 			g.MakeNoise(12, mons.Pos)
 			mons.MakeHuntIfHurt(g)
 		} else if g.Player.Pos == pos {
-			g.Player.HP /= 2
+			dmg := g.Player.HP / 2
+			m.InflictDamage(g, dmg, 15)
 		}
 	}
 }
