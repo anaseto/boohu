@@ -178,6 +178,7 @@ type cloudAction int
 
 const (
 	CloudEnd cloudAction = iota
+	ObstructionEnd
 )
 
 type cloudEvent struct {
@@ -195,6 +196,12 @@ func (cev *cloudEvent) Action(g *game) {
 	case CloudEnd:
 		delete(g.Clouds, cev.Pos)
 		g.ComputeLOS()
+	case ObstructionEnd:
+		g.Dungeon.SetCell(cev.Pos, FreeCell)
+		if !g.Player.LOS[cev.Pos] {
+			g.UnknownDig[cev.Pos] = true
+		}
+		g.MakeNoise(18, cev.Pos)
 	}
 }
 

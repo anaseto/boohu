@@ -55,6 +55,7 @@ type chooser struct {
 	area    bool
 	minDist bool
 	single  bool
+	free    bool
 }
 
 func (ch *chooser) ComputeHighlight(g *game, pos position) {
@@ -80,9 +81,20 @@ func (ch *chooser) Action(g *game, pos position) error {
 		return errors.New("Invalid target: too close.")
 	}
 	if c := g.Dungeon.Cell(pos); c.Explored && c.T == FreeCell {
-		mons, _ := g.MonsterAt(pos)
 		if (ch.area || ch.single) && !ch.freeWay(g, pos) {
 			return errors.New("Invalid target: there are monsters in the way.")
+		}
+		mons, _ := g.MonsterAt(pos)
+		if ch.free {
+			if mons.Exists() {
+				return errors.New("Invalid target: there is a monster there.")
+			}
+			if g.Player.Pos == pos {
+				return errors.New("Invalid target: you are here.")
+			}
+			g.Player.Target = pos
+			ch.done = true
+			return nil
 		}
 		if mons.Exists() {
 			g.Player.Target = pos

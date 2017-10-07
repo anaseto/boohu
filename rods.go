@@ -15,6 +15,7 @@ const (
 	RodLightningBolt
 	RodFireball
 	RodFog
+	RodObstruction
 	RodShatter
 	// below unimplemented
 	RodConfusingClouds
@@ -52,6 +53,8 @@ func (r rod) String() string {
 		text = "rod of fireball"
 	case RodLightningBolt:
 		text = "rod of lightning bolt"
+	case RodObstruction:
+		text = "rod of obstruction"
 	case RodShatter:
 		text = "rod of shatter"
 	case RodFreezingClouds:
@@ -77,6 +80,8 @@ func (r rod) Desc() string {
 		text = "throws a 1-radius fireball at your foes."
 	case RodLightningBolt:
 		text = "throws a lightning bolt through one or more ennemies."
+	case RodObstruction:
+		text = "creates a temporary wall at targetted location."
 	case RodShatter:
 		text = "induces an explosion around a wall. The wall can disintegrate."
 	case RodFear:
@@ -147,6 +152,8 @@ func (r rod) Use(g *game, ev event) error {
 		err = g.EvokeRodFog(ev)
 	case RodDigging:
 		err = g.EvokeRodDigging(ev)
+	case RodObstruction:
+		err = g.EvokeRodObstruction(ev)
 	case RodShatter:
 		err = g.EvokeRodShatter(ev)
 	}
@@ -357,6 +364,18 @@ func (g *game) EvokeRodShatter(ev event) error {
 		g.MakeNoise(12, mons.Pos)
 		mons.MakeHuntIfHurt(g)
 	}
+	return nil
+}
+
+func (g *game) EvokeRodObstruction(ev event) error {
+	if !g.ui.ChooseTarget(g, &chooser{single: true, free: true}) {
+		return errors.New("Ok, then.")
+	}
+	g.Dungeon.SetCell(g.Player.Target, WallCell)
+	g.MakeNoise(18, g.Player.Target)
+	heap.Push(g.Events, &cloudEvent{ERank: ev.Rank() + 200 + RandInt(50), Pos: g.Player.Target, EAction: ObstructionEnd})
+	g.Printf("You see a wall appear from nothing.")
+	g.ComputeLOS()
 	return nil
 }
 

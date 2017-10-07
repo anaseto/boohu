@@ -523,20 +523,25 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	mons, _ := g.MonsterAt(target)
 	switch {
 	case !mons.Exists():
-		m.Pos = m.Path[len(m.Path)-2]
-		if m.Kind == MonsEarthDragon && g.Dungeon.Cell(m.Pos).T == WallCell {
-			g.Dungeon.SetCell(m.Pos, FreeCell)
-			if !g.Player.LOS[m.Pos] {
+		if m.Kind == MonsEarthDragon && g.Dungeon.Cell(target).T == WallCell {
+			g.Dungeon.SetCell(target, FreeCell)
+			if !g.Player.LOS[target] {
 				g.UnknownDig[m.Pos] = true
 			}
 			g.MakeNoise(18, m.Pos)
-			if g.Player.Pos.Distance(m.Pos) < 10 {
+			if g.Player.Pos.Distance(target) < 10 {
 				// XXX use dijkstra distance ?
 				g.Print("You hear an earth-breaking noise.")
 				g.AutoHalt = true
 			}
+			m.Pos = target
+			m.Path = m.Path[:len(m.Path)-1]
+		} else if g.Dungeon.Cell(target).T == WallCell {
+			m.Path = m.APath(g, mpos, m.Target)
+		} else {
+			m.Pos = target
+			m.Path = m.Path[:len(m.Path)-1]
 		}
-		m.Path = m.Path[:len(m.Path)-1]
 	case !g.Player.LOS[mons.Pos] && g.Player.Pos.Distance(mons.Target) > 2 && mons.State != Hunting:
 		r := RandInt(10)
 		if r == 0 {
