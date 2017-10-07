@@ -708,13 +708,13 @@ func (ui *termui) DrawPosition(g *game, pos position) {
 	m := g.Dungeon
 	c := m.Cell(pos)
 	if !c.Explored && !g.Wizard {
-		if m.HasFreeExploredNeighbor(pos) {
+		if g.HasFreeExploredNeighbor(pos) {
 			termbox.SetCell(pos.X, pos.Y, '¤', ColorFgDark, ColorBgDark)
 		}
 		return
 	}
 	if g.Wizard {
-		if !c.Explored && m.HasFreeExploredNeighbor(pos) {
+		if !c.Explored && g.HasFreeExploredNeighbor(pos) {
 			termbox.SetCell(pos.X, pos.Y, '¤', ColorFgDark, ColorBgDark)
 			return
 		}

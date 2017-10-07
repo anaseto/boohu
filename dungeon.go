@@ -464,11 +464,12 @@ func (d *dungeon) HasFreeNeighbor(pos position) bool {
 	return false
 }
 
-func (d *dungeon) HasFreeExploredNeighbor(pos position) bool {
+func (g *game) HasFreeExploredNeighbor(pos position) bool {
+	d := g.Dungeon
 	neighbors := d.Neighbors(pos)
 	for _, pos := range neighbors {
 		c := d.Cell(pos)
-		if c.T == FreeCell && c.Explored {
+		if c.T == FreeCell && c.Explored && !g.UnknownDig[pos] {
 			return true
 		}
 	}
