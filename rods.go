@@ -353,7 +353,7 @@ func (g *game) EvokeRodShatter(ev event) error {
 	}
 	for _, pos := range neighbors {
 		mons, _ := g.MonsterAt(pos)
-		if mons == nil {
+		if !mons.Exists() {
 			continue
 		}
 		mons.HP -= RandInt(30)
@@ -371,8 +371,12 @@ func (g *game) EvokeRodObstruction(ev event) error {
 	if !g.ui.ChooseTarget(g, &chooser{single: true, free: true}) {
 		return errors.New("Ok, then.")
 	}
+	neighbors := g.Dungeon.FreeNeighbors(g.Player.Target)
+	for _, pos := range neighbors {
+		g.MakeNoise(18, pos)
+		break
+	}
 	g.Dungeon.SetCell(g.Player.Target, WallCell)
-	g.MakeNoise(18, g.Player.Target)
 	heap.Push(g.Events, &cloudEvent{ERank: ev.Rank() + 200 + RandInt(50), Pos: g.Player.Target, EAction: ObstructionEnd})
 	g.Printf("You see a wall appear from nothing.")
 	g.ComputeLOS()

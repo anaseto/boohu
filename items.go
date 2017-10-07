@@ -42,6 +42,7 @@ const (
 	LignificationPotion
 	MagicMappingPotion
 	MagicPotion
+	WallPotion
 	// below unimplemented
 	ResistancePotion
 )
@@ -67,6 +68,8 @@ func (p potion) String() (text string) {
 		text += " of running"
 	case LignificationPotion:
 		text += " of lignification"
+	case WallPotion:
+		text += " of walls"
 	case ResistancePotion:
 		text += " of resistance"
 	}
@@ -98,6 +101,8 @@ func (p potion) Desc() (text string) {
 		text = "makes you move faster."
 	case LignificationPotion:
 		text = "makes you more resistant to physical blows, but you are attached to the ground while the effect lasts."
+	case WallPotion:
+		text = "replaces free cells around you with temporal walls."
 	case ResistancePotion:
 		text = "makes you resistent to the elements."
 	}
@@ -144,6 +149,8 @@ func (p potion) Use(g *game, ev event) error {
 		err = g.QuaffMagicMapping(ev)
 	case MagicPotion:
 		err = g.QuaffMagic(ev)
+	case WallPotion:
+		err = g.QuaffWallPotion(ev)
 	}
 	if err != nil {
 		return err
@@ -240,6 +247,29 @@ func (g *game) QuaffMagicMapping(ev event) error {
 		}
 	}
 	g.Printf("You quaff the %s. You feel wiser.", MagicMappingPotion)
+	return nil
+}
+
+func (g *game) QuaffWallPotion(ev event) error {
+	neighbors := g.Dungeon.FreeNeighbors(g.Player.Pos)
+	for _, pos := range neighbors {
+		mons, _ := g.MonsterAt(pos)
+		if mons.Exists() {
+			continue
+		}
+		posNeighbors := g.Dungeon.FreeNeighbors(pos)
+		for _, pos := range posNeighbors {
+			if pos == g.Player.Pos {
+				continue
+			}
+			g.MakeNoise(18, pos)
+			break
+		}
+		g.Dungeon.SetCell(pos, WallCell)
+		heap.Push(g.Events, &cloudEvent{ERank: ev.Rank() + 200 + RandInt(50), Pos: pos, EAction: ObstructionEnd})
+	}
+	g.Printf("You quaff the %s. You feel surrounded by temporal walls.", WallPotion)
+	g.ComputeLOS()
 	return nil
 }
 
@@ -388,6 +418,7 @@ var ConsumablesCollectData = map[consumable]collectData{
 	LignificationPotion: {rarity: 8, quantity: 1},
 	MagicMappingPotion:  {rarity: 15, quantity: 1},
 	MagicPotion:         {rarity: 10, quantity: 1},
+	WallPotion:          {rarity: 12, quantity: 1},
 	Javelin:             {rarity: 3, quantity: 3},
 	ConfusingDart:       {rarity: 5, quantity: 2},
 }

@@ -202,6 +202,7 @@ func (cev *cloudEvent) Action(g *game) {
 			g.UnknownDig[cev.Pos] = true
 		}
 		g.MakeNoise(18, cev.Pos)
+		g.ComputeLOS()
 	}
 }
 
