@@ -951,7 +951,7 @@ func (g *game) MaxDanger() int {
 func (g *game) MaxMonsters() int {
 	max := 13 + 3*g.Depth
 	if max > 31 {
-		max = 30
+		max = 31
 	}
 	return max
 }
