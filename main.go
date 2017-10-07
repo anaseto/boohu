@@ -1066,6 +1066,9 @@ func (ui *termui) ExploreStep(g *game) bool {
 		}()
 	}
 	stop := <-next
+	if !stop {
+		termbox.Interrupt()
+	}
 	ui.DrawDungeonView(g, false)
 	return stop
 }
