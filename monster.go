@@ -194,6 +194,7 @@ const (
 	BandYacks
 	BandSpiders
 	BandBlinkingFrogs
+	BandExplosive
 	BandGiantBees
 	BandSkeletonWarrior
 	UBandWorms
@@ -261,7 +262,7 @@ var MonsBands = []monsterBandData{
 	LoneEarthDragon:    {rarity: 80, minDepth: 10, maxDepth: 13, monster: MonsEarthDragon},
 	LoneSpecter:        {rarity: 70, minDepth: 6, maxDepth: 13, monster: MonsMirrorSpecter},
 	LoneAcidMound:      {rarity: 70, minDepth: 6, maxDepth: 13, monster: MonsAcidMound},
-	LoneExplosiveNadre: {rarity: 60, minDepth: 4, maxDepth: 13, monster: MonsExplosiveNadre},
+	LoneExplosiveNadre: {rarity: 60, minDepth: 4, maxDepth: 7, monster: MonsExplosiveNadre},
 	BandGoblins: {
 		distribution: map[monsterKind]monsInterval{MonsGoblin: monsInterval{2, 4}},
 		rarity:       10, minDepth: 1, maxDepth: 6, band: true,
@@ -289,6 +290,15 @@ var MonsBands = []monsterBandData{
 	BandBlinkingFrogs: {
 		distribution: map[monsterKind]monsInterval{MonsBlinkingFrog: monsInterval{2, 4}},
 		rarity:       70, minDepth: 9, maxDepth: 13, band: true,
+	},
+	BandExplosive: {
+		distribution: map[monsterKind]monsInterval{
+			MonsBlinkingFrog:   monsInterval{0, 1},
+			MonsExplosiveNadre: monsInterval{1, 2},
+			MonsGiantBee:       monsInterval{1, 1},
+			MonsBrizzia:        monsInterval{0, 1},
+		},
+		rarity: 70, minDepth: 8, maxDepth: 13, band: true,
 	},
 	BandYacks: {
 		distribution: map[monsterKind]monsInterval{MonsYack: monsInterval{2, 5}},
