@@ -328,6 +328,10 @@ getKey:
 			default:
 				err = errors.New("Unknown key. Type ? for help.")
 			}
+			if g.Wizard && tev.Ch == '@' {
+				ui.WizardInfo(g)
+				continue getKey
+			}
 			if err != nil {
 				g.Print(err.Error())
 				continue getKey
@@ -401,6 +405,17 @@ func (ui *termui) CharacterInfo(g *game) {
 		b.WriteString("\n\n")
 	}
 	b.WriteString(ui.AptitudesText(g))
+	ui.DrawText(b.String(), 0, 0)
+	termbox.Flush()
+	ui.WaitForContinue(g)
+	ui.DrawDungeonView(g, false)
+}
+
+func (ui *termui) WizardInfo(g *game) {
+	termbox.Clear(ColorFg, ColorBg)
+	b := &bytes.Buffer{}
+	fmt.Fprintf(b, "Monsters: %d (%d)\n", len(g.Monsters), g.MaxMonsters())
+	fmt.Fprintf(b, "Danger: %d (%d)\n", g.Danger(), g.MaxDanger())
 	ui.DrawText(b.String(), 0, 0)
 	termbox.Flush()
 	ui.WaitForContinue(g)

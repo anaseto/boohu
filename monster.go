@@ -936,15 +936,31 @@ func (g *game) MonsterAt(pos position) (*monster, int) {
 	return mons, index
 }
 
+func (g *game) Danger() int {
+	danger := 0
+	for _, mons := range g.Monsters {
+		danger += mons.Kind.Dangerousness()
+	}
+	return danger
+}
+
+func (g *game) MaxDanger() int {
+	return 20 + 10*g.Depth + g.Depth*g.Depth/3
+}
+
+func (g *game) MaxMonsters() int {
+	max := 13 + 3*g.Depth
+	if max > 31 {
+		max = 30
+	}
+	return max
+}
+
 func (g *game) GenMonsters() {
 	g.Monsters = []*monster{}
 	g.Bands = []monsterBand{}
-	danger := 20 + 10*g.Depth + g.Depth*g.Depth/3
-	nmons := 15 + 3*g.Depth
-	nmons += RandInt(3)
-	if nmons > 40 {
-		nmons = 40 + RandInt(5)
-	}
+	danger := g.MaxDanger()
+	nmons := g.MaxMonsters()
 	nband := 0
 	for danger > 0 && nmons > 0 {
 		for band, data := range MonsBands {
