@@ -265,7 +265,7 @@ var MonsBands = []monsterBandData{
 	LoneExplosiveNadre: {rarity: 60, minDepth: 4, maxDepth: 7, monster: MonsExplosiveNadre},
 	BandGoblins: {
 		distribution: map[monsterKind]monsInterval{MonsGoblin: monsInterval{2, 4}},
-		rarity:       10, minDepth: 1, maxDepth: 6, band: true,
+		rarity:       10, minDepth: 1, maxDepth: 5, band: true,
 	},
 	BandGoblinsWithWarriors: {
 		distribution: map[monsterKind]monsInterval{
