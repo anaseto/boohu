@@ -61,7 +61,7 @@ func (p *player) Armor() int {
 		ar += 2
 	}
 	if p.HasStatus(StatusLignification) {
-		ar = 8 + ar/2
+		ar = 9 + ar/2
 	}
 	if p.HasStatus(StatusCorrosion) {
 		ar -= 2 * p.Statuses[StatusCorrosion]
