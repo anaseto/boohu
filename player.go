@@ -101,7 +101,7 @@ func (p *player) Evasion() int {
 		ev += 3
 	}
 	if p.HasStatus(StatusAgile) {
-		ev += 5
+		ev += 7
 	}
 	return ev
 }
