@@ -96,7 +96,7 @@ func (p potion) Desc() (text string) {
 	case MagicPotion:
 		text = "replenishes your magical reserves."
 	case BerserkPotion:
-		text = "makes you enter a crazy rage. You cannot drink potions while berserk, and afterwards it leaves you slow and exhausted."
+		text = "makes you enter a crazy rage, temporarily making you faster, stronger and healthier. You cannot drink potions while berserk, and afterwards it leaves you slow and exhausted."
 	case RunningPotion:
 		text = "makes you move faster."
 	case LignificationPotion:
@@ -181,6 +181,7 @@ func (g *game) QuaffBerserk(ev event) error {
 	g.Player.Statuses[StatusBerserk]++
 	heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 65 + RandInt(20), EAction: BerserkEnd})
 	g.Printf("You quaff a %s. You feel a sudden urge to kill things.", BerserkPotion)
+	g.Player.HP += 10
 	return nil
 }
 

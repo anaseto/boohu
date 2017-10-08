@@ -89,6 +89,7 @@ func (sev *simpleEvent) Action(g *game) {
 		g.Player.Statuses[StatusBerserk]--
 		g.Player.Statuses[StatusSlow]++
 		g.Player.Statuses[StatusExhausted]++
+		g.Player.HP -= int(10.0 * float64(g.Player.HP) / float64(g.Player.HPMax()))
 		g.Print("You are no longer berserk.")
 		heap.Push(g.Events, &simpleEvent{ERank: sev.Rank() + 90 + RandInt(40), EAction: SlowEnd})
 		heap.Push(g.Events, &simpleEvent{ERank: sev.Rank() + 270 + RandInt(60), EAction: ExhaustionEnd})
