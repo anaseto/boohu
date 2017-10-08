@@ -118,7 +118,7 @@ func (g *game) HitMonster(mons *monster) {
 		g.MakeNoise(12, mons.Pos)
 		bonus := 0
 		if g.Player.HasStatus(StatusBerserk) {
-			bonus += RandInt(5)
+			bonus += 2 + RandInt(4)
 		}
 		attack := g.HitDamage(g.Player.Attack()+bonus, mons.Armor)
 		if mons.State == Resting {
