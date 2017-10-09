@@ -368,7 +368,7 @@ func (g *game) EvokeRodShatter(ev event) error {
 }
 
 func (g *game) EvokeRodObstruction(ev event) error {
-	if !g.ui.ChooseTarget(g, &chooser{single: true, free: true}) {
+	if !g.ui.ChooseTarget(g, &chooser{needsFreeWay: true, free: true}) {
 		return errors.New("Ok, then.")
 	}
 	neighbors := g.Dungeon.FreeNeighbors(g.Player.Target)
