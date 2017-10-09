@@ -1074,16 +1074,14 @@ func (ui *termui) ExploreStep(g *game) bool {
 		// strange bugs it seems, cannot test myself, so disable on windows
 		go func() {
 			time.Sleep(10 * time.Millisecond)
-			next <- false
+			termbox.Interrupt()
 		}()
 		go func() {
-			ui.PressAnyKey()
-			next <- true
+			err := ui.PressAnyKey()
+			interrupted := err != nil
+			next <- !interrupted
 		}()
 		stop = <-next
-		if !stop {
-			termbox.Interrupt()
-		}
 	} else {
 		time.Sleep(10 * time.Millisecond)
 	}
@@ -1165,11 +1163,13 @@ func (ui *termui) PromptConfirmation(g *game) bool {
 	}
 }
 
-func (ui *termui) PressAnyKey() {
+func (ui *termui) PressAnyKey() error {
 	for {
 		switch tev := termbox.PollEvent(); tev.Type {
 		case termbox.EventKey:
-			return
+			return nil
+		case termbox.EventInterrupt:
+			return errors.New("interrupted")
 		}
 	}
 }
