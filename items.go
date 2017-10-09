@@ -282,6 +282,9 @@ func (g *game) QuaffWallPotion(ev event) error {
 }
 
 func (g *game) QuaffCBlinkPotion(ev event) error {
+	if g.Player.HasStatus(StatusLignification) {
+		return errors.New("You cannot blink while lignified.")
+	}
 	if !g.ui.ChooseTarget(g, &chooser{free: true}) {
 		return errors.New("Ok, then.")
 	}
