@@ -43,6 +43,7 @@ const (
 	MagicMappingPotion
 	MagicPotion
 	WallPotion
+	CBlinkPotion
 	// below unimplemented
 	ResistancePotion
 )
@@ -70,6 +71,8 @@ func (p potion) String() (text string) {
 		text += " of lignification"
 	case WallPotion:
 		text += " of walls"
+	case CBlinkPotion:
+		text += " of controlled blink"
 	case ResistancePotion:
 		text += " of resistance"
 	}
@@ -103,6 +106,8 @@ func (p potion) Desc() (text string) {
 		text = "makes you more resistant to physical blows, but you are attached to the ground while the effect lasts."
 	case WallPotion:
 		text = "replaces free cells around you with temporal walls."
+	case CBlinkPotion:
+		text = "makes you blink to a targetted cell in your line of sight."
 	case ResistancePotion:
 		text = "makes you resistent to the elements."
 	}
@@ -151,6 +156,8 @@ func (p potion) Use(g *game, ev event) error {
 		err = g.QuaffMagic(ev)
 	case WallPotion:
 		err = g.QuaffWallPotion(ev)
+	case CBlinkPotion:
+		err = g.QuaffCBlinkPotion(ev)
 	}
 	if err != nil {
 		return err
@@ -271,6 +278,17 @@ func (g *game) QuaffWallPotion(ev event) error {
 	}
 	g.Printf("You quaff the %s. You feel surrounded by temporal walls.", WallPotion)
 	g.ComputeLOS()
+	return nil
+}
+
+func (g *game) QuaffCBlinkPotion(ev event) error {
+	if !g.ui.ChooseTarget(g, &chooser{free: true}) {
+		return errors.New("Ok, then.")
+	}
+	g.Player.Pos = g.Player.Target
+	g.Printf("You quaff the %s. You blink.", CBlinkPotion)
+	g.ComputeLOS()
+	g.MakeMonstersAware()
 	return nil
 }
 
@@ -415,11 +433,12 @@ var ConsumablesCollectData = map[consumable]collectData{
 	BerserkPotion:       {rarity: 5, quantity: 1},
 	RunningPotion:       {rarity: 10, quantity: 1},
 	DescentPotion:       {rarity: 15, quantity: 1},
-	EvasionPotion:       {rarity: 8, quantity: 1},
+	EvasionPotion:       {rarity: 10, quantity: 1},
 	LignificationPotion: {rarity: 8, quantity: 1},
 	MagicMappingPotion:  {rarity: 15, quantity: 1},
 	MagicPotion:         {rarity: 10, quantity: 1},
 	WallPotion:          {rarity: 12, quantity: 1},
+	CBlinkPotion:        {rarity: 12, quantity: 1},
 	Javelin:             {rarity: 3, quantity: 3},
 	ConfusingDart:       {rarity: 5, quantity: 2},
 }
