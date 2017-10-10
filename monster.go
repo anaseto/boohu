@@ -36,6 +36,8 @@ func (st monsterStatus) String() (text string) {
 	switch st {
 	case MonsConfused:
 		text = "confused"
+	case MonsExhausted:
+		text = "exhausted"
 	case MonsAfraid:
 		text = "afraid"
 	}
