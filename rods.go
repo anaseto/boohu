@@ -402,7 +402,7 @@ func (g *game) GenerateRod() {
 		}
 		pos := g.FreeCellForStatic()
 		r := rod(RandInt(int(RodShatter) + 1))
-		if r.Rare() {
+		if r.Rare() && RandInt(2) == 0 {
 			r = rod(RandInt(int(RodShatter) + 1))
 		}
 		if g.Player.Rods[r] == nil && !g.GeneratedRods[r] {
