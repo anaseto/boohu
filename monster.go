@@ -156,7 +156,7 @@ var monsDesc = []string{
 	MonsOgre:            "Ogres are big clunky humanoids that can hit really hard.",
 	MonsCyclop:          "Cyclops are very similar to ogres, but they also like to throw rocks at their foes, sometimes confusing them.",
 	MonsWorm:            "Worms are ugly slow moving creatures, but surprisingly hardy at times.",
-	MonsBrizzia:         "Brizzias are big slow moving biped creatures. They are quite hardy, and they can cause nausea, impeding the use of potions.",
+	MonsBrizzia:         "Brizzias are big slow moving biped creatures. They are quite hardy, and when hurt they can cause nausea, impeding the use of potions.",
 	MonsAcidMound:       "Acid mounds are acidic creatures. They can temporally corrode your armour.",
 	MonsHound:           "Hounds are fast moving carnivore quadrupeds. They sometimes attack in group.",
 	MonsYack:            "Yacks are quite large herbivorous quadrupeds. They tend to form large groups.",
@@ -623,12 +623,6 @@ func (m *monster) HitSideEffects(g *game, ev event) {
 	case MonsBlinkingFrog:
 		if RandInt(2) == 0 {
 			g.Blink(ev)
-		}
-	case MonsBrizzia:
-		if RandInt(3) == 0 && !g.Player.HasStatus(StatusNausea) {
-			g.Player.Statuses[StatusNausea]++
-			heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 30 + RandInt(20), EAction: NauseaEnd})
-			g.Print("You feel sick.")
 		}
 	case MonsAcidMound:
 		g.Player.Statuses[StatusCorrosion]++

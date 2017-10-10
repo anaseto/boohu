@@ -333,7 +333,7 @@ func (g *game) MovePlayer(pos position, ev event) error {
 			}
 		} else {
 			g.FairAction()
-			g.AttackMonster(mons)
+			g.AttackMonster(mons, ev)
 		}
 	}
 	if g.Player.HasStatus(StatusBerserk) {
