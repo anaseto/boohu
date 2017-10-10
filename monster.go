@@ -154,7 +154,7 @@ var MonsData = []monsterData{
 var monsDesc = []string{
 	MonsGoblin:          "Goblins are little humanoid creatures. They often appear in group.",
 	MonsOgre:            "Ogres are big clunky humanoids that can hit really hard.",
-	MonsCyclop:          "Cyclops are very similar to ogres, but they also like to throw rocks at their foes, sometimes confusing them.",
+	MonsCyclop:          "Cyclops are very similar to ogres, but they also like to throw rocks at their foes (for up to 15 damage), sometimes confusing them.",
 	MonsWorm:            "Worms are ugly slow moving creatures, but surprisingly hardy at times.",
 	MonsBrizzia:         "Brizzias are big slow moving biped creatures. They are quite hardy, and when hurt they can cause nausea, impeding the use of potions.",
 	MonsAcidMound:       "Acid mounds are acidic creatures. They can temporally corrode your armour.",
