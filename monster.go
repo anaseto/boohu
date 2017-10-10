@@ -519,12 +519,8 @@ func (m *monster) HandleTurn(g *game, ev event) {
 			}
 			m.GatherBand(g)
 		case Hunting:
-			if RandInt(5) == 0 && m.Pos.Distance(g.Player.Pos) < 10 {
-				// make hunting monsters sometimes smart
-				m.Target = g.Player.Pos
-			} else {
-				m.Target = g.FreeCell()
-			}
+			// pick a random cell: more escape strategies for the player
+			m.Target = g.FreeCell()
 			m.State = Wandering
 			m.GatherBand(g)
 		}
