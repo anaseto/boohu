@@ -540,7 +540,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 			if g.Player.Pos.Distance(target) < 10 {
 				// XXX use dijkstra distance ?
 				g.Print("You hear an earth-breaking noise.")
-				g.AutoHalt = true
+				g.StopAuto()
 			}
 			m.Pos = target
 			m.Path = m.Path[:len(m.Path)-1]
