@@ -589,10 +589,21 @@ func (m *monster) HitPlayer(g *game, ev event) {
 		attack := g.HitDamage(m.Attack, g.Player.Armor())
 		g.Printf("The %s hits you (%d damage).", m.Kind, attack)
 		m.HitSideEffects(g, ev)
+		if g.Player.Aptitudes[AptConfusingGas] && g.Player.HP < g.Player.HPMax()/2 && RandInt(3) == 0 {
+			m.EnterConfusion(g, ev)
+			g.Printf("You release a confusing gas on the %s.", m.Kind)
+		}
 		m.InflictDamage(g, attack, m.Attack)
 	} else {
 		g.Printf("The %s misses you.", m.Kind)
 	}
+}
+
+func (m *monster) EnterConfusion(g *game, ev event) {
+	m.Statuses[MonsConfused]++
+	m.Path = nil
+	heap.Push(g.Events, &monsterEvent{
+		ERank: ev.Rank() + 50 + RandInt(100), NMons: m.Index(g), EAction: MonsConfusionEnd})
 }
 
 func (m *monster) HitSideEffects(g *game, ev event) {

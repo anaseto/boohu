@@ -12,6 +12,7 @@ const (
 	AptRegen
 	AptStealthyLOS
 	AptMagic
+	AptConfusingGas
 	AptStrong
 	// below unimplemented
 	AptVampiric
@@ -37,12 +38,14 @@ func (ap aptitude) String() string {
 		text = "You are strong."
 	case AptMagic:
 		text = "You have big magic reserves."
-	case AptVampiric:
-		text = "You sometimes steal the life of those you strike."
 	case AptRegen:
 		text = "You regenerate quickly."
 	case AptStealthyLOS:
 		text = "The shadows follow you."
+	case AptConfusingGas:
+		text = "You occasionally release a confusing gas when hurt."
+	case AptVampiric:
+		text = "You sometimes steal the life of those you strike."
 	case AptReflect:
 		text = "You sometimes reflect damage in combat."
 	}

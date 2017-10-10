@@ -408,10 +408,7 @@ func (g *game) ThrowConfusingDart(mons *monster, ev event) {
 		evasion /= 2 + 1
 	}
 	if acc > evasion {
-		mons.Statuses[MonsConfused]++
-		mons.Path = nil
-		heap.Push(g.Events, &monsterEvent{
-			ERank: ev.Rank() + 50 + RandInt(100), NMons: mons.Index(g), EAction: MonsConfusionEnd})
+		mons.EnterConfusion(g, ev)
 		g.Printf("Your %s hits the %s. The %s appears confused.", ConfusingDart, mons.Kind, mons.Kind)
 	} else {
 		g.Printf("Your %s missed the %s.", ConfusingDart, mons.Kind)
