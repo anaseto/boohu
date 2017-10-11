@@ -1,4 +1,5 @@
-// +build !tcell
+// +build tcell
+// DO NOT EDIT, generated automatically
 
 package main
 
@@ -15,7 +16,7 @@ import (
 	"strings"
 	"time"
 
-	termbox "github.com/nsf/termbox-go"
+	termbox "github.com/gdamore/tcell/termbox"
 )
 
 type termui struct {
