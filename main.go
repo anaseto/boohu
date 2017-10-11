@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 	"path/filepath"
 	"runtime"
 	"sort"
@@ -104,13 +105,21 @@ func WindowsPalette() {
 	ColorFgTargetMode = termbox.ColorCyan
 }
 
+var Version string = "v0.3"
+
 func main() {
 	opt := flag.Bool("s", false, "Use true 16-color solarized palette")
+	optVersion := flag.Bool("v", false, "print version number")
 	flag.Parse()
 	if *opt {
 		SolarizedPalette()
 	} else if runtime.GOOS == "windows" {
 		WindowsPalette()
+	}
+
+	if *optVersion {
+		fmt.Println(Version)
+		os.Exit(0)
 	}
 
 	err := termbox.Init()
