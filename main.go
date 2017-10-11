@@ -915,6 +915,8 @@ loop:
 				n++
 			case 'k':
 				n--
+			case ' ':
+				break loop
 			}
 		}
 	}
@@ -1071,6 +1073,9 @@ func (ui *termui) Select(g *game, ev event, l int) (index int, alternate bool, e
 			if tev.Ch == '?' {
 				return -1, true, nil
 			}
+			if tev.Ch == ' ' {
+				return -1, false, errors.New("Ok, then.")
+			}
 		}
 	}
 }
@@ -1142,6 +1147,9 @@ loop:
 				case termbox.KeyEsc, termbox.KeySpace:
 					break loop
 				}
+			}
+			if tev.Ch == ' ' {
+				break loop
 			}
 		}
 	}
