@@ -207,6 +207,7 @@ func (g *game) Blink(ev event) {
 	}
 	g.Player.Pos = npos
 	g.Print("You blink away.")
+	g.CollectGround()
 	g.ComputeLOS()
 	g.MakeMonstersAware()
 }

@@ -290,6 +290,7 @@ func (g *game) QuaffCBlinkPotion(ev event) error {
 	}
 	g.Player.Pos = g.Player.Target
 	g.Printf("You quaff the %s. You blink.", CBlinkPotion)
+	g.CollectGround()
 	g.ComputeLOS()
 	g.MakeMonstersAware()
 	return nil

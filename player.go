@@ -266,10 +266,34 @@ func (g *game) Teleportation(ev event) {
 		// should always happen
 		g.Player.Pos = pos
 		g.Print("You feel yourself teleported away.")
+		g.CollectGround()
 		g.ComputeLOS()
 		g.MakeMonstersAware()
 	} else {
 		g.Print("Something went wrong with the teleportation.")
+	}
+}
+
+func (g *game) CollectGround() {
+	pos := g.Player.Pos
+	if g.Gold[pos] > 0 {
+		g.Player.Gold += g.Gold[pos]
+		delete(g.Gold, pos)
+	}
+	if c, ok := g.Collectables[pos]; ok && c != nil {
+		g.Player.Consumables[c.Consumable] += c.Quantity
+		delete(g.Collectables, pos)
+		if c.Quantity > 1 {
+			g.Printf("You take %d %s.", c.Quantity, c.Consumable.Plural())
+		} else {
+			g.Printf("You take %s.", Indefinite(c.Consumable.String(), false))
+		}
+	}
+	if r, ok := g.Rods[pos]; ok {
+		g.Player.Rods[r] = &rodProps{Charge: r.MaxCharge() - 1}
+		delete(g.Rods, pos)
+		g.Printf("You take a %s.", r)
+		g.StoryPrintf("You found and took a %s.", r)
 	}
 }
 
@@ -293,25 +317,7 @@ func (g *game) MovePlayer(pos position, ev event) error {
 				return errors.New("You cannot move while lignified")
 			}
 			g.Player.Pos = pos
-			if g.Gold[pos] > 0 {
-				g.Player.Gold += g.Gold[pos]
-				delete(g.Gold, pos)
-			}
-			if c, ok := g.Collectables[pos]; ok && c != nil {
-				g.Player.Consumables[c.Consumable] += c.Quantity
-				delete(g.Collectables, pos)
-				if c.Quantity > 1 {
-					g.Printf("You take %d %s.", c.Quantity, c.Consumable.Plural())
-				} else {
-					g.Printf("You take %s.", Indefinite(c.Consumable.String(), false))
-				}
-			}
-			if r, ok := g.Rods[pos]; ok {
-				g.Player.Rods[r] = &rodProps{Charge: r.MaxCharge() - 1}
-				delete(g.Rods, pos)
-				g.Printf("You take a %s.", r)
-				g.StoryPrintf("You found and took a %s.", r)
-			}
+			g.CollectGround()
 			g.ComputeLOS()
 			if g.Autoexploring {
 				mons := g.MonsterInLOS()
