@@ -420,7 +420,7 @@ func (g *game) GenEquip(eq equipable, data equipableData) {
 			if !g.GeneratedEquipables[eq] && eq != Robe {
 				r = data.FavorableRoll(-depthAdjust)
 			} else {
-				r = RandInt(data.rarity * 2)
+				r = RandInt(5 * data.rarity / 4)
 			}
 		case weapon:
 			if !g.SeenGoodWeapon() && eq != Dagger {
@@ -429,7 +429,7 @@ func (g *game) GenEquip(eq equipable, data equipableData) {
 				if g.Player.Weapon != Dagger {
 					r = RandInt(data.rarity * 4)
 				} else {
-					r = RandInt(data.rarity * 2)
+					r = RandInt(5 * data.rarity / 4)
 				}
 			}
 		default:
