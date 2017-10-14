@@ -214,40 +214,48 @@ func (g *game) GenDungeon() {
 	}
 }
 
+func (g *game) InitPlayer() {
+	g.Player = &player{
+		HP:        40,
+		MP:        10,
+		Gold:      0,
+		Aptitudes: map[aptitude]bool{},
+	}
+	g.Player.Consumables = map[consumable]int{
+		HealWoundsPotion: 1,
+		Javelin:          3,
+	}
+	switch RandInt(6) {
+	case 0, 1:
+		g.Player.Consumables[TeleportationPotion] = 1
+	case 2, 3:
+		g.Player.Consumables[BerserkPotion] = 1
+	case 4:
+		g.Player.Consumables[EvasionPotion] = 1
+	case 5:
+		g.Player.Consumables[LignificationPotion] = 1
+	}
+	g.Player.Rods = map[rod]*rodProps{}
+	g.Player.Statuses = map[status]int{}
+
+	// Testing
+	// g.Player.Aptitudes[AptSmoke] = true
+}
+
 func (g *game) InitLevel() {
 	// Dungeon terrain
 	g.GenDungeon()
 
-	// Player
+	// Starting data
 	if g.Depth == 0 {
-		g.Player = &player{
-			HP:        40,
-			MP:        10,
-			Gold:      0,
-			Aptitudes: map[aptitude]bool{},
-		}
-		g.Player.Consumables = map[consumable]int{
-			HealWoundsPotion: 1,
-			Javelin:          3,
-		}
-		switch RandInt(6) {
-		case 0, 1:
-			g.Player.Consumables[TeleportationPotion] = 1
-		case 2, 3:
-			g.Player.Consumables[BerserkPotion] = 1
-		case 4:
-			g.Player.Consumables[EvasionPotion] = 1
-		case 5:
-			g.Player.Consumables[LignificationPotion] = 1
-		}
+		g.InitPlayer()
 		g.GeneratedRods = map[rod]bool{}
-		g.Player.Rods = map[rod]*rodProps{}
-		g.Player.Statuses = map[status]int{}
 		g.GeneratedEquipables = map[equipable]bool{}
-		g.GeneratedBands = map[monsterBand]int{}
 		g.FoundEquipables = map[equipable]bool{Robe: true, Dagger: true}
+		g.GeneratedBands = map[monsterBand]int{}
 		g.KilledMons = map[monsterKind]int{}
 	}
+
 	g.Player.Pos = g.FreeCell()
 
 	g.UnknownDig = map[position]bool{}
