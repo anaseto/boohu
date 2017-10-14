@@ -66,7 +66,7 @@ func (g *game) buildRayMap(from position, distance int) rayMap {
 func (g *game) LosRange() int {
 	losRange := 6
 	if g.Player.Aptitudes[AptStealthyLOS] {
-		losRange -= 1
+		losRange -= 2
 	}
 	return losRange
 }

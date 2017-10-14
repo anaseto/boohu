@@ -642,10 +642,7 @@ func (m *monster) RangedAttack(g *game, ev event) bool {
 	if !m.Kind.Ranged() {
 		return false
 	}
-	rdist := 5
-	if g.Player.Aptitudes[AptStealthyLOS] {
-		rdist = 4
-	}
+	rdist := g.LosRange() - 1
 	if m.Pos.Distance(g.Player.Pos) <= 1 || m.Pos.Distance(g.Player.Pos) > rdist || !g.Player.LOS[m.Pos] {
 		return false
 	}
@@ -803,10 +800,7 @@ func (m *monster) SmitingAttack(g *game, ev event) bool {
 	if !m.Kind.Smiting() {
 		return false
 	}
-	rdist := 5
-	if g.Player.Aptitudes[AptStealthyLOS] {
-		rdist = 4
-	}
+	rdist := g.LosRange() - 1
 	if m.Pos.Distance(g.Player.Pos) > rdist || !g.Player.LOS[m.Pos] {
 		return false
 	}
@@ -872,6 +866,9 @@ func (m *monster) MakeAware(g *game) {
 	}
 	if m.State == Resting {
 		adjust := (m.Pos.Distance(g.Player.Pos) - g.LosRange()/2 + 1)
+		if g.Player.Aptitudes[AptStealthyLOS] {
+			adjust += 1
+		}
 		adjust *= adjust
 		r := RandInt(25 + 3*adjust)
 		if g.Player.Aptitudes[AptStealthyMovement] {
@@ -883,8 +880,14 @@ func (m *monster) MakeAware(g *game) {
 	}
 	if m.State == Wandering {
 		adjust := (m.Pos.Distance(g.Player.Pos) - g.LosRange()/2 + 1)
+		if g.Player.Aptitudes[AptStealthyLOS] {
+			adjust += 1
+		}
 		adjust *= adjust
 		r := RandInt(30 + adjust)
+		if g.Player.Aptitudes[AptStealthyMovement] {
+			r += 5
+		}
 		if r >= 25 {
 			return
 		}
