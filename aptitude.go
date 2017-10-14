@@ -13,6 +13,7 @@ const (
 	AptStealthyLOS
 	AptMagic
 	AptConfusingGas
+	AptSmoke
 	AptStrong
 	// below unimplemented
 	AptVampiric
@@ -44,6 +45,8 @@ func (ap aptitude) String() string {
 		text = "The shadows follow you."
 	case AptConfusingGas:
 		text = "You occasionally release a confusing gas when hurt."
+	case AptSmoke:
+		text = "You occasionally smoke clouds when hurt."
 	case AptVampiric:
 		text = "You sometimes steal the life of those you strike."
 	case AptReflect:

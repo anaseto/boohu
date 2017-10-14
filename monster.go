@@ -588,12 +588,18 @@ func (m *monster) HitPlayer(g *game, ev event) {
 		g.MakeNoise(noise, g.Player.Pos)
 		attack := g.HitDamage(m.Attack, g.Player.Armor())
 		g.Printf("The %s hits you (%d damage).", m.Kind, attack)
+		m.InflictDamage(g, attack, m.Attack)
+		if g.Player.HP <= 0 {
+			return
+		}
 		m.HitSideEffects(g, ev)
 		if g.Player.Aptitudes[AptConfusingGas] && g.Player.HP < g.Player.HPMax()/2 && RandInt(3) == 0 {
 			m.EnterConfusion(g, ev)
 			g.Printf("You release a confusing gas on the %s.", m.Kind)
 		}
-		m.InflictDamage(g, attack, m.Attack)
+		if g.Player.Aptitudes[AptSmoke] && g.Player.HP < g.Player.HPMax()/2 && RandInt(2) == 0 {
+			g.Smoke(ev)
+		}
 	} else {
 		g.Printf("The %s misses you.", m.Kind)
 	}

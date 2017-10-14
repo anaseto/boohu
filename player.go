@@ -370,3 +370,17 @@ func (g *game) MPRegen(ev event) {
 	delay := 100
 	ev.Renew(g, delay)
 }
+
+func (g *game) Smoke(ev event) {
+	dij := &normalPath{game: g}
+	nm := Dijkstra(dij, []position{g.Player.Pos}, 2)
+	for pos := range nm {
+		_, ok := g.Clouds[pos]
+		if !ok {
+			g.Clouds[pos] = CloudFog
+			heap.Push(g.Events, &cloudEvent{ERank: ev.Rank() + 100 + RandInt(100), EAction: CloudEnd, Pos: pos})
+		}
+	}
+	g.ComputeLOS()
+	g.Print("Your corpse releases some clouds.")
+}
