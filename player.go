@@ -381,6 +381,8 @@ func (g *game) Smoke(ev event) {
 			heap.Push(g.Events, &cloudEvent{ERank: ev.Rank() + 100 + RandInt(100), EAction: CloudEnd, Pos: pos})
 		}
 	}
+	g.Player.Statuses[StatusSwift]++
+	heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 20 + RandInt(10), EAction: HasteEnd})
 	g.ComputeLOS()
-	g.Print("Your corpse releases some clouds.")
+	g.Print("You feel an energy burst and smoking coming out from you.")
 }
