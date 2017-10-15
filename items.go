@@ -588,7 +588,7 @@ func (wp weapon) Attack() int {
 	case BattleAxe, Halberd, DoubleSword:
 		return 15
 	case Dagger:
-		return 8
+		return 9
 	default:
 		return 0
 	}
