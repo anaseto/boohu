@@ -484,7 +484,11 @@ func (ui *termui) DescribePosition(g *game, pos position, targ Targetter) {
 	case g.Dungeon.Cell(pos).T == WallCell:
 		desc += "You see a wall."
 	default:
-		desc += "You see the ground."
+		if _, ok := g.Fungus[pos]; ok {
+			desc += "You see dense foliage there."
+		} else {
+			desc += "You see the ground."
+		}
 	}
 	g.Print(desc)
 }
@@ -782,6 +786,9 @@ func (ui *termui) DrawPosition(g *game, pos position) {
 			fgColor = ColorFgPlayer
 		default:
 			r = '.'
+			if _, ok := g.Fungus[pos]; ok {
+				r = '"'
+			}
 			if _, ok := g.Clouds[pos]; ok && g.Player.LOS[pos] {
 				r = '§'
 			}

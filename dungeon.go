@@ -698,3 +698,64 @@ func (g *game) GenCellularAutomataCaveMap(h, w int) {
 		}
 	}
 }
+
+type vegetation int
+
+const (
+	foliage vegetation = iota
+)
+
+func (g *game) Foliage(h, w int) map[position]vegetation {
+	// use same structure as for the dungeon
+	// walls will become foliage
+	d := &dungeon{}
+	d.Cells = make([]cell, h*w)
+	d.Width = w
+	d.Heigth = h
+	for i := range d.Cells {
+		r := RandInt(100)
+		pos := d.CellPosition(i)
+		if r >= 43 {
+			d.SetCell(pos, WallCell)
+		} else {
+			d.SetCell(pos, FreeCell)
+		}
+	}
+	for i := 0; i < 6; i++ {
+		bufm := &dungeon{}
+		bufm.Cells = make([]cell, h*w)
+		bufm.Width = w
+		bufm.Heigth = h
+		copy(bufm.Cells, d.Cells)
+		for j := range bufm.Cells {
+			pos := d.CellPosition(j)
+			c1 := d.WallAreaCount(pos, 1)
+			if i < 4 {
+				if c1 <= 4 {
+					bufm.SetCell(pos, FreeCell)
+				} else {
+					bufm.SetCell(pos, WallCell)
+				}
+			}
+			if i == 4 {
+				if c1 > 6 {
+					bufm.SetCell(pos, WallCell)
+				}
+			}
+			if i == 5 {
+				c2 := d.WallAreaCount(pos, 2)
+				if c2 < 5 && c1 <= 2 {
+					bufm.SetCell(pos, FreeCell)
+				}
+			}
+		}
+		d.Cells = bufm.Cells
+	}
+	fungus := make(map[position]vegetation)
+	for i, c := range d.Cells {
+		if c.T == FreeCell {
+			fungus[d.CellPosition(i)] = foliage
+		}
+	}
+	return fungus
+}

@@ -33,6 +33,9 @@ func (g *game) losCost(pos position) int {
 	if _, ok := g.Clouds[pos]; ok {
 		cost += 25
 	}
+	if _, ok := g.Fungus[pos]; ok {
+		cost += 23
+	}
 	return cost
 }
 

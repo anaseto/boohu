@@ -19,6 +19,7 @@ type game struct {
 	Rods                map[position]rod
 	Stairs              map[position]bool
 	Clouds              map[position]cloud
+	Fungus              map[position]vegetation
 	GeneratedBands      map[monsterBand]int
 	GeneratedEquipables map[equipable]bool
 	GeneratedRods       map[rod]bool
@@ -199,18 +200,25 @@ func (g *game) MaxDepth() int {
 	return 12
 }
 
+const (
+	DungeonHeigth = 21
+	DungeonWidth  = 79
+)
+
 func (g *game) GenDungeon() {
 	switch RandInt(6) {
 	case 0:
-		g.GenCaveMap(21, 79)
+		g.GenCaveMap(DungeonHeigth, DungeonWidth)
+		g.Fungus = g.Foliage(DungeonHeigth, DungeonWidth)
 	case 1:
-		g.GenRoomMap(21, 79)
+		g.GenRoomMap(DungeonHeigth, DungeonWidth)
 	case 2:
-		g.GenCellularAutomataCaveMap(21, 79)
+		g.GenCellularAutomataCaveMap(DungeonHeigth, DungeonWidth)
+		g.Fungus = g.Foliage(DungeonHeigth, DungeonWidth)
 	case 3:
-		g.GenCaveMapTree(21, 79)
+		g.GenCaveMapTree(DungeonHeigth, DungeonWidth)
 	default:
-		g.GenRuinsMap(21, 79)
+		g.GenRuinsMap(DungeonHeigth, DungeonWidth)
 	}
 }
 
