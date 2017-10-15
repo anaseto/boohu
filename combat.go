@@ -65,10 +65,10 @@ func (g *game) MakeNoise(noise int, at position) {
 			r += 10
 		}
 		if v > r {
-			m.Target = at
 			if g.Player.LOS[m.Pos] {
-				m.State = Hunting
+				m.MakeHunt(g)
 			} else {
+				m.Target = at
 				m.State = Wandering
 			}
 			m.GatherBand(g)

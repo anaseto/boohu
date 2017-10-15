@@ -405,6 +405,7 @@ type monster struct {
 	Target      position
 	Path        []position // cache
 	Obstructing bool
+	FireReady   bool
 }
 
 func (m *monster) Init() {
@@ -642,9 +643,21 @@ func (m *monster) RangedAttack(g *game, ev event) bool {
 	if !m.Kind.Ranged() {
 		return false
 	}
-	rdist := g.LosRange() - 1
-	if m.Pos.Distance(g.Player.Pos) <= 1 || m.Pos.Distance(g.Player.Pos) > rdist || !g.Player.LOS[m.Pos] {
+	if m.Pos.Distance(g.Player.Pos) <= 1 {
 		return false
+	}
+	if !g.Player.LOS[m.Pos] {
+		m.FireReady = false
+		return false
+	}
+	if !m.FireReady {
+		m.FireReady = true
+		if m.Pos.Distance(g.Player.Pos) <= 3 {
+			ev.Renew(g, m.Kind.AttackDelay())
+			return true
+		} else {
+			return false
+		}
 	}
 	if m.Status(MonsExhausted) {
 		return false
@@ -800,9 +813,18 @@ func (m *monster) SmitingAttack(g *game, ev event) bool {
 	if !m.Kind.Smiting() {
 		return false
 	}
-	rdist := g.LosRange() - 1
-	if m.Pos.Distance(g.Player.Pos) > rdist || !g.Player.LOS[m.Pos] {
+	if !g.Player.LOS[m.Pos] {
+		m.FireReady = false
 		return false
+	}
+	if !m.FireReady {
+		m.FireReady = true
+		if m.Pos.Distance(g.Player.Pos) <= 3 {
+			ev.Renew(g, m.Kind.AttackDelay())
+			return true
+		} else {
+			return false
+		}
 	}
 	if m.Status(MonsExhausted) {
 		return false
@@ -846,10 +868,14 @@ func (m *monster) Explode(g *game) {
 	}
 }
 
+func (m *monster) MakeHunt(g *game) {
+	m.State = Hunting
+	m.Target = g.Player.Pos
+}
+
 func (m *monster) MakeHuntIfHurt(g *game) {
 	if m.State != Hunting {
-		m.Target = g.Player.Pos
-		m.State = Hunting
+		m.MakeHunt(g)
 		if m.State == Resting {
 			g.Printf("The %s awakes.", m.Kind)
 		}
@@ -902,8 +928,7 @@ func (m *monster) MakeAware(g *game) {
 		g.Printf("The %s barks.", m.Kind)
 		g.MakeNoise(12, m.Pos)
 	}
-	m.Target = g.Player.Pos
-	m.State = Hunting
+	m.MakeHunt(g)
 }
 
 func (m *monster) Heal(g *game, ev event) {
@@ -921,6 +946,9 @@ func (m *monster) GatherBand(g *game) {
 	nm := Dijkstra(dij, []position{m.Pos}, 4)
 	for _, mons := range g.Monsters {
 		if mons.Band == m.Band {
+			if mons.State == Hunting && m.State != Hunting {
+				continue
+			}
 			n, ok := nm[mons.Pos]
 			if !ok || n.Cost > 4 {
 				continue
