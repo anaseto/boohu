@@ -20,6 +20,7 @@ type game struct {
 	Stairs              map[position]bool
 	Clouds              map[position]cloud
 	Fungus              map[position]vegetation
+	TemporalWalls       map[position]bool
 	GeneratedBands      map[monsterBand]int
 	GeneratedEquipables map[equipable]bool
 	GeneratedRods       map[rod]bool
@@ -269,6 +270,7 @@ func (g *game) InitLevel() {
 
 	g.UnknownDig = map[position]bool{}
 	g.ExclusionsMap = map[position]bool{}
+	g.TemporalWalls = map[position]bool{}
 
 	// Monsters
 	g.GenMonsters()

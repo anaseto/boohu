@@ -201,6 +201,8 @@ func (cev *cloudEvent) Action(g *game) {
 		g.Dungeon.SetCell(cev.Pos, FreeCell)
 		if !g.Player.LOS[cev.Pos] {
 			g.UnknownDig[cev.Pos] = true
+		} else {
+			delete(g.TemporalWalls, cev.Pos)
 		}
 		g.MakeNoise(18, cev.Pos)
 		g.ComputeLOS()

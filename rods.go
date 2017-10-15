@@ -378,6 +378,9 @@ func (g *game) EvokeRodObstruction(ev event) error {
 		break
 	}
 	g.Dungeon.SetCell(g.Player.Target, WallCell)
+	if g.TemporalWalls != nil {
+		g.TemporalWalls[g.Player.Target] = true
+	}
 	heap.Push(g.Events, &cloudEvent{ERank: ev.Rank() + 200 + RandInt(50), Pos: g.Player.Target, EAction: ObstructionEnd})
 	g.Printf("You see a wall appear from nothing.")
 	g.ComputeLOS()

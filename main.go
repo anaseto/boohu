@@ -49,6 +49,7 @@ var (
 	ColorFgStatusOther      termbox.Attribute = 137
 	ColorFgExcluded         termbox.Attribute = 161
 	ColorFgTargetMode       termbox.Attribute = 38
+	ColorFgTemporalWall     termbox.Attribute = 38
 )
 
 func SolarizedPalette() {
@@ -77,6 +78,7 @@ func SolarizedPalette() {
 	ColorFgStatusBad = 2
 	ColorFgStatusOther = 4
 	ColorFgTargetMode = 7
+	ColorFgTemporalWall = 7
 }
 
 func WindowsPalette() {
@@ -105,6 +107,7 @@ func WindowsPalette() {
 	ColorFgStatusBad = termbox.ColorRed
 	ColorFgStatusOther = termbox.ColorYellow
 	ColorFgTargetMode = termbox.ColorCyan
+	ColorFgTemporalWall = termbox.ColorCyan
 }
 
 var Version string = "v0.3"
@@ -775,9 +778,15 @@ func (ui *termui) DrawPosition(g *game, pos position) {
 	switch c.T {
 	case WallCell:
 		r = '#'
+		if g.TemporalWalls[pos] {
+			fgColor = ColorFgTemporalWall
+		}
 	case FreeCell:
 		if g.UnknownDig[pos] {
 			r = '#'
+			if g.TemporalWalls[pos] {
+				fgColor = ColorFgTemporalWall
+			}
 			break
 		}
 		switch {

@@ -109,6 +109,7 @@ func (g *game) ComputeLOS() {
 			}
 			if g.UnknownDig[pos] {
 				delete(g.UnknownDig, pos)
+				delete(g.TemporalWalls, pos)
 			}
 			g.Dungeon.SetExplored(pos)
 		}

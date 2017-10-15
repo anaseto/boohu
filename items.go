@@ -274,6 +274,9 @@ func (g *game) QuaffWallPotion(ev event) error {
 			break
 		}
 		g.Dungeon.SetCell(pos, WallCell)
+		if g.TemporalWalls != nil {
+			g.TemporalWalls[pos] = true
+		}
 		heap.Push(g.Events, &cloudEvent{ERank: ev.Rank() + 200 + RandInt(50), Pos: pos, EAction: ObstructionEnd})
 	}
 	g.Printf("You quaff the %s. You feel surrounded by temporal walls.", WallPotion)
