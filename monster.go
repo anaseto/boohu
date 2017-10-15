@@ -483,10 +483,10 @@ func (m *monster) HandleTurn(g *game, ev event) {
 		ev.Renew(g, m.Kind.MovementDelay())
 		return
 	}
-	if m.RangedAttack(g, ev) {
+	if m.State == Hunting && m.RangedAttack(g, ev) {
 		return
 	}
-	if m.SmitingAttack(g, ev) {
+	if m.State == Hunting && m.SmitingAttack(g, ev) {
 		return
 	}
 	if mpos.Distance(ppos) == 1 {
@@ -549,6 +549,9 @@ func (m *monster) HandleTurn(g *game, ev event) {
 			m.Path = m.APath(g, mpos, m.Target)
 		} else {
 			m.Pos = target
+			if m.Kind.Ranged() && !m.FireReady && g.Player.LOS[m.Pos] {
+				m.FireReady = true
+			}
 			m.Path = m.Path[:len(m.Path)-1]
 		}
 	case !g.Player.LOS[mons.Pos] && g.Player.Pos.Distance(mons.Target) > 2 && mons.State != Hunting:
