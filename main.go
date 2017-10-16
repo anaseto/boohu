@@ -682,7 +682,7 @@ func (ui *termui) ViewPositionDescription(g *game, pos position) {
 	} else if eq, ok := g.Equipables[pos]; ok {
 		ui.DrawDescription(g, eq.Desc())
 	} else if g.Stairs[pos] {
-		ui.DrawDescription(g, "Stairs lead to the next level of the Underground. There's no way back.")
+		ui.DrawDescription(g, "Stairs lead to the next level of the Underground. There's no way back. Monsters do not follow you.")
 	} else {
 		g.Print("Nothing worth of description here.")
 	}
