@@ -159,7 +159,7 @@ func (g *game) FreeCellForBandMonster(pos position) position {
 	for {
 		count++
 		if count > 1000 {
-			panic("FreeCellForBandMonster")
+			return g.FreeCellForMonster()
 		}
 		neighbors := g.Dungeon.FreeNeighbors(pos)
 		r := RandInt(len(neighbors))
