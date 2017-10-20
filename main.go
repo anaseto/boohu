@@ -287,7 +287,7 @@ getKey:
 				g.WaitTurn(ev)
 			case 'r':
 				err = g.Rest(ev)
-			case '>':
+			case '>', 'D':
 				if g.Stairs[g.Player.Pos] {
 					if g.Descend(ev) {
 						ui.Win(g)
@@ -574,7 +574,7 @@ loop:
 					}
 					npos = p
 				}
-			case '>':
+			case '>', 'D':
 			search:
 				for i := 0; i < g.Dungeon.Width*g.Dungeon.Heigth; i++ {
 					for nstatic.X < g.Dungeon.Width-1 {
