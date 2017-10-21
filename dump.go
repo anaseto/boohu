@@ -243,6 +243,8 @@ func (g *game) DumpDungeon() string {
 					r = '>'
 				} else if _, ok := g.Gold[pos]; ok {
 					r = '$'
+				} else if _, ok := g.Doors[pos]; ok {
+					r = '+'
 				}
 				m, _ := g.MonsterAt(pos)
 				if m.Exists() && (g.Player.LOS[m.Pos] || g.Wizard) {
