@@ -375,7 +375,7 @@ func (ui *termui) KeysHelp(g *game) {
 		"Movement", "h/j/k/l/y/u/b/n or numpad",
 		"Rest", "r",
 		"Wait", "“.” or 5",
-		"Use stairs", ">",
+		"Use stairs", "> or D",
 		"Quaff potion", "q or a",
 		"Equip weapon/armour/...", "e or g",
 		"Autoexplore", "o",
