@@ -532,6 +532,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	mons, _ := g.MonsterAt(target)
 	switch {
 	case !mons.Exists():
+		recomputeLOS := g.Doors[m.Pos] || g.Doors[target]
 		if m.Kind == MonsEarthDragon && g.Dungeon.Cell(target).T == WallCell {
 			g.Dungeon.SetCell(target, FreeCell)
 			if !g.Player.LOS[target] {
@@ -545,6 +546,9 @@ func (m *monster) HandleTurn(g *game, ev event) {
 			}
 			m.Pos = target
 			m.Path = m.Path[:len(m.Path)-1]
+			if recomputeLOS {
+				g.ComputeLOS()
+			}
 		} else if g.Dungeon.Cell(target).T == WallCell {
 			m.Path = m.APath(g, mpos, m.Target)
 		} else {
@@ -553,6 +557,9 @@ func (m *monster) HandleTurn(g *game, ev event) {
 				m.FireReady = true
 			}
 			m.Path = m.Path[:len(m.Path)-1]
+			if recomputeLOS {
+				g.ComputeLOS()
+			}
 		}
 	case !g.Player.LOS[mons.Pos] && g.Player.Pos.Distance(mons.Target) > 2 && mons.State != Hunting:
 		r := RandInt(10)

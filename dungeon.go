@@ -303,6 +303,7 @@ func (g *game) GenRuinsMap(h, w int) {
 		rooms = append(rooms, ro)
 	}
 	g.Dungeon = d
+	g.PutDoors(20)
 }
 
 type roomSlice []room
@@ -355,6 +356,7 @@ func (g *game) GenRoomMap(h, w int) {
 		}
 	}
 	g.Dungeon = d
+	g.PutDoors(90)
 }
 
 func (d *dungeon) FreeCell() position {
@@ -452,6 +454,7 @@ loop:
 		digs++
 	}
 	g.Dungeon = d
+	g.PutDoors(5)
 }
 
 func (d *dungeon) HasFreeNeighbor(pos position) bool {
@@ -529,6 +532,7 @@ loop:
 		}
 	}
 	g.Dungeon = d
+	g.PutDoors(5)
 }
 
 func (d *dungeon) WallNeighborsCount(pos position) int {
@@ -683,6 +687,7 @@ loop:
 		digs++
 	}
 	g.Dungeon = d
+	g.PutDoors(10)
 	return true
 }
 
@@ -758,4 +763,40 @@ func (g *game) Foliage(h, w int) map[position]vegetation {
 		}
 	}
 	return fungus
+}
+
+func (g *game) DoorCandidate(pos position) bool {
+	d := g.Dungeon
+	if !d.Valid(pos) || d.Cell(pos).T != FreeCell {
+		return false
+	}
+	return d.Valid(pos.W()) && d.Valid(pos.E()) &&
+		d.Cell(pos.W()).T == FreeCell && d.Cell(pos.E()).T == FreeCell &&
+		!g.Doors[pos.W()] && !g.Doors[pos.E()] &&
+		(!d.Valid(pos.N()) || d.Cell(pos.N()).T == WallCell) &&
+		(!d.Valid(pos.S()) || d.Cell(pos.S()).T == WallCell) &&
+		((d.Valid(pos.NW()) && d.Cell(pos.NW()).T == FreeCell) ||
+			(d.Valid(pos.SW()) && d.Cell(pos.SW()).T == FreeCell) ||
+			(d.Valid(pos.NE()) && d.Cell(pos.NE()).T == FreeCell) ||
+			(d.Valid(pos.SE()) && d.Cell(pos.SE()).T == FreeCell)) ||
+		d.Valid(pos.N()) && d.Valid(pos.S()) &&
+			d.Cell(pos.N()).T == FreeCell && d.Cell(pos.S()).T == FreeCell &&
+			!g.Doors[pos.N()] && !g.Doors[pos.S()] &&
+			(!d.Valid(pos.E()) || d.Cell(pos.E()).T == WallCell) &&
+			(!d.Valid(pos.W()) || d.Cell(pos.W()).T == WallCell) &&
+			((d.Valid(pos.NW()) && d.Cell(pos.NW()).T == FreeCell) ||
+				(d.Valid(pos.SW()) && d.Cell(pos.SW()).T == FreeCell) ||
+				(d.Valid(pos.NE()) && d.Cell(pos.NE()).T == FreeCell) ||
+				(d.Valid(pos.SE()) && d.Cell(pos.SE()).T == FreeCell))
+	return false
+}
+
+func (g *game) PutDoors(percentage int) {
+	g.Doors = map[position]bool{}
+	for i, _ := range g.Dungeon.Cells {
+		pos := g.Dungeon.CellPosition(i)
+		if g.DoorCandidate(pos) && RandInt(100) < percentage {
+			g.Doors[pos] = true
+		}
+	}
 }

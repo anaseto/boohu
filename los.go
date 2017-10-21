@@ -36,6 +36,14 @@ func (g *game) losCost(pos position) int {
 	if _, ok := g.Fungus[pos]; ok {
 		cost += 23
 	}
+	if _, ok := g.Doors[pos]; ok {
+		if pos != g.Player.Pos {
+			mons, _ := g.MonsterAt(pos)
+			if !mons.Exists() {
+				cost += 100
+			}
+		}
+	}
 	return cost
 }
 

@@ -20,6 +20,7 @@ type game struct {
 	Stairs              map[position]bool
 	Clouds              map[position]cloud
 	Fungus              map[position]vegetation
+	Doors               map[position]bool
 	TemporalWalls       map[position]bool
 	GeneratedBands      map[monsterBand]int
 	GeneratedEquipables map[equipable]bool
@@ -209,6 +210,7 @@ const (
 func (g *game) GenDungeon() {
 	g.Fungus = make(map[position]vegetation)
 	switch RandInt(6) {
+	//switch 1 {
 	case 0:
 		g.GenCaveMap(DungeonHeigth, DungeonWidth)
 		g.Fungus = g.Foliage(DungeonHeigth, DungeonWidth)

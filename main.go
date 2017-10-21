@@ -484,6 +484,8 @@ func (ui *termui) DescribePosition(g *game, pos position, targ Targetter) {
 		desc += fmt.Sprintf("You see a %v.", rod)
 	case g.Stairs[pos]:
 		desc += "You see stairs downwards."
+	case g.Doors[pos]:
+		desc += "You see a door."
 	case g.Dungeon.Cell(pos).T == WallCell:
 		desc += "You see a wall."
 	default:
@@ -683,6 +685,8 @@ func (ui *termui) ViewPositionDescription(g *game, pos position) {
 		ui.DrawDescription(g, eq.Desc())
 	} else if g.Stairs[pos] {
 		ui.DrawDescription(g, "Stairs lead to the next level of the Underground. There's no way back. Monsters do not follow you.")
+	} else if g.Doors[pos] {
+		ui.DrawDescription(g, "A closed door blocks your line of sight. Doors open automatically when you or a monster stand on them.")
 	} else {
 		g.Print("Nothing worth of description here.")
 	}
@@ -816,6 +820,9 @@ func (ui *termui) DrawPosition(g *game, pos position) {
 			} else if _, ok := g.Gold[pos]; ok {
 				r = '$'
 				fgColor = ColorFgGold
+			} else if _, ok := g.Doors[pos]; ok {
+				r = '+'
+				fgColor = ColorFgStairs
 			}
 			m, _ := g.MonsterAt(pos)
 			if m.Exists() && (g.Player.LOS[m.Pos] || g.Wizard) {
