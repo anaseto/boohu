@@ -110,6 +110,9 @@ func (g *game) FreeCellForStatic() position {
 			if mons.Exists() {
 				continue
 			}
+			if g.Doors[pos] {
+				continue
+			}
 			if g.Gold[pos] > 0 {
 				continue
 			}
