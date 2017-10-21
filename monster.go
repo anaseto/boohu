@@ -132,13 +132,13 @@ type monsterData struct {
 
 var MonsData = []monsterData{
 	MonsGoblin:          {10, 7, 10, 15, 14, 0, 12, 'g', "goblin", 2},
-	MonsOgre:            {10, 15, 12, 28, 13, 0, 8, 'O', "ogre", 5},
+	MonsOgre:            {10, 15, 12, 28, 13, 0, 8, 'O', "ogre", 6},
 	MonsCyclop:          {10, 12, 12, 28, 13, 0, 8, 'C', "cyclop", 9},
 	MonsWorm:            {12, 9, 10, 25, 13, 0, 10, 'w', "worm", 3},
 	MonsBrizzia:         {12, 10, 10, 30, 13, 0, 10, 'z', "brizzia", 7},
 	MonsAcidMound:       {10, 9, 10, 19, 15, 0, 8, 'a', "acid mound", 7},
 	MonsHound:           {8, 9, 10, 15, 14, 0, 12, 'h', "hound", 4},
-	MonsYack:            {10, 11, 10, 21, 14, 0, 10, 'y', "yack", 5},
+	MonsYack:            {10, 11, 10, 21, 14, 0, 10, 'y', "yack", 6},
 	MonsGiantBee:        {6, 10, 10, 11, 15, 0, 15, 'B', "giant bee", 6},
 	MonsGoblinWarrior:   {10, 11, 10, 22, 15, 3, 12, 'G', "goblin warrior", 8},
 	MonsHydra:           {10, 9, 10, 45, 13, 0, 6, 'H', "hydra", 15},
@@ -159,7 +159,7 @@ var monsDesc = []string{
 	MonsBrizzia:         "Brizzias are big slow moving biped creatures. They are quite hardy, and when hurt they can cause nausea, impeding the use of potions.",
 	MonsAcidMound:       "Acid mounds are acidic creatures. They can temporally corrode your armour.",
 	MonsHound:           "Hounds are fast moving carnivore quadrupeds. They sometimes attack in group.",
-	MonsYack:            "Yacks are quite large herbivorous quadrupeds. They tend to form large groups.",
+	MonsYack:            "Yacks are quite large herbivorous quadrupeds. They tend to form large groups. They can push you one cell away.",
 	MonsGiantBee:        "Giant bees are fragile, but extremely fast moving creatures. Their bite can sometimes enrage you.",
 	MonsGoblinWarrior:   "Goblin warriors are goblins that learned to fight, and got equipped with a leather armour. They can throw javelins.",
 	MonsHydra:           "Hydras are enormous creatures with four heads that can hit you each at once.",
@@ -645,6 +645,18 @@ func (m *monster) HitSideEffects(g *game, ev event) {
 		g.Player.Statuses[StatusCorrosion]++
 		heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 80 + RandInt(40), EAction: CorrosionEnd})
 		g.Print("Your equipment is corroded..")
+	case MonsYack:
+		dir := g.Player.Pos.Dir(m.Pos)
+		pos := g.Player.Pos.To(dir)
+		if RandInt(2) == 0 && g.Dungeon.Valid(pos) && g.Dungeon.Cell(pos).T == FreeCell {
+			mons, _ := g.MonsterAt(pos)
+			if !mons.Exists() {
+				g.Player.Pos = pos
+				g.CollectGround()
+				g.ComputeLOS()
+				g.MakeMonstersAware()
+			}
+		}
 	}
 
 }
