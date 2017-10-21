@@ -644,7 +644,7 @@ func (m *monster) HitSideEffects(g *game, ev event) {
 	case MonsAcidMound:
 		g.Player.Statuses[StatusCorrosion]++
 		heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 80 + RandInt(40), EAction: CorrosionEnd})
-		g.Print("Your equipment is corroded..")
+		g.Print("Your equipment is corroded.")
 	case MonsYack:
 		dir := g.Player.Pos.Dir(m.Pos)
 		pos := g.Player.Pos.To(dir)
@@ -656,6 +656,7 @@ func (m *monster) HitSideEffects(g *game, ev event) {
 				g.ComputeLOS()
 				g.MakeMonstersAware()
 			}
+			g.Print("The yack pushes you.")
 		}
 	}
 
