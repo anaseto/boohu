@@ -159,6 +159,9 @@ func (g *game) HandleKill(mons *monster) {
 	if mons.Kind == MonsExplosiveNadre {
 		mons.Explode(g)
 	}
+	if g.Doors[mons.Pos] {
+		g.ComputeLOS()
+	}
 	if mons.Kind.Dangerousness() > 10 {
 		g.StoryPrintf("You killed %s.", Indefinite(mons.Kind.String(), false))
 	}
