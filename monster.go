@@ -1080,8 +1080,8 @@ func (g *game) MaxDanger() int {
 
 func (g *game) MaxMonsters() int {
 	max := 13 + 3*g.Depth
-	if max > 31 {
-		max = 31
+	if max > 33 {
+		max = 33
 	}
 	return max
 }
