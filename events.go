@@ -89,7 +89,7 @@ func (sev *simpleEvent) Action(g *game) {
 		g.Player.Statuses[StatusBerserk]--
 		g.Player.Statuses[StatusSlow]++
 		g.Player.Statuses[StatusExhausted]++
-		g.Player.HP -= int(10.0 * float64(g.Player.HP) / float64(g.Player.HPMax()))
+		g.Player.HP -= int(10 * g.Player.HP / Max(g.Player.HPMax(), g.Player.HP))
 		g.Print("You are no longer berserk.")
 		heap.Push(g.Events, &simpleEvent{ERank: sev.Rank() + 90 + RandInt(40), EAction: SlowEnd})
 		heap.Push(g.Events, &simpleEvent{ERank: sev.Rank() + 270 + RandInt(60), EAction: ExhaustionEnd})
@@ -111,6 +111,7 @@ func (sev *simpleEvent) Action(g *game) {
 		}
 	case LignificationEnd:
 		g.Player.Statuses[StatusLignification]--
+		g.Player.HP -= int(10 * g.Player.HP / Max(g.Player.HPMax(), g.Player.HP))
 		if g.Player.Statuses[StatusLignification] == 0 {
 			g.Print("Your feel no longer attached to the ground.")
 		}

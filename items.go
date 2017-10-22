@@ -244,6 +244,7 @@ func (g *game) QuaffLignification(ev event) error {
 	g.Player.Statuses[StatusLignification]++
 	heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 150 + RandInt(100), EAction: LignificationEnd})
 	g.Printf("You quaff the %s. You feel attuned with the ground.", LignificationPotion)
+	g.Player.HP += 10
 	return nil
 }
 
