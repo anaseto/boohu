@@ -582,6 +582,17 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	ev.Renew(g, m.Kind.MovementDelay())
 }
 
+func (m *monster) DramaticAdjustment(g *game, baseAttack, attack, evasion int) (int, int) {
+	if attack >= g.Player.HP {
+		// a little dramatic effect
+		evasion = evasion * 3 / 2
+		if RandInt(2) == 0 {
+			attack = g.HitDamage(baseAttack, g.Player.Armor())
+		}
+	}
+	return attack, evasion
+}
+
 func (m *monster) HitPlayer(g *game, ev event) {
 	if g.Player.HP <= 0 {
 		// for hydras
@@ -589,6 +600,8 @@ func (m *monster) HitPlayer(g *game, ev event) {
 	}
 	evasion := RandInt(g.Player.Evasion())
 	acc := RandInt(m.Accuracy)
+	attack := g.HitDamage(m.Attack, g.Player.Armor())
+	attack, evasion = m.DramaticAdjustment(g, m.Attack, attack, evasion)
 	if acc > evasion {
 		if m.Blocked(g) {
 			g.Printf("You block the %s's attack with your %s.", m.Kind, g.Player.Shield)
@@ -597,7 +610,6 @@ func (m *monster) HitPlayer(g *game, ev event) {
 		noise := 12
 		noise += g.Player.Armor() / 2
 		g.MakeNoise(noise, g.Player.Pos)
-		attack := g.HitDamage(m.Attack, g.Player.Armor())
 		g.Printf("The %s hits you (%d damage).", m.Kind, attack)
 		m.InflictDamage(g, attack, m.Attack)
 		if g.Player.HP <= 0 {
@@ -765,6 +777,8 @@ func (m *monster) ThrowRock(g *game, ev event) bool {
 	hit := true
 	evasion := RandInt(g.Player.Evasion())
 	acc := RandInt(m.Accuracy)
+	attack := g.HitDamage(15, g.Player.Armor())
+	attack, evasion = m.DramaticAdjustment(g, 15, attack, evasion)
 	if 3*acc/2 <= evasion {
 		// rocks are big and do not miss so often
 		hit = false
@@ -776,7 +790,6 @@ func (m *monster) ThrowRock(g *game, ev event) bool {
 		noise := 12
 		noise += g.Player.Armor() / 2
 		g.MakeNoise(noise, g.Player.Pos)
-		attack := g.HitDamage(15, g.Player.Armor())
 		g.Printf("The %s throws a rock at you (%d damage).", m.Kind, attack)
 		if RandInt(4) == 0 {
 			g.Player.Statuses[StatusConfusion]++
@@ -802,6 +815,8 @@ func (m *monster) ThrowJavelin(g *game, ev event) bool {
 	hit := true
 	evasion := RandInt(g.Player.Evasion())
 	acc := RandInt(m.Accuracy)
+	attack := g.HitDamage(11, g.Player.Armor())
+	attack, evasion = m.DramaticAdjustment(g, 11, attack, evasion)
 	if acc <= evasion {
 		hit = false
 	} else {
@@ -812,7 +827,6 @@ func (m *monster) ThrowJavelin(g *game, ev event) bool {
 		noise := 12
 		noise += g.Player.Armor() / 2
 		g.MakeNoise(noise, g.Player.Pos)
-		attack := g.HitDamage(11, g.Player.Armor())
 		g.Printf("The %s throws %s at you (%d damage).", m.Kind, Indefinite(Javelin.String(), false), attack)
 		m.InflictDamage(g, attack, 11)
 	} else if block {
