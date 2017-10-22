@@ -1008,7 +1008,60 @@ func (g *game) Danger() int {
 }
 
 func (g *game) MaxDanger() int {
-	return 20 + 10*g.Depth + g.Depth*g.Depth/3
+	max := 20 + 10*g.Depth + g.Depth*g.Depth/3
+	adjust := -2 * g.Depth
+	for c, q := range g.Player.Consumables {
+		switch c {
+		case HealWoundsPotion, CBlinkPotion:
+			adjust += Min(5, g.Depth) * Min(q, g.Depth)
+		case BerserkPotion, TeleportationPotion:
+			adjust += Min(3, g.Depth) * Min(q, 3)
+		case RunningPotion, EvasionPotion, LignificationPotion, MagicPotion, WallPotion:
+			adjust += Min(2, g.Depth) * Min(q, 3)
+		case Javelin, ConfusingDart:
+			adjust += Min(1, g.Depth) * Min(q, 10)
+		}
+	}
+	for _, props := range g.Player.Rods {
+		if props != nil {
+			adjust += Min(props.Charge, 2) * Min(2, g.Depth)
+		}
+	}
+	if g.Depth < g.MaxDepth() && g.Player.Consumables[DescentPotion] > 0 {
+		adjust += g.Depth
+	}
+	if g.Player.Weapon == Dagger {
+		adjust -= Min(3, g.Depth) * g.Depth
+	}
+	if g.Player.Armour == PlateArmour {
+		adjust += g.MaxDepth() - g.Depth
+	}
+	if g.Depth > 3 && g.Player.Shield == NoShield && !g.Player.Weapon.TwoHanded() {
+		adjust -= Max(7-g.Depth, 0) * 2
+	}
+	if g.Player.Weapon.TwoHanded() && g.Depth < 4 {
+		adjust += (4 - g.Depth) * 2
+	}
+	if g.Player.Armour == ChainMail || g.Player.Armour == LeatherArmour {
+		adjust += g.MaxDepth()/2 - g.Depth
+	}
+	if g.Player.Weapon != Dagger && g.Depth < 3 {
+		adjust += 4 + (3-g.Depth)*3
+	}
+	if g.Player.Armour == Robe {
+		adjust -= 2 * g.Depth
+	}
+	if max+adjust < max-max/3 {
+		max = max - max/3
+	} else if max+adjust > max+max/3 {
+		max = max + max/3
+	} else {
+		max = max + adjust
+	}
+	if g.MaxDepth()-g.Depth < g.Player.Consumables[MagicMappingPotion] {
+		max = max * 110 / 100
+	}
+	return max
 }
 
 func (g *game) MaxMonsters() int {

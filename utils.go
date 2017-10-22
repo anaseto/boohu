@@ -26,6 +26,20 @@ func RandInt(n int) int {
 	return int(x.Int64())
 }
 
+func Min(x, y int) int {
+	if x < y {
+		return x
+	}
+	return y
+}
+
+func Max(x, y int) int {
+	if x > y {
+		return x
+	}
+	return y
+}
+
 func Indefinite(s string, upper bool) (text string) {
 	if len(s) > 0 {
 		switch s[0] {

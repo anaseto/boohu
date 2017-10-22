@@ -476,6 +476,12 @@ func (g *game) Descend(ev event) bool {
 	return false
 }
 
+func (g *game) WizardMode() {
+	g.Wizard = true
+	g.Player.Consumables[DescentPotion] = 12
+	g.Print("You are now in wizard mode and cannot obtain winner status.")
+}
+
 func (g *game) AutoPlayer(ev event) bool {
 	if g.Resting {
 		if g.MonsterInLOS() == nil &&

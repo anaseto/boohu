@@ -259,8 +259,7 @@ getKey:
 					tev.Ch = 'h'
 				case termbox.KeyCtrlW:
 					if ui.Wizard(g) {
-						g.Wizard = true
-						g.Print("You are now in wizard mode and cannot obtain winner status.")
+						g.WizardMode()
 						ui.DrawDungeonView(g, false)
 						continue getKey
 					}
