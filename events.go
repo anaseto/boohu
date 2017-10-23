@@ -71,6 +71,7 @@ func (sev *simpleEvent) Renew(g *game, delay int) {
 func (sev *simpleEvent) Action(g *game) {
 	switch sev.EAction {
 	case PlayerTurn:
+		g.ComputeNoise()
 		g.AutoNext = g.AutoPlayer(sev)
 		if g.AutoNext {
 			return

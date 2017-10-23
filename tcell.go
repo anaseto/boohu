@@ -745,6 +745,9 @@ func (ui *termui) DrawPosition(g *game, pos position) {
 		if g.HasFreeExploredNeighbor(pos) {
 			termbox.SetCell(pos.X, pos.Y, '¤', ColorFgDark, ColorBgDark)
 		}
+		if g.Noise[pos] {
+			termbox.SetCell(pos.X, pos.Y, '♫', ColorFgWanderingMonster, ColorBgDark)
+		}
 		return
 	}
 	if g.Wizard {
@@ -824,18 +827,23 @@ func (ui *termui) DrawPosition(g *game, pos position) {
 				r = '+'
 				fgColor = ColorFgStairs
 			}
-			m, _ := g.MonsterAt(pos)
-			if m.Exists() && (g.Player.LOS[m.Pos] || g.Wizard) {
-				r = m.Kind.Letter()
-				if m.Status(MonsConfused) {
-					fgColor = ColorFgConfusedMonster
-				} else if m.State == Resting {
-					fgColor = ColorFgSleepingMonster
-				} else if m.State == Wandering {
-					fgColor = ColorFgWanderingMonster
-				} else {
-					fgColor = ColorFgMonster
+			if g.Player.LOS[pos] || g.Wizard {
+				m, _ := g.MonsterAt(pos)
+				if m.Exists() {
+					r = m.Kind.Letter()
+					if m.Status(MonsConfused) {
+						fgColor = ColorFgConfusedMonster
+					} else if m.State == Resting {
+						fgColor = ColorFgSleepingMonster
+					} else if m.State == Wandering {
+						fgColor = ColorFgWanderingMonster
+					} else {
+						fgColor = ColorFgMonster
+					}
 				}
+			} else if !g.Wizard && g.Noise[pos] {
+				r = '♫'
+				fgColor = ColorFgWanderingMonster
 			}
 		}
 	}

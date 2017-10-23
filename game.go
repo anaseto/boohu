@@ -46,6 +46,7 @@ type game struct {
 	Killed              int
 	KilledMons          map[monsterKind]int
 	Scumming            int
+	Noise               map[position]bool
 }
 
 type Renderer interface {

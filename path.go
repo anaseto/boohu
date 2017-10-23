@@ -51,6 +51,18 @@ func (pp *playerPath) Estimation(from, to position) int {
 	return from.Distance(to)
 }
 
+type noisePath struct {
+	game *game
+}
+
+func (fp *noisePath) Neighbors(pos position) []position {
+	return fp.game.Dungeon.FreeNeighbors(pos)
+}
+
+func (fp *noisePath) Cost(from, to position) int {
+	return 1
+}
+
 type normalPath struct {
 	game *game
 }
