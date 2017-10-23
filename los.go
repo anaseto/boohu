@@ -25,26 +25,28 @@ func (g *game) bestParent(rm rayMap, from, pos position) (position, int) {
 }
 
 func (g *game) losCost(pos position) int {
-	cost := 1
+	if g.Player.Pos == pos {
+		return 0
+	}
 	c := g.Dungeon.Cell(pos)
 	if c.T == WallCell {
-		cost += 100
+		return g.LosRange()
 	}
 	if _, ok := g.Clouds[pos]; ok {
-		cost += 25
-	}
-	if _, ok := g.Fungus[pos]; ok {
-		cost += 23
+		return g.LosRange()
 	}
 	if _, ok := g.Doors[pos]; ok {
 		if pos != g.Player.Pos {
 			mons, _ := g.MonsterAt(pos)
 			if !mons.Exists() {
-				cost += 100
+				return g.LosRange()
 			}
 		}
 	}
-	return cost
+	if _, ok := g.Fungus[pos]; ok {
+		return g.LosRange() - 1
+	}
+	return 1
 }
 
 func (g *game) buildRayMap(from position, distance int) rayMap {
@@ -93,7 +95,7 @@ func (g *game) ComputeLOS() {
 	losRange := g.LosRange()
 	g.Player.Rays = g.buildRayMap(g.Player.Pos, losRange)
 	for pos, n := range g.Player.Rays {
-		if n.Cost < 50 {
+		if n.Cost < g.LosRange() {
 			m[pos] = true
 			if !g.Dungeon.Cell(pos).Explored {
 				if c, ok := g.Collectables[pos]; ok {
