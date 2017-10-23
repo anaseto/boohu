@@ -97,34 +97,38 @@ func (g *game) ComputeLOS() {
 	for pos, n := range g.Player.Rays {
 		if n.Cost < g.LosRange() {
 			m[pos] = true
-			if !g.Dungeon.Cell(pos).Explored {
-				if c, ok := g.Collectables[pos]; ok {
-					g.StopAuto()
-					if c.Quantity > 1 {
-						g.Printf("You see %d %s.", c.Quantity, c.Consumable.Plural())
-					} else {
-						g.Printf("You see %s.", Indefinite(c.Consumable.String(), false))
-					}
-				} else if _, ok := g.Stairs[pos]; ok {
-					g.StopAuto()
-					g.Printf("You see stairs.")
-				} else if eq, ok := g.Equipables[pos]; ok {
-					g.StopAuto()
-					g.Printf("You see %s.", Indefinite(eq.String(), false))
-				} else if rod, ok := g.Rods[pos]; ok {
-					g.StopAuto()
-					g.Printf("You see %s.", Indefinite(rod.String(), false))
-				}
-				g.FairAction()
-			}
-			if g.UnknownDig[pos] {
-				delete(g.UnknownDig, pos)
-				delete(g.TemporalWalls, pos)
-			}
-			g.Dungeon.SetExplored(pos)
+			g.SeePosition(pos)
 		}
 	}
 	g.Player.LOS = m
+}
+
+func (g *game) SeePosition(pos position) {
+	if !g.Dungeon.Cell(pos).Explored {
+		if c, ok := g.Collectables[pos]; ok {
+			g.StopAuto()
+			if c.Quantity > 1 {
+				g.Printf("You see %d %s.", c.Quantity, c.Consumable.Plural())
+			} else {
+				g.Printf("You see %s.", Indefinite(c.Consumable.String(), false))
+			}
+		} else if _, ok := g.Stairs[pos]; ok {
+			g.StopAuto()
+			g.Printf("You see stairs.")
+		} else if eq, ok := g.Equipables[pos]; ok {
+			g.StopAuto()
+			g.Printf("You see %s.", Indefinite(eq.String(), false))
+		} else if rod, ok := g.Rods[pos]; ok {
+			g.StopAuto()
+			g.Printf("You see %s.", Indefinite(rod.String(), false))
+		}
+		g.FairAction()
+		g.Dungeon.SetExplored(pos)
+	}
+	if g.UnknownDig[pos] {
+		delete(g.UnknownDig, pos)
+		delete(g.TemporalWalls, pos)
+	}
 }
 
 func (g *game) ComputeExclusion(pos position, toggle bool) {
