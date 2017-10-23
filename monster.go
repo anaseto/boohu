@@ -629,10 +629,12 @@ func (m *monster) HitPlayer(g *game, ev event) {
 }
 
 func (m *monster) EnterConfusion(g *game, ev event) {
-	m.Statuses[MonsConfused]++
-	m.Path = nil
-	heap.Push(g.Events, &monsterEvent{
-		ERank: ev.Rank() + 50 + RandInt(100), NMons: m.Index(g), EAction: MonsConfusionEnd})
+	if !m.Status(MonsConfused) {
+		m.Statuses[MonsConfused] = 1
+		m.Path = nil
+		heap.Push(g.Events, &monsterEvent{
+			ERank: ev.Rank() + 50 + RandInt(100), NMons: m.Index(g), EAction: MonsConfusionEnd})
+	}
 }
 
 func (m *monster) HitSideEffects(g *game, ev event) {
@@ -749,7 +751,7 @@ func (m *monster) TormentBolt(g *game, ev event) bool {
 	} else {
 		g.Printf("You block the %s's bolt of torment.", m.Kind)
 	}
-	m.Statuses[MonsExhausted]++
+	m.Statuses[MonsExhausted] = 1
 	heap.Push(g.Events, &monsterEvent{ERank: ev.Rank() + 100 + RandInt(50), NMons: m.Index(g), EAction: MonsExhaustionEnd})
 	ev.Renew(g, m.Kind.AttackDelay())
 	return true
@@ -840,7 +842,7 @@ func (m *monster) ThrowJavelin(g *game, ev event) bool {
 	} else {
 		g.Printf("You dodge %s's %s.", Indefinite(m.Kind.String(), false), Javelin)
 	}
-	m.Statuses[MonsExhausted]++
+	m.Statuses[MonsExhausted] = 1
 	heap.Push(g.Events, &monsterEvent{ERank: ev.Rank() + 50 + RandInt(50), NMons: m.Index(g), EAction: MonsExhaustionEnd})
 	ev.Renew(g, m.Kind.AttackDelay())
 	return true
@@ -879,7 +881,7 @@ func (m *monster) AbsorbMana(g *game, ev event) bool {
 	}
 	g.Player.MP = 2 * g.Player.MP / 3
 	g.Printf("The %s absorbs your mana.", m.Kind)
-	m.Statuses[MonsExhausted]++
+	m.Statuses[MonsExhausted] = 1
 	heap.Push(g.Events, &monsterEvent{ERank: ev.Rank() + 10 + RandInt(20), NMons: m.Index(g), EAction: MonsExhaustionEnd})
 	ev.Renew(g, m.Kind.AttackDelay())
 	return true

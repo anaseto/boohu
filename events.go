@@ -166,13 +166,13 @@ func (mev *monsterEvent) Action(g *game) {
 	case MonsConfusionEnd:
 		mons := g.Monsters[mev.NMons]
 		if mons.Exists() {
-			mons.Statuses[MonsConfused]--
+			mons.Statuses[MonsConfused] = 0
 			g.Printf("The %s is no longer confused.", mons.Kind)
 		}
 	case MonsExhaustionEnd:
 		mons := g.Monsters[mev.NMons]
 		if mons.Exists() {
-			mons.Statuses[MonsExhausted]--
+			mons.Statuses[MonsExhausted] = 0
 		}
 	}
 }
