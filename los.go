@@ -189,7 +189,7 @@ func (g *game) ComputeNoise() {
 			continue
 		}
 		mons, _ := g.MonsterAt(pos)
-		if mons.Exists() && mons.State != Resting && RandInt(2) == 0 {
+		if mons.Exists() && mons.State != Resting && RandInt(3) == 0 {
 			switch mons.Kind {
 			case MonsMirrorSpecter, MonsGiantBee:
 				// no footsteps
