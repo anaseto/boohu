@@ -118,7 +118,7 @@ func (g *game) Dump() string {
 	if g.Wizard {
 		fmt.Fprintf(buf, "**WIZARD MODE**\n")
 	}
-	if g.Player.HP > 0 && g.Depth > 12 {
+	if g.Player.HP > 0 && g.Depth > g.MaxDepth() {
 		fmt.Fprintf(buf, "You escaped from Hareka's Underground alive!\n")
 	} else if g.Player.HP <= 0 {
 		fmt.Fprintf(buf, "You died while exploring depth %d of Hareka's Underground.\n", g.Depth)
@@ -276,7 +276,7 @@ func (g *game) SimplifedDump() string {
 	if g.Wizard {
 		fmt.Fprintf(buf, "**WIZARD MODE**\n")
 	}
-	if g.Player.HP > 0 && g.Depth > 12 {
+	if g.Player.HP > 0 && g.Depth > g.MaxDepth() {
 		fmt.Fprintf(buf, "You escaped from Hareka's Underground alive!\n")
 	} else if g.Player.HP <= 0 {
 		fmt.Fprintf(buf, "You died while exploring depth %d of Hareka's Underground.\n", g.Depth)
