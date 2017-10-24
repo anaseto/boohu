@@ -367,15 +367,15 @@ func (g *game) InitLevel() {
 	if g.Depth == 0 {
 		g.Events = &eventQueue{}
 		heap.Init(g.Events)
-		heap.Push(g.Events, &simpleEvent{ERank: 0, EAction: PlayerTurn})
-		heap.Push(g.Events, &simpleEvent{ERank: 50, EAction: HealPlayer})
-		heap.Push(g.Events, &simpleEvent{ERank: 100, EAction: MPRegen})
+		g.PushEvent(&simpleEvent{ERank: 0, EAction: PlayerTurn})
+		g.PushEvent(&simpleEvent{ERank: 50, EAction: HealPlayer})
+		g.PushEvent(&simpleEvent{ERank: 100, EAction: MPRegen})
 	} else {
 		g.CleanEvents()
 	}
 	for i := range g.Monsters {
-		heap.Push(g.Events, &monsterEvent{ERank: g.Turn + 1, EAction: MonsterTurn, NMons: i})
-		heap.Push(g.Events, &monsterEvent{ERank: g.Turn + 50, EAction: HealMonster, NMons: i})
+		g.PushEvent(&monsterEvent{ERank: g.Turn + 1, EAction: MonsterTurn, NMons: i})
+		g.PushEvent(&monsterEvent{ERank: g.Turn + 50, EAction: HealMonster, NMons: i})
 	}
 }
 
@@ -471,7 +471,7 @@ func (g *game) Descend(ev event) bool {
 	}
 	g.Print("You descend deeper in the dungeon.")
 	g.Depth++
-	heap.Push(g.Events, &simpleEvent{ERank: ev.Rank(), EAction: PlayerTurn})
+	g.PushEvent(&simpleEvent{ERank: ev.Rank(), EAction: PlayerTurn})
 	g.InitLevel()
 	g.Save()
 	return false

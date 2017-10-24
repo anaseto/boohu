@@ -54,6 +54,10 @@ const (
 	CorrosionEnd
 )
 
+func (g *game) PushEvent(ev event) {
+	heap.Push(g.Events, ev)
+}
+
 type simpleEvent struct {
 	ERank   int
 	EAction simpleAction
@@ -65,7 +69,7 @@ func (sev *simpleEvent) Rank() int {
 
 func (sev *simpleEvent) Renew(g *game, delay int) {
 	sev.ERank += delay
-	heap.Push(g.Events, sev)
+	g.PushEvent(sev)
 }
 
 func (sev *simpleEvent) Action(g *game) {
@@ -92,8 +96,8 @@ func (sev *simpleEvent) Action(g *game) {
 		g.Player.Statuses[StatusExhausted]++
 		g.Player.HP -= int(10 * g.Player.HP / Max(g.Player.HPMax(), g.Player.HP))
 		g.Print("You are no longer berserk.")
-		heap.Push(g.Events, &simpleEvent{ERank: sev.Rank() + 90 + RandInt(40), EAction: SlowEnd})
-		heap.Push(g.Events, &simpleEvent{ERank: sev.Rank() + 270 + RandInt(60), EAction: ExhaustionEnd})
+		g.PushEvent(&simpleEvent{ERank: sev.Rank() + 90 + RandInt(40), EAction: SlowEnd})
+		g.PushEvent(&simpleEvent{ERank: sev.Rank() + 270 + RandInt(60), EAction: ExhaustionEnd})
 	case SlowEnd:
 		g.Print("You feel no longer slow.")
 		g.Player.Statuses[StatusSlow]--
@@ -180,7 +184,7 @@ func (mev *monsterEvent) Action(g *game) {
 
 func (mev *monsterEvent) Renew(g *game, delay int) {
 	mev.ERank += delay
-	heap.Push(g.Events, mev)
+	g.PushEvent(mev)
 }
 
 type cloudAction int
@@ -219,5 +223,5 @@ func (cev *cloudEvent) Action(g *game) {
 
 func (cev *cloudEvent) Renew(g *game, delay int) {
 	cev.ERank += delay
-	heap.Push(g.Events, cev)
+	g.PushEvent(cev)
 }

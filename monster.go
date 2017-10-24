@@ -1,7 +1,5 @@
 package main
 
-import "container/heap"
-
 type monsterState int
 
 const (
@@ -632,7 +630,7 @@ func (m *monster) EnterConfusion(g *game, ev event) {
 	if !m.Status(MonsConfused) {
 		m.Statuses[MonsConfused] = 1
 		m.Path = nil
-		heap.Push(g.Events, &monsterEvent{
+		g.PushEvent(&monsterEvent{
 			ERank: ev.Rank() + 50 + RandInt(100), NMons: m.Index(g), EAction: MonsConfusionEnd})
 	}
 }
@@ -642,13 +640,13 @@ func (m *monster) HitSideEffects(g *game, ev event) {
 	case MonsSpider:
 		if RandInt(2) == 0 && !g.Player.HasStatus(StatusConfusion) {
 			g.Player.Statuses[StatusConfusion]++
-			heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 100 + RandInt(100), EAction: ConfusionEnd})
+			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 100 + RandInt(100), EAction: ConfusionEnd})
 			g.Print("You feel confused.")
 		}
 	case MonsGiantBee:
 		if RandInt(5) == 0 && !g.Player.HasStatus(StatusBerserk) {
 			g.Player.Statuses[StatusBerserk]++
-			heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 25 + RandInt(40), EAction: BerserkEnd})
+			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 25 + RandInt(40), EAction: BerserkEnd})
 			g.Print("You feel a sudden urge to kill things.")
 		}
 	case MonsBlinkingFrog:
@@ -657,7 +655,7 @@ func (m *monster) HitSideEffects(g *game, ev event) {
 		}
 	case MonsAcidMound:
 		g.Player.Statuses[StatusCorrosion]++
-		heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 80 + RandInt(40), EAction: CorrosionEnd})
+		g.PushEvent(&simpleEvent{ERank: ev.Rank() + 80 + RandInt(40), EAction: CorrosionEnd})
 		g.Print("Your equipment is corroded.")
 	case MonsYack:
 		dir := g.Player.Pos.Dir(m.Pos)
@@ -741,7 +739,7 @@ func (m *monster) TormentBolt(g *game, ev event) bool {
 		return false
 	}
 	//g.Player.Statuses[StatusSlow]++
-	//heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 50 + RandInt(50), EAction: SlowEnd})
+	//g.PushEvent(&simpleEvent{ERank: ev.Rank() + 50 + RandInt(50), EAction: SlowEnd})
 	hit := !m.Blocked(g)
 	g.MakeNoise(9, m.Pos)
 	if hit {
@@ -753,7 +751,7 @@ func (m *monster) TormentBolt(g *game, ev event) bool {
 		g.Printf("You block the %s's bolt of torment.", m.Kind)
 	}
 	m.Statuses[MonsExhausted] = 1
-	heap.Push(g.Events, &monsterEvent{ERank: ev.Rank() + 100 + RandInt(50), NMons: m.Index(g), EAction: MonsExhaustionEnd})
+	g.PushEvent(&monsterEvent{ERank: ev.Rank() + 100 + RandInt(50), NMons: m.Index(g), EAction: MonsExhaustionEnd})
 	ev.Renew(g, m.Kind.AttackDelay())
 	return true
 }
@@ -796,7 +794,7 @@ func (m *monster) ThrowRock(g *game, ev event) bool {
 		g.Printf("The %s throws a rock at you (%d damage).", m.Kind, attack)
 		if RandInt(4) == 0 {
 			g.Player.Statuses[StatusConfusion]++
-			heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 100 + RandInt(100), EAction: ConfusionEnd})
+			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 100 + RandInt(100), EAction: ConfusionEnd})
 			g.Print("You feel confused.")
 		}
 		m.InflictDamage(g, attack, 15)
@@ -837,14 +835,14 @@ func (m *monster) ThrowJavelin(g *game, ev event) bool {
 			g.Printf("You block %s's %s.", Indefinite(m.Kind.String(), false), Javelin)
 		} else {
 			g.Player.Statuses[StatusDisabledShield]++
-			heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 100 + RandInt(100), EAction: DisabledShieldEnd})
+			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 100 + RandInt(100), EAction: DisabledShieldEnd})
 			g.Printf("%s's %s gets fixed on your shield.", Indefinite(m.Kind.String(), true), Javelin)
 		}
 	} else {
 		g.Printf("You dodge %s's %s.", Indefinite(m.Kind.String(), false), Javelin)
 	}
 	m.Statuses[MonsExhausted] = 1
-	heap.Push(g.Events, &monsterEvent{ERank: ev.Rank() + 50 + RandInt(50), NMons: m.Index(g), EAction: MonsExhaustionEnd})
+	g.PushEvent(&monsterEvent{ERank: ev.Rank() + 50 + RandInt(50), NMons: m.Index(g), EAction: MonsExhaustionEnd})
 	ev.Renew(g, m.Kind.AttackDelay())
 	return true
 }
@@ -883,7 +881,7 @@ func (m *monster) AbsorbMana(g *game, ev event) bool {
 	g.Player.MP = 2 * g.Player.MP / 3
 	g.Printf("The %s absorbs your mana.", m.Kind)
 	m.Statuses[MonsExhausted] = 1
-	heap.Push(g.Events, &monsterEvent{ERank: ev.Rank() + 10 + RandInt(20), NMons: m.Index(g), EAction: MonsExhaustionEnd})
+	g.PushEvent(&monsterEvent{ERank: ev.Rank() + 10 + RandInt(20), NMons: m.Index(g), EAction: MonsExhaustionEnd})
 	ev.Renew(g, m.Kind.AttackDelay())
 	return true
 }

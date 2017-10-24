@@ -1,7 +1,6 @@
 package main
 
 import (
-	"container/heap"
 	"errors"
 	"fmt"
 )
@@ -307,7 +306,7 @@ func (g *game) EvokeRodFog(ev event) error {
 		_, ok := g.Clouds[pos]
 		if !ok {
 			g.Clouds[pos] = CloudFog
-			heap.Push(g.Events, &cloudEvent{ERank: ev.Rank() + 100 + RandInt(100), EAction: CloudEnd, Pos: pos})
+			g.PushEvent(&cloudEvent{ERank: ev.Rank() + 100 + RandInt(100), EAction: CloudEnd, Pos: pos})
 		}
 	}
 	g.ComputeLOS()
@@ -381,7 +380,7 @@ func (g *game) EvokeRodObstruction(ev event) error {
 	if g.TemporalWalls != nil {
 		g.TemporalWalls[g.Player.Target] = true
 	}
-	heap.Push(g.Events, &cloudEvent{ERank: ev.Rank() + 200 + RandInt(50), Pos: g.Player.Target, EAction: ObstructionEnd})
+	g.PushEvent(&cloudEvent{ERank: ev.Rank() + 200 + RandInt(50), Pos: g.Player.Target, EAction: ObstructionEnd})
 	g.Printf("You see a wall appear from nothing.")
 	g.ComputeLOS()
 	return nil

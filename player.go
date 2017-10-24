@@ -1,7 +1,6 @@
 package main
 
 import (
-	"container/heap"
 	"errors"
 	"fmt"
 )
@@ -204,11 +203,11 @@ func (g *game) ScummingAction(ev event) {
 			}
 			g.Print("You hear a terrible explosion coming from the ground. You are lignified.")
 			g.Player.Statuses[StatusLignification]++
-			heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 240 + RandInt(10), EAction: LignificationEnd})
+			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 240 + RandInt(10), EAction: LignificationEnd})
 		} else {
 			delay := 20 + RandInt(5)
 			g.Player.Statuses[StatusTele]++
-			heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + delay, EAction: Teleportation})
+			g.PushEvent(&simpleEvent{ERank: ev.Rank() + delay, EAction: Teleportation})
 			g.Print("Something hurt you! You feel unstable.")
 		}
 		g.Scumming = 0
@@ -378,11 +377,11 @@ func (g *game) Smoke(ev event) {
 		_, ok := g.Clouds[pos]
 		if !ok {
 			g.Clouds[pos] = CloudFog
-			heap.Push(g.Events, &cloudEvent{ERank: ev.Rank() + 100 + RandInt(100), EAction: CloudEnd, Pos: pos})
+			g.PushEvent(&cloudEvent{ERank: ev.Rank() + 100 + RandInt(100), EAction: CloudEnd, Pos: pos})
 		}
 	}
 	g.Player.Statuses[StatusSwift]++
-	heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 20 + RandInt(10), EAction: HasteEnd})
+	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 20 + RandInt(10), EAction: HasteEnd})
 	g.ComputeLOS()
 	g.Print("You feel an energy burst and smoking coming out from you.")
 }

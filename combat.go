@@ -2,8 +2,6 @@
 
 package main
 
-import "container/heap"
-
 func (g *game) HitDamage(base int, armor int) int {
 	min := base / 2
 	attack := min + RandInt(base-min+1)
@@ -141,7 +139,7 @@ func (g *game) HitMonster(mons *monster, ev event) {
 		}
 		if mons.Kind == MonsBrizzia && RandInt(4) == 0 && !g.Player.HasStatus(StatusNausea) {
 			g.Player.Statuses[StatusNausea]++
-			heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 30 + RandInt(20), EAction: NauseaEnd})
+			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 30 + RandInt(20), EAction: NauseaEnd})
 			g.Print("The brizzia's corpse releases a nauseous gas. You feel sick.")
 		}
 	} else {

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"container/heap"
 	"errors"
 	"fmt"
 )
@@ -176,7 +175,7 @@ func (g *game) QuaffTeleportation(ev event) error {
 	}
 	delay := 20 + RandInt(30)
 	g.Player.Statuses[StatusTele]++
-	heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + delay, EAction: Teleportation})
+	g.PushEvent(&simpleEvent{ERank: ev.Rank() + delay, EAction: Teleportation})
 	g.Printf("You quaff a %s. You feel unstable.", TeleportationPotion)
 	return nil
 }
@@ -186,7 +185,7 @@ func (g *game) QuaffBerserk(ev event) error {
 		return errors.New("You are too exhausted to berserk.")
 	}
 	g.Player.Statuses[StatusBerserk]++
-	heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 65 + RandInt(20), EAction: BerserkEnd})
+	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 65 + RandInt(20), EAction: BerserkEnd})
 	g.Printf("You quaff a %s. You feel a sudden urge to kill things.", BerserkPotion)
 	g.Player.HP += 10
 	return nil
@@ -228,21 +227,21 @@ func (g *game) QuaffDescent(ev event) error {
 
 func (g *game) QuaffHaste(ev event) error {
 	g.Player.Statuses[StatusSwift]++
-	heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 80 + RandInt(20), EAction: HasteEnd})
+	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 80 + RandInt(20), EAction: HasteEnd})
 	g.Printf("You quaff the %s. You feel speedy.", RunningPotion)
 	return nil
 }
 
 func (g *game) QuaffEvasion(ev event) error {
 	g.Player.Statuses[StatusAgile]++
-	heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 90 + RandInt(20), EAction: EvasionEnd})
+	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 90 + RandInt(20), EAction: EvasionEnd})
 	g.Printf("You quaff the %s. You feel agile.", EvasionPotion)
 	return nil
 }
 
 func (g *game) QuaffLignification(ev event) error {
 	g.Player.Statuses[StatusLignification]++
-	heap.Push(g.Events, &simpleEvent{ERank: ev.Rank() + 150 + RandInt(100), EAction: LignificationEnd})
+	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 150 + RandInt(100), EAction: LignificationEnd})
 	g.Printf("You quaff the %s. You feel attuned with the ground.", LignificationPotion)
 	g.Player.HP += 10
 	return nil
@@ -278,7 +277,7 @@ func (g *game) QuaffWallPotion(ev event) error {
 		if g.TemporalWalls != nil {
 			g.TemporalWalls[pos] = true
 		}
-		heap.Push(g.Events, &cloudEvent{ERank: ev.Rank() + 200 + RandInt(50), Pos: pos, EAction: ObstructionEnd})
+		g.PushEvent(&cloudEvent{ERank: ev.Rank() + 200 + RandInt(50), Pos: pos, EAction: ObstructionEnd})
 	}
 	g.Printf("You quaff the %s. You feel surrounded by temporal walls.", WallPotion)
 	g.ComputeLOS()
