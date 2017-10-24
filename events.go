@@ -8,14 +8,20 @@ type event interface {
 	Renew(*game, int)
 }
 
-type eventQueue []event
+type iEvent struct {
+	Event event
+	Index int
+}
+
+type eventQueue []iEvent
 
 func (evq eventQueue) Len() int {
 	return len(evq)
 }
 
 func (evq eventQueue) Less(i, j int) bool {
-	return evq[i].Rank() < evq[j].Rank()
+	return evq[i].Event.Rank() < evq[j].Event.Rank() ||
+		evq[i].Event.Rank() == evq[j].Event.Rank() && evq[i].Index < evq[j].Index
 }
 
 func (evq eventQueue) Swap(i, j int) {
@@ -23,7 +29,7 @@ func (evq eventQueue) Swap(i, j int) {
 }
 
 func (evq *eventQueue) Push(x interface{}) {
-	no := x.(event)
+	no := x.(iEvent)
 	*evq = append(*evq, no)
 }
 
@@ -55,7 +61,14 @@ const (
 )
 
 func (g *game) PushEvent(ev event) {
-	heap.Push(g.Events, ev)
+	iev := iEvent{Event: ev, Index: g.EventIndex}
+	g.EventIndex++
+	heap.Push(g.Events, iev)
+}
+
+func (g *game) PopIEvent() iEvent {
+	iev := heap.Pop(g.Events).(iEvent)
+	return iev
 }
 
 type simpleEvent struct {

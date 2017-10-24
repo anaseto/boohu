@@ -43,6 +43,7 @@ type game struct {
 	Log                 []string
 	Story               []string
 	Turn                int
+	EventIndex          int
 	Killed              int
 	KilledMons          map[monsterKind]int
 	Scumming            int
@@ -382,12 +383,12 @@ func (g *game) InitLevel() {
 func (g *game) CleanEvents() {
 	evq := &eventQueue{}
 	for g.Events.Len() > 0 {
-		ev := heap.Pop(g.Events).(event)
-		switch ev.(type) {
+		iev := g.PopIEvent()
+		switch iev.Event.(type) {
 		case *monsterEvent:
 		case *cloudEvent:
 		default:
-			heap.Push(evq, ev)
+			heap.Push(evq, iev)
 		}
 	}
 	g.Events = evq
@@ -568,7 +569,7 @@ loop:
 		if g.Events.Len() == 0 {
 			break loop
 		}
-		ev := heap.Pop(g.Events).(event)
+		ev := g.PopIEvent().Event
 		g.Turn = ev.Rank()
 		ev.Action(g)
 		if g.AutoNext {
