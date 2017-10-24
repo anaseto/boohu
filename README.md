@@ -56,3 +56,4 @@ Basic Survival Tips
   avoid being killed while replenishing your HP.
 + You do not have to kill every monster. You want, though, to find as many items
   as you can, but survival comes first.
++ Use doors and dense foliage to break line of sight with monsters.
