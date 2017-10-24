@@ -2,10 +2,6 @@ package main
 
 import "container/heap"
 
-// idea: punish (mark) the player if it remains too many turns not in combat
-// and not exploring new cells and in good health
-// monster induced berserker
-
 type game struct {
 	Dungeon             *dungeon
 	Player              *player
