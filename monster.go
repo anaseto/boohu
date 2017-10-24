@@ -583,9 +583,11 @@ func (m *monster) HandleTurn(g *game, ev event) {
 func (m *monster) DramaticAdjustment(g *game, baseAttack, attack, evasion int) (int, int) {
 	if attack >= g.Player.HP {
 		// a little dramatic effect
-		evasion = evasion * 3 / 2
 		if RandInt(2) == 0 {
 			attack = g.HitDamage(baseAttack, g.Player.Armor())
+		}
+		if attack >= g.Player.HP {
+			evasion = evasion + RandInt(g.Player.Evasion())
 		}
 	}
 	return attack, evasion
