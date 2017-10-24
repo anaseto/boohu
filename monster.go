@@ -587,7 +587,10 @@ func (m *monster) DramaticAdjustment(g *game, baseAttack, attack, evasion int) (
 			attack = g.HitDamage(baseAttack, g.Player.Armor())
 		}
 		if attack >= g.Player.HP {
-			evasion = evasion + RandInt(g.Player.Evasion())
+			n := RandInt(g.Player.Evasion())
+			if n > evasion {
+				evasion = n
+			}
 		}
 	}
 	return attack, evasion
