@@ -41,11 +41,11 @@ func (g *game) DataDir() (string, error) {
 	return dataDir, nil
 }
 
-func (g *game) Save() {
+func (g *game) Save() error {
 	dataDir, err := g.DataDir()
 	if err != nil {
 		g.Print(err.Error())
-		return
+		return err
 	}
 	saveFile := filepath.Join(dataDir, "save.gob")
 	var data bytes.Buffer
@@ -53,12 +53,14 @@ func (g *game) Save() {
 	err = enc.Encode(g)
 	if err != nil {
 		g.Print(err.Error())
-		return
+		return err
 	}
 	err = ioutil.WriteFile(saveFile, data.Bytes(), 0644)
 	if err != nil {
 		g.Print(err.Error())
+		return err
 	}
+	return nil
 }
 
 func (g *game) RemoveSaveFile() {

@@ -613,7 +613,7 @@ func (m *monster) HitPlayer(g *game, ev event) {
 		noise := 12
 		noise += g.Player.Armor() / 2
 		g.MakeNoise(noise, g.Player.Pos)
-		g.Printf("The %s hits you (%d damage).", m.Kind, attack)
+		g.PrintfStyled("The %s hits you (%d damage).", logMonsterHit, m.Kind, attack)
 		m.InflictDamage(g, attack, m.Attack)
 		if g.Player.HP <= 0 {
 			return
@@ -750,7 +750,7 @@ func (m *monster) TormentBolt(g *game, ev event) bool {
 	if hit {
 		g.MakeNoise(12, g.Player.Pos)
 		damage := g.Player.HP - g.Player.HP/2
-		g.Printf("The %s throws a bolt of torment at you.", m.Kind)
+		g.PrintfStyled("The %s throws a bolt of torment at you.", logMonsterHit, m.Kind)
 		m.InflictDamage(g, damage, 15)
 	} else {
 		g.Printf("You block the %s's bolt of torment.", m.Kind)
@@ -796,7 +796,7 @@ func (m *monster) ThrowRock(g *game, ev event) bool {
 		noise := 12
 		noise += g.Player.Armor() / 2
 		g.MakeNoise(noise, g.Player.Pos)
-		g.Printf("The %s throws a rock at you (%d damage).", m.Kind, attack)
+		g.PrintfStyled("The %s throws a rock at you (%d damage).", logMonsterHit, m.Kind, attack)
 		if RandInt(4) == 0 {
 			g.Player.Statuses[StatusConfusion]++
 			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 100 + RandInt(100), EAction: ConfusionEnd})

@@ -89,6 +89,7 @@ func (sev *simpleEvent) Action(g *game) {
 	switch sev.EAction {
 	case PlayerTurn:
 		g.ComputeNoise()
+		g.LogNextTick = g.LogIndex
 		g.AutoNext = g.AutoPlayer(sev)
 		if g.AutoNext {
 			return
@@ -108,44 +109,44 @@ func (sev *simpleEvent) Action(g *game) {
 		g.Player.Statuses[StatusSlow]++
 		g.Player.Statuses[StatusExhausted]++
 		g.Player.HP -= int(10 * g.Player.HP / Max(g.Player.HPMax(), g.Player.HP))
-		g.Print("You are no longer berserk.")
+		g.PrintStyled("You are no longer berserk.", logStatusEnd)
 		g.PushEvent(&simpleEvent{ERank: sev.Rank() + 90 + RandInt(40), EAction: SlowEnd})
 		g.PushEvent(&simpleEvent{ERank: sev.Rank() + 270 + RandInt(60), EAction: ExhaustionEnd})
 	case SlowEnd:
-		g.Print("You feel no longer slow.")
+		g.PrintStyled("You feel no longer slow.", logStatusEnd)
 		g.Player.Statuses[StatusSlow]--
 	case ExhaustionEnd:
-		g.Print("You feel no longer exhausted.")
+		g.PrintStyled("You feel no longer exhausted.", logStatusEnd)
 		g.Player.Statuses[StatusExhausted]--
 	case HasteEnd:
 		g.Player.Statuses[StatusSwift]--
 		if g.Player.Statuses[StatusSwift] == 0 {
-			g.Print("You feel no longer speedy.")
+			g.PrintStyled("You feel no longer speedy.", logStatusEnd)
 		}
 	case EvasionEnd:
 		g.Player.Statuses[StatusAgile]--
 		if g.Player.Statuses[StatusAgile] == 0 {
-			g.Print("You feel no longer agile.")
+			g.PrintStyled("You feel no longer agile.", logStatusEnd)
 		}
 	case LignificationEnd:
 		g.Player.Statuses[StatusLignification]--
 		g.Player.HP -= int(10 * g.Player.HP / Max(g.Player.HPMax(), g.Player.HP))
 		if g.Player.Statuses[StatusLignification] == 0 {
-			g.Print("Your feel no longer attached to the ground.")
+			g.PrintStyled("Your feel no longer attached to the ground.", logStatusEnd)
 		}
 	case ConfusionEnd:
-		g.Print("Your feel no longer confused.")
+		g.PrintStyled("Your feel no longer confused.", logStatusEnd)
 		g.Player.Statuses[StatusConfusion]--
 	case NauseaEnd:
-		g.Print("You feel no longer sick.")
+		g.PrintStyled("You feel no longer sick.", logStatusEnd)
 		g.Player.Statuses[StatusNausea]--
 	case DisabledShieldEnd:
-		g.Print("You manage to free your shield from the projectile.")
+		g.PrintStyled("You manage to free your shield from the projectile.", logStatusEnd)
 		g.Player.Statuses[StatusDisabledShield]--
 	case CorrosionEnd:
 		g.Player.Statuses[StatusCorrosion]--
 		if g.Player.Statuses[StatusCorrosion] == 0 {
-			g.Print("Your equipment is now free from acid.")
+			g.PrintStyled("Your equipment is now free from acid.", logStatusEnd)
 		}
 	}
 }

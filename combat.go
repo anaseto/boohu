@@ -131,10 +131,10 @@ func (g *game) HitMonster(mons *monster, ev event) {
 		oldHP := mons.HP
 		mons.HP -= attack
 		if mons.HP > 0 {
-			g.Printf("You hit the %v (%d damage).", mons.Kind, attack)
+			g.PrintfStyled("You hit the %v (%d damage).", logPlayerHit, mons.Kind, attack)
 		} else if oldHP > 0 {
 			// test oldHP > 0 because of sword special attack
-			g.Printf("You kill the %v (%d damage).", mons.Kind, attack)
+			g.PrintfStyled("You kill the %v (%d damage).", logPlayerHit, mons.Kind, attack)
 			g.HandleKill(mons)
 		}
 		if mons.Kind == MonsBrizzia && RandInt(4) == 0 && !g.Player.HasStatus(StatusNausea) {

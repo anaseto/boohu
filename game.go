@@ -36,7 +36,9 @@ type game struct {
 	ui                  Renderer
 	Depth               int
 	Wizard              bool
-	Log                 []string
+	Log                 []logEntry
+	LogIndex            int
+	LogNextTick         int
 	Story               []string
 	Turn                int
 	EventIndex          int
