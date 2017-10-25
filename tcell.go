@@ -379,9 +379,9 @@ func (ui *termui) KeysHelp(g *game) {
 		"Quaff potion", "q or a",
 		"Equip weapon/armour/...", "e or g",
 		"Autoexplore", "o",
-		"Examine", "x (? for help)",
-		"Throw item", "t or f (? for help)",
-		"Evoke rod", "v or z (? for help)",
+		"Examine", "x",
+		"Throw item", "t or f",
+		"Evoke rod", "v or z",
 		"View Character Information", `% or C`,
 		"View previous messages", "m",
 		"Write character dump to file", "#",
@@ -732,6 +732,7 @@ func (ui *termui) DrawDungeonView(g *game, targetting bool) {
 	}
 	if targetting {
 		ui.DrawColoredText("Targetting", 81, 20, ColorFgTargetMode)
+		ui.DrawColoredText("(? for help)", 81, 21, ColorFgTargetMode)
 	}
 	ui.DrawStatusLine(g)
 	ui.DrawLog(g)
