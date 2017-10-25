@@ -875,7 +875,11 @@ func (ui *termui) DrawStatusLine(g *game) {
 	ui.DrawColoredText(fmt.Sprintf("HP: %d", g.Player.HP), 81, 4, hpColor)
 	ui.DrawColoredText(fmt.Sprintf("MP: %d", g.Player.MP), 81, 5, mpColor)
 	ui.DrawText(fmt.Sprintf("Gold: %d", g.Player.Gold), 81, 7)
-	ui.DrawText(fmt.Sprintf("Depth: %d", g.Depth), 81, 8)
+	if g.Depth > g.MaxDepth() {
+		ui.DrawText("Depth: Out!", 81, 8)
+	} else {
+		ui.DrawText(fmt.Sprintf("Depth: %d", g.Depth), 81, 8)
+	}
 	ui.DrawText(fmt.Sprintf("Turns: %.1f", float64(g.Turn)/10), 81, 9)
 
 	for i, st := range sts {
