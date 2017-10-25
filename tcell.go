@@ -326,7 +326,12 @@ getKey:
 				continue getKey
 			case 'S':
 				ev.Renew(g, 0)
-				g.Save()
+				err := g.Save()
+				if err != nil {
+					g.Print("Could not save game. --press any key to continue--")
+					ui.DrawDungeonView(g, false)
+					ui.PressAnyKey()
+				}
 				return true
 			case 's':
 				err = errors.New("Unknown key. Did you mean capital S for save and quit?")
@@ -900,13 +905,37 @@ func (ui *termui) DrawStatusLine(g *game) {
 	}
 }
 
+func (ui *termui) LogColor(e logEntry) termbox.Attribute {
+	color := ColorFg
+	// TODO: define colors?
+	switch e.Style {
+	case logCritic:
+		color = ColorFgHPcritical
+	case logPlayerHit:
+		color = ColorFgHPok
+	case logMonsterHit:
+		color = ColorFgHPwounded
+	case logSpecial:
+		color = ColorFgStairs
+	case logStatusEnd:
+		color = ColorFgSleepingMonster
+	}
+	return color
+}
+
 func (ui *termui) DrawLog(g *game) {
 	min := len(g.Log) - 4
 	if min < 0 {
 		min = 0
 	}
-	for i, s := range g.Log[min:] {
-		ui.DrawText(s, 0, g.Dungeon.Heigth+1+i)
+	for i, e := range g.Log[min:] {
+		fgcolor := ui.LogColor(e)
+		if e.Tick {
+			ui.DrawColoredText("•", 0, g.Dungeon.Heigth+1+i, ColorFgCollectable)
+			ui.DrawColoredText(e.String(), 2, g.Dungeon.Heigth+1+i, fgcolor)
+		} else {
+			ui.DrawColoredText(e.String(), 0, g.Dungeon.Heigth+1+i, fgcolor)
+		}
 	}
 }
 
@@ -928,7 +957,14 @@ loop:
 			to = len(g.Log)
 		}
 		for i := n; i < to; i++ {
-			ui.DrawText(g.Log[i], 0, i-n)
+			e := g.Log[i]
+			fgcolor := ui.LogColor(e)
+			if e.Tick {
+				ui.DrawColoredText("•", 0, i-n, ColorFgCollectable)
+				ui.DrawColoredText(e.String(), 2, i-n, fgcolor)
+			} else {
+				ui.DrawColoredText(e.String(), 0, i-n, fgcolor)
+			}
 		}
 		s := fmt.Sprintf("─────────(%d/%d)───────────────────────────────────────────────────────────────\n", len(g.Log)-to, len(g.Log))
 		ui.DrawText(s, 0, to-n)
@@ -1167,7 +1203,7 @@ func (ui *termui) Dump(g *game) {
 }
 
 func (ui *termui) CriticalHPWarning(g *game) {
-	g.Print("*** CRITICAL HP WARNING *** --press esc or space to continue--")
+	g.PrintStyled("*** CRITICAL HP WARNING *** --press esc or space to continue--", logCritic)
 	ui.DrawDungeonView(g, false)
 	ui.WaitForContinue(g)
 	g.Print("Ok. Be careful, then.")
