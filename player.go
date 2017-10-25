@@ -277,6 +277,7 @@ func (g *game) CollectGround() {
 	pos := g.Player.Pos
 	if g.Gold[pos] > 0 {
 		g.Player.Gold += g.Gold[pos]
+		g.Printf("You pick up %d gold.", g.Gold[pos])
 		delete(g.Gold, pos)
 	}
 	if c, ok := g.Collectables[pos]; ok && c != nil {
