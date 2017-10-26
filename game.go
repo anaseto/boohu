@@ -392,6 +392,16 @@ func (g *game) CleanEvents() {
 	g.Events = evq
 }
 
+func (g *game) StairsSlice() []position {
+	stairs := []position{}
+	for stairPos, b := range g.Stairs {
+		if b && g.Dungeon.Cell(stairPos).Explored {
+			stairs = append(stairs, stairPos)
+		}
+	}
+	return stairs
+}
+
 func (g *game) GenCollectables() {
 	rounds := 10
 	for i := 0; i < rounds; i++ {

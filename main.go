@@ -296,6 +296,17 @@ getKey:
 				} else {
 					err = errors.New("No stairs here.")
 				}
+			case 'G':
+				stairs := g.StairsSlice()
+				sortedStairs := g.SortedNearestTo(stairs, g.Player.Pos)
+				if len(sortedStairs) > 0 {
+					g.AutoTarget = &sortedStairs[0]
+					if !g.MoveToTarget(ev) {
+						err = errors.New("Cannot travel to stairs now.")
+					}
+				} else {
+					err = errors.New("You cannot go to any stairs.")
+				}
 			case 'e', 'g', ',':
 				err = ui.Equip(g, ev)
 			case 'q', 'a':
@@ -380,6 +391,7 @@ func (ui *termui) KeysHelp(g *game) {
 		"Rest", "r",
 		"Wait", "“.” or 5",
 		"Use stairs", "> or D",
+		"Go to nearest stairs", "G",
 		"Quaff potion", "q or a",
 		"Equip weapon/armour/...", "e or g",
 		"Autoexplore", "o",
@@ -534,11 +546,12 @@ func (ui *termui) CursorAction(g *game, targ Targetter) error {
 		}
 	}
 	var err error
-	var nstatic position
 	nmonster := 0
 	objects := []position{}
 	nobject := 0
 	opos := position{-1, -1}
+	var sortedStairs []position
+	var stairIndex int
 loop:
 	for {
 		err = nil
@@ -581,20 +594,16 @@ loop:
 					npos = p
 				}
 			case '>', 'D':
-			search:
-				for i := 0; i < g.Dungeon.Width*g.Dungeon.Heigth; i++ {
-					for nstatic.X < g.Dungeon.Width-1 {
-						nstatic.X++
-						if g.Stairs[nstatic] && g.Dungeon.Cell(nstatic).Explored {
-							npos = nstatic
-							break search
-						}
-					}
-					nstatic.Y++
-					nstatic.X = -1
-					if nstatic.Y >= g.Dungeon.Heigth {
-						nstatic.Y = 0
-					}
+				if sortedStairs == nil {
+					stairs := g.StairsSlice()
+					sortedStairs = g.SortedNearestTo(stairs, g.Player.Pos)
+				}
+				if stairIndex >= len(sortedStairs) {
+					stairIndex = 0
+				}
+				if len(sortedStairs) > 0 {
+					npos = sortedStairs[stairIndex]
+					stairIndex++
 				}
 			case '+', '-':
 				for i := 0; i < len(g.Monsters); i++ {

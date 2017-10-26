@@ -1,5 +1,7 @@
 package main
 
+import "sort"
+
 func (d *dungeon) FreeNeighbors(pos position) []position {
 	neighbors := [8]position{pos.E(), pos.W(), pos.N(), pos.S(), pos.NE(), pos.NW(), pos.SE(), pos.SW()}
 	freeNeighbors := []position{}
@@ -160,3 +162,31 @@ func (g *game) PlayerPath(from, to position) []position {
 	}
 	return path
 }
+
+func (g *game) SortedNearestTo(cells []position, to position) []position {
+	ps := posSlice{}
+	for _, pos := range cells {
+		pp := &playerPath{game: g}
+		_, cost, found := AstarPath(pp, pos, to)
+		if found {
+			ps = append(ps, posCost{pos, cost})
+		}
+	}
+	sort.Sort(ps)
+	sorted := []position{}
+	for _, pc := range ps {
+		sorted = append(sorted, pc.pos)
+	}
+	return sorted
+}
+
+type posCost struct {
+	pos  position
+	cost int
+}
+
+type posSlice []posCost
+
+func (ps posSlice) Len() int           { return len(ps) }
+func (ps posSlice) Swap(i, j int)      { ps[i], ps[j] = ps[j], ps[i] }
+func (ps posSlice) Less(i, j int) bool { return ps[i].cost < ps[j].cost }
