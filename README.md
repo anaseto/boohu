@@ -31,6 +31,11 @@ The only dependency outside of the go standard library is the lightweight
 curses-like library [termbox-go](https://github.com/nsf/termbox-go), which is
 installed automatically by the previous `go get` command.
 
+*Portability note.* If you happen to experience input problems, try adding
+option `--tags tcell` to the `go get` command, which will use
+[tcell](https://github.com/gdamore/tcell) instead of termbox-go. It requires
+cgo, but is more portable.
+
 Colors
 ------
 
