@@ -1333,6 +1333,10 @@ func (ui *termui) PressAnyKey() error {
 			return nil
 		case termbox.EventInterrupt:
 			return errors.New("interrupted")
+		case termbox.EventMouse:
+			if tev.Ch == 0 && tev.Key == termbox.MouseLeft {
+				return nil
+			}
 		}
 	}
 }
