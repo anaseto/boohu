@@ -435,7 +435,7 @@ func (ui *termui) DrawKeysDescription(g *game, actions []string) {
 
 func (ui *termui) KeysHelp(g *game) {
 	ui.DrawKeysDescription(g, []string{
-		"Movement", "h/j/k/l/y/u/b/n or numpad",
+		"Movement", "h/j/k/l/y/u/b/n or numpad or mouse",
 		"Rest", "r",
 		"Wait", "“.” or 5",
 		"Use stairs", "> or D",
