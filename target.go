@@ -30,6 +30,9 @@ func (ex *examiner) Action(g *game, pos position) error {
 	if g.ExclusionsMap[pos] {
 		return errors.New("You cannot travel to an excluded area.")
 	}
+	if g.Dungeon.Cell(pos).T == WallCell {
+		return errors.New("You cannot travel into a wall.")
+	}
 	path := g.PlayerPath(g.Player.Pos, pos)
 	if path == nil {
 		return errors.New("There is no safe path to this place.")

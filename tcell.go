@@ -135,6 +135,7 @@ func main() {
 	defer termbox.Close()
 
 	termbox.SetOutputMode(termbox.Output256)
+	termbox.SetInputMode(termbox.InputEsc | termbox.InputMouse)
 	if err != nil {
 		log.Println(err)
 	}
@@ -319,7 +320,7 @@ getKey:
 			case 'o':
 				err = g.Autoexplore(ev)
 			case 'x':
-				b := ui.Examine(g)
+				b := ui.Examine(g, nil)
 				ui.DrawDungeonView(g, false)
 				if !b {
 					continue getKey
@@ -367,6 +368,53 @@ getKey:
 				continue getKey
 			}
 			return false
+		case termbox.EventMouse:
+			action := false
+			if tev.Ch == 0 {
+				switch tev.Key {
+				case termbox.MouseLeft:
+					pos := position{X: tev.MouseX, Y: tev.MouseY}
+					switch pos.Distance(g.Player.Pos) {
+					case 0:
+						g.WaitTurn(ev)
+						action = true
+					case 1:
+						dir := pos.Dir(g.Player.Pos)
+						err = g.MovePlayer(g.Player.Pos.To(dir), ev)
+						if err == nil {
+							action = true
+						}
+					default:
+						ex := &examiner{}
+						err = ex.Action(g, pos)
+						if ex.done && g.MoveToTarget(ev) {
+							action = true
+						}
+					}
+				case termbox.MouseRight:
+					pos := position{X: tev.MouseX, Y: tev.MouseY}
+					var start *position
+					if g.Dungeon.Valid(pos) {
+						start = &pos
+					}
+					b := ui.Examine(g, start)
+					ui.DrawDungeonView(g, false)
+					if !b {
+						continue getKey
+					} else if !g.MoveToTarget(ev) {
+						continue getKey
+					} else {
+						action = true
+					}
+				}
+			}
+			if err != nil {
+				g.Print(err.Error())
+				continue getKey
+			}
+			if action {
+				return false
+			}
 		}
 	}
 }
@@ -515,9 +563,9 @@ func (ui *termui) DescribePosition(g *game, pos position, targ Targetter) {
 	g.Print(desc)
 }
 
-func (ui *termui) Examine(g *game) bool {
+func (ui *termui) Examine(g *game, start *position) bool {
 	ex := &examiner{}
-	err := ui.CursorAction(g, ex)
+	err := ui.CursorAction(g, ex, start)
 	if err != nil {
 		g.Print(err.Error())
 		return false
@@ -526,7 +574,7 @@ func (ui *termui) Examine(g *game) bool {
 }
 
 func (ui *termui) ChooseTarget(g *game, targ Targetter) bool {
-	err := ui.CursorAction(g, targ)
+	err := ui.CursorAction(g, targ, nil)
 	if err != nil {
 		g.Print(err.Error())
 		return false
@@ -534,15 +582,19 @@ func (ui *termui) ChooseTarget(g *game, targ Targetter) bool {
 	return targ.Done()
 }
 
-func (ui *termui) CursorAction(g *game, targ Targetter) error {
+func (ui *termui) CursorAction(g *game, targ Targetter, start *position) error {
 	pos := g.Player.Pos
-	minDist := 999
-	for _, mons := range g.Monsters {
-		if mons.Exists() && g.Player.LOS[mons.Pos] {
-			dist := mons.Pos.Distance(g.Player.Pos)
-			if minDist > dist {
-				minDist = dist
-				pos = mons.Pos
+	if start != nil {
+		pos = *start
+	} else {
+		minDist := 999
+		for _, mons := range g.Monsters {
+			if mons.Exists() && g.Player.LOS[mons.Pos] {
+				dist := mons.Pos.Distance(g.Player.Pos)
+				if minDist > dist {
+					minDist = dist
+					pos = mons.Pos
+				}
 			}
 		}
 	}
@@ -563,9 +615,9 @@ loop:
 		targ.ComputeHighlight(g, pos)
 		termbox.SetCursor(pos.X, pos.Y)
 		ui.DrawDungeonView(g, true)
+		npos := pos
 		switch tev := termbox.PollEvent(); tev.Type {
 		case termbox.EventKey:
-			npos := pos
 			if tev.Ch == 0 {
 				switch tev.Key {
 				case termbox.KeyArrowUp:
@@ -675,9 +727,23 @@ loop:
 			default:
 				g.Print("Invalid key. Type ? for help.")
 			}
-			if g.Dungeon.Valid(npos) {
-				pos = npos
+		case termbox.EventMouse:
+			if tev.Ch == 0 {
+				switch tev.Key {
+				case termbox.MouseLeft:
+					err = targ.Action(g, pos)
+					if err != nil {
+						g.Print(err.Error())
+					} else {
+						break loop
+					}
+				case termbox.MouseRight:
+					npos = position{X: tev.MouseX, Y: tev.MouseY}
+				}
 			}
+		}
+		if g.Dungeon.Valid(npos) {
+			pos = npos
 		}
 	}
 	g.Highlight = nil
