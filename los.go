@@ -88,6 +88,7 @@ func (g *game) StopAuto() {
 	g.AutoHalt = true
 	g.AutoDir = nil
 	g.AutoTarget = nil
+	g.Resting = false
 }
 
 func (g *game) ComputeLOS() {
