@@ -205,7 +205,7 @@ func (g *game) ComputeNoise() {
 		}
 	}
 	if count > 0 {
-		if count >= 1 {
+		if count > 1 {
 			g.Printf("You hear some footsteps (x%d).", count)
 		} else {
 			g.Print("You hear some footsteps.")
