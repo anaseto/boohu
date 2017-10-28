@@ -360,7 +360,7 @@ func (ui *termui) DrawKeysDescription(g *game, actions []string) {
 
 func (ui *termui) KeysHelp(g *game) {
 	ui.DrawKeysDescription(g, []string{
-		"Movement", "h/j/k/l/y/u/b/n or numpad or mouse left-clic",
+		"Movement", "h/j/k/l/y/u/b/n or numpad or mouse left-click",
 		"Rest", "r",
 		"Wait", "“.” or 5",
 		"Use stairs", "> or D",
@@ -368,7 +368,7 @@ func (ui *termui) KeysHelp(g *game) {
 		"Quaff potion", "q or a",
 		"Equip weapon/armour/...", "e or g",
 		"Autoexplore", "o",
-		"Examine", "x or mouse right clic",
+		"Examine", "x or mouse right-click",
 		"Throw item", "t or f",
 		"Evoke rod", "v or z",
 		"View Character Information", `% or C`,
