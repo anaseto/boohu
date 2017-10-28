@@ -1,5 +1,4 @@
 // +build tcell
-// DO NOT EDIT, generated automatically
 
 package main
 
