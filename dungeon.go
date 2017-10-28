@@ -535,17 +535,6 @@ loop:
 	g.PutDoors(5)
 }
 
-func (d *dungeon) WallNeighborsCount(pos position) int {
-	neighbors := d.Neighbors(pos)
-	count := 0
-	for _, npos := range neighbors {
-		if d.Cell(npos).T == WallCell {
-			count++
-		}
-	}
-	return count
-}
-
 func (d *dungeon) WallAreaCount(pos position, radius int) int {
 	neighbors := d.Area(pos, radius)
 	count := 0

@@ -250,7 +250,7 @@ func (g *game) QuaffLignification(ev event) error {
 func (g *game) QuaffMagicMapping(ev event) error {
 	for i, c := range g.Dungeon.Cells {
 		pos := g.Dungeon.CellPosition(i)
-		if c.T == FreeCell || g.Dungeon.WallNeighborsCount(pos) < 8 {
+		if c.T == FreeCell || g.Dungeon.HasFreeNeighbor(pos) {
 			g.Dungeon.SetExplored(pos)
 		}
 	}
