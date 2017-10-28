@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
-	"os"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -270,7 +269,7 @@ func (g *game) DumpedKilledMonsters() string {
 	return buf.String()
 }
 
-func (g *game) SimplifedDump() string {
+func (g *game) SimplifedDump(err error) string {
 	buf := &bytes.Buffer{}
 	fmt.Fprintf(buf, " ♣ Boohu version %s play summary ♣\n\n", Version)
 	if g.Wizard {
@@ -287,9 +286,13 @@ func (g *game) SimplifedDump() string {
 	fmt.Fprintf(buf, "You killed %d monsters.\n", g.Killed)
 	fmt.Fprintf(buf, "You spent %.1f turns in the Underground.\n", float64(g.Turn)/10)
 	fmt.Fprintf(buf, "\n")
-	dataDir, err := g.DataDir()
-	if err == nil {
-		fmt.Fprintf(buf, "Full dump written to %s.\n", filepath.Join(dataDir, "dump"))
+	if err != nil {
+		fmt.Fprintf(buf, "Error writting dump: %v.\n", err)
+	} else {
+		dataDir, err := g.DataDir()
+		if err == nil {
+			fmt.Fprintf(buf, "Full dump written to %s.\n", filepath.Join(dataDir, "dump"))
+		}
 	}
 	fmt.Fprintf(buf, "\n\n")
 	fmt.Fprintf(buf, "───Press esc or space to quit───")
@@ -299,12 +302,10 @@ func (g *game) SimplifedDump() string {
 func (g *game) WriteDump() error {
 	dataDir, err := g.DataDir()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error writing dump: %s", err)
 		return err
 	}
 	err = ioutil.WriteFile(filepath.Join(dataDir, "dump"), []byte(g.Dump()), 0644)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error writing dump: %s", err)
 		return err
 	}
 	return nil

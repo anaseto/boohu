@@ -1145,8 +1145,8 @@ func (ui *termui) Death(g *game) {
 	g.Print("You die... --press esc or space to continue--")
 	ui.DrawDungeonView(g, false)
 	ui.WaitForContinue(g)
-	ui.Dump(g)
-	g.WriteDump()
+	err := g.WriteDump()
+	ui.Dump(g, err)
 	ui.WaitForContinue(g)
 }
 
@@ -1158,14 +1158,14 @@ func (ui *termui) Win(g *game) {
 	}
 	ui.DrawDungeonView(g, false)
 	ui.WaitForContinue(g)
-	ui.Dump(g)
-	g.WriteDump()
+	err := g.WriteDump()
+	ui.Dump(g, err)
 	ui.WaitForContinue(g)
 }
 
-func (ui *termui) Dump(g *game) {
+func (ui *termui) Dump(g *game, err error) {
 	ui.Clear()
-	ui.DrawText(g.SimplifedDump(), 0, 0)
+	ui.DrawText(g.SimplifedDump(err), 0, 0)
 	ui.Flush()
 }
 
