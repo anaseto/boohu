@@ -78,7 +78,7 @@ func (g *game) RandomApt() (aptitude, bool) {
 func (g *game) ApplyAptitude(ap aptitude) {
 	if g.Player.Aptitudes[ap] {
 		// should not happen
-		g.Print("Hm… You already have that aptitude. " + ap.String())
+		g.PrintStyled("Hm… You already have that aptitude. "+ap.String(), logError)
 		return
 	}
 	g.Player.Aptitudes[ap] = true

@@ -184,7 +184,7 @@ func (g *game) ScummingAction(ev event) {
 	}
 	if g.Scumming == 100 {
 		if g.ExistsMonster() {
-			g.Print("You feel a little bored.")
+			g.PrintStyled("You feel a little bored.", logCritic)
 		}
 	}
 	if g.Scumming > 120 {

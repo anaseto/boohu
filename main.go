@@ -276,7 +276,7 @@ func (ui *termui) HandleCharacter(g *game, ev event, c rune) (err error, again b
 		ev.Renew(g, 0)
 		err := g.Save()
 		if err != nil {
-			g.Print("Could not save game. --press any key to continue--")
+			g.PrintStyled("Could not save game. --press any key to continue--", logError)
 			ui.DrawDungeonView(g, false)
 			ui.PressAnyKey()
 		}
@@ -286,7 +286,7 @@ func (ui *termui) HandleCharacter(g *game, ev event, c rune) (err error, again b
 	case '#':
 		err := g.WriteDump()
 		if err != nil {
-			g.Print("Error writting dump to file.")
+			g.PrintStyled("Error writting dump to file.", logError)
 		} else {
 			dataDir, _ := g.DataDir()
 			g.Printf("Dump written to %s.", filepath.Join(dataDir, "dump"))
@@ -923,6 +923,8 @@ func (ui *termui) LogColor(e logEntry) color {
 		fg = ColorFgStairs
 	case logStatusEnd:
 		fg = ColorFgSleepingMonster
+	case logError:
+		fg = ColorFgHPcritical
 	}
 	return fg
 }

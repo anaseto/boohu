@@ -344,7 +344,7 @@ func (g *game) InitLevel() {
 		g.Print("You're in Hareka's Underground. Good luck! Press ? for help.")
 	}
 	if g.Depth == g.MaxDepth() {
-		g.Print("You feel magic in the air. The way out is close.")
+		g.PrintStyled("You feel magic in the air. The way out is close.", logSpecial)
 	}
 	g.ComputeLOS()
 	g.MakeMonstersAware()
@@ -489,7 +489,7 @@ func (g *game) Descend(ev event) bool {
 func (g *game) WizardMode() {
 	g.Wizard = true
 	g.Player.Consumables[DescentPotion] = 12
-	g.Print("You are now in wizard mode and cannot obtain winner status.")
+	g.PrintStyled("You are now in wizard mode and cannot obtain winner status.", logSpecial)
 }
 
 func (g *game) AutoPlayer(ev event) bool {

@@ -11,6 +11,7 @@ const (
 	logMonsterHit
 	logSpecial
 	logStatusEnd
+	logError
 )
 
 type logEntry struct {
