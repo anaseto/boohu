@@ -1,5 +1,3 @@
-// +build !tcell
-
 package main
 
 import (
@@ -7,49 +5,45 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"runtime"
 	"sort"
 	"strings"
 	"time"
-
-	termbox "github.com/nsf/termbox-go"
 )
 
-type termui struct {
-}
+type color int
 
 // colors: http://ethanschoonover.com/solarized
 var (
-	ColorBgLOS              termbox.Attribute = 231
-	ColorBgDark             termbox.Attribute = 235
-	ColorBg                 termbox.Attribute = 235
-	ColorBgCloud            termbox.Attribute = 236
-	ColorFgLOS              termbox.Attribute = 242
-	ColorFgDark             termbox.Attribute = 241
-	ColorFg                 termbox.Attribute = 246
-	ColorFgPlayer           termbox.Attribute = 34
-	ColorFgMonster          termbox.Attribute = 161
-	ColorFgSleepingMonster  termbox.Attribute = 62
-	ColorFgWanderingMonster termbox.Attribute = 167
-	ColorFgConfusedMonster  termbox.Attribute = 65
-	ColorFgCollectable      termbox.Attribute = 137
-	ColorFgStairs           termbox.Attribute = 126
-	ColorFgGold             termbox.Attribute = 137
-	ColorFgHPok             termbox.Attribute = 65
-	ColorFgHPwounded        termbox.Attribute = 137
-	ColorFgHPcritical       termbox.Attribute = 161
-	ColorFgMPok             termbox.Attribute = 34
-	ColorFgMPpartial        termbox.Attribute = 62
-	ColorFgMPcritical       termbox.Attribute = 126
-	ColorFgStatusGood       termbox.Attribute = 34
-	ColorFgStatusBad        termbox.Attribute = 161
-	ColorFgStatusOther      termbox.Attribute = 137
-	ColorFgExcluded         termbox.Attribute = 161
-	ColorFgTargetMode       termbox.Attribute = 38
-	ColorFgTemporalWall     termbox.Attribute = 38
+	ColorBgLOS              color = 231
+	ColorBgDark             color = 235
+	ColorBg                 color = 235
+	ColorBgCloud            color = 236
+	ColorFgLOS              color = 242
+	ColorFgDark             color = 241
+	ColorFg                 color = 246
+	ColorFgPlayer           color = 34
+	ColorFgMonster          color = 161
+	ColorFgSleepingMonster  color = 62
+	ColorFgWanderingMonster color = 167
+	ColorFgConfusedMonster  color = 65
+	ColorFgCollectable      color = 137
+	ColorFgStairs           color = 126
+	ColorFgGold             color = 137
+	ColorFgHPok             color = 65
+	ColorFgHPwounded        color = 137
+	ColorFgHPcritical       color = 161
+	ColorFgMPok             color = 34
+	ColorFgMPpartial        color = 62
+	ColorFgMPcritical       color = 126
+	ColorFgStatusGood       color = 34
+	ColorFgStatusBad        color = 161
+	ColorFgStatusOther      color = 137
+	ColorFgExcluded         color = 161
+	ColorFgTargetMode       color = 38
+	ColorFgTemporalWall     color = 38
 )
 
 func SolarizedPalette() {
@@ -81,35 +75,6 @@ func SolarizedPalette() {
 	ColorFgTemporalWall = 7
 }
 
-func WindowsPalette() {
-	ColorBgLOS = termbox.ColorWhite
-	ColorBgDark = termbox.ColorBlack
-	ColorBg = termbox.ColorBlack
-	ColorBgCloud = termbox.ColorWhite
-	ColorFgLOS = termbox.ColorBlack
-	ColorFgDark = termbox.ColorWhite
-	ColorFg = termbox.ColorWhite
-	ColorFgPlayer = termbox.ColorBlue
-	ColorFgMonster = termbox.ColorRed
-	ColorFgSleepingMonster = termbox.ColorCyan
-	ColorFgWanderingMonster = termbox.ColorMagenta
-	ColorFgConfusedMonster = termbox.ColorGreen
-	ColorFgCollectable = termbox.ColorYellow
-	ColorFgStairs = termbox.ColorMagenta
-	ColorFgGold = termbox.ColorYellow
-	ColorFgHPok = termbox.ColorGreen
-	ColorFgHPwounded = termbox.ColorYellow
-	ColorFgHPcritical = termbox.ColorRed
-	ColorFgMPok = termbox.ColorBlue
-	ColorFgMPpartial = termbox.ColorMagenta
-	ColorFgMPcritical = termbox.ColorRed
-	ColorFgStatusGood = termbox.ColorBlue
-	ColorFgStatusBad = termbox.ColorRed
-	ColorFgStatusOther = termbox.ColorYellow
-	ColorFgTargetMode = termbox.ColorCyan
-	ColorFgTemporalWall = termbox.ColorCyan
-}
-
 var Version string = "v0.3"
 
 func main() {
@@ -118,28 +83,25 @@ func main() {
 	flag.Parse()
 	if *opt {
 		SolarizedPalette()
-	} else if runtime.GOOS == "windows" {
-		WindowsPalette()
 	}
-
 	if *optVersion {
 		fmt.Println(Version)
 		os.Exit(0)
 	}
 
-	err := termbox.Init()
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer termbox.Close()
-
-	termbox.SetOutputMode(termbox.Output256)
-	termbox.SetInputMode(termbox.InputEsc | termbox.InputMouse)
-	if err != nil {
-		log.Println(err)
-	}
-
 	tui := &termui{}
+	err := tui.Init()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "boohu: %v\n", err)
+		os.Exit(1)
+	}
+	defer tui.Close()
+
+	tui.PostInit()
+	if runtime.GOOS == "windows" {
+		WindowsPalette()
+	}
+
 	tui.DrawWelcome()
 	g := &game{}
 	load, err := g.Load()
@@ -154,7 +116,7 @@ func main() {
 }
 
 func (ui *termui) DrawWelcome() {
-	termbox.Clear(ColorFg, ColorBg)
+	ui.Clear()
 	col := 10
 	line := 5
 	rcol := col + 20
@@ -213,213 +175,176 @@ func (ui *termui) DrawWelcome() {
 	line++
 	line++
 	ui.DrawDark("───Press any key to continue───", col-3, line, ColorFg)
-	termbox.Flush()
+	ui.Flush()
 	ui.PressAnyKey()
 }
 
-func (ui *termui) DrawColored(text string, x, y int, fg, bg termbox.Attribute) {
+func (ui *termui) DrawColored(text string, x, y int, fg, bg color) {
 	col := 0
 	for _, r := range text {
-		termbox.SetCell(x+col, y, r, fg, bg)
+		ui.SetCell(x+col, y, r, fg, bg)
 		col++
 	}
 }
 
-func (ui *termui) DrawDark(text string, x, y int, fg termbox.Attribute) {
+func (ui *termui) DrawDark(text string, x, y int, fg color) {
 	col := 0
 	for _, r := range text {
-		termbox.SetCell(x+col, y, r, fg, ColorBgDark)
+		ui.SetCell(x+col, y, r, fg, ColorBgDark)
 		col++
 	}
 }
 
-func (ui *termui) DrawLight(text string, x, y int, fg termbox.Attribute) {
+func (ui *termui) DrawLight(text string, x, y int, fg color) {
 	col := 0
 	for _, r := range text {
-		termbox.SetCell(x+col, y, r, fg, ColorBgLOS)
+		ui.SetCell(x+col, y, r, fg, ColorBgLOS)
 		col++
 	}
 }
 
-func (ui *termui) HandlePlayerTurn(g *game, ev event) bool {
-getKey:
-	for {
+func (ui *termui) EnterWizard(g *game) {
+	if ui.Wizard(g) {
+		g.WizardMode()
 		ui.DrawDungeonView(g, false)
-		var err error
-		switch tev := termbox.PollEvent(); tev.Type {
-		case termbox.EventKey:
-			if tev.Ch == 0 {
-				switch tev.Key {
-				case termbox.KeyArrowUp:
-					tev.Ch = 'k'
-				case termbox.KeyArrowRight:
-					tev.Ch = 'l'
-				case termbox.KeyArrowDown:
-					tev.Ch = 'j'
-				case termbox.KeyArrowLeft:
-					tev.Ch = 'h'
-				case termbox.KeyCtrlW:
-					if ui.Wizard(g) {
-						g.WizardMode()
-						ui.DrawDungeonView(g, false)
-						continue getKey
-					}
-					g.Print("Ok, then.")
-					continue getKey
-				case termbox.KeyCtrlQ:
-					if ui.Quit(g) {
-						g.RemoveSaveFile()
-						return true
-					}
-					g.Print("Ok, then.")
-					continue getKey
-				case termbox.KeyCtrlP:
-					tev.Ch = 'm'
-				}
+	} else {
+		g.Print("Ok, then.")
+	}
+}
+
+func (ui *termui) HandleCharacter(g *game, ev event, c rune) (err error, again bool, quit bool) {
+	switch c {
+	case 'h', '4', 'l', '6', 'j', '2', 'k', '8',
+		'y', '7', 'b', '1', 'u', '9', 'n', '3':
+		err = g.MovePlayer(g.Player.Pos.To(KeyToDir(c)), ev)
+	case 'H', 'L', 'J', 'K', 'Y', 'B', 'U', 'N':
+		err = g.GoToDir(KeyToDir(c), ev)
+	case '.', '5':
+		g.WaitTurn(ev)
+	case 'r':
+		err = g.Rest(ev)
+	case '>', 'D':
+		if g.Stairs[g.Player.Pos] {
+			if g.Descend(ev) {
+				ui.Win(g)
+				quit = true
+				return err, again, quit
 			}
-			switch tev.Ch {
-			case 'h', '4', 'l', '6', 'j', '2', 'k', '8',
-				'y', '7', 'b', '1', 'u', '9', 'n', '3':
-				err = g.MovePlayer(g.Player.Pos.To(KeyToDir(tev.Ch)), ev)
-			case 'H', 'L', 'J', 'K', 'Y', 'B', 'U', 'N':
-				err = g.GoToDir(KeyToDir(tev.Ch), ev)
-			case '.', '5':
-				g.WaitTurn(ev)
-			case 'r':
-				err = g.Rest(ev)
-			case '>', 'D':
-				if g.Stairs[g.Player.Pos] {
-					if g.Descend(ev) {
-						ui.Win(g)
-						return true
-					}
-					ui.DrawDungeonView(g, false)
-				} else {
-					err = errors.New("No stairs here.")
-				}
-			case 'G':
-				stairs := g.StairsSlice()
-				sortedStairs := g.SortedNearestTo(stairs, g.Player.Pos)
-				if len(sortedStairs) > 0 {
-					g.AutoTarget = &sortedStairs[0]
-					if !g.MoveToTarget(ev) {
-						err = errors.New("Cannot travel to stairs now.")
-					}
-				} else {
-					err = errors.New("You cannot go to any stairs.")
-				}
-			case 'e', 'g', ',':
-				err = ui.Equip(g, ev)
-			case 'q', 'a':
-				err = ui.SelectPotion(g, ev)
-			case 't', 'f':
-				err = ui.SelectProjectile(g, ev)
-			case 'v', 'z':
-				err = ui.SelectRod(g, ev)
-			case 'o':
-				err = g.Autoexplore(ev)
-			case 'x':
-				b := ui.Examine(g, nil)
-				ui.DrawDungeonView(g, false)
-				if !b {
-					continue getKey
-				} else if !g.MoveToTarget(ev) {
-					continue getKey
-				}
-			case '?':
-				ui.KeysHelp(g)
-				continue getKey
-			case '%', 'C':
-				ui.CharacterInfo(g)
-				continue getKey
-			case 'm':
-				ui.DrawPreviousLogs(g)
-				continue getKey
-			case 'S':
-				ev.Renew(g, 0)
-				err := g.Save()
-				if err != nil {
-					g.Print("Could not save game. --press any key to continue--")
-					ui.DrawDungeonView(g, false)
-					ui.PressAnyKey()
-				}
-				return true
-			case 's':
-				err = errors.New("Unknown key. Did you mean capital S for save and quit?")
-			case '#':
-				err := g.WriteDump()
-				if err != nil {
-					g.Print("Error writting dump to file.")
-				} else {
-					dataDir, _ := g.DataDir()
-					g.Printf("Dump written to %s.", filepath.Join(dataDir, "dump"))
-				}
-				continue getKey
-			default:
-				err = errors.New("Unknown key. Type ? for help.")
+			ui.DrawDungeonView(g, false)
+		} else {
+			err = errors.New("No stairs here.")
+		}
+	case 'G':
+		stairs := g.StairsSlice()
+		sortedStairs := g.SortedNearestTo(stairs, g.Player.Pos)
+		if len(sortedStairs) > 0 {
+			g.AutoTarget = &sortedStairs[0]
+			if !g.MoveToTarget(ev) {
+				err = errors.New("Cannot travel to stairs now.")
 			}
-			if g.Wizard && tev.Ch == '@' {
-				ui.WizardInfo(g)
-				continue getKey
-			}
-			if err != nil {
-				g.Print(err.Error())
-				continue getKey
-			}
-			return false
-		case termbox.EventMouse:
-			action := false
-			if tev.Ch == 0 {
-				switch tev.Key {
-				case termbox.MouseLeft:
-					pos := position{X: tev.MouseX, Y: tev.MouseY}
-					switch pos.Distance(g.Player.Pos) {
-					case 0:
-						g.WaitTurn(ev)
-						action = true
-					case 1:
-						dir := pos.Dir(g.Player.Pos)
-						err = g.MovePlayer(g.Player.Pos.To(dir), ev)
-						if err == nil {
-							action = true
-						}
-					default:
-						ex := &examiner{}
-						err = ex.Action(g, pos)
-						if ex.done && g.MoveToTarget(ev) {
-							action = true
-						}
-					}
-				case termbox.MouseRight:
-					pos := position{X: tev.MouseX, Y: tev.MouseY}
-					var start *position
-					if g.Dungeon.Valid(pos) {
-						start = &pos
-					}
-					b := ui.Examine(g, start)
-					ui.DrawDungeonView(g, false)
-					if !b {
-						continue getKey
-					} else if !g.MoveToTarget(ev) {
-						continue getKey
-					} else {
-						action = true
-					}
-				}
-			}
-			if err != nil {
-				g.Print(err.Error())
-				continue getKey
-			}
-			if action {
-				return false
-			}
+		} else {
+			err = errors.New("You cannot go to any stairs.")
+		}
+	case 'e', 'g', ',':
+		err = ui.Equip(g, ev)
+	case 'q', 'a':
+		err = ui.SelectPotion(g, ev)
+	case 't', 'f':
+		err = ui.SelectProjectile(g, ev)
+	case 'v', 'z':
+		err = ui.SelectRod(g, ev)
+	case 'o':
+		err = g.Autoexplore(ev)
+	case 'x':
+		b := ui.Examine(g, nil)
+		ui.DrawDungeonView(g, false)
+		if !b {
+			again = true
+		} else if !g.MoveToTarget(ev) {
+			again = true
+		}
+	case '?':
+		ui.KeysHelp(g)
+		again = true
+	case '%', 'C':
+		ui.CharacterInfo(g)
+		again = true
+	case 'm':
+		ui.DrawPreviousLogs(g)
+		again = true
+	case 'S':
+		ev.Renew(g, 0)
+		err := g.Save()
+		if err != nil {
+			g.Print("Could not save game. --press any key to continue--")
+			ui.DrawDungeonView(g, false)
+			ui.PressAnyKey()
+		}
+		quit = true
+	case 's':
+		err = errors.New("Unknown key. Did you mean capital S for save and quit?")
+	case '#':
+		err := g.WriteDump()
+		if err != nil {
+			g.Print("Error writting dump to file.")
+		} else {
+			dataDir, _ := g.DataDir()
+			g.Printf("Dump written to %s.", filepath.Join(dataDir, "dump"))
+		}
+		again = true
+	case '@':
+		if g.Wizard {
+			ui.WizardInfo(g)
+			again = true
+		} else {
+			err = errors.New("Unknown key. Type ? for help.")
+		}
+	default:
+		err = errors.New("Unknown key. Type ? for help.")
+	}
+	return err, again, quit
+}
+
+func (ui *termui) GoToPos(g *game, ev event, pos position) (err error, action bool) {
+	switch pos.Distance(g.Player.Pos) {
+	case 0:
+		g.WaitTurn(ev)
+		action = true
+	case 1:
+		dir := pos.Dir(g.Player.Pos)
+		err = g.MovePlayer(g.Player.Pos.To(dir), ev)
+		if err == nil {
+			action = true
+		}
+	default:
+		ex := &examiner{}
+		err = ex.Action(g, pos)
+		if ex.done && g.MoveToTarget(ev) {
+			action = true
 		}
 	}
+	return err, action
+}
+
+func (ui *termui) ExaminePos(g *game, ev event, pos position) (again bool, action bool) {
+	var start *position
+	if g.Dungeon.Valid(pos) {
+		start = &pos
+	}
+	b := ui.Examine(g, start)
+	ui.DrawDungeonView(g, false)
+	if !b {
+		again = true
+	} else if !g.MoveToTarget(ev) {
+		again = true
+	} else {
+		action = true
+	}
+	return again, action
 }
 
 func (ui *termui) DrawKeysDescription(g *game, actions []string) {
-	termbox.Clear(ColorFg, ColorBg)
+	ui.Clear()
 	help := &bytes.Buffer{}
 	help.WriteString("┌────────────── Keys ────────────────────────────────────────────────────────\n")
 	help.WriteString("│\n")
@@ -429,7 +354,7 @@ func (ui *termui) DrawKeysDescription(g *game, actions []string) {
 	help.WriteString("│\n")
 	help.WriteString("└──── press esc or space to return to the game ──────────────────────────────\n")
 	ui.DrawText(help.String(), 0, 0)
-	termbox.Flush()
+	ui.Flush()
 	ui.WaitForContinue(g)
 }
 
@@ -471,7 +396,7 @@ func (ui *termui) Equip(g *game, ev event) error {
 }
 
 func (ui *termui) CharacterInfo(g *game) {
-	termbox.Clear(ColorFg, ColorBg)
+	ui.Clear()
 	b := bytes.Buffer{}
 	b.WriteString(formatText(
 		fmt.Sprintf("You are wielding %s. %s", Indefinite(g.Player.Weapon.String(), false), g.Player.Weapon.Desc()), 79))
@@ -484,18 +409,18 @@ func (ui *termui) CharacterInfo(g *game) {
 	}
 	b.WriteString(ui.AptitudesText(g))
 	ui.DrawText(b.String(), 0, 0)
-	termbox.Flush()
+	ui.Flush()
 	ui.WaitForContinue(g)
 	ui.DrawDungeonView(g, false)
 }
 
 func (ui *termui) WizardInfo(g *game) {
-	termbox.Clear(ColorFg, ColorBg)
+	ui.Clear()
 	b := &bytes.Buffer{}
 	fmt.Fprintf(b, "Monsters: %d (%d)\n", len(g.Monsters), g.MaxMonsters())
 	fmt.Fprintf(b, "Danger: %d (%d)\n", g.Danger(), g.MaxDanger())
 	ui.DrawText(b.String(), 0, 0)
-	termbox.Flush()
+	ui.Flush()
 	ui.WaitForContinue(g)
 	ui.DrawDungeonView(g, false)
 }
@@ -581,6 +506,136 @@ func (ui *termui) ChooseTarget(g *game, targ Targetter) bool {
 	return targ.Done()
 }
 
+func (ui *termui) NextMonster(g *game, r rune, pos position, nmonster int) (position, int) {
+	for i := 0; i < len(g.Monsters); i++ {
+		if r == '+' {
+			nmonster++
+		} else {
+			nmonster--
+		}
+		if nmonster > len(g.Monsters)-1 {
+			nmonster = 0
+		} else if nmonster < 0 {
+			nmonster = len(g.Monsters) - 1
+		}
+		mons := g.Monsters[nmonster]
+		if mons.Exists() && g.Player.LOS[mons.Pos] && pos != mons.Pos {
+			pos = mons.Pos
+			break
+		}
+	}
+	return pos, nmonster
+}
+
+func (ui *termui) NextObject(g *game, pos position, nobject int, objects *[]position) (position, int) {
+	if len(*objects) == 0 {
+		for p := range g.Collectables {
+			*objects = append(*objects, p)
+		}
+		for p := range g.Rods {
+			*objects = append(*objects, p)
+		}
+		for p := range g.Equipables {
+			*objects = append(*objects, p)
+		}
+		for p := range g.Gold {
+			*objects = append(*objects, p)
+		}
+	}
+	for i := 0; i < len(*objects); i++ {
+		nobject++
+		if nobject > len(*objects)-1 {
+			nobject = 0
+		}
+		p := (*objects)[nobject]
+		if g.Dungeon.Cell(p).Explored {
+			pos = p
+			break
+		}
+	}
+	return pos, nobject
+}
+
+func (ui *termui) ExcludeZone(g *game, pos position) {
+	if !g.Dungeon.Cell(pos).Explored {
+		g.Print("You cannot choose an unexplored cell for exclusion.")
+	} else {
+		toggle := !g.ExclusionsMap[pos]
+		g.ComputeExclusion(pos, toggle)
+	}
+}
+
+func (ui *termui) CursorMouseLeft(g *game, targ Targetter, pos position) bool {
+	err := targ.Action(g, pos)
+	if err != nil {
+		g.Print(err.Error())
+	} else {
+		return true
+	}
+	return false
+}
+
+func (ui *termui) CursorCharAction(g *game, targ Targetter, r rune, pos position, data *examineData) bool {
+	switch r {
+	case 'h', '4', 'l', '6', 'j', '2', 'k', '8',
+		'y', '7', 'b', '1', 'u', '9', 'n', '3':
+		data.npos = pos.To(KeyToDir(r))
+	case 'H', 'L', 'J', 'K', 'Y', 'B', 'U', 'N':
+		for i := 0; i < 5; i++ {
+			p := data.npos.To(KeyToDir(r))
+			if !g.Dungeon.Valid(p) {
+				break
+			}
+			data.npos = p
+		}
+	case '>', 'D':
+		if data.sortedStairs == nil {
+			stairs := g.StairsSlice()
+			data.sortedStairs = g.SortedNearestTo(stairs, g.Player.Pos)
+		}
+		if data.stairIndex >= len(data.sortedStairs) {
+			data.stairIndex = 0
+		}
+		if len(data.sortedStairs) > 0 {
+			data.npos = data.sortedStairs[data.stairIndex]
+			data.stairIndex++
+		}
+	case '+', '-':
+		data.npos, data.nmonster = ui.NextMonster(g, r, pos, data.nmonster)
+	case 'o':
+		data.npos, data.nobject = ui.NextObject(g, pos, data.nobject, &data.objects)
+	case 'v', 'd':
+		ui.HideCursor()
+		ui.ViewPositionDescription(g, pos)
+		ui.SetCursor(pos)
+	case '?':
+		ui.HideCursor()
+		ui.ExamineHelp(g)
+		ui.SetCursor(pos)
+	case '.':
+		err := targ.Action(g, pos)
+		if err != nil {
+			g.Print(err.Error())
+		} else {
+			return true
+		}
+	case 'e':
+		ui.ExcludeZone(g, pos)
+	default:
+		g.Print("Invalid key. Type ? for help.")
+	}
+	return false
+}
+
+type examineData struct {
+	npos         position
+	nmonster     int
+	objects      []position
+	nobject      int
+	sortedStairs []position
+	stairIndex   int
+}
+
 func (ui *termui) CursorAction(g *game, targ Targetter, start *position) error {
 	pos := g.Player.Pos
 	if start != nil {
@@ -598,12 +653,11 @@ func (ui *termui) CursorAction(g *game, targ Targetter, start *position) error {
 		}
 	}
 	var err error
-	nmonster := 0
-	objects := []position{}
-	nobject := 0
+	data := &examineData{
+		npos:    pos,
+		objects: []position{},
+	}
 	opos := position{-1, -1}
-	var sortedStairs []position
-	var stairIndex int
 loop:
 	for {
 		err = nil
@@ -612,150 +666,28 @@ loop:
 		}
 		opos = pos
 		targ.ComputeHighlight(g, pos)
-		termbox.SetCursor(pos.X, pos.Y)
+		ui.SetCursor(pos)
 		ui.DrawDungeonView(g, true)
-		npos := pos
-		switch tev := termbox.PollEvent(); tev.Type {
-		case termbox.EventKey:
-			if tev.Ch == 0 {
-				switch tev.Key {
-				case termbox.KeyArrowUp:
-					tev.Ch = 'k'
-				case termbox.KeyArrowRight:
-					tev.Ch = 'l'
-				case termbox.KeyArrowDown:
-					tev.Ch = 'j'
-				case termbox.KeyArrowLeft:
-					tev.Ch = 'h'
-				case termbox.KeyEsc:
-					break loop
-				case termbox.KeyEnter:
-					tev.Ch = '.'
-				}
-			}
-			switch tev.Ch {
-			case 'h', '4', 'l', '6', 'j', '2', 'k', '8',
-				'y', '7', 'b', '1', 'u', '9', 'n', '3':
-				npos = pos.To(KeyToDir(tev.Ch))
-			case 'H', 'L', 'J', 'K', 'Y', 'B', 'U', 'N':
-				for i := 0; i < 5; i++ {
-					p := npos.To(KeyToDir(tev.Ch))
-					if !g.Dungeon.Valid(p) {
-						break
-					}
-					npos = p
-				}
-			case '>', 'D':
-				if sortedStairs == nil {
-					stairs := g.StairsSlice()
-					sortedStairs = g.SortedNearestTo(stairs, g.Player.Pos)
-				}
-				if stairIndex >= len(sortedStairs) {
-					stairIndex = 0
-				}
-				if len(sortedStairs) > 0 {
-					npos = sortedStairs[stairIndex]
-					stairIndex++
-				}
-			case '+', '-':
-				for i := 0; i < len(g.Monsters); i++ {
-					if tev.Ch == '+' {
-						nmonster++
-					} else {
-						nmonster--
-					}
-					if nmonster > len(g.Monsters)-1 {
-						nmonster = 0
-					} else if nmonster < 0 {
-						nmonster = len(g.Monsters) - 1
-					}
-					mons := g.Monsters[nmonster]
-					if mons.Exists() && g.Player.LOS[mons.Pos] && pos != mons.Pos {
-						npos = mons.Pos
-						break
-					}
-				}
-			case 'o':
-				if len(objects) == 0 {
-					for p := range g.Collectables {
-						objects = append(objects, p)
-					}
-					for p := range g.Rods {
-						objects = append(objects, p)
-					}
-					for p := range g.Equipables {
-						objects = append(objects, p)
-					}
-					for p := range g.Gold {
-						objects = append(objects, p)
-					}
-				}
-				for i := 0; i < len(objects); i++ {
-					nobject++
-					if nobject > len(objects)-1 {
-						nobject = 0
-					}
-					p := objects[nobject]
-					if g.Dungeon.Cell(p).Explored {
-						npos = p
-						break
-					}
-				}
-			case 'v', 'd':
-				termbox.HideCursor()
-				ui.ViewPositionDescription(g, pos)
-				termbox.SetCursor(pos.X, pos.Y)
-			case '?':
-				termbox.HideCursor()
-				ui.ExamineHelp(g)
-				termbox.SetCursor(pos.X, pos.Y)
-			case '.':
-				err = targ.Action(g, pos)
-				if err != nil {
-					g.Print(err.Error())
-				} else {
-					break loop
-				}
-			case 'e':
-				if !g.Dungeon.Cell(pos).Explored {
-					g.Print("You cannot choose an unexplored cell for exclusion.")
-				} else {
-					toggle := !g.ExclusionsMap[pos]
-					g.ComputeExclusion(pos, toggle)
-				}
-			default:
-				g.Print("Invalid key. Type ? for help.")
-			}
-		case termbox.EventMouse:
-			if tev.Ch == 0 {
-				switch tev.Key {
-				case termbox.MouseLeft:
-					err = targ.Action(g, pos)
-					if err != nil {
-						g.Print(err.Error())
-					} else {
-						break loop
-					}
-				case termbox.MouseRight:
-					npos = position{X: tev.MouseX, Y: tev.MouseY}
-				}
-			}
+		data.npos = pos
+		b := ui.TargetModeEvent(g, targ, pos, data)
+		if b {
+			break loop
 		}
-		if g.Dungeon.Valid(npos) {
-			pos = npos
+		if g.Dungeon.Valid(data.npos) {
+			pos = data.npos
 		}
 	}
 	g.Highlight = nil
-	termbox.HideCursor()
+	ui.HideCursor()
 	return err
 }
 
 func (ui *termui) ViewPositionDescription(g *game, pos position) {
 	mons, _ := g.MonsterAt(pos)
 	if mons.Exists() {
-		termbox.HideCursor()
+		ui.HideCursor()
 		ui.DrawMonsterDescription(g, mons)
-		termbox.SetCursor(pos.X, pos.Y)
+		ui.SetCursor(pos)
 	} else if c, ok := g.Collectables[pos]; ok {
 		ui.DrawDescription(g, c.Consumable.Desc())
 	} else if r, ok := g.Rods[pos]; ok {
@@ -787,15 +719,15 @@ func (ui *termui) MonsterInfo(m *monster) string {
 }
 
 func (ui *termui) DrawDungeonView(g *game, targetting bool) {
-	termbox.Clear(ColorFg, ColorBg)
+	ui.Clear()
 	m := g.Dungeon
 	for i := 0; i < g.Dungeon.Width; i++ {
-		termbox.SetCell(i, g.Dungeon.Heigth, '─', ColorFg, ColorBg)
+		ui.SetCell(i, g.Dungeon.Heigth, '─', ColorFg, ColorBg)
 	}
 	for i := 0; i < g.Dungeon.Heigth; i++ {
-		termbox.SetCell(g.Dungeon.Width, i, '│', ColorFg, ColorBg)
+		ui.SetCell(g.Dungeon.Width, i, '│', ColorFg, ColorBg)
 	}
-	termbox.SetCell(g.Dungeon.Width, g.Dungeon.Heigth, '┘', ColorFg, ColorBg)
+	ui.SetCell(g.Dungeon.Width, g.Dungeon.Heigth, '┘', ColorFg, ColorBg)
 	for i := range m.Cells {
 		pos := m.CellPosition(i)
 		ui.DrawPosition(g, pos)
@@ -815,7 +747,7 @@ func (ui *termui) DrawDungeonView(g *game, targetting bool) {
 	}
 	ui.DrawStatusLine(g)
 	ui.DrawLog(g)
-	termbox.Flush()
+	ui.Flush()
 }
 
 func (ui *termui) DrawPosition(g *game, pos position) {
@@ -823,16 +755,16 @@ func (ui *termui) DrawPosition(g *game, pos position) {
 	c := m.Cell(pos)
 	if !c.Explored && !g.Wizard {
 		if g.HasFreeExploredNeighbor(pos) {
-			termbox.SetCell(pos.X, pos.Y, '¤', ColorFgDark, ColorBgDark)
+			ui.SetCell(pos.X, pos.Y, '¤', ColorFgDark, ColorBgDark)
 		}
 		if g.Noise[pos] {
-			termbox.SetCell(pos.X, pos.Y, '♫', ColorFgWanderingMonster, ColorBgDark)
+			ui.SetCell(pos.X, pos.Y, '♫', ColorFgWanderingMonster, ColorBgDark)
 		}
 		return
 	}
 	if g.Wizard {
 		if !c.Explored && g.HasFreeExploredNeighbor(pos) {
-			termbox.SetCell(pos.X, pos.Y, '¤', ColorFgDark, ColorBgDark)
+			ui.SetCell(pos.X, pos.Y, '¤', ColorFgDark, ColorBgDark)
 			return
 		}
 		if c.T == WallCell {
@@ -841,8 +773,8 @@ func (ui *termui) DrawPosition(g *game, pos position) {
 			}
 		}
 	}
-	var fgColor termbox.Attribute
-	var bgColor termbox.Attribute
+	fgColor := ColorFg
+	bgColor := ColorBg
 	if g.Player.LOS[pos] {
 		fgColor = ColorFgLOS
 		bgColor = ColorBgLOS
@@ -850,7 +782,7 @@ func (ui *termui) DrawPosition(g *game, pos position) {
 			bgColor = ColorBgCloud
 		}
 		if g.Highlight[pos] {
-			bgColor = ColorBgLOS | termbox.AttrReverse
+			bgColor = ui.Reverse(ColorBgLOS)
 			//fgColor = ColorFgRay
 			//bgColor = ColorBgRay
 		}
@@ -927,7 +859,7 @@ func (ui *termui) DrawPosition(g *game, pos position) {
 			}
 		}
 	}
-	termbox.SetCell(pos.X, pos.Y, r, fgColor, bgColor)
+	ui.SetCell(pos.X, pos.Y, r, fgColor, bgColor)
 }
 
 func (ui *termui) DrawStatusLine(g *game) {
@@ -938,14 +870,14 @@ func (ui *termui) DrawStatusLine(g *game) {
 		}
 	}
 	sort.Sort(sts)
-	hpColor := termbox.Attribute(ColorFgHPok)
+	hpColor := ColorFgHPok
 	switch {
 	case g.Player.HP*100/g.Player.HPMax() < 30:
 		hpColor = ColorFgHPcritical
 	case g.Player.HP*100/g.Player.HPMax() < 70:
 		hpColor = ColorFgHPwounded
 	}
-	mpColor := termbox.Attribute(ColorFgMPok)
+	mpColor := ColorFgMPok
 	switch {
 	case g.Player.MP*100/g.Player.MPMax() < 30:
 		mpColor = ColorFgMPcritical
@@ -963,38 +895,36 @@ func (ui *termui) DrawStatusLine(g *game) {
 	ui.DrawText(fmt.Sprintf("Turns: %.1f", float64(g.Turn)/10), 81, 9)
 
 	for i, st := range sts {
-		var color termbox.Attribute
+		fg := ColorFgStatusOther
 		if st.Good() {
-			color = ColorFgStatusGood
+			fg = ColorFgStatusGood
 		} else if st.Bad() {
-			color = ColorFgStatusBad
-		} else {
-			color = ColorFgStatusOther
+			fg = ColorFgStatusBad
 		}
 		if g.Player.Statuses[st] > 1 {
-			ui.DrawColoredText(fmt.Sprintf("%s (%d)", st, g.Player.Statuses[st]), 81, 10+i, color)
+			ui.DrawColoredText(fmt.Sprintf("%s (%d)", st, g.Player.Statuses[st]), 81, 10+i, fg)
 		} else {
-			ui.DrawColoredText(st.String(), 81, 10+i, color)
+			ui.DrawColoredText(st.String(), 81, 10+i, fg)
 		}
 	}
 }
 
-func (ui *termui) LogColor(e logEntry) termbox.Attribute {
-	color := ColorFg
+func (ui *termui) LogColor(e logEntry) color {
+	fg := ColorFg
 	// TODO: define colors?
 	switch e.Style {
 	case logCritic:
-		color = ColorFgHPcritical
+		fg = ColorFgHPcritical
 	case logPlayerHit:
-		color = ColorFgHPok
+		fg = ColorFgHPok
 	case logMonsterHit:
-		color = ColorFgHPwounded
+		fg = ColorFgHPwounded
 	case logSpecial:
-		color = ColorFgStairs
+		fg = ColorFgStairs
 	case logStatusEnd:
-		color = ColorFgSleepingMonster
+		fg = ColorFgSleepingMonster
 	}
-	return color
+	return fg
 }
 
 func (ui *termui) DrawLog(g *game) {
@@ -1019,7 +949,7 @@ func (ui *termui) DrawPreviousLogs(g *game) {
 	n := nmax
 loop:
 	for {
-		termbox.Clear(ColorFg, ColorBg)
+		ui.Clear()
 		if n >= nmax {
 			n = nmax
 		}
@@ -1043,27 +973,11 @@ loop:
 		s := fmt.Sprintf("─────────(%d/%d)───────────────────────────────────────────────────────────────\n", len(g.Log)-to, len(g.Log))
 		ui.DrawText(s, 0, to-n)
 		ui.DrawText("Keys: half-page up (u), half-page down (d), quit (esc or space)", 0, to+1-n)
-		termbox.Flush()
-		switch tev := termbox.PollEvent(); tev.Type {
-		case termbox.EventKey:
-			if tev.Ch == 0 {
-				switch tev.Key {
-				case termbox.KeyEsc, termbox.KeySpace:
-					break loop
-				}
-			}
-			switch tev.Ch {
-			case 'u':
-				n -= 12
-			case 'd':
-				n += 12
-			case 'j':
-				n++
-			case 'k':
-				n--
-			case ' ':
-				break loop
-			}
+		ui.Flush()
+		var quit bool
+		n, quit = ui.Scroll(n)
+		if quit {
+			break loop
 		}
 	}
 }
@@ -1080,12 +994,12 @@ func (ui *termui) DrawConsumableDescription(g *game, c consumable) {
 }
 
 func (ui *termui) DrawDescription(g *game, desc string) {
-	termbox.Clear(ColorFg, ColorBg)
+	ui.Clear()
 	desc = formatText(desc, 79)
 	lines := strings.Count(desc, "\n")
 	ui.DrawText(desc, 0, 0)
 	ui.DrawText("--press esc or space to continue--", 0, lines+2)
-	termbox.Flush()
+	ui.Flush()
 	ui.WaitForContinue(g)
 }
 
@@ -1093,7 +1007,7 @@ func (ui *termui) DrawText(text string, x, y int) {
 	ui.DrawColoredText(text, x, y, ColorFg)
 }
 
-func (ui *termui) DrawColoredText(text string, x, y int, color termbox.Attribute) {
+func (ui *termui) DrawColoredText(text string, x, y int, fg color) {
 	col := 0
 	for _, r := range text {
 		if r == '\n' {
@@ -1101,7 +1015,7 @@ func (ui *termui) DrawColoredText(text string, x, y int, color termbox.Attribute
 			col = 0
 			continue
 		}
-		termbox.SetCell(x+col, y, r, color, ColorBg)
+		ui.SetCell(x+col, y, r, fg, ColorBg)
 		col++
 	}
 }
@@ -1109,7 +1023,7 @@ func (ui *termui) DrawColoredText(text string, x, y int, color termbox.Attribute
 func (ui *termui) SelectProjectile(g *game, ev event) error {
 	desc := false
 	for {
-		termbox.Clear(ColorFg, ColorBg)
+		ui.Clear()
 		cs := g.SortedProjectiles()
 		if desc {
 			ui.DrawText("Describe which projectile? (press ? for throwing menu, esc to return to game)", 0, 0)
@@ -1119,7 +1033,7 @@ func (ui *termui) SelectProjectile(g *game, ev event) error {
 		for i, c := range cs {
 			ui.DrawText(fmt.Sprintf("%c - %s (%d available)", rune(i+97), c, g.Player.Consumables[c]), 0, i+1)
 		}
-		termbox.Flush()
+		ui.Flush()
 		index, alternate, noAction := ui.Select(g, ev, len(cs))
 		if alternate {
 			desc = !desc
@@ -1144,7 +1058,7 @@ func (ui *termui) SelectProjectile(g *game, ev event) error {
 func (ui *termui) SelectPotion(g *game, ev event) error {
 	desc := false
 	for {
-		termbox.Clear(ColorFg, ColorBg)
+		ui.Clear()
 		cs := g.SortedPotions()
 		if desc {
 			ui.DrawText("Describe which potion? (press ? for quaff menu, esc to return to game)", 0, 0)
@@ -1154,7 +1068,7 @@ func (ui *termui) SelectPotion(g *game, ev event) error {
 		for i, c := range cs {
 			ui.DrawText(fmt.Sprintf("%c - %s (%d available)", rune(i+97), c, g.Player.Consumables[c]), 0, i+1)
 		}
-		termbox.Flush()
+		ui.Flush()
 		index, alternate, noAction := ui.Select(g, ev, len(cs))
 		if alternate {
 			desc = !desc
@@ -1174,7 +1088,7 @@ func (ui *termui) SelectPotion(g *game, ev event) error {
 func (ui *termui) SelectRod(g *game, ev event) error {
 	desc := false
 	for {
-		termbox.Clear(ColorFg, ColorBg)
+		ui.Clear()
 		rs := g.SortedRods()
 		if desc {
 			ui.DrawText("Describe which rod? (press ? for evocation menu, esc to return to game)", 0, 0)
@@ -1185,7 +1099,7 @@ func (ui *termui) SelectRod(g *game, ev event) error {
 			ui.DrawText(fmt.Sprintf("%c - %s (%d/%d charges, %d mana cost)",
 				rune(i+97), c, g.Player.Rods[c].Charge, c.MaxCharge(), c.MPCost()), 0, i+1)
 		}
-		termbox.Flush()
+		ui.Flush()
 		index, alternate, noAction := ui.Select(g, ev, len(rs))
 		if alternate {
 			desc = !desc
@@ -1203,29 +1117,6 @@ func (ui *termui) SelectRod(g *game, ev event) error {
 	}
 }
 
-func (ui *termui) Select(g *game, ev event, l int) (index int, alternate bool, err error) {
-	for {
-		switch tev := termbox.PollEvent(); tev.Type {
-		case termbox.EventKey:
-			if tev.Ch == 0 {
-				switch tev.Key {
-				case termbox.KeyEsc, termbox.KeySpace:
-					return -1, false, errors.New("Ok, then.")
-				}
-			}
-			if 97 <= tev.Ch && int(tev.Ch) < 97+l {
-				return int(tev.Ch - 97), false, nil
-			}
-			if tev.Ch == '?' {
-				return -1, true, nil
-			}
-			if tev.Ch == ' ' {
-				return -1, false, errors.New("Ok, then.")
-			}
-		}
-	}
-}
-
 func (ui *termui) ExploreStep(g *game) bool {
 	next := make(chan bool)
 	var stop bool
@@ -1233,7 +1124,7 @@ func (ui *termui) ExploreStep(g *game) bool {
 		// strange bugs it seems, cannot test myself, so disable on windows
 		go func() {
 			time.Sleep(10 * time.Millisecond)
-			termbox.Interrupt()
+			ui.Interrupt()
 		}()
 		go func() {
 			err := ui.PressAnyKey()
@@ -1271,9 +1162,9 @@ func (ui *termui) Win(g *game) {
 }
 
 func (ui *termui) Dump(g *game) {
-	termbox.Clear(ColorFg, ColorBg)
+	ui.Clear()
 	ui.DrawText(g.SimplifedDump(), 0, 0)
-	termbox.Flush()
+	ui.Flush()
 }
 
 func (ui *termui) CriticalHPWarning(g *game) {
@@ -1283,59 +1174,20 @@ func (ui *termui) CriticalHPWarning(g *game) {
 	g.Print("Ok. Be careful, then.")
 }
 
-func (ui *termui) WaitForContinue(g *game) {
-loop:
-	for {
-		switch tev := termbox.PollEvent(); tev.Type {
-		case termbox.EventKey:
-			if tev.Ch == 0 {
-				switch tev.Key {
-				case termbox.KeyEsc, termbox.KeySpace:
-					break loop
-				}
-			}
-			if tev.Ch == ' ' {
-				break loop
-			}
-		}
-	}
-}
-
 func (ui *termui) Quit(g *game) bool {
 	g.Print("Do you really want to quit without saving? [y/N]")
 	ui.DrawDungeonView(g, false)
-	return ui.PromptConfirmation(g)
+	quit := ui.PromptConfirmation(g)
+	if quit {
+		g.RemoveSaveFile()
+	} else {
+		g.Print("Ok, then.")
+	}
+	return quit
 }
 
 func (ui *termui) Wizard(g *game) bool {
 	g.Print("Do you really want to enter wizard mode (no return)? [y/N]")
 	ui.DrawDungeonView(g, false)
 	return ui.PromptConfirmation(g)
-}
-
-func (ui *termui) PromptConfirmation(g *game) bool {
-	for {
-		switch tev := termbox.PollEvent(); tev.Type {
-		case termbox.EventKey:
-			if tev.Ch == 'Y' || tev.Ch == 'y' {
-				return true
-			}
-		}
-		return false
-	}
-}
-
-func (ui *termui) PressAnyKey() error {
-	for {
-		switch tev := termbox.PollEvent(); tev.Type {
-		case termbox.EventKey:
-			return nil
-		case termbox.EventInterrupt:
-			return errors.New("interrupted")
-		case termbox.EventMouse:
-			if tev.Ch == 0 && tev.Key == termbox.MouseLeft {
-				return nil
-			}
-		}
-	}
 }
