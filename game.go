@@ -474,8 +474,6 @@ func (g *game) GenEquip(eq equipable, data equipableData) {
 func (g *game) Descend(ev event) bool {
 	if g.Depth >= g.MaxDepth() {
 		g.Depth++
-		// win
-		g.RemoveSaveFile()
 		return true
 	}
 	g.Print("You descend deeper in the dungeon.")
@@ -569,8 +567,11 @@ loop:
 			if g.Wizard {
 				g.Player.HP = g.Player.HPMax()
 			} else {
+				err := g.RemoveSaveFile()
+				if err != nil {
+					g.PrintfStyled("Error removing save file: %v", logError, err.Error())
+				}
 				g.ui.Death(g)
-				g.RemoveSaveFile()
 				break loop
 			}
 		}

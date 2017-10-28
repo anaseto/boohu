@@ -63,20 +63,20 @@ func (g *game) Save() error {
 	return nil
 }
 
-func (g *game) RemoveSaveFile() {
+func (g *game) RemoveSaveFile() error {
 	dataDir, err := g.DataDir()
 	if err != nil {
-		g.Print(err.Error())
-		return
+		return err
 	}
 	saveFile := filepath.Join(dataDir, "save.gob")
 	_, err = os.Stat(saveFile)
 	if err == nil {
 		err := os.Remove(saveFile)
 		if err != nil {
-			fmt.Fprint(os.Stderr, "Error removing old save file")
+			return err
 		}
 	}
+	return err
 }
 
 func (g *game) Load() (bool, error) {

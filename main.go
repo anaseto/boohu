@@ -1151,6 +1151,10 @@ func (ui *termui) Death(g *game) {
 }
 
 func (ui *termui) Win(g *game) {
+	err := g.RemoveSaveFile()
+	if err != nil {
+		g.PrintfStyled("Error removing saved file: %v", logError, err)
+	}
 	if g.Wizard {
 		g.Print("You escape by the magic stairs! **WIZARD** --press esc or space to continue--")
 	} else {
@@ -1158,7 +1162,7 @@ func (ui *termui) Win(g *game) {
 	}
 	ui.DrawDungeonView(g, false)
 	ui.WaitForContinue(g)
-	err := g.WriteDump()
+	err = g.WriteDump()
 	ui.Dump(g, err)
 	ui.WaitForContinue(g)
 }
@@ -1181,7 +1185,12 @@ func (ui *termui) Quit(g *game) bool {
 	ui.DrawDungeonView(g, false)
 	quit := ui.PromptConfirmation(g)
 	if quit {
-		g.RemoveSaveFile()
+		err := g.RemoveSaveFile()
+		if err != nil {
+			g.PrintfStyled("Error removing save file: %v ——press any key to quit——", logError, err)
+			ui.DrawDungeonView(g, false)
+			ui.PressAnyKey()
+		}
 	} else {
 		g.Print("Ok, then.")
 	}
