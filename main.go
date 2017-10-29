@@ -306,6 +306,9 @@ func (ui *termui) HandleCharacter(g *game, ev event, c rune) (err error, again b
 }
 
 func (ui *termui) GoToPos(g *game, ev event, pos position) (err error, again bool) {
+	if !g.Dungeon.Valid(pos) {
+		return errors.New("Invalid location."), true
+	}
 	switch pos.Distance(g.Player.Pos) {
 	case 0:
 		g.WaitTurn(ev)
