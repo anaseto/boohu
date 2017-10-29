@@ -75,7 +75,7 @@ func SolarizedPalette() {
 	ColorFgTemporalWall = 7
 }
 
-var Version string = "v0.3"
+var Version string = "v0.4"
 
 func main() {
 	opt := flag.Bool("s", false, "Use true 16-color solarized palette")
