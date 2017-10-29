@@ -19,7 +19,7 @@ func (ex *examiner) ComputeHighlight(g *game, pos position) {
 
 func (ex *examiner) Action(g *game, pos position) error {
 	if g.MonsterInLOS() != nil {
-		return errors.New("You cannot travel while there are monsters in view.")
+		return errors.New("You cannot travel while there are monsters in view: one cell at a time.")
 	}
 	if g.ExclusionsMap[g.Player.Pos] {
 		return errors.New("You cannot travel while in an excluded area.")
