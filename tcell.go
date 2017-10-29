@@ -175,71 +175,48 @@ func (ui *termui) PressAnyKey() error {
 	}
 }
 
-func (ui *termui) HandlePlayerTurn(g *game, ev event) bool {
-getKey:
-	for {
-		ui.DrawDungeonView(g, false)
-		var err error
-		switch tev := ui.Screen.PollEvent().(type) {
-		case *tcell.EventKey:
-			key := tev.Rune()
-			switch tev.Key() {
-			case tcell.KeyUp:
-				key = 'k'
-			case tcell.KeyRight:
-				key = 'l'
-			case tcell.KeyDown:
-				key = 'j'
-			case tcell.KeyLeft:
-				key = 'h'
-			case tcell.KeyCtrlW:
-				ui.EnterWizard(g)
-				continue getKey
-			case tcell.KeyCtrlQ:
-				if ui.Quit(g) {
-					return true
-				}
-				continue getKey
-			case tcell.KeyCtrlP:
-				key = 'm'
+func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit bool) {
+	switch tev := ui.Screen.PollEvent().(type) {
+	case *tcell.EventKey:
+		key := tev.Rune()
+		switch tev.Key() {
+		case tcell.KeyUp:
+			key = 'k'
+		case tcell.KeyRight:
+			key = 'l'
+		case tcell.KeyDown:
+			key = 'j'
+		case tcell.KeyLeft:
+			key = 'h'
+		case tcell.KeyCtrlW:
+			ui.EnterWizard(g)
+			return nil, true, false
+		case tcell.KeyCtrlQ:
+			if ui.Quit(g) {
+				return nil, false, true
 			}
-			var again, quit bool
-			err, again, quit = ui.HandleCharacter(g, ev, key)
-			if again {
-				continue getKey
-			} else if quit {
-				return true
-			}
-			if err != nil {
-				g.Print(err.Error())
-				continue getKey
-			}
-			return false
-		case *tcell.EventMouse:
-			action := false
-			switch tev.Buttons() {
-			case tcell.Button1:
-				x, y := tev.Position()
-				pos := position{X: x, Y: y}
-				err, action = ui.GoToPos(g, ev, pos)
-			case tcell.Button3:
-				x, y := tev.Position()
-				pos := position{X: x, Y: y}
-				var again bool
-				again, action = ui.ExaminePos(g, ev, pos)
-				if again {
-					continue getKey
-				}
-			}
-			if err != nil {
-				g.Print(err.Error())
-				continue getKey
-			}
-			if action {
-				return false
-			}
+			return nil, true, false
+		case tcell.KeyCtrlP:
+			key = 'm'
+		}
+		err, again, quit = ui.HandleCharacter(g, ev, key)
+	case *tcell.EventMouse:
+		again = true
+		switch tev.Buttons() {
+		case tcell.Button1:
+			x, y := tev.Position()
+			pos := position{X: x, Y: y}
+			err, again = ui.GoToPos(g, ev, pos)
+		case tcell.Button3:
+			x, y := tev.Position()
+			pos := position{X: x, Y: y}
+			again = ui.ExaminePos(g, ev, pos)
 		}
 	}
+	if err != nil {
+		again = true
+	}
+	return err, again, quit
 }
 
 func (ui *termui) Scroll(n int) (m int, quit bool) {

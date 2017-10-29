@@ -305,42 +305,37 @@ func (ui *termui) HandleCharacter(g *game, ev event, c rune) (err error, again b
 	return err, again, quit
 }
 
-func (ui *termui) GoToPos(g *game, ev event, pos position) (err error, action bool) {
+func (ui *termui) GoToPos(g *game, ev event, pos position) (err error, again bool) {
 	switch pos.Distance(g.Player.Pos) {
 	case 0:
 		g.WaitTurn(ev)
-		action = true
 	case 1:
 		dir := pos.Dir(g.Player.Pos)
 		err = g.MovePlayer(g.Player.Pos.To(dir), ev)
-		if err == nil {
-			action = true
+		if err != nil {
+			again = true
 		}
 	default:
 		ex := &examiner{}
 		err = ex.Action(g, pos)
-		if ex.done && g.MoveToTarget(ev) {
-			action = true
+		if !ex.done || !g.MoveToTarget(ev) {
+			again = true
 		}
 	}
-	return err, action
+	return err, again
 }
 
-func (ui *termui) ExaminePos(g *game, ev event, pos position) (again bool, action bool) {
+func (ui *termui) ExaminePos(g *game, ev event, pos position) (again bool) {
 	var start *position
 	if g.Dungeon.Valid(pos) {
 		start = &pos
 	}
 	b := ui.Examine(g, start)
 	ui.DrawDungeonView(g, false)
-	if !b {
+	if !b || !g.MoveToTarget(ev) {
 		again = true
-	} else if !g.MoveToTarget(ev) {
-		again = true
-	} else {
-		action = true
 	}
-	return again, action
+	return again
 }
 
 func (ui *termui) DrawKeysDescription(g *game, actions []string) {
@@ -1201,4 +1196,19 @@ func (ui *termui) Wizard(g *game) bool {
 	g.Print("Do you really want to enter wizard mode (no return)? [y/N]")
 	ui.DrawDungeonView(g, false)
 	return ui.PromptConfirmation(g)
+}
+
+func (ui *termui) HandlePlayerTurn(g *game, ev event) bool {
+getKey:
+	for {
+		ui.DrawDungeonView(g, false)
+		err, again, quit := ui.PlayerTurnEvent(g, ev)
+		if err != nil {
+			g.Print(err.Error())
+		}
+		if again {
+			continue getKey
+		}
+		return quit
+	}
 }

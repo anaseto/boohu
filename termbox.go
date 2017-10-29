@@ -126,72 +126,49 @@ func (ui *termui) PressAnyKey() error {
 	}
 }
 
-func (ui *termui) HandlePlayerTurn(g *game, ev event) bool {
-getKey:
-	for {
-		ui.DrawDungeonView(g, false)
-		var err error
-		switch tev := termbox.PollEvent(); tev.Type {
-		case termbox.EventKey:
-			if tev.Ch == 0 {
-				switch tev.Key {
-				case termbox.KeyArrowUp:
-					tev.Ch = 'k'
-				case termbox.KeyArrowRight:
-					tev.Ch = 'l'
-				case termbox.KeyArrowDown:
-					tev.Ch = 'j'
-				case termbox.KeyArrowLeft:
-					tev.Ch = 'h'
-				case termbox.KeyCtrlW:
-					ui.EnterWizard(g)
-					continue getKey
-				case termbox.KeyCtrlQ:
-					if ui.Quit(g) {
-						return true
-					}
-					continue getKey
-				case termbox.KeyCtrlP:
-					tev.Ch = 'm'
+func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit bool) {
+	switch tev := termbox.PollEvent(); tev.Type {
+	case termbox.EventKey:
+		if tev.Ch == 0 {
+			switch tev.Key {
+			case termbox.KeyArrowUp:
+				tev.Ch = 'k'
+			case termbox.KeyArrowRight:
+				tev.Ch = 'l'
+			case termbox.KeyArrowDown:
+				tev.Ch = 'j'
+			case termbox.KeyArrowLeft:
+				tev.Ch = 'h'
+			case termbox.KeyCtrlW:
+				ui.EnterWizard(g)
+				return nil, true, false
+			case termbox.KeyCtrlQ:
+				if ui.Quit(g) {
+					return nil, false, true
 				}
+				return nil, true, false
+			case termbox.KeyCtrlP:
+				tev.Ch = 'm'
 			}
-			var again, quit bool
-			err, again, quit = ui.HandleCharacter(g, ev, tev.Ch)
-			if again {
-				continue getKey
-			} else if quit {
-				return true
-			}
-			if err != nil {
-				g.Print(err.Error())
-				continue getKey
-			}
-			return false
-		case termbox.EventMouse:
-			action := false
-			if tev.Ch == 0 {
-				switch tev.Key {
-				case termbox.MouseLeft:
-					pos := position{X: tev.MouseX, Y: tev.MouseY}
-					err, action = ui.GoToPos(g, ev, pos)
-				case termbox.MouseRight:
-					pos := position{X: tev.MouseX, Y: tev.MouseY}
-					var again bool
-					again, action = ui.ExaminePos(g, ev, pos)
-					if again {
-						continue getKey
-					}
-				}
-			}
-			if err != nil {
-				g.Print(err.Error())
-				continue getKey
-			}
-			if action {
-				return false
+		}
+		err, again, quit = ui.HandleCharacter(g, ev, tev.Ch)
+	case termbox.EventMouse:
+		again = true
+		if tev.Ch == 0 {
+			switch tev.Key {
+			case termbox.MouseLeft:
+				pos := position{X: tev.MouseX, Y: tev.MouseY}
+				err, again = ui.GoToPos(g, ev, pos)
+			case termbox.MouseRight:
+				pos := position{X: tev.MouseX, Y: tev.MouseY}
+				again = ui.ExaminePos(g, ev, pos)
 			}
 		}
 	}
+	if err != nil {
+		again = true
+	}
+	return err, again, quit
 }
 
 func (ui *termui) Scroll(n int) (m int, quit bool) {
