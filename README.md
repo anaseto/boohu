@@ -8,8 +8,6 @@ to find some magical stairs deep in the Underground. Along the way, you will
 collect treasures, as well as various helpful items. You will also encounter
 monsters, fight against them, or run away from them when you can…
 
-It is a work in progress, but is already a quite complete game.
-
 ![boohu intro screen](https://raw.githubusercontent.com/anaseto/boohu/master/img/intro-screen.png)
 
 Screenshot
