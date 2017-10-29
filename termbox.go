@@ -95,6 +95,13 @@ loop:
 			if tev.Ch == ' ' {
 				break loop
 			}
+		case termbox.EventMouse:
+			if tev.Ch == 0 {
+				switch tev.Key {
+				case termbox.MouseMiddle:
+					break loop
+				}
+			}
 		}
 	}
 }
@@ -119,7 +126,8 @@ func (ui *termui) PressAnyKey() error {
 		case termbox.EventInterrupt:
 			return errors.New("interrupted")
 		case termbox.EventMouse:
-			if tev.Ch == 0 && tev.Key == termbox.MouseLeft {
+			if tev.Ch == 0 && tev.Key == termbox.MouseLeft ||
+				tev.Key == termbox.MouseMiddle || tev.Key == termbox.MouseRight {
 				return nil
 			}
 		}
@@ -193,6 +201,17 @@ func (ui *termui) Scroll(n int) (m int, quit bool) {
 		case ' ':
 			quit = true
 		}
+	case termbox.EventMouse:
+		if tev.Ch == 0 {
+			switch tev.Key {
+			case termbox.MouseMiddle:
+				quit = true
+			case termbox.MouseWheelUp:
+				n -= 2
+			case termbox.MouseWheelDown:
+				n += 2
+			}
+		}
 	}
 	return n, quit
 }
@@ -228,6 +247,8 @@ func (ui *termui) TargetModeEvent(g *game, targ Targetter, pos position, data *e
 				}
 			case termbox.MouseRight:
 				data.npos = position{X: tev.MouseX, Y: tev.MouseY}
+			case termbox.MouseMiddle:
+				return true
 			}
 		}
 	}
@@ -252,6 +273,20 @@ func (ui *termui) Select(g *game, ev event, l int) (index int, alternate bool, e
 			}
 			if tev.Ch == ' ' {
 				return -1, false, errors.New("Ok, then.")
+			}
+		case termbox.EventMouse:
+			if tev.Ch == 0 {
+				switch tev.Key {
+				case termbox.MouseLeft:
+					y := tev.MouseY
+					if y > 0 && y <= l {
+						return y - 1, false, nil
+					}
+				case termbox.MouseRight:
+					return -1, true, nil
+				case termbox.MouseMiddle:
+					return -1, false, errors.New("Ok, then.")
+				}
 			}
 		}
 	}

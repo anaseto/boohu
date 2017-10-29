@@ -144,6 +144,10 @@ loop:
 			if tev.Rune() == ' ' {
 				break loop
 			}
+		case *tcell.EventMouse:
+			if tev.Buttons() == tcell.Button2 {
+				break loop
+			}
 		}
 	}
 }
@@ -168,7 +172,8 @@ func (ui *termui) PressAnyKey() error {
 		case *tcell.EventInterrupt:
 			return errors.New("interrupted")
 		case *tcell.EventMouse:
-			if tev.Buttons() == tcell.Button1 {
+			switch tev.Buttons() {
+			case tcell.Button1, tcell.Button2, tcell.Button3:
 				return nil
 			}
 		}
@@ -238,6 +243,15 @@ func (ui *termui) Scroll(n int) (m int, quit bool) {
 		case ' ':
 			quit = true
 		}
+	case *tcell.EventMouse:
+		switch tev.Buttons() {
+		case tcell.WheelUp:
+			n -= 2
+		case tcell.WheelDown:
+			n += 2
+		case tcell.Button2:
+			quit = true
+		}
 	}
 	return n, quit
 }
@@ -272,6 +286,8 @@ func (ui *termui) TargetModeEvent(g *game, targ Targetter, pos position, data *e
 		case tcell.Button3:
 			x, y := tev.Position()
 			data.npos = position{X: x, Y: y}
+		case tcell.Button2:
+			return true
 		}
 	}
 	return false
@@ -292,6 +308,18 @@ func (ui *termui) Select(g *game, ev event, l int) (index int, alternate bool, e
 				return -1, true, nil
 			}
 			if key == ' ' {
+				return -1, false, errors.New("Ok, then.")
+			}
+		case *tcell.EventMouse:
+			switch tev.Buttons() {
+			case tcell.Button1:
+				_, y := tev.Position()
+				if y > 0 && y <= l {
+					return y - 1, false, nil
+				}
+			case tcell.Button3:
+				return -1, true, nil
+			case tcell.Button2:
 				return -1, false, errors.New("Ok, then.")
 			}
 		}
