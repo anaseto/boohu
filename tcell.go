@@ -181,8 +181,10 @@ func (ui *termui) PressAnyKey() error {
 }
 
 func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit bool) {
+	again = true
 	switch tev := ui.Screen.PollEvent().(type) {
 	case *tcell.EventKey:
+		again = false
 		key := tev.Rune()
 		switch tev.Key() {
 		case tcell.KeyUp:
@@ -206,8 +208,8 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 		}
 		err, again, quit = ui.HandleCharacter(g, ev, key)
 	case *tcell.EventMouse:
-		again = true
 		switch tev.Buttons() {
+		case tcell.ButtonNone:
 		case tcell.Button1:
 			x, y := tev.Position()
 			pos := position{X: x, Y: y}

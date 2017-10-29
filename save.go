@@ -76,7 +76,7 @@ func (g *game) RemoveSaveFile() error {
 			return err
 		}
 	}
-	return err
+	return nil
 }
 
 func (g *game) Load() (bool, error) {

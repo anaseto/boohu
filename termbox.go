@@ -135,8 +135,10 @@ func (ui *termui) PressAnyKey() error {
 }
 
 func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit bool) {
+	again = true
 	switch tev := termbox.PollEvent(); tev.Type {
 	case termbox.EventKey:
+		again = false
 		if tev.Ch == 0 {
 			switch tev.Key {
 			case termbox.KeyArrowUp:
@@ -161,7 +163,6 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 		}
 		err, again, quit = ui.HandleCharacter(g, ev, tev.Ch)
 	case termbox.EventMouse:
-		again = true
 		if tev.Ch == 0 {
 			switch tev.Key {
 			case termbox.MouseLeft:
