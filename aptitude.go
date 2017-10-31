@@ -24,7 +24,7 @@ func (ap aptitude) String() string {
 	var text string
 	switch ap {
 	case AptAccurate:
-		text = "You are unusually accurate."
+		text = "You are unusually accurate, specially for ranged attacks."
 	case AptAgile:
 		text = "You are agile."
 	case AptFast:
