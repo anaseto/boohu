@@ -63,6 +63,7 @@ const (
 	MonsMirrorSpecter
 	MonsAcidMound
 	MonsExplosiveNadre
+	MonsOklobPlant
 )
 
 func (mk monsterKind) String() string {
@@ -95,7 +96,7 @@ func (mk monsterKind) Dangerousness() int {
 
 func (mk monsterKind) Ranged() bool {
 	switch mk {
-	case MonsLich, MonsCyclop, MonsGoblinWarrior:
+	case MonsLich, MonsCyclop, MonsGoblinWarrior, MonsOklobPlant:
 		return true
 	default:
 		return false
@@ -147,6 +148,7 @@ var MonsData = []monsterData{
 	MonsEarthDragon:     {10, 14, 10, 40, 14, 6, 8, 'D', "earth dragon", 20},
 	MonsMirrorSpecter:   {10, 9, 10, 18, 15, 0, 17, 'm', "mirror specter", 11},
 	MonsExplosiveNadre:  {10, 4, 10, 1, 14, 0, 10, 'n', "explosive nadre", 5},
+	MonsOklobPlant:      {10, 12, 12, 30, 15, 0, 4, 'P', "oklob plant", 7},
 }
 
 var monsDesc = []string{
@@ -168,6 +170,7 @@ var monsDesc = []string{
 	MonsEarthDragon:     "Earth dragons are big and hardy creatures that wander in the Underground. It is said they are to credit for many tunnels.",
 	MonsMirrorSpecter:   "Mirror specters are very insubstantial creatures. They can absorb your mana.",
 	MonsExplosiveNadre:  "Explosive nadres are very frail creatures that explode upon dying, halving HP of any adjacent creatures.",
+	MonsOklobPlant:      "Oklob Plants are static monsters that throw acidic projectiles at you, sometimes corroding and confusing you.",
 }
 
 type monsterBand int
@@ -187,12 +190,14 @@ const (
 	LoneSpecter
 	LoneAcidMound
 	LoneExplosiveNadre
+	LoneOklobPlant
 	BandGoblins
 	BandGoblinsWithWarriors
 	BandGoblinWarriors
 	BandHounds
 	BandYacks
 	BandSpiders
+	BandOklob
 	BandBlinkingFrogs
 	BandExplosive
 	BandGiantBees
@@ -208,6 +213,7 @@ const (
 	ULich
 	UBrizzias
 	UAcidMounds
+	UOklob
 	UDragon
 )
 
@@ -263,6 +269,7 @@ var MonsBands = []monsterBandData{
 	LoneSpecter:        {rarity: 70, minDepth: 6, maxDepth: 13, monster: MonsMirrorSpecter},
 	LoneAcidMound:      {rarity: 70, minDepth: 6, maxDepth: 13, monster: MonsAcidMound},
 	LoneExplosiveNadre: {rarity: 60, minDepth: 4, maxDepth: 7, monster: MonsExplosiveNadre},
+	LoneOklobPlant:     {rarity: 80, minDepth: 5, maxDepth: 13, monster: MonsOklobPlant},
 	BandGoblins: {
 		distribution: map[monsterKind]monsInterval{MonsGoblin: monsInterval{2, 4}},
 		rarity:       10, minDepth: 1, maxDepth: 5, band: true,
@@ -271,7 +278,7 @@ var MonsBands = []monsterBandData{
 		distribution: map[monsterKind]monsInterval{
 			MonsGoblin:        monsInterval{3, 5},
 			MonsGoblinWarrior: monsInterval{0, 2}},
-		rarity: 10, minDepth: 5, maxDepth: 9, band: true,
+		rarity: 12, minDepth: 5, maxDepth: 9, band: true,
 	},
 	BandGoblinWarriors: {
 		distribution: map[monsterKind]monsInterval{
@@ -290,6 +297,12 @@ var MonsBands = []monsterBandData{
 	BandBlinkingFrogs: {
 		distribution: map[monsterKind]monsInterval{MonsBlinkingFrog: monsInterval{2, 4}},
 		rarity:       70, minDepth: 9, maxDepth: 13, band: true,
+	},
+	BandOklob: {
+		distribution: map[monsterKind]monsInterval{
+			MonsOklobPlant: monsInterval{2, 2},
+		},
+		rarity: 100, minDepth: 7, maxDepth: 13, band: true,
 	},
 	BandExplosive: {
 		distribution: map[monsterKind]monsInterval{
@@ -351,7 +364,7 @@ var MonsBands = []monsterBandData{
 			MonsHydra:  monsInterval{2, 3},
 			MonsSpider: monsInterval{1, 2},
 		},
-		rarity: 35, minDepth: 10, maxDepth: 10, band: true, unique: true,
+		rarity: 40, minDepth: 10, maxDepth: 10, band: true, unique: true,
 	},
 	UExplosiveNadres: {
 		distribution: map[monsterKind]monsInterval{
@@ -377,6 +390,12 @@ var MonsBands = []monsterBandData{
 	UAcidMounds: {
 		distribution: map[monsterKind]monsInterval{
 			MonsAcidMound: monsInterval{3, 4},
+		},
+		rarity: 80, minDepth: 12, maxDepth: 12, band: true, unique: true,
+	},
+	UOklob: {
+		distribution: map[monsterKind]monsInterval{
+			MonsOklobPlant: monsInterval{3, 3},
 		},
 		rarity: 80, minDepth: 12, maxDepth: 12, band: true, unique: true,
 	},
@@ -485,6 +504,11 @@ func (m *monster) HandleTurn(g *game, ev event) {
 		return
 	}
 	if m.State == Hunting && m.SmitingAttack(g, ev) {
+		return
+	}
+	if m.Kind == MonsOklobPlant {
+		ev.Renew(g, m.Kind.MovementDelay())
+		// oklob plants are static ranged-only
 		return
 	}
 	if mpos.Distance(ppos) == 1 {
@@ -643,10 +667,8 @@ func (m *monster) EnterConfusion(g *game, ev event) {
 func (m *monster) HitSideEffects(g *game, ev event) {
 	switch m.Kind {
 	case MonsSpider:
-		if RandInt(2) == 0 && !g.Player.HasStatus(StatusConfusion) {
-			g.Player.Statuses[StatusConfusion]++
-			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 100 + RandInt(100), EAction: ConfusionEnd})
-			g.Print("You feel confused.")
+		if RandInt(2) == 0 {
+			g.Confusion(ev)
 		}
 	case MonsGiantBee:
 		if RandInt(5) == 0 && !g.Player.HasStatus(StatusBerserk) {
@@ -659,9 +681,7 @@ func (m *monster) HitSideEffects(g *game, ev event) {
 			g.Blink(ev)
 		}
 	case MonsAcidMound:
-		g.Player.Statuses[StatusCorrosion]++
-		g.PushEvent(&simpleEvent{ERank: ev.Rank() + 80 + RandInt(40), EAction: CorrosionEnd})
-		g.Print("Your equipment is corroded.")
+		g.Corrosion(ev)
 	case MonsYack:
 		dir := g.Player.Pos.Dir(m.Pos)
 		pos := g.Player.Pos.To(dir)
@@ -684,7 +704,7 @@ func (m *monster) RangedAttack(g *game, ev event) bool {
 	if !m.Kind.Ranged() {
 		return false
 	}
-	if m.Pos.Distance(g.Player.Pos) <= 1 {
+	if m.Pos.Distance(g.Player.Pos) <= 1 && m.Kind != MonsOklobPlant {
 		return false
 	}
 	if !g.Player.LOS[m.Pos] {
@@ -710,6 +730,8 @@ func (m *monster) RangedAttack(g *game, ev event) bool {
 		return m.ThrowRock(g, ev)
 	case MonsGoblinWarrior:
 		return m.ThrowJavelin(g, ev)
+	case MonsOklobPlant:
+		return m.ThrowAcid(g, ev)
 	}
 	return false
 }
@@ -798,9 +820,7 @@ func (m *monster) ThrowRock(g *game, ev event) bool {
 		g.MakeNoise(noise, g.Player.Pos)
 		g.PrintfStyled("The %s throws a rock at you (%d damage).", logMonsterHit, m.Kind, attack)
 		if RandInt(4) == 0 {
-			g.Player.Statuses[StatusConfusion]++
-			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 100 + RandInt(100), EAction: ConfusionEnd})
-			g.Print("You feel confused.")
+			g.Confusion(ev)
 		}
 		m.InflictDamage(g, attack, 15)
 	} else if block {
@@ -848,6 +868,47 @@ func (m *monster) ThrowJavelin(g *game, ev event) bool {
 	}
 	m.Statuses[MonsExhausted] = 1
 	g.PushEvent(&monsterEvent{ERank: ev.Rank() + 50 + RandInt(50), NMons: m.Index(g), EAction: MonsExhaustionEnd})
+	ev.Renew(g, m.Kind.AttackDelay())
+	return true
+}
+
+func (m *monster) ThrowAcid(g *game, ev event) bool {
+	blocked := m.RangeBlocked(g)
+	if blocked {
+		return false
+	}
+	block := false
+	hit := true
+	evasion := RandInt(g.Player.Evasion())
+	acc := RandInt(m.Accuracy)
+	attack := g.HitDamage(12, g.Player.Armor())
+	attack, evasion = m.DramaticAdjustment(g, 12, attack, evasion)
+	if acc <= evasion {
+		hit = false
+	} else {
+		block = m.Blocked(g)
+		hit = !block
+	}
+	if hit {
+		noise := 12
+		noise += g.Player.Armor() / 2
+		g.MakeNoise(noise, g.Player.Pos)
+		g.Printf("The %s throws acid at you (%d damage).", m.Kind, attack)
+		m.InflictDamage(g, attack, 11)
+		if RandInt(2) == 0 {
+			g.Corrosion(ev)
+			if RandInt(2) == 0 {
+				g.Confusion(ev)
+			}
+		}
+	} else if block {
+		g.Printf("You block %s's acid projectile.", Indefinite(m.Kind.String(), false))
+		if RandInt(2) == 0 {
+			g.Corrosion(ev)
+		}
+	} else {
+		g.Printf("You dodge %s's acid projectile.", Indefinite(m.Kind.String(), false))
+	}
 	ev.Renew(g, m.Kind.AttackDelay())
 	return true
 }
