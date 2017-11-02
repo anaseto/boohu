@@ -752,7 +752,7 @@ func (m *monster) RangeBlocked(g *game) bool {
 
 func (m *monster) Index(g *game) int {
 	for i, mons := range g.Monsters {
-		if mons.Pos == m.Pos {
+		if mons.Exists() && mons.Pos == m.Pos {
 			return i
 		}
 	}
