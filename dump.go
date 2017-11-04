@@ -229,6 +229,9 @@ func (g *game) DumpDungeon() string {
 				r = '@'
 			default:
 				r = '.'
+				if _, ok := g.Fungus[pos]; ok {
+					r = '"'
+				}
 				if _, ok := g.Clouds[pos]; ok && g.Player.LOS[pos] {
 					r = '§'
 				}
