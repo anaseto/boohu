@@ -42,32 +42,32 @@ func FixColor() {
 }
 
 func WindowsPalette() {
-	ColorBgLOS = color(tcell.ColorSilver)
-	ColorBgDark = color(tcell.ColorBlack)
-	ColorBg = color(tcell.ColorBlack)
-	ColorBgCloud = color(tcell.ColorSilver)
-	ColorFgLOS = color(tcell.ColorBlack)
-	ColorFgDark = color(tcell.ColorSilver)
-	ColorFg = color(tcell.ColorSilver)
-	ColorFgPlayer = color(tcell.ColorNavy)
-	ColorFgMonster = color(tcell.ColorMaroon)
-	ColorFgSleepingMonster = color(tcell.ColorTeal)
-	ColorFgWanderingMonster = color(tcell.ColorPurple)
-	ColorFgConfusedMonster = color(tcell.ColorGreen)
-	ColorFgCollectable = color(tcell.ColorOlive)
-	ColorFgStairs = color(tcell.ColorPurple)
-	ColorFgGold = color(tcell.ColorOlive)
-	ColorFgHPok = color(tcell.ColorGreen)
-	ColorFgHPwounded = color(tcell.ColorOlive)
-	ColorFgHPcritical = color(tcell.ColorMaroon)
-	ColorFgMPok = color(tcell.ColorNavy)
-	ColorFgMPpartial = color(tcell.ColorPurple)
-	ColorFgMPcritical = color(tcell.ColorMaroon)
-	ColorFgStatusGood = color(tcell.ColorNavy)
-	ColorFgStatusBad = color(tcell.ColorMaroon)
-	ColorFgStatusOther = color(tcell.ColorOlive)
-	ColorFgTargetMode = color(tcell.ColorTeal)
-	ColorFgTemporalWall = color(tcell.ColorTeal)
+	ColorBgLOS = uicolor(tcell.ColorSilver)
+	ColorBgDark = uicolor(tcell.ColorBlack)
+	ColorBg = uicolor(tcell.ColorBlack)
+	ColorBgCloud = uicolor(tcell.ColorSilver)
+	ColorFgLOS = uicolor(tcell.ColorBlack)
+	ColorFgDark = uicolor(tcell.ColorSilver)
+	ColorFg = uicolor(tcell.ColorSilver)
+	ColorFgPlayer = uicolor(tcell.ColorNavy)
+	ColorFgMonster = uicolor(tcell.ColorMaroon)
+	ColorFgSleepingMonster = uicolor(tcell.ColorTeal)
+	ColorFgWanderingMonster = uicolor(tcell.ColorPurple)
+	ColorFgConfusedMonster = uicolor(tcell.ColorGreen)
+	ColorFgCollectable = uicolor(tcell.ColorOlive)
+	ColorFgStairs = uicolor(tcell.ColorPurple)
+	ColorFgGold = uicolor(tcell.ColorOlive)
+	ColorFgHPok = uicolor(tcell.ColorGreen)
+	ColorFgHPwounded = uicolor(tcell.ColorOlive)
+	ColorFgHPcritical = uicolor(tcell.ColorMaroon)
+	ColorFgMPok = uicolor(tcell.ColorNavy)
+	ColorFgMPpartial = uicolor(tcell.ColorPurple)
+	ColorFgMPcritical = uicolor(tcell.ColorMaroon)
+	ColorFgStatusGood = uicolor(tcell.ColorNavy)
+	ColorFgStatusBad = uicolor(tcell.ColorMaroon)
+	ColorFgStatusOther = uicolor(tcell.ColorOlive)
+	ColorFgTargetMode = uicolor(tcell.ColorTeal)
+	ColorFgTemporalWall = uicolor(tcell.ColorTeal)
 }
 
 func (ui *termui) Init() error {
@@ -119,18 +119,18 @@ func (ui *termui) SetCursor(pos position) {
 	ui.Screen.ShowCursor(pos.X, pos.Y)
 }
 
-func (ui *termui) SetCell(x, y int, r rune, fg, bg color) {
+func (ui *termui) SetCell(x, y int, r rune, fg, bg uicolor) {
 	st := tcell.StyleDefault
 	st = st.Foreground(tcell.Color(fg)).Background(tcell.Color(bg))
 	ui.Screen.SetContent(x, y, r, nil, st)
 }
 
-func (ui *termui) Reverse(c color) color {
+func (ui *termui) Reverse(c uicolor) uicolor {
 	st := tcell.StyleDefault
 	// TODO: true reverse of actual foreground
 	st = st.Background(tcell.Color(c)).Foreground(tcell.Color(ColorFg))
 	bg, _, _ := st.Reverse(true).Decompose()
-	return color(bg)
+	return uicolor(bg)
 }
 
 func (ui *termui) WaitForContinue(g *game) {

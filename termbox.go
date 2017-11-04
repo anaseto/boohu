@@ -1,4 +1,4 @@
-// +build !tcell
+// +build !tcell,!ebiten
 
 package main
 
@@ -12,32 +12,32 @@ type termui struct {
 }
 
 func WindowsPalette() {
-	ColorBgLOS = color(termbox.ColorWhite)
-	ColorBgDark = color(termbox.ColorBlack)
-	ColorBg = color(termbox.ColorBlack)
-	ColorBgCloud = color(termbox.ColorWhite)
-	ColorFgLOS = color(termbox.ColorBlack)
-	ColorFgDark = color(termbox.ColorWhite)
-	ColorFg = color(termbox.ColorWhite)
-	ColorFgPlayer = color(termbox.ColorBlue)
-	ColorFgMonster = color(termbox.ColorRed)
-	ColorFgSleepingMonster = color(termbox.ColorCyan)
-	ColorFgWanderingMonster = color(termbox.ColorMagenta)
-	ColorFgConfusedMonster = color(termbox.ColorGreen)
-	ColorFgCollectable = color(termbox.ColorYellow)
-	ColorFgStairs = color(termbox.ColorMagenta)
-	ColorFgGold = color(termbox.ColorYellow)
-	ColorFgHPok = color(termbox.ColorGreen)
-	ColorFgHPwounded = color(termbox.ColorYellow)
-	ColorFgHPcritical = color(termbox.ColorRed)
-	ColorFgMPok = color(termbox.ColorBlue)
-	ColorFgMPpartial = color(termbox.ColorMagenta)
-	ColorFgMPcritical = color(termbox.ColorRed)
-	ColorFgStatusGood = color(termbox.ColorBlue)
-	ColorFgStatusBad = color(termbox.ColorRed)
-	ColorFgStatusOther = color(termbox.ColorYellow)
-	ColorFgTargetMode = color(termbox.ColorCyan)
-	ColorFgTemporalWall = color(termbox.ColorCyan)
+	ColorBgLOS = uicolor(termbox.ColorWhite)
+	ColorBgDark = uicolor(termbox.ColorBlack)
+	ColorBg = uicolor(termbox.ColorBlack)
+	ColorBgCloud = uicolor(termbox.ColorWhite)
+	ColorFgLOS = uicolor(termbox.ColorBlack)
+	ColorFgDark = uicolor(termbox.ColorWhite)
+	ColorFg = uicolor(termbox.ColorWhite)
+	ColorFgPlayer = uicolor(termbox.ColorBlue)
+	ColorFgMonster = uicolor(termbox.ColorRed)
+	ColorFgSleepingMonster = uicolor(termbox.ColorCyan)
+	ColorFgWanderingMonster = uicolor(termbox.ColorMagenta)
+	ColorFgConfusedMonster = uicolor(termbox.ColorGreen)
+	ColorFgCollectable = uicolor(termbox.ColorYellow)
+	ColorFgStairs = uicolor(termbox.ColorMagenta)
+	ColorFgGold = uicolor(termbox.ColorYellow)
+	ColorFgHPok = uicolor(termbox.ColorGreen)
+	ColorFgHPwounded = uicolor(termbox.ColorYellow)
+	ColorFgHPcritical = uicolor(termbox.ColorRed)
+	ColorFgMPok = uicolor(termbox.ColorBlue)
+	ColorFgMPpartial = uicolor(termbox.ColorMagenta)
+	ColorFgMPcritical = uicolor(termbox.ColorRed)
+	ColorFgStatusGood = uicolor(termbox.ColorBlue)
+	ColorFgStatusBad = uicolor(termbox.ColorRed)
+	ColorFgStatusOther = uicolor(termbox.ColorYellow)
+	ColorFgTargetMode = uicolor(termbox.ColorCyan)
+	ColorFgTemporalWall = uicolor(termbox.ColorCyan)
 }
 
 func (ui *termui) Init() error {
@@ -73,12 +73,12 @@ func (ui *termui) SetCursor(pos position) {
 	termbox.SetCursor(pos.X, pos.Y)
 }
 
-func (ui *termui) SetCell(x, y int, r rune, fg, bg color) {
+func (ui *termui) SetCell(x, y int, r rune, fg, bg uicolor) {
 	termbox.SetCell(x, y, r, termbox.Attribute(fg), termbox.Attribute(bg))
 }
 
-func (ui *termui) Reverse(c color) color {
-	return color(termbox.Attribute(c) | termbox.AttrReverse)
+func (ui *termui) Reverse(c uicolor) uicolor {
+	return uicolor(termbox.Attribute(c) | termbox.AttrReverse)
 }
 
 func (ui *termui) WaitForContinue(g *game) {

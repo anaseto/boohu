@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -300,16 +299,4 @@ func (g *game) SimplifedDump(err error) string {
 	fmt.Fprintf(buf, "\n\n")
 	fmt.Fprintf(buf, "───Press esc or space to quit───")
 	return buf.String()
-}
-
-func (g *game) WriteDump() error {
-	dataDir, err := g.DataDir()
-	if err != nil {
-		return err
-	}
-	err = ioutil.WriteFile(filepath.Join(dataDir, "dump"), []byte(g.Dump()), 0644)
-	if err != nil {
-		return err
-	}
-	return nil
 }
