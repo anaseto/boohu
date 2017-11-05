@@ -9,3 +9,6 @@
 *.bak
 boohu
 *.prof
+*.js
+*.map
+*.html
