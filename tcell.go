@@ -4,6 +4,7 @@ package main
 
 import (
 	"errors"
+	"runtime"
 
 	"github.com/gdamore/tcell"
 )
@@ -84,11 +85,11 @@ func (ui *termui) Close() {
 }
 
 func (ui *termui) PostInit() {
-	//termbox.SetOutputMode(termbox.Output256)
-	//termbox.SetInputMode(termbox.InputEsc | termbox.InputMouse)
 	FixColor()
 	ui.Screen.SetStyle(tcell.StyleDefault)
-	ui.Screen.EnableMouse()
+	if runtime.GOOS != "openbsd" {
+		ui.Screen.EnableMouse()
+	}
 }
 
 func (ui *termui) Clear() {
