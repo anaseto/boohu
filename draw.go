@@ -736,11 +736,6 @@ func (ui *termui) DrawPosition(g *game, pos position) {
 		if _, ok := g.Clouds[pos]; ok {
 			bgColor = ColorBgCloud
 		}
-		if g.Highlight[pos] {
-			bgColor = ui.Reverse(ColorBgLOS)
-			//fgColor = ColorFgRay
-			//bgColor = ColorBgRay
-		}
 	} else {
 		fgColor = ColorFgDark
 		bgColor = ColorBgDark
@@ -813,6 +808,9 @@ func (ui *termui) DrawPosition(g *game, pos position) {
 				fgColor = ColorFgWanderingMonster
 			}
 		}
+	}
+	if g.Highlight[pos] {
+		bgColor, fgColor = fgColor, bgColor
 	}
 	ui.SetCell(pos.X, pos.Y, r, fgColor, bgColor)
 }

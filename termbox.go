@@ -77,10 +77,6 @@ func (ui *termui) SetCell(x, y int, r rune, fg, bg uicolor) {
 	termbox.SetCell(x, y, r, termbox.Attribute(fg), termbox.Attribute(bg))
 }
 
-func (ui *termui) Reverse(c uicolor) uicolor {
-	return uicolor(termbox.Attribute(c) | termbox.AttrReverse)
-}
-
 func (ui *termui) WaitForContinue(g *game) {
 loop:
 	for {

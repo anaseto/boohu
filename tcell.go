@@ -126,14 +126,6 @@ func (ui *termui) SetCell(x, y int, r rune, fg, bg uicolor) {
 	ui.Screen.SetContent(x, y, r, nil, st)
 }
 
-func (ui *termui) Reverse(c uicolor) uicolor {
-	st := tcell.StyleDefault
-	// TODO: true reverse of actual foreground
-	st = st.Background(tcell.Color(c)).Foreground(tcell.Color(ColorFg))
-	bg, _, _ := st.Reverse(true).Decompose()
-	return uicolor(bg)
-}
-
 func (ui *termui) WaitForContinue(g *game) {
 loop:
 	for {

@@ -221,10 +221,6 @@ func (ui *termui) SetCell(x, y int, r rune, fg, bg uicolor) {
 	text.Draw(canvasImage, string(r), uiFont, FontSize*x, FontSize*y, color.White)
 }
 
-func (ui *termui) Reverse(c uicolor) uicolor {
-	return uicolor(1)
-}
-
 func (ui *termui) WaitForContinue(g *game) {
 loop:
 	for {
