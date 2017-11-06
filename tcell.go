@@ -13,35 +13,6 @@ type termui struct {
 	tcell.Screen
 }
 
-func FixColor() {
-	ColorBgLOS = ColorBgLOS - 1
-	ColorBgDark = ColorBgDark - 1
-	ColorBg = ColorBg - 1
-	ColorBgCloud = ColorBgCloud - 1
-	ColorFgLOS = ColorFgLOS - 1
-	ColorFgDark = ColorFgDark - 1
-	ColorFg = ColorFg - 1
-	ColorFgPlayer = ColorFgPlayer - 1
-	ColorFgMonster = ColorFgMonster - 1
-	ColorFgSleepingMonster = ColorFgSleepingMonster - 1
-	ColorFgWanderingMonster = ColorFgWanderingMonster - 1
-	ColorFgConfusedMonster = ColorFgConfusedMonster - 1
-	ColorFgCollectable = ColorFgCollectable - 1
-	ColorFgStairs = ColorFgStairs - 1
-	ColorFgGold = ColorFgGold - 1
-	ColorFgHPok = ColorFgHPok - 1
-	ColorFgHPwounded = ColorFgHPwounded - 1
-	ColorFgHPcritical = ColorFgHPcritical - 1
-	ColorFgMPok = ColorFgMPok - 1
-	ColorFgMPpartial = ColorFgMPpartial - 1
-	ColorFgMPcritical = ColorFgMPcritical - 1
-	ColorFgStatusGood = ColorFgStatusGood - 1
-	ColorFgStatusBad = ColorFgStatusBad - 1
-	ColorFgStatusOther = ColorFgStatusOther - 1
-	ColorFgTargetMode = ColorFgTargetMode - 1
-	ColorFgTemporalWall = ColorFgTemporalWall - 1
-}
-
 func WindowsPalette() {
 	ColorBgLOS = uicolor(tcell.ColorSilver)
 	ColorBgDark = uicolor(tcell.ColorBlack)

@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
-	"time"
 )
 
 type uicolor int
@@ -70,6 +69,35 @@ func SolarizedPalette() {
 	ColorFgStatusOther = 4
 	ColorFgTargetMode = 7
 	ColorFgTemporalWall = 7
+}
+
+func FixColor() {
+	ColorBgLOS = ColorBgLOS - 1
+	ColorBgDark = ColorBgDark - 1
+	ColorBg = ColorBg - 1
+	ColorBgCloud = ColorBgCloud - 1
+	ColorFgLOS = ColorFgLOS - 1
+	ColorFgDark = ColorFgDark - 1
+	ColorFg = ColorFg - 1
+	ColorFgPlayer = ColorFgPlayer - 1
+	ColorFgMonster = ColorFgMonster - 1
+	ColorFgSleepingMonster = ColorFgSleepingMonster - 1
+	ColorFgWanderingMonster = ColorFgWanderingMonster - 1
+	ColorFgConfusedMonster = ColorFgConfusedMonster - 1
+	ColorFgCollectable = ColorFgCollectable - 1
+	ColorFgStairs = ColorFgStairs - 1
+	ColorFgGold = ColorFgGold - 1
+	ColorFgHPok = ColorFgHPok - 1
+	ColorFgHPwounded = ColorFgHPwounded - 1
+	ColorFgHPcritical = ColorFgHPcritical - 1
+	ColorFgMPok = ColorFgMPok - 1
+	ColorFgMPpartial = ColorFgMPpartial - 1
+	ColorFgMPcritical = ColorFgMPcritical - 1
+	ColorFgStatusGood = ColorFgStatusGood - 1
+	ColorFgStatusBad = ColorFgStatusBad - 1
+	ColorFgStatusOther = ColorFgStatusOther - 1
+	ColorFgTargetMode = ColorFgTargetMode - 1
+	ColorFgTemporalWall = ColorFgTemporalWall - 1
 }
 
 func (ui *termui) DrawWelcome() {
@@ -1070,29 +1098,6 @@ func (ui *termui) SelectRod(g *game, ev event) error {
 		ui.DrawDungeonView(g, false)
 		return noAction
 	}
-}
-
-func (ui *termui) ExploreStep(g *game) bool {
-	next := make(chan bool)
-	var stop bool
-	//if runtime.GOOS != "windows" {
-	// strange bugs it seems, cannot test myself, so disable on windows
-	// -> Enable this again, works at least on one particular windows cmd
-	go func() {
-		time.Sleep(10 * time.Millisecond)
-		ui.Interrupt()
-	}()
-	go func() {
-		err := ui.PressAnyKey()
-		interrupted := err != nil
-		next <- !interrupted
-	}()
-	stop = <-next
-	//} else {
-	//time.Sleep(10 * time.Millisecond)
-	//}
-	ui.DrawDungeonView(g, false)
-	return stop
 }
 
 func (ui *termui) Death(g *game) {

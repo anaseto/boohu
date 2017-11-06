@@ -1,4 +1,4 @@
-// +build !tcell,!ebiten
+// +build !tcell,!ebiten,!ansi
 
 package main
 
