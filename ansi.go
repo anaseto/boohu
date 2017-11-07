@@ -169,6 +169,16 @@ func (ui *termui) PressAnyKey() error {
 func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit bool) {
 	again = true
 	r := ui.ReadChar()
+	switch r {
+	case 'W':
+		ui.EnterWizard(g)
+		return nil, true, false
+	case 'Q':
+		if ui.Quit(g) {
+			return nil, false, true
+		}
+		return nil, true, false
+	}
 	err, again, quit = ui.HandleCharacter(g, ev, r)
 	if err != nil {
 		again = true
