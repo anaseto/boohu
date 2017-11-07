@@ -83,7 +83,6 @@ func (ui *termui) Init() error {
 	ui.ResetCells()
 	ui.backBuffer = make([]AnsiCell, UIWidth*UIHeigth)
 	fmt.Fprint(ui.bStdout, "\x1b[2J")
-	// TODO: stty
 	return nil
 }
 
@@ -94,7 +93,6 @@ func (ui *termui) Close() {
 }
 
 func (ui *termui) PostInit() {
-	//SolarizedPalette()
 	FixColor()
 	ui.HideCursor()
 }
@@ -114,7 +112,6 @@ func (ui *termui) Flush() {
 		cell := ui.cells[i]
 		x, y := ui.GetPos(i)
 		ui.MoveTo(x, y)
-		//fmt.Fprintf(ui.bStdout, "\x1b[%s;%sm", fgAttr, bgAttr)
 		fmt.Fprintf(ui.bStdout, "\x1b[38;5;%dm", cell.fg)
 		fmt.Fprintf(ui.bStdout, "\x1b[48;5;%dm", cell.bg)
 		ui.bStdout.WriteRune(cell.r)
@@ -136,23 +133,10 @@ func (ui *termui) HideCursor() {
 }
 
 func (ui *termui) SetCursor(pos position) {
-	//fmt.Fprintf(ui.bStdout, "\x1b[?25h")
 	ui.cursor = pos
 }
 
 func (ui *termui) SetCell(x, y int, r rune, fg, bg uicolor) {
-	//var fgAttr string
-	//if fg <= 7 {
-	//fgAttr = fmt.Sprintf("%d", fg)
-	//} else {
-	//fgAttr = fmt.Sprintf("1;%d", fg)
-	//}
-	//var bgAttr string
-	//if bg <= 7 {
-	//bgAttr = fmt.Sprintf("%d", 40+bg)
-	//} else {
-	//bgAttr = fmt.Sprintf("%d", 100+bg)
-	//}
 	i := ui.GetIndex(x, y)
 	if i >= len(ui.cells) {
 		return
