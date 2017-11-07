@@ -126,7 +126,12 @@ func (ui *termui) ReadChar() rune {
 	r, _, _ := ui.bStdin.ReadRune()
 	cmd = exec.Command("stty", string(save))
 	cmd.Stdin = os.Stdin
-	cmd.Run()
+	err = cmd.Run()
+	if err != nil {
+		cmd = exec.Command("stty", "sane")
+		cmd.Stdin = os.Stdin
+		cmd.Run()
+	}
 	return r
 }
 
