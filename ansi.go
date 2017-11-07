@@ -70,6 +70,7 @@ func (ui *termui) MoveTo(x, y int) {
 }
 
 func (ui *termui) Clear() {
+	ui.ResetCells()
 }
 
 func (ui *termui) Flush() {
@@ -86,7 +87,6 @@ func (ui *termui) Flush() {
 		fmt.Fprintf(ui.bStdout, "\x1b[0m")
 		ui.backBuffer[i] = cell
 	}
-	ui.ResetCells()
 	ui.MoveTo(ui.cursor.X, ui.cursor.Y)
 	if ui.cursor.X >= 0 && ui.cursor.Y >= 0 {
 		fmt.Fprintf(ui.bStdout, "\x1b[?25h")
