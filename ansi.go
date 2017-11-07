@@ -13,9 +13,18 @@ import (
 	termbox "github.com/nsf/termbox-go"
 )
 
+type AnsiCell struct {
+	fg uicolor
+	bg uicolor
+	r  rune
+}
+
 type termui struct {
-	bStdin  *bufio.Reader
-	bStdout *bufio.Writer
+	bStdin     *bufio.Reader
+	bStdout    *bufio.Writer
+	cells      []AnsiCell
+	backBuffer []AnsiCell
+	cursor     position
 }
 
 func WindowsPalette() {
@@ -47,43 +56,88 @@ func WindowsPalette() {
 	ColorFgTemporalWall = uicolor(termbox.ColorCyan)
 }
 
+const (
+	UIWidth  = 103
+	UIHeigth = 27
+)
+
+func (ui *termui) GetIndex(x, y int) int {
+	return y*UIWidth + x
+}
+
+func (ui *termui) GetPos(i int) (int, int) {
+	return i - (i/UIWidth)*UIWidth, i / UIWidth
+}
+
+func (ui *termui) ResetCells() {
+	for i := 0; i < len(ui.cells); i++ {
+		ui.cells[i].r = ' '
+		ui.cells[i].bg = ColorBg
+	}
+}
+
 func (ui *termui) Init() error {
 	ui.bStdin = bufio.NewReader(os.Stdin)
 	ui.bStdout = bufio.NewWriter(os.Stdout)
+	ui.cells = make([]AnsiCell, UIWidth*UIHeigth)
+	ui.ResetCells()
+	ui.backBuffer = make([]AnsiCell, UIWidth*UIHeigth)
+	fmt.Fprint(ui.bStdout, "\x1b[2J")
 	// TODO: stty
 	return nil
 }
 
 func (ui *termui) Close() {
-	// TODO: stty
+	fmt.Fprint(ui.bStdout, "\x1b[2J")
+	fmt.Fprintf(ui.bStdout, "\x1b[?25h")
+	ui.bStdout.Flush()
 }
 
 func (ui *termui) PostInit() {
 	//SolarizedPalette()
 	FixColor()
+	ui.HideCursor()
 }
 
 func (ui *termui) MoveTo(x, y int) {
-	fmt.Fprintf(ui.bStdout, "\x1b[%d;%dH", y, x)
+	fmt.Fprintf(ui.bStdout, "\x1b[%d;%dH", y+1, x+1)
 }
 
 func (ui *termui) Clear() {
-	// TODO: avoid complete clear
-	fmt.Fprintf(ui.bStdout, "\x1b[2J")
-	ui.MoveTo(1, 1)
 }
 
 func (ui *termui) Flush() {
+	for i := 0; i < len(ui.cells); i++ {
+		if ui.cells[i] == ui.backBuffer[i] {
+			continue
+		}
+		cell := ui.cells[i]
+		x, y := ui.GetPos(i)
+		ui.MoveTo(x, y)
+		//fmt.Fprintf(ui.bStdout, "\x1b[%s;%sm", fgAttr, bgAttr)
+		fmt.Fprintf(ui.bStdout, "\x1b[38;5;%dm", cell.fg)
+		fmt.Fprintf(ui.bStdout, "\x1b[48;5;%dm", cell.bg)
+		ui.bStdout.WriteRune(cell.r)
+		fmt.Fprintf(ui.bStdout, "\x1b[0m")
+		ui.backBuffer[i] = cell
+	}
+	ui.ResetCells()
+	ui.MoveTo(ui.cursor.X, ui.cursor.Y)
+	if ui.cursor.X >= 0 && ui.cursor.Y >= 0 {
+		fmt.Fprintf(ui.bStdout, "\x1b[?25h")
+	} else {
+		fmt.Fprintf(ui.bStdout, "\x1b[?25l")
+	}
 	ui.bStdout.Flush()
 }
 
 func (ui *termui) HideCursor() {
-	fmt.Fprintf(ui.bStdout, "\x1b[?25l")
+	ui.cursor = position{-1, -1}
 }
 
 func (ui *termui) SetCursor(pos position) {
-	fmt.Fprintf(ui.bStdout, "\x1b[?25h")
-	ui.MoveTo(pos.X, pos.Y)
+	//fmt.Fprintf(ui.bStdout, "\x1b[?25h")
+	ui.cursor = pos
 }
 
 func (ui *termui) SetCell(x, y int, r rune, fg, bg uicolor) {
@@ -99,21 +153,26 @@ func (ui *termui) SetCell(x, y int, r rune, fg, bg uicolor) {
 	//} else {
 	//bgAttr = fmt.Sprintf("%d", 100+bg)
 	//}
+	i := ui.GetIndex(x, y)
+	if i >= len(ui.cells) {
+		return
+	}
+	ui.cells[ui.GetIndex(x, y)] = AnsiCell{fg: fg, bg: bg, r: r}
 
-	ui.MoveTo(x, y)
-	//fmt.Fprintf(ui.bStdout, "\x1b[%s;%sm", fgAttr, bgAttr)
-	fmt.Fprintf(ui.bStdout, "\x1b[38;5;%dm", fg)
-	fmt.Fprintf(ui.bStdout, "\x1b[48;5;%dm", bg)
-	ui.bStdout.WriteRune(r)
-	fmt.Fprintf(ui.bStdout, "\x1b[0m")
 }
 
 func (ui *termui) ReadChar() rune {
-	cmd := exec.Command("stty", "raw", "-echo")
+	cmd := exec.Command("stty", "-g")
+	cmd.Stdin = os.Stdin
+	save, err := cmd.Output()
+	if err != nil {
+		save = []byte("sane")
+	}
+	cmd = exec.Command("stty", "raw", "-echo")
 	cmd.Stdin = os.Stdin
 	cmd.Run()
 	r, _, _ := ui.bStdin.ReadRune()
-	cmd = exec.Command("stty", "sane")
+	cmd = exec.Command("stty", string(save))
 	cmd.Stdin = os.Stdin
 	cmd.Run()
 	return r
@@ -130,7 +189,7 @@ loop:
 	for {
 		r := ui.ReadChar()
 		switch r {
-		case '\xb1', ' ':
+		case '\x1b', ' ':
 			break loop
 		}
 	}
@@ -168,7 +227,7 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 func (ui *termui) Scroll(n int) (m int, quit bool) {
 	r := ui.ReadChar()
 	switch r {
-	case '\xb1', ' ':
+	case '\x1b', ' ':
 		quit = true
 	case 'u':
 		n -= 12
@@ -184,7 +243,7 @@ func (ui *termui) Scroll(n int) (m int, quit bool) {
 
 func (ui *termui) TargetModeEvent(g *game, targ Targetter, pos position, data *examineData) bool {
 	r := ui.ReadChar()
-	if r == '\xb1' {
+	if r == '\x1b' || r == ' ' {
 		return true
 	}
 	return ui.CursorCharAction(g, targ, r, pos, data)
@@ -194,7 +253,7 @@ func (ui *termui) Select(g *game, ev event, l int) (index int, alternate bool, e
 	for {
 		r := ui.ReadChar()
 		switch {
-		case r == '\xb1' || r == ' ':
+		case r == '\x1b' || r == ' ':
 			return -1, false, errors.New("Ok, then.")
 		case 97 <= r && int(r) < 97+l:
 			return int(r - 97), false, nil
