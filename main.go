@@ -31,10 +31,10 @@ func main() {
 	}
 	defer tui.Close()
 
-	tui.PostInit()
 	if runtime.GOOS == "windows" {
 		WindowsPalette()
 	}
+	tui.PostInit()
 
 	tui.DrawWelcome()
 	g := &game{}

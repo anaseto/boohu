@@ -11,35 +11,6 @@ import (
 type termui struct {
 }
 
-func WindowsPalette() {
-	ColorBgLOS = uicolor(termbox.ColorWhite)
-	ColorBgDark = uicolor(termbox.ColorBlack)
-	ColorBg = uicolor(termbox.ColorBlack)
-	ColorBgCloud = uicolor(termbox.ColorWhite)
-	ColorFgLOS = uicolor(termbox.ColorBlack)
-	ColorFgDark = uicolor(termbox.ColorWhite)
-	ColorFg = uicolor(termbox.ColorWhite)
-	ColorFgPlayer = uicolor(termbox.ColorBlue)
-	ColorFgMonster = uicolor(termbox.ColorRed)
-	ColorFgSleepingMonster = uicolor(termbox.ColorCyan)
-	ColorFgWanderingMonster = uicolor(termbox.ColorMagenta)
-	ColorFgConfusedMonster = uicolor(termbox.ColorGreen)
-	ColorFgCollectable = uicolor(termbox.ColorYellow)
-	ColorFgStairs = uicolor(termbox.ColorMagenta)
-	ColorFgGold = uicolor(termbox.ColorYellow)
-	ColorFgHPok = uicolor(termbox.ColorGreen)
-	ColorFgHPwounded = uicolor(termbox.ColorYellow)
-	ColorFgHPcritical = uicolor(termbox.ColorRed)
-	ColorFgMPok = uicolor(termbox.ColorBlue)
-	ColorFgMPpartial = uicolor(termbox.ColorMagenta)
-	ColorFgMPcritical = uicolor(termbox.ColorRed)
-	ColorFgStatusGood = uicolor(termbox.ColorBlue)
-	ColorFgStatusBad = uicolor(termbox.ColorRed)
-	ColorFgStatusOther = uicolor(termbox.ColorYellow)
-	ColorFgTargetMode = uicolor(termbox.ColorCyan)
-	ColorFgTemporalWall = uicolor(termbox.ColorCyan)
-}
-
 func (ui *termui) Init() error {
 	return termbox.Init()
 }
@@ -49,6 +20,7 @@ func (ui *termui) Close() {
 }
 
 func (ui *termui) PostInit() {
+	FixColor()
 	termbox.SetOutputMode(termbox.Output256)
 	termbox.SetInputMode(termbox.InputEsc | termbox.InputMouse)
 }

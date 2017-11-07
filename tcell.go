@@ -13,35 +13,6 @@ type termui struct {
 	tcell.Screen
 }
 
-func WindowsPalette() {
-	ColorBgLOS = uicolor(tcell.ColorSilver)
-	ColorBgDark = uicolor(tcell.ColorBlack)
-	ColorBg = uicolor(tcell.ColorBlack)
-	ColorBgCloud = uicolor(tcell.ColorSilver)
-	ColorFgLOS = uicolor(tcell.ColorBlack)
-	ColorFgDark = uicolor(tcell.ColorSilver)
-	ColorFg = uicolor(tcell.ColorSilver)
-	ColorFgPlayer = uicolor(tcell.ColorNavy)
-	ColorFgMonster = uicolor(tcell.ColorMaroon)
-	ColorFgSleepingMonster = uicolor(tcell.ColorTeal)
-	ColorFgWanderingMonster = uicolor(tcell.ColorPurple)
-	ColorFgConfusedMonster = uicolor(tcell.ColorGreen)
-	ColorFgCollectable = uicolor(tcell.ColorOlive)
-	ColorFgStairs = uicolor(tcell.ColorPurple)
-	ColorFgGold = uicolor(tcell.ColorOlive)
-	ColorFgHPok = uicolor(tcell.ColorGreen)
-	ColorFgHPwounded = uicolor(tcell.ColorOlive)
-	ColorFgHPcritical = uicolor(tcell.ColorMaroon)
-	ColorFgMPok = uicolor(tcell.ColorNavy)
-	ColorFgMPpartial = uicolor(tcell.ColorPurple)
-	ColorFgMPcritical = uicolor(tcell.ColorMaroon)
-	ColorFgStatusGood = uicolor(tcell.ColorNavy)
-	ColorFgStatusBad = uicolor(tcell.ColorMaroon)
-	ColorFgStatusOther = uicolor(tcell.ColorOlive)
-	ColorFgTargetMode = uicolor(tcell.ColorTeal)
-	ColorFgTemporalWall = uicolor(tcell.ColorTeal)
-}
-
 func (ui *termui) Init() error {
 	screen, err := tcell.NewScreen()
 	ui.Screen = screen
@@ -56,7 +27,6 @@ func (ui *termui) Close() {
 }
 
 func (ui *termui) PostInit() {
-	FixColor()
 	ui.Screen.SetStyle(tcell.StyleDefault)
 	if runtime.GOOS != "openbsd" {
 		ui.Screen.EnableMouse()
