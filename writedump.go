@@ -1,4 +1,4 @@
-// +build !ebiten
+// +build !ebiten,!js
 
 package main
 

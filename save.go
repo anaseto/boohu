@@ -1,26 +1,13 @@
-// +build !ebiten
+// +build !ebiten,!js
 
 package main
 
 import (
-	"bytes"
-	"encoding/gob"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 )
-
-func init() {
-	gob.Register(potion(0))
-	gob.Register(projectile(0))
-	gob.Register(&simpleEvent{})
-	gob.Register(&monsterEvent{})
-	gob.Register(&cloudEvent{})
-	gob.Register(armour(0))
-	gob.Register(weapon(0))
-	gob.Register(shield(0))
-}
 
 func (g *game) DataDir() (string, error) {
 	var xdg string
@@ -50,14 +37,12 @@ func (g *game) Save() error {
 		return err
 	}
 	saveFile := filepath.Join(dataDir, "save.gob")
-	var data bytes.Buffer
-	enc := gob.NewEncoder(&data)
-	err = enc.Encode(g)
+	data, err := g.GameSave()
 	if err != nil {
 		g.Print(err.Error())
 		return err
 	}
-	err = ioutil.WriteFile(saveFile, data.Bytes(), 0644)
+	err = ioutil.WriteFile(saveFile, data, 0644)
 	if err != nil {
 		g.Print(err.Error())
 		return err
@@ -96,13 +81,10 @@ func (g *game) Load() (bool, error) {
 	if err != nil {
 		return true, err
 	}
-	buf := bytes.NewBuffer(data)
-	dec := gob.NewDecoder(buf)
-	var lg game
-	err = dec.Decode(&lg)
+	lg, err := g.DecodeGameSave(data)
 	if err != nil {
 		return true, err
 	}
-	*g = lg
+	*g = *lg
 	return true, nil
 }
