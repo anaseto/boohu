@@ -5,16 +5,28 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
 	"runtime"
+	"runtime/pprof"
 )
 
 var Version string = "v0.4"
 
 func main() {
+	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to `file`")
 	opt := flag.Bool("s", false, "Use true 16-uicolor solarized palette")
 	optVersion := flag.Bool("v", false, "print version number")
 	flag.Parse()
+	if *cpuprofile != "" {
+		// profiling
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
+	}
 	if *opt {
 		SolarizedPalette()
 	}

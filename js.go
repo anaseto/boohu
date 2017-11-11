@@ -5,26 +5,87 @@
 package main
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"log"
+	"strings"
 	"time"
+
+	"github.com/gopherjs/gopherjs/js"
 )
 
-type AnsiCell struct {
+var Version string = "v0.4"
+
+func main() {
+	tui := &termui{}
+	err := tui.Init()
+	if err != nil {
+		log.Fatal("boohu: %v\n", err)
+	}
+	defer tui.Close()
+
+	tui.PostInit()
+
+	tui.DrawWelcome()
+	g := &game{}
+	//load, err := g.Load()
+	//if !load {
+	//g.InitLevel()
+	//} else if err != nil {
+	//g.InitLevel()
+	//g.Print("Error loading saved game… starting new game.")
+	//}
+	g.InitLevel()
+	g.ui = tui
+	g.EventLoop()
+}
+
+// io compatibility functions
+
+func (g *game) DataDir() (string, error) {
+	return "", nil
+}
+
+func (g *game) Save() error {
+	return nil
+}
+
+func (g *game) RemoveSaveFile() error {
+	return nil
+}
+
+func (g *game) Load() (bool, error) {
+	return false, nil
+}
+
+func (g *game) WriteDump() error {
+	return nil
+}
+
+// End of io compatibility functions
+
+type UICell struct {
 	fg uicolor
 	bg uicolor
 	r  rune
 }
 
+func (c uicolor) String() string {
+	// TODO
+	return "color"
+}
+
 type termui struct {
-	cells      []AnsiCell
-	backBuffer []AnsiCell
-	cursor     position
+	cells  []UICell
+	cursor position
 }
 
 const (
-	UIWidth  = 103
+	UIWidth = 103
+	//UIWidth = 10
 	UIHeigth = 27
+	//UIHeigth = 5
 )
 
 func (ui *termui) GetIndex(x, y int) int {
@@ -42,26 +103,36 @@ func (ui *termui) ResetCells() {
 	}
 }
 
+var ch chan string
+var wants chan bool
+
+func init() {
+	ch = make(chan string)
+	wants = make(chan bool)
+}
+
 func (ui *termui) Init() error {
-	ui.cells = make([]AnsiCell, UIWidth*UIHeigth)
+	ui.cells = make([]UICell, UIWidth*UIHeigth)
+	js.Global.Get("document").Call("addEventListener", "keypress", func(e *js.Object) {
+		select {
+		case <-wants:
+			s := e.Get("key").String()
+			ch <- s
+		default:
+		}
+	})
 	ui.ResetCells()
-	ui.backBuffer = make([]AnsiCell, UIWidth*UIHeigth)
-	fmt.Fprint(ui.bStdout, "\x1b[2J")
+	js.Global.Get("document").Call("getElementById", "game").Set("innerHTML", "game screen")
+	// TODO: init pre?
 	return nil
 }
 
 func (ui *termui) Close() {
-	fmt.Fprint(ui.bStdout, "\x1b[2J")
-	fmt.Fprintf(ui.bStdout, "\x1b[?25h")
-	ui.bStdout.Flush()
+	// TODO
 }
 
 func (ui *termui) PostInit() {
 	ui.HideCursor()
-}
-
-func (ui *termui) MoveTo(x, y int) {
-	fmt.Fprintf(ui.bStdout, "\x1b[%d;%dH", y+1, x+1)
 }
 
 func (ui *termui) Clear() {
@@ -69,26 +140,26 @@ func (ui *termui) Clear() {
 }
 
 func (ui *termui) Flush() {
+	buf := &bytes.Buffer{}
 	for i := 0; i < len(ui.cells); i++ {
-		if ui.cells[i] == ui.backBuffer[i] {
-			continue
-		}
 		cell := ui.cells[i]
-		x, y := ui.GetPos(i)
-		ui.MoveTo(x, y)
-		fmt.Fprintf(ui.bStdout, "\x1b[38;5;%dm", cell.fg)
-		fmt.Fprintf(ui.bStdout, "\x1b[48;5;%dm", cell.bg)
-		ui.bStdout.WriteRune(cell.r)
-		fmt.Fprintf(ui.bStdout, "\x1b[0m")
-		ui.backBuffer[i] = cell
+		// TODO: print newlines and html markup
+		if i%UIWidth == 0 {
+			fmt.Fprintf(buf, "\n")
+		}
+		if cell.r == ' ' {
+			cell.r = ' '
+		}
+		//fmt.Fprintf(buf, "<span class=\"%s %s\">%c</span>", cell.fg, cell.bg, cell.r)
+		fmt.Fprintf(buf, "%c", cell.r)
 	}
-	ui.MoveTo(ui.cursor.X, ui.cursor.Y)
-	if ui.cursor.X >= 0 && ui.cursor.Y >= 0 {
-		fmt.Fprintf(ui.bStdout, "\x1b[?25h")
-	} else {
-		fmt.Fprintf(ui.bStdout, "\x1b[?25l")
-	}
-	ui.bStdout.Flush()
+	//ui.MoveTo(ui.cursor.X, ui.cursor.Y)
+	//if ui.cursor.X >= 0 && ui.cursor.Y >= 0 {
+	//fmt.Fprintf(buf, "\x1b[?25h")
+	//} else {
+	//fmt.Fprintf(buf, "\x1b[?25l")
+	//}
+	js.Global.Get("document").Call("getElementById", "game").Set("innerHTML", buf.String())
 }
 
 func (ui *termui) HideCursor() {
@@ -104,13 +175,14 @@ func (ui *termui) SetCell(x, y int, r rune, fg, bg uicolor) {
 	if i >= len(ui.cells) {
 		return
 	}
-	ui.cells[ui.GetIndex(x, y)] = AnsiCell{fg: fg, bg: bg, r: r}
-
+	ui.cells[ui.GetIndex(x, y)] = UICell{fg: fg, bg: bg, r: r}
 }
 
 func (ui *termui) ReadChar() rune {
-	// TODO
-	r, _, _ := ui.bStdin.ReadRune()
+	wants <- true
+	s := <-ch
+	bs := strings.NewReader(s)
+	r, _, _ := bs.ReadRune()
 	return r
 }
 
