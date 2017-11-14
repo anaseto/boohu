@@ -5,9 +5,7 @@
 package main
 
 import (
-	"bytes"
 	"errors"
-	"fmt"
 	"log"
 	"strings"
 	"time"
@@ -115,6 +113,9 @@ type termui struct {
 	backBuffer []UICell
 	cursor     position
 	display    *js.Object
+	cache      map[UICell]*js.Object
+	ctx        *js.Object
+	width      int
 }
 
 const (
@@ -159,12 +160,12 @@ func (ui *termui) Init() error {
 	})
 	ui.ResetCells()
 	ui.backBuffer = make([]UICell, UIWidth*UIHeight)
-	//ui.display = js.Global.Get("ROT").Call("Display", map[string]int{"width": UIWidth, "height": UIHeight})
-	//ui.display = js.Global.Get("ROT").Call("Display")
-	//container := ui.display.Call("getContainer")
-	//js.Global.Get("document").Get("body").Call("appendChild", container)
-	//ui.display.Call("draw", 5, 4, "@")
-	// TODO: init pre?
+	canvas := js.Global.Get("document").Call("getElementById", "gamecanvas")
+	ui.ctx = canvas.Call("getContext", "2d")
+	ui.ctx.Set("font", "12px monospace")
+	mesure := ui.ctx.Call("measureText", "W")
+	ui.width = mesure.Get("width").Int() + 1
+	ui.cache = make(map[UICell]*js.Object)
 	return nil
 }
 
@@ -181,44 +182,38 @@ func (ui *termui) Clear() {
 	ui.ResetCells()
 }
 
+func (ui *termui) Draw(cell UICell, x, y int) {
+	var canvas *js.Object
+	if cv, ok := ui.cache[cell]; ok {
+		canvas = cv
+	} else {
+		canvas = js.Global.Get("document").Call("createElement", "canvas")
+		ctx := canvas.Call("getContext", "2d")
+		canvas.Set("width", ui.width)
+		canvas.Set("height", 17)
+		ctx.Set("font", ui.ctx.Get("font"))
+		ctx.Set("fillStyle", cell.bg.String())
+		ctx.Call("fillRect", 0, 0, ui.width, 17)
+		ctx.Set("fillStyle", cell.fg.String())
+		ctx.Call("fillText", string(cell.r), 0, 12)
+		ui.cache[cell] = canvas
+	}
+	ui.ctx.Call("drawImage", canvas, x*ui.width, 17*y)
+}
+
 func (ui *termui) Flush() {
-	buf := &bytes.Buffer{}
-	canvas := js.Global.Get("document").Call("getElementById", "gamecanvas")
-	ctx := canvas.Call("getContext", "2d")
-	ctx.Set("font", "12px monospace")
-	mesure := ctx.Call("measureText", "W")
-	width := mesure.Get("width").Int() + 1
-	//height := mesure.Get("height")
-	//ctx.Set("fillStyle", "#002b36")
-	//ctx.Call("fillRect", 0, 0, UIWidth*10, UIHeight*10)
 	for i := 0; i < len(ui.cells); i++ {
 		if ui.cells[i] == ui.backBuffer[i] {
 			continue
 		}
 		cell := ui.cells[i]
-		// TODO: print newlines and html markup
-		if i%UIWidth == 0 {
-			fmt.Fprintf(buf, "\n")
-		}
 		if cell.r == ' ' {
 			cell.r = ' '
 		}
 		x, y := ui.GetPos(i)
-		ctx.Set("fillStyle", cell.bg.String())
-		ctx.Call("fillRect", width*x, 17*y, width, 17)
-		ctx.Set("fillStyle", cell.fg.String())
-		ctx.Call("fillText", string(cell.r), width*x, 17*y+12)
-		//ui.display.Call("draw", x, y, string(cell.r))
+		ui.Draw(cell, x, y)
 		ui.backBuffer[i] = cell
 	}
-	//ui.MoveTo(ui.cursor.X, ui.cursor.Y)
-	//if ui.cursor.X >= 0 && ui.cursor.Y >= 0 {
-	//fmt.Fprintf(buf, "\x1b[?25h")
-	//} else {
-	//fmt.Fprintf(buf, "\x1b[?25l")
-	//}
-	//ctx.Call("fillText", buf.String(), 10, 10)
-	//js.Global.Get("document").Call("getElementById", "game").Set("innerHTML", buf.String())
 }
 
 func (ui *termui) HideCursor() {
@@ -246,7 +241,7 @@ func (ui *termui) ReadChar() rune {
 }
 
 func (ui *termui) ExploreStep(g *game) bool {
-	time.Sleep(10 * time.Millisecond)
+	time.Sleep(5 * time.Millisecond)
 	ui.DrawDungeonView(g, false)
 	return false
 }
