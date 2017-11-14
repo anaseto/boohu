@@ -67,6 +67,7 @@ func SolarizedPalette() {
 	ColorFgStatusGood = 4
 	ColorFgStatusBad = 1
 	ColorFgStatusOther = 3
+	ColorFgExcluded = 1
 	ColorFgTargetMode = 6
 	ColorFgTemporalWall = 6
 }
@@ -96,6 +97,7 @@ func FixColor() {
 	ColorFgStatusGood = ColorFgStatusGood + 1
 	ColorFgStatusBad = ColorFgStatusBad + 1
 	ColorFgStatusOther = ColorFgStatusOther + 1
+	ColorFgExcluded = ColorFgExcluded + 1
 	ColorFgTargetMode = ColorFgTargetMode + 1
 	ColorFgTemporalWall = ColorFgTemporalWall + 1
 }
