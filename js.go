@@ -29,14 +29,16 @@ func main() {
 	g := &game{}
 	//load, err := g.Load()
 	//if !load {
-	//g.InitLevel()
+	g.InitLevel()
 	//} else if err != nil {
 	//g.InitLevel()
-	//g.Print("Error loading saved game… starting new game.")
+	//g.Printf("Error loading saved game… starting new game. (%v)", err)
 	//}
-	g.InitLevel()
 	g.ui = tui
 	g.EventLoop()
+	tui.Clear()
+	tui.DrawText("Refresh the page to start again", 0, 0)
+	tui.Flush()
 }
 
 // io compatibility functions
@@ -46,18 +48,46 @@ func (g *game) DataDir() (string, error) {
 }
 
 func (g *game) Save() error {
+	//save, err := g.GameSave()
+	//if err != nil {
+	//return err
+	//}
+	//storage := js.Global.Get("localStorage")
+	//if !storage.Bool() {
+	//return errors.New("localStorage not found")
+	//}
+	//storage.Call("setItem", "boohusave", string(save))
 	return nil
 }
 
 func (g *game) RemoveSaveFile() error {
+	//storage := js.Global.Get("localStorage")
+	//storage.Call("removeItem", "boohusave")
 	return nil
 }
 
 func (g *game) Load() (bool, error) {
-	return false, nil
+	//storage := js.Global.Get("localStorage")
+	//if !storage.Bool() {
+	//return true, errors.New("localStorage not found")
+	//}
+	//save := storage.Call("getItem", "boohusave")
+	//if !save.Bool() {
+	//return false, nil
+	//}
+	//// XXX: this fails with unsigned integer out of range… (saving disabled
+	//// for now)
+	//lg, err := g.DecodeGameSave([]byte(save.String()))
+	//if err != nil {
+	//return true, err
+	//}
+	//*g = *lg
+	return true, nil
 }
 
 func (g *game) WriteDump() error {
+	//storage := js.Global.Get("localStorage")
+	//storage.Call("setItem", "boohudump", g.Dump())
 	return nil
 }
 
@@ -280,17 +310,17 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 	again = true
 	r := ui.ReadChar()
 	switch r {
-	case 'S', 'Q', '#':
-		err = errors.New("Command not available (still) for the js version.")
-		return nil, true, false
+	case 'S':
+		err = errors.New("Command not available (still) for the web html5 version.")
+		return err, true, false
 	case 'W':
 		ui.EnterWizard(g)
 		return nil, true, false
-		//case 'Q':
-		//if ui.Quit(g) {
-		//return nil, false, true
-		//}
-		//return nil, true, false
+	case 'Q':
+		if ui.Quit(g) {
+			return nil, false, true
+		}
+		return nil, true, false
 	}
 	err, again, quit = ui.HandleCharacter(g, ev, r)
 	if err != nil {
