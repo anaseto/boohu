@@ -1,7 +1,5 @@
 // +build js
 
-// TODO: adapt this from ansi.go for js
-
 package main
 
 import (
