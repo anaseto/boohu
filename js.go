@@ -190,7 +190,7 @@ func (ui *termui) Init() error {
 	ui.backBuffer = make([]UICell, UIWidth*UIHeight)
 	canvas := js.Global.Get("document").Call("getElementById", "gamecanvas")
 	ui.ctx = canvas.Call("getContext", "2d")
-	ui.ctx.Set("font", "12px monospace")
+	ui.ctx.Set("font", "18px monospace")
 	mesure := ui.ctx.Call("measureText", "W")
 	ui.width = mesure.Get("width").Int() + 1
 	ui.cache = make(map[UICell]*js.Object)
@@ -218,15 +218,15 @@ func (ui *termui) Draw(cell UICell, x, y int) {
 		canvas = js.Global.Get("document").Call("createElement", "canvas")
 		ctx := canvas.Call("getContext", "2d")
 		canvas.Set("width", ui.width)
-		canvas.Set("height", 17)
+		canvas.Set("height", 22)
 		ctx.Set("font", ui.ctx.Get("font"))
 		ctx.Set("fillStyle", cell.bg.String())
-		ctx.Call("fillRect", 0, 0, ui.width, 17)
+		ctx.Call("fillRect", 0, 0, ui.width, 22)
 		ctx.Set("fillStyle", cell.fg.String())
-		ctx.Call("fillText", string(cell.r), 0, 12)
+		ctx.Call("fillText", string(cell.r), 0, 18)
 		ui.cache[cell] = canvas
 	}
-	ui.ctx.Call("drawImage", canvas, x*ui.width, 17*y)
+	ui.ctx.Call("drawImage", canvas, x*ui.width, 22*y)
 }
 
 func (ui *termui) Flush() {
