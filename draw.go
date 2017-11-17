@@ -327,7 +327,7 @@ func (ui *termui) HandleCharacter(g *game, ev event, c rune) (err error, again b
 			err = errors.New("Unknown key. Type ? for help.")
 		}
 	default:
-		err = errors.New("Unknown key. Type ? for help.")
+		err = fmt.Errorf("Unknown key '%c'. Type ? for help.", c)
 	}
 	return err, again, quit
 }

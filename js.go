@@ -279,7 +279,7 @@ loop:
 	for {
 		r := ui.ReadChar()
 		switch r {
-		case '\x1b', ' ':
+		case '\x1b', 'E', ' ':
 			break loop
 		}
 	}
@@ -330,7 +330,7 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 func (ui *termui) Scroll(n int) (m int, quit bool) {
 	r := ui.ReadChar()
 	switch r {
-	case '\x1b', ' ':
+	case '\x1b', 'E', ' ':
 		quit = true
 	case 'u':
 		n -= 12
@@ -346,7 +346,7 @@ func (ui *termui) Scroll(n int) (m int, quit bool) {
 
 func (ui *termui) TargetModeEvent(g *game, targ Targetter, pos position, data *examineData) bool {
 	r := ui.ReadChar()
-	if r == '\x1b' || r == ' ' {
+	if r == '\x1b' || r == 'E' || r == ' ' {
 		return true
 	}
 	return ui.CursorCharAction(g, targ, r, pos, data)
@@ -356,7 +356,7 @@ func (ui *termui) Select(g *game, ev event, l int) (index int, alternate bool, e
 	for {
 		r := ui.ReadChar()
 		switch {
-		case r == '\x1b' || r == ' ':
+		case r == '\x1b' || r == 'E' || r == ' ':
 			return -1, false, errors.New("Ok, then.")
 		case 97 <= r && int(r) < 97+l:
 			return int(r - 97), false, nil
