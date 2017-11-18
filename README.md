@@ -18,7 +18,7 @@ Screenshot
 Install
 -------
 
-You can found binaries in the [realeases
+You can found binaries in the [releases
 page](https://github.com/anaseto/boohu/releases).
 
 You can also build from sources by following these steps:
