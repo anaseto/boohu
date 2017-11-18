@@ -18,6 +18,11 @@ Screenshot
 Install
 -------
 
+You can found binaries in the [realeases
+page](https://github.com/anaseto/boohu/releases).
+
+You can also build from sources by following these steps:
+
 + Install the [go compiler](https://golang.org/).
 + Set `$GOPATH` variable (for example `export GOPATH=$HOME/go`).
 + Add `$GOPATH/bin` to your `$PATH` (for example `export PATH="$PATH:$GOPATH/bin"`).
