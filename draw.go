@@ -15,6 +15,7 @@ type uicolor int
 var (
 	ColorBgLOS              uicolor = 230
 	ColorBgDark             uicolor = 234
+	ColorBgBorder           uicolor = 235
 	ColorBg                 uicolor = 234
 	ColorBgCloud            uicolor = 235
 	ColorFgLOS              uicolor = 241
@@ -45,6 +46,7 @@ var (
 func SolarizedPalette() {
 	ColorBgLOS = 15
 	ColorBgDark = 8
+	ColorBgBorder = 0
 	ColorBg = 8
 	ColorBgCloud = 7
 	ColorFgLOS = 11
@@ -75,6 +77,7 @@ func SolarizedPalette() {
 func FixColor() {
 	ColorBgLOS = ColorBgLOS + 1
 	ColorBgDark = ColorBgDark + 1
+	ColorBgBorder = ColorBgBorder + 1
 	ColorBg = ColorBg + 1
 	ColorBgCloud = ColorBgCloud + 1
 	ColorFgLOS = ColorFgLOS + 1
@@ -116,6 +119,7 @@ const (
 func WindowsPalette() {
 	ColorBgLOS = Silver
 	ColorBgDark = Black
+	ColorBgBorder = Black
 	ColorBg = Black
 	ColorBgCloud = Silver
 	ColorFgLOS = Black
@@ -791,7 +795,7 @@ func (ui *termui) DrawDungeonView(g *game, targetting bool) {
 			if ui.InViewBorder(g, pos, targetting) && g.Dungeon.Border(pos) {
 				for _, opos := range g.Dungeon.OutsideNeighbors(pos) {
 					xo, yo := ui.CameraOffset(g, opos, targetting)
-					ui.SetCell(xo, yo, '█', ColorFg, ColorBg)
+					ui.SetCell(xo, yo, '#', ColorFg, ColorBgBorder)
 				}
 			}
 		} else {
