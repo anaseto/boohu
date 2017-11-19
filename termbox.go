@@ -9,6 +9,7 @@ import (
 )
 
 type termui struct {
+	cursor position
 }
 
 func (ui *termui) Init() error {
@@ -23,6 +24,8 @@ func (ui *termui) PostInit() {
 	FixColor()
 	termbox.SetOutputMode(termbox.Output256)
 	termbox.SetInputMode(termbox.InputEsc | termbox.InputMouse)
+	termbox.HideCursor()
+	ui.HideCursor()
 }
 
 func (ui *termui) Clear() {
@@ -38,11 +41,11 @@ func (ui *termui) Interrupt() {
 }
 
 func (ui *termui) HideCursor() {
-	termbox.HideCursor()
+	ui.cursor = position{-1, -1}
 }
 
 func (ui *termui) SetCursor(pos position) {
-	termbox.SetCursor(pos.X, pos.Y)
+	ui.cursor = pos
 }
 
 func (ui *termui) SetCell(x, y int, r rune, fg, bg uicolor) {

@@ -38,6 +38,21 @@ func (d *dungeon) Valid(pos position) bool {
 	return pos.X < d.Width && pos.Y < d.Heigth && pos.X >= 0 && pos.Y >= 0
 }
 
+func (d *dungeon) Border(pos position) bool {
+	return pos.X == d.Width-1 || pos.Y == d.Heigth-1 || pos.X == 0 || pos.Y == 0
+}
+
+func (d *dungeon) OutsideNeighbors(pos position) []position {
+	neighbors := [8]position{pos.E(), pos.W(), pos.N(), pos.S(), pos.NE(), pos.NW(), pos.SE(), pos.SW()}
+	outsideNeighbors := []position{}
+	for _, npos := range neighbors {
+		if !d.Valid(npos) {
+			outsideNeighbors = append(outsideNeighbors, npos)
+		}
+	}
+	return outsideNeighbors
+}
+
 func (d *dungeon) SetCell(pos position, t terrain) {
 	d.Cells[pos.Y*d.Width+pos.X].T = t
 }

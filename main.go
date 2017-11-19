@@ -17,6 +17,7 @@ func main() {
 	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to `file`")
 	opt := flag.Bool("s", false, "Use true 16-uicolor solarized palette")
 	optVersion := flag.Bool("v", false, "print version number")
+	optCenteredCamera := flag.Bool("c", false, "centered camera")
 	flag.Parse()
 	if *cpuprofile != "" {
 		// profiling
@@ -33,6 +34,9 @@ func main() {
 	if *optVersion {
 		fmt.Println(Version)
 		os.Exit(0)
+	}
+	if *optCenteredCamera {
+		CenteredCamera = true
 	}
 
 	tui := &termui{}

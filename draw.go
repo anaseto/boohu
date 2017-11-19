@@ -743,6 +743,29 @@ func (ui *termui) MonsterInfo(m *monster) string {
 	return strings.Join(infos, ", ")
 }
 
+var CenteredCamera bool
+
+func (ui *termui) InView(g *game, pos position, targetting bool) bool {
+	if targetting {
+		return pos.DistanceY(ui.cursor) <= 10 && pos.DistanceX(ui.cursor) <= 39
+	}
+	return pos.DistanceY(g.Player.Pos) <= 10 && pos.DistanceX(g.Player.Pos) <= 39
+}
+
+func (ui *termui) CameraOffset(g *game, pos position, targetting bool) (int, int) {
+	if targetting {
+		return pos.X + 39 - ui.cursor.X, pos.Y + 10 - ui.cursor.Y
+	}
+	return pos.X + 39 - g.Player.Pos.X, pos.Y + 10 - g.Player.Pos.Y
+}
+
+func (ui *termui) InViewBorder(g *game, pos position, targetting bool) bool {
+	if targetting {
+		return pos.DistanceY(ui.cursor) != 10 && pos.DistanceX(ui.cursor) != 39
+	}
+	return pos.DistanceY(g.Player.Pos) != 10 && pos.DistanceX(g.Player.Pos) != 39
+}
+
 func (ui *termui) DrawDungeonView(g *game, targetting bool) {
 	ui.Clear()
 	m := g.Dungeon
@@ -755,7 +778,25 @@ func (ui *termui) DrawDungeonView(g *game, targetting bool) {
 	ui.SetCell(g.Dungeon.Width, g.Dungeon.Heigth, '┘', ColorFg, ColorBg)
 	for i := range m.Cells {
 		pos := m.CellPosition(i)
-		ui.DrawPosition(g, pos)
+		r, fgColor, bgColor := ui.PositionDrawing(g, pos)
+		if g.Highlight[pos] || pos == ui.cursor {
+			bgColor, fgColor = fgColor, bgColor
+		}
+		if CenteredCamera {
+			if !ui.InView(g, pos, targetting) {
+				continue
+			}
+			x, y := ui.CameraOffset(g, pos, targetting)
+			ui.SetCell(x, y, r, fgColor, bgColor)
+			if ui.InViewBorder(g, pos, targetting) && g.Dungeon.Border(pos) {
+				for _, opos := range g.Dungeon.OutsideNeighbors(pos) {
+					xo, yo := ui.CameraOffset(g, opos, targetting)
+					ui.SetCell(xo, yo, '█', ColorFg, ColorBg)
+				}
+			}
+		} else {
+			ui.SetCell(pos.X, pos.Y, r, fgColor, bgColor)
+		}
 	}
 	ui.DrawText(fmt.Sprintf("[ %v (%d)", g.Player.Armour, g.Player.Armor()), 81, 0)
 	ui.DrawText(fmt.Sprintf(") %v (%d)", g.Player.Weapon, g.Player.Attack()), 81, 1)
@@ -775,31 +816,39 @@ func (ui *termui) DrawDungeonView(g *game, targetting bool) {
 	ui.Flush()
 }
 
-func (ui *termui) DrawPosition(g *game, pos position) {
+func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgColor uicolor) {
 	m := g.Dungeon
 	c := m.Cell(pos)
+	fgColor = ColorFg
+	bgColor = ColorBg
 	if !c.Explored && !g.Wizard {
+		r = ' '
 		if g.HasFreeExploredNeighbor(pos) {
-			ui.SetCell(pos.X, pos.Y, '¤', ColorFgDark, ColorBgDark)
+			r = '¤'
+			fgColor = ColorFgDark
+			bgColor = ColorBgDark
 		}
 		if g.Noise[pos] {
-			ui.SetCell(pos.X, pos.Y, '♫', ColorFgWanderingMonster, ColorBgDark)
+			r = '♫'
+			fgColor = ColorFgWanderingMonster
+			bgColor = ColorBgDark
 		}
 		return
 	}
 	if g.Wizard {
 		if !c.Explored && g.HasFreeExploredNeighbor(pos) {
-			ui.SetCell(pos.X, pos.Y, '¤', ColorFgDark, ColorBgDark)
+			r = '¤'
+			fgColor = ColorFgDark
+			bgColor = ColorBgDark
 			return
 		}
 		if c.T == WallCell {
 			if len(g.Dungeon.FreeNeighbors(pos)) == 0 {
+				r = ' '
 				return
 			}
 		}
 	}
-	fgColor := ColorFg
-	bgColor := ColorBg
 	if g.Player.LOS[pos] {
 		fgColor = ColorFgLOS
 		bgColor = ColorBgLOS
@@ -813,7 +862,6 @@ func (ui *termui) DrawPosition(g *game, pos position) {
 	if g.ExclusionsMap[pos] {
 		fgColor = ColorFgExcluded
 	}
-	var r rune
 	switch c.T {
 	case WallCell:
 		r = '#'
@@ -879,10 +927,7 @@ func (ui *termui) DrawPosition(g *game, pos position) {
 			}
 		}
 	}
-	if g.Highlight[pos] {
-		bgColor, fgColor = fgColor, bgColor
-	}
-	ui.SetCell(pos.X, pos.Y, r, fgColor, bgColor)
+	return
 }
 
 func (ui *termui) DrawStatusLine(g *game) {

@@ -11,6 +11,7 @@ import (
 
 type termui struct {
 	tcell.Screen
+	cursor position
 }
 
 func (ui *termui) Init() error {
@@ -31,6 +32,8 @@ func (ui *termui) PostInit() {
 	if runtime.GOOS != "openbsd" {
 		ui.Screen.EnableMouse()
 	}
+	ui.Screen.HideCursor()
+	ui.HideCursor()
 }
 
 func (ui *termui) Clear() {
@@ -54,11 +57,11 @@ func (ui *termui) Interrupt() {
 }
 
 func (ui *termui) HideCursor() {
-	ui.Screen.ShowCursor(-1, -1)
+	ui.cursor = position{-1, -1}
 }
 
 func (ui *termui) SetCursor(pos position) {
-	ui.Screen.ShowCursor(pos.X, pos.Y)
+	ui.cursor = pos
 }
 
 func (ui *termui) SetCell(x, y int, r rune, fg, bg uicolor) {

@@ -46,6 +46,16 @@ func (pos position) Distance(to position) int {
 	return deltaY
 }
 
+func (pos position) DistanceX(to position) int {
+	deltaX := Abs(to.X - pos.X)
+	return deltaX
+}
+
+func (pos position) DistanceY(to position) int {
+	deltaY := Abs(to.Y - pos.Y)
+	return deltaY
+}
+
 type direction int
 
 const (
