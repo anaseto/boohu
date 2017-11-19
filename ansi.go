@@ -23,6 +23,7 @@ type termui struct {
 	cells      []AnsiCell
 	backBuffer []AnsiCell
 	cursor     position
+	stty       string
 }
 
 const (
@@ -59,11 +60,29 @@ func (ui *termui) Close() {
 	fmt.Fprint(ui.bStdout, "\x1b[2J")
 	fmt.Fprintf(ui.bStdout, "\x1b[?25h")
 	ui.bStdout.Flush()
+	cmd := exec.Command("stty", ui.stty)
+	cmd.Stdin = os.Stdin
+	err := cmd.Run()
+	if err != nil {
+		cmd = exec.Command("stty", "sane")
+		cmd.Stdin = os.Stdin
+		cmd.Run()
+	}
 }
 
 func (ui *termui) PostInit() {
 	ui.HideCursor()
 	fmt.Fprintf(ui.bStdout, "\x1b[?25l")
+	cmd := exec.Command("stty", "-g")
+	cmd.Stdin = os.Stdin
+	save, err := cmd.Output()
+	if err != nil {
+		save = []byte("sane")
+	}
+	ui.stty = string(save)
+	cmd = exec.Command("stty", "raw", "-echo")
+	cmd.Stdin = os.Stdin
+	cmd.Run()
 }
 
 func (ui *termui) MoveTo(x, y int) {
@@ -110,24 +129,7 @@ func (ui *termui) SetCell(x, y int, r rune, fg, bg uicolor) {
 }
 
 func (ui *termui) ReadChar() rune {
-	cmd := exec.Command("stty", "-g")
-	cmd.Stdin = os.Stdin
-	save, err := cmd.Output()
-	if err != nil {
-		save = []byte("sane")
-	}
-	cmd = exec.Command("stty", "raw", "-echo")
-	cmd.Stdin = os.Stdin
-	cmd.Run()
 	r, _, _ := ui.bStdin.ReadRune()
-	cmd = exec.Command("stty", string(save))
-	cmd.Stdin = os.Stdin
-	err = cmd.Run()
-	if err != nil {
-		cmd = exec.Command("stty", "sane")
-		cmd.Stdin = os.Stdin
-		cmd.Run()
-	}
 	return r
 }
 
