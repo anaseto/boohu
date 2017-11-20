@@ -69,6 +69,7 @@ func Dijkstra(dij Dijkstrer, sources []position, maxCost int) nodeMap {
 				neighborNode.Cost = cost
 				if cost < maxCost {
 					neighborNode.Open = true
+					neighborNode.Rank = cost
 					heap.Push(nq, neighborNode)
 				}
 			}
