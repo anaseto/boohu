@@ -132,10 +132,10 @@ func (sev *simpleEvent) Action(g *game) {
 		g.Player.Statuses[StatusLignification]--
 		g.Player.HP -= int(10 * g.Player.HP / Max(g.Player.HPMax(), g.Player.HP))
 		if g.Player.Statuses[StatusLignification] == 0 {
-			g.PrintStyled("Your feel no longer attached to the ground.", logStatusEnd)
+			g.PrintStyled("You feel no longer attached to the ground.", logStatusEnd)
 		}
 	case ConfusionEnd:
-		g.PrintStyled("Your feel no longer confused.", logStatusEnd)
+		g.PrintStyled("You feel no longer confused.", logStatusEnd)
 		g.Player.Statuses[StatusConfusion]--
 	case NauseaEnd:
 		g.PrintStyled("You feel no longer sick.", logStatusEnd)
