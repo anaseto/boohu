@@ -472,7 +472,7 @@ func (ui *termui) AptitudesText(g *game) string {
 	return text
 }
 
-func (ui *termui) DescribePosition(g *game, pos position, targ Targetter) {
+func (ui *termui) DescribePosition(g *game, pos position, targ Targeter) {
 	mons, _ := g.MonsterAt(pos)
 	c, okCollectable := g.Collectables[pos]
 	eq, okEq := g.Equipables[pos]
@@ -526,7 +526,7 @@ func (ui *termui) Examine(g *game, start *position) bool {
 	return ex.done
 }
 
-func (ui *termui) ChooseTarget(g *game, targ Targetter) bool {
+func (ui *termui) ChooseTarget(g *game, targ Targeter) bool {
 	err := ui.CursorAction(g, targ, nil)
 	if err != nil {
 		g.Print(err.Error())
@@ -594,7 +594,7 @@ func (ui *termui) ExcludeZone(g *game, pos position) {
 	}
 }
 
-func (ui *termui) CursorMouseLeft(g *game, targ Targetter, pos position) bool {
+func (ui *termui) CursorMouseLeft(g *game, targ Targeter, pos position) bool {
 	err := targ.Action(g, pos)
 	if err != nil {
 		g.Print(err.Error())
@@ -604,7 +604,7 @@ func (ui *termui) CursorMouseLeft(g *game, targ Targetter, pos position) bool {
 	return false
 }
 
-func (ui *termui) CursorCharAction(g *game, targ Targetter, r rune, pos position, data *examineData) bool {
+func (ui *termui) CursorCharAction(g *game, targ Targeter, r rune, pos position, data *examineData) bool {
 	switch r {
 	case 'h', '4', 'l', '6', 'j', '2', 'k', '8',
 		'y', '7', 'b', '1', 'u', '9', 'n', '3':
@@ -665,7 +665,7 @@ type examineData struct {
 	stairIndex   int
 }
 
-func (ui *termui) CursorAction(g *game, targ Targetter, start *position) error {
+func (ui *termui) CursorAction(g *game, targ Targeter, start *position) error {
 	pos := g.Player.Pos
 	if start != nil {
 		pos = *start
@@ -749,28 +749,28 @@ func (ui *termui) MonsterInfo(m *monster) string {
 
 var CenteredCamera bool
 
-func (ui *termui) InView(g *game, pos position, targetting bool) bool {
-	if targetting {
+func (ui *termui) InView(g *game, pos position, targeting bool) bool {
+	if targeting {
 		return pos.DistanceY(ui.cursor) <= 10 && pos.DistanceX(ui.cursor) <= 39
 	}
 	return pos.DistanceY(g.Player.Pos) <= 10 && pos.DistanceX(g.Player.Pos) <= 39
 }
 
-func (ui *termui) CameraOffset(g *game, pos position, targetting bool) (int, int) {
-	if targetting {
+func (ui *termui) CameraOffset(g *game, pos position, targeting bool) (int, int) {
+	if targeting {
 		return pos.X + 39 - ui.cursor.X, pos.Y + 10 - ui.cursor.Y
 	}
 	return pos.X + 39 - g.Player.Pos.X, pos.Y + 10 - g.Player.Pos.Y
 }
 
-func (ui *termui) InViewBorder(g *game, pos position, targetting bool) bool {
-	if targetting {
+func (ui *termui) InViewBorder(g *game, pos position, targeting bool) bool {
+	if targeting {
 		return pos.DistanceY(ui.cursor) != 10 && pos.DistanceX(ui.cursor) != 39
 	}
 	return pos.DistanceY(g.Player.Pos) != 10 && pos.DistanceX(g.Player.Pos) != 39
 }
 
-func (ui *termui) DrawDungeonView(g *game, targetting bool) {
+func (ui *termui) DrawDungeonView(g *game, targeting bool) {
 	ui.Clear()
 	m := g.Dungeon
 	for i := 0; i < g.Dungeon.Width; i++ {
@@ -787,14 +787,14 @@ func (ui *termui) DrawDungeonView(g *game, targetting bool) {
 			bgColor, fgColor = fgColor, bgColor
 		}
 		if CenteredCamera {
-			if !ui.InView(g, pos, targetting) {
+			if !ui.InView(g, pos, targeting) {
 				continue
 			}
-			x, y := ui.CameraOffset(g, pos, targetting)
+			x, y := ui.CameraOffset(g, pos, targeting)
 			ui.SetCell(x, y, r, fgColor, bgColor)
-			if ui.InViewBorder(g, pos, targetting) && g.Dungeon.Border(pos) {
+			if ui.InViewBorder(g, pos, targeting) && g.Dungeon.Border(pos) {
 				for _, opos := range g.Dungeon.OutsideNeighbors(pos) {
-					xo, yo := ui.CameraOffset(g, opos, targetting)
+					xo, yo := ui.CameraOffset(g, opos, targeting)
 					ui.SetCell(xo, yo, '#', ColorFg, ColorBgBorder)
 				}
 			}
@@ -811,8 +811,8 @@ func (ui *termui) DrawDungeonView(g *game, targetting bool) {
 			ui.DrawText(fmt.Sprintf("] %v (%d)", g.Player.Shield, g.Player.Block()), 81, 2)
 		}
 	}
-	if targetting {
-		ui.DrawColoredText("Targetting", 81, 20, ColorFgTargetMode)
+	if targeting {
+		ui.DrawColoredText("Targeting", 81, 20, ColorFgTargetMode)
 		ui.DrawColoredText("(? for help)", 81, 21, ColorFgTargetMode)
 	}
 	ui.DrawStatusLine(g)

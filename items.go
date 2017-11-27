@@ -106,7 +106,7 @@ func (p potion) Desc() (text string) {
 	case WallPotion:
 		text = "replaces free cells around you with temporal walls."
 	case CBlinkPotion:
-		text = "makes you blink to a targetted cell in your line of sight."
+		text = "makes you blink to a targeted cell in your line of sight."
 	case ResistancePotion:
 		text = "makes you resistent to the elements."
 	}

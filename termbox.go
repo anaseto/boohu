@@ -188,7 +188,7 @@ func (ui *termui) Scroll(n int) (m int, quit bool) {
 	return n, quit
 }
 
-func (ui *termui) TargetModeEvent(g *game, targ Targetter, pos position, data *examineData) bool {
+func (ui *termui) TargetModeEvent(g *game, targ Targeter, pos position, data *examineData) bool {
 	switch tev := termbox.PollEvent(); tev.Type {
 	case termbox.EventKey:
 		if tev.Ch == 0 {

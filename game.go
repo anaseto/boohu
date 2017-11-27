@@ -52,7 +52,7 @@ type Renderer interface {
 	ExploreStep(*game) bool
 	HandlePlayerTurn(*game, event) bool
 	Death(*game)
-	ChooseTarget(*game, Targetter) bool
+	ChooseTarget(*game, Targeter) bool
 	CriticalHPWarning(*game)
 }
 

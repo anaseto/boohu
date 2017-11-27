@@ -2,7 +2,7 @@ package main
 
 import "errors"
 
-type Targetter interface {
+type Targeter interface {
 	ComputeHighlight(*game, position)
 	Action(*game, position) error
 	Reachable(*game, position) bool
