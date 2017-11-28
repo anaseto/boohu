@@ -61,8 +61,8 @@ func (g *game) Save() error {
 }
 
 func (g *game) RemoveSaveFile() error {
-	storage := js.Global.Get("localStorage")
-	storage.Call("removeItem", "boohusave")
+	//storage := js.Global.Get("localStorage")
+	//storage.Call("removeItem", "boohusave")
 	return nil
 }
 
