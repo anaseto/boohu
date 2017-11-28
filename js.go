@@ -46,6 +46,7 @@ func (g *game) DataDir() (string, error) {
 }
 
 func (g *game) Save() error {
+	return nil
 	//save, err := g.GameSave()
 	//if err != nil {
 	//return err
@@ -54,13 +55,14 @@ func (g *game) Save() error {
 	//if !storage.Bool() {
 	//return errors.New("localStorage not found")
 	//}
-	//storage.Call("setItem", "boohusave", string(save))
-	return nil
+	//s := base64.StdEncoding.EncodeToString(save)
+	//storage.Call("setItem", "boohusave", s)
+	//return nil
 }
 
 func (g *game) RemoveSaveFile() error {
-	//storage := js.Global.Get("localStorage")
-	//storage.Call("removeItem", "boohusave")
+	storage := js.Global.Get("localStorage")
+	storage.Call("removeItem", "boohusave")
 	return nil
 }
 
@@ -73,13 +75,44 @@ func (g *game) Load() (bool, error) {
 	//if !save.Bool() {
 	//return false, nil
 	//}
-	//// XXX: this fails with unsigned integer out of range… (saving disabled
-	//// for now)
-	//lg, err := g.DecodeGameSave([]byte(save.String()))
+	//s, err := base64.StdEncoding.DecodeString(save.String())
+	//if err != nil {
+	//return true, err
+	//}
+	//lg, err := g.DecodeGameSave(s)
 	//if err != nil {
 	//return true, err
 	//}
 	//*g = *lg
+
+	// // XXX: gob encoding works badly with gopherjs, it seems, some maps get broken
+	// g.GeneratedRods = map[rod]bool{}
+	// g.GeneratedEquipables = map[equipable]bool{}
+	// g.FoundEquipables = map[equipable]bool{Robe: true, Dagger: true}
+	// g.GeneratedBands = map[monsterBand]int{}
+	// g.KilledMons = map[monsterKind]int{}
+	// g.Gold = make(map[position]int)
+	// g.Stairs = make(map[position]bool)
+	// g.Collectables = make(map[position]*collectable)
+	// g.UnknownDig = map[position]bool{}
+	// g.ExclusionsMap = map[position]bool{}
+	// g.TemporalWalls = map[position]bool{}
+	// g.Clouds = map[position]cloud{}
+	// g.Highlight = map[position]bool{}
+
+	// g.Equipables = map[position]equipable{}
+	// g.Player.Consumables = map[consumable]int{
+	// 	HealWoundsPotion: 1,
+	// 	Javelin:          3,
+	// }
+	// g.Player.Statuses = map[status]int{}
+	// g.Player.Aptitudes = map[aptitude]bool{}
+	// g.ComputeLOS()
+
+	// g.Rods = map[position]rod{}
+	// g.Fungus = map[position]vegetation{}
+	// g.Doors = map[position]bool{}
+
 	return true, nil
 }
 
@@ -309,7 +342,7 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 	r := ui.ReadChar()
 	switch r {
 	case 'S':
-		err = errors.New("Command not available (still) for the web html5 version.")
+		err = errors.New("Command not available for the web html5 version.")
 		return err, true, false
 	case 'W':
 		ui.EnterWizard(g)

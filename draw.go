@@ -307,6 +307,7 @@ func (ui *termui) HandleCharacter(g *game, ev event, c rune) (err error, again b
 		ev.Renew(g, 0)
 		err := g.Save()
 		if err != nil {
+			g.PrintfStyled("Error: %v", logError, err)
 			g.PrintStyled("Could not save game. --press any key to continue--", logError)
 			ui.DrawDungeonView(g, false)
 			ui.PressAnyKey()
