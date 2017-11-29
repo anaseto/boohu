@@ -528,6 +528,16 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	m.Obstructing = false
 	if !(len(m.Path) > 0 && m.Path[0] == m.Target && m.Path[len(m.Path)-1] == mpos) {
 		m.Path = m.APath(g, mpos, m.Target)
+		if m.Path == nil {
+			// if target is not accessible, try free neighbor cells
+			for _, npos := range g.Dungeon.FreeNeighbors(m.Target) {
+				m.Path = m.APath(g, mpos, npos)
+				if m.Path != nil {
+					m.Target = npos
+					break
+				}
+			}
+		}
 	}
 	if m.Path == nil || len(m.Path) < 2 {
 		switch m.State {
