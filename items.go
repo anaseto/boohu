@@ -265,14 +265,7 @@ func (g *game) QuaffWallPotion(ev event) error {
 		if mons.Exists() {
 			continue
 		}
-		posNeighbors := g.Dungeon.FreeNeighbors(pos)
-		for _, pos := range posNeighbors {
-			if pos == g.Player.Pos {
-				continue
-			}
-			g.MakeNoise(18, pos)
-			break
-		}
+		g.MakeNoise(15, pos)
 		g.Dungeon.SetCell(pos, WallCell)
 		if g.TemporalWalls != nil {
 			g.TemporalWalls[pos] = true

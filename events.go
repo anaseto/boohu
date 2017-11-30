@@ -230,7 +230,7 @@ func (cev *cloudEvent) Action(g *game) {
 		} else {
 			delete(g.TemporalWalls, cev.Pos)
 		}
-		g.MakeNoise(18, cev.Pos)
+		g.MakeNoise(15, cev.Pos)
 		g.ComputeLOS()
 	}
 }
