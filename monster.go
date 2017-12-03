@@ -571,7 +571,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 				g.UnknownDig[m.Pos] = true
 			}
 			g.MakeNoise(18, m.Pos)
-			if g.Player.Pos.Distance(target) < 10 {
+			if g.Player.Pos.Distance(target) < 12 {
 				// XXX use dijkstra distance ?
 				g.Print("You hear an earth-breaking noise.")
 				g.StopAuto()
@@ -594,7 +594,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 			}
 		}
 	case !g.Player.LOS[mons.Pos] && g.Player.Pos.Distance(mons.Target) > 2 && mons.State != Hunting:
-		r := RandInt(10)
+		r := RandInt(5)
 		if r == 0 {
 			m.Target = g.FreeCell()
 			m.GatherBand(g)
@@ -1068,7 +1068,7 @@ func (m *monster) GatherBand(g *game) {
 				continue
 			}
 			r := RandInt(100)
-			if r > 60 || mons.State == Wandering && r > 10 {
+			if r > 50 || mons.State == Wandering && r > 10 {
 				mons.Target = m.Target
 				mons.State = m.State
 			}

@@ -54,13 +54,12 @@ func (g *game) MakeNoise(noise int, at position) {
 		if v <= 0 {
 			continue
 		}
-		v *= 3
-		if v > 90 {
-			v = 90
+		if v > 25 {
+			v = 25
 		}
-		r := RandInt(100)
+		r := RandInt(30)
 		if m.State == Resting {
-			r += 10
+			v /= 2
 		}
 		if v > r {
 			if g.Player.LOS[m.Pos] {
