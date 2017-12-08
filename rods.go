@@ -78,7 +78,7 @@ func (r rod) Desc() string {
 	case RodFireball:
 		text = "throws a 1-radius fireball at your foes."
 	case RodLightningBolt:
-		text = "throws a lightning bolt through one or more ennemies."
+		text = "throws a lightning bolt through one or more enemies."
 	case RodObstruction:
 		text = "creates a temporary wall at targeted location."
 	case RodShatter:

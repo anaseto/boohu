@@ -90,7 +90,7 @@ func (p potion) Desc() (text string) {
 	case TeleportationPotion:
 		text = "teleports you away after a short delay."
 	case DescentPotion:
-		text = "makes you go to deeper in the Underground."
+		text = "makes you go deeper in the Underground."
 	case EvasionPotion:
 		text = "makes you better at avoiding blows."
 	case MagicMappingPotion:
@@ -108,7 +108,7 @@ func (p potion) Desc() (text string) {
 	case CBlinkPotion:
 		text = "makes you blink to a targeted cell in your line of sight."
 	case ResistancePotion:
-		text = "makes you resistent to the elements."
+		text = "makes you resistant to the elements."
 	}
 	return fmt.Sprintf("The %s %s", p, text)
 }
@@ -242,7 +242,7 @@ func (g *game) QuaffEvasion(ev event) error {
 func (g *game) QuaffLignification(ev event) error {
 	g.Player.Statuses[StatusLignification]++
 	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 150 + RandInt(100), EAction: LignificationEnd})
-	g.Printf("You quaff the %s. You feel attuned with the ground.", LignificationPotion)
+	g.Printf("You quaff the %s. You feel rooted to the ground.", LignificationPotion)
 	g.Player.HP += 10
 	return nil
 }
@@ -329,11 +329,11 @@ func (p projectile) Desc() (text string) {
 	switch p {
 	case Javelin:
 		// XXX
-		text = "can be thrown to ennemies, dealing up to 11 damage."
+		text = "can be thrown to foes, dealing up to 11 damage."
 	case ConfusingDart:
 		text = "can be thrown to confuse foes. Confused monsters cannot move diagonally."
 	case Net:
-		text = "can be thrown to emprison your ennemies."
+		text = "can be thrown to emprison your enemies."
 	}
 	return fmt.Sprintf("The %s %s", p, text)
 }

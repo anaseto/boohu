@@ -52,7 +52,7 @@ the terminal emulator options.
 Basic Survival Tips
 -------------
 
-+ Position yourself to fight one ennemy at a time whenever possible.
++ Position yourself to fight one enemy at a time whenever possible.
 + Fight far enough from unknown terrain if you can: combat is noisy, more
   monsters will come if they hear it.
 + Use your potions, projectiles and rods. With experience you learn when you
