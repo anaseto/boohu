@@ -792,7 +792,6 @@ func (g *game) DoorCandidate(pos position) bool {
 				(d.Valid(pos.SW()) && d.Cell(pos.SW()).T == FreeCell) ||
 				(d.Valid(pos.NE()) && d.Cell(pos.NE()).T == FreeCell) ||
 				(d.Valid(pos.SE()) && d.Cell(pos.SE()).T == FreeCell))
-	return false
 }
 
 func (g *game) PutDoors(percentage int) {
