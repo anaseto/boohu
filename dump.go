@@ -172,7 +172,7 @@ func (g *game) Dump() string {
 		fmt.Fprintf(buf, "You do not have any projectiles.\n")
 	}
 	fmt.Fprintf(buf, "\n")
-	fmt.Fprintf(buf, "Miscelaneous:\n")
+	fmt.Fprintf(buf, "Miscellaneous:\n")
 	fmt.Fprintf(buf, "You collected %d gold coins.\n", g.Player.Gold)
 	fmt.Fprintf(buf, "You killed %d monsters.\n", g.Killed)
 	fmt.Fprintf(buf, "You spent %.1f turns in the Underground.\n", float64(g.Turn)/10)
@@ -289,7 +289,7 @@ func (g *game) SimplifedDump(err error) string {
 	fmt.Fprintf(buf, "You spent %.1f turns in the Underground.\n", float64(g.Turn)/10)
 	fmt.Fprintf(buf, "\n")
 	if err != nil {
-		fmt.Fprintf(buf, "Error writting dump: %v.\n", err)
+		fmt.Fprintf(buf, "Error writing dump: %v.\n", err)
 	} else {
 		dataDir, err := g.DataDir()
 		if err == nil {

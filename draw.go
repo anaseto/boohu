@@ -318,7 +318,7 @@ func (ui *termui) HandleCharacter(g *game, ev event, c rune) (err error, again b
 	case '#':
 		err := g.WriteDump()
 		if err != nil {
-			g.PrintStyled("Error writting dump to file.", logError)
+			g.PrintStyled("Error writing dump to file.", logError)
 		} else {
 			dataDir, _ := g.DataDir()
 			g.Printf("Dump written to %s.", filepath.Join(dataDir, "dump"))
