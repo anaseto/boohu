@@ -411,8 +411,8 @@ var MonsBands = []monsterBandData{
 	},
 	UMarevorHelith: {
 		distribution: map[monsterKind]monsInterval{
-			MonsMarevorHelith: monsInterval{1, 1},
-			MonsLich:          monsInterval{0, 1},
+			MonsMarevorHelith: {1, 1},
+			MonsLich:          {0, 1},
 		},
 		rarity: 100, minDepth: 7, maxDepth: 12, band: true, unique: true,
 	},
