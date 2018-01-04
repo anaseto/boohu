@@ -64,6 +64,7 @@ const (
 	MonsAcidMound
 	MonsExplosiveNadre
 	MonsOklobPlant
+	MonsMarevorHelith
 )
 
 func (mk monsterKind) String() string {
@@ -149,6 +150,7 @@ var MonsData = []monsterData{
 	MonsMirrorSpecter:   {10, 9, 10, 18, 15, 0, 17, 'm', "mirror specter", 11},
 	MonsExplosiveNadre:  {10, 4, 10, 1, 14, 0, 10, 'n', "explosive nadre", 5},
 	MonsOklobPlant:      {10, 12, 12, 30, 15, 0, 4, 'P', "oklob plant", 7},
+	MonsMarevorHelith:   {10, 0, 10, 99, 17, 6, 99, 'M', "Marevor Helith", 18},
 }
 
 var monsDesc = []string{
@@ -171,6 +173,7 @@ var monsDesc = []string{
 	MonsMirrorSpecter:   "Mirror specters are very insubstantial creatures. They can absorb your mana.",
 	MonsExplosiveNadre:  "Explosive nadres are very frail creatures that explode upon dying, halving HP of any adjacent creatures.",
 	MonsOklobPlant:      "Oklob Plants are static monsters that throw acidic projectiles at you, sometimes corroding and confusing you.",
+	MonsMarevorHelith:   "Marevor Helith is an ancient nakrus very fond of teleporting people away.",
 }
 
 type monsterBand int
@@ -215,6 +218,7 @@ const (
 	UAcidMounds
 	UOklob
 	UDragon
+	UMarevorHelith
 )
 
 type monsInterval struct {
@@ -405,6 +409,13 @@ var MonsBands = []monsterBandData{
 		},
 		rarity: 60, minDepth: 12, maxDepth: 12, band: true, unique: true,
 	},
+	UMarevorHelith: {
+		distribution: map[monsterKind]monsInterval{
+			MonsMarevorHelith: monsInterval{1, 1},
+			MonsLich:          monsInterval{0, 1},
+		},
+		rarity: 100, minDepth: 7, maxDepth: 12, band: true, unique: true,
+	},
 }
 
 type monster struct {
@@ -433,6 +444,9 @@ func (m *monster) Init() {
 	m.Armor = MonsData[m.Kind].armor
 	m.Evasion = MonsData[m.Kind].evasion
 	m.Statuses = map[monsterStatus]int{}
+	if m.Kind == MonsMarevorHelith {
+		m.State = Wandering
+	}
 }
 
 func (m *monster) Status(st monsterStatus) bool {
@@ -463,6 +477,67 @@ func (m *monster) AlternatePlacement(g *game) *position {
 	return nil
 }
 
+func (m *monster) TeleportPlayer(g *game, ev event) {
+	evasion := RandInt(g.Player.Evasion())
+	acc := RandInt(m.Accuracy)
+	if acc > evasion {
+		g.Print("Marevor pushes you through a monolith.")
+		g.Teleportation(ev)
+	} else if RandInt(2) == 0 {
+		g.Print("Marevor inadvertently goes into a monolith.")
+		m.TeleportAway(g)
+	}
+}
+
+func (m *monster) TeleportAway(g *game) {
+	pos := m.Pos
+	i := 0
+	count := 0
+	for {
+		count++
+		if count > 1000 {
+			panic("TeleportOther")
+		}
+		pos = g.FreeCell()
+		if pos.Distance(m.Pos) < 15 && i < 1000 {
+			i++
+			continue
+		}
+		break
+	}
+
+	switch m.State {
+	case Hunting:
+		m.State = Wandering
+		// TODO: change the target?
+	case Resting, Wandering:
+		m.State = Wandering
+		m.Target = m.Pos
+	}
+	if g.Player.LOS[m.Pos] {
+		g.Printf("The %s teleports away.", m.Kind)
+	}
+	m.Pos = pos
+}
+
+func (m *monster) TeleportMonsterAway(g *game) bool {
+	neighbors := g.Dungeon.FreeNeighbors(m.Pos)
+	for _, pos := range neighbors {
+		if pos == m.Pos || RandInt(3) != 0 {
+			continue
+		}
+		mons, _ := g.MonsterAt(pos)
+		if mons.Exists() {
+			if g.Player.LOS[m.Pos] {
+				g.Print("Marevor makes some strange gestures.")
+			}
+			mons.TeleportAway(g)
+			return true
+		}
+	}
+	return false
+}
+
 func (m *monster) AttackAction(g *game, ev event) {
 	switch {
 	case m.Obstructing:
@@ -479,6 +554,8 @@ func (m *monster) AttackAction(g *game, ev event) {
 			for i := 0; i <= 3; i++ {
 				m.HitPlayer(g, ev)
 			}
+		} else if m.Kind == MonsMarevorHelith {
+			m.TeleportPlayer(g, ev)
 		} else {
 			m.HitPlayer(g, ev)
 		}
@@ -522,6 +599,12 @@ func (m *monster) HandleTurn(g *game, ev event) {
 		}
 		if attack {
 			m.AttackAction(g, ev)
+			return
+		}
+	}
+	if m.Kind == MonsMarevorHelith {
+		if m.TeleportMonsterAway(g) {
+			ev.Renew(g, m.Kind.MovementDelay())
 			return
 		}
 	}

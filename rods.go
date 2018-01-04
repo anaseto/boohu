@@ -220,32 +220,7 @@ func (g *game) EvokeRodTeleportOther(ev event) error {
 		// should not happen (done in the targeter)
 		return errors.New("You must target a monster for using this rod.")
 	}
-	pos := mons.Pos
-	i := 0
-	count := 0
-	for {
-		count++
-		if count > 1000 {
-			panic("TeleportOther")
-		}
-		pos = g.FreeCell()
-		if pos.Distance(mons.Pos) < 15 && i < 1000 {
-			i++
-			continue
-		}
-		break
-	}
-
-	switch mons.State {
-	case Hunting:
-		mons.State = Wandering
-		// TODO: change the target?
-	case Resting, Wandering:
-		mons.State = Wandering
-		mons.Target = mons.Pos
-	}
-	mons.Pos = pos
-	g.Printf("The %s teleports away.", mons.Kind)
+	mons.TeleportAway(g)
 	return nil
 }
 
