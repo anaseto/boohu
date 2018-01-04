@@ -17,7 +17,7 @@ func main() {
 	tui := &termui{}
 	err := tui.Init()
 	if err != nil {
-		log.Fatal("boohu: %v\n", err)
+		log.Fatalf("boohu: %v\n", err)
 	}
 	defer tui.Close()
 

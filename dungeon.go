@@ -792,12 +792,11 @@ func (g *game) DoorCandidate(pos position) bool {
 				(d.Valid(pos.SW()) && d.Cell(pos.SW()).T == FreeCell) ||
 				(d.Valid(pos.NE()) && d.Cell(pos.NE()).T == FreeCell) ||
 				(d.Valid(pos.SE()) && d.Cell(pos.SE()).T == FreeCell))
-	return false
 }
 
 func (g *game) PutDoors(percentage int) {
 	g.Doors = map[position]bool{}
-	for i, _ := range g.Dungeon.Cells {
+	for i := range g.Dungeon.Cells {
 		pos := g.Dungeon.CellPosition(i)
 		if g.DoorCandidate(pos) && RandInt(100) < percentage {
 			g.Doors[pos] = true
