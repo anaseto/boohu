@@ -150,7 +150,7 @@ var MonsData = []monsterData{
 	MonsMirrorSpecter:   {10, 9, 10, 18, 15, 0, 17, 'm', "mirror specter", 11},
 	MonsExplosiveNadre:  {10, 4, 10, 1, 14, 0, 10, 'n', "explosive nadre", 5},
 	MonsOklobPlant:      {10, 12, 12, 30, 15, 0, 4, 'P', "oklob plant", 7},
-	MonsMarevorHelith:   {10, 0, 10, 99, 17, 6, 99, 'M', "Marevor Helith", 18},
+	MonsMarevorHelith:   {10, 0, 10, 99, 18, 10, 15, 'M', "Marevor Helith", 18},
 }
 
 var monsDesc = []string{
