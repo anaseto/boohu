@@ -68,16 +68,17 @@ func (g *game) FreeCell() position {
 		y := RandInt(m.Heigth)
 		pos := position{x, y}
 		c := m.Cell(pos)
-		if c.T == FreeCell {
-			if g.Player != nil && g.Player.Pos == pos {
-				continue
-			}
-			mons, _ := g.MonsterAt(pos)
-			if mons.Exists() {
-				continue
-			}
-			return pos
+		if c.T != FreeCell {
+			continue
 		}
+		if g.Player != nil && g.Player.Pos == pos {
+			continue
+		}
+		mons, _ := g.MonsterAt(pos)
+		if mons.Exists() {
+			continue
+		}
+		return pos
 	}
 }
 
@@ -102,34 +103,35 @@ func (g *game) FreeCellForStatic() position {
 		y := RandInt(m.Heigth)
 		pos := position{x, y}
 		c := m.Cell(pos)
-		if c.T == FreeCell {
-			if g.Player != nil && g.Player.Pos == pos {
-				continue
-			}
-			mons, _ := g.MonsterAt(pos)
-			if mons.Exists() {
-				continue
-			}
-			if g.Doors[pos] {
-				continue
-			}
-			if g.Gold[pos] > 0 {
-				continue
-			}
-			if g.Collectables[pos] != nil {
-				continue
-			}
-			if g.Stairs[pos] {
-				continue
-			}
-			if _, ok := g.Rods[pos]; ok {
-				continue
-			}
-			if _, ok := g.Equipables[pos]; ok {
-				continue
-			}
-			return pos
+		if c.T != FreeCell {
+			continue
 		}
+		if g.Player != nil && g.Player.Pos == pos {
+			continue
+		}
+		mons, _ := g.MonsterAt(pos)
+		if mons.Exists() {
+			continue
+		}
+		if g.Doors[pos] {
+			continue
+		}
+		if g.Gold[pos] > 0 {
+			continue
+		}
+		if g.Collectables[pos] != nil {
+			continue
+		}
+		if g.Stairs[pos] {
+			continue
+		}
+		if _, ok := g.Rods[pos]; ok {
+			continue
+		}
+		if _, ok := g.Equipables[pos]; ok {
+			continue
+		}
+		return pos
 	}
 }
 
@@ -145,16 +147,17 @@ func (g *game) FreeCellForMonster() position {
 		y := RandInt(m.Heigth)
 		pos := position{x, y}
 		c := m.Cell(pos)
-		if c.T == FreeCell {
-			if g.Player != nil && g.Player.Pos.Distance(pos) < 8 {
-				continue
-			}
-			mons, _ := g.MonsterAt(pos)
-			if mons.Exists() {
-				continue
-			}
-			return pos
+		if c.T != FreeCell {
+			continue
 		}
+		if g.Player != nil && g.Player.Pos.Distance(pos) < 8 {
+			continue
+		}
+		mons, _ := g.MonsterAt(pos)
+		if mons.Exists() {
+			continue
+		}
+		return pos
 	}
 }
 
@@ -191,13 +194,14 @@ func (g *game) FreeForStairs() position {
 		y := RandInt(m.Heigth)
 		pos := position{x, y}
 		c := m.Cell(pos)
-		if c.T == FreeCell {
-			_, ok := g.Collectables[pos]
-			if ok {
-				continue
-			}
-			return pos
+		if c.T != FreeCell {
+			continue
 		}
+		_, ok := g.Collectables[pos]
+		if ok {
+			continue
+		}
+		return pos
 	}
 }
 
