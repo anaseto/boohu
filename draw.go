@@ -775,12 +775,12 @@ func (ui *termui) DrawDungeonView(g *game, targeting bool) {
 	ui.Clear()
 	m := g.Dungeon
 	for i := 0; i < g.Dungeon.Width; i++ {
-		ui.SetCell(i, g.Dungeon.Heigth, '─', ColorFg, ColorBg)
+		ui.SetCell(i, g.Dungeon.Height, '─', ColorFg, ColorBg)
 	}
-	for i := 0; i < g.Dungeon.Heigth; i++ {
+	for i := 0; i < g.Dungeon.Height; i++ {
 		ui.SetCell(g.Dungeon.Width, i, '│', ColorFg, ColorBg)
 	}
-	ui.SetCell(g.Dungeon.Width, g.Dungeon.Heigth, '┘', ColorFg, ColorBg)
+	ui.SetCell(g.Dungeon.Width, g.Dungeon.Height, '┘', ColorFg, ColorBg)
 	for i := range m.Cells {
 		pos := m.CellPosition(i)
 		r, fgColor, bgColor := ui.PositionDrawing(g, pos)
@@ -1010,10 +1010,10 @@ func (ui *termui) DrawLog(g *game) {
 	for i, e := range g.Log[min:] {
 		fguicolor := ui.LogColor(e)
 		if e.Tick {
-			ui.DrawColoredText("•", 0, g.Dungeon.Heigth+1+i, ColorFgCollectable)
-			ui.DrawColoredText(e.String(), 2, g.Dungeon.Heigth+1+i, fguicolor)
+			ui.DrawColoredText("•", 0, g.Dungeon.Height+1+i, ColorFgCollectable)
+			ui.DrawColoredText(e.String(), 2, g.Dungeon.Height+1+i, fguicolor)
 		} else {
-			ui.DrawColoredText(e.String(), 0, g.Dungeon.Heigth+1+i, fguicolor)
+			ui.DrawColoredText(e.String(), 0, g.Dungeon.Height+1+i, fguicolor)
 		}
 	}
 }

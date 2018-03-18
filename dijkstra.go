@@ -14,7 +14,7 @@ type Dijkstrer interface {
 func (g *game) drawDijkstra(nm nodeMap) string {
 	// TODO: this function could be removed
 	b := &bytes.Buffer{}
-	for y := 0; y < g.Dungeon.Heigth; y++ {
+	for y := 0; y < g.Dungeon.Height; y++ {
 		for x := 0; x < g.Dungeon.Width; x++ {
 			pos := position{x, y}
 			n, ok := nm[pos]

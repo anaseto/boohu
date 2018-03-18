@@ -9,7 +9,7 @@ import (
 type dungeon struct {
 	Cells  []cell
 	Width  int
-	Heigth int
+	Height int
 }
 
 type cell struct {
@@ -35,11 +35,11 @@ func (d *dungeon) Cell(pos position) cell {
 }
 
 func (d *dungeon) Valid(pos position) bool {
-	return pos.X < d.Width && pos.Y < d.Heigth && pos.X >= 0 && pos.Y >= 0
+	return pos.X < d.Width && pos.Y < d.Height && pos.X >= 0 && pos.Y >= 0
 }
 
 func (d *dungeon) Border(pos position) bool {
-	return pos.X == d.Width-1 || pos.Y == d.Heigth-1 || pos.X == 0 || pos.Y == 0
+	return pos.X == d.Width-1 || pos.Y == d.Height-1 || pos.X == 0 || pos.Y == 0
 }
 
 func (d *dungeon) OutsideNeighbors(pos position) []position {
@@ -281,7 +281,7 @@ func (g *game) GenRuinsMap(h, w int) {
 	d := &dungeon{}
 	d.Cells = make([]cell, h*w)
 	d.Width = w
-	d.Heigth = h
+	d.Height = h
 	rooms := []room{}
 	noIntersect := true
 	//if randInt(100) > 50 {
@@ -333,7 +333,7 @@ func (g *game) GenRoomMap(h, w int) {
 	d := &dungeon{}
 	d.Cells = make([]cell, h*w)
 	d.Width = w
-	d.Heigth = h
+	d.Height = h
 	rooms := []room{}
 	noIntersect := true
 	for i := 0; i < 35; i++ {
@@ -382,7 +382,7 @@ func (d *dungeon) FreeCell() position {
 			panic("FreeCell")
 		}
 		x := RandInt(d.Width)
-		y := RandInt(d.Heigth)
+		y := RandInt(d.Height)
 		pos := position{x, y}
 		c := d.Cell(pos)
 		if c.T == FreeCell {
@@ -399,7 +399,7 @@ func (d *dungeon) WallCell() position {
 			panic("WallCell")
 		}
 		x := RandInt(d.Width)
-		y := RandInt(d.Heigth)
+		y := RandInt(d.Height)
 		pos := position{x, y}
 		c := d.Cell(pos)
 		if c.T == WallCell {
@@ -412,7 +412,7 @@ func (g *game) GenCaveMap(h, w int) {
 	d := &dungeon{}
 	d.Cells = make([]cell, h*w)
 	d.Width = w
-	d.Heigth = h
+	d.Height = h
 	pos := position{40, 10}
 	max := 21 * 42
 	d.SetCell(pos, FreeCell)
@@ -442,7 +442,7 @@ func (g *game) GenCaveMap(h, w int) {
 		}
 	}
 	cells = 1
-	max = d.Heigth * 1
+	max = d.Height * 1
 	digs := 0
 	i := 0
 loop:
@@ -519,7 +519,7 @@ func (g *game) GenCaveMapTree(h, w int) {
 	d := &dungeon{}
 	d.Cells = make([]cell, h*w)
 	d.Width = w
-	d.Heigth = h
+	d.Height = h
 	center := position{40, 10}
 	d.SetCell(center, FreeCell)
 	d.SetCell(center.E(), FreeCell)
@@ -602,7 +602,7 @@ func (g *game) RunCellularAutomataCave(h, w int) bool {
 	d := &dungeon{}
 	d.Cells = make([]cell, h*w)
 	d.Width = w
-	d.Heigth = h
+	d.Height = h
 	for i := range d.Cells {
 		r := RandInt(100)
 		pos := d.CellPosition(i)
@@ -616,7 +616,7 @@ func (g *game) RunCellularAutomataCave(h, w int) bool {
 		bufm := &dungeon{}
 		bufm.Cells = make([]cell, h*w)
 		bufm.Width = w
-		bufm.Heigth = h
+		bufm.Height = h
 		copy(bufm.Cells, d.Cells)
 		for j := range bufm.Cells {
 			pos := d.CellPosition(j)
@@ -649,12 +649,12 @@ func (g *game) RunCellularAutomataCave(h, w int) bool {
 			count = ncount
 			winner = pos
 		}
-		if count >= 37*d.Heigth*d.Width/100 {
+		if count >= 37*d.Height*d.Width/100 {
 			break
 		}
 	}
 	conn, count = d.Connected(winner)
-	if count <= 37*d.Heigth*d.Width/100 {
+	if count <= 37*d.Height*d.Width/100 {
 		return false
 	}
 	for i, c := range d.Cells {
@@ -663,7 +663,7 @@ func (g *game) RunCellularAutomataCave(h, w int) bool {
 			d.SetCell(pos, WallCell)
 		}
 	}
-	max := d.Heigth * 1
+	max := d.Height * 1
 	cells := 1
 	digs := 0
 	i := 0
@@ -720,7 +720,7 @@ func (g *game) Foliage(h, w int) map[position]vegetation {
 	d := &dungeon{}
 	d.Cells = make([]cell, h*w)
 	d.Width = w
-	d.Heigth = h
+	d.Height = h
 	for i := range d.Cells {
 		r := RandInt(100)
 		pos := d.CellPosition(i)
@@ -734,7 +734,7 @@ func (g *game) Foliage(h, w int) map[position]vegetation {
 		bufm := &dungeon{}
 		bufm.Cells = make([]cell, h*w)
 		bufm.Width = w
-		bufm.Heigth = h
+		bufm.Height = h
 		copy(bufm.Cells, d.Cells)
 		for j := range bufm.Cells {
 			pos := d.CellPosition(j)

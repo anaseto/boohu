@@ -65,7 +65,7 @@ func (g *game) FreeCell() position {
 			panic("FreeCell")
 		}
 		x := RandInt(m.Width)
-		y := RandInt(m.Heigth)
+		y := RandInt(m.Height)
 		pos := position{x, y}
 		c := m.Cell(pos)
 		if c.T != FreeCell {
@@ -100,7 +100,7 @@ func (g *game) FreeCellForStatic() position {
 			panic("FreeCellForStatic")
 		}
 		x := RandInt(m.Width)
-		y := RandInt(m.Heigth)
+		y := RandInt(m.Height)
 		pos := position{x, y}
 		c := m.Cell(pos)
 		if c.T != FreeCell {
@@ -144,7 +144,7 @@ func (g *game) FreeCellForMonster() position {
 			panic("FreeCellForMonster")
 		}
 		x := RandInt(m.Width)
-		y := RandInt(m.Heigth)
+		y := RandInt(m.Height)
 		pos := position{x, y}
 		c := m.Cell(pos)
 		if c.T != FreeCell {
@@ -191,7 +191,7 @@ func (g *game) FreeForStairs() position {
 			panic("FreeForStairs")
 		}
 		x := RandInt(m.Width)
-		y := RandInt(m.Heigth)
+		y := RandInt(m.Height)
 		pos := position{x, y}
 		c := m.Cell(pos)
 		if c.T != FreeCell {
