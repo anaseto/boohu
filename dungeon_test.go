@@ -2,6 +2,13 @@ package main
 
 import "testing"
 
+func BenchmarkCellularAutomataCaveMap(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		g := &game{}
+		g.GenCellularAutomataCaveMap(21, 79)
+	}
+}
+
 func TestCellularAutomataCaveMap(t *testing.T) {
 	for i := 0; i < 100; i++ {
 		g := &game{}

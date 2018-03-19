@@ -612,12 +612,11 @@ func (g *game) RunCellularAutomataCave(h, w int) bool {
 			d.SetCell(pos, WallCell)
 		}
 	}
+	bufm := &dungeon{}
+	bufm.Cells = make([]cell, h*w)
+	bufm.Width = w
+	bufm.Height = h
 	for i := 0; i < 5; i++ {
-		bufm := &dungeon{}
-		bufm.Cells = make([]cell, h*w)
-		bufm.Width = w
-		bufm.Height = h
-		copy(bufm.Cells, d.Cells)
 		for j := range bufm.Cells {
 			pos := d.CellPosition(j)
 			c1 := d.WallAreaCount(pos, 1)
@@ -633,7 +632,7 @@ func (g *game) RunCellularAutomataCave(h, w int) bool {
 				}
 			}
 		}
-		d.Cells = bufm.Cells
+		copy(d.Cells, bufm.Cells)
 	}
 	var conn map[position]bool
 	var count int
