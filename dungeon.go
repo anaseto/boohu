@@ -274,7 +274,7 @@ func (d *dungeon) PutRoom(r room) {
 }
 
 func (d *dungeon) CellPosition(i int) position {
-	return position{i - (i/d.Width)*d.Width, i / d.Width}
+	return position{i % d.Width, i / d.Width}
 }
 
 func (g *game) GenRuinsMap(h, w int) {
