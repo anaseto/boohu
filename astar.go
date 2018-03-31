@@ -39,10 +39,17 @@ type node struct {
 
 type nodeMap map[position]*node
 
+var nodeCache []node
+
+func init() {
+	nodeCache = make([]node, 0, DungeonNCells)
+}
+
 func (nm nodeMap) get(p position) *node {
 	n, ok := nm[p]
 	if !ok {
-		n = &node{Pos: p}
+		nodeCache = append(nodeCache, node{Pos: p})
+		n = &nodeCache[len(nodeCache)-1]
 		nm[p] = n
 	}
 	return n
@@ -55,6 +62,7 @@ type Astar interface {
 }
 
 func AstarPath(ast Astar, from, to position) (path []position, length int, found bool) {
+	nodeCache = nodeCache[:0]
 	nm := nodeMap{}
 	nq := &priorityQueue{}
 	heap.Init(nq)

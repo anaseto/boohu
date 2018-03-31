@@ -2,6 +2,12 @@ package main
 
 import "errors"
 
+var AutoexploreMap []int
+
+func init() {
+	AutoexploreMap = make([]int, DungeonNCells)
+}
+
 func (g *game) Autoexplore(ev event) error {
 	if mons := g.MonsterInLOS(); mons.Exists() {
 		return errors.New("You cannot auto-explore while there are monsters in view.")
@@ -20,11 +26,11 @@ func (g *game) Autoexplore(ev event) error {
 	}
 	g.Autoexploring = true
 	g.AutoHalt = false
-	return g.MovePlayer(n.Pos, ev)
+	return g.MovePlayer(*n, ev)
 }
 
-func (g *game) AutoexploreSources() []position {
-	sources := []position{}
+func (g *game) AutoexploreSources() []int {
+	sources := []int{}
 	np := &normalPath{game: g}
 	for i, c := range g.Dungeon.Cells {
 		pos := g.Dungeon.CellPosition(i)
@@ -34,39 +40,39 @@ func (g *game) AutoexploreSources() []position {
 			}
 		}
 		if !c.Explored || g.Gold[pos] > 0 || g.Collectables[pos] != nil {
-			sources = append(sources, pos)
+			sources = append(sources, i)
 		} else if _, ok := g.Rods[pos]; ok {
-			sources = append(sources, pos)
+			sources = append(sources, i)
 		}
 
 	}
 	return sources
 }
 
-func (g *game) BuildAutoexploreMap(sources []position) {
+func (g *game) BuildAutoexploreMap(sources []int) {
 	ap := &autoexplorePath{game: g}
-	g.AutoexploreMap = Dijkstra(ap, sources, 9999)
+	g.DijkstraFast(ap, sources)
+	g.DijkstraMapRebuild = false
 }
 
-func (g *game) NextAuto() (*node, bool) {
-	rebuild := false
+func (g *game) NextAuto() (next *position, finished bool) {
 	ap := &autoexplorePath{game: g}
 	neighbors := ap.Neighbors(g.Player.Pos)
-	if len(neighbors) == 0 || g.ExclusionsMap[g.Player.Pos] {
+	if len(neighbors) == 0 {
 		return nil, false
 	}
-	next, ok := g.AutoexploreMap[neighbors[0]]
-	if !ok {
-		return nil, rebuild
-	}
+	n := neighbors[0]
+	ncost := AutoexploreMap[n.idx()]
 	for _, pos := range neighbors[1:] {
-		n := g.AutoexploreMap[pos]
-		if n != nil && n.Cost < next.Cost {
-			next = n
+		cost := AutoexploreMap[pos.idx()]
+		if cost < ncost {
+			n = pos
+			ncost = cost
 		}
 	}
-	if next.Cost >= g.AutoexploreMap[g.Player.Pos].Cost {
-		rebuild = true
+	if ncost >= AutoexploreMap[g.Player.Pos.idx()] {
+		finished = true
 	}
-	return next, rebuild
+	next = &n
+	return next, finished
 }

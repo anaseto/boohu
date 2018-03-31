@@ -26,7 +26,7 @@ type game struct {
 	UnknownDig          map[position]bool
 	Resting             bool
 	Autoexploring       bool
-	AutoexploreMap      nodeMap
+	DijkstraMapRebuild  bool
 	AutoTarget          *position
 	AutoDir             *direction
 	AutoHalt            bool
@@ -212,6 +212,7 @@ func (g *game) MaxDepth() int {
 const (
 	DungeonHeigth = 21
 	DungeonWidth  = 79
+	DungeonNCells = DungeonWidth * DungeonHeigth
 )
 
 func (g *game) GenDungeon() {
@@ -515,34 +516,21 @@ func (g *game) AutoPlayer(ev event) bool {
 			// stop exploring for other reasons
 			g.Print("You stop exploring.")
 		default:
-			var n *node
-			var b bool
-			count := 0
-			for {
-				count++
-				if count > 100 {
-					// should not happen
-					g.Print("Hm… something went wrong with auto-explore. You stop.")
-					n = nil
-					break
-				}
-				n, b = g.NextAuto()
-				if !b {
-					if n == nil {
-						g.Print("You could not reach safely some places.")
-					}
-					break
-				}
+			var n *position
+			var finished bool
+			if g.DijkstraMapRebuild {
 				sources := g.AutoexploreSources()
-				if len(sources) == 0 {
-					g.Print("You finished exploring.")
-					n = nil
-					break
-				}
 				g.BuildAutoexploreMap(sources)
 			}
+			n, finished = g.NextAuto()
+			if finished {
+				g.Print("You finished exploring.")
+				n = nil
+			} else if n == nil {
+				g.Print("You could not reach safely some places.")
+			}
 			if n != nil {
-				err := g.MovePlayer(n.Pos, ev)
+				err := g.MovePlayer(*n, ev)
 				if err != nil {
 					g.Print(err.Error())
 					break

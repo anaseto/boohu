@@ -39,6 +39,7 @@ func (g *game) drawDijkstra(nm nodeMap) string {
 }
 
 func Dijkstra(dij Dijkstrer, sources []position, maxCost int) nodeMap {
+	nodeCache = nodeCache[:0]
 	nm := nodeMap{}
 	nq := &priorityQueue{}
 	heap.Init(nq)
@@ -72,6 +73,53 @@ func Dijkstra(dij Dijkstrer, sources []position, maxCost int) nodeMap {
 					neighborNode.Rank = cost
 					heap.Push(nq, neighborNode)
 				}
+			}
+		}
+	}
+}
+
+func idxtopos(i int) position {
+	return position{i % DungeonWidth, i / DungeonWidth}
+}
+
+func (pos position) idx() int {
+	return pos.Y*DungeonWidth + pos.X
+}
+
+func (pos position) valid() bool {
+	return pos.Y >= 0 && pos.Y < DungeonHeigth && pos.X >= 0 && pos.X < DungeonWidth
+}
+
+func (g *game) DijkstraFast(dij Dijkstrer, sources []int) {
+	d := g.Dungeon
+	dmap := AutoexploreMap
+	const unreachable = 9999
+	var visited [DungeonNCells]bool
+	var queue [DungeonNCells]int
+	var qstart, qend int
+	for i := 0; i < DungeonNCells; i++ {
+		dmap[i] = unreachable
+	}
+	for _, s := range sources {
+		dmap[s] = 0
+		queue[qend] = s
+		qend++
+		visited[s] = true
+	}
+	for qstart < qend {
+		cidx := queue[qstart]
+		qstart++
+		cpos := idxtopos(cidx)
+		for _, npos := range dij.Neighbors(cpos) {
+			nidx := npos.idx()
+			if !npos.valid() || d.Cells[nidx].T == WallCell {
+				continue
+			}
+			if !visited[nidx] {
+				queue[qend] = nidx
+				qend++
+				visited[nidx] = true
+				dmap[nidx] = 1 + dmap[cidx]
 			}
 		}
 	}
