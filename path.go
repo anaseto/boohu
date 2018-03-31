@@ -4,24 +4,24 @@ import "sort"
 
 func (d *dungeon) FreeNeighbors(pos position) []position {
 	neighbors := [8]position{pos.E(), pos.W(), pos.N(), pos.S(), pos.NE(), pos.NW(), pos.SE(), pos.SW()}
-	freeNeighbors := []position{}
+	neighborsCache = neighborsCache[:0]
 	for _, npos := range neighbors {
 		if d.Valid(npos) && d.Cell(npos).T != WallCell {
-			freeNeighbors = append(freeNeighbors, npos)
+			neighborsCache = append(neighborsCache, npos)
 		}
 	}
-	return freeNeighbors
+	return neighborsCache
 }
 
 func (d *dungeon) CardinalFreeNeighbors(pos position) []position {
 	neighbors := [4]position{pos.E(), pos.W(), pos.N(), pos.S()}
-	freeNeighbors := []position{}
+	neighborsCache = neighborsCache[:0]
 	for _, npos := range neighbors {
 		if d.Valid(npos) && d.Cell(npos).T != WallCell {
-			freeNeighbors = append(freeNeighbors, npos)
+			neighborsCache = append(neighborsCache, npos)
 		}
 	}
-	return freeNeighbors
+	return neighborsCache
 }
 
 type playerPath struct {
