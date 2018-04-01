@@ -42,17 +42,15 @@ func (d *dungeon) Border(pos position) bool {
 	return pos.X == d.Width-1 || pos.Y == d.Height-1 || pos.X == 0 || pos.Y == 0
 }
 
-var neighborsCache []position
-
 func (d *dungeon) OutsideNeighbors(pos position) []position {
 	neighbors := [8]position{pos.E(), pos.W(), pos.N(), pos.S(), pos.NE(), pos.NW(), pos.SE(), pos.SW()}
-	neighborsCache = neighborsCache[:0]
+	nb := make([]position, 0, 8)
 	for _, npos := range neighbors {
 		if !d.Valid(npos) {
-			neighborsCache = append(neighborsCache, npos)
+			nb = append(nb, npos)
 		}
 	}
-	return neighborsCache
+	return nb
 }
 
 func (d *dungeon) SetCell(pos position, t terrain) {
@@ -205,24 +203,24 @@ func (d *dungeon) connectRoomsDiagonally(r1, r2 room) {
 
 func (d *dungeon) Neighbors(pos position) []position {
 	neighbors := [8]position{pos.E(), pos.W(), pos.N(), pos.S(), pos.NE(), pos.NW(), pos.SE(), pos.SW()}
-	neighborsCache = neighborsCache[:0]
+	nb := make([]position, 0, 8)
 	for _, npos := range neighbors {
 		if d.Valid(npos) {
-			neighborsCache = append(neighborsCache, npos)
+			nb = append(nb, npos)
 		}
 	}
-	return neighborsCache
+	return nb
 }
 
 func (d *dungeon) CardinalNeighbors(pos position) []position {
 	neighbors := [4]position{pos.E(), pos.W(), pos.N(), pos.S()}
-	neighborsCache = neighborsCache[:0]
+	nb := make([]position, 0, 4)
 	for _, npos := range neighbors {
 		if d.Valid(npos) {
-			neighborsCache = append(neighborsCache, npos)
+			nb = append(nb, npos)
 		}
 	}
-	return neighborsCache
+	return nb
 }
 
 func (d *dungeon) Area(pos position, radius int) []position {
