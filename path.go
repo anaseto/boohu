@@ -36,7 +36,7 @@ func (pp *playerPath) Neighbors(pos position) []position {
 	} else {
 		neighbors = m.FreeNeighbors(pos)
 	}
-	freeNeighbors := []position{}
+	freeNeighbors := make([]position, 0, len(neighbors))
 	for _, npos := range neighbors {
 		if m.Cell(npos).Explored && !pp.game.UnknownDig[npos] && !pp.game.ExclusionsMap[npos] {
 			freeNeighbors = append(freeNeighbors, npos)
