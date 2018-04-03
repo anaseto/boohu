@@ -50,13 +50,12 @@ func (g *game) losCost(pos position) int {
 }
 
 func (g *game) buildRayMap(from position, distance int) rayMap {
-	dungeon := g.Dungeon
 	rm := rayMap{}
 	rm[from] = &raynode{Cost: 0}
 	for d := 1; d <= distance; d++ {
 		for x := -d + from.X; x <= d+from.X; x++ {
 			for _, pos := range []position{{x, from.Y + d}, {x, from.Y - d}} {
-				if !dungeon.Valid(pos) {
+				if !pos.valid() {
 					continue
 				}
 				_, c := g.bestParent(rm, from, pos)
@@ -65,7 +64,7 @@ func (g *game) buildRayMap(from position, distance int) rayMap {
 		}
 		for y := -d + 1 + from.Y; y <= d-1+from.Y; y++ {
 			for _, pos := range []position{{from.X + d, y}, {from.X - d, y}} {
-				if !dungeon.Valid(pos) {
+				if !pos.valid() {
 					continue
 				}
 				_, c := g.bestParent(rm, from, pos)
@@ -147,7 +146,7 @@ func (g *game) ComputeExclusion(pos position, toggle bool) {
 	for d := 1; d <= exclusionRange; d++ {
 		for x := -d + pos.X; x <= d+pos.X; x++ {
 			for _, pos := range []position{{x, pos.Y + d}, {x, pos.Y - d}} {
-				if !g.Dungeon.Valid(pos) {
+				if !pos.valid() {
 					continue
 				}
 				if !g.Player.LOS[pos] {
@@ -157,7 +156,7 @@ func (g *game) ComputeExclusion(pos position, toggle bool) {
 		}
 		for y := -d + 1 + pos.Y; y <= d-1+pos.Y; y++ {
 			for _, pos := range []position{{pos.X + d, y}, {pos.X - d, y}} {
-				if !g.Dungeon.Valid(pos) {
+				if !pos.valid() {
 					continue
 				}
 				if !g.Player.LOS[pos] {

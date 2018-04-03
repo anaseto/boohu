@@ -203,7 +203,7 @@ func (g *game) ScummingAction(ev event) {
 		g.Player.HP = g.Player.HP / 2
 		if RandInt(2) == 0 {
 			g.MakeNoise(100, g.Player.Pos)
-			neighbors := g.Dungeon.Neighbors(g.Player.Pos)
+			neighbors := g.Player.Pos.ValidNeighbors()
 			for _, pos := range neighbors {
 				if RandInt(3) != 0 {
 					g.Dungeon.SetCell(pos, FreeCell)
@@ -269,7 +269,7 @@ func (g *game) Teleportation(ev event) {
 
 	}
 	g.Player.Statuses[StatusTele]--
-	if g.Dungeon.Valid(pos) {
+	if pos.valid() {
 		// should always happen
 		g.Player.Pos = pos
 		g.Print("You feel yourself teleported away.")
@@ -313,7 +313,7 @@ func (g *game) CollectGround() {
 }
 
 func (g *game) MovePlayer(pos position, ev event) error {
-	if !g.Dungeon.Valid(pos) || g.Dungeon.Cell(pos).T == WallCell {
+	if !pos.valid() || g.Dungeon.Cell(pos).T == WallCell {
 		return errors.New("You cannot move there.")
 	}
 	if g.Player.HasStatus(StatusConfusion) {

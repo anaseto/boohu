@@ -779,7 +779,7 @@ func (m *monster) HitSideEffects(g *game, ev event) {
 		dir := g.Player.Pos.Dir(m.Pos)
 		pos := g.Player.Pos.To(dir)
 		if RandInt(2) == 0 && !g.Player.HasStatus(StatusLignification) &&
-			g.Dungeon.Valid(pos) && g.Dungeon.Cell(pos).T == FreeCell {
+			pos.valid() && g.Dungeon.Cell(pos).T == FreeCell {
 			mons, _ := g.MonsterAt(pos)
 			if !mons.Exists() {
 				g.Player.Pos = pos

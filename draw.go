@@ -338,7 +338,7 @@ func (ui *termui) HandleCharacter(g *game, ev event, c rune) (err error, again b
 }
 
 func (ui *termui) GoToPos(g *game, ev event, pos position) (err error, again bool) {
-	if !g.Dungeon.Valid(pos) {
+	if !pos.valid() {
 		return errors.New("Invalid location."), true
 	}
 	switch pos.Distance(g.Player.Pos) {
@@ -362,7 +362,7 @@ func (ui *termui) GoToPos(g *game, ev event, pos position) (err error, again boo
 
 func (ui *termui) ExaminePos(g *game, ev event, pos position) (again bool) {
 	var start *position
-	if g.Dungeon.Valid(pos) {
+	if pos.valid() {
 		start = &pos
 	}
 	b := ui.Examine(g, start)
@@ -613,7 +613,7 @@ func (ui *termui) CursorCharAction(g *game, targ Targeter, r rune, pos position,
 	case 'H', 'L', 'J', 'K', 'Y', 'B', 'U', 'N':
 		for i := 0; i < 5; i++ {
 			p := data.npos.To(KeyToDir(r))
-			if !g.Dungeon.Valid(p) {
+			if !p.valid() {
 				break
 			}
 			data.npos = p
@@ -703,7 +703,7 @@ loop:
 		if b {
 			break loop
 		}
-		if g.Dungeon.Valid(data.npos) {
+		if data.npos.valid() {
 			pos = data.npos
 		}
 	}
@@ -794,7 +794,7 @@ func (ui *termui) DrawDungeonView(g *game, targeting bool) {
 			x, y := ui.CameraOffset(g, pos, targeting)
 			ui.SetCell(x, y, r, fgColor, bgColor)
 			if ui.InViewBorder(g, pos, targeting) && g.Dungeon.Border(pos) {
-				for _, opos := range g.Dungeon.OutsideNeighbors(pos) {
+				for _, opos := range pos.OutsideNeighbors() {
 					xo, yo := ui.CameraOffset(g, opos, targeting)
 					ui.SetCell(xo, yo, '#', ColorFg, ColorBgBorder)
 				}

@@ -32,10 +32,6 @@ func (d *dungeon) Cell(pos position) cell {
 	return d.Cells[pos.idx()]
 }
 
-func (d *dungeon) Valid(pos position) bool {
-	return pos.X < DungeonWidth && pos.Y < DungeonHeight && pos.X >= 0 && pos.Y >= 0
-}
-
 func (d *dungeon) Border(pos position) bool {
 	return pos.X == DungeonWidth-1 || pos.Y == DungeonHeight-1 || pos.X == 0 || pos.Y == 0
 }
@@ -193,7 +189,7 @@ func (d *dungeon) Area(area []position, pos position, radius int) []position {
 	for x := pos.X - radius; x <= pos.X+radius; x++ {
 		for y := pos.Y - radius; y <= pos.Y+radius; y++ {
 			pos := position{x, y}
-			if d.Valid(pos) {
+			if pos.valid() {
 				area = append(area, pos)
 			}
 		}
@@ -212,8 +208,9 @@ func (d *dungeon) ConnectRoomsShortestPath(r1, r2 room) {
 func (d *dungeon) PutRoom(r room) {
 	for i := r.pos.X; i < r.pos.X+r.w; i++ {
 		for j := r.pos.Y; j < r.pos.Y+r.h; j++ {
-			if d.Valid(position{i, j}) {
-				d.SetCell(position{i, j}, FreeCell)
+			rpos := position{i, j}
+			if rpos.valid() {
+				d.SetCell(rpos, FreeCell)
 			}
 		}
 	}
@@ -347,12 +344,12 @@ func (g *game) GenCaveMap(h, w int) {
 	diag := RandInt(4) == 0
 	for cells < max {
 		npos := pos.RandomNeighbor(diag)
-		if !d.Valid(pos) && d.Valid(npos) && d.Cell(npos).T == WallCell {
+		if !pos.valid() && npos.valid() && d.Cell(npos).T == WallCell {
 			pos = lastValid
 			continue
 		}
 		pos = npos
-		if d.Valid(pos) {
+		if pos.valid() {
 			if d.Cell(pos).T != FreeCell {
 				d.SetCell(pos, FreeCell)
 				cells++
@@ -399,7 +396,7 @@ loop:
 }
 
 func (d *dungeon) HasFreeNeighbor(pos position) bool {
-	neighbors := d.Neighbors(pos)
+	neighbors := pos.ValidNeighbors()
 	for _, pos := range neighbors {
 		if d.Cell(pos).T == FreeCell {
 			return true
@@ -410,7 +407,7 @@ func (d *dungeon) HasFreeNeighbor(pos position) bool {
 
 func (g *game) HasFreeExploredNeighbor(pos position) bool {
 	d := g.Dungeon
-	neighbors := d.Neighbors(pos)
+	neighbors := pos.ValidNeighbors()
 	for _, pos := range neighbors {
 		c := d.Cell(pos)
 		if c.T == FreeCell && c.Explored && !g.UnknownDig[pos] {
@@ -429,12 +426,12 @@ func (d *dungeon) DigBlock(block []position, diag bool) []position {
 			break
 		}
 		pos = pos.RandomNeighbor(diag)
-		if !d.Valid(pos) {
+		if !pos.valid() {
 			block = block[:0]
 			pos = d.WallCell()
 			continue
 		}
-		if !d.Valid(pos) {
+		if !pos.valid() {
 			return nil
 		}
 	}
@@ -503,7 +500,7 @@ func (d *dungeon) Connected(pos position) (map[position]bool, int) {
 		stack = stack[:len(stack)-1]
 		count++
 		nb = pos.Neighbors(nb, func(npos position) bool {
-			return d.Valid(npos) && d.Cell(npos).T != WallCell
+			return npos.valid() && d.Cell(npos).T != WallCell
 		})
 		for _, npos := range nb {
 			if !conn[npos] {
@@ -693,27 +690,27 @@ func (g *game) Foliage(h, w int) map[position]vegetation {
 
 func (g *game) DoorCandidate(pos position) bool {
 	d := g.Dungeon
-	if !d.Valid(pos) || d.Cell(pos).T != FreeCell {
+	if !pos.valid() || d.Cell(pos).T != FreeCell {
 		return false
 	}
-	return d.Valid(pos.W()) && d.Valid(pos.E()) &&
+	return pos.W().valid() && pos.E().valid() &&
 		d.Cell(pos.W()).T == FreeCell && d.Cell(pos.E()).T == FreeCell &&
 		!g.Doors[pos.W()] && !g.Doors[pos.E()] &&
-		(!d.Valid(pos.N()) || d.Cell(pos.N()).T == WallCell) &&
-		(!d.Valid(pos.S()) || d.Cell(pos.S()).T == WallCell) &&
-		((d.Valid(pos.NW()) && d.Cell(pos.NW()).T == FreeCell) ||
-			(d.Valid(pos.SW()) && d.Cell(pos.SW()).T == FreeCell) ||
-			(d.Valid(pos.NE()) && d.Cell(pos.NE()).T == FreeCell) ||
-			(d.Valid(pos.SE()) && d.Cell(pos.SE()).T == FreeCell)) ||
-		d.Valid(pos.N()) && d.Valid(pos.S()) &&
+		(!pos.N().valid() || d.Cell(pos.N()).T == WallCell) &&
+		(!pos.S().valid() || d.Cell(pos.S()).T == WallCell) &&
+		((pos.NW().valid() && d.Cell(pos.NW()).T == FreeCell) ||
+			(pos.SW().valid() && d.Cell(pos.SW()).T == FreeCell) ||
+			(pos.NE().valid() && d.Cell(pos.NE()).T == FreeCell) ||
+			(pos.SE().valid() && d.Cell(pos.SE()).T == FreeCell)) ||
+		pos.N().valid() && pos.S().valid() &&
 			d.Cell(pos.N()).T == FreeCell && d.Cell(pos.S()).T == FreeCell &&
 			!g.Doors[pos.N()] && !g.Doors[pos.S()] &&
-			(!d.Valid(pos.E()) || d.Cell(pos.E()).T == WallCell) &&
-			(!d.Valid(pos.W()) || d.Cell(pos.W()).T == WallCell) &&
-			((d.Valid(pos.NW()) && d.Cell(pos.NW()).T == FreeCell) ||
-				(d.Valid(pos.SW()) && d.Cell(pos.SW()).T == FreeCell) ||
-				(d.Valid(pos.NE()) && d.Cell(pos.NE()).T == FreeCell) ||
-				(d.Valid(pos.SE()) && d.Cell(pos.SE()).T == FreeCell))
+			(!pos.E().valid() || d.Cell(pos.E()).T == WallCell) &&
+			(!pos.W().valid() || d.Cell(pos.W()).T == WallCell) &&
+			((pos.NW().valid() && d.Cell(pos.NW()).T == FreeCell) ||
+				(pos.SW().valid() && d.Cell(pos.SW()).T == FreeCell) ||
+				(pos.NE().valid() && d.Cell(pos.NE()).T == FreeCell) ||
+				(pos.SE().valid() && d.Cell(pos.SE()).T == FreeCell))
 }
 
 func (g *game) PutDoors(percentage int) {

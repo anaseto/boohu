@@ -93,7 +93,7 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 		deltaX := mons.Pos.X - g.Player.Pos.X
 		deltaY := mons.Pos.Y - g.Player.Pos.Y
 		behind := position{g.Player.Pos.X + 2*deltaX, g.Player.Pos.Y + 2*deltaY}
-		if g.Dungeon.Valid(behind) {
+		if behind.valid() {
 			mons, _ := g.MonsterAt(behind)
 			if mons.Exists() {
 				g.HitMonster(mons, ev)

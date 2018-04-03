@@ -22,30 +22,24 @@ func (pos position) CardinalNeighbors(nb []position, keep func(position) bool) [
 	return nb
 }
 
-func (d *dungeon) OutsideNeighbors(pos position) []position {
+func (pos position) OutsideNeighbors() []position {
 	nb := make([]position, 0, 8)
 	nb = pos.Neighbors(nb, func(npos position) bool {
-		return !d.Valid(npos)
+		return !npos.valid()
 	})
 	return nb
 }
 
-func (d *dungeon) Neighbors(pos position) []position {
+func (pos position) ValidNeighbors() []position {
 	nb := make([]position, 0, 8)
-	nb = pos.Neighbors(nb, d.Valid)
-	return nb
-}
-
-func (d *dungeon) CardinalNeighbors(pos position) []position {
-	nb := make([]position, 0, 4)
-	nb = pos.CardinalNeighbors(nb, d.Valid)
+	nb = pos.Neighbors(nb, position.valid)
 	return nb
 }
 
 func (d *dungeon) FreeNeighbors(pos position) []position {
 	nb := make([]position, 0, 8)
 	nb = pos.Neighbors(nb, func(npos position) bool {
-		return d.Valid(npos) && d.Cell(npos).T != WallCell
+		return npos.valid() && d.Cell(npos).T != WallCell
 	})
 	return nb
 }
@@ -53,7 +47,7 @@ func (d *dungeon) FreeNeighbors(pos position) []position {
 func (d *dungeon) CardinalFreeNeighbors(pos position) []position {
 	nb := make([]position, 0, 4)
 	nb = pos.CardinalNeighbors(nb, func(npos position) bool {
-		return d.Valid(npos) && d.Cell(npos).T != WallCell
+		return npos.valid() && d.Cell(npos).T != WallCell
 	})
 	return nb
 }

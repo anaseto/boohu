@@ -9,7 +9,7 @@ type dungeonPath struct {
 
 func (dp *dungeonPath) Neighbors(pos position) []position {
 	nb := dp.neighbors[:0]
-	return pos.Neighbors(nb, dp.dungeon.Valid)
+	return pos.Neighbors(nb, position.valid)
 }
 
 func (dp *dungeonPath) Cost(from, to position) int {
@@ -32,7 +32,7 @@ func (pp *playerPath) Neighbors(pos position) []position {
 	d := pp.game.Dungeon
 	nb := pp.neighbors[:0]
 	keep := func(npos position) bool {
-		return d.Valid(npos) && d.Cell(npos).T != WallCell &&
+		return npos.valid() && d.Cell(npos).T != WallCell &&
 			d.Cell(npos).Explored && !pp.game.UnknownDig[npos] && !pp.game.ExclusionsMap[npos]
 	}
 	if pp.game.Player.HasStatus(StatusConfusion) {
@@ -58,7 +58,7 @@ type noisePath struct {
 
 func (fp *noisePath) Neighbors(pos position) []position {
 	nb := fp.neighbors[:0]
-	return pos.Neighbors(nb, fp.game.Dungeon.Valid)
+	return pos.Neighbors(nb, position.valid)
 }
 
 func (fp *noisePath) Cost(from, to position) int {
@@ -74,7 +74,7 @@ func (np *normalPath) Neighbors(pos position) []position {
 	nb := np.neighbors[:0]
 	d := np.game.Dungeon
 	keep := func(npos position) bool {
-		return d.Valid(npos) && d.Cell(npos).T != WallCell
+		return npos.valid() && d.Cell(npos).T != WallCell
 	}
 	if np.game.Player.HasStatus(StatusConfusion) {
 		return pos.CardinalNeighbors(nb, keep)
@@ -98,7 +98,7 @@ func (ap *autoexplorePath) Neighbors(pos position) []position {
 	d := ap.game.Dungeon
 	nb := ap.neighbors[:0]
 	keep := func(npos position) bool {
-		return d.Valid(npos) && d.Cell(npos).T != WallCell && !ap.game.ExclusionsMap[pos]
+		return npos.valid() && d.Cell(npos).T != WallCell && !ap.game.ExclusionsMap[pos]
 	}
 	if ap.game.Player.HasStatus(StatusConfusion) {
 		nb = pos.CardinalNeighbors(nb, keep)
@@ -123,7 +123,7 @@ func (mp *monPath) Neighbors(pos position) []position {
 	nb := mp.neighbors[:0]
 	d := mp.game.Dungeon
 	keep := func(npos position) bool {
-		return d.Valid(npos) && (d.Cell(npos).T != WallCell || mp.wall)
+		return npos.valid() && (d.Cell(npos).T != WallCell || mp.wall)
 	}
 	if mp.monster.Status(MonsConfused) {
 		return pos.CardinalNeighbors(nb, keep)
