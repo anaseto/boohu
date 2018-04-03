@@ -190,8 +190,8 @@ func (d *dungeon) connectRoomsDiagonally(r1, r2 room) {
 	}
 }
 
-func (d *dungeon) Area(pos position, radius int) []position {
-	area := []position{}
+func (d *dungeon) Area(area []position, pos position, radius int) []position {
+	area = area[:0]
 	for x := pos.X - radius; x <= pos.X+radius; x++ {
 		for y := pos.Y - radius; y <= pos.Y+radius; y++ {
 			pos := position{x, y}
@@ -393,6 +393,7 @@ func (g *game) GenCaveMap(h, w int) {
 	max = d.Height * 1
 	digs := 0
 	i := 0
+	block := make([]position, 0, 64)
 loop:
 	for cells < max {
 		i++
@@ -403,7 +404,7 @@ loop:
 			break
 		}
 		diag = RandInt(2) == 0
-		block := d.DigBlock(diag)
+		block = d.DigBlock(block, diag)
 		if len(block) == 0 {
 			continue loop
 		}
@@ -442,9 +443,9 @@ func (g *game) HasFreeExploredNeighbor(pos position) bool {
 	return false
 }
 
-func (d *dungeon) DigBlock(diag bool) []position {
+func (d *dungeon) DigBlock(block []position, diag bool) []position {
 	pos := d.WallCell()
-	block := []position{}
+	block = block[:0]
 	for {
 		block = append(block, pos)
 		if d.HasFreeNeighbor(pos) {
@@ -481,9 +482,10 @@ func (g *game) GenCaveMapTree(h, w int) {
 	max := 21 * 23
 	cells := 1
 	diag := RandInt(2) == 0
+	block := make([]position, 0, 64)
 loop:
 	for cells < max {
-		block := d.DigBlock(diag)
+		block = d.DigBlock(block, diag)
 		if len(block) == 0 {
 			continue loop
 		}
@@ -498,19 +500,19 @@ loop:
 	g.PutDoors(5)
 }
 
-func (d *dungeon) WallAreaCount(pos position, radius int) int {
-	neighbors := d.Area(pos, radius)
+func (d *dungeon) WallAreaCount(area []position, pos position, radius int) int {
+	area = d.Area(area, pos, radius)
 	count := 0
-	for _, npos := range neighbors {
+	for _, npos := range area {
 		if d.Cell(npos).T == WallCell {
 			count++
 		}
 	}
 	switch radius {
 	case 1:
-		count += 9 - len(neighbors)
+		count += 9 - len(area)
 	case 2:
-		count += 25 - len(neighbors)
+		count += 25 - len(area)
 	}
 	return count
 }
@@ -520,12 +522,15 @@ func (d *dungeon) Connected(pos position) (map[position]bool, int) {
 	stack := []position{pos}
 	count := 0
 	conn[pos] = true
+	nb := make([]position, 0, 8)
 	for len(stack) > 0 {
 		pos = stack[len(stack)-1]
 		stack = stack[:len(stack)-1]
 		count++
-		neighbors := d.FreeNeighbors(pos)
-		for _, npos := range neighbors {
+		nb = pos.Neighbors(nb, func(npos position) bool {
+			return d.Valid(npos) && d.Cell(npos).T != WallCell
+		})
+		for _, npos := range nb {
 			if !conn[npos] {
 				conn[npos] = true
 				stack = append(stack, npos)
@@ -564,17 +569,18 @@ func (g *game) RunCellularAutomataCave(h, w int) bool {
 	bufm.Cells = make([]cell, h*w)
 	bufm.Width = w
 	bufm.Height = h
+	area := make([]position, 0, 25)
 	for i := 0; i < 5; i++ {
 		for j := range bufm.Cells {
 			pos := d.CellPosition(j)
-			c1 := d.WallAreaCount(pos, 1)
+			c1 := d.WallAreaCount(area, pos, 1)
 			if c1 >= 5 {
 				bufm.SetCell(pos, WallCell)
 			} else {
 				bufm.SetCell(pos, FreeCell)
 			}
 			if i == 3 {
-				c2 := d.WallAreaCount(pos, 2)
+				c2 := d.WallAreaCount(area, pos, 2)
 				if c2 <= 2 {
 					bufm.SetCell(pos, WallCell)
 				}
@@ -614,6 +620,7 @@ func (g *game) RunCellularAutomataCave(h, w int) bool {
 	cells := 1
 	digs := 0
 	i := 0
+	block := make([]position, 0, 64)
 loop:
 	for cells < max {
 		i++
@@ -624,7 +631,7 @@ loop:
 			break
 		}
 		diag := RandInt(2) == 0
-		block := d.DigBlock(diag)
+		block = d.DigBlock(block, diag)
 		if len(block) == 0 {
 			continue loop
 		}
@@ -677,6 +684,7 @@ func (g *game) Foliage(h, w int) map[position]vegetation {
 			d.SetCell(pos, FreeCell)
 		}
 	}
+	area := make([]position, 0, 25)
 	for i := 0; i < 6; i++ {
 		bufm := &dungeon{}
 		bufm.Cells = make([]cell, h*w)
@@ -685,7 +693,7 @@ func (g *game) Foliage(h, w int) map[position]vegetation {
 		copy(bufm.Cells, d.Cells)
 		for j := range bufm.Cells {
 			pos := d.CellPosition(j)
-			c1 := d.WallAreaCount(pos, 1)
+			c1 := d.WallAreaCount(area, pos, 1)
 			if i < 4 {
 				if c1 <= 4 {
 					bufm.SetCell(pos, FreeCell)
@@ -699,7 +707,7 @@ func (g *game) Foliage(h, w int) map[position]vegetation {
 				}
 			}
 			if i == 5 {
-				c2 := d.WallAreaCount(pos, 2)
+				c2 := d.WallAreaCount(area, pos, 2)
 				if c2 < 5 && c1 <= 2 {
 					bufm.SetCell(pos, FreeCell)
 				}
