@@ -2,47 +2,45 @@ package main
 
 import "sort"
 
-func (d *dungeon) FreeNeighbors(pos position) []position {
-	neighbors := [8]position{pos.E(), pos.W(), pos.N(), pos.S(), pos.NE(), pos.NW(), pos.SE(), pos.SW()}
-	nb := make([]position, 0, 8)
-	for _, npos := range neighbors {
-		if d.Valid(npos) && d.Cell(npos).T != WallCell {
-			nb = append(nb, npos)
-		}
-	}
-	return nb
+type dungeonPath struct {
+	dungeon   *dungeon
+	neighbors [8]position
 }
 
-func (d *dungeon) CardinalFreeNeighbors(pos position) []position {
-	neighbors := [4]position{pos.E(), pos.W(), pos.N(), pos.S()}
-	nb := make([]position, 0, 4)
-	for _, npos := range neighbors {
-		if d.Valid(npos) && d.Cell(npos).T != WallCell {
-			nb = append(nb, npos)
-		}
+func (dp *dungeonPath) Neighbors(pos position) []position {
+	nb := dp.neighbors[:0]
+	return pos.Neighbors(nb, dp.dungeon.Valid)
+}
+
+func (dp *dungeonPath) Cost(from, to position) int {
+	if dp.dungeon.Cell(to).T == WallCell {
+		return 4
 	}
-	return nb
+	return 1
+}
+
+func (dp *dungeonPath) Estimation(from, to position) int {
+	return from.Distance(to)
 }
 
 type playerPath struct {
-	game *game
+	game      *game
+	neighbors [8]position
 }
 
 func (pp *playerPath) Neighbors(pos position) []position {
-	m := pp.game.Dungeon
-	var neighbors []position
+	d := pp.game.Dungeon
+	nb := pp.neighbors[:0]
+	keep := func(npos position) bool {
+		return d.Valid(npos) && d.Cell(npos).T != WallCell &&
+			d.Cell(npos).Explored && !pp.game.UnknownDig[npos] && !pp.game.ExclusionsMap[npos]
+	}
 	if pp.game.Player.HasStatus(StatusConfusion) {
-		neighbors = m.CardinalFreeNeighbors(pos)
+		nb = pos.CardinalNeighbors(nb, keep)
 	} else {
-		neighbors = m.FreeNeighbors(pos)
+		nb = pos.Neighbors(nb, keep)
 	}
-	freeNeighbors := make([]position, 0, len(neighbors))
-	for _, npos := range neighbors {
-		if m.Cell(npos).Explored && !pp.game.UnknownDig[npos] && !pp.game.ExclusionsMap[npos] {
-			freeNeighbors = append(freeNeighbors, npos)
-		}
-	}
-	return freeNeighbors
+	return nb
 }
 
 func (pp *playerPath) Cost(from, to position) int {
@@ -54,11 +52,13 @@ func (pp *playerPath) Estimation(from, to position) int {
 }
 
 type noisePath struct {
-	game *game
+	game      *game
+	neighbors [8]position
 }
 
 func (fp *noisePath) Neighbors(pos position) []position {
-	return fp.game.Dungeon.FreeNeighbors(pos)
+	nb := fp.neighbors[:0]
+	return pos.Neighbors(nb, fp.game.Dungeon.Valid)
 }
 
 func (fp *noisePath) Cost(from, to position) int {
@@ -66,14 +66,20 @@ func (fp *noisePath) Cost(from, to position) int {
 }
 
 type normalPath struct {
-	game *game
+	game      *game
+	neighbors [8]position
 }
 
 func (np *normalPath) Neighbors(pos position) []position {
-	if np.game.Player.HasStatus(StatusConfusion) {
-		return np.game.Dungeon.CardinalFreeNeighbors(pos)
+	nb := np.neighbors[:0]
+	d := np.game.Dungeon
+	keep := func(npos position) bool {
+		return d.Valid(npos) && d.Cell(npos).T != WallCell
 	}
-	return np.game.Dungeon.FreeNeighbors(pos)
+	if np.game.Player.HasStatus(StatusConfusion) {
+		return pos.CardinalNeighbors(nb, keep)
+	}
+	return pos.Neighbors(nb, keep)
 }
 
 func (np *normalPath) Cost(from, to position) int {
@@ -81,26 +87,25 @@ func (np *normalPath) Cost(from, to position) int {
 }
 
 type autoexplorePath struct {
-	game *game
+	game      *game
+	neighbors [8]position
 }
 
 func (ap *autoexplorePath) Neighbors(pos position) []position {
 	if ap.game.ExclusionsMap[pos] {
 		return nil
 	}
-	var neighbors []position
+	d := ap.game.Dungeon
+	nb := ap.neighbors[:0]
+	keep := func(npos position) bool {
+		return d.Valid(npos) && d.Cell(npos).T != WallCell && !ap.game.ExclusionsMap[pos]
+	}
 	if ap.game.Player.HasStatus(StatusConfusion) {
-		neighbors = ap.game.Dungeon.CardinalFreeNeighbors(pos)
+		nb = pos.CardinalNeighbors(nb, keep)
 	} else {
-		neighbors = ap.game.Dungeon.FreeNeighbors(pos)
+		nb = pos.Neighbors(nb, keep)
 	}
-	var suitableNeighbors []position
-	for _, pos := range neighbors {
-		if !ap.game.ExclusionsMap[pos] {
-			suitableNeighbors = append(suitableNeighbors, pos)
-		}
-	}
-	return suitableNeighbors
+	return nb
 }
 
 func (ap *autoexplorePath) Cost(from, to position) int {
@@ -108,22 +113,22 @@ func (ap *autoexplorePath) Cost(from, to position) int {
 }
 
 type monPath struct {
-	game    *game
-	monster *monster
-	wall    bool
+	game      *game
+	monster   *monster
+	wall      bool
+	neighbors [8]position
 }
 
 func (mp *monPath) Neighbors(pos position) []position {
+	nb := mp.neighbors[:0]
+	d := mp.game.Dungeon
+	keep := func(npos position) bool {
+		return d.Valid(npos) && (d.Cell(npos).T != WallCell || mp.wall)
+	}
 	if mp.monster.Status(MonsConfused) {
-		if mp.wall {
-			return mp.game.Dungeon.CardinalNeighbors(pos)
-		}
-		return mp.game.Dungeon.CardinalFreeNeighbors(pos)
+		return pos.CardinalNeighbors(nb, keep)
 	}
-	if mp.wall {
-		return mp.game.Dungeon.Neighbors(pos)
-	}
-	return mp.game.Dungeon.FreeNeighbors(pos)
+	return pos.Neighbors(nb, keep)
 }
 
 func (mp *monPath) Cost(from, to position) int {

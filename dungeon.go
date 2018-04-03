@@ -42,17 +42,6 @@ func (d *dungeon) Border(pos position) bool {
 	return pos.X == d.Width-1 || pos.Y == d.Height-1 || pos.X == 0 || pos.Y == 0
 }
 
-func (d *dungeon) OutsideNeighbors(pos position) []position {
-	neighbors := [8]position{pos.E(), pos.W(), pos.N(), pos.S(), pos.NE(), pos.NW(), pos.SE(), pos.SW()}
-	nb := make([]position, 0, 8)
-	for _, npos := range neighbors {
-		if !d.Valid(npos) {
-			nb = append(nb, npos)
-		}
-	}
-	return nb
-}
-
 func (d *dungeon) SetCell(pos position, t terrain) {
 	d.Cells[pos.Y*d.Width+pos.X].T = t
 }
@@ -201,28 +190,6 @@ func (d *dungeon) connectRoomsDiagonally(r1, r2 room) {
 	}
 }
 
-func (d *dungeon) Neighbors(pos position) []position {
-	neighbors := [8]position{pos.E(), pos.W(), pos.N(), pos.S(), pos.NE(), pos.NW(), pos.SE(), pos.SW()}
-	nb := make([]position, 0, 8)
-	for _, npos := range neighbors {
-		if d.Valid(npos) {
-			nb = append(nb, npos)
-		}
-	}
-	return nb
-}
-
-func (d *dungeon) CardinalNeighbors(pos position) []position {
-	neighbors := [4]position{pos.E(), pos.W(), pos.N(), pos.S()}
-	nb := make([]position, 0, 4)
-	for _, npos := range neighbors {
-		if d.Valid(npos) {
-			nb = append(nb, npos)
-		}
-	}
-	return nb
-}
-
 func (d *dungeon) Area(pos position, radius int) []position {
 	area := []position{}
 	for x := pos.X - radius; x <= pos.X+radius; x++ {
@@ -234,25 +201,6 @@ func (d *dungeon) Area(pos position, radius int) []position {
 		}
 	}
 	return area
-}
-
-type dungeonPath struct {
-	dungeon *dungeon
-}
-
-func (dp *dungeonPath) Neighbors(pos position) []position {
-	return dp.dungeon.Neighbors(pos)
-}
-
-func (dp *dungeonPath) Cost(from, to position) int {
-	if dp.dungeon.Cell(to).T == WallCell {
-		return 4
-	}
-	return 1
-}
-
-func (dp *dungeonPath) Estimation(from, to position) int {
-	return from.Distance(to)
 }
 
 func (d *dungeon) ConnectRoomsShortestPath(r1, r2 room) {
