@@ -33,7 +33,7 @@ func (g *game) AutoexploreSources() []int {
 	sources := []int{}
 	np := &normalPath{game: g}
 	for i, c := range g.Dungeon.Cells {
-		pos := g.Dungeon.CellPosition(i)
+		pos := idxtopos(i)
 		if c.T == WallCell {
 			if len(np.Neighbors(pos)) == 0 {
 				continue
@@ -51,7 +51,7 @@ func (g *game) AutoexploreSources() []int {
 
 func (g *game) BuildAutoexploreMap(sources []int) {
 	ap := &autoexplorePath{game: g}
-	g.DijkstraFast(ap, sources)
+	g.AutoExploreDijkstra(ap, sources)
 	g.DijkstraMapRebuild = false
 }
 

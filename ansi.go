@@ -28,7 +28,7 @@ type termui struct {
 
 const (
 	UIWidth  = 103
-	UIHeigth = 27
+	UIHeight = 27
 )
 
 func (ui *termui) GetIndex(x, y int) int {
@@ -49,9 +49,9 @@ func (ui *termui) ResetCells() {
 func (ui *termui) Init() error {
 	ui.bStdin = bufio.NewReader(os.Stdin)
 	ui.bStdout = bufio.NewWriter(os.Stdout)
-	ui.cells = make([]AnsiCell, UIWidth*UIHeigth)
+	ui.cells = make([]AnsiCell, UIWidth*UIHeight)
 	ui.ResetCells()
-	ui.backBuffer = make([]AnsiCell, UIWidth*UIHeigth)
+	ui.backBuffer = make([]AnsiCell, UIWidth*UIHeight)
 	fmt.Fprint(ui.bStdout, "\x1b[2J")
 	return nil
 }

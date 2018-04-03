@@ -14,8 +14,8 @@ type Dijkstrer interface {
 func (g *game) drawDijkstra(nm nodeMap) string {
 	// TODO: this function could be removed
 	b := &bytes.Buffer{}
-	for y := 0; y < g.Dungeon.Height; y++ {
-		for x := 0; x < g.Dungeon.Width; x++ {
+	for y := 0; y < DungeonHeight; y++ {
+		for x := 0; x < DungeonWidth; x++ {
 			pos := position{x, y}
 			n, ok := nm[pos]
 			if ok {
@@ -78,19 +78,7 @@ func Dijkstra(dij Dijkstrer, sources []position, maxCost int) nodeMap {
 	}
 }
 
-func idxtopos(i int) position {
-	return position{i % DungeonWidth, i / DungeonWidth}
-}
-
-func (pos position) idx() int {
-	return pos.Y*DungeonWidth + pos.X
-}
-
-func (pos position) valid() bool {
-	return pos.Y >= 0 && pos.Y < DungeonHeigth && pos.X >= 0 && pos.X < DungeonWidth
-}
-
-func (g *game) DijkstraFast(dij Dijkstrer, sources []int) {
+func (g *game) AutoExploreDijkstra(dij Dijkstrer, sources []int) {
 	d := g.Dungeon
 	dmap := AutoexploreMap
 	const unreachable = 9999

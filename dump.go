@@ -185,9 +185,9 @@ func (g *game) Dump() string {
 	}
 	fmt.Fprintf(buf, "\n")
 	fmt.Fprintf(buf, "Dungeon:\n")
-	fmt.Fprintf(buf, "┌%s┐\n", strings.Repeat("─", g.Dungeon.Width))
+	fmt.Fprintf(buf, "┌%s┐\n", strings.Repeat("─", DungeonWidth))
 	buf.WriteString(g.DumpDungeon())
-	fmt.Fprintf(buf, "└%s┘\n", strings.Repeat("─", g.Dungeon.Width))
+	fmt.Fprintf(buf, "└%s┘\n", strings.Repeat("─", DungeonWidth))
 	fmt.Fprintf(buf, "\n")
 	fmt.Fprintf(buf, g.DumpedKilledMonsters())
 	fmt.Fprintf(buf, "\n")
@@ -203,14 +203,14 @@ func (g *game) DumpStory() string {
 func (g *game) DumpDungeon() string {
 	buf := bytes.Buffer{}
 	for i, c := range g.Dungeon.Cells {
-		if i%g.Dungeon.Width == 0 {
+		if i%DungeonWidth == 0 {
 			if i == 0 {
 				buf.WriteRune('│')
 			} else {
 				buf.WriteString("│\n│")
 			}
 		}
-		pos := g.Dungeon.CellPosition(i)
+		pos := idxtopos(i)
 		if !c.Explored {
 			buf.WriteRune(' ')
 			if i == len(g.Dungeon.Cells)-1 {

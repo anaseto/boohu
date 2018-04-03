@@ -248,3 +248,15 @@ func (pos position) RandomNeighborCardinal() position {
 	}
 	return neighbors[r]
 }
+
+func idxtopos(i int) position {
+	return position{i % DungeonWidth, i / DungeonWidth}
+}
+
+func (pos position) idx() int {
+	return pos.Y*DungeonWidth + pos.X
+}
+
+func (pos position) valid() bool {
+	return pos.Y >= 0 && pos.Y < DungeonHeight && pos.X >= 0 && pos.X < DungeonWidth
+}

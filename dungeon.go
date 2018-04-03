@@ -7,9 +7,7 @@ import (
 )
 
 type dungeon struct {
-	Cells  []cell
-	Width  int
-	Height int
+	Cells []cell
 }
 
 type cell struct {
@@ -31,23 +29,23 @@ type room struct {
 }
 
 func (d *dungeon) Cell(pos position) cell {
-	return d.Cells[pos.Y*d.Width+pos.X]
+	return d.Cells[pos.idx()]
 }
 
 func (d *dungeon) Valid(pos position) bool {
-	return pos.X < d.Width && pos.Y < d.Height && pos.X >= 0 && pos.Y >= 0
+	return pos.X < DungeonWidth && pos.Y < DungeonHeight && pos.X >= 0 && pos.Y >= 0
 }
 
 func (d *dungeon) Border(pos position) bool {
-	return pos.X == d.Width-1 || pos.Y == d.Height-1 || pos.X == 0 || pos.Y == 0
+	return pos.X == DungeonWidth-1 || pos.Y == DungeonHeight-1 || pos.X == 0 || pos.Y == 0
 }
 
 func (d *dungeon) SetCell(pos position, t terrain) {
-	d.Cells[pos.Y*d.Width+pos.X].T = t
+	d.Cells[pos.idx()].T = t
 }
 
 func (d *dungeon) SetExplored(pos position) {
-	d.Cells[pos.Y*d.Width+pos.X].Explored = true
+	d.Cells[pos.idx()].Explored = true
 }
 
 func roomDistance(r1, r2 room) int {
@@ -221,20 +219,10 @@ func (d *dungeon) PutRoom(r room) {
 	}
 }
 
-func (d *dungeon) CellPosition(i int) position {
-	return position{i % d.Width, i / d.Width}
-}
-
 func (g *game) GenRuinsMap(h, w int) {
 	d := &dungeon{}
 	d.Cells = make([]cell, h*w)
-	d.Width = w
-	d.Height = h
 	rooms := []room{}
-	noIntersect := true
-	//if randInt(100) > 50 {
-	//noIntersect = false
-	//}
 	for i := 0; i < 45; i++ {
 		var ro room
 		count := 100
@@ -244,9 +232,6 @@ func (g *game) GenRuinsMap(h, w int) {
 				pos: position{RandInt(w - 1), RandInt(h - 1)},
 				w:   3 + RandInt(5),
 				h:   2 + RandInt(3)}
-			if !noIntersect {
-				break
-			}
 			if !intersectsRoom(rooms, ro) {
 				break
 			}
@@ -280,10 +265,7 @@ func (rs roomSlice) Less(i, j int) bool {
 func (g *game) GenRoomMap(h, w int) {
 	d := &dungeon{}
 	d.Cells = make([]cell, h*w)
-	d.Width = w
-	d.Height = h
 	rooms := []room{}
-	noIntersect := true
 	for i := 0; i < 35; i++ {
 		var ro room
 		count := 100
@@ -293,9 +275,6 @@ func (g *game) GenRoomMap(h, w int) {
 				pos: position{RandInt(w - 1), RandInt(h - 1)},
 				w:   5 + RandInt(4),
 				h:   3 + RandInt(3)}
-			if !noIntersect {
-				break
-			}
 			if !intersectsRoom(rooms, ro) {
 				break
 			}
@@ -329,8 +308,8 @@ func (d *dungeon) FreeCell() position {
 		if count > 1000 {
 			panic("FreeCell")
 		}
-		x := RandInt(d.Width)
-		y := RandInt(d.Height)
+		x := RandInt(DungeonWidth)
+		y := RandInt(DungeonHeight)
 		pos := position{x, y}
 		c := d.Cell(pos)
 		if c.T == FreeCell {
@@ -346,8 +325,8 @@ func (d *dungeon) WallCell() position {
 		if count > 1000 {
 			panic("WallCell")
 		}
-		x := RandInt(d.Width)
-		y := RandInt(d.Height)
+		x := RandInt(DungeonWidth)
+		y := RandInt(DungeonHeight)
 		pos := position{x, y}
 		c := d.Cell(pos)
 		if c.T == WallCell {
@@ -359,8 +338,6 @@ func (d *dungeon) WallCell() position {
 func (g *game) GenCaveMap(h, w int) {
 	d := &dungeon{}
 	d.Cells = make([]cell, h*w)
-	d.Width = w
-	d.Height = h
 	pos := position{40, 10}
 	max := 21 * 42
 	d.SetCell(pos, FreeCell)
@@ -390,7 +367,7 @@ func (g *game) GenCaveMap(h, w int) {
 		}
 	}
 	cells = 1
-	max = d.Height * 1
+	max = DungeonHeight * 1
 	digs := 0
 	i := 0
 	block := make([]position, 0, 64)
@@ -467,8 +444,6 @@ func (d *dungeon) DigBlock(block []position, diag bool) []position {
 func (g *game) GenCaveMapTree(h, w int) {
 	d := &dungeon{}
 	d.Cells = make([]cell, h*w)
-	d.Width = w
-	d.Height = h
 	center := position{40, 10}
 	d.SetCell(center, FreeCell)
 	d.SetCell(center.E(), FreeCell)
@@ -544,7 +519,7 @@ func (d *dungeon) connex() bool {
 	pos := d.FreeCell()
 	conn, _ := d.Connected(pos)
 	for i, c := range d.Cells {
-		if c.T == FreeCell && !conn[d.CellPosition(i)] {
+		if c.T == FreeCell && !conn[idxtopos(i)] {
 			return false
 		}
 	}
@@ -554,11 +529,9 @@ func (d *dungeon) connex() bool {
 func (g *game) RunCellularAutomataCave(h, w int) bool {
 	d := &dungeon{}
 	d.Cells = make([]cell, h*w)
-	d.Width = w
-	d.Height = h
 	for i := range d.Cells {
 		r := RandInt(100)
-		pos := d.CellPosition(i)
+		pos := idxtopos(i)
 		if r >= 45 {
 			d.SetCell(pos, FreeCell)
 		} else {
@@ -567,12 +540,10 @@ func (g *game) RunCellularAutomataCave(h, w int) bool {
 	}
 	bufm := &dungeon{}
 	bufm.Cells = make([]cell, h*w)
-	bufm.Width = w
-	bufm.Height = h
 	area := make([]position, 0, 25)
 	for i := 0; i < 5; i++ {
 		for j := range bufm.Cells {
-			pos := d.CellPosition(j)
+			pos := idxtopos(j)
 			c1 := d.WallAreaCount(area, pos, 1)
 			if c1 >= 5 {
 				bufm.SetCell(pos, WallCell)
@@ -602,21 +573,21 @@ func (g *game) RunCellularAutomataCave(h, w int) bool {
 			count = ncount
 			winner = pos
 		}
-		if count >= 37*d.Height*d.Width/100 {
+		if count >= 37*DungeonHeight*DungeonWidth/100 {
 			break
 		}
 	}
 	conn, count = d.Connected(winner)
-	if count <= 37*d.Height*d.Width/100 {
+	if count <= 37*DungeonHeight*DungeonWidth/100 {
 		return false
 	}
 	for i, c := range d.Cells {
-		pos := d.CellPosition(i)
+		pos := idxtopos(i)
 		if c.T == FreeCell && !conn[pos] {
 			d.SetCell(pos, WallCell)
 		}
 	}
-	max := d.Height * 1
+	max := DungeonHeight * 1
 	cells := 1
 	digs := 0
 	i := 0
@@ -673,11 +644,9 @@ func (g *game) Foliage(h, w int) map[position]vegetation {
 	// walls will become foliage
 	d := &dungeon{}
 	d.Cells = make([]cell, h*w)
-	d.Width = w
-	d.Height = h
 	for i := range d.Cells {
 		r := RandInt(100)
-		pos := d.CellPosition(i)
+		pos := idxtopos(i)
 		if r >= 43 {
 			d.SetCell(pos, WallCell)
 		} else {
@@ -688,11 +657,9 @@ func (g *game) Foliage(h, w int) map[position]vegetation {
 	for i := 0; i < 6; i++ {
 		bufm := &dungeon{}
 		bufm.Cells = make([]cell, h*w)
-		bufm.Width = w
-		bufm.Height = h
 		copy(bufm.Cells, d.Cells)
 		for j := range bufm.Cells {
-			pos := d.CellPosition(j)
+			pos := idxtopos(j)
 			c1 := d.WallAreaCount(area, pos, 1)
 			if i < 4 {
 				if c1 <= 4 {
@@ -718,7 +685,7 @@ func (g *game) Foliage(h, w int) map[position]vegetation {
 	fungus := make(map[position]vegetation)
 	for i, c := range d.Cells {
 		if c.T == FreeCell {
-			fungus[d.CellPosition(i)] = foliage
+			fungus[idxtopos(i)] = foliage
 		}
 	}
 	return fungus
@@ -752,7 +719,7 @@ func (g *game) DoorCandidate(pos position) bool {
 func (g *game) PutDoors(percentage int) {
 	g.Doors = map[position]bool{}
 	for i := range g.Dungeon.Cells {
-		pos := g.Dungeon.CellPosition(i)
+		pos := idxtopos(i)
 		if g.DoorCandidate(pos) && RandInt(100) < percentage {
 			g.Doors[pos] = true
 		}

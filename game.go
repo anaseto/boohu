@@ -57,17 +57,17 @@ type Renderer interface {
 }
 
 func (g *game) FreeCell() position {
-	m := g.Dungeon
+	d := g.Dungeon
 	count := 0
 	for {
 		count++
 		if count > 1000 {
 			panic("FreeCell")
 		}
-		x := RandInt(m.Width)
-		y := RandInt(m.Height)
+		x := RandInt(DungeonWidth)
+		y := RandInt(DungeonHeight)
 		pos := position{x, y}
-		c := m.Cell(pos)
+		c := d.Cell(pos)
 		if c.T != FreeCell {
 			continue
 		}
@@ -92,17 +92,17 @@ func (g *game) FreeCellForImportantStair() position {
 }
 
 func (g *game) FreeCellForStatic() position {
-	m := g.Dungeon
+	d := g.Dungeon
 	count := 0
 	for {
 		count++
 		if count > 1000 {
 			panic("FreeCellForStatic")
 		}
-		x := RandInt(m.Width)
-		y := RandInt(m.Height)
+		x := RandInt(DungeonWidth)
+		y := RandInt(DungeonHeight)
 		pos := position{x, y}
-		c := m.Cell(pos)
+		c := d.Cell(pos)
 		if c.T != FreeCell {
 			continue
 		}
@@ -136,17 +136,17 @@ func (g *game) FreeCellForStatic() position {
 }
 
 func (g *game) FreeCellForMonster() position {
-	m := g.Dungeon
+	d := g.Dungeon
 	count := 0
 	for {
 		count++
 		if count > 1000 {
 			panic("FreeCellForMonster")
 		}
-		x := RandInt(m.Width)
-		y := RandInt(m.Height)
+		x := RandInt(DungeonWidth)
+		y := RandInt(DungeonHeight)
 		pos := position{x, y}
-		c := m.Cell(pos)
+		c := d.Cell(pos)
 		if c.T != FreeCell {
 			continue
 		}
@@ -183,17 +183,17 @@ func (g *game) FreeCellForBandMonster(pos position) position {
 }
 
 func (g *game) FreeForStairs() position {
-	m := g.Dungeon
+	d := g.Dungeon
 	count := 0
 	for {
 		count++
 		if count > 1000 {
 			panic("FreeForStairs")
 		}
-		x := RandInt(m.Width)
-		y := RandInt(m.Height)
+		x := RandInt(DungeonWidth)
+		y := RandInt(DungeonHeight)
 		pos := position{x, y}
-		c := m.Cell(pos)
+		c := d.Cell(pos)
 		if c.T != FreeCell {
 			continue
 		}
@@ -210,9 +210,9 @@ func (g *game) MaxDepth() int {
 }
 
 const (
-	DungeonHeigth = 21
+	DungeonHeight = 21
 	DungeonWidth  = 79
-	DungeonNCells = DungeonWidth * DungeonHeigth
+	DungeonNCells = DungeonWidth * DungeonHeight
 )
 
 func (g *game) GenDungeon() {
@@ -220,17 +220,17 @@ func (g *game) GenDungeon() {
 	switch RandInt(6) {
 	//switch 1 {
 	case 0:
-		g.GenCaveMap(DungeonHeigth, DungeonWidth)
-		g.Fungus = g.Foliage(DungeonHeigth, DungeonWidth)
+		g.GenCaveMap(DungeonHeight, DungeonWidth)
+		g.Fungus = g.Foliage(DungeonHeight, DungeonWidth)
 	case 1:
-		g.GenRoomMap(DungeonHeigth, DungeonWidth)
+		g.GenRoomMap(DungeonHeight, DungeonWidth)
 	case 2:
-		g.GenCellularAutomataCaveMap(DungeonHeigth, DungeonWidth)
-		g.Fungus = g.Foliage(DungeonHeigth, DungeonWidth)
+		g.GenCellularAutomataCaveMap(DungeonHeight, DungeonWidth)
+		g.Fungus = g.Foliage(DungeonHeight, DungeonWidth)
 	case 3:
-		g.GenCaveMapTree(DungeonHeigth, DungeonWidth)
+		g.GenCaveMapTree(DungeonHeight, DungeonWidth)
 	default:
-		g.GenRuinsMap(DungeonHeigth, DungeonWidth)
+		g.GenRuinsMap(DungeonHeight, DungeonWidth)
 	}
 }
 
