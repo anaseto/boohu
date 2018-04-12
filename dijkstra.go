@@ -80,7 +80,7 @@ func Dijkstra(dij Dijkstrer, sources []position, maxCost int) nodeMap {
 
 func (g *game) AutoExploreDijkstra(dij Dijkstrer, sources []int) {
 	d := g.Dungeon
-	dmap := AutoexploreMap
+	dmap := AutoexploreMap[:]
 	const unreachable = 9999
 	var visited [DungeonNCells]bool
 	var queue [DungeonNCells]int

@@ -128,6 +128,7 @@ func (g *game) SeePosition(pos position) {
 	} else if g.UnknownDig[pos] {
 		g.StopAuto()
 		g.Printf("There is no more a wall there.")
+		g.DijkstraMapRebuild = true
 	}
 	if g.UnknownDig[pos] {
 		delete(g.UnknownDig, pos)

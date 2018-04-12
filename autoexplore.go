@@ -2,11 +2,7 @@ package main
 
 import "errors"
 
-var AutoexploreMap []int
-
-func init() {
-	AutoexploreMap = make([]int, DungeonNCells)
-}
+var AutoexploreMap [DungeonNCells]int
 
 func (g *game) Autoexplore(ev event) error {
 	if mons := g.MonsterInLOS(); mons.Exists() {

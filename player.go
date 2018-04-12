@@ -286,10 +286,12 @@ func (g *game) CollectGround() {
 	if g.Gold[pos] > 0 {
 		g.Player.Gold += g.Gold[pos]
 		g.Printf("You pick up %d gold.", g.Gold[pos])
+		g.DijkstraMapRebuild = true
 		delete(g.Gold, pos)
 	}
 	if c, ok := g.Collectables[pos]; ok && c != nil {
 		g.Player.Consumables[c.Consumable] += c.Quantity
+		g.DijkstraMapRebuild = true
 		delete(g.Collectables, pos)
 		if c.Quantity > 1 {
 			g.Printf("You take %d %s.", c.Quantity, c.Consumable.Plural())
@@ -299,6 +301,7 @@ func (g *game) CollectGround() {
 	}
 	if r, ok := g.Rods[pos]; ok {
 		g.Player.Rods[r] = &rodProps{Charge: r.MaxCharge() - 1}
+		g.DijkstraMapRebuild = true
 		delete(g.Rods, pos)
 		g.Printf("You take a %s.", r)
 		g.StoryPrintf("You found and took a %s.", r)
