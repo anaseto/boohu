@@ -58,7 +58,11 @@ type noisePath struct {
 
 func (fp *noisePath) Neighbors(pos position) []position {
 	nb := fp.neighbors[:0]
-	return pos.Neighbors(nb, position.valid)
+	d := fp.game.Dungeon
+	keep := func(npos position) bool {
+		return npos.valid() && d.Cell(npos).T != WallCell
+	}
+	return pos.Neighbors(nb, keep)
 }
 
 func (fp *noisePath) Cost(from, to position) int {
