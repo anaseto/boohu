@@ -530,6 +530,9 @@ func (wp weapon) Equip(g *game) {
 		g.FoundEquipables[wp] = true
 	}
 	g.Printf("You take the %s and leave your %s on the ground.", wp, owp)
+	if wp == Frundis {
+		g.PrintfStyled("♫ ♪ … Oh, you're there, let's fight our way out!", logSpecial)
+	}
 	g.Equipables[g.Player.Pos] = owp
 }
 

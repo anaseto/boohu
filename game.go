@@ -354,6 +354,11 @@ func (g *game) InitLevel() {
 	g.ComputeLOS()
 	g.MakeMonstersAware()
 
+	// Frundis is somewhere in the level
+	if g.FrundisInLevel() {
+		g.PrintStyled("You hear some faint music… ♫ larilon, larila ♫ ♪", logSpecial)
+	}
+
 	// recharge rods
 	for r, props := range g.Player.Rods {
 		if props.Charge < r.MaxCharge() {
@@ -478,6 +483,15 @@ func (g *game) GenEquip(eq equipable, data equipableData) {
 		g.GeneratedEquipables[eq] = true
 	}
 
+}
+
+func (g *game) FrundisInLevel() bool {
+	for _, eq := range g.Equipables {
+		if wp, ok := eq.(weapon); ok && wp == Frundis {
+			return true
+		}
+	}
+	return false
 }
 
 func (g *game) Descend(ev event) bool {
