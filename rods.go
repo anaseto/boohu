@@ -275,14 +275,14 @@ const (
 )
 
 func (g *game) EvokeRodFog(ev event) error {
-	g.Fog(g.Player.Pos, ev)
+	g.Fog(g.Player.Pos, 3, ev)
 	g.Print("You are surrounded by a dense fog.")
 	return nil
 }
 
-func (g *game) Fog(at position, ev event) {
+func (g *game) Fog(at position, radius int, ev event) {
 	dij := &normalPath{game: g}
-	nm := Dijkstra(dij, []position{at}, 3)
+	nm := Dijkstra(dij, []position{at}, radius)
 	for pos := range nm {
 		_, ok := g.Clouds[pos]
 		if !ok {
@@ -325,6 +325,7 @@ func (g *game) EvokeRodShatter(ev event) error {
 		g.ComputeLOS()
 		g.MakeMonstersAware()
 		g.MakeNoise(19, g.Player.Target)
+		g.Fog(g.Player.Target, 2, ev)
 		g.Print("You see the wall disappear in a noisy explosion.")
 	} else {
 		g.MakeNoise(15, g.Player.Target)
