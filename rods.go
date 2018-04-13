@@ -275,8 +275,14 @@ const (
 )
 
 func (g *game) EvokeRodFog(ev event) error {
+	g.Fog(g.Player.Pos, ev)
+	g.Print("You are surrounded by a dense fog.")
+	return nil
+}
+
+func (g *game) Fog(at position, ev event) {
 	dij := &normalPath{game: g}
-	nm := Dijkstra(dij, []position{g.Player.Pos}, 3)
+	nm := Dijkstra(dij, []position{at}, 3)
 	for pos := range nm {
 		_, ok := g.Clouds[pos]
 		if !ok {
@@ -285,8 +291,6 @@ func (g *game) EvokeRodFog(ev event) error {
 		}
 	}
 	g.ComputeLOS()
-	g.Print("You are surrounded by a dense fog.")
-	return nil
 }
 
 func (g *game) EvokeRodDigging(ev event) error {

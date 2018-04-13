@@ -374,7 +374,8 @@ func (g *game) ThrowJavelin(mons *monster, ev event) {
 		evasion /= 2 + 1
 	}
 	if acc > evasion {
-		g.MakeNoise(12, mons.Pos)
+		noise := 12 + mons.Armor/3
+		g.MakeNoise(noise, mons.Pos)
 		bonus := 0
 		if g.Player.HasStatus(StatusBerserk) {
 			bonus += RandInt(5)
@@ -515,6 +516,7 @@ const (
 	Halberd
 	Sword
 	DoubleSword
+	Frundis
 )
 
 func (wp weapon) Equip(g *game) {
@@ -547,6 +549,8 @@ func (wp weapon) String() string {
 		return "sword"
 	case DoubleSword:
 		return "double sword"
+	case Frundis:
+		return "staff Frundis"
 	default:
 		// should not happen
 		return "some weapon"
@@ -570,6 +574,8 @@ func (wp weapon) Desc() string {
 		text = "A sword is a one-handed weapon that occasionally gets additional free hits."
 	case DoubleSword:
 		text = "A double sword is a big two-handed weapon that occasionally gets additional free hits."
+	case Frundis:
+		text = "Frundis is a musician and harmonist, which happens to be a two-handed staff too. It may occasionally confuse monsters on hit, or generate a dense magical fog. It magically helps reducing noise in combat."
 	}
 	return fmt.Sprintf("%s It can hit for up to %d damage.", text, wp.Attack())
 }
@@ -580,6 +586,8 @@ func (wp weapon) Attack() int {
 		return 11
 	case BattleAxe, Halberd, DoubleSword:
 		return 15
+	case Frundis:
+		return 13
 	case Dagger:
 		return 9
 	default:
@@ -589,7 +597,7 @@ func (wp weapon) Attack() int {
 
 func (wp weapon) TwoHanded() bool {
 	switch wp {
-	case BattleAxe, Halberd, DoubleSword:
+	case BattleAxe, Halberd, DoubleSword, Frundis:
 		return true
 	default:
 		return false
@@ -708,6 +716,7 @@ var EquipablesRepartitionData = map[equipable]equipableData{
 	Halberd:       {30, 3},
 	Sword:         {25, 1},
 	DoubleSword:   {30, 3},
+	Frundis:       {25, 3},
 	Buckler:       {10, 2},
 	Shield:        {15, 5},
 }

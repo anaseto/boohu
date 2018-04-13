@@ -75,6 +75,17 @@ func (g *game) MakeNoise(noise int, at position) {
 
 func (g *game) AttackMonster(mons *monster, ev event) {
 	switch {
+	case g.Player.Weapon == Frundis:
+		if !g.HitMonster(mons, ev) {
+			break
+		}
+		if RandInt(7) == 0 {
+			mons.EnterConfusion(g, ev)
+			g.PrintfStyled("Frundis glows… the %s appears confused.", logPlayerHit, mons.Kind)
+		} else if RandInt(11) == 0 {
+			g.Fog(mons.Pos, ev)
+			g.PrintfStyled("Frundis glows… the %s is surrounded by a dense fog.", logPlayerHit, mons.Kind)
+		}
 	case g.Player.Weapon.Cleave():
 		var neighbors []position
 		if g.Player.HasStatus(StatusConfusion) {
@@ -107,14 +118,32 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 	}
 }
 
-func (g *game) HitMonster(mons *monster, ev event) {
+func (g *game) HitNoise() int {
+	noise := 12
+	if g.Player.Weapon == Frundis || g.Player.Weapon == Dagger {
+		noise -= 2
+	}
+	if g.Player.Armour == Robe {
+		noise -= 1
+	}
+	noise += g.Player.Armor() / 2
+	return noise
+}
+
+func (g *game) HitMonster(mons *monster, ev event) (hit bool) {
 	acc := RandInt(g.Player.Accuracy())
 	evasion := RandInt(mons.Evasion)
 	if mons.State == Resting {
 		evasion /= 2 + 1
 	}
 	if acc > evasion {
-		g.MakeNoise(12, mons.Pos)
+		hit = true
+		noise := 12
+		if g.Player.Weapon == Frundis || g.Player.Weapon == Dagger {
+			noise -= 2
+		}
+		noise += mons.Armor / 3
+		g.MakeNoise(noise, mons.Pos)
 		bonus := 0
 		if g.Player.HasStatus(StatusBerserk) {
 			bonus += 2 + RandInt(4)
@@ -145,6 +174,7 @@ func (g *game) HitMonster(mons *monster, ev event) {
 		g.Printf("You miss the %v.", mons.Kind)
 	}
 	mons.MakeHuntIfHurt(g)
+	return hit
 }
 
 func (g *game) HandleKill(mons *monster) {

@@ -431,7 +431,7 @@ func (g *game) GenCollectables() {
 
 func (g *game) SeenGoodWeapon() bool {
 	return g.GeneratedEquipables[Sword] || g.GeneratedEquipables[DoubleSword] || g.GeneratedEquipables[Spear] || g.GeneratedEquipables[Halberd] ||
-		g.GeneratedEquipables[Axe] || g.GeneratedEquipables[BattleAxe]
+		g.GeneratedEquipables[Axe] || g.GeneratedEquipables[BattleAxe] || g.GeneratedEquipables[Frundis]
 }
 
 func (g *game) GenEquip(eq equipable, data equipableData) {
@@ -454,6 +454,10 @@ func (g *game) GenEquip(eq equipable, data equipableData) {
 				r = RandInt(5 * data.rarity / 4)
 			}
 		case weapon:
+			if eq == Frundis && g.GeneratedEquipables[Frundis] {
+				// unique
+				return
+			}
 			if !g.SeenGoodWeapon() && eq != Dagger {
 				r = data.FavorableRoll(-depthAdjust)
 			} else {
