@@ -654,6 +654,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 				g.UnknownDig[m.Pos] = true
 			}
 			g.MakeNoise(18, m.Pos)
+			g.Fog(m.Pos, 1, ev)
 			if g.Player.Pos.Distance(target) < 12 {
 				// XXX use dijkstra distance ?
 				g.Print("You hear an earth-breaking noise.")

@@ -231,6 +231,7 @@ func (cev *cloudEvent) Action(g *game) {
 			delete(g.TemporalWalls, cev.Pos)
 		}
 		g.MakeNoise(15, cev.Pos)
+		g.Fog(cev.Pos, 1, &simpleEvent{ERank: cev.Rank()})
 		g.ComputeLOS()
 	}
 }
