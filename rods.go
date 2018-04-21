@@ -373,7 +373,7 @@ func (g *game) EvokeRodObstruction(ev event) error {
 
 func (g *game) EvokeRodSwapping(ev event) error {
 	if g.Player.HasStatus(StatusLignification) {
-		return errors.New("You cannot blink while lignified.")
+		return errors.New("You cannot use this rod while lignified.")
 	}
 	if !g.ui.ChooseTarget(g, &chooser{}) {
 		return errors.New("Ok, then.")
