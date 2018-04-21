@@ -375,9 +375,6 @@ func (g *game) HealPlayer(ev event) {
 		g.Player.HP++
 	}
 	delay := 50
-	if g.Player.Aptitudes[AptRegen] {
-		delay = 25
-	}
 	ev.Renew(g, delay)
 }
 

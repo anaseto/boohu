@@ -9,7 +9,6 @@ const (
 	AptHealthy
 	AptStealthyMovement
 	AptScales
-	AptRegen
 	AptStealthyLOS
 	AptMagic
 	AptConfusingGas
@@ -39,8 +38,6 @@ func (ap aptitude) String() string {
 		text = "You are strong."
 	case AptMagic:
 		text = "You have big magic reserves."
-	case AptRegen:
-		text = "You regenerate quickly."
 	case AptStealthyLOS:
 		text = "The shadows follow you."
 	case AptConfusingGas:
