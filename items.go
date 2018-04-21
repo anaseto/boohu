@@ -383,7 +383,7 @@ func (g *game) ThrowJavelin(mons *monster, ev event) {
 		if g.Player.Aptitudes[AptStrong] {
 			bonus += 2
 		}
-		attack := g.HitDamage(11+bonus, mons.Armor)
+		attack := g.HitDamage(DmgPhysical, 11+bonus, mons.Armor)
 		mons.HP -= attack
 		if mons.HP > 0 {
 			g.PrintfStyled("Your %s hits the %s (%d).", logPlayerHit, Javelin, mons.Kind, attack)
@@ -517,6 +517,7 @@ const (
 	Sword
 	DoubleSword
 	Frundis
+	ElecWhip
 )
 
 func (wp weapon) Equip(g *game) {
@@ -554,6 +555,8 @@ func (wp weapon) String() string {
 		return "double sword"
 	case Frundis:
 		return "staff Frundis"
+	case ElecWhip:
+		return "lightning whip"
 	default:
 		// should not happen
 		return "some weapon"
@@ -579,6 +582,8 @@ func (wp weapon) Desc() string {
 		text = "A double sword is a big two-handed weapon that occasionally gets additional free hits."
 	case Frundis:
 		text = "Frundis is a musician and harmonist, which happens to be a two-handed staff too. It may occasionally confuse monsters on hit, or generate a dense magical fog. It magically helps reducing noise in combat."
+	case ElecWhip:
+		text = "A whip that inflicts electrical damage to a monster and any foes connected to it."
 	}
 	return fmt.Sprintf("%s It can hit for up to %d damage.", text, wp.Attack())
 }
@@ -593,6 +598,8 @@ func (wp weapon) Attack() int {
 		return 13
 	case Dagger:
 		return 9
+	case ElecWhip:
+		return 8
 	default:
 		return 0
 	}
@@ -719,7 +726,8 @@ var EquipablesRepartitionData = map[equipable]equipableData{
 	Halberd:       {30, 3},
 	Sword:         {25, 1},
 	DoubleSword:   {30, 3},
-	Frundis:       {25, 3},
+	Frundis:       {30, 3},
+	ElecWhip:      {30, 2},
 	Buckler:       {10, 2},
 	Shield:        {15, 5},
 }

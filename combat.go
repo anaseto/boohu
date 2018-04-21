@@ -2,10 +2,12 @@
 
 package main
 
-func (g *game) HitDamage(base int, armor int) int {
+func (g *game) HitDamage(dt dmgType, base int, armor int) int {
 	min := base / 2
 	attack := min + RandInt(base-min+1)
-	attack -= RandInt(armor + 1)
+	if dt == DmgPhysical {
+		attack -= RandInt(armor + 1)
+	}
 	if attack < 0 {
 		attack = 0
 	}
@@ -76,7 +78,7 @@ func (g *game) MakeNoise(noise int, at position) {
 func (g *game) AttackMonster(mons *monster, ev event) {
 	switch {
 	case g.Player.Weapon == Frundis:
-		if !g.HitMonster(mons, ev) {
+		if !g.HitMonster(DmgPhysical, mons, ev) {
 			break
 		}
 		if RandInt(7) == 0 {
@@ -96,24 +98,52 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 		for _, pos := range neighbors {
 			mons, _ := g.MonsterAt(pos)
 			if mons.Exists() {
-				g.HitMonster(mons, ev)
+				g.HitMonster(DmgPhysical, mons, ev)
 			}
 		}
 	case g.Player.Weapon.Pierce():
-		g.HitMonster(mons, ev)
+		g.HitMonster(DmgPhysical, mons, ev)
 		deltaX := mons.Pos.X - g.Player.Pos.X
 		deltaY := mons.Pos.Y - g.Player.Pos.Y
 		behind := position{g.Player.Pos.X + 2*deltaX, g.Player.Pos.Y + 2*deltaY}
 		if behind.valid() {
 			mons, _ := g.MonsterAt(behind)
 			if mons.Exists() {
-				g.HitMonster(mons, ev)
+				g.HitMonster(DmgPhysical, mons, ev)
 			}
 		}
+	case g.Player.Weapon == ElecWhip:
+		g.HitConnected(mons.Pos, DmgMagical, ev)
 	default:
-		g.HitMonster(mons, ev)
+		g.HitMonster(DmgPhysical, mons, ev)
 		if (g.Player.Weapon == Sword || g.Player.Weapon == DoubleSword) && RandInt(4) == 0 {
-			g.HitMonster(mons, ev)
+			g.HitMonster(DmgPhysical, mons, ev)
+		}
+	}
+}
+
+func (g *game) HitConnected(pos position, dt dmgType, ev event) {
+	d := g.Dungeon
+	conn := map[position]bool{}
+	stack := []position{pos}
+	conn[pos] = true
+	nb := make([]position, 0, 8)
+	for len(stack) > 0 {
+		pos = stack[len(stack)-1]
+		stack = stack[:len(stack)-1]
+		mons, _ := g.MonsterAt(pos)
+		if !mons.Exists() {
+			continue
+		}
+		g.HitMonster(dt, mons, ev)
+		nb = pos.Neighbors(nb, func(npos position) bool {
+			return npos.valid() && d.Cell(npos).T != WallCell
+		})
+		for _, npos := range nb {
+			if !conn[npos] {
+				conn[npos] = true
+				stack = append(stack, npos)
+			}
 		}
 	}
 }
@@ -130,7 +160,14 @@ func (g *game) HitNoise() int {
 	return noise
 }
 
-func (g *game) HitMonster(mons *monster, ev event) (hit bool) {
+type dmgType int
+
+const (
+	DmgPhysical dmgType = iota
+	DmgMagical
+)
+
+func (g *game) HitMonster(dt dmgType, mons *monster, ev event) (hit bool) {
 	acc := RandInt(g.Player.Accuracy())
 	evasion := RandInt(mons.Evasion)
 	if mons.State == Resting {
@@ -148,7 +185,7 @@ func (g *game) HitMonster(mons *monster, ev event) (hit bool) {
 		if g.Player.HasStatus(StatusBerserk) {
 			bonus += 2 + RandInt(4)
 		}
-		attack := g.HitDamage(g.Player.Attack()+bonus, mons.Armor)
+		attack := g.HitDamage(dt, g.Player.Attack()+bonus, mons.Armor)
 		if mons.State == Resting {
 			if g.Player.Weapon == Dagger {
 				attack *= 4
@@ -165,7 +202,8 @@ func (g *game) HitMonster(mons *monster, ev event) (hit bool) {
 			g.PrintfStyled("You kill the %v (%d damage).", logPlayerHit, mons.Kind, attack)
 			g.HandleKill(mons)
 		}
-		if mons.Kind == MonsBrizzia && RandInt(4) == 0 && !g.Player.HasStatus(StatusNausea) {
+		if mons.Kind == MonsBrizzia && RandInt(4) == 0 && !g.Player.HasStatus(StatusNausea) &&
+			mons.Pos.Distance(g.Player.Pos) == 1 {
 			g.Player.Statuses[StatusNausea]++
 			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 30 + RandInt(20), EAction: NauseaEnd})
 			g.Print("The brizzia's corpse releases a nauseous gas. You feel sick.")

@@ -702,7 +702,7 @@ func (m *monster) DramaticAdjustment(g *game, baseAttack, attack, evasion int) (
 	if attack >= g.Player.HP {
 		// a little dramatic effect
 		if RandInt(2) == 0 {
-			attack = g.HitDamage(baseAttack, g.Player.Armor())
+			attack = g.HitDamage(DmgPhysical, baseAttack, g.Player.Armor())
 		}
 		if attack >= g.Player.HP {
 			n := RandInt(g.Player.Evasion())
@@ -721,7 +721,7 @@ func (m *monster) HitPlayer(g *game, ev event) {
 	}
 	evasion := RandInt(g.Player.Evasion())
 	acc := RandInt(m.Accuracy)
-	attack := g.HitDamage(m.Attack, g.Player.Armor())
+	attack := g.HitDamage(DmgPhysical, m.Attack, g.Player.Armor())
 	attack, evasion = m.DramaticAdjustment(g, m.Attack, attack, evasion)
 	if acc > evasion {
 		if m.Blocked(g) {
@@ -898,7 +898,7 @@ func (m *monster) ThrowRock(g *game, ev event) bool {
 	hit := true
 	evasion := RandInt(g.Player.Evasion())
 	acc := RandInt(m.Accuracy)
-	attack := g.HitDamage(15, g.Player.Armor())
+	attack := g.HitDamage(DmgPhysical, 15, g.Player.Armor())
 	attack, evasion = m.DramaticAdjustment(g, 15, attack, evasion)
 	if 3*acc/2 <= evasion {
 		// rocks are big and do not miss so often
@@ -933,7 +933,7 @@ func (m *monster) ThrowJavelin(g *game, ev event) bool {
 	hit := true
 	evasion := RandInt(g.Player.Evasion())
 	acc := RandInt(m.Accuracy)
-	attack := g.HitDamage(11, g.Player.Armor())
+	attack := g.HitDamage(DmgPhysical, 11, g.Player.Armor())
 	attack, evasion = m.DramaticAdjustment(g, 11, attack, evasion)
 	if acc <= evasion {
 		hit = false
@@ -972,7 +972,7 @@ func (m *monster) ThrowAcid(g *game, ev event) bool {
 	hit := true
 	evasion := RandInt(g.Player.Evasion())
 	acc := RandInt(m.Accuracy)
-	attack := g.HitDamage(12, g.Player.Armor())
+	attack := g.HitDamage(DmgPhysical, 12, g.Player.Armor())
 	attack, evasion = m.DramaticAdjustment(g, 12, attack, evasion)
 	if acc <= evasion {
 		hit = false
