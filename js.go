@@ -11,7 +11,7 @@ import (
 	"github.com/gopherjs/gopherjs/js"
 )
 
-var Version string = "v0.4"
+var Version string = "v0.5"
 
 func main() {
 	tui := &termui{}

@@ -11,7 +11,7 @@ import (
 	"runtime/pprof"
 )
 
-var Version string = "v0.4"
+var Version string = "v0.5"
 
 func main() {
 	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to `file`")
