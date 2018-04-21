@@ -260,6 +260,7 @@ func (g *game) InitPlayer() {
 
 	// Testing
 	// g.Player.Aptitudes[AptSmoke] = true
+	//g.Player.Rods[RodSwapping] = &rodProps{Charge: 3}
 }
 
 func (g *game) InitLevel() {

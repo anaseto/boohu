@@ -16,6 +16,7 @@ const (
 	RodFog
 	RodObstruction
 	RodShatter
+	RodSwapping
 	// below unimplemented
 	RodConfusingClouds
 	RodFear
@@ -28,7 +29,7 @@ func (r rod) Letter() rune {
 
 func (r rod) Rare() bool {
 	switch r {
-	case RodDigging, RodTeleportOther, RodShatter:
+	case RodDigging, RodTeleportOther, RodShatter, RodSwapping:
 		return true
 	default:
 		return false
@@ -56,6 +57,8 @@ func (r rod) String() string {
 		text = "rod of obstruction"
 	case RodShatter:
 		text = "rod of shatter"
+	case RodSwapping:
+		text = "rod of swapping"
 	case RodFreezingClouds:
 		text = "rod of freezing clouds"
 	case RodConfusingClouds:
@@ -83,6 +86,8 @@ func (r rod) Desc() string {
 		text = "creates a temporary wall at targeted location."
 	case RodShatter:
 		text = "induces an explosion around a wall. The wall can disintegrate."
+	case RodSwapping:
+		text = "makes you swap positions with a targeted monster."
 	case RodFear:
 		text = "TODO"
 	case RodFreezingClouds:
@@ -155,6 +160,8 @@ func (r rod) Use(g *game, ev event) error {
 		err = g.EvokeRodObstruction(ev)
 	case RodShatter:
 		err = g.EvokeRodShatter(ev)
+	case RodSwapping:
+		err = g.EvokeRodSwapping(ev)
 	}
 
 	if err != nil {
@@ -216,10 +223,7 @@ func (g *game) EvokeRodTeleportOther(ev event) error {
 		return errors.New("Ok, then.")
 	}
 	mons, _ := g.MonsterAt(g.Player.Target)
-	if mons == nil {
-		// should not happen (done in the targeter)
-		return errors.New("You must target a monster for using this rod.")
-	}
+	// mons not nil (check done in the targeter)
 	mons.TeleportAway(g)
 	return nil
 }
@@ -367,6 +371,24 @@ func (g *game) EvokeRodObstruction(ev event) error {
 	return nil
 }
 
+func (g *game) EvokeRodSwapping(ev event) error {
+	if g.Player.HasStatus(StatusLignification) {
+		return errors.New("You cannot blink while lignified.")
+	}
+	if !g.ui.ChooseTarget(g, &chooser{}) {
+		return errors.New("Ok, then.")
+	}
+	mons, _ := g.MonsterAt(g.Player.Target)
+	// mons not nil (check done in the targeter)
+	mons.Pos, g.Player.Pos = g.Player.Pos, mons.Pos
+	mons.MakeAware(g)
+	g.Printf("You swap positions with the %s.", mons.Kind)
+	g.CollectGround()
+	g.ComputeLOS()
+	g.MakeMonstersAware()
+	return nil
+}
+
 func (g *game) GeneratedRodsCount() int {
 	count := 0
 	for _, b := range g.GeneratedRods {
@@ -386,8 +408,8 @@ func (g *game) GenerateRod() {
 		}
 		pos := g.FreeCellForStatic()
 		r := rod(RandInt(int(RodShatter) + 1))
-		if r.Rare() && RandInt(2) == 0 {
-			r = rod(RandInt(int(RodShatter) + 1))
+		if r.Rare() && RandInt(3) == 0 {
+			r = rod(RandInt(int(RodSwapping) + 1))
 		}
 		if g.Player.Rods[r] == nil && !g.GeneratedRods[r] {
 			g.GeneratedRods[r] = true
