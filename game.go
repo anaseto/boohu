@@ -363,7 +363,11 @@ func (g *game) InitLevel() {
 	// recharge rods
 	for r, props := range g.Player.Rods {
 		if props.Charge < r.MaxCharge() {
-			props.Charge += RandInt(1 + r.Rate())
+			rchg := RandInt(1 + r.Rate())
+			if rchg == 0 && RandInt(2) == 0 {
+				rchg++
+			}
+			props.Charge += rchg
 		}
 		if props.Charge > r.MaxCharge() {
 			props.Charge = r.MaxCharge()
