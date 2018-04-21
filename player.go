@@ -209,14 +209,14 @@ func (g *game) ScummingAction(ev event) {
 					g.Dungeon.SetCell(pos, FreeCell)
 				}
 			}
-			g.Print("You hear a terrible explosion coming from the ground. You are lignified.")
+			g.PrintStyled("You hear a terrible explosion coming from the ground. You are lignified.", logCritic)
 			g.Player.Statuses[StatusLignification]++
 			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 240 + RandInt(10), EAction: LignificationEnd})
 		} else {
 			delay := 20 + RandInt(5)
 			g.Player.Statuses[StatusTele]++
 			g.PushEvent(&simpleEvent{ERank: ev.Rank() + delay, EAction: Teleportation})
-			g.Print("Something hurt you! You feel unstable.")
+			g.PrintStyled("Something hurt you! You feel unstable.", logCritic)
 		}
 		g.Scumming = 0
 	}
