@@ -442,7 +442,7 @@ func (g *game) GenCollectables() {
 
 func (g *game) SeenGoodWeapon() bool {
 	return g.GeneratedEquipables[Sword] || g.GeneratedEquipables[DoubleSword] || g.GeneratedEquipables[Spear] || g.GeneratedEquipables[Halberd] ||
-		g.GeneratedEquipables[Axe] || g.GeneratedEquipables[BattleAxe] || g.GeneratedEquipables[Frundis]
+		g.GeneratedEquipables[Axe] || g.GeneratedEquipables[BattleAxe] || g.GeneratedEquipables[Frundis] || g.GeneratedEquipables[ElecWhip]
 }
 
 func (g *game) GenEquip(eq equipable, data equipableData) {
