@@ -583,7 +583,7 @@ func (wp weapon) Desc() string {
 	case Frundis:
 		text = "Frundis is a musician and harmonist, which happens to be a two-handed staff too. It may occasionally confuse monsters on hit, or generate a dense magical fog. It magically helps reducing noise in combat."
 	case ElecWhip:
-		text = "A one-handed weapon that inflicts electrical damage to a monster and any foes connected to it."
+		text = "The lightning whip is a one-handed weapon that inflicts electrical damage to a monster and any foes connected to it."
 	}
 	return fmt.Sprintf("%s It can hit for up to %d damage.", text, wp.Attack())
 }
