@@ -205,7 +205,7 @@ func (d *dungeon) ConnectRoomsShortestPath(r1, r2 room) {
 	}
 }
 
-func (d *dungeon) PutRoom(r room) {
+func (d *dungeon) DigRoom(r room) {
 	for i := r.pos.X; i < r.pos.X+r.w; i++ {
 		for j := r.pos.Y; j < r.pos.Y+r.h; j++ {
 			rpos := position{i, j}
@@ -214,6 +214,53 @@ func (d *dungeon) PutRoom(r room) {
 			}
 		}
 	}
+}
+
+func (d *dungeon) IsAreaFree(pos position, h, w int) bool {
+	for i := pos.X; i < pos.X+w; i++ {
+		for j := pos.Y; j < pos.Y+h; j++ {
+			rpos := position{i, j}
+			if !rpos.valid() || d.Cell(rpos).T != FreeCell {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+func (d *dungeon) BuildRoom(pos position, w, h int) bool {
+	spos := position{pos.X - 1, pos.Y - 1}
+	if !d.IsAreaFree(spos, h+2, w+2) {
+		return false
+	}
+	for i := pos.X; i < pos.X+w; i++ {
+		d.SetCell(position{i, pos.Y}, WallCell)
+		d.SetCell(position{i, pos.Y + h - 1}, WallCell)
+	}
+	for i := pos.Y; i < pos.Y+h; i++ {
+		d.SetCell(position{pos.X, i}, WallCell)
+		d.SetCell(position{pos.X + w - 1, i}, WallCell)
+	}
+	doors := [4]position{
+		position{pos.X + w/2, pos.Y},
+		position{pos.X + w/2, pos.Y + h - 1},
+		position{pos.X, pos.Y + h/2},
+		position{pos.X + w - 1, pos.Y + h/2},
+	}
+	for i := 0; i < 4; i++ {
+		d.SetCell(doors[RandInt(4)], FreeCell)
+	}
+	return true
+}
+
+func (d *dungeon) BuildSomeRoom(w, h int) bool {
+	for i := 0; i < 100; i++ {
+		pos := d.FreeCell()
+		if d.BuildRoom(pos, w, h) {
+			return true
+		}
+	}
+	return false
 }
 
 func (g *game) GenRuinsMap(h, w int) {
@@ -234,7 +281,7 @@ func (g *game) GenRuinsMap(h, w int) {
 			}
 		}
 
-		d.PutRoom(ro)
+		d.DigRoom(ro)
 		if len(rooms) > 0 {
 			r := RandInt(100)
 			if r > 75 {
@@ -277,7 +324,7 @@ func (g *game) GenRoomMap(h, w int) {
 			}
 		}
 
-		d.PutRoom(ro)
+		d.DigRoom(ro)
 		rooms = append(rooms, ro)
 	}
 	sort.Sort(roomSlice(rooms))
@@ -391,6 +438,7 @@ loop:
 		}
 		digs++
 	}
+	//d.BuildSomeRoom(9, 7)
 	g.Dungeon = d
 	g.PutDoors(5)
 }

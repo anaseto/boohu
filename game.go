@@ -218,7 +218,7 @@ const (
 func (g *game) GenDungeon() {
 	g.Fungus = make(map[position]vegetation)
 	switch RandInt(6) {
-	//switch 1 {
+	//switch 0 {
 	case 0:
 		g.GenCaveMap(DungeonHeight, DungeonWidth)
 		g.Fungus = g.Foliage(DungeonHeight, DungeonWidth)
