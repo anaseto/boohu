@@ -241,13 +241,26 @@ func (d *dungeon) BuildRoom(pos position, w, h int) bool {
 		d.SetCell(position{pos.X, i}, WallCell)
 		d.SetCell(position{pos.X + w - 1, i}, WallCell)
 	}
+	if RandInt(2) == 0 {
+		n := RandInt(2)
+		for x := pos.X + 1; x < pos.X+w-1; x++ {
+			m := n
+			for y := pos.Y + 1; y < pos.Y+h-1; y++ {
+				if m%2 == 0 {
+					d.SetCell(position{x, y}, WallCell)
+				}
+				m++
+			}
+			n++
+		}
+	}
 	doors := [4]position{
 		position{pos.X + w/2, pos.Y},
 		position{pos.X + w/2, pos.Y + h - 1},
 		position{pos.X, pos.Y + h/2},
 		position{pos.X + w - 1, pos.Y + h/2},
 	}
-	for i := 0; i < 4; i++ {
+	for i := 0; i < 3+RandInt(2); i++ {
 		d.SetCell(doors[RandInt(4)], FreeCell)
 	}
 	return true
@@ -438,7 +451,12 @@ loop:
 		}
 		digs++
 	}
-	//d.BuildSomeRoom(9, 7)
+	if RandInt(3) > 0 {
+		d.BuildSomeRoom(9, 7)
+		if RandInt(3) == 0 {
+			d.BuildSomeRoom(9, 7)
+		}
+	}
 	g.Dungeon = d
 	g.PutDoors(5)
 }
