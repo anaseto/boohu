@@ -92,7 +92,14 @@ func intersectsRoom(rooms []room, r room) bool {
 
 func (d *dungeon) connectRooms(r1, r2 room) {
 	x := r1.pos.X
+	if x < r2.pos.X {
+		x += r1.w - 1
+	}
 	y := r1.pos.Y
+	if y < r2.pos.Y {
+		y += r1.h - 1
+	}
+	d.SetCell(position{x, y}, FreeCell)
 	count := 0
 	for {
 		count++
@@ -121,11 +128,19 @@ func (d *dungeon) connectRooms(r1, r2 room) {
 		}
 		break
 	}
+	d.SetCell(r2.pos, FreeCell)
 }
 
 func (d *dungeon) connectRoomsDiagonally(r1, r2 room) {
 	x := r1.pos.X
+	if x < r2.pos.X {
+		x += r1.w - 1
+	}
 	y := r1.pos.Y
+	if y < r2.pos.Y {
+		y += r1.h - 1
+	}
+	d.SetCell(position{x, y}, FreeCell)
 	count := 0
 	for {
 		count++
@@ -182,6 +197,7 @@ func (d *dungeon) connectRoomsDiagonally(r1, r2 room) {
 		}
 		break
 	}
+	d.SetCell(r2.pos, FreeCell)
 }
 
 func (d *dungeon) Area(area []position, pos position, radius int) []position {
@@ -198,8 +214,25 @@ func (d *dungeon) Area(area []position, pos position, radius int) []position {
 }
 
 func (d *dungeon) ConnectRoomsShortestPath(r1, r2 room) {
+	var r1pos, r2pos position
+	r1pos.X = r1.pos.X + RandInt(r1.w)
+	if r1pos.X < r2.pos.X {
+		r1pos.X = r1.pos.X + r1.w - 1
+	}
+	r1pos.Y = r1.pos.Y + RandInt(r1.h)
+	if r1pos.Y < r2.pos.Y {
+		r1pos.Y = r1.pos.Y + r1.h - 1
+	}
+	r2pos.X = r2.pos.X + RandInt(r2.w)
+	if r2pos.X < r1.pos.X {
+		r2pos.X = r2.pos.X + r2.w - 1
+	}
+	r2pos.Y = r2.pos.Y + RandInt(r2.h)
+	if r2pos.Y < r1.pos.Y {
+		r2pos.Y = r2.pos.Y + r2.h - 1
+	}
 	mp := &dungeonPath{dungeon: d}
-	path, _, _ := AstarPath(mp, r1.pos, r2.pos)
+	path, _, _ := AstarPath(mp, r1pos, r2pos)
 	for _, pos := range path {
 		d.SetCell(pos, FreeCell)
 	}
@@ -213,6 +246,32 @@ func (d *dungeon) DigRoom(r room) {
 				d.SetCell(rpos, FreeCell)
 			}
 		}
+	}
+}
+
+func (d *dungeon) PutCols(r room) {
+	for i := r.pos.X + 1; i < r.pos.X+r.w-1; i += 2 {
+		for j := r.pos.Y + 1; j < r.pos.Y+r.h-1; j += 2 {
+			rpos := position{i, j}
+			if rpos.valid() {
+				d.SetCell(rpos, WallCell)
+			}
+		}
+	}
+}
+
+func (d *dungeon) PutDiagCols(r room) {
+	n := RandInt(2)
+	for i := r.pos.X + 1; i < r.pos.X+r.w-1; i++ {
+		m := n
+		for j := r.pos.Y + 1; j < r.pos.Y+r.h-1; j++ {
+			rpos := position{i, j}
+			if rpos.valid() && m%2 == 0 {
+				d.SetCell(rpos, WallCell)
+			}
+			m++
+		}
+		n++
 	}
 }
 
@@ -288,6 +347,16 @@ func (d *dungeon) BuildSomeRoom(w, h int) map[position]bool {
 	return nil
 }
 
+func (d *dungeon) ResizeRoom(r room) room {
+	if DungeonWidth-r.pos.X < r.w {
+		r.w = DungeonWidth - r.pos.X
+	}
+	if DungeonHeight-r.pos.Y < r.h {
+		r.h = DungeonHeight - r.pos.Y
+	}
+	return r
+}
+
 func (g *game) GenRuinsMap(h, w int) {
 	d := &dungeon{}
 	d.Cells = make([]cell, h*w)
@@ -301,12 +370,20 @@ func (g *game) GenRuinsMap(h, w int) {
 				pos: position{RandInt(w - 1), RandInt(h - 1)},
 				w:   3 + RandInt(5),
 				h:   2 + RandInt(3)}
+			ro = d.ResizeRoom(ro)
 			if !intersectsRoom(rooms, ro) {
 				break
 			}
 		}
 
 		d.DigRoom(ro)
+		if RandInt(45) == 0 {
+			if RandInt(2) == 0 {
+				d.PutCols(ro)
+			} else {
+				d.PutDiagCols(ro)
+			}
+		}
 		if len(rooms) > 0 {
 			r := RandInt(100)
 			if r > 75 {
@@ -374,12 +451,20 @@ func (g *game) GenRoomMap(h, w int) {
 				pos: position{RandInt(w - 1), RandInt(h - 1)},
 				w:   5 + RandInt(4),
 				h:   3 + RandInt(3)}
+			ro = d.ResizeRoom(ro)
 			if !intersectsRoom(rooms, ro) {
 				break
 			}
 		}
 
 		d.DigRoom(ro)
+		if RandInt(35) == 0 {
+			if RandInt(2) == 0 {
+				d.PutCols(ro)
+			} else {
+				d.PutDiagCols(ro)
+			}
+		}
 		rooms = append(rooms, ro)
 	}
 	sort.Sort(roomSlice(rooms))

@@ -95,7 +95,7 @@ func (r rod) Desc() string {
 	case RodConfusingClouds:
 		text = "TODO"
 	}
-	return fmt.Sprintf("The %s %s. Rods sometimes regain charges as you go deeper. This rod can have up to %d charges.", r, text, r.MaxCharge)
+	return fmt.Sprintf("The %s %s. Rods sometimes regain charges as you go deeper. This rod can have up to %d charges.", r, text, r.MaxCharge())
 }
 
 type rodProps struct {
