@@ -228,10 +228,10 @@ func (d *dungeon) IsAreaFree(pos position, h, w int) bool {
 	return true
 }
 
-func (d *dungeon) BuildRoom(pos position, w, h int) bool {
+func (d *dungeon) BuildRoom(pos position, w, h int) map[position]bool {
 	spos := position{pos.X - 1, pos.Y - 1}
 	if !d.IsAreaFree(spos, h+2, w+2) {
-		return false
+		return nil
 	}
 	for i := pos.X; i < pos.X+w; i++ {
 		d.SetCell(position{i, pos.Y}, WallCell)
@@ -253,27 +253,39 @@ func (d *dungeon) BuildRoom(pos position, w, h int) bool {
 			}
 			n++
 		}
+	} else {
+		n := RandInt(2)
+		for x := pos.X + 1 + RandInt(2); x < pos.X+w-1; x += 2 {
+			for y := pos.Y + 1 + n; y < pos.Y+h-1; y += 2 {
+				d.SetCell(position{x, y}, WallCell)
+			}
+		}
+
 	}
-	doors := [4]position{
+	doorsc := [4]position{
 		position{pos.X + w/2, pos.Y},
 		position{pos.X + w/2, pos.Y + h - 1},
 		position{pos.X, pos.Y + h/2},
 		position{pos.X + w - 1, pos.Y + h/2},
 	}
+	doors := make(map[position]bool)
 	for i := 0; i < 3+RandInt(2); i++ {
-		d.SetCell(doors[RandInt(4)], FreeCell)
+		dpos := doorsc[RandInt(4)]
+		doors[dpos] = true
+		d.SetCell(dpos, FreeCell)
 	}
-	return true
+	return doors
 }
 
-func (d *dungeon) BuildSomeRoom(w, h int) bool {
+func (d *dungeon) BuildSomeRoom(w, h int) map[position]bool {
 	for i := 0; i < 100; i++ {
 		pos := d.FreeCell()
-		if d.BuildRoom(pos, w, h) {
-			return true
+		doors := d.BuildRoom(pos, w, h)
+		if doors != nil {
+			return doors
 		}
 	}
-	return false
+	return nil
 }
 
 func (g *game) GenRuinsMap(h, w int) {
@@ -451,14 +463,30 @@ loop:
 		}
 		digs++
 	}
+	doors := make(map[position]bool)
 	if RandInt(3) > 0 {
-		d.BuildSomeRoom(9, 7)
+		w, h := GenCaveRoomSize()
+		for pos := range d.BuildSomeRoom(w, h) {
+			doors[pos] = true
+		}
 		if RandInt(3) == 0 {
-			d.BuildSomeRoom(9, 7)
+			w, h := GenCaveRoomSize()
+			for pos := range d.BuildSomeRoom(w, h) {
+				doors[pos] = true
+			}
 		}
 	}
 	g.Dungeon = d
 	g.PutDoors(5)
+	for pos := range doors {
+		if g.DoorCandidate(pos) && RandInt(100) > 20 {
+			g.Doors[pos] = true
+		}
+	}
+}
+
+func GenCaveRoomSize() (int, int) {
+	return 7 + 2*RandInt(2), 5 + 2*RandInt(2)
 }
 
 func (d *dungeon) HasFreeNeighbor(pos position) bool {
