@@ -398,14 +398,17 @@ func (g *game) GenRuinsMap(h, w int) {
 	}
 	g.Dungeon = d
 	g.Fungus = make(map[position]vegetation)
-	g.DigFungus(RandInt(2) == 0, RandInt(3))
+	g.DigFungus(RandInt(3))
 	g.PutDoors(20)
 }
 
-func (g *game) DigFungus(dig bool, n int) {
+func (g *game) DigFungus(n int) {
 	d := g.Dungeon
 	fungus := g.Foliage(DungeonHeight, DungeonWidth)
 	for i := 0; i < 100; i++ {
+		if n <= 0 {
+			break
+		}
 		pos := d.FreeCell()
 		if _, ok := fungus[pos]; ok {
 			continue
@@ -418,15 +421,12 @@ func (g *game) DigFungus(dig bool, n int) {
 			continue
 		}
 		for pos := range conn {
-			if dig {
+			if RandInt(2) == 0 {
 				d.SetCell(pos, FreeCell)
 			}
 			g.Fungus[pos] = foliage
 		}
 		n--
-		if n < 0 {
-			break
-		}
 	}
 }
 
@@ -679,7 +679,7 @@ loop:
 	}
 	g.Dungeon = d
 	g.Fungus = make(map[position]vegetation)
-	g.DigFungus(RandInt(2) == 0, RandInt(3))
+	g.DigFungus(RandInt(3))
 	g.PutDoors(5)
 }
 
