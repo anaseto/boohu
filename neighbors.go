@@ -36,18 +36,18 @@ func (pos position) ValidNeighbors() []position {
 	return nb
 }
 
+func (d *dungeon) IsFreeCell(pos position) bool {
+	return pos.valid() && d.Cell(pos).T != WallCell
+}
+
 func (d *dungeon) FreeNeighbors(pos position) []position {
 	nb := make([]position, 0, 8)
-	nb = pos.Neighbors(nb, func(npos position) bool {
-		return npos.valid() && d.Cell(npos).T != WallCell
-	})
+	nb = pos.Neighbors(nb, d.IsFreeCell)
 	return nb
 }
 
 func (d *dungeon) CardinalFreeNeighbors(pos position) []position {
 	nb := make([]position, 0, 4)
-	nb = pos.CardinalNeighbors(nb, func(npos position) bool {
-		return npos.valid() && d.Cell(npos).T != WallCell
-	})
+	nb = pos.CardinalNeighbors(nb, d.IsFreeCell)
 	return nb
 }

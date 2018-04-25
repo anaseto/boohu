@@ -320,7 +320,37 @@ func (g *game) GenRuinsMap(h, w int) {
 		rooms = append(rooms, ro)
 	}
 	g.Dungeon = d
+	g.Fungus = make(map[position]vegetation)
+	g.DigFungus(RandInt(2) == 0, RandInt(3))
 	g.PutDoors(20)
+}
+
+func (g *game) DigFungus(dig bool, n int) {
+	d := g.Dungeon
+	fungus := g.Foliage(DungeonHeight, DungeonWidth)
+	for i := 0; i < 100; i++ {
+		pos := d.FreeCell()
+		if _, ok := fungus[pos]; ok {
+			continue
+		}
+		conn, count := d.Connected(pos, func(npos position) bool {
+			_, ok := fungus[npos]
+			return ok && d.IsFreeCell(npos)
+		})
+		if count < 3 {
+			continue
+		}
+		for pos := range conn {
+			if dig {
+				d.SetCell(pos, FreeCell)
+			}
+			g.Fungus[pos] = foliage
+		}
+		n--
+		if n < 0 {
+			break
+		}
+	}
 }
 
 type roomSlice []room
@@ -563,6 +593,8 @@ loop:
 		}
 	}
 	g.Dungeon = d
+	g.Fungus = make(map[position]vegetation)
+	g.DigFungus(RandInt(2) == 0, RandInt(3))
 	g.PutDoors(5)
 }
 
@@ -583,7 +615,7 @@ func (d *dungeon) WallAreaCount(area []position, pos position, radius int) int {
 	return count
 }
 
-func (d *dungeon) Connected(pos position) (map[position]bool, int) {
+func (d *dungeon) Connected(pos position, nf func(position) bool) (map[position]bool, int) {
 	conn := map[position]bool{}
 	stack := []position{pos}
 	count := 0
@@ -593,9 +625,7 @@ func (d *dungeon) Connected(pos position) (map[position]bool, int) {
 		pos = stack[len(stack)-1]
 		stack = stack[:len(stack)-1]
 		count++
-		nb = pos.Neighbors(nb, func(npos position) bool {
-			return npos.valid() && d.Cell(npos).T != WallCell
-		})
+		nb = pos.Neighbors(nb, nf)
 		for _, npos := range nb {
 			if !conn[npos] {
 				conn[npos] = true
@@ -608,7 +638,7 @@ func (d *dungeon) Connected(pos position) (map[position]bool, int) {
 
 func (d *dungeon) connex() bool {
 	pos := d.FreeCell()
-	conn, _ := d.Connected(pos)
+	conn, _ := d.Connected(pos, d.IsFreeCell)
 	for i, c := range d.Cells {
 		if c.T == FreeCell && !conn[idxtopos(i)] {
 			return false
@@ -659,7 +689,7 @@ func (g *game) RunCellularAutomataCave(h, w int) bool {
 			continue
 		}
 		var ncount int
-		conn, ncount = d.Connected(pos)
+		conn, ncount = d.Connected(pos, d.IsFreeCell)
 		if ncount > count {
 			count = ncount
 			winner = pos
@@ -668,7 +698,7 @@ func (g *game) RunCellularAutomataCave(h, w int) bool {
 			break
 		}
 	}
-	conn, count = d.Connected(winner)
+	conn, count = d.Connected(winner, d.IsFreeCell)
 	if count <= 37*DungeonHeight*DungeonWidth/100 {
 		return false
 	}
