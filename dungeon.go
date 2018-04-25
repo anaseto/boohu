@@ -314,7 +314,15 @@ func (d *dungeon) BuildRoom(pos position, w, h int) map[position]bool {
 		}
 	} else {
 		n := RandInt(2)
-		for x := pos.X + 1 + RandInt(2); x < pos.X+w-1; x += 2 {
+		m := RandInt(2)
+		if n == 0 && m == 0 {
+			// round room
+			d.SetCell(pos, FreeCell)
+			d.SetCell(position{pos.X, pos.Y + h - 1}, FreeCell)
+			d.SetCell(position{pos.X + w - 1, pos.Y}, FreeCell)
+			d.SetCell(position{pos.X + w - 1, pos.Y + h - 1}, FreeCell)
+		}
+		for x := pos.X + 1 + m; x < pos.X+w-1; x += 2 {
 			for y := pos.Y + 1 + n; y < pos.Y+h-1; y += 2 {
 				d.SetCell(position{x, y}, WallCell)
 			}
