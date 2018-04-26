@@ -294,8 +294,12 @@ func (g *game) InitLevel() {
 	// Equipment
 	g.Equipables = make(map[position]equipable)
 	for eq, data := range EquipablesRepartitionData {
+		if _, ok := eq.(weapon); ok {
+			continue
+		}
 		g.GenEquip(eq, data)
 	}
+	g.GenWeapon()
 
 	// Rods
 	g.Rods = map[position]rod{}
@@ -445,6 +449,50 @@ func (g *game) SeenGoodWeapon() bool {
 		g.GeneratedEquipables[Axe] || g.GeneratedEquipables[BattleAxe] || g.GeneratedEquipables[Frundis] || g.GeneratedEquipables[ElecWhip]
 }
 
+func (g *game) GenWeapon() {
+	wps := [9]weapon{Dagger, Axe, BattleAxe, Spear, Halberd, Sword, DoubleSword, Frundis, ElecWhip}
+	n := 11
+	if !g.SeenGoodWeapon() {
+		n -= 4 * g.Depth
+		if n < 2 {
+			n = 2
+		}
+	} else if g.Player.Weapon != Dagger {
+		n *= 2
+	}
+	r := RandInt(n)
+	if r != 0 && !g.SeenGoodWeapon() && g.Depth > 3 {
+		r = RandInt(n)
+	}
+	if r != 0 {
+		return
+	}
+loop:
+	for {
+		for i := 0; i < len(wps); i++ {
+			if wps[i] == Frundis && g.GeneratedEquipables[Frundis] {
+				// unique
+				return
+			}
+			n := 30
+			if wps[i].TwoHanded() && g.Depth < 3 {
+				n *= (3 - g.Depth)
+			}
+			if wps[i] == Dagger {
+				n *= 2
+			}
+			r := RandInt(n)
+			if r == 0 {
+				pos := g.FreeCellForStatic()
+				g.Equipables[pos] = wps[i]
+				g.GeneratedEquipables[wps[i]] = true
+				break loop
+			}
+		}
+
+	}
+}
+
 func (g *game) GenEquip(eq equipable, data equipableData) {
 	depthAdjust := data.minDepth - g.Depth
 	var r int
@@ -464,23 +512,9 @@ func (g *game) GenEquip(eq equipable, data equipableData) {
 			} else {
 				r = RandInt(5 * data.rarity / 4)
 			}
-		case weapon:
-			if eq == Frundis && g.GeneratedEquipables[Frundis] {
-				// unique
-				return
-			}
-			if !g.SeenGoodWeapon() && eq != Dagger {
-				r = data.FavorableRoll(-depthAdjust)
-			} else {
-				if g.Player.Weapon != Dagger {
-					r = RandInt(data.rarity * 4)
-				} else {
-					r = RandInt(5 * data.rarity / 4)
-				}
-			}
 		default:
 			// not reached
-			r = RandInt(data.rarity)
+			return
 		}
 	}
 	if r == 0 {
