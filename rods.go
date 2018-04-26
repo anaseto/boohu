@@ -23,6 +23,8 @@ const (
 	RodFreezingClouds
 )
 
+const NumRods = int(RodSwapping)
+
 func (r rod) Letter() rune {
 	return '/'
 }
@@ -407,9 +409,9 @@ func (g *game) GenerateRod() {
 			panic("GenerateRod")
 		}
 		pos := g.FreeCellForStatic()
-		r := rod(RandInt(int(RodShatter) + 1))
+		r := rod(RandInt(NumRods + 1))
 		if r.Rare() && RandInt(3) == 0 {
-			r = rod(RandInt(int(RodSwapping) + 1))
+			r = rod(RandInt(NumRods + 1))
 		}
 		if g.Player.Rods[r] == nil && !g.GeneratedRods[r] {
 			g.GeneratedRods[r] = true
