@@ -78,10 +78,11 @@ func Dijkstra(dij Dijkstrer, sources []position, maxCost int) nodeMap {
 	}
 }
 
+const unreachable = 9999
+
 func (g *game) AutoExploreDijkstra(dij Dijkstrer, sources []int) {
 	d := g.Dungeon
 	dmap := AutoexploreMap[:]
-	const unreachable = 9999
 	var visited [DungeonNCells]bool
 	var queue [DungeonNCells]int
 	var qstart, qend int

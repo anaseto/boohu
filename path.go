@@ -102,7 +102,7 @@ func (ap *autoexplorePath) Neighbors(pos position) []position {
 	d := ap.game.Dungeon
 	nb := ap.neighbors[:0]
 	keep := func(npos position) bool {
-		return npos.valid() && d.Cell(npos).T != WallCell && !ap.game.ExclusionsMap[pos]
+		return npos.valid() && d.Cell(npos).T != WallCell && !ap.game.ExclusionsMap[npos]
 	}
 	if ap.game.Player.HasStatus(StatusConfusion) {
 		nb = pos.CardinalNeighbors(nb, keep)

@@ -11,10 +11,10 @@ func (g *game) Autoexplore(ev event) error {
 	if g.ExclusionsMap[g.Player.Pos] {
 		return errors.New("You cannot auto-explore while in an excluded area.")
 	}
-	sources := g.AutoexploreSources()
 	if g.AllExplored() {
 		return errors.New("Nothing left to explore.")
 	}
+	sources := g.AutoexploreSources()
 	if len(sources) == 0 {
 		return errors.New("Some excluded places remain unexplored.")
 	}
@@ -77,6 +77,9 @@ func (g *game) BuildAutoexploreMap(sources []int) {
 
 func (g *game) NextAuto() (next *position, finished bool) {
 	ap := &autoexplorePath{game: g}
+	if AutoexploreMap[g.Player.Pos.idx()] == unreachable {
+		return nil, false
+	}
 	neighbors := ap.Neighbors(g.Player.Pos)
 	if len(neighbors) == 0 {
 		return nil, false

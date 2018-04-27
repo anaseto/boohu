@@ -577,6 +577,10 @@ func (g *game) AutoPlayer(ev event) bool {
 			var n *position
 			var finished bool
 			if g.DijkstraMapRebuild {
+				if g.AllExplored() {
+					g.Print("You finished exploring.")
+					break
+				}
 				sources := g.AutoexploreSources()
 				g.BuildAutoexploreMap(sources)
 			}
