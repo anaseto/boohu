@@ -482,6 +482,7 @@ func (m *monster) TeleportPlayer(g *game, ev event) {
 	acc := RandInt(m.Accuracy)
 	if acc > evasion {
 		g.Print("Marevor pushes you through a monolith.")
+		g.StoryPrint("Marevor pushed you through a monolith.")
 		g.Teleportation(ev)
 	} else if RandInt(2) == 0 {
 		g.Print("Marevor inadvertently goes into a monolith.")
