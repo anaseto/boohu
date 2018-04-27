@@ -119,15 +119,6 @@ func (mk monsterKind) Desc() string {
 	return monsDesc[mk]
 }
 
-func (mk monsterKind) SeenStory() bool {
-	switch mk {
-	case MonsEarthDragon, MonsMarevorHelith, MonsLich, MonsHydra:
-		return true
-	default:
-		return false
-	}
-}
-
 func (mk monsterKind) SeenStoryText() (text string) {
 	switch mk {
 	case MonsMarevorHelith:

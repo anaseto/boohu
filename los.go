@@ -104,7 +104,7 @@ func (g *game) ComputeLOS() {
 	for _, mons := range g.Monsters {
 		if !mons.Seen && mons.Exists() && g.Player.LOS[mons.Pos] {
 			mons.Seen = true
-			if mons.Kind.SeenStory() {
+			if mons.Kind.Dangerousness() > 10 {
 				g.StoryPrint(mons.Kind.SeenStoryText())
 			}
 		}
