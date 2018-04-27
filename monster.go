@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 type monsterState int
 
 const (
@@ -115,6 +117,25 @@ func (mk monsterKind) Smiting() bool {
 
 func (mk monsterKind) Desc() string {
 	return monsDesc[mk]
+}
+
+func (mk monsterKind) SeenStory() bool {
+	switch mk {
+	case MonsEarthDragon, MonsMarevorHelith, MonsLich, MonsHydra:
+		return true
+	default:
+		return false
+	}
+}
+
+func (mk monsterKind) SeenStoryText() (text string) {
+	switch mk {
+	case MonsMarevorHelith:
+		text = "You saw Marevor."
+	default:
+		text = fmt.Sprintf("You saw %s.", Indefinite(mk.String(), false))
+	}
+	return text
 }
 
 type monsterData struct {
@@ -434,6 +455,7 @@ type monster struct {
 	Path        []position // cache
 	Obstructing bool
 	FireReady   bool
+	Seen        bool
 }
 
 func (m *monster) Init() {

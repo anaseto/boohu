@@ -101,6 +101,14 @@ func (g *game) ComputeLOS() {
 		}
 	}
 	g.Player.LOS = m
+	for _, mons := range g.Monsters {
+		if !mons.Seen && mons.Exists() && g.Player.LOS[mons.Pos] {
+			mons.Seen = true
+			if mons.Kind.SeenStory() {
+				g.StoryPrint(mons.Kind.SeenStoryText())
+			}
+		}
+	}
 }
 
 func (g *game) SeePosition(pos position) {
