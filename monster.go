@@ -1187,7 +1187,7 @@ func (g *game) MaxDanger() int {
 			adjust += Min(5, g.Depth) * Min(q, g.Depth)
 		case BerserkPotion, TeleportationPotion:
 			adjust += Min(3, g.Depth) * Min(q, 3)
-		case RunningPotion, EvasionPotion, LignificationPotion, MagicPotion, WallPotion:
+		case SwiftnessPotion, LignificationPotion, MagicPotion, WallPotion:
 			adjust += Min(2, g.Depth) * Min(q, 3)
 		case Javelin, ConfusingDart:
 			adjust += Min(1, g.Depth) * Min(q, 10)

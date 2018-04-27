@@ -251,7 +251,7 @@ func (g *game) InitPlayer() {
 	case 2, 3:
 		g.Player.Consumables[BerserkPotion] = 1
 	case 4:
-		g.Player.Consumables[EvasionPotion] = 1
+		g.Player.Consumables[SwiftnessPotion] = 1
 	case 5:
 		g.Player.Consumables[LignificationPotion] = 1
 	}

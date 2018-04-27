@@ -36,8 +36,7 @@ const (
 	TeleportationPotion
 	BerserkPotion
 	DescentPotion
-	RunningPotion
-	EvasionPotion
+	SwiftnessPotion
 	LignificationPotion
 	MagicMappingPotion
 	MagicPotion
@@ -56,16 +55,14 @@ func (p potion) String() (text string) {
 		text += " of teleportation"
 	case DescentPotion:
 		text += " of descent"
-	case EvasionPotion:
-		text += " of evasion"
 	case MagicMappingPotion:
 		text += " of magic mapping"
 	case MagicPotion:
 		text += " of refill magic"
 	case BerserkPotion:
 		text += " of berserk"
-	case RunningPotion:
-		text += " of running"
+	case SwiftnessPotion:
+		text += " of swiftness"
 	case LignificationPotion:
 		text += " of lignification"
 	case WallPotion:
@@ -91,16 +88,14 @@ func (p potion) Desc() (text string) {
 		text = "teleports you away after a short delay."
 	case DescentPotion:
 		text = "makes you go deeper in the Underground."
-	case EvasionPotion:
-		text = "makes you better at avoiding blows."
 	case MagicMappingPotion:
 		text = "shows you the map."
 	case MagicPotion:
 		text = "replenishes your magical reserves."
 	case BerserkPotion:
 		text = "makes you enter a crazy rage, temporarily making you faster, stronger and healthier. You cannot drink potions while berserk, and afterwards it leaves you slow and exhausted."
-	case RunningPotion:
-		text = "makes you move faster."
+	case SwiftnessPotion:
+		text = "makes you move faster and better at avoiding blows for a short time."
 	case LignificationPotion:
 		text = "makes you more resistant to physical blows, but you are attached to the ground while the effect lasts."
 	case WallPotion:
@@ -143,10 +138,8 @@ func (p potion) Use(g *game, ev event) error {
 		err = g.QuaffBerserk(ev)
 	case DescentPotion:
 		err = g.QuaffDescent(ev)
-	case RunningPotion:
-		err = g.QuaffHaste(ev)
-	case EvasionPotion:
-		err = g.QuaffEvasion(ev)
+	case SwiftnessPotion:
+		err = g.QuaffSwiftness(ev)
 	case LignificationPotion:
 		err = g.QuaffLignification(ev)
 	case MagicMappingPotion:
@@ -225,17 +218,12 @@ func (g *game) QuaffDescent(ev event) error {
 	return nil
 }
 
-func (g *game) QuaffHaste(ev event) error {
+func (g *game) QuaffSwiftness(ev event) error {
 	g.Player.Statuses[StatusSwift]++
-	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 80 + RandInt(20), EAction: HasteEnd})
-	g.Printf("You quaff the %s. You feel speedy.", RunningPotion)
-	return nil
-}
-
-func (g *game) QuaffEvasion(ev event) error {
 	g.Player.Statuses[StatusAgile]++
-	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 90 + RandInt(20), EAction: EvasionEnd})
-	g.Printf("You quaff the %s. You feel agile.", EvasionPotion)
+	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 85 + RandInt(20), EAction: HasteEnd})
+	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 85 + RandInt(20), EAction: EvasionEnd})
+	g.Printf("You quaff the %s. You feel speedy and agile.", SwiftnessPotion)
 	return nil
 }
 
@@ -429,9 +417,8 @@ var ConsumablesCollectData = map[consumable]collectData{
 	HealWoundsPotion:    {rarity: 6, quantity: 1},
 	TeleportationPotion: {rarity: 4, quantity: 1},
 	BerserkPotion:       {rarity: 5, quantity: 1},
-	RunningPotion:       {rarity: 10, quantity: 1},
+	SwiftnessPotion:     {rarity: 6, quantity: 1},
 	DescentPotion:       {rarity: 15, quantity: 1},
-	EvasionPotion:       {rarity: 10, quantity: 1},
 	LignificationPotion: {rarity: 8, quantity: 1},
 	MagicMappingPotion:  {rarity: 15, quantity: 1},
 	MagicPotion:         {rarity: 10, quantity: 1},
