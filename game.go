@@ -582,8 +582,10 @@ func (g *game) AutoPlayer(ev event) bool {
 			}
 			n, finished = g.NextAuto()
 			if finished {
-				g.Print("You finished exploring.")
 				n = nil
+			}
+			if finished && g.AllExplored() {
+				g.Print("You finished exploring.")
 			} else if n == nil {
 				g.Print("You could not reach safely some places.")
 			}

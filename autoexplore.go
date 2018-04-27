@@ -12,17 +12,38 @@ func (g *game) Autoexplore(ev event) error {
 		return errors.New("You cannot auto-explore while in an excluded area.")
 	}
 	sources := g.AutoexploreSources()
-	if len(sources) == 0 {
+	if g.AllExplored() {
 		return errors.New("Nothing left to explore.")
 	}
+	if len(sources) == 0 {
+		return errors.New("Some excluded places remain unexplored.")
+	}
 	g.BuildAutoexploreMap(sources)
-	n, _ := g.NextAuto()
-	if n == nil {
-		return errors.New("Some unexplored parts not safely reachable remain.")
+	n, finished := g.NextAuto()
+	if finished || n == nil {
+		return errors.New("You cannot not reach safely some places.")
 	}
 	g.Autoexploring = true
 	g.AutoHalt = false
 	return g.MovePlayer(*n, ev)
+}
+
+func (g *game) AllExplored() bool {
+	np := &normalPath{game: g}
+	for i, c := range g.Dungeon.Cells {
+		pos := idxtopos(i)
+		if c.T == WallCell {
+			if len(np.Neighbors(pos)) == 0 {
+				continue
+			}
+		}
+		if !c.Explored || g.Gold[pos] > 0 || g.Collectables[pos] != nil {
+			return false
+		} else if _, ok := g.Rods[pos]; ok {
+			return false
+		}
+	}
+	return true
 }
 
 func (g *game) AutoexploreSources() []int {
@@ -34,6 +55,9 @@ func (g *game) AutoexploreSources() []int {
 			if len(np.Neighbors(pos)) == 0 {
 				continue
 			}
+		}
+		if g.ExclusionsMap[pos] {
+			continue
 		}
 		if !c.Explored || g.Gold[pos] > 0 || g.Collectables[pos] != nil {
 			sources = append(sources, i)
