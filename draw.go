@@ -714,7 +714,7 @@ loop:
 
 func (ui *termui) ViewPositionDescription(g *game, pos position) {
 	mons, _ := g.MonsterAt(pos)
-	if mons.Exists() {
+	if mons.Exists() && g.Player.LOS[mons.Pos] {
 		ui.HideCursor()
 		ui.DrawMonsterDescription(g, mons)
 		ui.SetCursor(pos)
