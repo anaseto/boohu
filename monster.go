@@ -138,6 +138,30 @@ func (mk monsterKind) SeenStoryText() (text string) {
 	return text
 }
 
+func (mk monsterKind) Indefinite(capital bool) (text string) {
+	switch mk {
+	case MonsMarevorHelith:
+		text = mk.String()
+	default:
+		text = Indefinite(mk.String(), capital)
+	}
+	return text
+}
+
+func (mk monsterKind) Definite(capital bool) (text string) {
+	switch mk {
+	case MonsMarevorHelith:
+		text = mk.String()
+	default:
+		if capital {
+			text = fmt.Sprintf("The %s", mk.String())
+		} else {
+			text = fmt.Sprintf("the %s", mk.String())
+		}
+	}
+	return text
+}
+
 type monsterData struct {
 	movementDelay int
 	baseAttack    int
@@ -538,7 +562,7 @@ func (m *monster) TeleportAway(g *game) {
 		m.Target = m.Pos
 	}
 	if g.Player.LOS[m.Pos] {
-		g.Printf("The %s teleports away.", m.Kind)
+		g.Printf("%s teleports away.", m.Kind.Definite(true))
 	}
 	m.Pos = pos
 }
@@ -753,7 +777,7 @@ func (m *monster) HitPlayer(g *game, ev event) {
 		}
 		noise := g.HitNoise()
 		g.MakeNoise(noise, g.Player.Pos)
-		g.PrintfStyled("The %s hits you (%d damage).", logMonsterHit, m.Kind, attack)
+		g.PrintfStyled("%s hits you (%d damage).", logMonsterHit, m.Kind.Definite(true), attack)
 		m.InflictDamage(g, attack, m.Attack)
 		if g.Player.HP <= 0 {
 			return
@@ -767,7 +791,7 @@ func (m *monster) HitPlayer(g *game, ev event) {
 			g.Smoke(ev)
 		}
 	} else {
-		g.Printf("The %s misses you.", m.Kind)
+		g.Printf("%s misses you.", m.Kind.Definite(true))
 	}
 }
 
@@ -888,7 +912,7 @@ func (m *monster) TormentBolt(g *game, ev event) bool {
 	if hit {
 		g.MakeNoise(12, g.Player.Pos)
 		damage := g.Player.HP - g.Player.HP/2
-		g.PrintfStyled("The %s throws a bolt of torment at you.", logMonsterHit, m.Kind)
+		g.PrintfStyled("%s throws a bolt of torment at you.", logMonsterHit, m.Kind.Definite(true))
 		m.InflictDamage(g, damage, 15)
 	} else {
 		g.Printf("You block the %s's bolt of torment.", m.Kind)
@@ -933,15 +957,15 @@ func (m *monster) ThrowRock(g *game, ev event) bool {
 	if hit {
 		noise := g.HitNoise()
 		g.MakeNoise(noise, g.Player.Pos)
-		g.PrintfStyled("The %s throws a rock at you (%d damage).", logMonsterHit, m.Kind, attack)
+		g.PrintfStyled("%s throws a rock at you (%d damage).", logMonsterHit, m.Kind.Definite(true), attack)
 		if RandInt(4) == 0 {
 			g.Confusion(ev)
 		}
 		m.InflictDamage(g, attack, 15)
 	} else if block {
-		g.Printf("You block %s's rock.", Indefinite(m.Kind.String(), false))
+		g.Printf("You block %s's rock.", m.Kind.Indefinite(false))
 	} else {
-		g.Printf("You dodge %s's rock.", Indefinite(m.Kind.String(), false))
+		g.Printf("You dodge %s's rock.", m.Kind.Indefinite(false))
 	}
 	ev.Renew(g, 2*m.Kind.AttackDelay())
 	return true
@@ -967,18 +991,18 @@ func (m *monster) ThrowJavelin(g *game, ev event) bool {
 	if hit {
 		noise := g.HitNoise()
 		g.MakeNoise(noise, g.Player.Pos)
-		g.Printf("The %s throws %s at you (%d damage).", m.Kind, Indefinite(Javelin.String(), false), attack)
+		g.Printf("%s throws %s at you (%d damage).", m.Kind.Definite(true), Indefinite(Javelin.String(), false), attack)
 		m.InflictDamage(g, attack, 11)
 	} else if block {
 		if RandInt(3) == 0 {
-			g.Printf("You block %s's %s.", Indefinite(m.Kind.String(), false), Javelin)
+			g.Printf("You block %s's %s.", m.Kind.Indefinite(false), Javelin)
 		} else {
 			g.Player.Statuses[StatusDisabledShield]++
 			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 100 + RandInt(100), EAction: DisabledShieldEnd})
-			g.Printf("%s's %s gets fixed on your shield.", Indefinite(m.Kind.String(), true), Javelin)
+			g.Printf("%s's %s gets fixed on your shield.", m.Kind.Indefinite(true), Javelin)
 		}
 	} else {
-		g.Printf("You dodge %s's %s.", Indefinite(m.Kind.String(), false), Javelin)
+		g.Printf("You dodge %s's %s.", m.Kind.Indefinite(false), Javelin)
 	}
 	m.Statuses[MonsExhausted] = 1
 	g.PushEvent(&monsterEvent{ERank: ev.Rank() + 50 + RandInt(50), NMons: m.Index(g), EAction: MonsExhaustionEnd})
@@ -1006,7 +1030,7 @@ func (m *monster) ThrowAcid(g *game, ev event) bool {
 	if hit {
 		noise := g.HitNoise()
 		g.MakeNoise(noise, g.Player.Pos)
-		g.Printf("The %s throws acid at you (%d damage).", m.Kind, attack)
+		g.Printf("%s throws acid at you (%d damage).", m.Kind.Definite(true), attack)
 		m.InflictDamage(g, attack, 11)
 		if RandInt(2) == 0 {
 			g.Corrosion(ev)
@@ -1015,12 +1039,12 @@ func (m *monster) ThrowAcid(g *game, ev event) bool {
 			}
 		}
 	} else if block {
-		g.Printf("You block %s's acid projectile.", Indefinite(m.Kind.String(), false))
+		g.Printf("You block %s's acid projectile.", m.Kind.Indefinite(false))
 		if RandInt(2) == 0 {
 			g.Corrosion(ev)
 		}
 	} else {
-		g.Printf("You dodge %s's acid projectile.", Indefinite(m.Kind.String(), false))
+		g.Printf("You dodge %s's acid projectile.", m.Kind.Indefinite(false))
 	}
 	ev.Renew(g, m.Kind.AttackDelay())
 	return true
@@ -1058,7 +1082,7 @@ func (m *monster) AbsorbMana(g *game, ev event) bool {
 		return false
 	}
 	g.Player.MP = 2 * g.Player.MP / 3
-	g.Printf("The %s absorbs your mana.", m.Kind)
+	g.Printf("%s absorbs your mana.", m.Kind.Definite(true))
 	m.Statuses[MonsExhausted] = 1
 	g.PushEvent(&monsterEvent{ERank: ev.Rank() + 10 + RandInt(20), NMons: m.Index(g), EAction: MonsExhaustionEnd})
 	ev.Renew(g, m.Kind.AttackDelay())
@@ -1068,7 +1092,7 @@ func (m *monster) AbsorbMana(g *game, ev event) bool {
 func (m *monster) Explode(g *game) {
 	neighbors := g.Dungeon.FreeNeighbors(m.Pos)
 	g.MakeNoise(18, m.Pos)
-	g.Printf("The %s blows with a noisy pop.", m.Kind)
+	g.Printf("%s blows with a noisy pop.", m.Kind.Definite(true))
 	for _, pos := range neighbors {
 		mons, _ := g.MonsterAt(pos)
 		if mons.Exists() {
@@ -1094,10 +1118,10 @@ func (m *monster) MakeHuntIfHurt(g *game) {
 	if m.State != Hunting {
 		m.MakeHunt(g)
 		if m.State == Resting {
-			g.Printf("The %s awakes.", m.Kind)
+			g.Printf("%s awakes.", m.Kind.Definite(true))
 		}
 		if m.Kind == MonsHound {
-			g.Printf("The %s barks.", m.Kind)
+			g.Printf("%s barks.", m.Kind.Definite(true))
 			g.MakeNoise(12, m.Pos)
 		}
 	}
@@ -1136,13 +1160,13 @@ func (m *monster) MakeAware(g *game) {
 		}
 	}
 	if m.State == Resting {
-		g.Printf("The %s awakes.", m.Kind)
+		g.Printf("%s awakes.", m.Kind.Definite(true))
 	}
 	if m.State == Wandering {
-		g.Printf("The %s notices you.", m.Kind)
+		g.Printf("%s notices you.", m.Kind.Definite(true))
 	}
 	if m.State != Hunting && m.Kind == MonsHound {
-		g.Printf("The %s barks.", m.Kind)
+		g.Printf("%s barks.", m.Kind.Definite(true))
 		g.MakeNoise(12, m.Pos)
 	}
 	m.MakeHunt(g)

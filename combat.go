@@ -18,7 +18,7 @@ func (m *monster) InflictDamage(g *game, damage, max int) {
 	oldHP := g.Player.HP
 	g.Player.HP -= damage
 	if oldHP > max && g.Player.HP <= max {
-		g.StoryPrintf("Critical HP: %d (hit by %s)", g.Player.HP, Indefinite(m.Kind.String(), false))
+		g.StoryPrintf("Critical HP: %d (hit by %s)", g.Player.HP, m.Kind.Indefinite(false))
 		g.ui.CriticalHPWarning(g)
 	}
 }
@@ -198,10 +198,10 @@ func (g *game) HitMonster(dt dmgType, mons *monster, ev event) (hit bool) {
 		oldHP := mons.HP
 		mons.HP -= attack
 		if mons.HP > 0 {
-			g.PrintfStyled("You hit the %v (%d damage).", logPlayerHit, mons.Kind, attack)
+			g.PrintfStyled("You hit %s (%d damage).", logPlayerHit, mons.Kind.Definite(false), attack)
 		} else if oldHP > 0 {
 			// test oldHP > 0 because of sword special attack
-			g.PrintfStyled("You kill the %v (%d damage).", logPlayerHit, mons.Kind, attack)
+			g.PrintfStyled("You kill %s (%d damage).", logPlayerHit, mons.Kind.Definite(false), attack)
 			g.HandleKill(mons)
 		}
 		if mons.Kind == MonsBrizzia && RandInt(4) == 0 && !g.Player.HasStatus(StatusNausea) &&
@@ -211,7 +211,7 @@ func (g *game) HitMonster(dt dmgType, mons *monster, ev event) (hit bool) {
 			g.Print("The brizzia's corpse releases a nauseous gas. You feel sick.")
 		}
 	} else {
-		g.Printf("You miss the %v.", mons.Kind)
+		g.Printf("You miss %s.", mons.Kind.Definite(false))
 	}
 	mons.MakeHuntIfHurt(g)
 	return hit
@@ -230,6 +230,6 @@ func (g *game) HandleKill(mons *monster) {
 		g.ComputeLOS()
 	}
 	if mons.Kind.Dangerousness() > 10 {
-		g.StoryPrintf("You killed %s.", Indefinite(mons.Kind.String(), false))
+		g.StoryPrintf("You killed %s.", mons.Kind.Indefinite(false))
 	}
 }

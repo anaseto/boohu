@@ -488,7 +488,7 @@ func (ui *termui) DescribePosition(g *game, pos position, targ Targeter) {
 	case !targ.Reachable(g, pos):
 		desc = "This is out of reach."
 	case mons.Exists() && g.Player.LOS[pos]:
-		desc += fmt.Sprintf("You see %s (%s).", Indefinite(mons.Kind.String(), false), ui.MonsterInfo(mons))
+		desc += fmt.Sprintf("You see %s (%s).", mons.Kind.Indefinite(false), ui.MonsterInfo(mons))
 	case g.Gold[pos] > 0:
 		desc += fmt.Sprintf("You see some gold (%d).", g.Gold[pos])
 	case okCollectable && c != nil:

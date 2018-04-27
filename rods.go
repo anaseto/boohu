@@ -243,7 +243,7 @@ func (g *game) EvokeRodLightningBolt(ev event) error {
 		}
 		mons.HP -= RandInt(21)
 		if mons.HP <= 0 {
-			g.Printf("%s is killed by the bolt.", Indefinite(mons.Kind.String(), true))
+			g.Printf("%s is killed by the bolt.", mons.Kind.Indefinite(true))
 			g.HandleKill(mons)
 		}
 		g.MakeNoise(12, mons.Pos)
@@ -265,7 +265,7 @@ func (g *game) EvokeRodFireball(ev event) error {
 		}
 		mons.HP -= RandInt(21)
 		if mons.HP <= 0 {
-			g.Printf("%s is killed by the fireball.", Indefinite(mons.Kind.String(), true))
+			g.Printf("%s is killed by the fireball.", mons.Kind.Indefinite(true))
 			g.HandleKill(mons)
 		}
 		g.MakeNoise(12, mons.Pos)
@@ -345,7 +345,7 @@ func (g *game) EvokeRodShatter(ev event) error {
 		}
 		mons.HP -= RandInt(30)
 		if mons.HP <= 0 {
-			g.Printf("%s is killed by the explosion.", Indefinite(mons.Kind.String(), true))
+			g.Printf("%s is killed by the explosion.", mons.Kind.Indefinite(true))
 			g.HandleKill(mons)
 		}
 		g.MakeNoise(12, mons.Pos)

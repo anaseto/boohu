@@ -340,7 +340,7 @@ func (g *game) MovePlayer(pos position, ev event) error {
 			if g.Autoexploring {
 				mons := g.MonsterInLOS()
 				if mons.Exists() {
-					g.Printf("You see %s (%v).", Indefinite(mons.Kind.String(), false), mons.State)
+					g.Printf("You see %s (%v).", mons.Kind.Indefinite(false), mons.State)
 				}
 				g.FairAction()
 			} else {
