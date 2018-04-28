@@ -15,6 +15,8 @@ Screenshot
 
 ![Dragons](https://raw.githubusercontent.com/anaseto/boohu/master/img/dragons.png)
 
+There are also some [asciinema screencasts](https://asciinema.org/~anaseto).
+
 Install
 -------
 
