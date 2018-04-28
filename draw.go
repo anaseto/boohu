@@ -713,6 +713,10 @@ loop:
 }
 
 func (ui *termui) ViewPositionDescription(g *game, pos position) {
+	if !g.Dungeon.Cell(pos).Explored {
+		g.Print("No description: unknown place.")
+		return
+	}
 	mons, _ := g.MonsterAt(pos)
 	if mons.Exists() && g.Player.LOS[mons.Pos] {
 		ui.HideCursor()
