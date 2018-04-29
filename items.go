@@ -167,7 +167,7 @@ func (g *game) QuaffTeleportation(ev event) error {
 		return errors.New("You already quaffed a potion of teleportation.")
 	}
 	delay := 20 + RandInt(30)
-	g.Player.Statuses[StatusTele]++
+	g.Player.Statuses[StatusTele] = 1
 	g.PushEvent(&simpleEvent{ERank: ev.Rank() + delay, EAction: Teleportation})
 	g.Printf("You quaff a %s. You feel unstable.", TeleportationPotion)
 	return nil

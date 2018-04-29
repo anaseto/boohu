@@ -104,6 +104,7 @@ func (sev *simpleEvent) Action(g *game) {
 		g.MPRegen(sev)
 	case Teleportation:
 		g.Teleportation(sev)
+		g.Player.Statuses[StatusTele] = 0
 	case BerserkEnd:
 		g.Player.Statuses[StatusBerserk]--
 		g.Player.Statuses[StatusSlow]++

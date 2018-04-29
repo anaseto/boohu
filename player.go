@@ -214,7 +214,7 @@ func (g *game) ScummingAction(ev event) {
 			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 240 + RandInt(10), EAction: LignificationEnd})
 		} else {
 			delay := 20 + RandInt(5)
-			g.Player.Statuses[StatusTele]++
+			g.Player.Statuses[StatusTele] = 1
 			g.PushEvent(&simpleEvent{ERank: ev.Rank() + delay, EAction: Teleportation})
 			g.PrintStyled("Something hurt you! You feel unstable.", logCritic)
 		}
@@ -268,7 +268,6 @@ func (g *game) Teleportation(ev event) {
 		break
 
 	}
-	g.Player.Statuses[StatusTele]--
 	if pos.valid() {
 		// should always happen
 		g.Player.Pos = pos
