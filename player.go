@@ -284,7 +284,11 @@ func (g *game) CollectGround() {
 	pos := g.Player.Pos
 	if g.Simellas[pos] > 0 {
 		g.Player.Simellas += g.Simellas[pos]
-		g.Printf("You pick up %d gold.", g.Simellas[pos])
+		if g.Simellas[pos] == 1 {
+			g.Print("You pick up a simella.")
+		} else {
+			g.Printf("You pick up %d simellas.", g.Simellas[pos])
+		}
 		g.DijkstraMapRebuild = true
 		delete(g.Simellas, pos)
 	}

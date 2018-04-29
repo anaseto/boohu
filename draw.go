@@ -492,7 +492,7 @@ func (ui *termui) DescribePosition(g *game, pos position, targ Targeter) {
 	case mons.Exists() && g.Player.LOS[pos]:
 		desc += fmt.Sprintf("You see %s (%s).", mons.Kind.Indefinite(false), ui.MonsterInfo(mons))
 	case g.Simellas[pos] > 0:
-		desc += fmt.Sprintf("You see some simmellas (%d).", g.Simellas[pos])
+		desc += fmt.Sprintf("You see some simellas (%d).", g.Simellas[pos])
 	case okCollectable && c != nil:
 		if c.Quantity > 1 {
 			desc += fmt.Sprintf("You see %d %s there.", c.Quantity, c.Consumable)
