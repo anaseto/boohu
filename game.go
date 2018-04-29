@@ -22,7 +22,7 @@ type game struct {
 	GeneratedEquipables map[equipable]bool
 	GeneratedRods       map[rod]bool
 	FoundEquipables     map[equipable]bool
-	Gold                map[position]int
+	Simellas            map[position]int
 	UnknownDig          map[position]bool
 	Resting             bool
 	Autoexploring       bool
@@ -116,7 +116,7 @@ func (g *game) FreeCellForStatic() position {
 		if g.Doors[pos] {
 			continue
 		}
-		if g.Gold[pos] > 0 {
+		if g.Simellas[pos] > 0 {
 			continue
 		}
 		if g.Collectables[pos] != nil {
@@ -238,7 +238,7 @@ func (g *game) InitPlayer() {
 	g.Player = &player{
 		HP:        40,
 		MP:        10,
-		Gold:      0,
+		Simellas:  0,
 		Aptitudes: map[aptitude]bool{},
 	}
 	g.Player.Consumables = map[consumable]int{
@@ -343,16 +343,17 @@ func (g *game) InitLevel() {
 		g.Stairs[pos] = true
 	}
 
-	// Gold
-	g.Gold = make(map[position]int)
+	// Simellas
+	g.Simellas = make(map[position]int)
 	for i := 0; i < 5; i++ {
 		pos := g.FreeCellForStatic()
-		g.Gold[pos] = 1 + RandInt(g.Depth+g.Depth*g.Depth/10)
+		g.Simellas[pos] = 1 + RandInt(g.Depth+g.Depth*g.Depth/10)
 	}
 
 	// initialize LOS
 	if g.Depth == 0 {
-		g.Print("You're in Hareka's Underground. Good luck! Press ? for help.")
+		g.Print("You're in Hareka's Underground searching for medicinal simellas. Good luck!")
+		g.PrintStyled("► Press ? for help.", logSpecial)
 	}
 	if g.Depth == g.MaxDepth() {
 		g.PrintStyled("You feel magic in the air. The way out is close.", logSpecial)

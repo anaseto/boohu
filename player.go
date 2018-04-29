@@ -12,7 +12,7 @@ type player struct {
 	HP          int
 	MP          int
 	Consumables map[consumable]int
-	Gold        int
+	Simellas    int
 	Target      position
 	Statuses    map[status]int
 	Armour      armour
@@ -282,11 +282,11 @@ func (g *game) Teleportation(ev event) {
 
 func (g *game) CollectGround() {
 	pos := g.Player.Pos
-	if g.Gold[pos] > 0 {
-		g.Player.Gold += g.Gold[pos]
-		g.Printf("You pick up %d gold.", g.Gold[pos])
+	if g.Simellas[pos] > 0 {
+		g.Player.Simellas += g.Simellas[pos]
+		g.Printf("You pick up %d gold.", g.Simellas[pos])
 		g.DijkstraMapRebuild = true
-		delete(g.Gold, pos)
+		delete(g.Simellas, pos)
 	}
 	if c, ok := g.Collectables[pos]; ok && c != nil {
 		g.Player.Consumables[c.Consumable] += c.Quantity

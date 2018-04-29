@@ -28,7 +28,7 @@ var (
 	ColorFgConfusedMonster  uicolor = 64
 	ColorFgCollectable      uicolor = 136
 	ColorFgStairs           uicolor = 125
-	ColorFgGold             uicolor = 136
+	ColorFgSimellas         uicolor = 136
 	ColorFgHPok             uicolor = 64
 	ColorFgHPwounded        uicolor = 136
 	ColorFgHPcritical       uicolor = 160
@@ -59,7 +59,7 @@ func SolarizedPalette() {
 	ColorFgConfusedMonster = 2
 	ColorFgCollectable = 3
 	ColorFgStairs = 5
-	ColorFgGold = 3
+	ColorFgSimellas = 3
 	ColorFgHPok = 2
 	ColorFgHPwounded = 3
 	ColorFgHPcritical = 1
@@ -90,7 +90,7 @@ func FixColor() {
 	ColorFgConfusedMonster = ColorFgConfusedMonster + 1
 	ColorFgCollectable = ColorFgCollectable + 1
 	ColorFgStairs = ColorFgStairs + 1
-	ColorFgGold = ColorFgGold + 1
+	ColorFgSimellas = ColorFgSimellas + 1
 	ColorFgHPok = ColorFgHPok + 1
 	ColorFgHPwounded = ColorFgHPwounded + 1
 	ColorFgHPcritical = ColorFgHPcritical + 1
@@ -132,7 +132,7 @@ func WindowsPalette() {
 	ColorFgConfusedMonster = Green
 	ColorFgCollectable = Olive
 	ColorFgStairs = Purple
-	ColorFgGold = Olive
+	ColorFgSimellas = Olive
 	ColorFgHPok = Green
 	ColorFgHPwounded = Olive
 	ColorFgHPcritical = Maroon
@@ -401,7 +401,7 @@ func (ui *termui) KeysHelp(g *game) {
 		"Examine", "x or mouse right-click",
 		"Throw item", "t or f",
 		"Evoke rod", "v or z",
-		"View Character Information", `% or C`,
+		"View Character and Quest Information", `% or C`,
 		"View previous messages", "m",
 		"Write character dump to file", "#",
 		"Save and Quit", "S",
@@ -428,6 +428,8 @@ func (ui *termui) Equip(g *game, ev event) error {
 func (ui *termui) CharacterInfo(g *game) {
 	ui.Clear()
 	b := bytes.Buffer{}
+	b.WriteString(formatText("Every year, your village sends someone to collect medicinal simella plants in the Underground. This year, the duty fell upon you, and so here you are. Your heart is teared between your will to be as helpful as possible to your village and your will to make it out alive.", 79))
+	b.WriteString("\n\n")
 	b.WriteString(formatText(
 		fmt.Sprintf("You are wielding %s. %s", Indefinite(g.Player.Weapon.String(), false), g.Player.Weapon.Desc()), 79))
 	b.WriteString("\n\n")
@@ -489,8 +491,8 @@ func (ui *termui) DescribePosition(g *game, pos position, targ Targeter) {
 		desc = "This is out of reach."
 	case mons.Exists() && g.Player.LOS[pos]:
 		desc += fmt.Sprintf("You see %s (%s).", mons.Kind.Indefinite(false), ui.MonsterInfo(mons))
-	case g.Gold[pos] > 0:
-		desc += fmt.Sprintf("You see some gold (%d).", g.Gold[pos])
+	case g.Simellas[pos] > 0:
+		desc += fmt.Sprintf("You see some simmellas (%d).", g.Simellas[pos])
 	case okCollectable && c != nil:
 		if c.Quantity > 1 {
 			desc += fmt.Sprintf("You see %d %s there.", c.Quantity, c.Consumable)
@@ -568,7 +570,7 @@ func (ui *termui) NextObject(g *game, pos position, nobject int, objects *[]posi
 		for p := range g.Equipables {
 			*objects = append(*objects, p)
 		}
-		for p := range g.Gold {
+		for p := range g.Simellas {
 			*objects = append(*objects, p)
 		}
 	}
@@ -732,6 +734,8 @@ func (ui *termui) ViewPositionDescription(g *game, pos position) {
 		ui.DrawDescription(g, "Stairs lead to the next level of the Underground. There's no way back. Monsters do not follow you.")
 	} else if g.Doors[pos] {
 		ui.DrawDescription(g, "A closed door blocks your line of sight. Doors open automatically when you or a monster stand on them.")
+	} else if g.Simellas[pos] > 0 {
+		ui.DrawDescription(g, "A Simella is a plant with big white flowers which are used in the Underground's for their medicinal properties. They can also make tasty infusions. You were actually sent here by your village to collect as many as possible of those plants.")
 	} else {
 		g.Print("Nothing worth of description here.")
 	}
@@ -909,9 +913,9 @@ func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgCol
 			} else if _, ok := g.Stairs[pos]; ok {
 				r = '>'
 				fgColor = ColorFgStairs
-			} else if _, ok := g.Gold[pos]; ok {
-				r = '$'
-				fgColor = ColorFgGold
+			} else if _, ok := g.Simellas[pos]; ok {
+				r = '♣'
+				fgColor = ColorFgSimellas
 			} else if _, ok := g.Doors[pos]; ok {
 				r = '+'
 				fgColor = ColorFgStairs
@@ -963,7 +967,7 @@ func (ui *termui) DrawStatusLine(g *game) {
 	}
 	ui.DrawColoredText(fmt.Sprintf("HP: %d", g.Player.HP), 81, 4, hpColor)
 	ui.DrawColoredText(fmt.Sprintf("MP: %d", g.Player.MP), 81, 5, mpColor)
-	ui.DrawText(fmt.Sprintf("Gold: %d", g.Player.Gold), 81, 7)
+	ui.DrawText(fmt.Sprintf("Simellas: %d", g.Player.Simellas), 81, 7)
 	if g.Depth > g.MaxDepth() {
 		ui.DrawText("Depth: Out!", 81, 8)
 	} else {

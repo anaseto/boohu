@@ -3,10 +3,13 @@ inspiration mainly from DCSS and its tavern, and some ideas from Brogue, but
 aiming for very short games, almost no character building, and simplified
 inventory management.
 
-You somehow ended up in Hareka's Underground, and in order to leave, you have
-to find some magical stairs deep in the Underground. Along the way, you will
-collect treasures, as well as various helpful items. You will also encounter
-monsters, fight against them, or run away from them when you can…
+Every year, your village sends someone to collect medicinal simella plants in
+the Underground.  This year, the duty fell upon you, and so here you are. Your
+heart is teared between your will to be as helpful as possible to your village
+and your will to make it out alive.  Deep in the Underground, some magical
+stairs will lead you back to your village. Along the way, you will collect
+simellas, as well as various helpful items. You will also encounter monsters,
+fight against them, or run away from them when you can…
 
 ![boohu intro screen](https://raw.githubusercontent.com/anaseto/boohu/master/img/intro-screen.png)
 

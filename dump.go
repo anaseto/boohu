@@ -173,7 +173,7 @@ func (g *game) Dump() string {
 	}
 	fmt.Fprintf(buf, "\n")
 	fmt.Fprintf(buf, "Miscellaneous:\n")
-	fmt.Fprintf(buf, "You collected %d gold coins.\n", g.Player.Gold)
+	fmt.Fprintf(buf, "You collected %d simellas.\n", g.Player.Simellas)
 	fmt.Fprintf(buf, "You killed %d monsters.\n", g.Killed)
 	fmt.Fprintf(buf, "You spent %.1f turns in the Underground.\n", float64(g.Turn)/10)
 	fmt.Fprintf(buf, "\n")
@@ -242,8 +242,8 @@ func (g *game) DumpDungeon() string {
 					r = rod.Letter()
 				} else if _, ok := g.Stairs[pos]; ok {
 					r = '>'
-				} else if _, ok := g.Gold[pos]; ok {
-					r = '$'
+				} else if _, ok := g.Simellas[pos]; ok {
+					r = '♣'
 				} else if _, ok := g.Doors[pos]; ok {
 					r = '+'
 				}
@@ -284,7 +284,7 @@ func (g *game) SimplifedDump(err error) string {
 	} else {
 		fmt.Fprintf(buf, "You are exploring depth %d of Hareka's Underground.\n", g.Depth)
 	}
-	fmt.Fprintf(buf, "You collected %d gold coins.\n", g.Player.Gold)
+	fmt.Fprintf(buf, "You collected %d simellas.\n", g.Player.Simellas)
 	fmt.Fprintf(buf, "You killed %d monsters.\n", g.Killed)
 	fmt.Fprintf(buf, "You spent %.1f turns in the Underground.\n", float64(g.Turn)/10)
 	fmt.Fprintf(buf, "\n")

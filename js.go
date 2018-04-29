@@ -91,7 +91,7 @@ func (g *game) Load() (bool, error) {
 	// g.FoundEquipables = map[equipable]bool{Robe: true, Dagger: true}
 	// g.GeneratedBands = map[monsterBand]int{}
 	// g.KilledMons = map[monsterKind]int{}
-	// g.Gold = make(map[position]int)
+	// g.Simellas = make(map[position]int)
 	// g.Stairs = make(map[position]bool)
 	// g.Collectables = make(map[position]*collectable)
 	// g.UnknownDig = map[position]bool{}
