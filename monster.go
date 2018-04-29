@@ -65,7 +65,7 @@ const (
 	MonsMirrorSpecter
 	MonsAcidMound
 	MonsExplosiveNadre
-	MonsOklobPlant
+	MonsSatowalgaPlant
 	MonsMarevorHelith
 )
 
@@ -99,7 +99,7 @@ func (mk monsterKind) Dangerousness() int {
 
 func (mk monsterKind) Ranged() bool {
 	switch mk {
-	case MonsLich, MonsCyclop, MonsGoblinWarrior, MonsOklobPlant:
+	case MonsLich, MonsCyclop, MonsGoblinWarrior, MonsSatowalgaPlant:
 		return true
 	default:
 		return false
@@ -185,7 +185,7 @@ var MonsData = []monsterData{
 	MonsEarthDragon:     {10, 14, 10, 40, 14, 6, 8, 'D', "earth dragon", 20},
 	MonsMirrorSpecter:   {10, 9, 10, 18, 15, 0, 17, 'm', "mirror specter", 11},
 	MonsExplosiveNadre:  {10, 4, 10, 1, 14, 0, 10, 'n', "explosive nadre", 5},
-	MonsOklobPlant:      {10, 12, 12, 30, 15, 0, 4, 'P', "oklob plant", 7},
+	MonsSatowalgaPlant:  {10, 12, 12, 30, 15, 0, 4, 'P', "satowalga plant", 7},
 	MonsMarevorHelith:   {10, 0, 10, 99, 18, 10, 15, 'M', "Marevor Helith", 18},
 }
 
@@ -208,7 +208,7 @@ var monsDesc = []string{
 	MonsEarthDragon:     "Earth dragons are big and hardy creatures that wander in the Underground. It is said they are to credit for many tunnels.",
 	MonsMirrorSpecter:   "Mirror specters are very insubstantial creatures. They can absorb your mana.",
 	MonsExplosiveNadre:  "Explosive nadres are very frail creatures that explode upon dying, halving HP of any adjacent creatures.",
-	MonsOklobPlant:      "Oklob Plants are static monsters that throw acidic projectiles at you, sometimes corroding and confusing you.",
+	MonsSatowalgaPlant:  "Satowalga Plants are static bushes that throw acidic projectiles at you, sometimes corroding and confusing you.",
 	MonsMarevorHelith:   "Marevor Helith is an ancient nakrus very fond of teleporting people away.",
 }
 
@@ -229,14 +229,14 @@ const (
 	LoneSpecter
 	LoneAcidMound
 	LoneExplosiveNadre
-	LoneOklobPlant
+	LoneSatowalgaPlant
 	BandGoblins
 	BandGoblinsWithWarriors
 	BandGoblinWarriors
 	BandHounds
 	BandYacks
 	BandSpiders
-	BandOklob
+	BandSatowalga
 	BandBlinkingFrogs
 	BandExplosive
 	BandGiantBees
@@ -252,7 +252,7 @@ const (
 	ULich
 	UBrizzias
 	UAcidMounds
-	UOklob
+	USatowalga
 	UDragon
 	UMarevorHelith
 )
@@ -309,7 +309,7 @@ var MonsBands = []monsterBandData{
 	LoneSpecter:        {rarity: 70, minDepth: 6, maxDepth: 13, monster: MonsMirrorSpecter},
 	LoneAcidMound:      {rarity: 70, minDepth: 6, maxDepth: 13, monster: MonsAcidMound},
 	LoneExplosiveNadre: {rarity: 60, minDepth: 4, maxDepth: 7, monster: MonsExplosiveNadre},
-	LoneOklobPlant:     {rarity: 80, minDepth: 5, maxDepth: 13, monster: MonsOklobPlant},
+	LoneSatowalgaPlant: {rarity: 80, minDepth: 5, maxDepth: 13, monster: MonsSatowalgaPlant},
 	BandGoblins: {
 		distribution: map[monsterKind]monsInterval{MonsGoblin: {2, 4}},
 		rarity:       10, minDepth: 1, maxDepth: 5, band: true,
@@ -338,9 +338,9 @@ var MonsBands = []monsterBandData{
 		distribution: map[monsterKind]monsInterval{MonsBlinkingFrog: {2, 4}},
 		rarity:       70, minDepth: 9, maxDepth: 13, band: true,
 	},
-	BandOklob: {
+	BandSatowalga: {
 		distribution: map[monsterKind]monsInterval{
-			MonsOklobPlant: {2, 2},
+			MonsSatowalgaPlant: {2, 2},
 		},
 		rarity: 100, minDepth: 7, maxDepth: 13, band: true,
 	},
@@ -433,9 +433,9 @@ var MonsBands = []monsterBandData{
 		},
 		rarity: 80, minDepth: 12, maxDepth: 12, band: true, unique: true,
 	},
-	UOklob: {
+	USatowalga: {
 		distribution: map[monsterKind]monsInterval{
-			MonsOklobPlant: {3, 3},
+			MonsSatowalgaPlant: {3, 3},
 		},
 		rarity: 80, minDepth: 12, maxDepth: 12, band: true, unique: true,
 	},
@@ -621,7 +621,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	if m.State == Hunting && m.SmitingAttack(g, ev) {
 		return
 	}
-	if m.Kind == MonsOklobPlant {
+	if m.Kind == MonsSatowalgaPlant {
 		ev.Renew(g, m.Kind.MovementDelay())
 		// oklob plants are static ranged-only
 		return
@@ -835,7 +835,7 @@ func (m *monster) RangedAttack(g *game, ev event) bool {
 	if !m.Kind.Ranged() {
 		return false
 	}
-	if m.Pos.Distance(g.Player.Pos) <= 1 && m.Kind != MonsOklobPlant {
+	if m.Pos.Distance(g.Player.Pos) <= 1 && m.Kind != MonsSatowalgaPlant {
 		return false
 	}
 	if !g.Player.LOS[m.Pos] {
@@ -861,7 +861,7 @@ func (m *monster) RangedAttack(g *game, ev event) bool {
 		return m.ThrowRock(g, ev)
 	case MonsGoblinWarrior:
 		return m.ThrowJavelin(g, ev)
-	case MonsOklobPlant:
+	case MonsSatowalgaPlant:
 		return m.ThrowAcid(g, ev)
 	}
 	return false
