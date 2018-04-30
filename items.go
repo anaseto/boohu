@@ -568,7 +568,7 @@ func (wp weapon) Desc() string {
 	case DoubleSword:
 		text = "A double sword is a big two-handed weapon that occasionally gets additional free hits."
 	case Frundis:
-		text = "Frundis is a musician and harmonist, which happens to be a two-handed staff too. It may occasionally confuse monsters on hit, or generate a dense magical fog. It magically helps reducing noise in combat."
+		text = "Frundis is a musician and harmonist, which happens to be a two-handed staff too. It may occasionally confuse monsters on hit. It magically helps reducing noise in combat too."
 	case ElecWhip:
 		text = "The lightning whip is a one-handed weapon that inflicts electrical damage to a monster and any foes connected to it."
 	}
