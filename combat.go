@@ -81,13 +81,9 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 		if !g.HitMonster(DmgPhysical, mons, ev) {
 			break
 		}
-		if RandInt(5) == 0 {
+		if RandInt(4) == 0 {
 			mons.EnterConfusion(g, ev)
 			g.PrintfStyled("Frundis glows… the %s appears confused.", logPlayerHit, mons.Kind)
-			if RandInt(3) == 0 {
-				g.Fog(mons.Pos, 3, ev)
-				g.PrintfStyled("Frundis glows… the %s is surrounded by a dense fog.", logPlayerHit, mons.Kind)
-			}
 		}
 	case g.Player.Weapon.Cleave():
 		var neighbors []position
@@ -152,7 +148,7 @@ func (g *game) HitConnected(pos position, dt dmgType, ev event) {
 
 func (g *game) HitNoise() int {
 	noise := 12
-	if g.Player.Weapon == Frundis || g.Player.Weapon == Dagger {
+	if g.Player.Weapon == Frundis {
 		noise -= 2
 	}
 	if g.Player.Armour == Robe {
