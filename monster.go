@@ -195,7 +195,7 @@ var monsDesc = []string{
 	MonsCyclop:          "Cyclops are very similar to ogres, but they also like to throw rocks at their foes (for up to 15 damage), sometimes confusing them.",
 	MonsWorm:            "Worms are ugly slow moving creatures, but surprisingly hardy at times.",
 	MonsBrizzia:         "Brizzias are big slow moving biped creatures. They are quite hardy, and when hurt they can cause nausea, impeding the use of potions.",
-	MonsAcidMound:       "Acid mounds are acidic creatures. They can temporally corrode your armour.",
+	MonsAcidMound:       "Acid mounds are acidic creatures. They can temporally corrode your equipment.",
 	MonsHound:           "Hounds are fast moving carnivore quadrupeds. They sometimes attack in group.",
 	MonsYack:            "Yacks are quite large herbivorous quadrupeds. They tend to form large groups. They can push you one cell away.",
 	MonsGiantBee:        "Giant bees are fragile, but extremely fast moving creatures. Their bite can sometimes enrage you.",
