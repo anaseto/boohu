@@ -225,12 +225,15 @@ func (cev *cloudEvent) Action(g *game) {
 		delete(g.Clouds, cev.Pos)
 		g.ComputeLOS()
 	case ObstructionEnd:
-		g.Dungeon.SetCell(cev.Pos, FreeCell)
-		if !g.Player.LOS[cev.Pos] {
+		if !g.Player.LOS[cev.Pos] && g.Dungeon.Cell(cev.Pos).T == WallCell {
 			g.UnknownDig[cev.Pos] = true
 		} else {
 			delete(g.TemporalWalls, cev.Pos)
 		}
+		if g.Dungeon.Cell(cev.Pos).T == FreeCell {
+			break
+		}
+		g.Dungeon.SetCell(cev.Pos, FreeCell)
 		g.MakeNoise(15, cev.Pos)
 		g.Fog(cev.Pos, 1, &simpleEvent{ERank: cev.Rank()})
 		g.ComputeLOS()
