@@ -40,7 +40,7 @@ var (
 	ColorFgStatusOther      uicolor = 136
 	ColorFgExcluded         uicolor = 160
 	ColorFgTargetMode       uicolor = 37
-	ColorFgTemporalWall     uicolor = 37
+	ColorFgMagicPlace       uicolor = 37
 )
 
 func SolarizedPalette() {
@@ -71,7 +71,7 @@ func SolarizedPalette() {
 	ColorFgStatusOther = 3
 	ColorFgExcluded = 1
 	ColorFgTargetMode = 6
-	ColorFgTemporalWall = 6
+	ColorFgMagicPlace = 6
 }
 
 func FixColor() {
@@ -102,7 +102,7 @@ func FixColor() {
 	ColorFgStatusOther = ColorFgStatusOther + 1
 	ColorFgExcluded = ColorFgExcluded + 1
 	ColorFgTargetMode = ColorFgTargetMode + 1
-	ColorFgTemporalWall = ColorFgTemporalWall + 1
+	ColorFgMagicPlace = ColorFgMagicPlace + 1
 }
 
 const (
@@ -143,7 +143,7 @@ func WindowsPalette() {
 	ColorFgStatusBad = Maroon
 	ColorFgStatusOther = Olive
 	ColorFgTargetMode = Teal
-	ColorFgTemporalWall = Teal
+	ColorFgMagicPlace = Teal
 }
 
 func (ui *termui) DrawWelcome() {
@@ -504,7 +504,11 @@ func (ui *termui) DescribePosition(g *game, pos position, targ Targeter) {
 	case okRod:
 		desc += fmt.Sprintf("You see a %v.", rod)
 	case g.Stairs[pos]:
-		desc += "You see stairs downwards."
+		if g.Depth == g.MaxDepth() {
+			desc += "You see some glowing stairs."
+		} else {
+			desc += "You see stairs downwards."
+		}
 	case g.Doors[pos]:
 		desc += "You see a door."
 	case g.Dungeon.Cell(pos).T == WallCell:
@@ -731,7 +735,11 @@ func (ui *termui) ViewPositionDescription(g *game, pos position) {
 	} else if eq, ok := g.Equipables[pos]; ok {
 		ui.DrawDescription(g, eq.Desc())
 	} else if g.Stairs[pos] {
-		ui.DrawDescription(g, "Stairs lead to the next level of the Underground. There's no way back. Monsters do not follow you.")
+		if g.Depth == g.MaxDepth() {
+			ui.DrawDescription(g, "These shiny-looking stairs are in fact a magical monolith. It is said they were made some centuries ago by Marevor Helith. They will lead you back to your village.")
+		} else {
+			ui.DrawDescription(g, "Stairs lead to the next level of the Underground. There's no way back. Monsters do not follow you.")
+		}
 	} else if g.Doors[pos] {
 		ui.DrawDescription(g, "A closed door blocks your line of sight. Doors open automatically when you or a monster stand on them.")
 	} else if g.Simellas[pos] > 0 {
@@ -879,13 +887,13 @@ func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgCol
 	case WallCell:
 		r = '#'
 		if g.TemporalWalls[pos] {
-			fgColor = ColorFgTemporalWall
+			fgColor = ColorFgMagicPlace
 		}
 	case FreeCell:
 		if g.UnknownDig[pos] {
 			r = '#'
 			if g.TemporalWalls[pos] {
-				fgColor = ColorFgTemporalWall
+				fgColor = ColorFgMagicPlace
 			}
 			break
 		}
@@ -912,7 +920,11 @@ func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgCol
 				fgColor = ColorFgCollectable
 			} else if _, ok := g.Stairs[pos]; ok {
 				r = '>'
-				fgColor = ColorFgStairs
+				if g.Depth == g.MaxDepth() {
+					fgColor = ColorFgMagicPlace
+				} else {
+					fgColor = ColorFgStairs
+				}
 			} else if _, ok := g.Simellas[pos]; ok {
 				r = '♣'
 				fgColor = ColorFgSimellas
