@@ -148,7 +148,7 @@ func (g *game) ComputeExclusion(pos position, toggle bool) {
 	exclusionRange := g.LosRange()
 	rays := g.buildRayMap(pos, exclusionRange)
 	for pos, n := range rays {
-		if n.Cost < g.LosRange() {
+		if n.Cost <= g.LosRange() {
 			g.ExclusionsMap[pos] = toggle
 		}
 	}
