@@ -542,7 +542,8 @@ func (ui *termui) ChooseTarget(g *game, targ Targeter) bool {
 	return targ.Done()
 }
 
-func (ui *termui) NextMonster(g *game, r rune, pos position, nmonster int) (position, int) {
+func (ui *termui) NextMonster(g *game, r rune, pos position, data *examineData) {
+	nmonster := data.nmonster
 	for i := 0; i < len(g.Monsters); i++ {
 		if r == '+' {
 			nmonster++
@@ -560,36 +561,54 @@ func (ui *termui) NextMonster(g *game, r rune, pos position, nmonster int) (posi
 			break
 		}
 	}
-	return pos, nmonster
+	data.npos = pos
+	data.nmonster = nmonster
 }
 
-func (ui *termui) NextObject(g *game, pos position, nobject int, objects *[]position) (position, int) {
-	if len(*objects) == 0 {
+func (ui *termui) NextStair(g *game, data *examineData) {
+	if data.sortedStairs == nil {
+		stairs := g.StairsSlice()
+		data.sortedStairs = g.SortedNearestTo(stairs, g.Player.Pos)
+	}
+	if data.stairIndex >= len(data.sortedStairs) {
+		data.stairIndex = 0
+	}
+	if len(data.sortedStairs) > 0 {
+		data.npos = data.sortedStairs[data.stairIndex]
+		data.stairIndex++
+	}
+}
+
+func (ui *termui) NextObject(g *game, pos position, data *examineData) {
+	nobject := data.nobject
+	if len(data.objects) == 0 {
 		for p := range g.Collectables {
-			*objects = append(*objects, p)
+			data.objects = append(data.objects, p)
 		}
 		for p := range g.Rods {
-			*objects = append(*objects, p)
+			data.objects = append(data.objects, p)
 		}
 		for p := range g.Equipables {
-			*objects = append(*objects, p)
+			data.objects = append(data.objects, p)
 		}
 		for p := range g.Simellas {
-			*objects = append(*objects, p)
+			data.objects = append(data.objects, p)
 		}
+		data.objects = g.SortedNearestTo(data.objects, g.Player.Pos)
 	}
-	for i := 0; i < len(*objects); i++ {
+	for i := 0; i < len(data.objects); i++ {
+		p := data.objects[nobject]
 		nobject++
-		if nobject > len(*objects)-1 {
+		if nobject > len(data.objects)-1 {
 			nobject = 0
 		}
-		p := (*objects)[nobject]
 		if g.Dungeon.Cell(p).Explored {
 			pos = p
 			break
 		}
 	}
-	return pos, nobject
+	data.npos = pos
+	data.nobject = nobject
 }
 
 func (ui *termui) ExcludeZone(g *game, pos position) {
@@ -625,21 +644,11 @@ func (ui *termui) CursorCharAction(g *game, targ Targeter, r rune, pos position,
 			data.npos = p
 		}
 	case '>', 'D':
-		if data.sortedStairs == nil {
-			stairs := g.StairsSlice()
-			data.sortedStairs = g.SortedNearestTo(stairs, g.Player.Pos)
-		}
-		if data.stairIndex >= len(data.sortedStairs) {
-			data.stairIndex = 0
-		}
-		if len(data.sortedStairs) > 0 {
-			data.npos = data.sortedStairs[data.stairIndex]
-			data.stairIndex++
-		}
+		ui.NextStair(g, data)
 	case '+', '-':
-		data.npos, data.nmonster = ui.NextMonster(g, r, pos, data.nmonster)
+		ui.NextMonster(g, r, pos, data)
 	case 'o':
-		data.npos, data.nobject = ui.NextObject(g, pos, data.nobject, &data.objects)
+		ui.NextObject(g, pos, data)
 	case 'v', 'd':
 		ui.HideCursor()
 		ui.ViewPositionDescription(g, pos)
@@ -692,6 +701,15 @@ func (ui *termui) CursorAction(g *game, targ Targeter, start *position) error {
 	data := &examineData{
 		npos:    pos,
 		objects: []position{},
+	}
+	if pos == g.Player.Pos {
+		ui.NextObject(g, position{-1, -1}, data)
+		if !data.npos.valid() {
+			ui.NextStair(g, data)
+		}
+		if data.npos.valid() {
+			pos = data.npos
+		}
 	}
 	opos := position{-1, -1}
 loop:
