@@ -259,7 +259,7 @@ func (g *game) EvokeRodFireball(ev event) error {
 	}
 	neighbors := g.Dungeon.FreeNeighbors(g.Player.Target)
 	g.Print("A fireball emerges straight from the rod.")
-	g.ui.ExplosionAnimation(g, g.Player.Target)
+	g.ui.ExplosionAnimation(g, FireExplosion, g.Player.Target)
 	for _, pos := range append(neighbors, g.Player.Target) {
 		g.Burn(pos, ev)
 		mons, _ := g.MonsterAt(pos)
@@ -336,11 +336,13 @@ func (g *game) EvokeRodShatter(ev event) error {
 		g.ComputeLOS()
 		g.MakeMonstersAware()
 		g.MakeNoise(19, g.Player.Target)
-		g.Fog(g.Player.Target, 2, ev)
 		g.Print("You see the wall disappear in a noisy explosion.")
+		g.ui.ExplosionAnimation(g, WallExplosion, g.Player.Target)
+		g.Fog(g.Player.Target, 2, ev)
 	} else {
 		g.MakeNoise(15, g.Player.Target)
 		g.Print("You see an explosion around the wall.")
+		g.ui.ExplosionAnimation(g, AroundWallExplosion, g.Player.Target)
 	}
 	for _, pos := range neighbors {
 		mons, _ := g.MonsterAt(pos)

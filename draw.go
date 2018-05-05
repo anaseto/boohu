@@ -868,13 +868,29 @@ func (ui *termui) DrawDungeonView(g *game, targeting bool) {
 	ui.Flush()
 }
 
-func (ui *termui) ExplosionAnimation(g *game, pos position) {
+type explosionStyle int
+
+const (
+	FireExplosion explosionStyle = iota
+	WallExplosion
+	AroundWallExplosion
+)
+
+func (ui *termui) ExplosionAnimation(g *game, es explosionStyle, pos position) {
 	ui.DrawDungeonView(g, false)
-	for _, fg := range [2]uicolor{ColorFgSimellas, ColorFgWanderingMonster} {
-		_, _, bgColor := ui.PositionDrawing(g, pos)
-		ui.DrawAtPosition(g, pos, true, '☼', fg, bgColor)
-		ui.Flush()
-		time.Sleep(20 * time.Millisecond)
+	// TODO: use new specific variables for colors
+	colors := [2]uicolor{ColorFgSimellas, ColorFgWanderingMonster}
+	if es == WallExplosion || es == AroundWallExplosion {
+		colors[0] = ColorFgSleepingMonster
+		colors[1] = ColorFgStairs
+	}
+	for _, fg := range colors {
+		if es != AroundWallExplosion {
+			_, _, bgColor := ui.PositionDrawing(g, pos)
+			ui.DrawAtPosition(g, pos, true, '☼', fg, bgColor)
+			ui.Flush()
+			time.Sleep(15 * time.Millisecond)
+		}
 		for _, npos := range g.Dungeon.FreeNeighbors(pos) {
 			if !g.Player.LOS[npos] {
 				continue
@@ -882,7 +898,7 @@ func (ui *termui) ExplosionAnimation(g *game, pos position) {
 			_, _, bgColor := ui.PositionDrawing(g, npos)
 			ui.DrawAtPosition(g, npos, true, '¤', fg, bgColor)
 			ui.Flush()
-			time.Sleep(5 * time.Millisecond)
+			time.Sleep(6 * time.Millisecond)
 		}
 	}
 	time.Sleep(20 * time.Millisecond)
