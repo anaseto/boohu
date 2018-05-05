@@ -874,7 +874,7 @@ func (ui *termui) ExplosionAnimation(g *game, pos position) {
 		_, _, bgColor := ui.PositionDrawing(g, pos)
 		ui.DrawAtPosition(g, pos, true, '☼', fg, bgColor)
 		ui.Flush()
-		time.Sleep(10 * time.Millisecond)
+		time.Sleep(20 * time.Millisecond)
 		for _, npos := range g.Dungeon.FreeNeighbors(pos) {
 			if !g.Player.LOS[npos] {
 				continue
@@ -882,10 +882,10 @@ func (ui *termui) ExplosionAnimation(g *game, pos position) {
 			_, _, bgColor := ui.PositionDrawing(g, npos)
 			ui.DrawAtPosition(g, npos, true, '¤', fg, bgColor)
 			ui.Flush()
-			time.Sleep(3 * time.Millisecond)
+			time.Sleep(5 * time.Millisecond)
 		}
 	}
-	time.Sleep(7 * time.Millisecond)
+	time.Sleep(20 * time.Millisecond)
 	ui.DrawDungeonView(g, false)
 }
 
@@ -1302,6 +1302,15 @@ func (ui *termui) Dump(g *game, err error) {
 func (ui *termui) CriticalHPWarning(g *game) {
 	g.PrintStyled("*** CRITICAL HP WARNING *** --press esc or space to continue--", logCritic)
 	ui.DrawDungeonView(g, false)
+	r, fg, bg := ui.PositionDrawing(g, g.Player.Pos)
+	ui.DrawAtPosition(g, g.Player.Pos, true, r, ColorFgHPwounded, bg)
+	ui.Flush()
+	time.Sleep(50 * time.Millisecond)
+	ui.DrawAtPosition(g, g.Player.Pos, true, r, ColorFgHPcritical, bg)
+	ui.Flush()
+	time.Sleep(50 * time.Millisecond)
+	ui.DrawAtPosition(g, g.Player.Pos, true, r, fg, bg)
+	ui.Flush()
 	ui.WaitForContinue(g)
 	g.Print("Ok. Be careful, then.")
 }
