@@ -898,10 +898,10 @@ func (ui *termui) ExplosionAnimation(g *game, es explosionStyle, pos position) {
 			_, _, bgColor := ui.PositionDrawing(g, npos)
 			ui.DrawAtPosition(g, npos, true, '¤', fg, bgColor)
 			ui.Flush()
-			time.Sleep(6 * time.Millisecond)
+			time.Sleep(7 * time.Millisecond)
 		}
 	}
-	time.Sleep(20 * time.Millisecond)
+	time.Sleep(25 * time.Millisecond)
 	ui.DrawDungeonView(g, false)
 }
 
@@ -915,10 +915,10 @@ func (ui *termui) LightningBoltAnimation(g *game, ray []position) {
 			_, _, bgColor := ui.PositionDrawing(g, pos)
 			ui.DrawAtPosition(g, pos, true, '☼', fg, bgColor)
 			ui.Flush()
-			time.Sleep(6 * time.Millisecond)
+			time.Sleep(7 * time.Millisecond)
 		}
 	}
-	time.Sleep(20 * time.Millisecond)
+	time.Sleep(25 * time.Millisecond)
 	ui.DrawDungeonView(g, false)
 }
 
