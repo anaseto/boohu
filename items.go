@@ -255,6 +255,7 @@ func (g *game) QuaffWallPotion(ev event) error {
 		}
 		g.MakeNoise(15, pos)
 		g.Dungeon.SetCell(pos, WallCell)
+		delete(g.Clouds, g.Player.Target)
 		if g.TemporalWalls != nil {
 			g.TemporalWalls[pos] = true
 		}

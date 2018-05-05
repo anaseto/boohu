@@ -367,6 +367,7 @@ func (g *game) EvokeRodObstruction(ev event) error {
 		break
 	}
 	g.Dungeon.SetCell(g.Player.Target, WallCell)
+	delete(g.Clouds, g.Player.Target)
 	if g.TemporalWalls != nil {
 		g.TemporalWalls[g.Player.Target] = true
 	}
