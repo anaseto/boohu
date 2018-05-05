@@ -910,7 +910,8 @@ func (ui *termui) LightningBoltAnimation(g *game, ray []position) {
 	time.Sleep(10 * time.Millisecond)
 	colors := [2]uicolor{ColorFgSimellas, ColorFgWanderingMonster}
 	for _, fg := range colors {
-		for _, pos := range ray {
+		for i := len(ray) - 1; i >= 0; i-- {
+			pos := ray[i]
 			_, _, bgColor := ui.PositionDrawing(g, pos)
 			ui.DrawAtPosition(g, pos, true, '☼', fg, bgColor)
 			ui.Flush()
@@ -938,7 +939,8 @@ func (ui *termui) ProjectileSymbol(dir direction) (r rune) {
 func (ui *termui) ThrowAnimation(g *game, ray []position, hit bool) {
 	ui.DrawDungeonView(g, false)
 	time.Sleep(10 * time.Millisecond)
-	for _, pos := range ray {
+	for i := len(ray) - 1; i >= 0; i-- {
+		pos := ray[i]
 		r, fgColor, bgColor := ui.PositionDrawing(g, pos)
 		ui.DrawAtPosition(g, pos, true, ui.ProjectileSymbol(pos.Dir(g.Player.Pos)), ColorFgPlayer, bgColor)
 		ui.Flush()
@@ -946,7 +948,7 @@ func (ui *termui) ThrowAnimation(g *game, ray []position, hit bool) {
 		ui.DrawAtPosition(g, pos, true, r, fgColor, bgColor)
 	}
 	if hit {
-		pos := ray[len(ray)-1]
+		pos := ray[0]
 		_, _, bgColor := ui.PositionDrawing(g, pos)
 		ui.DrawAtPosition(g, pos, true, '¤', ColorFgMPcritical, bgColor)
 		ui.Flush()
