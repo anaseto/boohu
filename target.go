@@ -59,7 +59,7 @@ type chooser struct {
 	minDist      bool
 	needsFreeWay bool
 	free         bool
-	fungus       bool
+	flammable    bool
 }
 
 func (ch *chooser) ComputeHighlight(g *game, pos position) {
@@ -100,12 +100,12 @@ func (ch *chooser) Action(g *game, pos position) error {
 			ch.done = true
 			return nil
 		}
-		if mons.Exists() || ch.fungus && ch.fungusInWay(g, pos) {
+		if mons.Exists() || ch.flammable && ch.flammableInWay(g, pos) {
 			g.Player.Target = pos
 			ch.done = true
 			return nil
 		}
-		if ch.fungus && ch.fungusInWay(g, pos) {
+		if ch.flammable && ch.flammableInWay(g, pos) {
 			g.Player.Target = pos
 			ch.done = true
 			return nil
@@ -116,14 +116,15 @@ func (ch *chooser) Action(g *game, pos position) error {
 		neighbors := g.Dungeon.FreeNeighbors(pos)
 		for _, npos := range neighbors {
 			mons, _ := g.MonsterAt(npos)
-
-			if _, ok := g.Fungus[pos]; ch.fungus && ok || mons.Exists() {
+			_, okFungus := g.Fungus[pos]
+			_, okDoors := g.Doors[pos]
+			if ch.flammable && (okFungus || okDoors) || mons.Exists() {
 				g.Player.Target = pos
 				ch.done = true
 				return nil
 			}
 		}
-		if ch.fungus {
+		if ch.flammable {
 			return errors.New("Invalid target: no monsters nor flammable terrain in the area.")
 		}
 		return errors.New("Invalid target: no monsters in the area.")
@@ -151,13 +152,16 @@ func (ch *chooser) freeWay(g *game, pos position) bool {
 	return tpos == pos
 }
 
-func (ch *chooser) fungusInWay(g *game, pos position) bool {
+func (ch *chooser) flammableInWay(g *game, pos position) bool {
 	ray := g.Ray(pos)
 	for _, rpos := range ray {
 		if rpos == g.Player.Pos {
 			continue
 		}
 		if _, ok := g.Fungus[rpos]; ok {
+			return true
+		}
+		if _, ok := g.Doors[rpos]; ok {
 			return true
 		}
 	}

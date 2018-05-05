@@ -279,10 +279,13 @@ func (g *game) Burn(pos position, ev event) {
 	if _, ok := g.Clouds[pos]; ok {
 		return
 	}
-	if _, ok := g.Fungus[pos]; !ok {
+	_, okFungus := g.Fungus[pos]
+	_, okDoor := g.Doors[pos]
+	if !okFungus && !okDoor {
 		return
 	}
 	delete(g.Fungus, pos)
+	delete(g.Doors, pos)
 	g.Clouds[pos] = CloudFire
 	g.PushEvent(&cloudEvent{ERank: ev.Rank() + 10, EAction: FireProgression, Pos: pos})
 	g.BurnCreature(pos, ev)

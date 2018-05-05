@@ -231,7 +231,7 @@ func (g *game) EvokeRodTeleportOther(ev event) error {
 }
 
 func (g *game) EvokeRodLightningBolt(ev event) error {
-	if !g.ui.ChooseTarget(g, &chooser{fungus: true}) {
+	if !g.ui.ChooseTarget(g, &chooser{flammable: true}) {
 		return errors.New("Ok, then.")
 	}
 	ray := g.Ray(g.Player.Target)
@@ -254,7 +254,7 @@ func (g *game) EvokeRodLightningBolt(ev event) error {
 }
 
 func (g *game) EvokeRodFireball(ev event) error {
-	if !g.ui.ChooseTarget(g, &chooser{area: true, minDist: true, fungus: true}) {
+	if !g.ui.ChooseTarget(g, &chooser{area: true, minDist: true, flammable: true}) {
 		return errors.New("Ok, then.")
 	}
 	neighbors := g.Dungeon.FreeNeighbors(g.Player.Target)
