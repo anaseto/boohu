@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"time"
 )
 
 type uicolor int
@@ -813,6 +814,27 @@ func (ui *termui) InViewBorder(g *game, pos position, targeting bool) bool {
 	return pos.DistanceY(g.Player.Pos) != 10 && pos.DistanceX(g.Player.Pos) != 39
 }
 
+func (ui *termui) DrawAtPosition(g *game, pos position, targeting bool, r rune, fg, bg uicolor) {
+	if g.Highlight[pos] || pos == ui.cursor {
+		bg, fg = fg, bg
+	}
+	if CenteredCamera {
+		if !ui.InView(g, pos, targeting) {
+			return
+		}
+		x, y := ui.CameraOffset(g, pos, targeting)
+		ui.SetCell(x, y, r, fg, bg)
+		if ui.InViewBorder(g, pos, targeting) && g.Dungeon.Border(pos) {
+			for _, opos := range pos.OutsideNeighbors() {
+				xo, yo := ui.CameraOffset(g, opos, targeting)
+				ui.SetCell(xo, yo, '#', ColorFg, ColorBgBorder)
+			}
+		}
+		return
+	}
+	ui.SetCell(pos.X, pos.Y, r, fg, bg)
+}
+
 func (ui *termui) DrawDungeonView(g *game, targeting bool) {
 	ui.Clear()
 	m := g.Dungeon
@@ -826,24 +848,7 @@ func (ui *termui) DrawDungeonView(g *game, targeting bool) {
 	for i := range m.Cells {
 		pos := idxtopos(i)
 		r, fgColor, bgColor := ui.PositionDrawing(g, pos)
-		if g.Highlight[pos] || pos == ui.cursor {
-			bgColor, fgColor = fgColor, bgColor
-		}
-		if CenteredCamera {
-			if !ui.InView(g, pos, targeting) {
-				continue
-			}
-			x, y := ui.CameraOffset(g, pos, targeting)
-			ui.SetCell(x, y, r, fgColor, bgColor)
-			if ui.InViewBorder(g, pos, targeting) && g.Dungeon.Border(pos) {
-				for _, opos := range pos.OutsideNeighbors() {
-					xo, yo := ui.CameraOffset(g, opos, targeting)
-					ui.SetCell(xo, yo, '#', ColorFg, ColorBgBorder)
-				}
-			}
-		} else {
-			ui.SetCell(pos.X, pos.Y, r, fgColor, bgColor)
-		}
+		ui.DrawAtPosition(g, pos, targeting, r, fgColor, bgColor)
 	}
 	ui.DrawText(fmt.Sprintf("[ %v (%d)", g.Player.Armour, g.Player.Armor()), 81, 0)
 	ui.DrawText(fmt.Sprintf(") %v (%d)", g.Player.Weapon, g.Player.Attack()), 81, 1)
@@ -861,6 +866,27 @@ func (ui *termui) DrawDungeonView(g *game, targeting bool) {
 	ui.DrawStatusLine(g)
 	ui.DrawLog(g)
 	ui.Flush()
+}
+
+func (ui *termui) ExplosionAnimation(g *game, pos position) {
+	ui.DrawDungeonView(g, false)
+	for _, fg := range [2]uicolor{ColorFgSimellas, ColorFgWanderingMonster} {
+		_, _, bgColor := ui.PositionDrawing(g, pos)
+		ui.DrawAtPosition(g, pos, true, '☼', fg, bgColor)
+		ui.Flush()
+		time.Sleep(10 * time.Millisecond)
+		for _, npos := range g.Dungeon.FreeNeighbors(pos) {
+			if !g.Player.LOS[npos] {
+				continue
+			}
+			_, _, bgColor := ui.PositionDrawing(g, npos)
+			ui.DrawAtPosition(g, npos, true, '¤', fg, bgColor)
+			ui.Flush()
+			time.Sleep(3 * time.Millisecond)
+		}
+	}
+	time.Sleep(7 * time.Millisecond)
+	ui.DrawDungeonView(g, false)
 }
 
 func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgColor uicolor) {

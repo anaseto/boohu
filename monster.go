@@ -1084,6 +1084,7 @@ func (m *monster) Explode(g *game, ev event) {
 	neighbors := g.Dungeon.FreeNeighbors(m.Pos)
 	g.MakeNoise(18, m.Pos)
 	g.Printf("%s blows with a noisy pop.", m.Kind.Definite(true))
+	g.ui.ExplosionAnimation(g, m.Pos)
 	for _, pos := range append(neighbors, m.Pos) {
 		g.Burn(pos, ev)
 		mons, _ := g.MonsterAt(pos)

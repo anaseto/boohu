@@ -259,6 +259,7 @@ func (g *game) EvokeRodFireball(ev event) error {
 	}
 	neighbors := g.Dungeon.FreeNeighbors(g.Player.Target)
 	g.Print("A fireball emerges straight from the rod.")
+	g.ui.ExplosionAnimation(g, g.Player.Target)
 	for _, pos := range append(neighbors, g.Player.Target) {
 		g.Burn(pos, ev)
 		mons, _ := g.MonsterAt(pos)

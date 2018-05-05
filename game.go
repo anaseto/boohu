@@ -54,6 +54,7 @@ type Renderer interface {
 	Death(*game)
 	ChooseTarget(*game, Targeter) bool
 	CriticalHPWarning(*game)
+	ExplosionAnimation(*game, position)
 }
 
 func (g *game) FreeCell() position {
@@ -261,6 +262,7 @@ func (g *game) InitPlayer() {
 	// Testing
 	// g.Player.Aptitudes[AptSmoke] = true
 	//g.Player.Rods[RodSwapping] = &rodProps{Charge: 3}
+	//g.Player.Rods[RodFireball] = &rodProps{Charge: 3}
 	//g.Player.Weapon = ElecWhip
 }
 
