@@ -198,7 +198,7 @@ func (g *game) HitMonster(dt dmgType, mons *monster, ev event) (hit bool) {
 		} else if oldHP > 0 {
 			// test oldHP > 0 because of sword special attack
 			g.PrintfStyled("You kill %s (%d damage).", logPlayerHit, mons.Kind.Definite(false), attack)
-			g.HandleKill(mons)
+			g.HandleKill(mons, ev)
 		}
 		if mons.Kind == MonsBrizzia && RandInt(4) == 0 && !g.Player.HasStatus(StatusNausea) &&
 			mons.Pos.Distance(g.Player.Pos) == 1 {
@@ -213,14 +213,14 @@ func (g *game) HitMonster(dt dmgType, mons *monster, ev event) (hit bool) {
 	return hit
 }
 
-func (g *game) HandleKill(mons *monster) {
+func (g *game) HandleKill(mons *monster, ev event) {
 	g.Killed++
 	if g.KilledMons == nil {
 		g.KilledMons = map[monsterKind]int{}
 	}
 	g.KilledMons[mons.Kind]++
 	if mons.Kind == MonsExplosiveNadre {
-		mons.Explode(g)
+		mons.Explode(g, ev)
 	}
 	if g.Doors[mons.Pos] {
 		g.ComputeLOS()

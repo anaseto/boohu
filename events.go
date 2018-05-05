@@ -207,6 +207,7 @@ type cloudAction int
 const (
 	CloudEnd cloudAction = iota
 	ObstructionEnd
+	FireProgression
 )
 
 type cloudEvent struct {
@@ -237,7 +238,54 @@ func (cev *cloudEvent) Action(g *game) {
 		g.MakeNoise(15, cev.Pos)
 		g.Fog(cev.Pos, 1, &simpleEvent{ERank: cev.Rank()})
 		g.ComputeLOS()
+	case FireProgression:
+		if _, ok := g.Clouds[cev.Pos]; !ok {
+			break
+		}
+		g.BurnCreature(cev.Pos, cev)
+		if RandInt(10) == 0 {
+			delete(g.Clouds, cev.Pos)
+			g.Fog(cev.Pos, 1, &simpleEvent{ERank: cev.Rank()})
+			g.ComputeLOS()
+			break
+		}
+		for _, pos := range g.Dungeon.FreeNeighbors(cev.Pos) {
+			if RandInt(3) > 0 {
+				continue
+			}
+			g.Burn(pos, cev)
+		}
+		cev.Renew(g, 10)
 	}
+}
+
+func (g *game) BurnCreature(pos position, ev event) {
+	mons, _ := g.MonsterAt(pos)
+	if mons.Exists() {
+		mons.HP -= 1 + RandInt(10)
+		if mons.HP <= 0 {
+			g.PrintfStyled("%s is killed by the fire.", logPlayerHit, mons.Kind.Definite(true))
+			g.HandleKill(mons, ev)
+		}
+	}
+	if pos == g.Player.Pos {
+		damage := 1 + RandInt(10)
+		g.Player.HP -= damage
+		g.PrintfStyled("The fire burns you (%d damage).", logMonsterHit, damage)
+	}
+}
+
+func (g *game) Burn(pos position, ev event) {
+	if _, ok := g.Clouds[pos]; ok {
+		return
+	}
+	if _, ok := g.Fungus[pos]; !ok {
+		return
+	}
+	delete(g.Fungus, pos)
+	g.Clouds[pos] = CloudFire
+	g.PushEvent(&cloudEvent{ERank: ev.Rank() + 10, EAction: FireProgression, Pos: pos})
+	g.BurnCreature(pos, ev)
 }
 
 func (cev *cloudEvent) Renew(g *game, delay int) {

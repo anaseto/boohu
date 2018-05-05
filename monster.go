@@ -1080,11 +1080,12 @@ func (m *monster) AbsorbMana(g *game, ev event) bool {
 	return true
 }
 
-func (m *monster) Explode(g *game) {
+func (m *monster) Explode(g *game, ev event) {
 	neighbors := g.Dungeon.FreeNeighbors(m.Pos)
 	g.MakeNoise(18, m.Pos)
 	g.Printf("%s blows with a noisy pop.", m.Kind.Definite(true))
 	for _, pos := range neighbors {
+		g.Burn(pos, ev)
 		mons, _ := g.MonsterAt(pos)
 		if mons.Exists() {
 			mons.HP /= 2

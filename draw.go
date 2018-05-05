@@ -514,7 +514,13 @@ func (ui *termui) DescribePosition(g *game, pos position, targ Targeter) {
 	case g.Dungeon.Cell(pos).T == WallCell:
 		desc += "You see a wall."
 	default:
-		if _, ok := g.Fungus[pos]; ok {
+		if cld, ok := g.Clouds[pos]; ok {
+			if cld == CloudFire {
+				desc += "You see burning flames."
+			} else {
+				desc += "You see a dense fog."
+			}
+		} else if _, ok := g.Fungus[pos]; ok {
 			desc += "You see dense foliage there."
 		} else {
 			desc += "You see the ground."
@@ -702,7 +708,7 @@ func (ui *termui) CursorAction(g *game, targ Targeter, start *position) error {
 		npos:    pos,
 		objects: []position{},
 	}
-	if pos == g.Player.Pos {
+	if _, ok := targ.(*examiner); ok && pos == g.Player.Pos {
 		ui.NextObject(g, position{-1, -1}, data)
 		if !data.npos.valid() {
 			ui.NextStair(g, data)
@@ -762,6 +768,8 @@ func (ui *termui) ViewPositionDescription(g *game, pos position) {
 		ui.DrawDescription(g, "A closed door blocks your line of sight. Doors open automatically when you or a monster stand on them.")
 	} else if g.Simellas[pos] > 0 {
 		ui.DrawDescription(g, "A simella is a plant with big white flowers which are used in the Underground for their medicinal properties. They can also make tasty infusions. You were actually sent here by your village to collect as many as possible of those plants.")
+	} else if _, ok := g.Fungus[pos]; ok {
+		ui.DrawDescription(g, "Dense foliage is difficult to see through. It is flammable.")
 	} else {
 		g.Print("Nothing worth of description here.")
 	}
@@ -924,8 +932,11 @@ func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgCol
 			if _, ok := g.Fungus[pos]; ok {
 				r = '"'
 			}
-			if _, ok := g.Clouds[pos]; ok && g.Player.LOS[pos] {
+			if cld, ok := g.Clouds[pos]; ok && g.Player.LOS[pos] {
 				r = '§'
+				if cld == CloudFire {
+					fgColor = ColorFgWanderingMonster
+				}
 			}
 			if c, ok := g.Collectables[pos]; ok {
 				r = c.Consumable.Letter()

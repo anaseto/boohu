@@ -231,12 +231,13 @@ func (g *game) EvokeRodTeleportOther(ev event) error {
 }
 
 func (g *game) EvokeRodLightningBolt(ev event) error {
-	if !g.ui.ChooseTarget(g, &chooser{}) {
+	if !g.ui.ChooseTarget(g, &chooser{fungus: true}) {
 		return errors.New("Ok, then.")
 	}
 	ray := g.Ray(g.Player.Target)
 	g.Print("A lightning bolt emerges straight from the rod.")
 	for _, pos := range ray {
+		g.Burn(pos, ev)
 		mons, _ := g.MonsterAt(pos)
 		if mons == nil {
 			continue
@@ -244,7 +245,7 @@ func (g *game) EvokeRodLightningBolt(ev event) error {
 		mons.HP -= RandInt(21)
 		if mons.HP <= 0 {
 			g.Printf("%s is killed by the bolt.", mons.Kind.Indefinite(true))
-			g.HandleKill(mons)
+			g.HandleKill(mons, ev)
 		}
 		g.MakeNoise(12, mons.Pos)
 		mons.MakeHuntIfHurt(g)
@@ -253,12 +254,13 @@ func (g *game) EvokeRodLightningBolt(ev event) error {
 }
 
 func (g *game) EvokeRodFireball(ev event) error {
-	if !g.ui.ChooseTarget(g, &chooser{area: true, minDist: true}) {
+	if !g.ui.ChooseTarget(g, &chooser{area: true, minDist: true, fungus: true}) {
 		return errors.New("Ok, then.")
 	}
 	neighbors := g.Dungeon.FreeNeighbors(g.Player.Target)
 	g.Print("A fireball emerges straight from the rod.")
 	for _, pos := range append(neighbors, g.Player.Target) {
+		g.Burn(pos, ev)
 		mons, _ := g.MonsterAt(pos)
 		if mons == nil {
 			continue
@@ -266,7 +268,7 @@ func (g *game) EvokeRodFireball(ev event) error {
 		mons.HP -= RandInt(21)
 		if mons.HP <= 0 {
 			g.Printf("%s is killed by the fireball.", mons.Kind.Indefinite(true))
-			g.HandleKill(mons)
+			g.HandleKill(mons, ev)
 		}
 		g.MakeNoise(12, mons.Pos)
 		mons.MakeHuntIfHurt(g)
@@ -278,6 +280,7 @@ type cloud int
 
 const (
 	CloudFog cloud = iota
+	CloudFire
 )
 
 func (g *game) EvokeRodFog(ev event) error {
@@ -346,7 +349,7 @@ func (g *game) EvokeRodShatter(ev event) error {
 		mons.HP -= RandInt(30)
 		if mons.HP <= 0 {
 			g.Printf("%s is killed by the explosion.", mons.Kind.Indefinite(true))
-			g.HandleKill(mons)
+			g.HandleKill(mons, ev)
 		}
 		g.MakeNoise(12, mons.Pos)
 		mons.MakeHuntIfHurt(g)
