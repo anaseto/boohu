@@ -376,13 +376,16 @@ func (g *game) ThrowJavelin(mons *monster, ev event) {
 		mons.HP -= attack
 		if mons.HP > 0 {
 			g.PrintfStyled("Your %s hits the %s (%d).", logPlayerHit, Javelin, mons.Kind, attack)
+			g.ui.ThrowAnimation(g, g.Ray(mons.Pos), true)
 			mons.MakeHuntIfHurt(g)
 		} else {
 			g.PrintfStyled("Your %s kills the %s.", logPlayerHit, Javelin, mons.Kind)
+			g.ui.ThrowAnimation(g, g.Ray(mons.Pos), true)
 			g.HandleKill(mons, ev)
 		}
 	} else {
 		g.Printf("Your %s missed the %s.", Javelin, mons.Kind)
+		g.ui.ThrowAnimation(g, g.Ray(mons.Pos), false)
 		mons.MakeHuntIfHurt(g)
 	}
 	ev.Renew(g, 10)
@@ -397,8 +400,10 @@ func (g *game) ThrowConfusingDart(mons *monster, ev event) {
 	if acc > evasion {
 		mons.EnterConfusion(g, ev)
 		g.PrintfStyled("Your %s hits the %s. The %s appears confused.", logPlayerHit, ConfusingDart, mons.Kind, mons.Kind)
+		g.ui.ThrowAnimation(g, g.Ray(mons.Pos), true)
 	} else {
 		g.Printf("Your %s missed the %s.", ConfusingDart, mons.Kind)
+		g.ui.ThrowAnimation(g, g.Ray(mons.Pos), false)
 	}
 	mons.MakeHuntIfHurt(g)
 	ev.Renew(g, 10)

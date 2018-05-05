@@ -921,6 +921,41 @@ func (ui *termui) LightningBoltAnimation(g *game, ray []position) {
 	ui.DrawDungeonView(g, false)
 }
 
+func (ui *termui) ProjectileSymbol(dir direction) (r rune) {
+	switch dir {
+	case E, ENE, ESE, WNW, W, WSW:
+		r = '—'
+	case NE, SW:
+		r = '/'
+	case NNE, N, NNW, SSW, S, SSE:
+		r = '|'
+	case NW, SE:
+		r = '\\'
+	}
+	return r
+}
+
+func (ui *termui) ThrowAnimation(g *game, ray []position, hit bool) {
+	ui.DrawDungeonView(g, false)
+	time.Sleep(10 * time.Millisecond)
+	for _, pos := range ray {
+		r, fgColor, bgColor := ui.PositionDrawing(g, pos)
+		ui.DrawAtPosition(g, pos, true, ui.ProjectileSymbol(pos.Dir(g.Player.Pos)), ColorFgPlayer, bgColor)
+		ui.Flush()
+		time.Sleep(15 * time.Millisecond)
+		ui.DrawAtPosition(g, pos, true, r, fgColor, bgColor)
+	}
+	if hit {
+		pos := ray[len(ray)-1]
+		_, _, bgColor := ui.PositionDrawing(g, pos)
+		ui.DrawAtPosition(g, pos, true, '¤', ColorFgMPcritical, bgColor)
+		ui.Flush()
+		time.Sleep(50 * time.Millisecond)
+	}
+	time.Sleep(20 * time.Millisecond)
+	ui.DrawDungeonView(g, false)
+}
+
 func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgColor uicolor) {
 	m := g.Dungeon
 	c := m.Cell(pos)
