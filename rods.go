@@ -236,6 +236,7 @@ func (g *game) EvokeRodLightningBolt(ev event) error {
 	}
 	ray := g.Ray(g.Player.Target)
 	g.Print("A lightning bolt emerges straight from the rod.")
+	g.ui.LightningBoltAnimation(g, ray)
 	for _, pos := range ray {
 		g.Burn(pos, ev)
 		mons, _ := g.MonsterAt(pos)

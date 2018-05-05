@@ -55,6 +55,7 @@ type Renderer interface {
 	ChooseTarget(*game, Targeter) bool
 	CriticalHPWarning(*game)
 	ExplosionAnimation(*game, explosionStyle, position)
+	LightningBoltAnimation(*game, []position)
 }
 
 func (g *game) FreeCell() position {

@@ -905,6 +905,22 @@ func (ui *termui) ExplosionAnimation(g *game, es explosionStyle, pos position) {
 	ui.DrawDungeonView(g, false)
 }
 
+func (ui *termui) LightningBoltAnimation(g *game, ray []position) {
+	ui.DrawDungeonView(g, false)
+	time.Sleep(10 * time.Millisecond)
+	colors := [2]uicolor{ColorFgSimellas, ColorFgWanderingMonster}
+	for _, fg := range colors {
+		for _, pos := range ray {
+			_, _, bgColor := ui.PositionDrawing(g, pos)
+			ui.DrawAtPosition(g, pos, true, '☼', fg, bgColor)
+			ui.Flush()
+			time.Sleep(6 * time.Millisecond)
+		}
+	}
+	time.Sleep(20 * time.Millisecond)
+	ui.DrawDungeonView(g, false)
+}
+
 func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgColor uicolor) {
 	m := g.Dungeon
 	c := m.Cell(pos)
