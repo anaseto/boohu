@@ -293,10 +293,17 @@ func (ui *termui) DrawLight(text string, x, y int, fg uicolor) {
 
 const DoNothing = "Do nothing, then."
 
+type uiMode int
+
+const (
+	NormalMode uiMode = iota
+	TargetingMode
+)
+
 func (ui *termui) EnterWizard(g *game) {
 	if ui.Wizard(g) {
 		g.WizardMode()
-		ui.DrawDungeonView(g, false)
+		ui.DrawDungeonView(g, NormalMode)
 	} else {
 		g.Print(DoNothing)
 	}
@@ -320,7 +327,7 @@ func (ui *termui) HandleCharacter(g *game, ev event, c rune) (err error, again b
 				quit = true
 				return err, again, quit
 			}
-			ui.DrawDungeonView(g, false)
+			ui.DrawDungeonView(g, NormalMode)
 		} else {
 			err = errors.New("No stairs here.")
 		}
@@ -347,7 +354,7 @@ func (ui *termui) HandleCharacter(g *game, ev event, c rune) (err error, again b
 		err = g.Autoexplore(ev)
 	case 'x':
 		b := ui.Examine(g, nil)
-		ui.DrawDungeonView(g, false)
+		ui.DrawDungeonView(g, NormalMode)
 		if !b {
 			again = true
 		} else if !g.MoveToTarget(ev) {
@@ -368,7 +375,7 @@ func (ui *termui) HandleCharacter(g *game, ev event, c rune) (err error, again b
 		if err != nil {
 			g.PrintfStyled("Error: %v", logError, err)
 			g.PrintStyled("Could not save game. --press any key to continue--", logError)
-			ui.DrawDungeonView(g, false)
+			ui.DrawDungeonView(g, NormalMode)
 			ui.PressAnyKey()
 		}
 		quit = true
@@ -433,7 +440,7 @@ func (ui *termui) ExaminePos(g *game, ev event, pos position) (again bool) {
 		start = &pos
 	}
 	b := ui.Examine(g, start)
-	ui.DrawDungeonView(g, false)
+	ui.DrawDungeonView(g, NormalMode)
 	if !b || !g.MoveToTarget(ev) {
 		again = true
 	}
@@ -441,7 +448,7 @@ func (ui *termui) ExaminePos(g *game, ev event, pos position) (again bool) {
 }
 
 func (ui *termui) DrawKeysDescription(g *game, actions []string) {
-	ui.DrawDungeonView(g, false)
+	ui.DrawDungeonView(g, NormalMode)
 
 	ui.DrawStyledTextLine(" Keys ", 0, HeaderLine)
 	for i := 0; i < len(actions)-1; i += 2 {
@@ -496,10 +503,10 @@ func (ui *termui) Equip(g *game, ev event) error {
 	return g.Equip(ev)
 }
 
-const TextWidth = 78
+const TextWidth = DungeonWidth - 2
 
 func (ui *termui) CharacterInfo(g *game) {
-	ui.DrawDungeonView(g, false)
+	ui.DrawDungeonView(g, NormalMode)
 
 	b := bytes.Buffer{}
 	b.WriteString(formatText("Every year, your village sends someone to collect medicinal simella plants in the Underground. This year, the duty fell upon you, and so here you are. Your heart is teared between your will to be as helpful as possible to your village and your will to make it out alive.", TextWidth))
@@ -525,7 +532,7 @@ func (ui *termui) CharacterInfo(g *game) {
 
 	ui.Flush()
 	ui.WaitForContinue(g)
-	ui.DrawDungeonView(g, false)
+	ui.DrawDungeonView(g, NormalMode)
 }
 
 func (ui *termui) WizardInfo(g *game) {
@@ -536,7 +543,7 @@ func (ui *termui) WizardInfo(g *game) {
 	ui.DrawText(b.String(), 0, 0)
 	ui.Flush()
 	ui.WaitForContinue(g)
-	ui.DrawDungeonView(g, false)
+	ui.DrawDungeonView(g, NormalMode)
 }
 
 func (ui *termui) AptitudesText(g *game) string {
@@ -810,7 +817,11 @@ loop:
 		opos = pos
 		targ.ComputeHighlight(g, pos)
 		ui.SetCursor(pos)
-		ui.DrawDungeonView(g, true)
+		ui.DrawDungeonView(g, TargetingMode)
+		ui.DrawInfoLine(g.InfoEntry)
+		ui.DrawStyledTextLine(" Targeting (? for help) ", DungeonHeight+2, FooterLine)
+		ui.SetCell(DungeonWidth, DungeonHeight, '┤', ColorFg, ColorBg)
+		ui.Flush()
 		data.npos = pos
 		b := ui.TargetModeEvent(g, targ, pos, data)
 		if b {
@@ -917,9 +928,9 @@ func (ui *termui) DrawAtPosition(g *game, pos position, targeting bool, r rune, 
 	ui.SetCell(pos.X, pos.Y, r, fg, bg)
 }
 
-func (ui *termui) DrawDungeonView(g *game, targeting bool) {
+func (ui *termui) DrawDungeonView(g *game, m uiMode) {
 	ui.Clear()
-	m := g.Dungeon
+	d := g.Dungeon
 	for i := 0; i < DungeonWidth; i++ {
 		ui.SetCell(i, DungeonHeight, '─', ColorFg, ColorBg)
 	}
@@ -927,10 +938,10 @@ func (ui *termui) DrawDungeonView(g *game, targeting bool) {
 		ui.SetCell(DungeonWidth, i, '│', ColorFg, ColorBg)
 	}
 	ui.SetCell(DungeonWidth, DungeonHeight, '┘', ColorFg, ColorBg)
-	for i := range m.Cells {
+	for i := range d.Cells {
 		pos := idxtopos(i)
 		r, fgColor, bgColor := ui.PositionDrawing(g, pos)
-		ui.DrawAtPosition(g, pos, targeting, r, fgColor, bgColor)
+		ui.DrawAtPosition(g, pos, m == TargetingMode, r, fgColor, bgColor)
 	}
 	ui.DrawText(fmt.Sprintf("[ %v (%d)", g.Player.Armour, g.Player.Armor()), 81, 0)
 	ui.DrawText(fmt.Sprintf(") %v (%d)", g.Player.Weapon, g.Player.Attack()), 81, 1)
@@ -943,12 +954,9 @@ func (ui *termui) DrawDungeonView(g *game, targeting bool) {
 	}
 	ui.DrawStatusLine(g)
 	ui.DrawLog(g)
-	if targeting {
-		ui.DrawInfoLine(g.InfoEntry)
-		ui.DrawStyledTextLine(" Targeting (? for help) ", DungeonHeight+2, FooterLine)
-		ui.SetCell(DungeonWidth, DungeonHeight, '┤', ColorFg, ColorBg)
+	if m != TargetingMode {
+		ui.Flush()
 	}
-	ui.Flush()
 }
 
 type explosionStyle int
@@ -960,7 +968,7 @@ const (
 )
 
 func (ui *termui) ExplosionAnimation(g *game, es explosionStyle, pos position) {
-	ui.DrawDungeonView(g, false)
+	ui.DrawDungeonView(g, NormalMode)
 	// TODO: use new specific variables for colors
 	colors := [2]uicolor{ColorFgExplosionStart, ColorFgExplosionEnd}
 	if es == WallExplosion || es == AroundWallExplosion {
@@ -985,11 +993,11 @@ func (ui *termui) ExplosionAnimation(g *game, es explosionStyle, pos position) {
 		}
 	}
 	time.Sleep(25 * time.Millisecond)
-	ui.DrawDungeonView(g, false)
+	ui.DrawDungeonView(g, NormalMode)
 }
 
 func (ui *termui) LightningBoltAnimation(g *game, ray []position) {
-	ui.DrawDungeonView(g, false)
+	ui.DrawDungeonView(g, NormalMode)
 	time.Sleep(10 * time.Millisecond)
 	colors := [2]uicolor{ColorFgExplosionStart, ColorFgExplosionEnd}
 	for _, fg := range colors {
@@ -1002,7 +1010,7 @@ func (ui *termui) LightningBoltAnimation(g *game, ray []position) {
 		}
 	}
 	time.Sleep(25 * time.Millisecond)
-	ui.DrawDungeonView(g, false)
+	ui.DrawDungeonView(g, NormalMode)
 }
 
 func (ui *termui) ProjectileSymbol(dir direction) (r rune) {
@@ -1020,7 +1028,7 @@ func (ui *termui) ProjectileSymbol(dir direction) (r rune) {
 }
 
 func (ui *termui) ThrowAnimation(g *game, ray []position, hit bool) {
-	ui.DrawDungeonView(g, false)
+	ui.DrawDungeonView(g, NormalMode)
 	time.Sleep(10 * time.Millisecond)
 	for i := len(ray) - 1; i >= 0; i-- {
 		pos := ray[i]
@@ -1038,7 +1046,7 @@ func (ui *termui) ThrowAnimation(g *game, ray []position, hit bool) {
 		time.Sleep(50 * time.Millisecond)
 	}
 	time.Sleep(20 * time.Millisecond)
-	ui.DrawDungeonView(g, false)
+	ui.DrawDungeonView(g, NormalMode)
 }
 
 func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgColor uicolor) {
@@ -1299,7 +1307,7 @@ func (ui *termui) DrawConsumableDescription(g *game, c consumable) {
 }
 
 func (ui *termui) DrawDescription(g *game, desc string) {
-	ui.DrawDungeonView(g, false)
+	ui.DrawDungeonView(g, NormalMode)
 	desc = formatText(desc, TextWidth)
 	lines := strings.Count(desc, "\n")
 	for i := 0; i <= lines+2; i++ {
@@ -1309,7 +1317,7 @@ func (ui *termui) DrawDescription(g *game, desc string) {
 	ui.DrawTextLine(" press esc or space to continue ", lines+2)
 	ui.Flush()
 	ui.WaitForContinue(g)
-	ui.DrawDungeonView(g, false)
+	ui.DrawDungeonView(g, NormalMode)
 }
 
 func (ui *termui) DrawText(text string, x, y int) {
@@ -1521,14 +1529,14 @@ func (ui *termui) SelectRod(g *game, ev event) error {
 			}
 			noAction = rs[index].Use(g, ev)
 		}
-		ui.DrawDungeonView(g, false)
+		ui.DrawDungeonView(g, NormalMode)
 		return noAction
 	}
 }
 
 func (ui *termui) Death(g *game) {
 	g.Print("You die... --press esc or space to continue--")
-	ui.DrawDungeonView(g, false)
+	ui.DrawDungeonView(g, NormalMode)
 	ui.WaitForContinue(g)
 	err := g.WriteDump()
 	ui.Dump(g, err)
@@ -1545,7 +1553,7 @@ func (ui *termui) Win(g *game) {
 	} else {
 		g.Print("You escape by the magic stairs! You win. --press esc or space to continue--")
 	}
-	ui.DrawDungeonView(g, false)
+	ui.DrawDungeonView(g, NormalMode)
 	ui.WaitForContinue(g)
 	err = g.WriteDump()
 	ui.Dump(g, err)
@@ -1560,7 +1568,7 @@ func (ui *termui) Dump(g *game, err error) {
 
 func (ui *termui) CriticalHPWarning(g *game) {
 	g.PrintStyled("*** CRITICAL HP WARNING *** --press esc or space to continue--", logCritic)
-	ui.DrawDungeonView(g, false)
+	ui.DrawDungeonView(g, NormalMode)
 	r, fg, bg := ui.PositionDrawing(g, g.Player.Pos)
 	ui.DrawAtPosition(g, g.Player.Pos, true, r, ColorFgHPwounded, bg)
 	ui.Flush()
@@ -1575,7 +1583,7 @@ func (ui *termui) CriticalHPWarning(g *game) {
 }
 
 func (ui *termui) DrinkingPotionAnimation(g *game) {
-	ui.DrawDungeonView(g, false)
+	ui.DrawDungeonView(g, NormalMode)
 	time.Sleep(50 * time.Millisecond)
 	r, fg, bg := ui.PositionDrawing(g, g.Player.Pos)
 	ui.DrawAtPosition(g, g.Player.Pos, true, r, ColorGreen, bg)
@@ -1590,13 +1598,13 @@ func (ui *termui) DrinkingPotionAnimation(g *game) {
 
 func (ui *termui) Quit(g *game) bool {
 	g.Print("Do you really want to quit without saving? [y/N]")
-	ui.DrawDungeonView(g, false)
+	ui.DrawDungeonView(g, NormalMode)
 	quit := ui.PromptConfirmation(g)
 	if quit {
 		err := g.RemoveSaveFile()
 		if err != nil {
 			g.PrintfStyled("Error removing save file: %v ——press any key to quit——", logError, err)
-			ui.DrawDungeonView(g, false)
+			ui.DrawDungeonView(g, NormalMode)
 			ui.PressAnyKey()
 		}
 	} else {
@@ -1607,14 +1615,14 @@ func (ui *termui) Quit(g *game) bool {
 
 func (ui *termui) Wizard(g *game) bool {
 	g.Print("Do you really want to enter wizard mode (no return)? [y/N]")
-	ui.DrawDungeonView(g, false)
+	ui.DrawDungeonView(g, NormalMode)
 	return ui.PromptConfirmation(g)
 }
 
 func (ui *termui) HandlePlayerTurn(g *game, ev event) bool {
 getKey:
 	for {
-		ui.DrawDungeonView(g, false)
+		ui.DrawDungeonView(g, NormalMode)
 		err, again, quit := ui.PlayerTurnEvent(g, ev)
 		if err != nil {
 			g.Print(err.Error())

@@ -23,6 +23,6 @@ func (ui *termui) ExploreStep(g *game) bool {
 	//} else {
 	//time.Sleep(10 * time.Millisecond)
 	//}
-	ui.DrawDungeonView(g, false)
+	ui.DrawDungeonView(g, NormalMode)
 	return stop
 }
