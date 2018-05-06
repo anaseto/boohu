@@ -451,7 +451,7 @@ func (ui *termui) DrawKeysDescription(g *game, actions []string) {
 		ui.DrawColoredTextOnBG(fmt.Sprintf(" %-36s %s", actions[i], actions[i+1]), 0, i/2+1, ColorFg, bg)
 	}
 	lines := 1 + len(actions)/2
-	ui.DrawTextLine("press esc or space to continue", lines)
+	ui.DrawTextLine(" press esc or space to continue ", lines)
 	ui.Flush()
 
 	ui.WaitForContinue(g)
@@ -519,7 +519,7 @@ func (ui *termui) CharacterInfo(g *game) {
 		ui.ClearLine(i)
 	}
 	ui.DrawText(desc, 0, 0)
-	ui.DrawTextLine("press esc or space to continue", lines+2)
+	ui.DrawTextLine(" press esc or space to continue ", lines+2)
 
 	ui.Flush()
 	ui.WaitForContinue(g)
@@ -1303,7 +1303,7 @@ func (ui *termui) DrawDescription(g *game, desc string) {
 		ui.ClearLine(i)
 	}
 	ui.DrawText(desc, 0, 0)
-	ui.DrawTextLine("press esc or space to continue", lines+2)
+	ui.DrawTextLine(" press esc or space to continue ", lines+2)
 	ui.Flush()
 	ui.WaitForContinue(g)
 	ui.DrawDungeonView(g, false)
