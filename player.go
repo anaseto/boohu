@@ -272,8 +272,10 @@ func (g *game) Teleportation(ev event) {
 	}
 	if pos.valid() {
 		// should always happen
+		opos := g.Player.Pos
 		g.Player.Pos = pos
 		g.Print("You feel yourself teleported away.")
+		g.ui.TeleportAnimation(g, opos, pos, true)
 		g.CollectGround()
 		g.ComputeLOS()
 		g.MakeMonstersAware()

@@ -953,17 +953,19 @@ func (ui *termui) SwappingAnimation(g *game, mpos, ppos position) {
 	time.Sleep(75 * time.Millisecond)
 }
 
-func (ui *termui) BlinkingAnimation(g *game, from, to position) {
+func (ui *termui) TeleportAnimation(g *game, from, to position, showto bool) {
 	time.Sleep(50 * time.Millisecond)
 	r, fg, bgColorf := ui.PositionDrawing(g, from)
-	_, _, bgColort := ui.PositionDrawing(g, to)
-	ui.DrawAtPosition(g, from, true, '¤', ColorFgPlayer, bgColorf)
+	_, tofg, bgColort := ui.PositionDrawing(g, to)
+	ui.DrawAtPosition(g, from, true, '¤', tofg, bgColorf)
 	ui.Flush()
 	time.Sleep(75 * time.Millisecond)
-	ui.DrawAtPosition(g, from, true, r, fg, bgColorf)
-	ui.DrawAtPosition(g, to, true, '¤', ColorFgPlayer, bgColort)
-	ui.Flush()
-	time.Sleep(75 * time.Millisecond)
+	if showto {
+		ui.DrawAtPosition(g, from, true, r, fg, bgColorf)
+		ui.DrawAtPosition(g, to, true, '¤', tofg, bgColort)
+		ui.Flush()
+		time.Sleep(75 * time.Millisecond)
+	}
 }
 
 type explosionStyle int

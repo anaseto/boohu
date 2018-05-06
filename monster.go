@@ -555,7 +555,11 @@ func (m *monster) TeleportAway(g *game) {
 	if g.Player.LOS[m.Pos] {
 		g.Printf("%s teleports away.", m.Kind.Definite(true))
 	}
+	opos := m.Pos
 	m.Pos = pos
+	if g.Player.LOS[opos] {
+		g.ui.TeleportAnimation(g, opos, pos, false)
+	}
 }
 
 func (m *monster) TeleportMonsterAway(g *game) bool {
