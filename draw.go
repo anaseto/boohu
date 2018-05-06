@@ -296,7 +296,7 @@ func (ui *termui) EnterWizard(g *game) {
 		g.WizardMode()
 		ui.DrawDungeonView(g, false)
 	} else {
-		g.Print("Ok, then.")
+		g.Print("Do nothing, then.")
 	}
 }
 
@@ -1441,7 +1441,7 @@ func (ui *termui) SelectProjectile(g *game, ev event) error {
 			if b {
 				noAction = cs[index].Use(g, ev)
 			} else {
-				noAction = errors.New("Ok, then.")
+				noAction = errors.New("Do nothing, then.")
 			}
 		}
 		return noAction
@@ -1598,7 +1598,7 @@ func (ui *termui) Quit(g *game) bool {
 			ui.PressAnyKey()
 		}
 	} else {
-		g.Print("Ok, then.")
+		g.Print("Do nothing, then.")
 	}
 	return quit
 }
