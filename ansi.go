@@ -135,7 +135,7 @@ func (ui *termui) ReadChar() rune {
 
 func (ui *termui) ExploreStep(g *game) bool {
 	time.Sleep(10 * time.Millisecond)
-	ui.DrawDungeonView(g, false)
+	ui.DrawDungeonView(g, NormalMode)
 	return false
 }
 
