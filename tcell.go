@@ -237,7 +237,7 @@ func (ui *termui) Select(g *game, ev event, l int) (index int, alternate bool, e
 		switch tev := ui.Screen.PollEvent().(type) {
 		case *tcell.EventKey:
 			if tev.Key() == tcell.KeyEsc {
-				return -1, false, errors.New("Ok, then.")
+				return -1, false, errors.New("Do nothing, then.")
 			}
 			key := tev.Rune()
 			if 97 <= key && int(key) < 97+l {
@@ -247,7 +247,7 @@ func (ui *termui) Select(g *game, ev event, l int) (index int, alternate bool, e
 				return -1, true, nil
 			}
 			if key == ' ' {
-				return -1, false, errors.New("Ok, then.")
+				return -1, false, errors.New("Do nothing, then.")
 			}
 		case *tcell.EventMouse:
 			switch tev.Buttons() {
@@ -259,7 +259,7 @@ func (ui *termui) Select(g *game, ev event, l int) (index int, alternate bool, e
 			case tcell.Button3:
 				return -1, true, nil
 			case tcell.Button2:
-				return -1, false, errors.New("Ok, then.")
+				return -1, false, errors.New("Do nothing, then.")
 			}
 		}
 	}
