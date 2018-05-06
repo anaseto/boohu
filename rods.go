@@ -213,8 +213,10 @@ func (g *game) Blink(ev event) {
 		// Give close cells less chance to make blinking more useful
 		npos = losPos[RandInt(len(losPos))]
 	}
+	opos := g.Player.Pos
 	g.Player.Pos = npos
 	g.Print("You blink away.")
+	g.ui.BlinkingAnimation(g, opos, npos)
 	g.CollectGround()
 	g.ComputeLOS()
 	g.MakeMonstersAware()

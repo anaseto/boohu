@@ -953,6 +953,19 @@ func (ui *termui) SwappingAnimation(g *game, mpos, ppos position) {
 	time.Sleep(75 * time.Millisecond)
 }
 
+func (ui *termui) BlinkingAnimation(g *game, from, to position) {
+	time.Sleep(50 * time.Millisecond)
+	r, fg, bgColorf := ui.PositionDrawing(g, from)
+	_, _, bgColort := ui.PositionDrawing(g, to)
+	ui.DrawAtPosition(g, from, true, '¤', ColorFgPlayer, bgColorf)
+	ui.Flush()
+	time.Sleep(75 * time.Millisecond)
+	ui.DrawAtPosition(g, from, true, r, fg, bgColorf)
+	ui.DrawAtPosition(g, to, true, '¤', ColorFgPlayer, bgColort)
+	ui.Flush()
+	time.Sleep(75 * time.Millisecond)
+}
+
 type explosionStyle int
 
 const (
@@ -963,6 +976,7 @@ const (
 
 func (ui *termui) ExplosionAnimation(g *game, es explosionStyle, pos position) {
 	ui.DrawDungeonView(g, NormalMode)
+	time.Sleep(25 * time.Millisecond)
 	// TODO: use new specific variables for colors
 	colors := [2]uicolor{ColorFgExplosionStart, ColorFgExplosionEnd}
 	if es == WallExplosion || es == AroundWallExplosion {
@@ -974,7 +988,7 @@ func (ui *termui) ExplosionAnimation(g *game, es explosionStyle, pos position) {
 			_, _, bgColor := ui.PositionDrawing(g, pos)
 			ui.DrawAtPosition(g, pos, true, '☼', fg, bgColor)
 			ui.Flush()
-			time.Sleep(15 * time.Millisecond)
+			time.Sleep(25 * time.Millisecond)
 		}
 		for _, npos := range g.Dungeon.FreeNeighbors(pos) {
 			if !g.Player.LOS[npos] {
@@ -983,7 +997,7 @@ func (ui *termui) ExplosionAnimation(g *game, es explosionStyle, pos position) {
 			_, _, bgColor := ui.PositionDrawing(g, npos)
 			ui.DrawAtPosition(g, npos, true, '¤', fg, bgColor)
 			ui.Flush()
-			time.Sleep(7 * time.Millisecond)
+			time.Sleep(10 * time.Millisecond)
 		}
 	}
 	time.Sleep(25 * time.Millisecond)
@@ -991,16 +1005,18 @@ func (ui *termui) ExplosionAnimation(g *game, es explosionStyle, pos position) {
 
 func (ui *termui) LightningBoltAnimation(g *game, ray []position) {
 	ui.DrawDungeonView(g, NormalMode)
-	time.Sleep(10 * time.Millisecond)
+	time.Sleep(25 * time.Millisecond)
 	colors := [2]uicolor{ColorFgExplosionStart, ColorFgExplosionEnd}
+	n := 0
 	for _, fg := range colors {
 		for i := len(ray) - 1; i >= 0; i-- {
 			pos := ray[i]
 			_, _, bgColor := ui.PositionDrawing(g, pos)
 			ui.DrawAtPosition(g, pos, true, '☼', fg, bgColor)
 			ui.Flush()
-			time.Sleep(7 * time.Millisecond)
+			time.Sleep(10 * time.Duration(2-n) * time.Millisecond)
 		}
+		n++
 	}
 	time.Sleep(25 * time.Millisecond)
 }
@@ -1021,13 +1037,13 @@ func (ui *termui) ProjectileSymbol(dir direction) (r rune) {
 
 func (ui *termui) ThrowAnimation(g *game, ray []position, hit bool) {
 	ui.DrawDungeonView(g, NormalMode)
-	time.Sleep(10 * time.Millisecond)
+	time.Sleep(25 * time.Millisecond)
 	for i := len(ray) - 1; i >= 0; i-- {
 		pos := ray[i]
 		r, fgColor, bgColor := ui.PositionDrawing(g, pos)
 		ui.DrawAtPosition(g, pos, true, ui.ProjectileSymbol(pos.Dir(g.Player.Pos)), ColorFgProjectile, bgColor)
 		ui.Flush()
-		time.Sleep(15 * time.Millisecond)
+		time.Sleep(20 * time.Millisecond)
 		ui.DrawAtPosition(g, pos, true, r, fgColor, bgColor)
 	}
 	if hit {
@@ -1035,9 +1051,9 @@ func (ui *termui) ThrowAnimation(g *game, ray []position, hit bool) {
 		_, _, bgColor := ui.PositionDrawing(g, pos)
 		ui.DrawAtPosition(g, pos, true, '¤', ColorFgAnimationHit, bgColor)
 		ui.Flush()
-		time.Sleep(50 * time.Millisecond)
+		time.Sleep(75 * time.Millisecond)
 	}
-	time.Sleep(20 * time.Millisecond)
+	time.Sleep(25 * time.Millisecond)
 }
 
 func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgColor uicolor) {

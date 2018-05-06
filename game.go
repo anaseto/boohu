@@ -61,6 +61,7 @@ type Renderer interface {
 	ThrowAnimation(*game, []position, bool)
 	DrinkingPotionAnimation(*game)
 	SwappingAnimation(*game, position, position)
+	BlinkingAnimation(*game, position, position)
 }
 
 func (g *game) FreeCell() position {
