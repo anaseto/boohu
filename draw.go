@@ -1159,6 +1159,12 @@ func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgCol
 
 func (ui *termui) DrawStatusLine(g *game) {
 	sts := statusSlice{}
+	if cld, ok := g.Clouds[g.Player.Pos]; ok && cld == CloudFire {
+		g.Player.Statuses[StatusFlames] = 1
+		defer func() {
+			g.Player.Statuses[StatusFlames] = 0
+		}()
+	}
 	for st, c := range g.Player.Statuses {
 		if c > 0 {
 			sts = append(sts, st)
