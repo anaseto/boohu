@@ -605,7 +605,7 @@ func (ui *termui) DescribePosition(g *game, pos position, targ Targeter) {
 			desc += "You see the ground."
 		}
 	}
-	g.Print(desc)
+	g.InfoEntry = desc
 }
 
 func (ui *termui) Examine(g *game, start *position) bool {
@@ -939,12 +939,13 @@ func (ui *termui) DrawDungeonView(g *game, targeting bool) {
 			ui.DrawText(fmt.Sprintf("] %v (%d)", g.Player.Shield, g.Player.Block()), 81, 2)
 		}
 	}
-	if targeting {
-		ui.DrawColoredText("Targeting", 81, 20, ColorFgTargetMode)
-		ui.DrawColoredText("(? for help)", 81, 21, ColorFgTargetMode)
-	}
 	ui.DrawStatusLine(g)
 	ui.DrawLog(g)
+	if targeting {
+		ui.DrawInfoLine(g.InfoEntry)
+		ui.DrawStyledTextLine(" Targeting (? for help) ", DungeonHeight+2, FooterLine)
+		ui.SetCell(DungeonWidth, DungeonHeight, '┤', ColorFg, ColorBg)
+	}
 	ui.Flush()
 }
 
@@ -1346,7 +1347,14 @@ type linestyle int
 const (
 	NormalLine linestyle = iota
 	HeaderLine
+	FooterLine
 )
+
+func (ui *termui) DrawInfoLine(text string) {
+	ui.ClearLine(DungeonHeight + 1)
+	ui.DrawColoredTextOnBG(text, 0, DungeonHeight+1, ColorBlue, ColorBg)
+	ui.SetCell(DungeonWidth, DungeonHeight+1, '│', ColorFg, ColorBg)
+}
 
 func (ui *termui) DrawStyledTextLine(text string, lnum int, st linestyle) {
 	nchars := utf8.RuneCountInString(text)
@@ -1357,6 +1365,8 @@ func (ui *termui) DrawStyledTextLine(text string, lnum int, st linestyle) {
 	switch st {
 	case HeaderLine:
 		ui.DrawColoredText(text, dist, lnum, ColorYellow)
+	case FooterLine:
+		ui.DrawColoredText(text, dist, lnum, ColorCyan)
 	default:
 		ui.DrawColoredText(text, dist, lnum, ColorFg)
 	}
@@ -1366,6 +1376,8 @@ func (ui *termui) DrawStyledTextLine(text string, lnum int, st linestyle) {
 	switch st {
 	case HeaderLine:
 		ui.SetCell(DungeonWidth, lnum, '┐', ColorFg, ColorBg)
+	case FooterLine:
+		ui.SetCell(DungeonWidth, lnum, '┘', ColorFg, ColorBg)
 	default:
 		ui.SetCell(DungeonWidth, lnum, '┤', ColorFg, ColorBg)
 	}

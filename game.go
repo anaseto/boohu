@@ -40,6 +40,7 @@ type game struct {
 	Log                 []logEntry
 	LogIndex            int
 	LogNextTick         int
+	InfoEntry           string
 	Story               []string
 	Turn                int
 	EventIndex          int
