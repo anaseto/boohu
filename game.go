@@ -266,7 +266,7 @@ func (g *game) InitPlayer() {
 	// Testing
 	// g.Player.Aptitudes[AptSmoke] = true
 	//g.Player.Rods[RodSwapping] = &rodProps{Charge: 3}
-	g.Player.Rods[RodFireball] = &rodProps{Charge: 3}
+	//g.Player.Rods[RodFireball] = &rodProps{Charge: 3}
 	//g.Player.Weapon = ElecWhip
 }
 
