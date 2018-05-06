@@ -1067,9 +1067,14 @@ func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgCol
 	if g.Player.LOS[pos] {
 		fgColor = ColorFgLOS
 		bgColor = ColorBgLOS
-		if _, ok := g.Clouds[pos]; ok {
+		if pos.X%2 == 1 && pos.Y%2 == 0 {
+			bgColor = ColorBgCloud
+		} else if pos.X%2 == 0 && pos.Y%2 == 1 {
 			bgColor = ColorBgCloud
 		}
+		//if _, ok := g.Clouds[pos]; ok {
+		//bgColor = ColorBgCloud
+		//}
 	} else {
 		fgColor = ColorFgDark
 		bgColor = ColorBgDark
