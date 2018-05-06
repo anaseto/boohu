@@ -51,6 +51,7 @@ func main() {
 		WindowsPalette()
 	}
 	tui.PostInit()
+	LinkColors()
 
 	tui.DrawWelcome()
 	g := &game{}

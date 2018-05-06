@@ -14,96 +14,122 @@ type uicolor int
 
 // uicolors: http://ethanschoonover.com/solarized
 var (
-	ColorBgLOS              uicolor = 230
-	ColorBgDark             uicolor = 234
-	ColorBgBorder           uicolor = 235
-	ColorBg                 uicolor = 234
-	ColorBgCloud            uicolor = 235
-	ColorFgLOS              uicolor = 241
-	ColorFgDark             uicolor = 240
-	ColorFg                 uicolor = 245
-	ColorFgPlayer           uicolor = 33
-	ColorFgMonster          uicolor = 160
-	ColorFgSleepingMonster  uicolor = 61
-	ColorFgWanderingMonster uicolor = 166
-	ColorFgConfusedMonster  uicolor = 64
-	ColorFgCollectable      uicolor = 136
-	ColorFgStairs           uicolor = 125
-	ColorFgSimellas         uicolor = 136
-	ColorFgHPok             uicolor = 64
-	ColorFgHPwounded        uicolor = 136
-	ColorFgHPcritical       uicolor = 160
-	ColorFgMPok             uicolor = 33
-	ColorFgMPpartial        uicolor = 61
-	ColorFgMPcritical       uicolor = 125
-	ColorFgStatusGood       uicolor = 33
-	ColorFgStatusBad        uicolor = 160
-	ColorFgStatusOther      uicolor = 136
-	ColorFgExcluded         uicolor = 160
-	ColorFgTargetMode       uicolor = 37
-	ColorFgMagicPlace       uicolor = 37
+	ColorBase03  uicolor = 234
+	ColorBase02  uicolor = 235
+	ColorBase01  uicolor = 240
+	ColorBase00  uicolor = 241
+	ColorBase0   uicolor = 244
+	ColorBase1   uicolor = 245
+	ColorBase2   uicolor = 254
+	ColorBase3   uicolor = 230
+	ColorYellow  uicolor = 136
+	ColorOrange  uicolor = 166
+	ColorRed     uicolor = 160
+	ColorMagenta uicolor = 125
+	ColorViolet  uicolor = 61
+	ColorBlue    uicolor = 33
+	ColorCyan    uicolor = 37
+	ColorGreen   uicolor = 64
 )
 
+var (
+	ColorBg,
+	ColorBgBorder,
+	ColorBgCloud,
+	ColorBgDark,
+	ColorBgLOS,
+	ColorFg,
+	ColorFgCollectable,
+	ColorFgConfusedMonster,
+	ColorFgDark,
+	ColorFgExcluded,
+	ColorFgHPcritical,
+	ColorFgHPok,
+	ColorFgHPwounded,
+	ColorFgLOS,
+	ColorFgMPcritical,
+	ColorFgMPok,
+	ColorFgMPpartial,
+	ColorFgMagicPlace,
+	ColorFgMonster,
+	ColorFgPlayer,
+	ColorFgSimellas,
+	ColorFgSleepingMonster,
+	ColorFgStairs,
+	ColorFgStatusBad,
+	ColorFgStatusGood,
+	ColorFgStatusOther,
+	ColorFgTargetMode,
+	ColorFgWanderingMonster uicolor
+)
+
+func LinkColors() {
+	ColorBg = ColorBase03
+	ColorBgBorder = ColorBase02
+	ColorBgCloud = ColorBase02
+	ColorBgDark = ColorBase03
+	ColorBgLOS = ColorBase3
+	ColorFg = ColorBase0
+	ColorFgCollectable = ColorYellow
+	ColorFgConfusedMonster = ColorGreen
+	ColorFgDark = ColorBase01
+	ColorFgExcluded = ColorRed
+	ColorFgHPcritical = ColorRed
+	ColorFgHPok = ColorGreen
+	ColorFgHPwounded = ColorYellow
+	ColorFgLOS = ColorBase00
+	ColorFgMPcritical = ColorMagenta
+	ColorFgMPok = ColorBlue
+	ColorFgMPpartial = ColorViolet
+	ColorFgMagicPlace = ColorCyan
+	ColorFgMonster = ColorRed
+	ColorFgPlayer = ColorBlue
+	ColorFgSimellas = ColorYellow
+	ColorFgSleepingMonster = ColorViolet
+	ColorFgStairs = ColorMagenta
+	ColorFgStatusBad = ColorRed
+	ColorFgStatusGood = ColorBlue
+	ColorFgStatusOther = ColorYellow
+	ColorFgTargetMode = ColorCyan
+	ColorFgWanderingMonster = ColorOrange
+}
+
 func SolarizedPalette() {
-	ColorBgLOS = 15
-	ColorBgDark = 8
-	ColorBgBorder = 0
-	ColorBg = 8
-	ColorBgCloud = 7
-	ColorFgLOS = 11
-	ColorFgDark = 10
-	ColorFg = 12
-	ColorFgPlayer = 4
-	ColorFgMonster = 1
-	ColorFgSleepingMonster = 13
-	ColorFgWanderingMonster = 9
-	ColorFgConfusedMonster = 2
-	ColorFgCollectable = 3
-	ColorFgStairs = 5
-	ColorFgSimellas = 3
-	ColorFgHPok = 2
-	ColorFgHPwounded = 3
-	ColorFgHPcritical = 1
-	ColorFgMPok = 4
-	ColorFgMPpartial = 13
-	ColorFgMPcritical = 5
-	ColorFgStatusGood = 4
-	ColorFgStatusBad = 1
-	ColorFgStatusOther = 3
-	ColorFgExcluded = 1
-	ColorFgTargetMode = 6
-	ColorFgMagicPlace = 6
+	ColorBase03 = 8
+	ColorBase02 = 0
+	ColorBase01 = 10
+	ColorBase00 = 11
+	ColorBase0 = 12
+	ColorBase1 = 14
+	ColorBase2 = 7
+	ColorBase3 = 15
+	ColorYellow = 3
+	ColorOrange = 9
+	ColorRed = 1
+	ColorMagenta = 5
+	ColorViolet = 13
+	ColorBlue = 4
+	ColorCyan = 6
+	ColorGreen = 2
 }
 
 func FixColor() {
-	ColorBgLOS = ColorBgLOS + 1
-	ColorBgDark = ColorBgDark + 1
-	ColorBgBorder = ColorBgBorder + 1
-	ColorBg = ColorBg + 1
-	ColorBgCloud = ColorBgCloud + 1
-	ColorFgLOS = ColorFgLOS + 1
-	ColorFgDark = ColorFgDark + 1
-	ColorFg = ColorFg + 1
-	ColorFgPlayer = ColorFgPlayer + 1
-	ColorFgMonster = ColorFgMonster + 1
-	ColorFgSleepingMonster = ColorFgSleepingMonster + 1
-	ColorFgWanderingMonster = ColorFgWanderingMonster + 1
-	ColorFgConfusedMonster = ColorFgConfusedMonster + 1
-	ColorFgCollectable = ColorFgCollectable + 1
-	ColorFgStairs = ColorFgStairs + 1
-	ColorFgSimellas = ColorFgSimellas + 1
-	ColorFgHPok = ColorFgHPok + 1
-	ColorFgHPwounded = ColorFgHPwounded + 1
-	ColorFgHPcritical = ColorFgHPcritical + 1
-	ColorFgMPok = ColorFgMPok + 1
-	ColorFgMPpartial = ColorFgMPpartial + 1
-	ColorFgMPcritical = ColorFgMPcritical + 1
-	ColorFgStatusGood = ColorFgStatusGood + 1
-	ColorFgStatusBad = ColorFgStatusBad + 1
-	ColorFgStatusOther = ColorFgStatusOther + 1
-	ColorFgExcluded = ColorFgExcluded + 1
-	ColorFgTargetMode = ColorFgTargetMode + 1
-	ColorFgMagicPlace = ColorFgMagicPlace + 1
+	ColorBase03++
+	ColorBase02++
+	ColorBase01++
+	ColorBase00++
+	ColorBase0++
+	ColorBase1++
+	ColorBase2++
+	ColorBase3++
+	ColorYellow++
+	ColorOrange++
+	ColorRed++
+	ColorMagenta++
+	ColorViolet++
+	ColorBlue++
+	ColorCyan++
+	ColorGreen++
 }
 
 const (

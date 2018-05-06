@@ -22,6 +22,7 @@ func main() {
 	defer tui.Close()
 
 	tui.PostInit()
+	LinkColors()
 
 	tui.DrawWelcome()
 	g := &game{}
