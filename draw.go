@@ -474,7 +474,7 @@ func (ui *termui) KeysHelp(g *game) {
 		"View previous messages", "m",
 		"Write character dump to file", "#",
 		"Save and Quit", "S",
-		"Quit without saving", "Ctrl-Q",
+		"Quit without saving", "Q",
 	})
 }
 
