@@ -950,7 +950,6 @@ func (ui *termui) SwappingAnimation(g *game, mpos, ppos position) {
 	ui.DrawAtPosition(g, mpos, true, '¤', ColorFgMonster, bgColorm)
 	ui.Flush()
 	time.Sleep(75 * time.Millisecond)
-	ui.DrawDungeonView(g, NormalMode)
 }
 
 type explosionStyle int
@@ -987,7 +986,6 @@ func (ui *termui) ExplosionAnimation(g *game, es explosionStyle, pos position) {
 		}
 	}
 	time.Sleep(25 * time.Millisecond)
-	ui.DrawDungeonView(g, NormalMode)
 }
 
 func (ui *termui) LightningBoltAnimation(g *game, ray []position) {
@@ -1004,7 +1002,6 @@ func (ui *termui) LightningBoltAnimation(g *game, ray []position) {
 		}
 	}
 	time.Sleep(25 * time.Millisecond)
-	ui.DrawDungeonView(g, NormalMode)
 }
 
 func (ui *termui) ProjectileSymbol(dir direction) (r rune) {
@@ -1040,7 +1037,6 @@ func (ui *termui) ThrowAnimation(g *game, ray []position, hit bool) {
 		time.Sleep(50 * time.Millisecond)
 	}
 	time.Sleep(20 * time.Millisecond)
-	ui.DrawDungeonView(g, NormalMode)
 }
 
 func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgColor uicolor) {
