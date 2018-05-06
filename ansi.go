@@ -219,13 +219,13 @@ func (ui *termui) Select(g *game, ev event, l int) (index int, alternate bool, e
 		r := ui.ReadChar()
 		switch {
 		case r == '\x1b' || r == ' ':
-			return -1, false, errors.New("Do nothing, then.")
+			return -1, false, errors.New(DoNothing)
 		case 97 <= r && int(r) < 97+l:
 			return int(r - 97), false, nil
 		case r == '?':
 			return -1, true, nil
 		case r == ' ':
-			return -1, false, errors.New("Do nothing, then.")
+			return -1, false, errors.New(DoNothing)
 		}
 	}
 }

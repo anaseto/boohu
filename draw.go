@@ -291,12 +291,14 @@ func (ui *termui) DrawLight(text string, x, y int, fg uicolor) {
 	}
 }
 
+const DoNothing = "Do nothing, then."
+
 func (ui *termui) EnterWizard(g *game) {
 	if ui.Wizard(g) {
 		g.WizardMode()
 		ui.DrawDungeonView(g, false)
 	} else {
-		g.Print("Do nothing, then.")
+		g.Print(DoNothing)
 	}
 }
 
@@ -1441,7 +1443,7 @@ func (ui *termui) SelectProjectile(g *game, ev event) error {
 			if b {
 				noAction = cs[index].Use(g, ev)
 			} else {
-				noAction = errors.New("Do nothing, then.")
+				noAction = errors.New(DoNothing)
 			}
 		}
 		return noAction
@@ -1598,7 +1600,7 @@ func (ui *termui) Quit(g *game) bool {
 			ui.PressAnyKey()
 		}
 	} else {
-		g.Print("Do nothing, then.")
+		g.Print(DoNothing)
 	}
 	return quit
 }

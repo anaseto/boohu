@@ -234,7 +234,7 @@ func (ui *termui) Select(g *game, ev event, l int) (index int, alternate bool, e
 			if tev.Ch == 0 {
 				switch tev.Key {
 				case termbox.KeyEsc, termbox.KeySpace:
-					return -1, false, errors.New("Do nothing, then.")
+					return -1, false, errors.New(DoNothing)
 				}
 			}
 			if 97 <= tev.Ch && int(tev.Ch) < 97+l {
@@ -244,7 +244,7 @@ func (ui *termui) Select(g *game, ev event, l int) (index int, alternate bool, e
 				return -1, true, nil
 			}
 			if tev.Ch == ' ' {
-				return -1, false, errors.New("Do nothing, then.")
+				return -1, false, errors.New(DoNothing)
 			}
 		case termbox.EventMouse:
 			if tev.Ch == 0 {
@@ -257,7 +257,7 @@ func (ui *termui) Select(g *game, ev event, l int) (index int, alternate bool, e
 				case termbox.MouseRight:
 					return -1, true, nil
 				case termbox.MouseMiddle:
-					return -1, false, errors.New("Do nothing, then.")
+					return -1, false, errors.New(DoNothing)
 				}
 			}
 		}

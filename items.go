@@ -272,7 +272,7 @@ func (g *game) QuaffCBlinkPotion(ev event) error {
 		return errors.New("You cannot blink while lignified.")
 	}
 	if !g.ui.ChooseTarget(g, &chooser{free: true}) {
-		return errors.New("Do nothing, then.")
+		return errors.New(DoNothing)
 	}
 	g.Player.Pos = g.Player.Target
 	g.Printf("You quaff the %s. You blink.", CBlinkPotion)
