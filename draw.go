@@ -434,10 +434,7 @@ func (ui *termui) DrawKeysDescription(g *game, actions []string) {
 
 	ui.DrawStyledTextLine(" Keys ", 0, HeaderLine)
 	for i := 0; i < len(actions)-1; i += 2 {
-		bg := ColorBase03
-		if i%4 == 2 {
-			bg = ColorBase02
-		}
+		bg := ui.ListItemBG(i / 2)
 		ui.ClearLineWithColor(i/2+1, bg)
 		ui.DrawColoredTextOnBG(fmt.Sprintf(" %-36s %s", actions[i], actions[i+1]), 0, i/2+1, ColorFg, bg)
 	}
