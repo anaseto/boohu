@@ -482,22 +482,33 @@ func (ui *termui) Equip(g *game, ev event) error {
 	return g.Equip(ev)
 }
 
+const TextWidth = 78
+
 func (ui *termui) CharacterInfo(g *game) {
-	ui.Clear()
+	ui.DrawDungeonView(g, false)
+
 	b := bytes.Buffer{}
-	b.WriteString(formatText("Every year, your village sends someone to collect medicinal simella plants in the Underground. This year, the duty fell upon you, and so here you are. Your heart is teared between your will to be as helpful as possible to your village and your will to make it out alive.", 79))
+	b.WriteString(formatText("Every year, your village sends someone to collect medicinal simella plants in the Underground. This year, the duty fell upon you, and so here you are. Your heart is teared between your will to be as helpful as possible to your village and your will to make it out alive.", TextWidth))
 	b.WriteString("\n\n")
 	b.WriteString(formatText(
-		fmt.Sprintf("You are wielding %s. %s", Indefinite(g.Player.Weapon.String(), false), g.Player.Weapon.Desc()), 79))
+		fmt.Sprintf("You are wielding %s. %s", Indefinite(g.Player.Weapon.String(), false), g.Player.Weapon.Desc()), TextWidth))
 	b.WriteString("\n\n")
-	b.WriteString(formatText(fmt.Sprintf("You are wearing a %s. %s", g.Player.Armour, g.Player.Armour.Desc()), 79))
+	b.WriteString(formatText(fmt.Sprintf("You are wearing a %s. %s", g.Player.Armour, g.Player.Armour.Desc()), TextWidth))
 	b.WriteString("\n\n")
 	if g.Player.Shield != NoShield {
-		b.WriteString(formatText(fmt.Sprintf("You are wearing a %s. %s", g.Player.Shield, g.Player.Shield.Desc()), 79))
+		b.WriteString(formatText(fmt.Sprintf("You are wearing a %s. %s", g.Player.Shield, g.Player.Shield.Desc()), TextWidth))
 		b.WriteString("\n\n")
 	}
 	b.WriteString(ui.AptitudesText(g))
-	ui.DrawText(b.String(), 0, 0)
+
+	desc := b.String()
+	lines := strings.Count(desc, "\n")
+	for i := 0; i <= lines+2; i++ {
+		ui.ClearLine(i)
+	}
+	ui.DrawText(desc, 0, 0)
+	ui.DrawTextLine("press esc or space to continue", lines+2)
+
 	ui.Flush()
 	ui.WaitForContinue(g)
 	ui.DrawDungeonView(g, false)
@@ -528,7 +539,6 @@ func (ui *termui) AptitudesText(g *game) string {
 	} else {
 		text = "You do not have any special aptitudes."
 	}
-	text += "\n\n--press esc or space to continue--"
 	return text
 }
 
@@ -1270,13 +1280,13 @@ func (ui *termui) DrawConsumableDescription(g *game, c consumable) {
 
 func (ui *termui) DrawDescription(g *game, desc string) {
 	ui.DrawDungeonView(g, false)
-	desc = formatText(desc, 79)
+	desc = formatText(desc, TextWidth)
 	lines := strings.Count(desc, "\n")
-	for i := 0; i <= lines+1; i++ {
+	for i := 0; i <= lines+2; i++ {
 		ui.ClearLine(i)
 	}
 	ui.DrawText(desc, 0, 0)
-	ui.DrawTextLine("press esc or space to continue", lines+1)
+	ui.DrawTextLine("press esc or space to continue", lines+2)
 	ui.Flush()
 	ui.WaitForContinue(g)
 	ui.DrawDungeonView(g, false)
