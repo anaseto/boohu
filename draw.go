@@ -17,7 +17,7 @@ var (
 	ColorBase03  uicolor = 234
 	ColorBase02  uicolor = 235
 	ColorBase01  uicolor = 240
-	ColorBase00  uicolor = 241
+	ColorBase00  uicolor = 241 // for dark on light background
 	ColorBase0   uicolor = 244
 	ColorBase1   uicolor = 245
 	ColorBase2   uicolor = 254
@@ -39,10 +39,15 @@ var (
 	ColorBgDark,
 	ColorBgLOS,
 	ColorFg,
+	ColorFgAnimationHit,
 	ColorFgCollectable,
 	ColorFgConfusedMonster,
 	ColorFgDark,
 	ColorFgExcluded,
+	ColorFgExplosionEnd,
+	ColorFgExplosionStart,
+	ColorFgExplosionWallEnd,
+	ColorFgExplosionWallStart,
 	ColorFgHPcritical,
 	ColorFgHPok,
 	ColorFgHPwounded,
@@ -52,10 +57,11 @@ var (
 	ColorFgMPpartial,
 	ColorFgMagicPlace,
 	ColorFgMonster,
+	ColorFgPlace,
 	ColorFgPlayer,
+	ColorFgProjectile,
 	ColorFgSimellas,
 	ColorFgSleepingMonster,
-	ColorFgStairs,
 	ColorFgStatusBad,
 	ColorFgStatusGood,
 	ColorFgStatusOther,
@@ -70,10 +76,15 @@ func LinkColors() {
 	ColorBgDark = ColorBase03
 	ColorBgLOS = ColorBase3
 	ColorFg = ColorBase0
+	ColorFgAnimationHit = ColorMagenta
 	ColorFgCollectable = ColorYellow
 	ColorFgConfusedMonster = ColorGreen
 	ColorFgDark = ColorBase01
 	ColorFgExcluded = ColorRed
+	ColorFgExplosionEnd = ColorOrange
+	ColorFgExplosionStart = ColorYellow
+	ColorFgExplosionWallEnd = ColorMagenta
+	ColorFgExplosionWallStart = ColorViolet
 	ColorFgHPcritical = ColorRed
 	ColorFgHPok = ColorGreen
 	ColorFgHPwounded = ColorYellow
@@ -83,10 +94,11 @@ func LinkColors() {
 	ColorFgMPpartial = ColorViolet
 	ColorFgMagicPlace = ColorCyan
 	ColorFgMonster = ColorRed
+	ColorFgPlace = ColorMagenta
 	ColorFgPlayer = ColorBlue
+	ColorFgProjectile = ColorBlue
 	ColorFgSimellas = ColorYellow
 	ColorFgSleepingMonster = ColorViolet
-	ColorFgStairs = ColorMagenta
 	ColorFgStatusBad = ColorRed
 	ColorFgStatusGood = ColorBlue
 	ColorFgStatusOther = ColorYellow
@@ -144,6 +156,23 @@ const (
 )
 
 func WindowsPalette() {
+	ColorBase03 = Black
+	ColorBase02 = Black
+	ColorBase01 = Silver
+	ColorBase00 = Black
+	ColorBase0 = Silver
+	ColorBase1 = Silver
+	ColorBase2 = Silver
+	ColorBase3 = Silver
+	ColorYellow = Olive
+	ColorOrange = Purple
+	ColorRed = Maroon
+	ColorMagenta = Purple
+	ColorViolet = Teal
+	ColorBlue = Navy
+	ColorCyan = Teal
+	ColorGreen = Green
+
 	ColorBgLOS = Silver
 	ColorBgDark = Black
 	ColorBgBorder = Black
@@ -158,7 +187,7 @@ func WindowsPalette() {
 	ColorFgWanderingMonster = Purple
 	ColorFgConfusedMonster = Green
 	ColorFgCollectable = Olive
-	ColorFgStairs = Purple
+	ColorFgPlace = Purple
 	ColorFgSimellas = Olive
 	ColorFgHPok = Green
 	ColorFgHPwounded = Olive
@@ -219,7 +248,7 @@ func (ui *termui) DrawWelcome() {
 	ui.DrawDark("#", col+3, line, ColorFgDark)
 	ui.DrawDark("│              │", col+4, line, ColorText)
 	ui.DrawDark("#.", rcol, line, ColorFgDark)
-	ui.DrawDark(">", rcol+2, line, ColorFgStairs)
+	ui.DrawDark(">", rcol+2, line, ColorFgPlace)
 	ui.DrawDark("#", rcol+3, line, ColorFgDark)
 	line++
 	ui.DrawLight("#", col, line, ColorFgLOS)
@@ -905,10 +934,10 @@ const (
 func (ui *termui) ExplosionAnimation(g *game, es explosionStyle, pos position) {
 	ui.DrawDungeonView(g, false)
 	// TODO: use new specific variables for colors
-	colors := [2]uicolor{ColorFgSimellas, ColorFgWanderingMonster}
+	colors := [2]uicolor{ColorFgExplosionStart, ColorFgExplosionEnd}
 	if es == WallExplosion || es == AroundWallExplosion {
-		colors[0] = ColorFgSleepingMonster
-		colors[1] = ColorFgStairs
+		colors[0] = ColorFgExplosionWallStart
+		colors[1] = ColorFgExplosionWallEnd
 	}
 	for _, fg := range colors {
 		if es != AroundWallExplosion {
@@ -934,7 +963,7 @@ func (ui *termui) ExplosionAnimation(g *game, es explosionStyle, pos position) {
 func (ui *termui) LightningBoltAnimation(g *game, ray []position) {
 	ui.DrawDungeonView(g, false)
 	time.Sleep(10 * time.Millisecond)
-	colors := [2]uicolor{ColorFgSimellas, ColorFgWanderingMonster}
+	colors := [2]uicolor{ColorFgExplosionStart, ColorFgExplosionEnd}
 	for _, fg := range colors {
 		for i := len(ray) - 1; i >= 0; i-- {
 			pos := ray[i]
@@ -968,7 +997,7 @@ func (ui *termui) ThrowAnimation(g *game, ray []position, hit bool) {
 	for i := len(ray) - 1; i >= 0; i-- {
 		pos := ray[i]
 		r, fgColor, bgColor := ui.PositionDrawing(g, pos)
-		ui.DrawAtPosition(g, pos, true, ui.ProjectileSymbol(pos.Dir(g.Player.Pos)), ColorFgPlayer, bgColor)
+		ui.DrawAtPosition(g, pos, true, ui.ProjectileSymbol(pos.Dir(g.Player.Pos)), ColorFgProjectile, bgColor)
 		ui.Flush()
 		time.Sleep(15 * time.Millisecond)
 		ui.DrawAtPosition(g, pos, true, r, fgColor, bgColor)
@@ -976,7 +1005,7 @@ func (ui *termui) ThrowAnimation(g *game, ray []position, hit bool) {
 	if hit {
 		pos := ray[0]
 		_, _, bgColor := ui.PositionDrawing(g, pos)
-		ui.DrawAtPosition(g, pos, true, '¤', ColorFgMPcritical, bgColor)
+		ui.DrawAtPosition(g, pos, true, '¤', ColorFgAnimationHit, bgColor)
 		ui.Flush()
 		time.Sleep(50 * time.Millisecond)
 	}
@@ -1073,14 +1102,14 @@ func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgCol
 				if g.Depth == g.MaxDepth() {
 					fgColor = ColorFgMagicPlace
 				} else {
-					fgColor = ColorFgStairs
+					fgColor = ColorFgPlace
 				}
 			} else if _, ok := g.Simellas[pos]; ok {
 				r = '♣'
 				fgColor = ColorFgSimellas
 			} else if _, ok := g.Doors[pos]; ok {
 				r = '+'
-				fgColor = ColorFgStairs
+				fgColor = ColorFgPlace
 			}
 			if g.Player.LOS[pos] || g.Wizard {
 				m, _ := g.MonsterAt(pos)
@@ -1157,17 +1186,17 @@ func (ui *termui) LogColor(e logEntry) uicolor {
 	// TODO: define uicolors?
 	switch e.Style {
 	case logCritic:
-		fg = ColorFgHPcritical
+		fg = ColorRed
 	case logPlayerHit:
-		fg = ColorFgHPok
+		fg = ColorGreen
 	case logMonsterHit:
-		fg = ColorFgHPwounded
+		fg = ColorOrange
 	case logSpecial:
-		fg = ColorFgStairs
+		fg = ColorMagenta
 	case logStatusEnd:
-		fg = ColorFgSleepingMonster
+		fg = ColorViolet
 	case logError:
-		fg = ColorFgHPcritical
+		fg = ColorRed
 	}
 	return fg
 }
@@ -1180,7 +1209,7 @@ func (ui *termui) DrawLog(g *game) {
 	for i, e := range g.Log[min:] {
 		fguicolor := ui.LogColor(e)
 		if e.Tick {
-			ui.DrawColoredText("•", 0, DungeonHeight+1+i, ColorFgCollectable)
+			ui.DrawColoredText("•", 0, DungeonHeight+1+i, ColorYellow)
 			ui.DrawColoredText(e.String(), 2, DungeonHeight+1+i, fguicolor)
 		} else {
 			ui.DrawColoredText(e.String(), 0, DungeonHeight+1+i, fguicolor)
@@ -1209,7 +1238,7 @@ loop:
 			e := g.Log[i]
 			fguicolor := ui.LogColor(e)
 			if e.Tick {
-				ui.DrawColoredText("•", 0, i-n, ColorFgCollectable)
+				ui.DrawColoredText("•", 0, i-n, ColorYellow)
 				ui.DrawColoredText(e.String(), 2, i-n, fguicolor)
 			} else {
 				ui.DrawColoredText(e.String(), 0, i-n, fguicolor)
