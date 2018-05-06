@@ -2,7 +2,7 @@ package main
 
 import "errors"
 
-var AutoexploreMap [DungeonNCells]int
+var DijkstraMapCache [DungeonNCells]int
 
 func (g *game) Autoexplore(ev event) error {
 	if mons := g.MonsterInLOS(); mons.Exists() {
@@ -77,7 +77,7 @@ func (g *game) BuildAutoexploreMap(sources []int) {
 
 func (g *game) NextAuto() (next *position, finished bool) {
 	ap := &autoexplorePath{game: g}
-	if AutoexploreMap[g.Player.Pos.idx()] == unreachable {
+	if DijkstraMapCache[g.Player.Pos.idx()] == unreachable {
 		return nil, false
 	}
 	neighbors := ap.Neighbors(g.Player.Pos)
@@ -85,15 +85,15 @@ func (g *game) NextAuto() (next *position, finished bool) {
 		return nil, false
 	}
 	n := neighbors[0]
-	ncost := AutoexploreMap[n.idx()]
+	ncost := DijkstraMapCache[n.idx()]
 	for _, pos := range neighbors[1:] {
-		cost := AutoexploreMap[pos.idx()]
+		cost := DijkstraMapCache[pos.idx()]
 		if cost < ncost {
 			n = pos
 			ncost = cost
 		}
 	}
-	if ncost >= AutoexploreMap[g.Player.Pos.idx()] {
+	if ncost >= DijkstraMapCache[g.Player.Pos.idx()] {
 		finished = true
 	}
 	next = &n
