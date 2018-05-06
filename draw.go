@@ -270,6 +270,7 @@ type uiMode int
 const (
 	NormalMode uiMode = iota
 	TargetingMode
+	NoFlushMode
 )
 
 func (ui *termui) EnterWizard(g *game) {
@@ -933,7 +934,7 @@ func (ui *termui) DrawDungeonView(g *game, m uiMode) {
 	}
 	ui.DrawStatusLine(g)
 	ui.DrawLog(g)
-	if m != TargetingMode {
+	if m != TargetingMode && m != NoFlushMode {
 		ui.Flush()
 	}
 }
@@ -1308,7 +1309,7 @@ func (ui *termui) DrawConsumableDescription(g *game, c consumable) {
 }
 
 func (ui *termui) DrawDescription(g *game, desc string) {
-	ui.DrawDungeonView(g, NormalMode)
+	ui.DrawDungeonView(g, NoFlushMode)
 	desc = formatText(desc, TextWidth)
 	lines := strings.Count(desc, "\n")
 	for i := 0; i <= lines+2; i++ {
@@ -1318,7 +1319,6 @@ func (ui *termui) DrawDescription(g *game, desc string) {
 	ui.DrawTextLine(" press esc or space to continue ", lines+2)
 	ui.Flush()
 	ui.WaitForContinue(g)
-	ui.DrawDungeonView(g, NormalMode)
 }
 
 func (ui *termui) DrawText(text string, x, y int) {
