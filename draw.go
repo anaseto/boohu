@@ -1294,19 +1294,34 @@ func (ui *termui) DrawColoredText(text string, x, y int, fg uicolor) {
 	}
 }
 
+func (ui *termui) DrawLine(lnum int) {
+	for i := 0; i < DungeonWidth; i++ {
+		ui.SetCell(i, lnum, '─', ColorFg, ColorBg)
+	}
+	ui.SetCell(DungeonWidth, lnum, '┤', ColorFg, ColorBg)
+}
+
+func (ui *termui) ClearLine(lnum int) {
+	for i := 0; i < DungeonWidth; i++ {
+		ui.SetCell(i, lnum, ' ', ColorFg, ColorBg)
+	}
+}
+
 func (ui *termui) SelectProjectile(g *game, ev event) error {
 	desc := false
 	for {
-		ui.Clear()
 		cs := g.SortedProjectiles()
+		ui.ClearLine(0)
 		if desc {
 			ui.DrawText("Describe which projectile? (press ? for throwing menu, esc to cancel)", 0, 0)
 		} else {
 			ui.DrawText("Throw which projectile? (press ? for describe menu, esc to cancel)", 0, 0)
 		}
 		for i, c := range cs {
+			ui.ClearLine(i + 1)
 			ui.DrawText(fmt.Sprintf("%c - %s (%d available)", rune(i+97), c, g.Player.Consumables[c]), 0, i+1)
 		}
+		ui.DrawLine(len(cs) + 1)
 		ui.Flush()
 		index, alternate, noAction := ui.Select(g, ev, len(cs))
 		if alternate {
@@ -1332,16 +1347,18 @@ func (ui *termui) SelectProjectile(g *game, ev event) error {
 func (ui *termui) SelectPotion(g *game, ev event) error {
 	desc := false
 	for {
-		ui.Clear()
 		cs := g.SortedPotions()
+		ui.ClearLine(0)
 		if desc {
 			ui.DrawText("Describe which potion? (press ? for quaff menu, esc to cancel)", 0, 0)
 		} else {
 			ui.DrawText("Drink which potion? (press ? for description menu, esc to cancel)", 0, 0)
 		}
 		for i, c := range cs {
+			ui.ClearLine(i + 1)
 			ui.DrawText(fmt.Sprintf("%c - %s (%d available)", rune(i+97), c, g.Player.Consumables[c]), 0, i+1)
 		}
+		ui.DrawLine(len(cs) + 1)
 		ui.Flush()
 		index, alternate, noAction := ui.Select(g, ev, len(cs))
 		if alternate {
@@ -1362,17 +1379,19 @@ func (ui *termui) SelectPotion(g *game, ev event) error {
 func (ui *termui) SelectRod(g *game, ev event) error {
 	desc := false
 	for {
-		ui.Clear()
 		rs := g.SortedRods()
+		ui.ClearLine(0)
 		if desc {
 			ui.DrawText("Describe which rod? (press ? for evocation menu, esc to cancel)", 0, 0)
 		} else {
 			ui.DrawText("Evoke which rod? (press ? for description menu, esc to cancel)", 0, 0)
 		}
 		for i, c := range rs {
+			ui.ClearLine(i + 1)
 			ui.DrawText(fmt.Sprintf("%c - %s (%d/%d charges, %d mana cost)",
 				rune(i+97), c, g.Player.Rods[c].Charge, c.MaxCharge(), c.MPCost()), 0, i+1)
 		}
+		ui.DrawLine(len(rs) + 1)
 		ui.Flush()
 		index, alternate, noAction := ui.Select(g, ev, len(rs))
 		if alternate {
