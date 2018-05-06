@@ -751,6 +751,8 @@ func (ui *termui) CursorCharAction(g *game, targ Targeter, r rune, pos position,
 		}
 	case 'e':
 		ui.ExcludeZone(g, pos)
+	case ' ':
+		return true
 	default:
 		g.Print("Invalid key. Type ? for help.")
 	}
