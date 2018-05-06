@@ -290,6 +290,9 @@ func (g *game) Burn(pos position, ev event) {
 		g.Print("The door vanishes in flames.")
 	}
 	g.Clouds[pos] = CloudFire
+	if !g.Player.LOS[pos] {
+		g.UnknownBurn[pos] = true
+	}
 	g.PushEvent(&cloudEvent{ERank: ev.Rank() + 10, EAction: FireProgression, Pos: pos})
 	g.BurnCreature(pos, ev)
 }

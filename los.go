@@ -133,14 +133,24 @@ func (g *game) SeePosition(pos position) {
 		g.FairAction()
 		g.Dungeon.SetExplored(pos)
 		g.DijkstraMapRebuild = true
-	} else if g.UnknownDig[pos] {
-		g.StopAuto()
-		g.Printf("There is no more a wall there.")
-		g.DijkstraMapRebuild = true
+	} else {
+		if g.UnknownDig[pos] {
+			g.StopAuto()
+			g.Printf("There is no more a wall there.")
+			g.DijkstraMapRebuild = true
+		}
+		if g.UnknownBurn[pos] {
+			g.StopAuto()
+			g.Printf("There are flames there.")
+			g.DijkstraMapRebuild = true
+		}
 	}
 	if g.UnknownDig[pos] {
 		delete(g.UnknownDig, pos)
 		delete(g.TemporalWalls, pos)
+	}
+	if g.UnknownBurn[pos] {
+		delete(g.UnknownBurn, pos)
 	}
 }
 

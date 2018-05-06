@@ -73,7 +73,7 @@ var (
 func LinkColors() {
 	ColorBg = ColorBase03
 	ColorBgBorder = ColorBase02
-	ColorBgCloud = ColorBase02
+	ColorBgCloud = ColorBase2
 	ColorBgDark = ColorBase03
 	ColorBgLOS = ColorBase3
 	ColorFg = ColorBase0
@@ -1096,6 +1096,9 @@ func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgCol
 		default:
 			r = '.'
 			if _, ok := g.Fungus[pos]; ok {
+				r = '"'
+			}
+			if _, ok := g.UnknownBurn[pos]; ok {
 				r = '"'
 			}
 			if cld, ok := g.Clouds[pos]; ok && g.Player.LOS[pos] {

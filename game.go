@@ -24,6 +24,7 @@ type game struct {
 	FoundEquipables     map[equipable]bool
 	Simellas            map[position]int
 	UnknownDig          map[position]bool
+	UnknownBurn         map[position]bool
 	Resting             bool
 	Autoexploring       bool
 	DijkstraMapRebuild  bool
@@ -265,7 +266,7 @@ func (g *game) InitPlayer() {
 	// Testing
 	// g.Player.Aptitudes[AptSmoke] = true
 	//g.Player.Rods[RodSwapping] = &rodProps{Charge: 3}
-	//g.Player.Rods[RodFireball] = &rodProps{Charge: 3}
+	g.Player.Rods[RodFireball] = &rodProps{Charge: 3}
 	//g.Player.Weapon = ElecWhip
 }
 
@@ -286,6 +287,7 @@ func (g *game) InitLevel() {
 	g.Player.Pos = g.FreeCell()
 
 	g.UnknownDig = map[position]bool{}
+	g.UnknownBurn = map[position]bool{}
 	g.ExclusionsMap = map[position]bool{}
 	g.TemporalWalls = map[position]bool{}
 

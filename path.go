@@ -32,6 +32,9 @@ func (pp *playerPath) Neighbors(pos position) []position {
 	d := pp.game.Dungeon
 	nb := pp.neighbors[:0]
 	keep := func(npos position) bool {
+		if cld, ok := pp.game.Clouds[npos]; ok && cld == CloudFire && !pp.game.UnknownBurn[npos] {
+			return false
+		}
 		return npos.valid() && d.Cell(npos).T != WallCell &&
 			d.Cell(npos).Explored && !pp.game.UnknownDig[npos] && !pp.game.ExclusionsMap[npos]
 	}
@@ -102,6 +105,9 @@ func (ap *autoexplorePath) Neighbors(pos position) []position {
 	d := ap.game.Dungeon
 	nb := ap.neighbors[:0]
 	keep := func(npos position) bool {
+		if cld, ok := ap.game.Clouds[npos]; ok && cld == CloudFire && !ap.game.UnknownBurn[npos] {
+			return false
+		}
 		return npos.valid() && d.Cell(npos).T != WallCell && !ap.game.ExclusionsMap[npos]
 	}
 	if ap.game.Player.HasStatus(StatusConfusion) {
