@@ -156,6 +156,7 @@ func (p potion) Use(g *game, ev event) error {
 	}
 	ev.Renew(g, 5)
 	g.UseConsumable(p)
+	g.ui.DrinkingPotionAnimation(g)
 	return nil
 }
 

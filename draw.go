@@ -1300,9 +1300,9 @@ func (ui *termui) SelectProjectile(g *game, ev event) error {
 		ui.Clear()
 		cs := g.SortedProjectiles()
 		if desc {
-			ui.DrawText("Describe which projectile? (press ? for throwing menu, esc to return to game)", 0, 0)
+			ui.DrawText("Describe which projectile? (press ? for throwing menu, esc to cancel)", 0, 0)
 		} else {
-			ui.DrawText("Throw which projectile? (press ? for describe menu, esc to return to game)", 0, 0)
+			ui.DrawText("Throw which projectile? (press ? for describe menu, esc to cancel)", 0, 0)
 		}
 		for i, c := range cs {
 			ui.DrawText(fmt.Sprintf("%c - %s (%d available)", rune(i+97), c, g.Player.Consumables[c]), 0, i+1)
@@ -1335,9 +1335,9 @@ func (ui *termui) SelectPotion(g *game, ev event) error {
 		ui.Clear()
 		cs := g.SortedPotions()
 		if desc {
-			ui.DrawText("Describe which potion? (press ? for quaff menu, esc to return to game)", 0, 0)
+			ui.DrawText("Describe which potion? (press ? for quaff menu, esc to cancel)", 0, 0)
 		} else {
-			ui.DrawText("Drink which potion? (press ? for description menu, esc to return to game)", 0, 0)
+			ui.DrawText("Drink which potion? (press ? for description menu, esc to cancel)", 0, 0)
 		}
 		for i, c := range cs {
 			ui.DrawText(fmt.Sprintf("%c - %s (%d available)", rune(i+97), c, g.Player.Consumables[c]), 0, i+1)
@@ -1365,9 +1365,9 @@ func (ui *termui) SelectRod(g *game, ev event) error {
 		ui.Clear()
 		rs := g.SortedRods()
 		if desc {
-			ui.DrawText("Describe which rod? (press ? for evocation menu, esc to return to game)", 0, 0)
+			ui.DrawText("Describe which rod? (press ? for evocation menu, esc to cancel)", 0, 0)
 		} else {
-			ui.DrawText("Evoke which rod? (press ? for description menu, esc to return to game)", 0, 0)
+			ui.DrawText("Evoke which rod? (press ? for description menu, esc to cancel)", 0, 0)
 		}
 		for i, c := range rs {
 			ui.DrawText(fmt.Sprintf("%c - %s (%d/%d charges, %d mana cost)",
@@ -1429,14 +1429,28 @@ func (ui *termui) CriticalHPWarning(g *game) {
 	r, fg, bg := ui.PositionDrawing(g, g.Player.Pos)
 	ui.DrawAtPosition(g, g.Player.Pos, true, r, ColorFgHPwounded, bg)
 	ui.Flush()
-	time.Sleep(50 * time.Millisecond)
+	time.Sleep(75 * time.Millisecond)
 	ui.DrawAtPosition(g, g.Player.Pos, true, r, ColorFgHPcritical, bg)
 	ui.Flush()
-	time.Sleep(50 * time.Millisecond)
+	time.Sleep(75 * time.Millisecond)
 	ui.DrawAtPosition(g, g.Player.Pos, true, r, fg, bg)
 	ui.Flush()
 	ui.WaitForContinue(g)
 	g.Print("Ok. Be careful, then.")
+}
+
+func (ui *termui) DrinkingPotionAnimation(g *game) {
+	ui.DrawDungeonView(g, false)
+	time.Sleep(50 * time.Millisecond)
+	r, fg, bg := ui.PositionDrawing(g, g.Player.Pos)
+	ui.DrawAtPosition(g, g.Player.Pos, true, r, ColorGreen, bg)
+	ui.Flush()
+	time.Sleep(75 * time.Millisecond)
+	ui.DrawAtPosition(g, g.Player.Pos, true, r, ColorYellow, bg)
+	ui.Flush()
+	time.Sleep(75 * time.Millisecond)
+	ui.DrawAtPosition(g, g.Player.Pos, true, r, fg, bg)
+	ui.Flush()
 }
 
 func (ui *termui) Quit(g *game) bool {

@@ -57,6 +57,7 @@ type Renderer interface {
 	ExplosionAnimation(*game, explosionStyle, position)
 	LightningBoltAnimation(*game, []position)
 	ThrowAnimation(*game, []position, bool)
+	DrinkingPotionAnimation(*game)
 }
 
 func (g *game) FreeCell() position {
