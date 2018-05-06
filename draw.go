@@ -431,7 +431,7 @@ func (ui *termui) ExaminePos(g *game, ev event, pos position) (again bool) {
 }
 
 func (ui *termui) DrawKeysDescription(g *game, actions []string) {
-	ui.DrawDungeonView(g, NormalMode)
+	ui.DrawDungeonView(g, NoFlushMode)
 
 	ui.DrawStyledTextLine(" Keys ", 0, HeaderLine)
 	for i := 0; i < len(actions)-1; i += 2 {
@@ -486,7 +486,7 @@ func (ui *termui) Equip(g *game, ev event) error {
 const TextWidth = DungeonWidth - 2
 
 func (ui *termui) CharacterInfo(g *game) {
-	ui.DrawDungeonView(g, NormalMode)
+	ui.DrawDungeonView(g, NoFlushMode)
 
 	b := bytes.Buffer{}
 	b.WriteString(formatText("Every year, your village sends someone to collect medicinal simella plants in the Underground. This year, the duty fell upon you, and so here you are. Your heart is teared between your will to be as helpful as possible to your village and your will to make it out alive.", TextWidth))
