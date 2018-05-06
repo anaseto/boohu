@@ -1383,6 +1383,20 @@ func (ui *termui) ClearLineWithColor(lnum int, bg uicolor) {
 	}
 }
 
+func (ui *termui) ListItemBG(i int) uicolor {
+	bg := ColorBase03
+	if i%2 == 1 {
+		bg = ColorBase02
+	}
+	return bg
+}
+
+func (ui *termui) ConsumableItem(g *game, i, lnum int, c consumable, fg uicolor) {
+	bg := ui.ListItemBG(i)
+	ui.ClearLineWithColor(lnum, bg)
+	ui.DrawColoredTextOnBG(fmt.Sprintf("%c - %s (%d available)", rune(i+97), c, g.Player.Consumables[c]), 0, lnum, fg, bg)
+}
+
 func (ui *termui) SelectProjectile(g *game, ev event) error {
 	desc := false
 	for {
@@ -1394,12 +1408,7 @@ func (ui *termui) SelectProjectile(g *game, ev event) error {
 			ui.DrawText("Throw which projectile? (press ? for describe menu, esc or space to cancel)", 0, 0)
 		}
 		for i, c := range cs {
-			bg := ColorBase03
-			if i%2 == 1 {
-				bg = ColorBase02
-			}
-			ui.ClearLineWithColor(i+1, bg)
-			ui.DrawColoredTextOnBG(fmt.Sprintf("%c - %s (%d available)", rune(i+97), c, g.Player.Consumables[c]), 0, i+1, ColorFg, bg)
+			ui.ConsumableItem(g, i, i+1, c, ColorFg)
 		}
 		ui.DrawLine(len(cs) + 1)
 		ui.Flush()
@@ -1409,6 +1418,9 @@ func (ui *termui) SelectProjectile(g *game, ev event) error {
 			continue
 		}
 		if noAction == nil {
+			ui.ConsumableItem(g, index, index+1, cs[index], ColorGreen)
+			ui.Flush()
+			time.Sleep(100 * time.Millisecond)
 			if desc {
 				ui.DrawDescription(g, cs[index].Desc())
 				continue
@@ -1435,12 +1447,7 @@ func (ui *termui) SelectPotion(g *game, ev event) error {
 			ui.DrawText("Drink which potion? (press ? for description menu, esc or space to cancel)", 0, 0)
 		}
 		for i, c := range cs {
-			bg := ColorBase03
-			if i%2 == 1 {
-				bg = ColorBase02
-			}
-			ui.ClearLineWithColor(i+1, bg)
-			ui.DrawColoredTextOnBG(fmt.Sprintf("%c - %s (%d available)", rune(i+97), c, g.Player.Consumables[c]), 0, i+1, ColorFg, bg)
+			ui.ConsumableItem(g, i, i+1, c, ColorFg)
 		}
 		ui.DrawLine(len(cs) + 1)
 		ui.Flush()
@@ -1450,6 +1457,9 @@ func (ui *termui) SelectPotion(g *game, ev event) error {
 			continue
 		}
 		if noAction == nil {
+			ui.ConsumableItem(g, index, index+1, cs[index], ColorGreen)
+			ui.Flush()
+			time.Sleep(100 * time.Millisecond)
 			if desc {
 				ui.DrawDescription(g, cs[index].Desc())
 				continue
@@ -1458,6 +1468,13 @@ func (ui *termui) SelectPotion(g *game, ev event) error {
 		}
 		return noAction
 	}
+}
+
+func (ui *termui) RodItem(g *game, i, lnum int, r rod, fg uicolor) {
+	bg := ui.ListItemBG(i)
+	ui.ClearLineWithColor(lnum, bg)
+	ui.DrawColoredTextOnBG(fmt.Sprintf("%c - %s (%d/%d charges, %d mana cost)",
+		rune(i+97), r, g.Player.Rods[r].Charge, r.MaxCharge(), r.MPCost()), 0, lnum, fg, bg)
 }
 
 func (ui *termui) SelectRod(g *game, ev event) error {
@@ -1470,14 +1487,8 @@ func (ui *termui) SelectRod(g *game, ev event) error {
 		} else {
 			ui.DrawText("Evoke which rod? (press ? for description menu, esc or space to cancel)", 0, 0)
 		}
-		for i, c := range rs {
-			bg := ColorBase03
-			if i%2 == 1 {
-				bg = ColorBase02
-			}
-			ui.ClearLineWithColor(i+1, bg)
-			ui.DrawColoredTextOnBG(fmt.Sprintf("%c - %s (%d/%d charges, %d mana cost)",
-				rune(i+97), c, g.Player.Rods[c].Charge, c.MaxCharge(), c.MPCost()), 0, i+1, ColorFg, bg)
+		for i, r := range rs {
+			ui.RodItem(g, i, i+1, r, ColorFg)
 		}
 		ui.DrawLine(len(rs) + 1)
 		ui.Flush()
@@ -1487,6 +1498,9 @@ func (ui *termui) SelectRod(g *game, ev event) error {
 			continue
 		}
 		if noAction == nil {
+			ui.RodItem(g, index, index+1, rs[index], ColorGreen)
+			ui.Flush()
+			time.Sleep(100 * time.Millisecond)
 			if desc {
 				ui.DrawDescription(g, rs[index].Desc())
 				continue
