@@ -309,6 +309,13 @@ func (ui *termui) EnterWizard(g *game) {
 	}
 }
 
+func (ui *termui) CleanError(err error) error {
+	if err.Error() == DoNothing {
+		err = errors.New("")
+	}
+	return err
+}
+
 func (ui *termui) HandleCharacter(g *game, ev event, c rune) (err error, again bool, quit bool) {
 	switch c {
 	case 'h', '4', 'l', '6', 'j', '2', 'k', '8',
@@ -346,10 +353,13 @@ func (ui *termui) HandleCharacter(g *game, ev event, c rune) (err error, again b
 		err = ui.Equip(g, ev)
 	case 'q', 'a':
 		err = ui.SelectPotion(g, ev)
+		err = ui.CleanError(err)
 	case 't', 'f':
 		err = ui.SelectProjectile(g, ev)
+		err = ui.CleanError(err)
 	case 'v', 'z':
 		err = ui.SelectRod(g, ev)
+		err = ui.CleanError(err)
 	case 'o':
 		err = g.Autoexplore(ev)
 	case 'x':
@@ -1624,7 +1634,7 @@ getKey:
 	for {
 		ui.DrawDungeonView(g, NormalMode)
 		err, again, quit := ui.PlayerTurnEvent(g, ev)
-		if err != nil {
+		if err != nil && err.Error() != "" {
 			g.Print(err.Error())
 		}
 		if again {
