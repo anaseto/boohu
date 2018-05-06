@@ -956,13 +956,13 @@ func (ui *termui) SwappingAnimation(g *game, mpos, ppos position) {
 func (ui *termui) TeleportAnimation(g *game, from, to position, showto bool) {
 	time.Sleep(50 * time.Millisecond)
 	r, fg, bgColorf := ui.PositionDrawing(g, from)
-	_, tofg, bgColort := ui.PositionDrawing(g, to)
-	ui.DrawAtPosition(g, from, true, '¤', tofg, bgColorf)
+	_, _, bgColort := ui.PositionDrawing(g, to)
+	ui.DrawAtPosition(g, from, true, '¤', ColorCyan, bgColorf)
 	ui.Flush()
 	time.Sleep(75 * time.Millisecond)
 	if showto {
 		ui.DrawAtPosition(g, from, true, r, fg, bgColorf)
-		ui.DrawAtPosition(g, to, true, '¤', tofg, bgColort)
+		ui.DrawAtPosition(g, to, true, '¤', ColorCyan, bgColort)
 		ui.Flush()
 		time.Sleep(75 * time.Millisecond)
 	}
