@@ -8,6 +8,7 @@ import (
 	"sort"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 type uicolor int
@@ -1268,13 +1269,17 @@ func (ui *termui) DrawConsumableDescription(g *game, c consumable) {
 }
 
 func (ui *termui) DrawDescription(g *game, desc string) {
-	ui.Clear()
+	ui.DrawDungeonView(g, false)
 	desc = formatText(desc, 79)
 	lines := strings.Count(desc, "\n")
+	for i := 0; i <= lines+1; i++ {
+		ui.ClearLine(i)
+	}
 	ui.DrawText(desc, 0, 0)
-	ui.DrawText("--press esc or space to continue--", 0, lines+2)
+	ui.DrawTextLine("press esc or space to continue", lines+1)
 	ui.Flush()
 	ui.WaitForContinue(g)
+	ui.DrawDungeonView(g, false)
 }
 
 func (ui *termui) DrawText(text string, x, y int) {
@@ -1301,6 +1306,19 @@ func (ui *termui) DrawLine(lnum int) {
 	ui.SetCell(DungeonWidth, lnum, '┤', ColorFg, ColorBg)
 }
 
+func (ui *termui) DrawTextLine(text string, lnum int) {
+	nchars := utf8.RuneCountInString(text)
+	dist := (DungeonWidth - nchars) / 2
+	for i := 0; i < dist; i++ {
+		ui.SetCell(i, lnum, '─', ColorFg, ColorBg)
+	}
+	ui.DrawText(text, dist, lnum)
+	for i := dist + nchars; i < DungeonWidth; i++ {
+		ui.SetCell(i, lnum, '─', ColorFg, ColorBg)
+	}
+	ui.SetCell(DungeonWidth, lnum, '┤', ColorFg, ColorBg)
+}
+
 func (ui *termui) ClearLine(lnum int) {
 	for i := 0; i < DungeonWidth; i++ {
 		ui.SetCell(i, lnum, ' ', ColorFg, ColorBg)
@@ -1313,9 +1331,9 @@ func (ui *termui) SelectProjectile(g *game, ev event) error {
 		cs := g.SortedProjectiles()
 		ui.ClearLine(0)
 		if desc {
-			ui.DrawText("Describe which projectile? (press ? for throwing menu, esc to cancel)", 0, 0)
+			ui.DrawText("Describe which projectile? (press ? for throwing menu, esc or space to cancel)", 0, 0)
 		} else {
-			ui.DrawText("Throw which projectile? (press ? for describe menu, esc to cancel)", 0, 0)
+			ui.DrawText("Throw which projectile? (press ? for describe menu, esc or space to cancel)", 0, 0)
 		}
 		for i, c := range cs {
 			ui.ClearLine(i + 1)
@@ -1350,9 +1368,9 @@ func (ui *termui) SelectPotion(g *game, ev event) error {
 		cs := g.SortedPotions()
 		ui.ClearLine(0)
 		if desc {
-			ui.DrawText("Describe which potion? (press ? for quaff menu, esc to cancel)", 0, 0)
+			ui.DrawText("Describe which potion? (press ? for quaff menu, esc or space to cancel)", 0, 0)
 		} else {
-			ui.DrawText("Drink which potion? (press ? for description menu, esc to cancel)", 0, 0)
+			ui.DrawText("Drink which potion? (press ? for description menu, esc or space to cancel)", 0, 0)
 		}
 		for i, c := range cs {
 			ui.ClearLine(i + 1)
@@ -1382,9 +1400,9 @@ func (ui *termui) SelectRod(g *game, ev event) error {
 		rs := g.SortedRods()
 		ui.ClearLine(0)
 		if desc {
-			ui.DrawText("Describe which rod? (press ? for evocation menu, esc to cancel)", 0, 0)
+			ui.DrawText("Describe which rod? (press ? for evocation menu, esc or space to cancel)", 0, 0)
 		} else {
-			ui.DrawText("Evoke which rod? (press ? for description menu, esc to cancel)", 0, 0)
+			ui.DrawText("Evoke which rod? (press ? for description menu, esc or space to cancel)", 0, 0)
 		}
 		for i, c := range rs {
 			ui.ClearLine(i + 1)
