@@ -310,7 +310,7 @@ func (ui *termui) EnterWizard(g *game) {
 }
 
 func (ui *termui) CleanError(err error) error {
-	if err.Error() == DoNothing {
+	if err != nil && err.Error() == DoNothing {
 		err = errors.New("")
 	}
 	return err
