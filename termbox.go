@@ -201,7 +201,7 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, pos position, data *ex
 				tev.Ch = 'j'
 			case termbox.KeyArrowLeft:
 				tev.Ch = 'h'
-			case termbox.KeyEsc:
+			case termbox.KeyEsc, termbox.KeySpace:
 				return true
 			case termbox.KeyEnter:
 				tev.Ch = '.'
