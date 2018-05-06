@@ -938,6 +938,21 @@ func (ui *termui) DrawDungeonView(g *game, m uiMode) {
 	}
 }
 
+func (ui *termui) SwappingAnimation(g *game, mpos, ppos position) {
+	time.Sleep(50 * time.Millisecond)
+	_, _, bgColorm := ui.PositionDrawing(g, mpos)
+	_, _, bgColorp := ui.PositionDrawing(g, ppos)
+	ui.DrawAtPosition(g, ppos, true, '¤', ColorFgMonster, bgColorp)
+	ui.DrawAtPosition(g, mpos, true, '¤', ColorFgPlayer, bgColorm)
+	ui.Flush()
+	time.Sleep(75 * time.Millisecond)
+	ui.DrawAtPosition(g, ppos, true, '¤', ColorFgPlayer, bgColorp)
+	ui.DrawAtPosition(g, mpos, true, '¤', ColorFgMonster, bgColorm)
+	ui.Flush()
+	time.Sleep(75 * time.Millisecond)
+	ui.DrawDungeonView(g, NormalMode)
+}
+
 type explosionStyle int
 
 const (

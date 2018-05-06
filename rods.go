@@ -393,6 +393,7 @@ func (g *game) EvokeRodSwapping(ev event) error {
 	mons.Pos, g.Player.Pos = g.Player.Pos, mons.Pos
 	mons.MakeAware(g)
 	g.Printf("You swap positions with the %s.", mons.Kind)
+	g.ui.SwappingAnimation(g, mons.Pos, g.Player.Pos)
 	g.CollectGround()
 	g.ComputeLOS()
 	g.MakeMonstersAware()
