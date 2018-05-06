@@ -1435,9 +1435,13 @@ func (ui *termui) SelectProjectile(g *game, ev event) error {
 		cs := g.SortedProjectiles()
 		ui.ClearLine(0)
 		if desc {
-			ui.DrawText("Describe which projectile? (press ? for throwing menu, esc or space to cancel)", 0, 0)
+			ui.DrawColoredText("Describe", 0, 0, ColorBlue)
+			col := utf8.RuneCountInString("Describe")
+			ui.DrawText(" which projectile? (press ? for throwing menu, esc or space to cancel)", col, 0)
 		} else {
-			ui.DrawText("Throw which projectile? (press ? for describe menu, esc or space to cancel)", 0, 0)
+			ui.DrawColoredText("Throw", 0, 0, ColorOrange)
+			col := utf8.RuneCountInString("Throw")
+			ui.DrawText(" which projectile? (press ? for describe menu, esc or space to cancel)", col, 0)
 		}
 		for i, c := range cs {
 			ui.ConsumableItem(g, i, i+1, c, ColorFg)
@@ -1450,7 +1454,7 @@ func (ui *termui) SelectProjectile(g *game, ev event) error {
 			continue
 		}
 		if noAction == nil {
-			ui.ConsumableItem(g, index, index+1, cs[index], ColorGreen)
+			ui.ConsumableItem(g, index, index+1, cs[index], ColorYellow)
 			ui.Flush()
 			time.Sleep(100 * time.Millisecond)
 			if desc {
@@ -1474,9 +1478,13 @@ func (ui *termui) SelectPotion(g *game, ev event) error {
 		cs := g.SortedPotions()
 		ui.ClearLine(0)
 		if desc {
-			ui.DrawText("Describe which potion? (press ? for quaff menu, esc or space to cancel)", 0, 0)
+			ui.DrawColoredText("Describe", 0, 0, ColorBlue)
+			col := utf8.RuneCountInString("Describe")
+			ui.DrawText(" which potion? (press ? for quaff menu, esc or space to cancel)", col, 0)
 		} else {
-			ui.DrawText("Drink which potion? (press ? for description menu, esc or space to cancel)", 0, 0)
+			ui.DrawColoredText("Drink", 0, 0, ColorGreen)
+			col := utf8.RuneCountInString("Drink")
+			ui.DrawText(" which potion? (press ? for description menu, esc or space to cancel)", col, 0)
 		}
 		for i, c := range cs {
 			ui.ConsumableItem(g, i, i+1, c, ColorFg)
@@ -1489,7 +1497,7 @@ func (ui *termui) SelectPotion(g *game, ev event) error {
 			continue
 		}
 		if noAction == nil {
-			ui.ConsumableItem(g, index, index+1, cs[index], ColorGreen)
+			ui.ConsumableItem(g, index, index+1, cs[index], ColorYellow)
 			ui.Flush()
 			time.Sleep(100 * time.Millisecond)
 			if desc {
@@ -1515,9 +1523,13 @@ func (ui *termui) SelectRod(g *game, ev event) error {
 		rs := g.SortedRods()
 		ui.ClearLine(0)
 		if desc {
-			ui.DrawText("Describe which rod? (press ? for evocation menu, esc or space to cancel)", 0, 0)
+			ui.DrawColoredText("Describe", 0, 0, ColorBlue)
+			col := utf8.RuneCountInString("Describe")
+			ui.DrawText(" which rod? (press ? for evocation menu, esc or space to cancel)", col, 0)
 		} else {
-			ui.DrawText("Evoke which rod? (press ? for description menu, esc or space to cancel)", 0, 0)
+			ui.DrawColoredText("Evoke", 0, 0, ColorCyan)
+			col := utf8.RuneCountInString("Evoke")
+			ui.DrawText(" which rod? (press ? for description menu, esc or space to cancel)", col, 0)
 		}
 		for i, r := range rs {
 			ui.RodItem(g, i, i+1, r, ColorFg)
@@ -1530,7 +1542,7 @@ func (ui *termui) SelectRod(g *game, ev event) error {
 			continue
 		}
 		if noAction == nil {
-			ui.RodItem(g, index, index+1, rs[index], ColorGreen)
+			ui.RodItem(g, index, index+1, rs[index], ColorYellow)
 			ui.Flush()
 			time.Sleep(100 * time.Millisecond)
 			if desc {
