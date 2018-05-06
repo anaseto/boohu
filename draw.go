@@ -173,34 +173,6 @@ func WindowsPalette() {
 	ColorBlue = Navy
 	ColorCyan = Teal
 	ColorGreen = Green
-
-	ColorBgLOS = Silver
-	ColorBgDark = Black
-	ColorBgBorder = Black
-	ColorBg = Black
-	ColorBgCloud = Silver
-	ColorFgLOS = Black
-	ColorFgDark = Silver
-	ColorFg = Silver
-	ColorFgPlayer = Navy
-	ColorFgMonster = Maroon
-	ColorFgSleepingMonster = Teal
-	ColorFgWanderingMonster = Purple
-	ColorFgConfusedMonster = Green
-	ColorFgCollectable = Olive
-	ColorFgPlace = Purple
-	ColorFgSimellas = Olive
-	ColorFgHPok = Green
-	ColorFgHPwounded = Olive
-	ColorFgHPcritical = Maroon
-	ColorFgMPok = Navy
-	ColorFgMPpartial = Purple
-	ColorFgMPcritical = Maroon
-	ColorFgStatusGood = Navy
-	ColorFgStatusBad = Maroon
-	ColorFgStatusOther = Olive
-	ColorFgTargetMode = Teal
-	ColorFgMagicPlace = Teal
 }
 
 func (ui *termui) DrawWelcome() {
