@@ -1371,8 +1371,8 @@ const (
 )
 
 func (ui *termui) DrawInfoLine(text string) {
-	ui.ClearLine(DungeonHeight + 1)
-	ui.DrawColoredTextOnBG(text, 0, DungeonHeight+1, ColorBlue, ColorBg)
+	ui.ClearLineWithColor(DungeonHeight+1, ColorBase02)
+	ui.DrawColoredTextOnBG(text, 0, DungeonHeight+1, ColorBlue, ColorBase02)
 	ui.SetCell(DungeonWidth, DungeonHeight+1, '│', ColorFg, ColorBg)
 }
 
