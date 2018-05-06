@@ -1617,14 +1617,24 @@ func (ui *termui) DrinkingPotionAnimation(g *game) {
 	ui.DrawDungeonView(g, NormalMode)
 	time.Sleep(50 * time.Millisecond)
 	r, fg, bg := ui.PositionDrawing(g, g.Player.Pos)
-	ui.DrawAtPosition(g, g.Player.Pos, true, r, ColorGreen, bg)
+	ui.DrawAtPosition(g, g.Player.Pos, false, r, ColorGreen, bg)
 	ui.Flush()
 	time.Sleep(75 * time.Millisecond)
-	ui.DrawAtPosition(g, g.Player.Pos, true, r, ColorYellow, bg)
+	ui.DrawAtPosition(g, g.Player.Pos, false, r, ColorYellow, bg)
 	ui.Flush()
 	time.Sleep(75 * time.Millisecond)
-	ui.DrawAtPosition(g, g.Player.Pos, true, r, fg, bg)
+	ui.DrawAtPosition(g, g.Player.Pos, false, r, fg, bg)
 	ui.Flush()
+}
+
+func (ui *termui) MagicMappingAnimation(g *game, border []int) {
+	for _, i := range border {
+		pos := idxtopos(i)
+		r, fg, bg := ui.PositionDrawing(g, pos)
+		ui.DrawAtPosition(g, pos, false, r, fg, bg)
+	}
+	ui.Flush()
+	time.Sleep(12 * time.Millisecond)
 }
 
 func (ui *termui) Quit(g *game) bool {

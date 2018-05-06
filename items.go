@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"sort"
 )
 
 // + consumables (potion-like or throwing dart, strategic + tactical)
@@ -237,10 +238,30 @@ func (g *game) QuaffLignification(ev event) error {
 }
 
 func (g *game) QuaffMagicMapping(ev event) error {
-	for i, c := range g.Dungeon.Cells {
-		pos := idxtopos(i)
-		if c.T == FreeCell || g.Dungeon.HasFreeNeighbor(pos) {
-			g.Dungeon.SetExplored(pos)
+	dp := &dungeonPath{dungeon: g.Dungeon}
+	g.AutoExploreDijkstra(dp, []int{g.Player.Pos.idx()})
+	cdists := make(map[int][]int)
+	for i, dist := range DijkstraMapCache {
+		cdists[dist] = append(cdists[dist], i)
+	}
+	var dists []int
+	for dist, _ := range cdists {
+		dists = append(dists, dist)
+	}
+	sort.Ints(dists)
+	g.ui.DrawDungeonView(g, NormalMode)
+	for _, d := range dists {
+		draw := false
+		for _, i := range cdists[d] {
+			pos := idxtopos(i)
+			c := g.Dungeon.Cell(pos)
+			if (c.T == FreeCell || g.Dungeon.HasFreeNeighbor(pos)) && !c.Explored {
+				g.Dungeon.SetExplored(pos)
+				draw = true
+			}
+		}
+		if draw {
+			g.ui.MagicMappingAnimation(g, cdists[d])
 		}
 	}
 	g.Printf("You quaff the %s. You feel wiser.", MagicMappingPotion)

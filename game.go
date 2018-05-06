@@ -62,6 +62,8 @@ type Renderer interface {
 	DrinkingPotionAnimation(*game)
 	SwappingAnimation(*game, position, position)
 	TeleportAnimation(*game, position, position, bool)
+	MagicMappingAnimation(*game, []int)
+	DrawDungeonView(*game, uiMode)
 }
 
 func (g *game) FreeCell() position {
@@ -271,6 +273,7 @@ func (g *game) InitPlayer() {
 	//g.Player.Rods[RodSwapping] = &rodProps{Charge: 3}
 	//g.Player.Rods[RodFireball] = &rodProps{Charge: 3}
 	//g.Player.Rods[RodFog] = &rodProps{Charge: 3}
+	//g.Player.Consumables[MagicMappingPotion] = 1
 	//g.Player.Weapon = ElecWhip
 }
 
