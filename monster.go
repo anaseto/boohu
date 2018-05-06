@@ -1120,6 +1120,18 @@ func (m *monster) MakeHuntIfHurt(g *game) {
 	}
 }
 
+func (m *monster) MakeAwareIfHurt(g *game) {
+	if g.Player.LOS[m.Pos] && m.State != Hunting {
+		m.MakeAwareIfHurt(g)
+		return
+	}
+	if m.State != Resting {
+		return
+	}
+	m.State = Wandering
+	m.Target = g.FreeCell()
+}
+
 func (m *monster) MakeAware(g *game) {
 	if !g.Player.LOS[m.Pos] {
 		return

@@ -266,6 +266,8 @@ func (g *game) BurnCreature(pos position, ev event) {
 		if mons.HP <= 0 {
 			g.PrintfStyled("%s is killed by the fire.", logPlayerHit, mons.Kind.Definite(true))
 			g.HandleKill(mons, ev)
+		} else {
+			mons.MakeAwareIfHurt(g)
 		}
 	}
 	if pos == g.Player.Pos {
