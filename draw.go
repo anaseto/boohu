@@ -388,6 +388,14 @@ func (ui *termui) HandleCharacter(g *game, ev event, c rune) (err error, again b
 		} else {
 			err = errors.New("Unknown key. Type ? for help.")
 		}
+	case 'W':
+		ui.EnterWizard(g)
+		return nil, true, false
+	case 'Q':
+		if ui.Quit(g) {
+			return nil, false, true
+		}
+		return nil, true, false
 	default:
 		err = fmt.Errorf("Unknown key '%c'. Type ? for help.", c)
 	}
@@ -433,18 +441,17 @@ func (ui *termui) ExaminePos(g *game, ev event, pos position) (again bool) {
 func (ui *termui) DrawKeysDescription(g *game, actions []string) {
 	ui.DrawDungeonView(g, false)
 
-	help := &bytes.Buffer{}
-	for i := 0; i < len(actions)-1; i += 2 {
-		fmt.Fprintf(help, " %s: %s\n", actions[i], actions[i+1])
-	}
-	desc := help.String()
-	lines := strings.Count(desc, "\n")
-	for i := 0; i <= lines+1; i++ {
-		ui.ClearLine(i)
-	}
 	ui.DrawStyledTextLine(" Keys ", 0, HeaderLine)
-	ui.DrawText(desc, 0, 1)
-	ui.DrawTextLine("press esc or space to continue", lines+1)
+	for i := 0; i < len(actions)-1; i += 2 {
+		bg := ColorBase03
+		if i%4 == 2 {
+			bg = ColorBase02
+		}
+		ui.ClearLineWithColor(i/2+1, bg)
+		ui.DrawColoredTextOnBG(fmt.Sprintf(" %-36s %s", actions[i], actions[i+1]), 0, i/2+1, ColorFg, bg)
+	}
+	lines := 1 + len(actions)/2
+	ui.DrawTextLine("press esc or space to continue", lines)
 	ui.Flush()
 
 	ui.WaitForContinue(g)
@@ -452,7 +459,7 @@ func (ui *termui) DrawKeysDescription(g *game, actions []string) {
 
 func (ui *termui) KeysHelp(g *game) {
 	ui.DrawKeysDescription(g, []string{
-		"Movement", "h/j/k/l/y/u/b/n or numpad or mouse left-click",
+		"Movement", "h/j/k/l/y/u/b/n or numpad or mouse left",
 		"Rest", "r",
 		"Wait", "“.” or 5",
 		"Use stairs", "> or D",
@@ -479,7 +486,7 @@ func (ui *termui) ExamineHelp(g *game) {
 		"Cycle through objects", "o",
 		"Go to/select target", "“.” or enter",
 		"View target description", "v or d",
-		"Toggle exclude area from automatic travelling", "e",
+		"Toggle exclude area from auto-travel", "e",
 	})
 }
 
@@ -1305,6 +1312,10 @@ func (ui *termui) DrawText(text string, x, y int) {
 }
 
 func (ui *termui) DrawColoredText(text string, x, y int, fg uicolor) {
+	ui.DrawColoredTextOnBG(text, x, y, fg, ColorBg)
+}
+
+func (ui *termui) DrawColoredTextOnBG(text string, x, y int, fg, bg uicolor) {
 	col := 0
 	for _, r := range text {
 		if r == '\n' {
@@ -1312,7 +1323,7 @@ func (ui *termui) DrawColoredText(text string, x, y int, fg uicolor) {
 			col = 0
 			continue
 		}
-		ui.SetCell(x+col, y, r, fg, ColorBg)
+		ui.SetCell(x+col, y, r, fg, bg)
 		col++
 	}
 }
@@ -1364,6 +1375,12 @@ func (ui *termui) ClearLine(lnum int) {
 	}
 }
 
+func (ui *termui) ClearLineWithColor(lnum int, bg uicolor) {
+	for i := 0; i < DungeonWidth; i++ {
+		ui.SetCell(i, lnum, ' ', ColorFg, bg)
+	}
+}
+
 func (ui *termui) SelectProjectile(g *game, ev event) error {
 	desc := false
 	for {
@@ -1375,8 +1392,12 @@ func (ui *termui) SelectProjectile(g *game, ev event) error {
 			ui.DrawText("Throw which projectile? (press ? for describe menu, esc or space to cancel)", 0, 0)
 		}
 		for i, c := range cs {
-			ui.ClearLine(i + 1)
-			ui.DrawText(fmt.Sprintf("%c - %s (%d available)", rune(i+97), c, g.Player.Consumables[c]), 0, i+1)
+			bg := ColorBase03
+			if i%2 == 1 {
+				bg = ColorBase02
+			}
+			ui.ClearLineWithColor(i+1, bg)
+			ui.DrawColoredTextOnBG(fmt.Sprintf("%c - %s (%d available)", rune(i+97), c, g.Player.Consumables[c]), 0, i+1, ColorFg, bg)
 		}
 		ui.DrawLine(len(cs) + 1)
 		ui.Flush()
@@ -1412,8 +1433,12 @@ func (ui *termui) SelectPotion(g *game, ev event) error {
 			ui.DrawText("Drink which potion? (press ? for description menu, esc or space to cancel)", 0, 0)
 		}
 		for i, c := range cs {
-			ui.ClearLine(i + 1)
-			ui.DrawText(fmt.Sprintf("%c - %s (%d available)", rune(i+97), c, g.Player.Consumables[c]), 0, i+1)
+			bg := ColorBase03
+			if i%2 == 1 {
+				bg = ColorBase02
+			}
+			ui.ClearLineWithColor(i+1, bg)
+			ui.DrawColoredTextOnBG(fmt.Sprintf("%c - %s (%d available)", rune(i+97), c, g.Player.Consumables[c]), 0, i+1, ColorFg, bg)
 		}
 		ui.DrawLine(len(cs) + 1)
 		ui.Flush()
@@ -1444,9 +1469,13 @@ func (ui *termui) SelectRod(g *game, ev event) error {
 			ui.DrawText("Evoke which rod? (press ? for description menu, esc or space to cancel)", 0, 0)
 		}
 		for i, c := range rs {
-			ui.ClearLine(i + 1)
-			ui.DrawText(fmt.Sprintf("%c - %s (%d/%d charges, %d mana cost)",
-				rune(i+97), c, g.Player.Rods[c].Charge, c.MaxCharge(), c.MPCost()), 0, i+1)
+			bg := ColorBase03
+			if i%2 == 1 {
+				bg = ColorBase02
+			}
+			ui.ClearLineWithColor(i+1, bg)
+			ui.DrawColoredTextOnBG(fmt.Sprintf("%c - %s (%d/%d charges, %d mana cost)",
+				rune(i+97), c, g.Player.Rods[c].Charge, c.MaxCharge(), c.MPCost()), 0, i+1, ColorFg, bg)
 		}
 		ui.DrawLine(len(rs) + 1)
 		ui.Flush()

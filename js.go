@@ -345,14 +345,6 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 	case 'S':
 		err = errors.New("Command not available for the web html5 version.")
 		return err, true, false
-	case 'W':
-		ui.EnterWizard(g)
-		return nil, true, false
-	case 'Q':
-		if ui.Quit(g) {
-			return nil, false, true
-		}
-		return nil, true, false
 	}
 	err, again, quit = ui.HandleCharacter(g, ev, r)
 	if err != nil {
