@@ -431,17 +431,22 @@ func (ui *termui) ExaminePos(g *game, ev event, pos position) (again bool) {
 }
 
 func (ui *termui) DrawKeysDescription(g *game, actions []string) {
-	ui.Clear()
+	ui.DrawDungeonView(g, false)
+
 	help := &bytes.Buffer{}
-	help.WriteString("┌────────────── Keys ────────────────────────────────────────────────────────\n")
-	help.WriteString("│\n")
 	for i := 0; i < len(actions)-1; i += 2 {
-		fmt.Fprintf(help, "│ %s: %s\n", actions[i], actions[i+1])
+		fmt.Fprintf(help, " %s: %s\n", actions[i], actions[i+1])
 	}
-	help.WriteString("│\n")
-	help.WriteString("└──── press esc or space to return to the game ──────────────────────────────\n")
-	ui.DrawText(help.String(), 0, 0)
+	desc := help.String()
+	lines := strings.Count(desc, "\n")
+	for i := 0; i <= lines+1; i++ {
+		ui.ClearLine(i)
+	}
+	ui.DrawStyledTextLine(" Keys ", 0, HeaderLine)
+	ui.DrawText(desc, 0, 1)
+	ui.DrawTextLine("press esc or space to continue", lines+1)
 	ui.Flush()
+
 	ui.WaitForContinue(g)
 }
 
@@ -1317,16 +1322,37 @@ func (ui *termui) DrawLine(lnum int) {
 }
 
 func (ui *termui) DrawTextLine(text string, lnum int) {
+	ui.DrawStyledTextLine(text, lnum, NormalLine)
+}
+
+type linestyle int
+
+const (
+	NormalLine linestyle = iota
+	HeaderLine
+)
+
+func (ui *termui) DrawStyledTextLine(text string, lnum int, st linestyle) {
 	nchars := utf8.RuneCountInString(text)
 	dist := (DungeonWidth - nchars) / 2
 	for i := 0; i < dist; i++ {
 		ui.SetCell(i, lnum, '─', ColorFg, ColorBg)
 	}
-	ui.DrawText(text, dist, lnum)
+	switch st {
+	case HeaderLine:
+		ui.DrawColoredText(text, dist, lnum, ColorYellow)
+	default:
+		ui.DrawColoredText(text, dist, lnum, ColorFg)
+	}
 	for i := dist + nchars; i < DungeonWidth; i++ {
 		ui.SetCell(i, lnum, '─', ColorFg, ColorBg)
 	}
-	ui.SetCell(DungeonWidth, lnum, '┤', ColorFg, ColorBg)
+	switch st {
+	case HeaderLine:
+		ui.SetCell(DungeonWidth, lnum, '┐', ColorFg, ColorBg)
+	default:
+		ui.SetCell(DungeonWidth, lnum, '┤', ColorFg, ColorBg)
+	}
 }
 
 func (ui *termui) ClearLine(lnum int) {
