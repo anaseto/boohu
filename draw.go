@@ -1807,12 +1807,12 @@ loop:
 }
 
 func (ui *termui) DrawPreviousLogs(g *game) {
-	lines := 23
+	lines := DungeonHeight + 4
 	nmax := len(g.Log) - lines
 	n := nmax
 loop:
 	for {
-		ui.Clear()
+		ui.DrawDungeonView(g, NoFlushMode)
 		if n >= nmax {
 			n = nmax
 		}
@@ -1826,6 +1826,7 @@ loop:
 		for i := n; i < to; i++ {
 			e := g.Log[i]
 			fguicolor := ui.LogColor(e)
+			ui.ClearLine(i - n)
 			if e.Tick {
 				ui.DrawColoredText("•", 0, i-n, ColorYellow)
 				ui.DrawColoredText(e.String(), 2, i-n, fguicolor)
@@ -1833,9 +1834,12 @@ loop:
 				ui.DrawColoredText(e.String(), 0, i-n, fguicolor)
 			}
 		}
-		s := fmt.Sprintf("─────────(%d/%d)───────────────────────────────────────────────────────────────\n", len(g.Log)-to, len(g.Log))
-		ui.DrawText(s, 0, to-n)
-		ui.DrawText("Keys: half-page up (u), half-page down (d), quit (esc or space)", 0, to+1-n)
+		ui.ClearLine(lines)
+		s := fmt.Sprintf(" half-page up/down (u/d) quit (esc or space) — (%d/%d) \n", len(g.Log)-to, len(g.Log))
+		ui.DrawStyledTextLine(s, lines, FooterLine)
+		for i := 0; i < 4; i++ {
+			ui.SetCell(DungeonWidth, DungeonHeight+i, '│', ColorFg, ColorBg)
+		}
 		ui.Flush()
 		var quit bool
 		n, quit = ui.Scroll(n)
