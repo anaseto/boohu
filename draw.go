@@ -1057,6 +1057,9 @@ func (ui *termui) ThrowAnimation(g *game, ray []position, hit bool) {
 }
 
 func (ui *termui) HitAnimation(g *game, mons *monster, targeting bool) {
+	if mons == nil {
+		return
+	}
 	_, _, bgColor := ui.PositionDrawing(g, mons.Pos)
 	if mons.Exists() {
 		ui.DrawAtPosition(g, mons.Pos, targeting, '¤', ColorFgAnimationHit, bgColor)
