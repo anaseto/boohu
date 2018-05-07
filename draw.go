@@ -1479,12 +1479,7 @@ func (ui *termui) SelectProjectile(g *game, ev event) error {
 				ui.DrawDescription(g, cs[index].Desc())
 				continue
 			}
-			b := ui.ChooseTarget(g, &chooser{needsFreeWay: true})
-			if b {
-				noAction = cs[index].Use(g, ev)
-			} else {
-				noAction = errors.New(DoNothing)
-			}
+			noAction = cs[index].Use(g, ev)
 		}
 		return noAction
 	}

@@ -308,6 +308,7 @@ type projectile int
 const (
 	Javelin projectile = iota
 	ConfusingDart
+	ExplosiveMagara
 	// unimplemented
 	Net
 )
@@ -318,6 +319,8 @@ func (p projectile) String() (text string) {
 		text = "javelin"
 	case ConfusingDart:
 		text = "dart of confusion"
+	case ExplosiveMagara:
+		text = "explosive magara"
 	case Net:
 		text = "throwing net"
 	}
@@ -330,6 +333,8 @@ func (p projectile) Plural() (text string) {
 		text = "javelins"
 	case ConfusingDart:
 		text = "darts of confusion"
+	case ExplosiveMagara:
+		text = "explosive magaras"
 	case Net:
 		text = "throwing nets"
 	}
@@ -343,6 +348,8 @@ func (p projectile) Desc() (text string) {
 		text = "can be thrown to foes, dealing up to 11 damage."
 	case ConfusingDart:
 		text = "can be thrown to confuse foes. Confused monsters cannot move diagonally."
+	case ExplosiveMagara:
+		text = "can be thrown to cause a fire explosion halving HP of monsters in a square area."
 	case Net:
 		text = "can be thrown to emprison your enemies."
 	}
@@ -363,22 +370,24 @@ func (p projectile) Use(g *game, ev event) error {
 		// should not happen
 		return errors.New("no such consumable: " + p.String())
 	}
-	mons, _ := g.MonsterAt(g.Player.Target)
-	if mons == nil {
-		// should not happen
-		return errors.New("internal error: no monster")
-	}
+	var err error
 	switch p {
 	case Javelin:
-		g.ThrowJavelin(mons, ev)
+		err = g.ThrowJavelin(ev)
 	case ConfusingDart:
-		g.ThrowConfusingDart(mons, ev)
+		err = g.ThrowConfusingDart(ev)
+	case ExplosiveMagara:
+		err = g.ThrowExplosiveMagara(ev)
 	}
 	g.UseConsumable(p)
-	return nil
+	return err
 }
 
-func (g *game) ThrowJavelin(mons *monster, ev event) {
+func (g *game) ThrowJavelin(ev event) error {
+	if !g.ui.ChooseTarget(g, &chooser{needsFreeWay: true}) {
+		return errors.New(DoNothing)
+	}
+	mons, _ := g.MonsterAt(g.Player.Target)
 	acc := RandInt(g.Player.RangedAccuracy())
 	evasion := RandInt(mons.Evasion)
 	if mons.State == Resting {
@@ -411,9 +420,14 @@ func (g *game) ThrowJavelin(mons *monster, ev event) {
 		mons.MakeHuntIfHurt(g)
 	}
 	ev.Renew(g, 10)
+	return nil
 }
 
-func (g *game) ThrowConfusingDart(mons *monster, ev event) {
+func (g *game) ThrowConfusingDart(ev event) error {
+	if !g.ui.ChooseTarget(g, &chooser{needsFreeWay: true}) {
+		return errors.New(DoNothing)
+	}
+	mons, _ := g.MonsterAt(g.Player.Target)
 	acc := RandInt(g.Player.RangedAccuracy())
 	evasion := RandInt(mons.Evasion)
 	if mons.State == Resting {
@@ -429,6 +443,32 @@ func (g *game) ThrowConfusingDart(mons *monster, ev event) {
 	}
 	mons.MakeHuntIfHurt(g)
 	ev.Renew(g, 10)
+	return nil
+}
+
+func (g *game) ThrowExplosiveMagara(ev event) error {
+	if !g.ui.ChooseTarget(g, &chooser{area: true, minDist: true, flammable: true}) {
+		return errors.New(DoNothing)
+	}
+	neighbors := g.Dungeon.FreeNeighbors(g.Player.Target)
+	g.Print("You throw the explosive magara, which gives a noisy pop.")
+	g.MakeNoise(18, g.Player.Target)
+	g.ui.ExplosionAnimation(g, FireExplosion, g.Player.Target)
+	for _, pos := range append(neighbors, g.Player.Target) {
+		g.Burn(pos, ev)
+		mons, _ := g.MonsterAt(pos)
+		if mons.Exists() {
+			mons.HP /= 2
+			if mons.HP == 0 {
+				mons.HP = 1
+			}
+			g.MakeNoise(12, mons.Pos)
+			mons.MakeHuntIfHurt(g)
+		}
+	}
+
+	ev.Renew(g, 10)
+	return nil
 }
 
 type collectable struct {
@@ -454,6 +494,7 @@ var ConsumablesCollectData = map[consumable]collectData{
 	CBlinkPotion:        {rarity: 12, quantity: 1},
 	Javelin:             {rarity: 3, quantity: 3},
 	ConfusingDart:       {rarity: 5, quantity: 2},
+	ExplosiveMagara:     {rarity: 10, quantity: 1},
 }
 
 type equipable interface {
