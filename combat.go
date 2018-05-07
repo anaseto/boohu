@@ -193,6 +193,7 @@ func (g *game) HitMonster(dt dmgType, mons *monster, ev event) (hit bool) {
 		}
 		oldHP := mons.HP
 		mons.HP -= attack
+		g.ui.HitAnimation(g, mons, false)
 		if mons.HP > 0 {
 			g.PrintfStyled("You hit %s (%d damage).", logPlayerHit, mons.Kind.Definite(false), attack)
 		} else if oldHP > 0 {
