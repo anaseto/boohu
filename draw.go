@@ -1451,6 +1451,9 @@ func (ui *termui) ThrowAnimation(g *game, ray []position, hit bool) {
 }
 
 func (ui *termui) HitAnimation(g *game, pos position, targeting bool) {
+	if !g.Player.LOS[pos] {
+		return
+	}
 	_, _, bgColor := ui.PositionDrawing(g, pos)
 	mons, _ := g.MonsterAt(pos)
 	if mons.Exists() {
