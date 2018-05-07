@@ -1227,7 +1227,7 @@ func (ui *termui) ViewPositionDescription(g *game, pos position) {
 		ui.DrawDescription(g, "A closed door blocks your line of sight. Doors open automatically when you or a monster stand on them. Doors are flammable.")
 	} else if g.Simellas[pos] > 0 {
 		ui.DrawDescription(g, "A simella is a plant with big white flowers which are used in the Underground for their medicinal properties. They can also make tasty infusions. You were actually sent here by your village to collect as many as possible of those plants.")
-	} else if _, ok := g.Fungus[pos]; ok {
+	} else if _, ok := g.Fungus[pos]; ok && g.Dungeon.Cell(pos).T == FreeCell {
 		ui.DrawDescription(g, "Dense foliage is difficult to see through. It is flammable.")
 	} else {
 		g.Print("Nothing worth of description here.")
