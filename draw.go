@@ -990,7 +990,6 @@ func (ui *termui) ProjectileTrajectoryAnimation(g *game, ray []position, fg uico
 func (ui *termui) ExplosionAnimation(g *game, es explosionStyle, pos position) {
 	ui.DrawDungeonView(g, NormalMode)
 	time.Sleep(20 * time.Millisecond)
-	// TODO: use new specific variables for colors
 	colors := [2]uicolor{ColorFgExplosionStart, ColorFgExplosionEnd}
 	if es == WallExplosion || es == AroundWallExplosion {
 		colors[0] = ColorFgExplosionWallStart
