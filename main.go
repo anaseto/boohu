@@ -50,6 +50,7 @@ func main() {
 	if runtime.GOOS == "windows" {
 		WindowsPalette()
 	}
+	ApplyDefaultKeyBindings()
 	tui.PostInit()
 	LinkColors()
 
@@ -62,6 +63,11 @@ func main() {
 		g.InitLevel()
 		g.Print("Error loading saved game… starting new game.")
 	}
+	load, err = g.LoadConfig()
+	if load && err != nil {
+		g.Print("Error loading config file.")
+	}
+
 	g.ui = tui
 	g.EventLoop()
 }

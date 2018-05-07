@@ -77,23 +77,23 @@ const (
 	ESE
 )
 
-func KeyToDir(r rune) (dir direction) {
-	switch r {
-	case 'h', 'H', '4':
+func KeyToDir(k keyAction) (dir direction) {
+	switch k {
+	case KeyW, KeyRunW:
 		dir = W
-	case 'l', 'L', '6':
+	case KeyE, KeyRunE:
 		dir = E
-	case 'j', 'J', '2':
+	case KeyS, KeyRunS:
 		dir = S
-	case 'k', 'K', '8':
+	case KeyN, KeyRunN:
 		dir = N
-	case 'y', 'Y', '7':
+	case KeyNW, KeyRunNW:
 		dir = NW
-	case 'b', 'B', '1':
+	case KeySW, KeyRunSW:
 		dir = SW
-	case 'u', 'U', '9':
+	case KeyNE, KeyRunNE:
 		dir = NE
-	case 'n', 'N', '3':
+	case KeySE, KeyRunSE:
 		dir = SE
 	}
 	return dir

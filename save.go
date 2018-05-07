@@ -51,19 +51,7 @@ func (g *game) Save() error {
 }
 
 func (g *game) RemoveSaveFile() error {
-	dataDir, err := g.DataDir()
-	if err != nil {
-		return err
-	}
-	saveFile := filepath.Join(dataDir, "save.gob")
-	_, err = os.Stat(saveFile)
-	if err == nil {
-		err := os.Remove(saveFile)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+	return g.RemoveDataFile("save.gob")
 }
 
 func (g *game) Load() (bool, error) {
@@ -87,4 +75,71 @@ func (g *game) Load() (bool, error) {
 	}
 	*g = *lg
 	return true, nil
+}
+
+func (g *game) SaveConfig() error {
+	dataDir, err := g.DataDir()
+	if err != nil {
+		g.Print(err.Error())
+		return err
+	}
+	saveFile := filepath.Join(dataDir, "config.gob")
+	c := &config{
+		RuneNormalModeKeys: runeNormalKeyActions,
+		RuneTargetModeKeys: runeTargetingKeyActions}
+	data, err := c.ConfigSave()
+	if err != nil {
+		g.Print(err.Error())
+		return err
+	}
+	err = ioutil.WriteFile(saveFile, data, 0644)
+	if err != nil {
+		g.Print(err.Error())
+		return err
+	}
+	return nil
+}
+
+func (g *game) LoadConfig() (bool, error) {
+	dataDir, err := g.DataDir()
+	if err != nil {
+		return false, err
+	}
+	saveFile := filepath.Join(dataDir, "config.gob")
+	_, err = os.Stat(saveFile)
+	if err != nil {
+		// no save file, new game
+		return false, err
+	}
+	data, err := ioutil.ReadFile(saveFile)
+	if err != nil {
+		return true, err
+	}
+	c, err := g.DecodeConfigSave(data)
+	if err != nil {
+		return true, err
+	}
+	if c.RuneNormalModeKeys != nil {
+		runeNormalKeyActions = c.RuneNormalModeKeys
+	}
+	if c.RuneTargetModeKeys != nil {
+		runeTargetingKeyActions = c.RuneTargetModeKeys
+	}
+	return true, nil
+}
+
+func (g *game) RemoveDataFile(file string) error {
+	dataDir, err := g.DataDir()
+	if err != nil {
+		return err
+	}
+	dataFile := filepath.Join(dataDir, file)
+	_, err = os.Stat(dataFile)
+	if err == nil {
+		err := os.Remove(dataFile)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

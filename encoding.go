@@ -26,6 +26,21 @@ func (g *game) GameSave() ([]byte, error) {
 	return data.Bytes(), nil
 }
 
+type config struct {
+	RuneNormalModeKeys map[rune]keyAction
+	RuneTargetModeKeys map[rune]keyAction
+}
+
+func (c *config) ConfigSave() ([]byte, error) {
+	data := bytes.Buffer{}
+	enc := gob.NewEncoder(&data)
+	err := enc.Encode(c)
+	if err != nil {
+		return nil, err
+	}
+	return data.Bytes(), nil
+}
+
 func (g *game) DecodeGameSave(data []byte) (*game, error) {
 	buf := bytes.NewBuffer(data)
 	dec := gob.NewDecoder(buf)
@@ -35,4 +50,15 @@ func (g *game) DecodeGameSave(data []byte) (*game, error) {
 		return nil, err
 	}
 	return lg, nil
+}
+
+func (g *game) DecodeConfigSave(data []byte) (*config, error) {
+	buf := bytes.NewBuffer(data)
+	dec := gob.NewDecoder(buf)
+	c := &config{}
+	err := dec.Decode(c)
+	if err != nil {
+		return nil, err
+	}
+	return c, nil
 }

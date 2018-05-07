@@ -4,6 +4,7 @@ package main
 
 import (
 	"errors"
+	"unicode"
 
 	termbox "github.com/nsf/termbox-go"
 )
@@ -112,14 +113,15 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 		again = false
 		if tev.Ch == 0 {
 			switch tev.Key {
-			case termbox.KeyArrowUp:
-				tev.Ch = 'k'
-			case termbox.KeyArrowRight:
-				tev.Ch = 'l'
-			case termbox.KeyArrowDown:
-				tev.Ch = 'j'
 			case termbox.KeyArrowLeft:
-				tev.Ch = 'h'
+				// TODO: will not work if user changes keybindings
+				tev.Ch = '4'
+			case termbox.KeyArrowDown:
+				tev.Ch = '2'
+			case termbox.KeyArrowUp:
+				tev.Ch = '8'
+			case termbox.KeyArrowRight:
+				tev.Ch = '6'
 			case termbox.KeyCtrlW:
 				ui.EnterWizard(g)
 				return nil, true, false
@@ -159,6 +161,10 @@ func (ui *termui) Scroll(n int) (m int, quit bool) {
 			case termbox.KeyEsc, termbox.KeySpace:
 				quit = true
 				return n, quit
+			case termbox.KeyArrowDown:
+				tev.Ch = '2'
+			case termbox.KeyArrowUp:
+				tev.Ch = '8'
 			}
 		}
 		switch tev.Ch {
@@ -166,9 +172,9 @@ func (ui *termui) Scroll(n int) (m int, quit bool) {
 			n -= 12
 		case 'd':
 			n += 12
-		case 'j':
+		case 'j', '2':
 			n++
-		case 'k':
+		case 'k', '8':
 			n--
 		case ' ':
 			quit = true
@@ -188,19 +194,75 @@ func (ui *termui) Scroll(n int) (m int, quit bool) {
 	return n, quit
 }
 
+func (ui *termui) ReadRuneKey() rune {
+	for {
+		switch tev := termbox.PollEvent(); tev.Type {
+		case termbox.EventKey:
+			if unicode.IsGraphic(tev.Ch) {
+				return tev.Ch
+			}
+		}
+	}
+}
+
+func (ui *termui) MenuAction(n int) (m int, action configAction) {
+	switch tev := termbox.PollEvent(); tev.Type {
+	case termbox.EventKey:
+		if tev.Ch == 0 {
+			switch tev.Key {
+			case termbox.KeyEsc, termbox.KeySpace:
+				action = QuitConfig
+				return n, action
+			case termbox.KeyArrowDown:
+				tev.Ch = '2'
+			case termbox.KeyArrowUp:
+				tev.Ch = '8'
+			}
+		}
+		switch tev.Ch {
+		case 'a':
+			action = ChangeConfig
+		case 'u':
+			n -= DungeonHeight / 2
+		case 'd':
+			n += DungeonHeight / 2
+		case 'j', '2':
+			n++
+		case 'k', '8':
+			n--
+		case 'R':
+			action = ResetConfig
+		case ' ':
+			action = QuitConfig
+		}
+	case termbox.EventMouse:
+		if tev.Ch == 0 {
+			switch tev.Key {
+			case termbox.MouseMiddle:
+				action = QuitConfig
+			case termbox.MouseWheelUp:
+				n -= 2
+			case termbox.MouseWheelDown:
+				n += 2
+			}
+		}
+	}
+	return n, action
+}
+
 func (ui *termui) TargetModeEvent(g *game, targ Targeter, pos position, data *examineData) bool {
 	switch tev := termbox.PollEvent(); tev.Type {
 	case termbox.EventKey:
 		if tev.Ch == 0 {
 			switch tev.Key {
-			case termbox.KeyArrowUp:
-				tev.Ch = 'k'
-			case termbox.KeyArrowRight:
-				tev.Ch = 'l'
-			case termbox.KeyArrowDown:
-				tev.Ch = 'j'
 			case termbox.KeyArrowLeft:
-				tev.Ch = 'h'
+				tev.Ch = '4'
+			case termbox.KeyArrowDown:
+				tev.Ch = '2'
+			case termbox.KeyArrowUp:
+				tev.Ch = '8'
+			case termbox.KeyArrowRight:
+				tev.Ch = '6'
 			case termbox.KeyEsc, termbox.KeySpace:
 				return true
 			case termbox.KeyEnter:

@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"time"
+	"unicode"
 )
 
 type AnsiCell struct {
@@ -198,12 +199,42 @@ func (ui *termui) Scroll(n int) (m int, quit bool) {
 		n -= 12
 	case 'd':
 		n += 12
-	case 'j':
+	case 'j', '2':
 		n++
-	case 'k':
+	case 'k', '8':
 		n--
 	}
 	return n, quit
+}
+
+func (ui *termui) ReadRuneKey() rune {
+	for {
+		r := ui.ReadChar()
+		if unicode.IsGraphic(r) {
+			return r
+		}
+	}
+}
+
+func (ui *termui) MenuAction(n int) (m int, action configAction) {
+	r := ui.ReadChar()
+	switch r {
+	case 'a':
+		action = ChangeConfig
+	case '\x1b', ' ':
+		action = QuitConfig
+	case 'u':
+		n -= DungeonHeight / 2
+	case 'd':
+		n += DungeonHeight / 2
+	case 'j', '2':
+		n++
+	case 'k', '8':
+		n--
+	case 'R':
+		action = ResetConfig
+	}
+	return n, action
 }
 
 func (ui *termui) TargetModeEvent(g *game, targ Targeter, pos position, data *examineData) bool {

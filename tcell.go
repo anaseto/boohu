@@ -5,6 +5,7 @@ package main
 import (
 	"errors"
 	"runtime"
+	"unicode"
 
 	"github.com/gdamore/tcell"
 )
@@ -124,14 +125,15 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 		again = false
 		key := tev.Rune()
 		switch tev.Key() {
-		case tcell.KeyUp:
-			key = 'k'
-		case tcell.KeyRight:
-			key = 'l'
-		case tcell.KeyDown:
-			key = 'j'
 		case tcell.KeyLeft:
-			key = 'h'
+			// TODO: will not work if user changes keybindings
+			key = '4'
+		case tcell.KeyDown:
+			key = '2'
+		case tcell.KeyUp:
+			key = '8'
+		case tcell.KeyRight:
+			key = '6'
 		case tcell.KeyCtrlW:
 			ui.EnterWizard(g)
 			return nil, true, false
@@ -166,18 +168,24 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 func (ui *termui) Scroll(n int) (m int, quit bool) {
 	switch tev := ui.Screen.PollEvent().(type) {
 	case *tcell.EventKey:
-		if tev.Key() == tcell.KeyEsc {
+		r := tev.Rune()
+		switch tev.Key() {
+		case tcell.KeyEsc:
 			quit = true
 			return n, quit
+		case tcell.KeyDown:
+			r = '2'
+		case tcell.KeyUp:
+			r = '8'
 		}
-		switch tev.Rune() {
+		switch r {
 		case 'u':
 			n -= 12
 		case 'd':
 			n += 12
-		case 'j':
+		case 'j', '2':
 			n++
-		case 'k':
+		case 'k', '8':
 			n--
 		case ' ':
 			quit = true
@@ -195,19 +203,73 @@ func (ui *termui) Scroll(n int) (m int, quit bool) {
 	return n, quit
 }
 
+func (ui *termui) ReadRuneKey() rune {
+	for {
+		switch tev := ui.Screen.PollEvent().(type) {
+		case *tcell.EventKey:
+			r := tev.Rune()
+			if unicode.IsGraphic(r) {
+				return r
+			}
+		}
+	}
+}
+
+func (ui *termui) MenuAction(n int) (m int, action configAction) {
+	switch tev := ui.Screen.PollEvent().(type) {
+	case *tcell.EventKey:
+		r := tev.Rune()
+		switch tev.Key() {
+		case tcell.KeyEsc:
+			action = QuitConfig
+			return n, action
+		case tcell.KeyDown:
+			r = '2'
+		case tcell.KeyUp:
+			r = '8'
+		}
+		switch r {
+		case 'a':
+			action = ChangeConfig
+		case 'u':
+			n -= DungeonHeight / 2
+		case 'd':
+			n += DungeonHeight / 2
+		case 'j', '2':
+			n++
+		case 'k', '8':
+			n--
+		case 'R':
+			action = ResetConfig
+		case ' ':
+			action = QuitConfig
+		}
+	case *tcell.EventMouse:
+		switch tev.Buttons() {
+		case tcell.WheelUp:
+			n -= 2
+		case tcell.WheelDown:
+			n += 2
+		case tcell.Button2:
+			action = QuitConfig
+		}
+	}
+	return n, action
+}
+
 func (ui *termui) TargetModeEvent(g *game, targ Targeter, pos position, data *examineData) bool {
 	switch tev := ui.Screen.PollEvent().(type) {
 	case *tcell.EventKey:
 		key := tev.Rune()
 		switch tev.Key() {
-		case tcell.KeyUp:
-			key = 'k'
-		case tcell.KeyRight:
-			key = 'l'
-		case tcell.KeyDown:
-			key = 'j'
 		case tcell.KeyLeft:
-			key = 'h'
+			key = '4'
+		case tcell.KeyDown:
+			key = '2'
+		case tcell.KeyUp:
+			key = '8'
+		case tcell.KeyRight:
+			key = '6'
 		case tcell.KeyEsc:
 			return true
 		case tcell.KeyEnter:

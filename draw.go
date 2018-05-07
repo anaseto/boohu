@@ -289,18 +289,397 @@ func (ui *termui) CleanError(err error) error {
 	return err
 }
 
+type keyAction int
+
+const (
+	KeyW keyAction = iota
+	KeyS
+	KeyN
+	KeyE
+	KeyNW
+	KeyNE
+	KeySW
+	KeySE
+	KeyRunW
+	KeyRunS
+	KeyRunN
+	KeyRunE
+	KeyRunNW
+	KeyRunNE
+	KeyRunSW
+	KeyRunSE
+	KeyRest
+	KeyWaitTurn
+	KeyDescend
+	KeyGoToStairs
+	KeyExplore
+	KeyExamine
+	KeyEquip
+	KeyDrink
+	KeyThrow
+	KeyEvoke
+	KeyCharacterInfo
+	KeyLogs
+	KeyDump
+	KeyHelp
+	KeySave
+	KeyQuit
+	KeyWizard
+	KeyWizardInfo
+
+	KeyPreviousMonster
+	KeyNextMonster
+	KeyNextObject
+	KeyDescription
+	KeyTarget
+	KeyExclude
+	KeyEscape
+
+	KeyConfigure
+)
+
+var configurableKeyActions = [...]keyAction{
+	KeyW,
+	KeyS,
+	KeyN,
+	KeyE,
+	KeyNW,
+	KeyNE,
+	KeySW,
+	KeySE,
+	KeyRunW,
+	KeyRunS,
+	KeyRunN,
+	KeyRunE,
+	KeyRunNW,
+	KeyRunNE,
+	KeyRunSW,
+	KeyRunSE,
+	KeyRest,
+	KeyWaitTurn,
+	KeyDescend,
+	KeyGoToStairs,
+	KeyExplore,
+	KeyExamine,
+	KeyEquip,
+	KeyDrink,
+	KeyThrow,
+	KeyEvoke,
+	KeyCharacterInfo,
+	KeyLogs,
+	KeyDump,
+	KeySave,
+	KeyQuit,
+	KeyPreviousMonster,
+	KeyNextMonster,
+	KeyNextObject,
+	KeyDescription,
+	KeyTarget,
+	KeyExclude}
+
+func FixedRuneKey(r rune) bool {
+	switch r {
+	case ' ', '?', '=':
+		return true
+	default:
+		return false
+	}
+}
+
+func (k keyAction) NormalModeKey() bool {
+	switch k {
+	case KeyW, KeyS, KeyN, KeyE,
+		KeyNW, KeyNE, KeySW, KeySE,
+		KeyRunW, KeyRunS, KeyRunN, KeyRunE,
+		KeyRunNW, KeyRunNE, KeyRunSW, KeyRunSE,
+		KeyRest,
+		KeyWaitTurn,
+		KeyDescend,
+		KeyGoToStairs,
+		KeyExplore,
+		KeyExamine,
+		KeyEquip,
+		KeyDrink,
+		KeyThrow,
+		KeyEvoke,
+		KeyCharacterInfo,
+		KeyLogs,
+		KeyDump,
+		KeyHelp,
+		KeySave,
+		KeyQuit,
+		KeyWizard,
+		KeyWizardInfo:
+		return true
+	default:
+		return false
+	}
+}
+
+func (k keyAction) NormalModeDescription() (text string) {
+	switch k {
+	case KeyW:
+		text = "Move west"
+	case KeyS:
+		text = "Move south"
+	case KeyN:
+		text = "Move north"
+	case KeyE:
+		text = "Move east"
+	case KeyNW:
+		text = "Move north west"
+	case KeyNE:
+		text = "Move north east"
+	case KeySW:
+		text = "Move south west"
+	case KeySE:
+		text = "Move south east"
+	case KeyRunW:
+		text = "Travel west"
+	case KeyRunS:
+		text = "Travel south"
+	case KeyRunN:
+		text = "Travel north"
+	case KeyRunE:
+		text = "Travel east"
+	case KeyRunNW:
+		text = "Travel north west"
+	case KeyRunNE:
+		text = "Travel north east"
+	case KeyRunSW:
+		text = "Travel south west"
+	case KeyRunSE:
+		text = "Travel south east"
+	case KeyRest:
+		text = "Rest"
+	case KeyWaitTurn:
+		text = "Wait a turn"
+	case KeyDescend:
+		text = "Use stairs"
+	case KeyGoToStairs:
+		text = "Go to nearest stairs"
+	case KeyExplore:
+		text = "Autoexplore"
+	case KeyExamine:
+		text = "Examine"
+	case KeyEquip:
+		text = "Equip weapon/armour/..."
+	case KeyDrink:
+		text = "Quaff potion"
+	case KeyThrow:
+		text = "Throw item"
+	case KeyEvoke:
+		text = "Evoke rode"
+	case KeyCharacterInfo:
+		text = "View Character and Quest Information"
+	case KeyLogs:
+		text = "View previous messages"
+	case KeyDump:
+		text = "Write character dump to file"
+	case KeySave:
+		text = "Save and Quit"
+	case KeyQuit:
+		text = "Quit without saving"
+	case KeyHelp:
+		text = "Help"
+	case KeyWizard:
+		text = "Wizard (debug) mode"
+	case KeyWizardInfo:
+		text = "Wizard (debug) mode information"
+	}
+	return text
+}
+
+func (k keyAction) TargetingModeDescription() (text string) {
+	switch k {
+	case KeyW:
+		text = "Move cursor west"
+	case KeyS:
+		text = "Move cursor south"
+	case KeyN:
+		text = "Move cursor north"
+	case KeyE:
+		text = "Move cursor east"
+	case KeyNW:
+		text = "Move cursor north west"
+	case KeyNE:
+		text = "Move cursor north east"
+	case KeySW:
+		text = "Move cursor south west"
+	case KeySE:
+		text = "Move cursor south east"
+	case KeyRunW:
+		text = "Big move cursor west"
+	case KeyRunS:
+		text = "Big move cursor south"
+	case KeyRunN:
+		text = "Big move north"
+	case KeyRunE:
+		text = "Big move east"
+	case KeyRunNW:
+		text = "Big move north west"
+	case KeyRunNE:
+		text = "Big move north east"
+	case KeyRunSW:
+		text = "Big move south west"
+	case KeyRunSE:
+		text = "Big move south east"
+	case KeyDescend:
+		text = "Target next stair"
+	case KeyPreviousMonster:
+		text = "Target previous monster"
+	case KeyNextMonster:
+		text = "Target next monster"
+	case KeyNextObject:
+		text = "Target next object"
+	case KeyDescription:
+		text = "View target description"
+	case KeyTarget:
+		text = "Go to/select target"
+	case KeyExclude:
+		text = "Toggle exclude area from auto-travel"
+	case KeyEscape:
+		text = "Quit targeting mode"
+	}
+	return text
+}
+
+func (k keyAction) TargetingModeKey() bool {
+	switch k {
+	case KeyW, KeyS, KeyN, KeyE,
+		KeyNW, KeyNE, KeySW, KeySE,
+		KeyRunW, KeyRunS, KeyRunN, KeyRunE,
+		KeyRunNW, KeyRunNE, KeyRunSW, KeyRunSE,
+		KeyDescend,
+		KeyPreviousMonster,
+		KeyNextMonster,
+		KeyNextObject,
+		KeyDescription,
+		KeyTarget,
+		KeyExclude,
+		KeyEscape:
+		return true
+	default:
+		return false
+	}
+}
+
+var runeNormalKeyActions map[rune]keyAction
+var runeTargetingKeyActions map[rune]keyAction
+
+func ApplyDefaultKeyBindings() {
+	runeNormalKeyActions = map[rune]keyAction{
+		'h': KeyW,
+		'j': KeyS,
+		'k': KeyN,
+		'l': KeyE,
+		'y': KeyNW,
+		'u': KeyNE,
+		'b': KeySW,
+		'n': KeySE,
+		'4': KeyW,
+		'2': KeyS,
+		'8': KeyN,
+		'6': KeyE,
+		'7': KeyNW,
+		'9': KeyNE,
+		'1': KeySW,
+		'3': KeySE,
+		'H': KeyRunW,
+		'J': KeyRunS,
+		'K': KeyRunN,
+		'L': KeyRunE,
+		'Y': KeyRunNW,
+		'U': KeyRunNE,
+		'B': KeyRunSW,
+		'N': KeyRunSE,
+		'.': KeyWaitTurn,
+		'5': KeyWaitTurn,
+		'r': KeyRest,
+		'>': KeyDescend,
+		'D': KeyDescend,
+		'G': KeyGoToStairs,
+		'o': KeyExplore,
+		'x': KeyExamine,
+		'e': KeyEquip,
+		'g': KeyEquip,
+		',': KeyEquip,
+		'q': KeyDrink,
+		'a': KeyDrink,
+		't': KeyThrow,
+		'f': KeyThrow,
+		'v': KeyEvoke,
+		'z': KeyEvoke,
+		'%': KeyCharacterInfo,
+		'C': KeyCharacterInfo,
+		'm': KeyLogs,
+		'#': KeyDump,
+		'?': KeyHelp,
+		'S': KeySave,
+		'Q': KeyQuit,
+		'W': KeyWizard,
+		'@': KeyWizardInfo,
+		'=': KeyConfigure,
+	}
+	runeTargetingKeyActions = map[rune]keyAction{
+		'h': KeyW,
+		'j': KeyS,
+		'k': KeyN,
+		'l': KeyE,
+		'y': KeyNW,
+		'u': KeyNE,
+		'b': KeySW,
+		'n': KeySE,
+		'4': KeyW,
+		'2': KeyS,
+		'8': KeyN,
+		'6': KeyE,
+		'7': KeyNW,
+		'9': KeyNE,
+		'1': KeySW,
+		'3': KeySE,
+		'H': KeyRunW,
+		'J': KeyRunS,
+		'K': KeyRunN,
+		'L': KeyRunE,
+		'Y': KeyRunNW,
+		'U': KeyRunNE,
+		'B': KeyRunSW,
+		'N': KeyRunSE,
+		'>': KeyDescend,
+		'D': KeyDescend,
+		'-': KeyPreviousMonster,
+		'+': KeyNextMonster,
+		'o': KeyNextObject,
+		'v': KeyDescription,
+		'd': KeyDescription,
+		'.': KeyTarget,
+		'e': KeyExclude,
+		' ': KeyEscape,
+		'?': KeyHelp}
+}
+
 func (ui *termui) HandleCharacter(g *game, ev event, c rune) (err error, again bool, quit bool) {
-	switch c {
-	case 'h', '4', 'l', '6', 'j', '2', 'k', '8',
-		'y', '7', 'b', '1', 'u', '9', 'n', '3':
-		err = g.MovePlayer(g.Player.Pos.To(KeyToDir(c)), ev)
-	case 'H', 'L', 'J', 'K', 'Y', 'B', 'U', 'N':
-		err = g.GoToDir(KeyToDir(c), ev)
-	case '.', '5':
+	k, ok := runeNormalKeyActions[c]
+	if !ok {
+		switch c {
+		case 's':
+			err = errors.New("Unknown key. Did you mean capital S for save and quit?")
+		default:
+			err = fmt.Errorf("Unknown key '%c'. Type ? for help.", c)
+		}
+		return err, again, quit
+	}
+	switch k {
+	case KeyW, KeyS, KeyN, KeyE, KeyNW, KeyNE, KeySW, KeySE:
+		err = g.MovePlayer(g.Player.Pos.To(KeyToDir(k)), ev)
+	case KeyRunW, KeyRunS, KeyRunN, KeyRunE, KeyRunNW, KeyRunNE, KeyRunSW, KeyRunSE:
+		err = g.GoToDir(KeyToDir(k), ev)
+	case KeyWaitTurn:
 		g.WaitTurn(ev)
-	case 'r':
+	case KeyRest:
 		err = g.Rest(ev)
-	case '>', 'D':
+	case KeyDescend:
 		if g.Stairs[g.Player.Pos] {
 			if g.Descend(ev) {
 				ui.Win(g)
@@ -311,7 +690,7 @@ func (ui *termui) HandleCharacter(g *game, ev event, c rune) (err error, again b
 		} else {
 			err = errors.New("No stairs here.")
 		}
-	case 'G':
+	case KeyGoToStairs:
 		stairs := g.StairsSlice()
 		sortedStairs := g.SortedNearestTo(stairs, g.Player.Pos)
 		if len(sortedStairs) > 0 {
@@ -322,20 +701,20 @@ func (ui *termui) HandleCharacter(g *game, ev event, c rune) (err error, again b
 		} else {
 			err = errors.New("You cannot go to any stairs.")
 		}
-	case 'e', 'g', ',':
+	case KeyEquip:
 		err = ui.Equip(g, ev)
-	case 'q', 'a':
+	case KeyDrink:
 		err = ui.SelectPotion(g, ev)
 		err = ui.CleanError(err)
-	case 't', 'f':
+	case KeyThrow:
 		err = ui.SelectProjectile(g, ev)
 		err = ui.CleanError(err)
-	case 'v', 'z':
+	case KeyEvoke:
 		err = ui.SelectRod(g, ev)
 		err = ui.CleanError(err)
-	case 'o':
+	case KeyExplore:
 		err = g.Autoexplore(ev)
-	case 'x':
+	case KeyExamine:
 		b := ui.Examine(g, nil)
 		ui.DrawDungeonView(g, NormalMode)
 		if !b {
@@ -343,16 +722,16 @@ func (ui *termui) HandleCharacter(g *game, ev event, c rune) (err error, again b
 		} else if !g.MoveToTarget(ev) {
 			again = true
 		}
-	case '?':
+	case KeyHelp:
 		ui.KeysHelp(g)
 		again = true
-	case '%', 'C':
+	case KeyCharacterInfo:
 		ui.CharacterInfo(g)
 		again = true
-	case 'm':
+	case KeyLogs:
 		ui.DrawPreviousLogs(g)
 		again = true
-	case 'S':
+	case KeySave:
 		ev.Renew(g, 0)
 		err := g.Save()
 		if err != nil {
@@ -362,9 +741,7 @@ func (ui *termui) HandleCharacter(g *game, ev event, c rune) (err error, again b
 			ui.PressAnyKey()
 		}
 		quit = true
-	case 's':
-		err = errors.New("Unknown key. Did you mean capital S for save and quit?")
-	case '#':
+	case KeyDump:
 		err := g.WriteDump()
 		if err != nil {
 			g.PrintStyled("Error writing dump to file.", logError)
@@ -373,21 +750,24 @@ func (ui *termui) HandleCharacter(g *game, ev event, c rune) (err error, again b
 			g.Printf("Dump written to %s.", filepath.Join(dataDir, "dump"))
 		}
 		again = true
-	case '@':
+	case KeyWizardInfo:
 		if g.Wizard {
 			ui.WizardInfo(g)
 			again = true
 		} else {
 			err = errors.New("Unknown key. Type ? for help.")
 		}
-	case 'W':
+	case KeyWizard:
 		ui.EnterWizard(g)
 		return nil, true, false
-	case 'Q':
+	case KeyQuit:
 		if ui.Quit(g) {
 			return nil, false, true
 		}
 		return nil, true, false
+	case KeyConfigure:
+		ui.Configure(g)
+		again = true
 	default:
 		err = fmt.Errorf("Unknown key '%c'. Type ? for help.", c)
 	}
@@ -464,6 +844,7 @@ func (ui *termui) KeysHelp(g *game) {
 		"Write character dump to file", "#",
 		"Save and Quit", "S",
 		"Quit without saving", "Q",
+		"Change key bindings", "=",
 	})
 }
 
@@ -705,45 +1086,49 @@ func (ui *termui) CursorMouseLeft(g *game, targ Targeter, pos position) bool {
 }
 
 func (ui *termui) CursorCharAction(g *game, targ Targeter, r rune, pos position, data *examineData) bool {
-	switch r {
-	case 'h', '4', 'l', '6', 'j', '2', 'k', '8',
-		'y', '7', 'b', '1', 'u', '9', 'n', '3':
-		data.npos = pos.To(KeyToDir(r))
-	case 'H', 'L', 'J', 'K', 'Y', 'B', 'U', 'N':
+	k, ok := runeTargetingKeyActions[r]
+	if !ok {
+		g.Printf("Invalid targeting mode key '%c'. Type ? for help.", r)
+		return false
+	}
+	switch k {
+	case KeyW, KeyS, KeyN, KeyE, KeyNW, KeyNE, KeySW, KeySE:
+		data.npos = pos.To(KeyToDir(k))
+	case KeyRunW, KeyRunS, KeyRunN, KeyRunE, KeyRunNW, KeyRunNE, KeyRunSW, KeyRunSE:
 		for i := 0; i < 5; i++ {
-			p := data.npos.To(KeyToDir(r))
+			p := data.npos.To(KeyToDir(k))
 			if !p.valid() {
 				break
 			}
 			data.npos = p
 		}
-	case '>', 'D':
+	case KeyDescend:
 		ui.NextStair(g, data)
-	case '+', '-':
+	case KeyPreviousMonster, KeyNextMonster:
 		ui.NextMonster(g, r, pos, data)
-	case 'o':
+	case KeyNextObject:
 		ui.NextObject(g, pos, data)
-	case 'v', 'd':
+	case KeyDescription:
 		ui.HideCursor()
 		ui.ViewPositionDescription(g, pos)
 		ui.SetCursor(pos)
-	case '?':
+	case KeyHelp:
 		ui.HideCursor()
 		ui.ExamineHelp(g)
 		ui.SetCursor(pos)
-	case '.':
+	case KeyTarget:
 		err := targ.Action(g, pos)
 		if err != nil {
 			g.Print(err.Error())
 		} else {
 			return true
 		}
-	case 'e':
+	case KeyExclude:
 		ui.ExcludeZone(g, pos)
-	case ' ':
+	case KeyEscape:
 		return true
 	default:
-		g.Print("Invalid key. Type ? for help.")
+		g.Printf("Invalid targeting mode key '%c'. Type ? for help.", r)
 	}
 	return false
 }
@@ -1291,6 +1676,129 @@ func (ui *termui) DrawLog(g *game) {
 			ui.DrawColoredText(e.String(), 2, DungeonHeight+1+i, fguicolor)
 		} else {
 			ui.DrawColoredText(e.String(), 0, DungeonHeight+1+i, fguicolor)
+		}
+	}
+}
+
+func InRuneSlice(r rune, s []rune) bool {
+	for _, rr := range s {
+		if r == rr {
+			return true
+		}
+	}
+	return false
+}
+
+func (ui *termui) RunesForKeyAction(k keyAction) string {
+	runes := []rune{}
+	for r, ka := range runeNormalKeyActions {
+		if k == ka && !InRuneSlice(r, runes) {
+			runes = append(runes, r)
+		}
+	}
+	for r, ka := range runeTargetingKeyActions {
+		if k == ka && !InRuneSlice(r, runes) {
+			runes = append(runes, r)
+		}
+	}
+	chars := strings.Split(string(runes), "")
+	sort.Strings(chars)
+	text := strings.Join(chars, " or ")
+	return text
+}
+
+type configAction int
+
+const (
+	NavigateConfig configAction = iota
+	ChangeConfig
+	ResetConfig
+	QuitConfig
+)
+
+func (ui *termui) Configure(g *game) {
+	lines := DungeonHeight
+	nmax := len(configurableKeyActions) - lines
+	n := 0
+	s := 0
+loop:
+	for {
+		ui.DrawDungeonView(g, NoFlushMode)
+		if n >= nmax {
+			n = nmax
+		}
+		if n < 0 {
+			n = 0
+		}
+		to := n + lines
+		if to >= len(configurableKeyActions) {
+			to = len(configurableKeyActions)
+		}
+		for i := n; i < to; i++ {
+			ka := configurableKeyActions[i]
+			desc := ka.NormalModeDescription()
+			if !ka.NormalModeKey() {
+				desc = ka.TargetingModeDescription()
+			}
+			bg := ui.ListItemBG(i)
+			ui.ClearLineWithColor(i-n, bg)
+			desc = fmt.Sprintf(" %-36s %s", desc, ui.RunesForKeyAction(ka))
+			if i == s {
+				ui.DrawColoredTextOnBG(desc, 0, i-n, ColorYellow, bg)
+			} else {
+				ui.DrawColoredTextOnBG(desc, 0, i-n, ColorFg, bg)
+			}
+		}
+		ui.ClearLine(lines)
+		ui.DrawStyledTextLine(" add key (a) up/down (arrows/u/d) reset (R) quit (esc or space) ", lines, FooterLine)
+		ui.Flush()
+
+		var action configAction
+		s, action = ui.MenuAction(s)
+		if s >= len(configurableKeyActions) {
+			s = len(configurableKeyActions) - 1
+		}
+		if s < 0 {
+			s = 0
+		}
+		if s < n+1 {
+			n -= 12
+		}
+		if s > n+lines-2 {
+			n += 12
+		}
+		switch action {
+		case ChangeConfig:
+			ui.DrawStyledTextLine(" insert new key ", lines, FooterLine)
+			ui.Flush()
+			r := ui.ReadRuneKey()
+			if FixedRuneKey(r) {
+				g.Printf("You cannot rebind “%c”.", r)
+				continue loop
+			}
+			ka := configurableKeyActions[s]
+			if ka.NormalModeKey() {
+				runeNormalKeyActions[r] = ka
+			} else {
+				delete(runeNormalKeyActions, r)
+			}
+			if ka.TargetingModeKey() {
+				runeTargetingKeyActions[r] = ka
+			} else {
+				delete(runeTargetingKeyActions, r)
+			}
+			err := g.SaveConfig()
+			if err != nil {
+				g.Print(err.Error())
+			}
+		case QuitConfig:
+			break loop
+		case ResetConfig:
+			ApplyDefaultKeyBindings()
+			err := g.RemoveDataFile("config.gob")
+			if err != nil {
+				g.Print(err.Error())
+			}
 		}
 	}
 }
