@@ -1834,6 +1834,9 @@ loop:
 				ui.DrawColoredText(e.String(), 0, i-n, fguicolor)
 			}
 		}
+		for i := len(g.Log); i < DungeonHeight+4; i++ {
+			ui.ClearLine(i - n)
+		}
 		ui.ClearLine(lines)
 		s := fmt.Sprintf(" half-page up/down (u/d) quit (esc or space) — (%d/%d) \n", len(g.Log)-to, len(g.Log))
 		ui.DrawStyledTextLine(s, lines, FooterLine)
