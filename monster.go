@@ -1126,7 +1126,7 @@ func (m *monster) MakeHuntIfHurt(g *game) {
 
 func (m *monster) MakeAwareIfHurt(g *game) {
 	if g.Player.LOS[m.Pos] && m.State != Hunting {
-		m.MakeAwareIfHurt(g)
+		m.MakeHuntIfHurt(g)
 		return
 	}
 	if m.State != Resting {
