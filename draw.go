@@ -1125,7 +1125,7 @@ func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgCol
 		fgColor = ColorFgDark
 		bgColor = ColorBgDark
 	}
-	if g.ExclusionsMap[pos] {
+	if g.ExclusionsMap[pos] && c.T != WallCell {
 		fgColor = ColorFgExcluded
 	}
 	switch c.T {

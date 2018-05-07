@@ -156,21 +156,14 @@ func (g *game) SeePosition(pos position) {
 
 func (g *game) ComputeExclusion(pos position, toggle bool) {
 	exclusionRange := g.LosRange()
-	rays := g.buildRayMap(pos, exclusionRange)
-	for pos, n := range rays {
-		if n.Cost <= g.LosRange() {
-			g.ExclusionsMap[pos] = toggle
-		}
-	}
+	g.ExclusionsMap[pos] = toggle
 	for d := 1; d <= exclusionRange; d++ {
 		for x := -d + pos.X; x <= d+pos.X; x++ {
 			for _, pos := range []position{{x, pos.Y + d}, {x, pos.Y - d}} {
 				if !pos.valid() {
 					continue
 				}
-				if !g.Player.LOS[pos] {
-					g.ExclusionsMap[pos] = toggle
-				}
+				g.ExclusionsMap[pos] = toggle
 			}
 		}
 		for y := -d + 1 + pos.Y; y <= d-1+pos.Y; y++ {
@@ -178,9 +171,7 @@ func (g *game) ComputeExclusion(pos position, toggle bool) {
 				if !pos.valid() {
 					continue
 				}
-				if !g.Player.LOS[pos] {
-					g.ExclusionsMap[pos] = toggle
-				}
+				g.ExclusionsMap[pos] = toggle
 			}
 		}
 	}
