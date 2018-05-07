@@ -441,7 +441,7 @@ func (g *game) StairsSlice() []position {
 }
 
 func (g *game) GenCollectables() {
-	rounds := 20
+	rounds := 50
 	for i := 0; i < rounds; i++ {
 		for c, data := range ConsumablesCollectData {
 			var r int
