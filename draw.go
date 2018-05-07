@@ -1050,21 +1050,18 @@ func (ui *termui) ThrowAnimation(g *game, ray []position, hit bool) {
 	}
 	if hit {
 		pos := ray[0]
-		mons, _ := g.MonsterAt(pos)
-		ui.HitAnimation(g, mons, true)
+		ui.HitAnimation(g, pos, true)
 	}
 	time.Sleep(25 * time.Millisecond)
 }
 
-func (ui *termui) HitAnimation(g *game, mons *monster, targeting bool) {
-	if mons == nil {
-		return
-	}
-	_, _, bgColor := ui.PositionDrawing(g, mons.Pos)
+func (ui *termui) HitAnimation(g *game, pos position, targeting bool) {
+	_, _, bgColor := ui.PositionDrawing(g, pos)
+	mons, _ := g.MonsterAt(pos)
 	if mons.Exists() {
-		ui.DrawAtPosition(g, mons.Pos, targeting, '¤', ColorFgAnimationHit, bgColor)
+		ui.DrawAtPosition(g, pos, targeting, '¤', ColorFgAnimationHit, bgColor)
 	} else {
-		ui.DrawAtPosition(g, mons.Pos, targeting, '∞', ColorFgAnimationHit, bgColor)
+		ui.DrawAtPosition(g, pos, targeting, '∞', ColorFgAnimationHit, bgColor)
 	}
 	ui.Flush()
 	time.Sleep(75 * time.Millisecond)
