@@ -17,11 +17,11 @@ func (g *game) HitDamage(dt dmgType, base int, armor int) int {
 func (m *monster) InflictDamage(g *game, damage, max int) {
 	oldHP := g.Player.HP
 	g.Player.HP -= damage
+	g.ui.WoundedAnimation(g)
 	if oldHP > max && g.Player.HP <= max {
 		g.StoryPrintf("Critical HP: %d (hit by %s)", g.Player.HP, m.Kind.Indefinite(false))
 		g.ui.CriticalHPWarning(g)
 	}
-	g.ui.WoundedAnimation(g)
 }
 
 func (g *game) MakeMonstersAware() {

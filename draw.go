@@ -1627,7 +1627,7 @@ func (ui *termui) WoundedAnimation(g *game) {
 	ui.DrawAtPosition(g, g.Player.Pos, false, r, ColorFgHPwounded, bg)
 	ui.Flush()
 	time.Sleep(75 * time.Millisecond)
-	if g.Player.HP < 15 {
+	if g.Player.HP <= 15 {
 		ui.DrawAtPosition(g, g.Player.Pos, false, r, ColorFgHPcritical, bg)
 		ui.Flush()
 		time.Sleep(75 * time.Millisecond)
