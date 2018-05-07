@@ -65,6 +65,7 @@ type Renderer interface {
 	MagicMappingAnimation(*game, []int)
 	HitAnimation(*game, position, bool)
 	WoundedAnimation(*game)
+	ProjectileTrajectoryAnimation(*game, []position, uicolor)
 	DrawDungeonView(*game, uiMode)
 }
 
@@ -273,7 +274,7 @@ func (g *game) InitPlayer() {
 	// Testing
 	// g.Player.Aptitudes[AptSmoke] = true
 	//g.Player.Rods[RodSwapping] = &rodProps{Charge: 3}
-	//g.Player.Rods[RodFireball] = &rodProps{Charge: 3}
+	g.Player.Rods[RodFireball] = &rodProps{Charge: 3}
 	//g.Player.Rods[RodFog] = &rodProps{Charge: 3}
 	//g.Player.Consumables[MagicMappingPotion] = 1
 	//g.Player.Consumables[ExplosiveMagara] = 5

@@ -453,6 +453,7 @@ func (g *game) ThrowExplosiveMagara(ev event) error {
 	neighbors := g.Dungeon.FreeNeighbors(g.Player.Target)
 	g.Print("You throw the explosive magara, which gives a noisy pop.")
 	g.MakeNoise(18, g.Player.Target)
+	g.ui.ProjectileTrajectoryAnimation(g, g.Ray(g.Player.Target), ColorFgPlayer)
 	g.ui.ExplosionAnimation(g, FireExplosion, g.Player.Target)
 	for _, pos := range append(neighbors, g.Player.Target) {
 		g.Burn(pos, ev)

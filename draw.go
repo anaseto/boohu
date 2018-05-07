@@ -976,9 +976,20 @@ const (
 	AroundWallExplosion
 )
 
+func (ui *termui) ProjectileTrajectoryAnimation(g *game, ray []position, fg uicolor) {
+	for i := len(ray) - 1; i >= 0; i-- {
+		pos := ray[i]
+		r, fgColor, bgColor := ui.PositionDrawing(g, pos)
+		ui.DrawAtPosition(g, pos, true, '•', fg, bgColor)
+		ui.Flush()
+		time.Sleep(25 * time.Millisecond)
+		ui.DrawAtPosition(g, pos, true, r, fgColor, bgColor)
+	}
+}
+
 func (ui *termui) ExplosionAnimation(g *game, es explosionStyle, pos position) {
 	ui.DrawDungeonView(g, NormalMode)
-	time.Sleep(25 * time.Millisecond)
+	time.Sleep(20 * time.Millisecond)
 	// TODO: use new specific variables for colors
 	colors := [2]uicolor{ColorFgExplosionStart, ColorFgExplosionEnd}
 	if es == WallExplosion || es == AroundWallExplosion {
@@ -1045,7 +1056,7 @@ func (ui *termui) ThrowAnimation(g *game, ray []position, hit bool) {
 		r, fgColor, bgColor := ui.PositionDrawing(g, pos)
 		ui.DrawAtPosition(g, pos, true, ui.ProjectileSymbol(pos.Dir(g.Player.Pos)), ColorFgProjectile, bgColor)
 		ui.Flush()
-		time.Sleep(20 * time.Millisecond)
+		time.Sleep(25 * time.Millisecond)
 		ui.DrawAtPosition(g, pos, true, r, fgColor, bgColor)
 	}
 	if hit {
