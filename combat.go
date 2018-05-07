@@ -21,6 +21,7 @@ func (m *monster) InflictDamage(g *game, damage, max int) {
 		g.StoryPrintf("Critical HP: %d (hit by %s)", g.Player.HP, m.Kind.Indefinite(false))
 		g.ui.CriticalHPWarning(g)
 	}
+	g.ui.WoundedAnimation(g)
 }
 
 func (g *game) MakeMonstersAware() {

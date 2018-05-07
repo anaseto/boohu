@@ -1610,16 +1610,28 @@ func (ui *termui) CriticalHPWarning(g *game) {
 	g.PrintStyled("*** CRITICAL HP WARNING *** --press esc or space to continue--", logCritic)
 	ui.DrawDungeonView(g, NormalMode)
 	r, fg, bg := ui.PositionDrawing(g, g.Player.Pos)
-	ui.DrawAtPosition(g, g.Player.Pos, true, r, ColorFgHPwounded, bg)
+	ui.DrawAtPosition(g, g.Player.Pos, false, r, ColorFgHPwounded, bg)
 	ui.Flush()
 	time.Sleep(75 * time.Millisecond)
-	ui.DrawAtPosition(g, g.Player.Pos, true, r, ColorFgHPcritical, bg)
+	ui.DrawAtPosition(g, g.Player.Pos, false, r, ColorFgHPcritical, bg)
 	ui.Flush()
 	time.Sleep(75 * time.Millisecond)
-	ui.DrawAtPosition(g, g.Player.Pos, true, r, fg, bg)
+	ui.DrawAtPosition(g, g.Player.Pos, false, r, fg, bg)
 	ui.Flush()
 	ui.WaitForContinue(g)
 	g.Print("Ok. Be careful, then.")
+}
+
+func (ui *termui) WoundedAnimation(g *game) {
+	r, _, bg := ui.PositionDrawing(g, g.Player.Pos)
+	ui.DrawAtPosition(g, g.Player.Pos, false, r, ColorFgHPwounded, bg)
+	ui.Flush()
+	time.Sleep(75 * time.Millisecond)
+	if g.Player.HP < 15 {
+		ui.DrawAtPosition(g, g.Player.Pos, false, r, ColorFgHPcritical, bg)
+		ui.Flush()
+		time.Sleep(75 * time.Millisecond)
+	}
 }
 
 func (ui *termui) DrinkingPotionAnimation(g *game) {

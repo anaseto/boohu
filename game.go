@@ -64,6 +64,7 @@ type Renderer interface {
 	TeleportAnimation(*game, position, position, bool)
 	MagicMappingAnimation(*game, []int)
 	HitAnimation(*game, position, bool)
+	WoundedAnimation(*game)
 	DrawDungeonView(*game, uiMode)
 }
 
