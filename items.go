@@ -494,7 +494,7 @@ var ConsumablesCollectData = map[consumable]collectData{
 	CBlinkPotion:        {rarity: 12, quantity: 1},
 	Javelin:             {rarity: 3, quantity: 3},
 	ConfusingDart:       {rarity: 5, quantity: 2},
-	ExplosiveMagara:     {rarity: 10, quantity: 1},
+	ExplosiveMagara:     {rarity: 12, quantity: 1},
 }
 
 type equipable interface {
