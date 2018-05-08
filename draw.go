@@ -181,6 +181,7 @@ func (ui *termui) DrawWelcome() {
 	line := 5
 	rcol := col + 20
 	ColorText := ColorFgHPok
+	ui.DrawDark(fmt.Sprintf("       Boohu %s", Version), col, line-2, ColorText)
 	ui.DrawDark("────│\\/\\/\\/\\/\\/\\/\\/│────", col, line, ColorText)
 	line++
 	ui.DrawDark("##", col, line, ColorFgDark)
