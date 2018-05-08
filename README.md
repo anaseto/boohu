@@ -1,4 +1,4 @@
-This is Break Out Of Hareka's Underground (Boohu), a roguelike game which takes
+Break Out Of Hareka's Underground (Boohu) is a roguelike game that takes
 inspiration mainly from DCSS and its tavern, and some ideas from Brogue, but
 aiming for very short games, almost no character building, and simplified
 inventory management.
