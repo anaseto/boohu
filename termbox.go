@@ -198,7 +198,7 @@ func (ui *termui) ReadRuneKey() rune {
 	for {
 		switch tev := termbox.PollEvent(); tev.Type {
 		case termbox.EventKey:
-			if unicode.IsGraphic(tev.Ch) {
+			if unicode.IsPrint(tev.Ch) {
 				return tev.Ch
 			}
 		}
