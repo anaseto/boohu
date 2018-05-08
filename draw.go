@@ -36,7 +36,7 @@ var (
 var (
 	ColorBg,
 	ColorBgBorder,
-	ColorBgCloud,
+	ColorBgLOSalt,
 	ColorBgDark,
 	ColorBgLOS,
 	ColorFg,
@@ -73,7 +73,7 @@ var (
 func LinkColors() {
 	ColorBg = ColorBase03
 	ColorBgBorder = ColorBase02
-	ColorBgCloud = ColorBase2
+	ColorBgLOSalt = ColorBase2
 	ColorBgDark = ColorBase03
 	ColorBgLOS = ColorBase3
 	ColorFg = ColorBase0
@@ -184,52 +184,61 @@ func (ui *termui) DrawWelcome() {
 	ui.DrawDark("────│\\/\\/\\/\\/\\/\\/\\/│────", col, line, ColorText)
 	line++
 	ui.DrawDark("##", col, line, ColorFgDark)
-	ui.DrawLight("##", col+2, line, ColorFgLOS)
+	ui.DrawLight("#", col+2, line, ColorFgLOS)
+	ui.DrawLightAlt("#", col+3, line, ColorFgLOS)
 	ui.DrawDark("│              │", col+4, line, ColorText)
 	ui.DrawDark("####", rcol, line, ColorFgDark)
 	line++
 	ui.DrawDark("#.", col, line, ColorFgDark)
-	ui.DrawLight("..", col+2, line, ColorFgLOS)
+	ui.DrawLightAlt(".", col+2, line, ColorFgLOS)
+	ui.DrawLight(".", col+3, line, ColorFgLOS)
 	ui.DrawDark("│              │", col+4, line, ColorText)
-	ui.DrawDark("...#", rcol, line, ColorFgDark)
+	ui.DrawDark(".", rcol, line, ColorFgDark)
+	ui.DrawDark("♣", rcol+1, line, ColorFgSimellas)
+	ui.DrawDark(".#", rcol+2, line, ColorFgDark)
 	line++
 	ui.DrawDark("##", col, line, ColorFgDark)
 	ui.DrawLight("!", col+2, line, ColorFgCollectable)
-	ui.DrawLight(".", col+3, line, ColorFgLOS)
+	ui.DrawLightAlt(".", col+3, line, ColorFgLOS)
 	ui.DrawDark("│              │", col+4, line, ColorText)
 	ui.DrawDark("│  BREAK       │", col+4, line, ColorText)
 	ui.DrawDark(".###", rcol, line, ColorFgDark)
 	line++
 	ui.DrawDark(" #", col, line, ColorFgDark)
-	ui.DrawLight("gG", col+2, line, ColorFgMonster)
+	ui.DrawLightAlt("g", col+2, line, ColorFgMonster)
+	ui.DrawLight("G", col+3, line, ColorFgMonster)
 	ui.DrawDark("│  OUT OF      │", col+4, line, ColorText)
 	ui.DrawDark("##  ", rcol, line, ColorFgDark)
 	line++
-	ui.DrawLight("##", col, line, ColorFgLOS)
-	ui.DrawLight("Dg", col+2, line, ColorFgMonster)
+	ui.DrawLight("#", col, line, ColorFgLOS)
+	ui.DrawLightAlt("#", col+1, line, ColorFgLOS)
+	ui.DrawLight("D", col+2, line, ColorFgMonster)
+	ui.DrawLightAlt("g", col+3, line, ColorFgMonster)
 	ui.DrawDark("│  HAREKA'S    │", col+4, line, ColorText)
 	ui.DrawDark(".## ", rcol, line, ColorFgDark)
 	line++
-	ui.DrawLight("#", col, line, ColorFgLOS)
+	ui.DrawLightAlt("#", col, line, ColorFgLOS)
 	ui.DrawLight("@", col+1, line, ColorFgPlayer)
-	ui.DrawLight("#", col+2, line, ColorFgLOS)
+	ui.DrawLightAlt("#", col+2, line, ColorFgLOS)
 	ui.DrawDark("#", col+3, line, ColorFgDark)
 	ui.DrawDark("│  UNDERGROUND │", col+4, line, ColorText)
-	ui.DrawDark("..##", rcol, line, ColorFgDark)
+	ui.DrawDark("\".##", rcol, line, ColorFgDark)
 	line++
-	ui.DrawLight("#.#", col, line, ColorFgLOS)
+	ui.DrawLight("#", col, line, ColorFgLOS)
+	ui.DrawLightAlt(".", col+1, line, ColorFgLOS)
+	ui.DrawLight("#", col+2, line, ColorFgLOS)
 	ui.DrawDark("#", col+3, line, ColorFgDark)
 	ui.DrawDark("│              │", col+4, line, ColorText)
 	ui.DrawDark("#.", rcol, line, ColorFgDark)
 	ui.DrawDark(">", rcol+2, line, ColorFgPlace)
 	ui.DrawDark("#", rcol+3, line, ColorFgDark)
 	line++
-	ui.DrawLight("#", col, line, ColorFgLOS)
+	ui.DrawLightAlt("#", col, line, ColorFgLOS)
 	ui.DrawLight("[", col+1, line, ColorFgCollectable)
-	ui.DrawLight(".", col+2, line, ColorFgLOS)
+	ui.DrawLightAlt(".", col+2, line, ColorFgLOS)
 	ui.DrawDark("##", col+3, line, ColorFgDark)
 	ui.DrawDark("│              │", col+4, line, ColorFgHPok)
-	ui.DrawDark("..##", rcol, line, ColorFgDark)
+	ui.DrawDark("\"\"##", rcol, line, ColorFgDark)
 	line++
 	ui.DrawDark("────│/\\/\\/\\/\\/\\/\\/\\│────", col, line, ColorText)
 	line++
@@ -259,6 +268,14 @@ func (ui *termui) DrawLight(text string, x, y int, fg uicolor) {
 	col := 0
 	for _, r := range text {
 		ui.SetCell(x+col, y, r, fg, ColorBgLOS)
+		col++
+	}
+}
+
+func (ui *termui) DrawLightAlt(text string, x, y int, fg uicolor) {
+	col := 0
+	for _, r := range text {
+		ui.SetCell(x+col, y, r, fg, ColorBgLOSalt)
 		col++
 	}
 }
@@ -1503,9 +1520,9 @@ func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgCol
 		fgColor = ColorFgLOS
 		bgColor = ColorBgLOS
 		if pos.X%2 == 1 && pos.Y%2 == 0 {
-			bgColor = ColorBgCloud
+			bgColor = ColorBgLOSalt
 		} else if pos.X%2 == 0 && pos.Y%2 == 1 {
-			bgColor = ColorBgCloud
+			bgColor = ColorBgLOSalt
 		}
 		//if _, ok := g.Clouds[pos]; ok {
 		//bgColor = ColorBgCloud
