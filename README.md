@@ -12,13 +12,14 @@ simellas, as well as various helpful items. You will also encounter monsters,
 fight against them, or run away from them when you can…
 
 ![boohu intro screen](https://raw.githubusercontent.com/anaseto/boohu/master/img/intro-screen.png)
+![Boohu introduction screen](https://raw.githubusercontent.com/anaseto/boohu-pages/master/intro-screen.png)
 
 Screenshot
 ----------
 
-![Dragons](https://raw.githubusercontent.com/anaseto/boohu/master/img/dragons.png)
+[![Introduction Screeshot](https://raw.githubusercontent.com/anaseto/boohu-pages/master/screenshot.png)](https://anaseto.github.io/boohu-pages/)
 
-There are also some [asciinema screencasts](https://asciinema.org/~anaseto).
+Click on the image to see a little introduction screencast.
 
 Install
 -------
