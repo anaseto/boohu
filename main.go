@@ -11,8 +11,6 @@ import (
 	"runtime/pprof"
 )
 
-var Version string = "v0.7"
-
 func main() {
 	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to `file`")
 	opt := flag.Bool("s", false, "Use true 16-uicolor solarized palette")

@@ -13,8 +13,6 @@ import (
 	"github.com/gopherjs/gopherjs/js"
 )
 
-var Version string = "v0.7"
-
 func main() {
 	tui := &termui{}
 	err := tui.Init()
