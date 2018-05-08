@@ -1841,6 +1841,9 @@ loop:
 		if to >= len(g.Log) {
 			to = len(g.Log)
 		}
+		for i := 0; i < 4; i++ {
+			ui.SetCell(DungeonWidth, DungeonHeight+i, '│', ColorFg, ColorBg)
+		}
 		for i := n; i < to; i++ {
 			e := g.Log[i]
 			fguicolor := ui.LogColor(e)
@@ -1867,9 +1870,6 @@ loop:
 		ui.ClearLine(lines)
 		s := fmt.Sprintf(" half-page up/down (u/d) quit (esc or space) — (%d/%d) \n", len(g.Log)-to, len(g.Log))
 		ui.DrawStyledTextLine(s, lines, FooterLine)
-		for i := 0; i < 4; i++ {
-			ui.SetCell(DungeonWidth, DungeonHeight+i, '│', ColorFg, ColorBg)
-		}
 		ui.Flush()
 		var quit bool
 		n, quit = ui.Scroll(n)
