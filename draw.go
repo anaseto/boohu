@@ -1946,7 +1946,6 @@ const (
 func (ui *termui) DrawInfoLine(text string) {
 	ui.ClearLineWithColor(DungeonHeight+1, ColorBase02)
 	ui.DrawColoredTextOnBG(text, 0, DungeonHeight+1, ColorBlue, ColorBase02)
-	ui.SetCell(DungeonWidth, DungeonHeight+1, '│', ColorFg, ColorBg)
 }
 
 func (ui *termui) DrawStyledTextLine(text string, lnum int, st linestyle) {
@@ -1980,12 +1979,14 @@ func (ui *termui) ClearLine(lnum int) {
 	for i := 0; i < DungeonWidth; i++ {
 		ui.SetCell(i, lnum, ' ', ColorFg, ColorBg)
 	}
+	ui.SetCell(DungeonWidth, lnum, '│', ColorFg, ColorBg)
 }
 
 func (ui *termui) ClearLineWithColor(lnum int, bg uicolor) {
 	for i := 0; i < DungeonWidth; i++ {
 		ui.SetCell(i, lnum, ' ', ColorFg, bg)
 	}
+	ui.SetCell(DungeonWidth, lnum, '│', ColorFg, ColorBg)
 }
 
 func (ui *termui) ListItemBG(i int) uicolor {
