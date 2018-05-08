@@ -181,7 +181,7 @@ func (g *game) PlayerPath(from, to position) []position {
 func (g *game) SortedNearestTo(cells []position, to position) []position {
 	ps := posSlice{}
 	for _, pos := range cells {
-		pp := &playerPath{game: g}
+		pp := &dungeonPath{dungeon: g.Dungeon}
 		_, cost, found := AstarPath(pp, pos, to)
 		if found {
 			ps = append(ps, posCost{pos, cost})
