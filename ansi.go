@@ -210,7 +210,7 @@ func (ui *termui) Scroll(n int) (m int, quit bool) {
 func (ui *termui) ReadRuneKey() rune {
 	for {
 		r := ui.ReadChar()
-		if r == ' ' || r == '\xb1' {
+		if r == ' ' || r == '\x1b' {
 			return 0
 		}
 		if unicode.IsPrint(r) {
