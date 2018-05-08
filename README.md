@@ -24,7 +24,7 @@ short animations.
 Install
 -------
 
-You can found binaries in the [releases
+You can found latest stable binaries in the [releases
 page](https://github.com/anaseto/boohu/releases).
 
 You can also build from sources by following these steps:
