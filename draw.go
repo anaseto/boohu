@@ -1801,6 +1801,9 @@ loop:
 			ui.DrawStyledTextLine(" insert new key ", lines, FooterLine)
 			ui.Flush()
 			r := ui.ReadRuneKey()
+			if r == 0 {
+				continue loop
+			}
 			if FixedRuneKey(r) {
 				g.Printf("You cannot rebind “%c”.", r)
 				continue loop

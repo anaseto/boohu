@@ -363,6 +363,10 @@ func (ui *termui) Scroll(n int) (m int, quit bool) {
 func (ui *termui) ReadRuneKey() rune {
 	for {
 		r := ui.ReadChar()
+		switch r {
+		case '\x1b', 'E', ' ':
+			return 0
+		}
 		if unicode.IsPrint(r) {
 			return r
 		}

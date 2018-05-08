@@ -198,8 +198,17 @@ func (ui *termui) ReadRuneKey() rune {
 	for {
 		switch tev := termbox.PollEvent(); tev.Type {
 		case termbox.EventKey:
+			if tev.Ch == ' ' {
+				return 0
+			}
 			if unicode.IsPrint(tev.Ch) {
 				return tev.Ch
+			}
+			if tev.Ch == 0 {
+				switch tev.Key {
+				case termbox.KeyEsc, termbox.KeySpace:
+					return 0
+				}
 			}
 		}
 	}

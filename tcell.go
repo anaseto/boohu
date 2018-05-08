@@ -208,8 +208,15 @@ func (ui *termui) ReadRuneKey() rune {
 		switch tev := ui.Screen.PollEvent().(type) {
 		case *tcell.EventKey:
 			r := tev.Rune()
+			if r == ' ' {
+				return 0
+			}
 			if unicode.IsPrint(r) {
 				return r
+			}
+			switch tev.Key() {
+			case tcell.KeyEsc:
+				return 0
 			}
 		}
 	}
