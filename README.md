@@ -11,7 +11,6 @@ stairs will lead you back to your village. Along the way, you will collect
 simellas, as well as various helpful items. You will also encounter monsters,
 fight against them, or run away from them when you can…
 
-![boohu intro screen](https://raw.githubusercontent.com/anaseto/boohu/master/img/intro-screen.png)
 ![Boohu introduction screen](https://raw.githubusercontent.com/anaseto/boohu-pages/master/intro-screen.png)
 
 Screenshot
