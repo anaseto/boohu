@@ -1845,11 +1845,20 @@ loop:
 			e := g.Log[i]
 			fguicolor := ui.LogColor(e)
 			ui.ClearLine(i - n)
+			rc := utf8.RuneCountInString(e.Text)
+			if e.Tick {
+				rc += 2
+			}
+			if rc >= DungeonWidth {
+				for j := DungeonWidth; j < 103; j++ {
+					ui.SetCell(j, i-n, ' ', ColorFg, ColorBg)
+				}
+			}
 			if e.Tick {
 				ui.DrawColoredText("•", 0, i-n, ColorYellow)
-				ui.DrawColoredText(e.String(), 2, i-n, fguicolor)
+				ui.DrawColoredText(e.Text, 2, i-n, fguicolor)
 			} else {
-				ui.DrawColoredText(e.String(), 0, i-n, fguicolor)
+				ui.DrawColoredText(e.Text, 0, i-n, fguicolor)
 			}
 		}
 		for i := len(g.Log); i < DungeonHeight+4; i++ {
