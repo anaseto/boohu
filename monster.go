@@ -1112,7 +1112,7 @@ func (m *monster) MakeHunt(g *game) {
 }
 
 func (m *monster) MakeHuntIfHurt(g *game) {
-	if m.State != Hunting {
+	if m.Exists() && m.State != Hunting {
 		m.MakeHunt(g)
 		if m.State == Resting {
 			g.Printf("%s awakes.", m.Kind.Definite(true))
