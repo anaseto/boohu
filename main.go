@@ -66,6 +66,8 @@ func main() {
 	load, err = g.LoadConfig()
 	if load && err != nil {
 		g.Print("Error loading config file.")
+	} else if load {
+		CustomKeys = true
 	}
 
 	g.ui = tui

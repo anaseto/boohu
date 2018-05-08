@@ -394,6 +394,8 @@ var configurableKeyActions = [...]keyAction{
 	KeyTarget,
 	KeyExclude}
 
+var CustomKeys bool
+
 func FixedRuneKey(r rune) bool {
 	switch r {
 	case ' ', '?', '=':
@@ -674,6 +676,7 @@ func ApplyDefaultKeyBindings() {
 		'e': KeyExclude,
 		' ': KeyEscape,
 		'?': KeyHelp}
+	CustomKeys = false
 }
 
 func (ui *termui) HandleCharacter(g *game, ev event, c rune) (err error, again bool, quit bool) {
@@ -831,7 +834,11 @@ func (ui *termui) ExaminePos(g *game, ev event, pos position) (again bool) {
 func (ui *termui) DrawKeysDescription(g *game, actions []string) {
 	ui.DrawDungeonView(g, NoFlushMode)
 
-	ui.DrawStyledTextLine(" Keys ", 0, HeaderLine)
+	if CustomKeys {
+		ui.DrawStyledTextLine(" Default Keys ", 0, HeaderLine)
+	} else {
+		ui.DrawStyledTextLine(" Keys ", 0, HeaderLine)
+	}
 	for i := 0; i < len(actions)-1; i += 2 {
 		bg := ui.ListItemBG(i / 2)
 		ui.ClearLineWithColor(i/2+1, bg)
@@ -1797,6 +1804,7 @@ loop:
 				g.Printf("You cannot rebind “%c”.", r)
 				continue loop
 			}
+			CustomKeys = true
 			ka := configurableKeyActions[s]
 			if ka.NormalModeKey() {
 				runeNormalKeyActions[r] = ka
