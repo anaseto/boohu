@@ -18,7 +18,8 @@ Screenshot
 
 [![Introduction Screeshot](https://raw.githubusercontent.com/anaseto/boohu-pages/master/screenshot.png)](https://anaseto.github.io/boohu-pages/)
 
-Click on the image to see a little introduction screencast.
+Follow the link on the image to see a little introduction screencast and some
+short animations.
 
 Install
 -------
