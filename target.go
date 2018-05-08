@@ -10,7 +10,8 @@ type Targeter interface {
 }
 
 type examiner struct {
-	done bool
+	done   bool
+	stairs bool
 }
 
 func (ex *examiner) ComputeHighlight(g *game, pos position) {
@@ -35,6 +36,9 @@ func (ex *examiner) Action(g *game, pos position) error {
 	}
 	path := g.PlayerPath(g.Player.Pos, pos)
 	if path == nil {
+		if ex.stairs {
+			return errors.New("There is no safe path to the nearest stairs.")
+		}
 		return errors.New("There is no safe path to this place.")
 	}
 	if c := g.Dungeon.Cell(pos); c.Explored && c.T == FreeCell {

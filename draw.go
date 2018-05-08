@@ -694,9 +694,10 @@ func (ui *termui) HandleCharacter(g *game, ev event, c rune) (err error, again b
 		stairs := g.StairsSlice()
 		sortedStairs := g.SortedNearestTo(stairs, g.Player.Pos)
 		if len(sortedStairs) > 0 {
-			g.AutoTarget = &sortedStairs[0]
+			ex := &examiner{stairs: true}
+			err = ex.Action(g, sortedStairs[0])
 			if !g.MoveToTarget(ev) {
-				err = errors.New("Cannot travel to stairs now.")
+				err = errors.New("You could not move toward stairs.")
 			}
 		} else {
 			err = errors.New("You cannot go to any stairs.")
