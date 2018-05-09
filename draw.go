@@ -717,7 +717,7 @@ func (ui *termui) HandleCharacter(g *game, ev event, c rune) (err error, again b
 		if len(sortedStairs) > 0 {
 			ex := &examiner{stairs: true}
 			err = ex.Action(g, sortedStairs[0])
-			if !g.MoveToTarget(ev) {
+			if err == nil && !g.MoveToTarget(ev) {
 				err = errors.New("You could not move toward stairs.")
 			}
 		} else {
