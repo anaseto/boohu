@@ -1,0 +1,101 @@
+/* Colors from http://ethanschoonover.com/solarized */
+body {
+	font-family: monospace
+}
+span.fg0 {
+	color: #073642
+}
+span.fg1 {
+	color: #dc322f
+}
+span.fg2 {
+	color: #859900
+}
+span.fg3 {
+	color: #b58900
+}
+span.fg4 {
+	color: #268bd2
+}
+span.fg5 {
+	color: #d33682
+}
+span.fg6 {
+	color: #2aa198
+}
+span.fg7 {
+	color: #eee8d5
+}
+span.fg8 {
+	color: #002b36
+}
+span.fg9 {
+	color: #cb4b16
+}
+span.fg10 {
+	color: #586e75
+}
+span.fg11 {
+	color: #657b83
+}
+span.fg12 {
+	color: #839496
+}
+span.fg13 {
+	color: #6c71c4
+}
+span.fg14 {
+	color: #93a1a1
+}
+span.fg15 {
+	color: #fdf6e3
+}
+
+span.bg0 {
+	background-color: #073642
+}
+span.bg1 {
+	background-color: #dc322f
+}
+span.bg2 {
+	background-color: #859900
+}
+span.bg3 {
+	background-color: #b58900
+}
+span.bg4 {
+	background-color: #b58900
+}
+span.bg5 {
+	background-color: #d33682
+}
+span.bg6 {
+	background-color: #2aa198
+}
+span.bg7 {
+	background-color: #eee8d5
+}
+span.bg8 {
+	background-color: #002b36
+}
+span.bg9 {
+	background-color: #cb4b16
+}
+span.bg10 {
+	background-color: #586e75
+}
+span.bg11 {
+	background-color: #657b83
+}
+span.bg12 {
+	background-color: #839496
+}
+span.bg13 {
+	background-color: #6c71c4
+}
+span.bg14 {
+	background-color: #93a1a1
+}
+span.bg15 {
+	background-color: #fdf6e3
+}

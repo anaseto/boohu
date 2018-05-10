@@ -16,18 +16,7 @@ type termui struct {
 	cache      []*js.Object
 }
 
-func (ui *termui) Init() error {
-	ui.cells = make([]UICell, UIWidth*UIHeight)
-	js.Global.Get("document").Call("addEventListener", "keypress", func(e *js.Object) {
-		select {
-		case <-wants:
-			s := e.Get("key").String()
-			ch <- s
-		default:
-		}
-	})
-	ui.ResetCells()
-	ui.backBuffer = make([]UICell, UIWidth*UIHeight)
+func (ui *termui) InitElements() error {
 	doc := js.Global.Get("document")
 	pre := doc.Call("getElementById", "game")
 	for y := 0; y < UIHeight; y++ {
@@ -51,4 +40,9 @@ func (ui *termui) Draw(cell UICell, x, y int) {
 	c := ui.cache[uiidx(x, y)]
 	c.Set("textContent", string(cell.r))
 	c.Call("setAttribute", "class", fmt.Sprintf("fg%d bg%d", cell.fg, cell.bg))
+}
+
+func (ui *termui) GetMousePos(evt *js.Object) (x, y int) {
+	// TODO
+	return
 }

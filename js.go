@@ -115,6 +115,34 @@ func (g *game) WriteDump() error {
 
 // End of io compatibility functions
 
+func (ui *termui) Init() error {
+	ui.cells = make([]UICell, UIWidth*UIHeight)
+	js.Global.Get("document").Call("addEventListener", "keypress", func(e *js.Object) {
+		select {
+		case <-wants:
+			s := e.Get("key").String()
+			ch <- jsInput{key: s}
+		default:
+		}
+	})
+	js.Global.Get("document").Call("addEventListener", "mousedown", func(e *js.Object) {
+		select {
+		case <-wants:
+			x, y := ui.GetMousePos(e)
+			ch <- jsInput{mouse: true, mouseX: x, mouseY: y, button: e.Get("button").Int()}
+		default:
+		}
+	})
+	//js.Global.Get("document").Call("addEventListener", "mousemove", func(e *js.Object) {
+	//x, y := ui.GetMousePos(e)
+	//ui.mouse = position{x, y}
+	//})
+	ui.ResetCells()
+	ui.backBuffer = make([]UICell, UIWidth*UIHeight)
+	ui.InitElements()
+	return nil
+}
+
 type UICell struct {
 	fg uicolor
 	bg uicolor
@@ -180,11 +208,11 @@ func (ui *termui) ResetCells() {
 	}
 }
 
-var ch chan string
+var ch chan jsInput
 var wants chan bool
 
 func init() {
-	ch = make(chan string)
+	ch = make(chan jsInput)
 	wants = make(chan bool)
 }
 
@@ -232,12 +260,24 @@ func (ui *termui) SetCell(x, y int, r rune, fg, bg uicolor) {
 	ui.cells[ui.GetIndex(x, y)] = UICell{fg: fg, bg: bg, r: r}
 }
 
-func (ui *termui) ReadChar() rune {
-	wants <- true
-	s := <-ch
+type jsInput struct {
+	key    string
+	mouse  bool
+	mouseX int
+	mouseY int
+	button int
+}
+
+func (ui *termui) ReadKey(s string) (r rune) {
 	bs := strings.NewReader(s)
-	r, _, _ := bs.ReadRune()
+	r, _, _ = bs.ReadRune()
 	return r
+}
+
+func (ui *termui) PollEvent() (in jsInput) {
+	wants <- true
+	in = <-ch
+	return in
 }
 
 func (ui *termui) ExploreStep(g *game) bool {
@@ -249,9 +289,9 @@ func (ui *termui) ExploreStep(g *game) bool {
 func (ui *termui) WaitForContinue(g *game) {
 loop:
 	for {
-		r := ui.ReadChar()
-		switch r {
-		case '\x1b', 'E', ' ':
+		in := ui.PollEvent()
+		switch in.key {
+		case "Escape", " ":
 			break loop
 		}
 	}
@@ -259,9 +299,9 @@ loop:
 
 func (ui *termui) PromptConfirmation(g *game) bool {
 	for {
-		r := ui.ReadChar()
-		switch r {
-		case 'Y', 'y':
+		in := ui.PollEvent()
+		switch in.key {
+		case "Y", "y":
 			return true
 		default:
 			return false
@@ -271,20 +311,37 @@ func (ui *termui) PromptConfirmation(g *game) bool {
 
 func (ui *termui) PressAnyKey() error {
 	for {
-		ui.ReadChar()
+		ui.PollEvent()
 		return nil
 	}
 }
 
 func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit bool) {
 	again = true
-	r := ui.ReadChar()
-	switch r {
-	case 'S':
+	in := ui.PollEvent()
+	switch in.key {
+	case "S":
 		err = errors.New("Command not available for the web html5 version.")
 		return err, true, false
+	case "":
+		if in.mouse {
+			pos := position{X: in.mouseX, Y: in.mouseY}
+			// TODO menu
+			switch in.button {
+			case 0:
+				err, again = ui.GoToPos(g, ev, pos)
+			case 2:
+				again = ui.ExaminePos(g, ev, pos)
+			}
+		}
+	default:
+		switch in.key {
+		case "Enter":
+			in.key = "."
+		}
+		// TODO: check for more than one rune length
+		err, again, quit = ui.HandleCharacter(g, ev, ui.ReadKey(in.key))
 	}
-	err, again, quit = ui.HandleCharacter(g, ev, r)
 	if err != nil {
 		again = true
 	}
@@ -292,17 +349,17 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 }
 
 func (ui *termui) Scroll(n int) (m int, quit bool) {
-	r := ui.ReadChar()
-	switch r {
-	case '\x1b', 'E', ' ':
+	in := ui.PollEvent()
+	switch in.key {
+	case "Escape", "\x1b", " ":
 		quit = true
-	case 'u':
+	case "u":
 		n -= 12
-	case 'd':
+	case "d":
 		n += 12
-	case 'j', '2':
+	case "j", "2":
 		n++
-	case 'k', '8':
+	case "k", "8":
 		n--
 	}
 	return n, quit
@@ -310,11 +367,14 @@ func (ui *termui) Scroll(n int) (m int, quit bool) {
 
 func (ui *termui) ReadRuneKey() rune {
 	for {
-		r := ui.ReadChar()
-		switch r {
-		case '\x1b', 'E', ' ':
+		in := ui.PollEvent()
+		switch in.key {
+		case "\x1b", "Escape", " ":
 			return 0
+		case "Enter":
+			return '.'
 		}
+		r := ui.ReadKey(in.key)
 		if unicode.IsPrint(r) {
 			return r
 		}
@@ -322,46 +382,76 @@ func (ui *termui) ReadRuneKey() rune {
 }
 
 func (ui *termui) MenuAction(n int) (m int, action configAction) {
-	r := ui.ReadChar()
-	switch r {
-	case 'a':
+	in := ui.PollEvent()
+	switch in.key {
+	case "a":
 		action = ChangeConfig
-	case '\x1b', 'E', ' ':
+	case "\x1b", "Escape", " ":
 		action = QuitConfig
-	case 'u':
+	case "u":
 		n -= DungeonHeight / 2
-	case 'd':
+	case "d":
 		n += DungeonHeight / 2
-	case 'j', '2':
+	case "j", "2":
 		n++
-	case 'k', '8':
+	case "k", "8":
 		n--
-	case 'R':
+	case "R":
 		action = ResetConfig
 	}
 	return n, action
 }
 
 func (ui *termui) TargetModeEvent(g *game, targ Targeter, pos position, data *examineData) bool {
-	r := ui.ReadChar()
-	if r == '\x1b' || r == 'E' || r == ' ' {
+	in := ui.PollEvent()
+	switch in.key {
+	case "\x1b", "Escape", " ":
 		return true
+	case "Enter":
+		in.key = "."
+	case "":
+		if in.mouse {
+			switch in.button {
+			case 0:
+				if ui.CursorMouseLeft(g, targ, pos) {
+					return true
+				}
+			case 2:
+				data.npos = position{X: in.mouseX, Y: in.mouseY}
+			case 1:
+				return true
+			}
+		}
 	}
-	return ui.CursorCharAction(g, targ, r, pos, data)
+	// TODO: check for more than 1 character
+	return ui.CursorCharAction(g, targ, ui.ReadKey(in.key), pos, data)
 }
 
 func (ui *termui) Select(g *game, ev event, l int) (index int, alternate bool, err error) {
 	for {
-		r := ui.ReadChar()
+		in := ui.PollEvent()
+		r := ui.ReadKey(in.key)
 		switch {
-		case r == '\x1b' || r == 'E' || r == ' ':
+		case in.key == "\x1b" || in.key == "Escape" || in.key == " ":
 			return -1, false, errors.New(DoNothing)
+		case in.key == "?":
+			return -1, true, nil
 		case 97 <= r && int(r) < 97+l:
 			return int(r - 97), false, nil
-		case r == '?':
-			return -1, true, nil
-		case r == ' ':
-			return -1, false, errors.New(DoNothing)
+		case in.key == "" && in.mouse:
+			y := in.mouseY
+			x := in.mouseX
+			switch in.button {
+			case 0:
+				if y > 0 && y <= l && x < DungeonWidth {
+					return y - 1, false, nil
+				}
+				return -1, false, errors.New(DoNothing)
+			case 2:
+				return -1, true, nil
+			case 1:
+				return -1, false, errors.New(DoNothing)
+			}
 		}
 	}
 }

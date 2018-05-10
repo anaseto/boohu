@@ -14,18 +14,7 @@ type termui struct {
 	width      int
 }
 
-func (ui *termui) Init() error {
-	ui.cells = make([]UICell, UIWidth*UIHeight)
-	js.Global.Get("document").Call("addEventListener", "keypress", func(e *js.Object) {
-		select {
-		case <-wants:
-			s := e.Get("key").String()
-			ch <- s
-		default:
-		}
-	})
-	ui.ResetCells()
-	ui.backBuffer = make([]UICell, UIWidth*UIHeight)
+func (ui *termui) InitElements() error {
 	canvas := js.Global.Get("document").Call("getElementById", "gamecanvas")
 	ui.ctx = canvas.Call("getContext", "2d")
 	ui.ctx.Set("font", "18px monospace")
@@ -52,4 +41,12 @@ func (ui *termui) Draw(cell UICell, x, y int) {
 		ui.cache[cell] = canvas
 	}
 	ui.ctx.Call("drawImage", canvas, x*ui.width, 22*y)
+}
+
+func (ui *termui) GetMousePos(evt *js.Object) (x, y int) {
+	canvas := js.Global.Get("document").Call("getElementById", "gamecanvas")
+	rect := canvas.Call("getBoundingClientRect")
+	x = evt.Get("clientX").Int() - rect.Get("left").Int()
+	y = evt.Get("clientY").Int() - rect.Get("top").Int()
+	return (x - ui.width + 1) / ui.width, (y - 11) / 22
 }
