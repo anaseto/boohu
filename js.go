@@ -7,7 +7,6 @@ import (
 	"errors"
 	"log"
 	"strings"
-	"time"
 	"unicode"
 
 	"github.com/gopherjs/gopherjs/js"
@@ -210,10 +209,16 @@ func (ui *termui) ResetCells() {
 
 var ch chan jsInput
 var wants chan bool
+var interrupt chan bool
 
 func init() {
 	ch = make(chan jsInput)
 	wants = make(chan bool)
+	interrupt = make(chan bool)
+}
+
+func (ui *termui) Interrupt() {
+	interrupt <- true
 }
 
 func (ui *termui) Close() {
@@ -261,11 +266,12 @@ func (ui *termui) SetCell(x, y int, r rune, fg, bg uicolor) {
 }
 
 type jsInput struct {
-	key    string
-	mouse  bool
-	mouseX int
-	mouseY int
-	button int
+	key       string
+	mouse     bool
+	mouseX    int
+	mouseY    int
+	button    int
+	interrupt bool
 }
 
 func (ui *termui) ReadKey(s string) (r rune) {
@@ -275,16 +281,19 @@ func (ui *termui) ReadKey(s string) (r rune) {
 }
 
 func (ui *termui) PollEvent() (in jsInput) {
-	wants <- true
-	in = <-ch
+	select {
+	case wants <- true:
+		in = <-ch
+	case in.interrupt = <-interrupt:
+	}
 	return in
 }
 
-func (ui *termui) ExploreStep(g *game) bool {
-	time.Sleep(5 * time.Millisecond)
-	ui.DrawDungeonView(g, NormalMode)
-	return false
-}
+//func (ui *termui) ExploreStep(g *game) bool {
+//time.Sleep(5 * time.Millisecond)
+//ui.DrawDungeonView(g, NormalMode)
+//return false
+//}
 
 func (ui *termui) WaitForContinue(g *game) {
 loop:
@@ -311,8 +320,13 @@ func (ui *termui) PromptConfirmation(g *game) bool {
 
 func (ui *termui) PressAnyKey() error {
 	for {
-		ui.PollEvent()
-		return nil
+		e := ui.PollEvent()
+		if e.interrupt {
+			return errors.New("interrupted")
+		}
+		if e.key != "" || e.mouse {
+			return nil
+		}
 	}
 }
 
