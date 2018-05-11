@@ -354,6 +354,7 @@ const (
 	KeyEscape
 
 	KeyConfigure
+	KeyMenu
 )
 
 var configurableKeyActions = [...]keyAction{
@@ -399,7 +400,7 @@ var CustomKeys bool
 
 func FixedRuneKey(r rune) bool {
 	switch r {
-	case ' ', '?', '=':
+	case ' ', '?', '=', 'M':
 		return true
 	default:
 		return false
@@ -640,6 +641,7 @@ func ApplyDefaultKeyBindings() {
 		'W': KeyWizard,
 		'@': KeyWizardInfo,
 		'=': KeyConfigure,
+		'M': KeyMenu,
 	}
 	runeTargetingKeyActions = map[rune]keyAction{
 		'h': KeyW,
@@ -690,6 +692,12 @@ func (ui *termui) HandleCharacter(g *game, ev event, c rune) (err error, again b
 			err = fmt.Errorf("Unknown key '%c'. Type ? for help.", c)
 		}
 		return err, again, quit
+	}
+	if k == KeyMenu {
+		k, err = ui.SelectAction(g, menuActions, ev)
+		if err != nil {
+			return err, again, quit
+		}
 	}
 	switch k {
 	case KeyW, KeyS, KeyN, KeyE, KeyNW, KeyNE, KeySW, KeySE:
@@ -1122,6 +1130,14 @@ func (ui *termui) CursorCharAction(g *game, targ Targeter, r rune, data *examine
 		g.Printf("Invalid targeting mode key '%c'. Type ? for help.", r)
 		return false
 	}
+	//if k == KeyMenu {
+	//var err error
+	//k, err = ui.SelectAction(g, menuTargetActions, ev)
+	//if err != nil {
+	//g.Print(err)
+	//return false
+	//}
+	//}
 	switch k {
 	case KeyW, KeyS, KeyN, KeyE, KeyNW, KeyNE, KeySW, KeySE:
 		data.npos = pos.To(KeyToDir(k))
@@ -1324,6 +1340,8 @@ func (ui *termui) DrawAtPosition(g *game, pos position, targeting bool, r rune, 
 	ui.SetCell(pos.X, pos.Y, r, fg, bg)
 }
 
+const BarCol = DungeonWidth + 2
+
 func (ui *termui) DrawDungeonView(g *game, m uiMode) {
 	ui.Clear()
 	d := g.Dungeon
@@ -1339,16 +1357,23 @@ func (ui *termui) DrawDungeonView(g *game, m uiMode) {
 		r, fgColor, bgColor := ui.PositionDrawing(g, pos)
 		ui.DrawAtPosition(g, pos, m == TargetingMode, r, fgColor, bgColor)
 	}
-	ui.DrawText(fmt.Sprintf("[ %v (%d)", g.Player.Armour, g.Player.Armor()), 81, 0)
-	ui.DrawText(fmt.Sprintf(") %v (%d)", g.Player.Weapon, g.Player.Attack()), 81, 1)
+	line := 0
+	ui.DrawColoredTextOnBG("→Menu", BarCol, line, ColorBlue, ColorBg)
+	line++
+	ui.DrawText(fmt.Sprintf("[ %v (%d)", g.Player.Armour, g.Player.Armor()), BarCol, line)
+	line++
+	ui.DrawText(fmt.Sprintf(") %v (%d)", g.Player.Weapon, g.Player.Attack()), BarCol, line)
+	line++
 	if g.Player.Shield != NoShield {
 		if g.Player.Weapon.TwoHanded() {
-			ui.DrawText(fmt.Sprintf("] %v (unusable)", g.Player.Shield), 81, 2)
+			ui.DrawText(fmt.Sprintf("] %v (unusable)", g.Player.Shield), BarCol, line)
 		} else {
-			ui.DrawText(fmt.Sprintf("] %v (%d)", g.Player.Shield, g.Player.Block()), 81, 2)
+			ui.DrawText(fmt.Sprintf("] %v (%d)", g.Player.Shield, g.Player.Block()), BarCol, line)
 		}
 	}
-	ui.DrawStatusLine(g)
+	line++
+	line++
+	ui.DrawStatusBar(g, line)
 	ui.DrawLog(g)
 	if m != TargetingMode && m != NoFlushMode {
 		ui.Flush()
@@ -1625,7 +1650,7 @@ func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgCol
 	return
 }
 
-func (ui *termui) DrawStatusLine(g *game) {
+func (ui *termui) DrawStatusBar(g *game, line int) {
 	sts := statusSlice{}
 	if cld, ok := g.Clouds[g.Player.Pos]; ok && cld == CloudFire {
 		g.Player.Statuses[StatusFlames] = 1
@@ -1653,17 +1678,22 @@ func (ui *termui) DrawStatusLine(g *game) {
 	case g.Player.MP*100/g.Player.MPMax() < 70:
 		mpColor = ColorFgMPpartial
 	}
-	ui.DrawColoredText(fmt.Sprintf("HP: %d", g.Player.HP), 81, 4, hpColor)
-	ui.DrawColoredText(fmt.Sprintf("MP: %d", g.Player.MP), 81, 5, mpColor)
-	ui.DrawText(fmt.Sprintf("Simellas: %d", g.Player.Simellas), 81, 7)
+	ui.DrawColoredText(fmt.Sprintf("HP: %d", g.Player.HP), BarCol, line, hpColor)
+	line++
+	ui.DrawColoredText(fmt.Sprintf("MP: %d", g.Player.MP), BarCol, line, mpColor)
+	line++
+	line++
+	ui.DrawText(fmt.Sprintf("Simellas: %d", g.Player.Simellas), BarCol, line)
+	line++
 	if g.Depth > g.MaxDepth() {
-		ui.DrawText("Depth: Out!", 81, 8)
+		ui.DrawText("Depth: Out!", BarCol, line)
 	} else {
-		ui.DrawText(fmt.Sprintf("Depth: %d", g.Depth), 81, 8)
+		ui.DrawText(fmt.Sprintf("Depth: %d", g.Depth), BarCol, line)
 	}
-	ui.DrawText(fmt.Sprintf("Turns: %.1f", float64(g.Turn)/10), 81, 9)
-
-	for i, st := range sts {
+	line++
+	ui.DrawText(fmt.Sprintf("Turns: %.1f", float64(g.Turn)/10), BarCol, line)
+	line++
+	for _, st := range sts {
 		fg := ColorFgStatusOther
 		if st.Good() {
 			fg = ColorFgStatusGood
@@ -1671,10 +1701,11 @@ func (ui *termui) DrawStatusLine(g *game) {
 			fg = ColorFgStatusBad
 		}
 		if g.Player.Statuses[st] > 1 {
-			ui.DrawColoredText(fmt.Sprintf("%s (%d)", st, g.Player.Statuses[st]), 81, 10+i, fg)
+			ui.DrawColoredText(fmt.Sprintf("%s (%d)", st, g.Player.Statuses[st]), BarCol, line, fg)
 		} else {
-			ui.DrawColoredText(st.String(), 81, 10+i, fg)
+			ui.DrawColoredText(st.String(), BarCol, line, fg)
 		}
+		line++
 	}
 }
 
@@ -2139,6 +2170,57 @@ func (ui *termui) SelectRod(g *game, ev event) error {
 		}
 		ui.DrawDungeonView(g, NormalMode)
 		return noAction
+	}
+}
+
+func (ui *termui) ActionItem(g *game, i, lnum int, ka keyAction, fg uicolor) {
+	bg := ui.ListItemBG(i)
+	ui.ClearLineWithColor(lnum, bg)
+	ui.DrawColoredTextOnBG(fmt.Sprintf("%c - %s",
+		rune(i+97), ka.NormalModeDescription()), 0, lnum, fg, bg)
+}
+
+var menuActions = []keyAction{
+	KeyExamine,
+	KeyExplore,
+	KeyRest,
+	KeyThrow,
+	KeyDrink,
+	KeyEvoke,
+	KeyDescend,
+	KeyEquip,
+	KeyCharacterInfo,
+}
+
+var menuTargetActions = []keyAction{
+	KeyExclude,
+	KeyDescription,
+}
+
+func (ui *termui) SelectAction(g *game, actions []keyAction, ev event) (keyAction, error) {
+	for {
+		ui.ClearLine(0)
+		ui.DrawColoredText("Choose", 0, 0, ColorCyan)
+		col := utf8.RuneCountInString("Choose")
+		ui.DrawText(" which action? (esc or space to cancel)", col, 0)
+		for i, r := range actions {
+			ui.ActionItem(g, i, i+1, r, ColorFg)
+		}
+		ui.DrawLine(len(actions) + 1)
+		ui.Flush()
+		index, alt, noAction := ui.Select(g, ev, len(actions))
+		if alt {
+			continue
+		}
+		if noAction != nil {
+			ui.DrawDungeonView(g, NoFlushMode)
+			return KeyExamine, noAction
+		}
+		ui.ActionItem(g, index, index+1, actions[index], ColorYellow)
+		ui.Flush()
+		time.Sleep(100 * time.Millisecond)
+		ui.DrawDungeonView(g, NoFlushMode)
+		return actions[index], nil
 	}
 }
 

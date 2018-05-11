@@ -343,6 +343,14 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 			// TODO menu
 			switch in.button {
 			case 0:
+				if in.mouseX > DungeonWidth && in.mouseY == 0 {
+					// TODO: improve such that you can change M
+					err, again, quit = ui.HandleCharacter(g, ev, 'M')
+					if err != nil {
+						again = true
+					}
+					return err, again, quit
+				}
 				err, again = ui.GoToPos(g, ev, pos)
 			case 2:
 				again = ui.ExaminePos(g, ev, pos)
