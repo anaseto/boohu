@@ -5,9 +5,11 @@ package main
 import (
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"log"
 	"strings"
 	"unicode"
+	"unicode/utf8"
 
 	"github.com/gopherjs/gopherjs/js"
 )
@@ -364,9 +366,20 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 		switch in.key {
 		case "Enter":
 			in.key = "."
+		case "ArrowLeft":
+			in.key = "4"
+		case "ArrowRight":
+			in.key = "6"
+		case "ArrowUp":
+			in.key = "8"
+		case "ArrowDown":
+			in.key = "2"
 		}
-		// TODO: check for more than one rune length
-		err, again, quit = ui.HandleCharacter(g, ev, ui.ReadKey(in.key))
+		if utf8.RuneCountInString(in.key) > 1 {
+			err = fmt.Errorf("Invalid key: “%s”.", in.key)
+		} else {
+			err, again, quit = ui.HandleCharacter(g, ev, ui.ReadKey(in.key))
+		}
 	}
 	if err != nil {
 		again = true
@@ -471,8 +484,19 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) boo
 			}
 		}
 		return false
+	case "ArrowLeft":
+		in.key = "4"
+	case "ArrowRight":
+		in.key = "6"
+	case "ArrowUp":
+		in.key = "8"
+	case "ArrowDown":
+		in.key = "2"
 	}
-	// TODO: check for more than 1 character
+	if utf8.RuneCountInString(in.key) > 1 {
+		g.Printf("Invalid key: “%s”.", in.key)
+		return false
+	}
 	return ui.CursorCharAction(g, targ, ui.ReadKey(in.key), data)
 }
 
