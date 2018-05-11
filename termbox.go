@@ -279,7 +279,7 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) boo
 				tev.Ch = '.'
 			}
 		}
-		if ui.CursorCharAction(g, targ, tev.Ch, pos, data) {
+		if ui.CursorCharAction(g, targ, tev.Ch, data) {
 			return true
 		}
 	case termbox.EventMouse:
