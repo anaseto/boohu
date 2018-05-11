@@ -155,7 +155,7 @@ func (g *game) GoToDir(dir direction, ev event) error {
 }
 
 func (g *game) MoveToTarget(ev event) bool {
-	if g.MonsterInLOS() == nil {
+	if g.MonsterInLOS() == nil && g.AutoTarget != nil {
 		path := g.PlayerPath(g.Player.Pos, *g.AutoTarget)
 		if len(path) > 1 {
 			err := g.MovePlayer(path[len(path)-2], ev)
