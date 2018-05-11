@@ -15,7 +15,15 @@ type examiner struct {
 }
 
 func (ex *examiner) ComputeHighlight(g *game, pos position) {
-	g.ComputeRayHighlight(pos)
+	g.ComputePathHighlight(pos)
+}
+
+func (g *game) ComputePathHighlight(pos position) {
+	path := g.PlayerPath(g.Player.Pos, pos)
+	g.Highlight = map[position]bool{}
+	for _, p := range path {
+		g.Highlight[p] = true
+	}
 }
 
 func (ex *examiner) Action(g *game, pos position) error {

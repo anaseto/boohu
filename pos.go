@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 type position struct {
 	X int
 	Y int
@@ -171,7 +173,7 @@ func (pos position) Dir(from position) direction {
 			return ESE
 		}
 	default:
-		panic("internal error: invalid position")
+		panic(fmt.Sprintf("internal error: invalid position:%+v-%+v", pos, from))
 	}
 }
 

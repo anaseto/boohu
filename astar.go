@@ -35,6 +35,7 @@ type node struct {
 	Open   bool
 	Closed bool
 	Index  int
+	Num    int
 }
 
 type nodeMap map[position]*node
@@ -68,6 +69,8 @@ func AstarPath(ast Astar, from, to position) (path []position, length int, found
 	heap.Init(nq)
 	fromNode := nm.get(from)
 	fromNode.Open = true
+	num := 0
+	fromNode.Num = num
 	heap.Push(nq, fromNode)
 	for {
 		if nq.Len() == 0 {
@@ -107,6 +110,8 @@ func AstarPath(ast Astar, from, to position) (path []position, length int, found
 				neighborNode.Open = true
 				neighborNode.Rank = cost + ast.Estimation(neighbor, to)
 				neighborNode.Parent = &current.Pos
+				num++
+				neighborNode.Num = num
 				heap.Push(nq, neighborNode)
 			}
 		}
@@ -122,7 +127,8 @@ func (pq priorityQueue) Len() int {
 }
 
 func (pq priorityQueue) Less(i, j int) bool {
-	return pq[i].Rank < pq[j].Rank
+	//return pq[i].Rank < pq[j].Rank
+	return pq[i].Rank < pq[j].Rank || pq[i].Rank == pq[j].Rank && pq[i].Num < pq[j].Num
 }
 
 func (pq priorityQueue) Swap(i, j int) {
