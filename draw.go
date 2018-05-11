@@ -678,7 +678,9 @@ func ApplyDefaultKeyBindings() {
 		'.': KeyTarget,
 		'e': KeyExclude,
 		' ': KeyEscape,
-		'?': KeyHelp}
+		'?': KeyHelp,
+		'M': KeyMenu,
+	}
 	CustomKeys = false
 }
 
@@ -857,7 +859,7 @@ func (ui *termui) DrawKeysDescription(g *game, actions []string) {
 	ui.DrawTextLine(" press esc or space to continue ", lines)
 	ui.Flush()
 
-	ui.WaitForContinue(g)
+	ui.WaitForContinue(g, lines)
 }
 
 func (ui *termui) KeysHelp(g *game) {
@@ -926,7 +928,7 @@ func (ui *termui) CharacterInfo(g *game) {
 	ui.DrawTextLine(" press esc or space to continue ", lines+2)
 
 	ui.Flush()
-	ui.WaitForContinue(g)
+	ui.WaitForContinue(g, lines+2)
 	ui.DrawDungeonView(g, NormalMode)
 }
 
@@ -937,7 +939,7 @@ func (ui *termui) WizardInfo(g *game) {
 	fmt.Fprintf(b, "Danger: %d (%d)\n", g.Danger(), g.MaxDanger())
 	ui.DrawText(b.String(), 0, 0)
 	ui.Flush()
-	ui.WaitForContinue(g)
+	ui.WaitForContinue(g, -1)
 	ui.DrawDungeonView(g, NormalMode)
 }
 
@@ -1130,14 +1132,14 @@ func (ui *termui) CursorCharAction(g *game, targ Targeter, r rune, data *examine
 		g.Printf("Invalid targeting mode key '%c'. Type ? for help.", r)
 		return false
 	}
-	//if k == KeyMenu {
-	//var err error
-	//k, err = ui.SelectAction(g, menuTargetActions, ev)
-	//if err != nil {
-	//g.Print(err)
-	//return false
-	//}
-	//}
+	if k == KeyMenu {
+		var err error
+		k, err = ui.SelectAction(g, menuTargetActions, g.CurEvent)
+		if err != nil {
+			g.Print(err.Error())
+			return false
+		}
+	}
 	switch k {
 	case KeyW, KeyS, KeyN, KeyE, KeyNW, KeyNE, KeySW, KeySE:
 		data.npos = pos.To(KeyToDir(k))
@@ -1948,7 +1950,7 @@ func (ui *termui) DrawDescription(g *game, desc string) {
 	ui.DrawText(desc, 0, 0)
 	ui.DrawTextLine(" press esc or space to continue ", lines+2)
 	ui.Flush()
-	ui.WaitForContinue(g)
+	ui.WaitForContinue(g, lines+2)
 }
 
 func (ui *termui) DrawText(text string, x, y int) {
@@ -2176,8 +2178,11 @@ func (ui *termui) SelectRod(g *game, ev event) error {
 func (ui *termui) ActionItem(g *game, i, lnum int, ka keyAction, fg uicolor) {
 	bg := ui.ListItemBG(i)
 	ui.ClearLineWithColor(lnum, bg)
-	ui.DrawColoredTextOnBG(fmt.Sprintf("%c - %s",
-		rune(i+97), ka.NormalModeDescription()), 0, lnum, fg, bg)
+	desc := ka.NormalModeDescription()
+	if !ka.NormalModeKey() {
+		desc = ka.TargetingModeDescription()
+	}
+	ui.DrawColoredTextOnBG(fmt.Sprintf("%c - %s", rune(i+97), desc), 0, lnum, fg, bg)
 }
 
 var menuActions = []keyAction{
@@ -2227,10 +2232,10 @@ func (ui *termui) SelectAction(g *game, actions []keyAction, ev event) (keyActio
 func (ui *termui) Death(g *game) {
 	g.Print("You die... --press esc or space to continue--")
 	ui.DrawDungeonView(g, NormalMode)
-	ui.WaitForContinue(g)
+	ui.WaitForContinue(g, -1)
 	err := g.WriteDump()
 	ui.Dump(g, err)
-	ui.WaitForContinue(g)
+	ui.WaitForContinue(g, -1)
 }
 
 func (ui *termui) Win(g *game) {
@@ -2244,10 +2249,10 @@ func (ui *termui) Win(g *game) {
 		g.Print("You escape by the magic stairs! You win. --press esc or space to continue--")
 	}
 	ui.DrawDungeonView(g, NormalMode)
-	ui.WaitForContinue(g)
+	ui.WaitForContinue(g, -1)
 	err = g.WriteDump()
 	ui.Dump(g, err)
-	ui.WaitForContinue(g)
+	ui.WaitForContinue(g, -1)
 }
 
 func (ui *termui) Dump(g *game, err error) {
@@ -2268,7 +2273,7 @@ func (ui *termui) CriticalHPWarning(g *game) {
 	time.Sleep(75 * time.Millisecond)
 	ui.DrawAtPosition(g, g.Player.Pos, false, r, fg, bg)
 	ui.Flush()
-	ui.WaitForContinue(g)
+	ui.WaitForContinue(g, DungeonHeight)
 	g.Print("Ok. Be careful, then.")
 }
 

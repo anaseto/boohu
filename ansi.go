@@ -140,7 +140,7 @@ func (ui *termui) ExploreStep(g *game) bool {
 	return false
 }
 
-func (ui *termui) WaitForContinue(g *game) {
+func (ui *termui) WaitForContinue(g *game, line int) {
 loop:
 	for {
 		r := ui.ReadChar()

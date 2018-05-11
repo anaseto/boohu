@@ -71,7 +71,7 @@ func (ui *termui) SetCell(x, y int, r rune, fg, bg uicolor) {
 	ui.Screen.SetContent(x, y, r, nil, st)
 }
 
-func (ui *termui) WaitForContinue(g *game) {
+func (ui *termui) WaitForContinue(g *game, line int) {
 loop:
 	for {
 		switch tev := ui.Screen.PollEvent().(type) {

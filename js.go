@@ -295,13 +295,18 @@ func (ui *termui) PollEvent() (in jsInput) {
 //return false
 //}
 
-func (ui *termui) WaitForContinue(g *game) {
+func (ui *termui) WaitForContinue(g *game, line int) {
 loop:
 	for {
 		in := ui.PollEvent()
 		switch in.key {
 		case "Escape", " ":
 			break loop
+		}
+		if in.mouse && line >= 0 {
+			if in.mouseY > line || in.mouseY > DungeonWidth {
+				break loop
+			}
 		}
 	}
 }
@@ -340,7 +345,6 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 	case "":
 		if in.mouse {
 			pos := position{X: in.mouseX, Y: in.mouseY}
-			// TODO menu
 			switch in.button {
 			case 0:
 				if in.mouseX > DungeonWidth && in.mouseY == 0 {
@@ -451,6 +455,12 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) boo
 		if in.mouse {
 			switch in.button {
 			case 0:
+				if in.mouseX > DungeonWidth && in.mouseY == 0 {
+					// TODO: improve such that you can change M
+					return ui.CursorCharAction(g, targ, 'M', data)
+				} else if in.mouseX > DungeonWidth || in.mouseY > DungeonHeight {
+					return true
+				}
 				if ui.CursorMouseLeft(g, targ, position{X: in.mouseX, Y: in.mouseY}, data) {
 					return true
 				}

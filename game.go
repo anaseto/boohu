@@ -10,6 +10,7 @@ type game struct {
 	Monsters            []*monster
 	Bands               []monsterBand
 	Events              *eventQueue
+	CurEvent            event
 	Highlight           map[position]bool // highlighted positions (e.g. targeted ray)
 	Collectables        map[position]*collectable
 	CollectableScore    int
@@ -657,6 +658,7 @@ loop:
 		}
 		ev := g.PopIEvent().Event
 		g.Turn = ev.Rank()
+		g.CurEvent = ev
 		ev.Action(g)
 		if g.AutoNext {
 			continue loop
