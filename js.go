@@ -52,6 +52,7 @@ func (g *game) DataDir() (string, error) {
 }
 
 func (g *game) Save() error {
+	return nil // TODO remove when it works
 	save, err := g.GameSave()
 	if err != nil {
 		SaveError = err.Error()
