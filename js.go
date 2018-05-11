@@ -375,6 +375,22 @@ func (ui *termui) Scroll(n int) (m int, quit bool) {
 		n++
 	case "k", "8":
 		n--
+	case "":
+		if in.mouse {
+			switch in.button {
+			case 0:
+				y := in.mouseY
+				x := in.mouseX
+				if x >= DungeonWidth {
+					quit = true
+					break
+				}
+				if y > UIHeight {
+					break
+				}
+				n += y - (DungeonHeight+3)/2
+			}
+		}
 	}
 	return n, quit
 }
@@ -416,7 +432,7 @@ func (ui *termui) MenuAction(n int) (m int, action configAction) {
 	return n, action
 }
 
-func (ui *termui) TargetModeEvent(g *game, targ Targeter, pos position, data *examineData) bool {
+func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) bool {
 	in := ui.PollEvent()
 	switch in.key {
 	case "\x1b", "Escape", " ":
@@ -427,7 +443,7 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, pos position, data *ex
 		if in.mouse {
 			switch in.button {
 			case 0:
-				if ui.CursorMouseLeft(g, targ, pos) {
+				if ui.CursorMouseLeft(g, targ, position{X: in.mouseX, Y: in.mouseY}, data) {
 					return true
 				}
 			case 2:
@@ -436,9 +452,10 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, pos position, data *ex
 				return true
 			}
 		}
+		return false
 	}
 	// TODO: check for more than 1 character
-	return ui.CursorCharAction(g, targ, ui.ReadKey(in.key), pos, data)
+	return ui.CursorCharAction(g, targ, ui.ReadKey(in.key), data)
 }
 
 func (ui *termui) Select(g *game, ev event, l int) (index int, alternate bool, err error) {
@@ -457,10 +474,13 @@ func (ui *termui) Select(g *game, ev event, l int) (index int, alternate bool, e
 			x := in.mouseX
 			switch in.button {
 			case 0:
-				if y > 0 && y <= l && x < DungeonWidth {
-					return y - 1, false, nil
+				if y < 0 || y > l || x >= DungeonWidth {
+					return -1, false, errors.New(DoNothing)
 				}
-				return -1, false, errors.New(DoNothing)
+				if y == 0 {
+					return -1, true, nil
+				}
+				return y - 1, false, nil
 			case 2:
 				return -1, true, nil
 			case 1:

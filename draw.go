@@ -1101,17 +1101,22 @@ func (ui *termui) ExcludeZone(g *game, pos position) {
 	}
 }
 
-func (ui *termui) CursorMouseLeft(g *game, targ Targeter, pos position) bool {
-	err := targ.Action(g, pos)
-	if err != nil {
-		g.Print(err.Error())
+func (ui *termui) CursorMouseLeft(g *game, targ Targeter, pos position, data *examineData) bool {
+	if data.npos == pos {
+		err := targ.Action(g, pos)
+		if err != nil {
+			g.Print(err.Error())
+		} else {
+			return true
+		}
 	} else {
-		return true
+		data.npos = pos
 	}
 	return false
 }
 
-func (ui *termui) CursorCharAction(g *game, targ Targeter, r rune, pos position, data *examineData) bool {
+func (ui *termui) CursorCharAction(g *game, targ Targeter, r rune, data *examineData) bool {
+	pos := data.npos
 	k, ok := runeTargetingKeyActions[r]
 	if !ok {
 		g.Printf("Invalid targeting mode key '%c'. Type ? for help.", r)
@@ -1214,7 +1219,7 @@ loop:
 		ui.SetCell(DungeonWidth, DungeonHeight, '┤', ColorFg, ColorBg)
 		ui.Flush()
 		data.npos = pos
-		b := ui.TargetModeEvent(g, targ, pos, data)
+		b := ui.TargetModeEvent(g, targ, data)
 		if b {
 			break loop
 		}

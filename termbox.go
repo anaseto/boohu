@@ -259,7 +259,8 @@ func (ui *termui) MenuAction(n int) (m int, action configAction) {
 	return n, action
 }
 
-func (ui *termui) TargetModeEvent(g *game, targ Targeter, pos position, data *examineData) bool {
+func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) bool {
+	pos := data.npos
 	switch tev := termbox.PollEvent(); tev.Type {
 	case termbox.EventKey:
 		if tev.Ch == 0 {
@@ -285,7 +286,7 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, pos position, data *ex
 		if tev.Ch == 0 {
 			switch tev.Key {
 			case termbox.MouseLeft:
-				if ui.CursorMouseLeft(g, targ, pos) {
+				if ui.CursorMouseLeft(g, targ, pos, data) {
 					return true
 				}
 			case termbox.MouseRight:

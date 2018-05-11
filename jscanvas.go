@@ -48,5 +48,5 @@ func (ui *termui) GetMousePos(evt *js.Object) (x, y int) {
 	rect := canvas.Call("getBoundingClientRect")
 	x = evt.Get("clientX").Int() - rect.Get("left").Int()
 	y = evt.Get("clientY").Int() - rect.Get("top").Int()
-	return (x - ui.width + 1) / ui.width, (y - 11) / 22
+	return (x - ui.width/2) / ui.width, (y - 8) / 22
 }

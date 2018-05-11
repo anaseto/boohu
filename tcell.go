@@ -264,7 +264,8 @@ func (ui *termui) MenuAction(n int) (m int, action configAction) {
 	return n, action
 }
 
-func (ui *termui) TargetModeEvent(g *game, targ Targeter, pos position, data *examineData) bool {
+func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) bool {
+	pos := data.npos
 	switch tev := ui.Screen.PollEvent().(type) {
 	case *tcell.EventKey:
 		key := tev.Rune()
@@ -282,13 +283,13 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, pos position, data *ex
 		case tcell.KeyEnter:
 			key = '.'
 		}
-		if ui.CursorCharAction(g, targ, key, pos, data) {
+		if ui.CursorCharAction(g, targ, key, data) {
 			return true
 		}
 	case *tcell.EventMouse:
 		switch tev.Buttons() {
 		case tcell.Button1:
-			if ui.CursorMouseLeft(g, targ, pos) {
+			if ui.CursorMouseLeft(g, targ, pos, data) {
 				return true
 			}
 		case tcell.Button3:
