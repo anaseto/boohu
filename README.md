@@ -1,15 +1,12 @@
-Break Out Of Hareka's Underground (Boohu) is a roguelike game that takes
-inspiration mainly from DCSS and its tavern, and some ideas from Brogue, but
-aiming for very short games, almost no character building, and simplified
-inventory management.
+Break Out Of Hareka's Underground (Boohu) is a roguelike game mainly inspired from DCSS and its tavern, with some ideas from Brogue, but aiming for very short games, almost no character building, and a simplified inventory.
 
 Every year, your village sends someone to collect medicinal simella plants in
 the Underground.  This year, the duty fell upon you, and so here you are. Your
 heart is teared between your will to be as helpful as possible to your village
-and your will to make it out alive.  Deep in the Underground, some magical
+and your will to make it out alive.  Deep in the Underground, magical
 stairs will lead you back to your village. Along the way, you will collect
 simellas, as well as various helpful items. You will also encounter monsters,
-fight against them, or run away from them when you can…
+which you can fight, or run away from, when you can..
 
 ![Boohu introduction screen](https://raw.githubusercontent.com/anaseto/boohu-pages/master/intro-screen.png)
 
@@ -24,10 +21,10 @@ short animations.
 Install
 -------
 
-You can found latest stable binaries in the [releases
+You can download binaries on the [releases
 page](https://github.com/anaseto/boohu/releases).
 
-You can also build from sources by following these steps:
+You can also build from source by following these steps:
 
 + Install the [go compiler](https://golang.org/).
 + Set `$GOPATH` variable (for example `export GOPATH=$HOME/go`).
@@ -50,10 +47,9 @@ Colors
 ------
 
 If the default colors do not display nicely on your terminal emulator, you can
-use the `-s` option: `boohu -s`. The game then uses the 16-color palette, and
+use the `-s` option: `boohu -s` to use the 16-color palette, which
 will display nicely if the [solarized](http://ethanschoonover.com/solarized)
-palette, with configurations available easily for most terminal emulators, is
-used.  Otherwise, colors may have to be configured manually to one's liking in
+palette is used. Configurations are available for most terminal emulators, otherwise, colors may have to be configured manually to one's liking in
 the terminal emulator options.
 
 Basic Survival Tips
