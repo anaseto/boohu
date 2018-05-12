@@ -72,6 +72,13 @@ loop:
 				switch tev.Key {
 				case termbox.MouseMiddle:
 					break loop
+				case termbox.MouseLeft:
+					if line >= 0 {
+						if tev.MouseY > line || tev.MouseX > DungeonWidth {
+							break loop
+						}
+
+					}
 				}
 			}
 		}
@@ -140,6 +147,13 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 			switch tev.Key {
 			case termbox.MouseLeft:
 				pos := position{X: tev.MouseX, Y: tev.MouseY}
+				if pos.X > DungeonWidth && pos.Y == 0 {
+					err, again, quit = ui.HandleKeyAction(g, runeKeyAction{k: KeyMenu})
+					if err != nil {
+						again = true
+					}
+					return err, again, quit
+				}
 				err, again = ui.GoToPos(g, ev, pos)
 			case termbox.MouseRight:
 				pos := position{X: tev.MouseX, Y: tev.MouseY}
@@ -187,7 +201,16 @@ func (ui *termui) Scroll(n int) (m int, quit bool) {
 			case termbox.MouseWheelUp:
 				n -= 2
 			case termbox.MouseWheelDown:
-				n += 2
+				y := tev.MouseY
+				x := tev.MouseX
+				if x >= DungeonWidth {
+					quit = true
+					break
+				}
+				if y > UIHeight {
+					break
+				}
+				n += y - (DungeonHeight+3)/2
 			}
 		}
 	}
@@ -260,7 +283,6 @@ func (ui *termui) MenuAction(n int) (m int, action configAction) {
 }
 
 func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) bool {
-	pos := data.npos
 	switch tev := termbox.PollEvent(); tev.Type {
 	case termbox.EventKey:
 		if tev.Ch == 0 {
@@ -286,7 +308,13 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) boo
 		if tev.Ch == 0 {
 			switch tev.Key {
 			case termbox.MouseLeft:
-				if ui.CursorMouseLeft(g, targ, pos, data) {
+				if tev.MouseX > DungeonWidth && tev.MouseY == 0 {
+					// TODO: improve such that you can change M
+					return ui.CursorCharAction(g, targ, 'M', data)
+				} else if tev.MouseX > DungeonWidth || tev.MouseY > DungeonHeight {
+					return true
+				}
+				if ui.CursorMouseLeft(g, targ, position{X: tev.MouseX, Y: tev.MouseY}, data) {
 					return true
 				}
 			case termbox.MouseRight:
@@ -323,9 +351,14 @@ func (ui *termui) Select(g *game, ev event, l int) (index int, alternate bool, e
 				switch tev.Key {
 				case termbox.MouseLeft:
 					y := tev.MouseY
-					if y > 0 && y <= l {
-						return y - 1, false, nil
+					x := tev.MouseX
+					if y < 0 || y > l || x >= DungeonWidth {
+						return -1, false, errors.New(DoNothing)
 					}
+					if y == 0 {
+						return -1, true, nil
+					}
+					return y - 1, false, nil
 				case termbox.MouseRight:
 					return -1, true, nil
 				case termbox.MouseMiddle:

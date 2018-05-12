@@ -190,11 +190,6 @@ func (c uicolor) String() string {
 	return color
 }
 
-const (
-	UIWidth  = 103
-	UIHeight = 27
-)
-
 func (ui *termui) GetIndex(x, y int) int {
 	return y*UIWidth + x
 }
@@ -307,7 +302,7 @@ loop:
 			break loop
 		}
 		if in.mouse && line >= 0 {
-			if in.mouseY > line || in.mouseY > DungeonWidth {
+			if in.mouseY > line || in.mouseX > DungeonWidth {
 				break loop
 			}
 		}

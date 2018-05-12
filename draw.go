@@ -11,6 +11,11 @@ import (
 	"unicode/utf8"
 )
 
+const (
+	UIWidth  = 103
+	UIHeight = 27
+)
+
 type uicolor int
 
 // uicolors: http://ethanschoonover.com/solarized
