@@ -2208,6 +2208,8 @@ var menuActions = []keyAction{
 	KeyDescend,
 	KeyEquip,
 	KeyCharacterInfo,
+	KeySave,
+	KeyQuit,
 }
 
 var menuTargetActions = []keyAction{
