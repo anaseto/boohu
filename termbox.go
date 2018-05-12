@@ -305,7 +305,7 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) boo
 				tev.Ch = '.'
 			}
 		}
-		if ui.CursorCharAction(g, targ, tev.Ch, data) {
+		if ui.CursorCharAction(g, targ, runeKeyAction{r: tev.Ch}, data) {
 			return true
 		}
 	case termbox.EventMouse:
@@ -313,8 +313,7 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) boo
 			switch tev.Key {
 			case termbox.MouseLeft:
 				if tev.MouseX > DungeonWidth && tev.MouseY == 0 {
-					// TODO: improve such that you can change M
-					return ui.CursorCharAction(g, targ, 'M', data)
+					return ui.CursorCharAction(g, targ, runeKeyAction{k: KeyMenu}, data)
 				} else if tev.MouseX > DungeonWidth || tev.MouseY > DungeonHeight {
 					return true
 				}

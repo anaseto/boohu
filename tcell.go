@@ -294,22 +294,22 @@ func (ui *termui) MenuAction(n int) (m int, action configAction) {
 func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) bool {
 	switch tev := ui.Screen.PollEvent().(type) {
 	case *tcell.EventKey:
-		key := tev.Rune()
+		r := tev.Rune()
 		switch tev.Key() {
 		case tcell.KeyLeft:
-			key = '4'
+			r = '4'
 		case tcell.KeyDown:
-			key = '2'
+			r = '2'
 		case tcell.KeyUp:
-			key = '8'
+			r = '8'
 		case tcell.KeyRight:
-			key = '6'
+			r = '6'
 		case tcell.KeyEsc:
 			return true
 		case tcell.KeyEnter:
-			key = '.'
+			r = '.'
 		}
-		if ui.CursorCharAction(g, targ, key, data) {
+		if ui.CursorCharAction(g, targ, runeKeyAction{r: r}, data) {
 			return true
 		}
 	case *tcell.EventMouse:
@@ -318,7 +318,7 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) boo
 			x, y := tev.Position()
 			if x > DungeonWidth && y == 0 {
 				// TODO: improve such that you can change M
-				return ui.CursorCharAction(g, targ, 'M', data)
+				return ui.CursorCharAction(g, targ, runeKeyAction{k: KeyMenu}, data)
 			} else if x > DungeonWidth || y > DungeonHeight {
 				return true
 			}
@@ -342,14 +342,14 @@ func (ui *termui) Select(g *game, ev event, l int) (index int, alternate bool, e
 			if tev.Key() == tcell.KeyEsc {
 				return -1, false, errors.New(DoNothing)
 			}
-			key := tev.Rune()
-			if 97 <= key && int(key) < 97+l {
-				return int(key - 97), false, nil
+			r := tev.Rune()
+			if 97 <= r && int(r) < 97+l {
+				return int(r - 97), false, nil
 			}
-			if key == '?' {
+			if r == '?' {
 				return -1, true, nil
 			}
-			if key == ' ' {
+			if r == ' ' {
 				return -1, false, errors.New(DoNothing)
 			}
 		case *tcell.EventMouse:

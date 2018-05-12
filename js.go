@@ -466,8 +466,7 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) boo
 			switch in.button {
 			case 0:
 				if in.mouseX > DungeonWidth && in.mouseY == 0 {
-					// TODO: improve such that you can change M
-					return ui.CursorCharAction(g, targ, 'M', data)
+					return ui.CursorCharAction(g, targ, runeKeyAction{k: KeyMenu}, data)
 				} else if in.mouseX > DungeonWidth || in.mouseY > DungeonHeight {
 					return true
 				}
@@ -494,7 +493,7 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) boo
 		g.Printf("Invalid key: “%s”.", in.key)
 		return false
 	}
-	return ui.CursorCharAction(g, targ, ui.ReadKey(in.key), data)
+	return ui.CursorCharAction(g, targ, runeKeyAction{r: ui.ReadKey(in.key)}, data)
 }
 
 func (ui *termui) Select(g *game, ev event, l int) (index int, alternate bool, err error) {

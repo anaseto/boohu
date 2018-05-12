@@ -240,7 +240,7 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) boo
 	if r == '\x1b' || r == ' ' {
 		return true
 	}
-	return ui.CursorCharAction(g, targ, r, data)
+	return ui.CursorCharAction(g, targ, runeKeyAction{r: r}, data)
 }
 
 func (ui *termui) Select(g *game, ev event, l int) (index int, alternate bool, err error) {

@@ -1138,27 +1138,30 @@ func (ui *termui) CursorMouseLeft(g *game, targ Targeter, pos position, data *ex
 	return false
 }
 
-func (ui *termui) CursorCharAction(g *game, targ Targeter, r rune, data *examineData) bool {
+func (ui *termui) CursorCharAction(g *game, targ Targeter, rka runeKeyAction, data *examineData) bool {
 	pos := data.npos
-	k, ok := runeTargetingKeyActions[r]
-	if !ok {
-		g.Printf("Invalid targeting mode key '%c'. Type ? for help.", r)
-		return false
+	if rka.r != 0 {
+		var ok bool
+		rka.k, ok = runeTargetingKeyActions[rka.r]
+		if !ok {
+			g.Printf("Invalid targeting mode key '%c'. Type ? for help.", rka.r)
+			return false
+		}
 	}
-	if k == KeyMenu {
+	if rka.k == KeyMenu {
 		var err error
-		k, err = ui.SelectAction(g, menuTargetActions, g.CurEvent)
+		rka.k, err = ui.SelectAction(g, menuTargetActions, g.CurEvent)
 		if err != nil {
 			g.Print(err.Error())
 			return false
 		}
 	}
-	switch k {
+	switch rka.k {
 	case KeyW, KeyS, KeyN, KeyE, KeyNW, KeyNE, KeySW, KeySE:
-		data.npos = pos.To(KeyToDir(k))
+		data.npos = pos.To(KeyToDir(rka.k))
 	case KeyRunW, KeyRunS, KeyRunN, KeyRunE, KeyRunNW, KeyRunNE, KeyRunSW, KeyRunSE:
 		for i := 0; i < 5; i++ {
-			p := data.npos.To(KeyToDir(k))
+			p := data.npos.To(KeyToDir(rka.k))
 			if !p.valid() {
 				break
 			}
@@ -1167,7 +1170,7 @@ func (ui *termui) CursorCharAction(g *game, targ Targeter, r rune, data *examine
 	case KeyDescend:
 		ui.NextStair(g, data)
 	case KeyPreviousMonster, KeyNextMonster:
-		ui.NextMonster(g, r, pos, data)
+		ui.NextMonster(g, rka.r, pos, data)
 	case KeyNextObject:
 		ui.NextObject(g, pos, data)
 	case KeyDescription:
@@ -1190,7 +1193,7 @@ func (ui *termui) CursorCharAction(g *game, targ Targeter, r rune, data *examine
 	case KeyEscape:
 		return true
 	default:
-		g.Printf("Invalid targeting mode key '%c'. Type ? for help.", r)
+		g.Printf("Invalid targeting mode key '%c'. Type ? for help.", rka.r)
 	}
 	return false
 }
