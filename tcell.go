@@ -90,6 +90,8 @@ loop:
 					if y > line || x > DungeonWidth {
 						break loop
 					}
+				} else {
+					break loop
 				}
 			case tcell.Button2:
 				break loop

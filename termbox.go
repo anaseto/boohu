@@ -78,6 +78,8 @@ loop:
 							break loop
 						}
 
+					} else {
+						break loop
 					}
 				}
 			}

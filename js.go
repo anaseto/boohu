@@ -305,6 +305,8 @@ loop:
 			if in.mouseY > line || in.mouseX > DungeonWidth {
 				break loop
 			}
+		} else if in.mouse {
+			break loop
 		}
 	}
 }
