@@ -83,7 +83,15 @@ loop:
 				break loop
 			}
 		case *tcell.EventMouse:
-			if tev.Buttons() == tcell.Button2 {
+			switch tev.Buttons() {
+			case tcell.Button1:
+				x, y := tev.Position()
+				if line >= 0 {
+					if y > line || x > DungeonWidth {
+						break loop
+					}
+				}
+			case tcell.Button2:
 				break loop
 			}
 		}
@@ -152,6 +160,13 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 		case tcell.Button1:
 			x, y := tev.Position()
 			pos := position{X: x, Y: y}
+			if pos.X > DungeonWidth && pos.Y == 0 {
+				err, again, quit = ui.HandleKeyAction(g, runeKeyAction{k: KeyMenu})
+				if err != nil {
+					again = true
+				}
+				return err, again, quit
+			}
 			err, again = ui.GoToPos(g, ev, pos)
 		case tcell.Button3:
 			x, y := tev.Position()
@@ -198,6 +213,16 @@ func (ui *termui) Scroll(n int) (m int, quit bool) {
 			n += 2
 		case tcell.Button2:
 			quit = true
+		case tcell.Button1:
+			x, y := tev.Position()
+			if x >= DungeonWidth {
+				quit = true
+				break
+			}
+			if y > UIHeight {
+				break
+			}
+			n += y - (DungeonHeight+3)/2
 		}
 	}
 	return n, quit
@@ -265,7 +290,6 @@ func (ui *termui) MenuAction(n int) (m int, action configAction) {
 }
 
 func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) bool {
-	pos := data.npos
 	switch tev := ui.Screen.PollEvent().(type) {
 	case *tcell.EventKey:
 		key := tev.Rune()
@@ -289,7 +313,14 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) boo
 	case *tcell.EventMouse:
 		switch tev.Buttons() {
 		case tcell.Button1:
-			if ui.CursorMouseLeft(g, targ, pos, data) {
+			x, y := tev.Position()
+			if x > DungeonWidth && y == 0 {
+				// TODO: improve such that you can change M
+				return ui.CursorCharAction(g, targ, 'M', data)
+			} else if x > DungeonWidth || y > DungeonHeight {
+				return true
+			}
+			if ui.CursorMouseLeft(g, targ, position{X: x, Y: y}, data) {
 				return true
 			}
 		case tcell.Button3:
@@ -322,10 +353,14 @@ func (ui *termui) Select(g *game, ev event, l int) (index int, alternate bool, e
 		case *tcell.EventMouse:
 			switch tev.Buttons() {
 			case tcell.Button1:
-				_, y := tev.Position()
-				if y > 0 && y <= l {
-					return y - 1, false, nil
+				x, y := tev.Position()
+				if y < 0 || y > l || x >= DungeonWidth {
+					return -1, false, errors.New(DoNothing)
 				}
+				if y == 0 {
+					return -1, true, nil
+				}
+				return y - 1, false, nil
 			case tcell.Button3:
 				return -1, true, nil
 			case tcell.Button2:

@@ -201,6 +201,8 @@ func (ui *termui) Scroll(n int) (m int, quit bool) {
 			case termbox.MouseWheelUp:
 				n -= 2
 			case termbox.MouseWheelDown:
+				n += 2
+			case termbox.MouseLeft:
 				y := tev.MouseY
 				x := tev.MouseX
 				if x >= DungeonWidth {
