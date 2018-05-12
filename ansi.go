@@ -27,11 +27,6 @@ type termui struct {
 	stty       string
 }
 
-const (
-	UIWidth  = 103
-	UIHeight = 27
-)
-
 func (ui *termui) GetIndex(x, y int) int {
 	return y*UIWidth + x
 }
