@@ -134,7 +134,7 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 				tev.Ch = 'm'
 			}
 		}
-		err, again, quit = ui.HandleCharacter(g, ev, tev.Ch)
+		err, again, quit = ui.HandleKeyAction(g, runeKeyAction{r: tev.Ch})
 	case termbox.EventMouse:
 		if tev.Ch == 0 {
 			switch tev.Key {

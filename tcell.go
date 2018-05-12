@@ -123,17 +123,17 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 	switch tev := ui.Screen.PollEvent().(type) {
 	case *tcell.EventKey:
 		again = false
-		key := tev.Rune()
+		r := tev.Rune()
 		switch tev.Key() {
 		case tcell.KeyLeft:
 			// TODO: will not work if user changes keybindings
-			key = '4'
+			r = '4'
 		case tcell.KeyDown:
-			key = '2'
+			r = '2'
 		case tcell.KeyUp:
-			key = '8'
+			r = '8'
 		case tcell.KeyRight:
-			key = '6'
+			r = '6'
 		case tcell.KeyCtrlW:
 			ui.EnterWizard(g)
 			return nil, true, false
@@ -143,9 +143,9 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 			}
 			return nil, true, false
 		case tcell.KeyCtrlP:
-			key = 'm'
+			r = 'm'
 		}
-		err, again, quit = ui.HandleCharacter(g, ev, key)
+		err, again, quit = ui.HandleKeyAction(g, runeKeyAction{r: r})
 	case *tcell.EventMouse:
 		switch tev.Buttons() {
 		case tcell.ButtonNone:

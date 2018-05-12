@@ -351,8 +351,7 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 			switch in.button {
 			case 0:
 				if in.mouseX > DungeonWidth && in.mouseY == 0 {
-					// TODO: improve such that you can change M
-					err, again, quit = ui.HandleCharacter(g, ev, 'M')
+					err, again, quit = ui.HandleKeyAction(g, runeKeyAction{k: KeyMenu})
 					if err != nil {
 						again = true
 					}
@@ -379,7 +378,7 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 		if utf8.RuneCountInString(in.key) > 1 {
 			err = fmt.Errorf("Invalid key: “%s”.", in.key)
 		} else {
-			err, again, quit = ui.HandleCharacter(g, ev, ui.ReadKey(in.key))
+			err, again, quit = ui.HandleKeyAction(g, runeKeyAction{r: ui.ReadKey(in.key)})
 		}
 	}
 	if err != nil {

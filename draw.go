@@ -684,35 +684,43 @@ func ApplyDefaultKeyBindings() {
 	CustomKeys = false
 }
 
-func (ui *termui) HandleCharacter(g *game, ev event, c rune) (err error, again bool, quit bool) {
-	k, ok := runeNormalKeyActions[c]
-	if !ok {
-		switch c {
-		case 's':
-			err = errors.New("Unknown key. Did you mean capital S for save and quit?")
-		default:
-			err = fmt.Errorf("Unknown key '%c'. Type ? for help.", c)
+type runeKeyAction struct {
+	r rune
+	k keyAction
+}
+
+func (ui *termui) HandleKeyAction(g *game, rka runeKeyAction) (err error, again bool, quit bool) {
+	if rka.r != 0 {
+		var ok bool
+		rka.k, ok = runeNormalKeyActions[rka.r]
+		if !ok {
+			switch rka.r {
+			case 's':
+				err = errors.New("Unknown key. Did you mean capital S for save and quit?")
+			default:
+				err = fmt.Errorf("Unknown key '%c'. Type ? for help.", rka.r)
+			}
+			return err, again, quit
 		}
-		return err, again, quit
 	}
-	if k == KeyMenu {
-		k, err = ui.SelectAction(g, menuActions, ev)
+	if rka.k == KeyMenu {
+		rka.k, err = ui.SelectAction(g, menuActions, g.CurEvent)
 		if err != nil {
 			return err, again, quit
 		}
 	}
-	switch k {
+	switch rka.k {
 	case KeyW, KeyS, KeyN, KeyE, KeyNW, KeyNE, KeySW, KeySE:
-		err = g.MovePlayer(g.Player.Pos.To(KeyToDir(k)), ev)
+		err = g.MovePlayer(g.Player.Pos.To(KeyToDir(rka.k)), g.CurEvent)
 	case KeyRunW, KeyRunS, KeyRunN, KeyRunE, KeyRunNW, KeyRunNE, KeyRunSW, KeyRunSE:
-		err = g.GoToDir(KeyToDir(k), ev)
+		err = g.GoToDir(KeyToDir(rka.k), g.CurEvent)
 	case KeyWaitTurn:
-		g.WaitTurn(ev)
+		g.WaitTurn(g.CurEvent)
 	case KeyRest:
-		err = g.Rest(ev)
+		err = g.Rest(g.CurEvent)
 	case KeyDescend:
 		if g.Stairs[g.Player.Pos] {
-			if g.Descend(ev) {
+			if g.Descend(g.CurEvent) {
 				ui.Win(g)
 				quit = true
 				return err, again, quit
@@ -727,31 +735,31 @@ func (ui *termui) HandleCharacter(g *game, ev event, c rune) (err error, again b
 		if len(sortedStairs) > 0 {
 			ex := &examiner{stairs: true}
 			err = ex.Action(g, sortedStairs[0])
-			if err == nil && !g.MoveToTarget(ev) {
+			if err == nil && !g.MoveToTarget(g.CurEvent) {
 				err = errors.New("You could not move toward stairs.")
 			}
 		} else {
 			err = errors.New("You cannot go to any stairs.")
 		}
 	case KeyEquip:
-		err = ui.Equip(g, ev)
+		err = ui.Equip(g, g.CurEvent)
 	case KeyDrink:
-		err = ui.SelectPotion(g, ev)
+		err = ui.SelectPotion(g, g.CurEvent)
 		err = ui.CleanError(err)
 	case KeyThrow:
-		err = ui.SelectProjectile(g, ev)
+		err = ui.SelectProjectile(g, g.CurEvent)
 		err = ui.CleanError(err)
 	case KeyEvoke:
-		err = ui.SelectRod(g, ev)
+		err = ui.SelectRod(g, g.CurEvent)
 		err = ui.CleanError(err)
 	case KeyExplore:
-		err = g.Autoexplore(ev)
+		err = g.Autoexplore(g.CurEvent)
 	case KeyExamine:
 		b := ui.Examine(g, nil)
 		ui.DrawDungeonView(g, NormalMode)
 		if !b {
 			again = true
-		} else if !g.MoveToTarget(ev) {
+		} else if !g.MoveToTarget(g.CurEvent) {
 			again = true
 		}
 	case KeyHelp:
@@ -764,7 +772,7 @@ func (ui *termui) HandleCharacter(g *game, ev event, c rune) (err error, again b
 		ui.DrawPreviousLogs(g)
 		again = true
 	case KeySave:
-		ev.Renew(g, 0)
+		g.CurEvent.Renew(g, 0)
 		err := g.Save()
 		if err != nil {
 			g.PrintfStyled("Error: %v", logError, err)
@@ -801,7 +809,7 @@ func (ui *termui) HandleCharacter(g *game, ev event, c rune) (err error, again b
 		ui.Configure(g)
 		again = true
 	default:
-		err = fmt.Errorf("Unknown key '%c'. Type ? for help.", c)
+		err = fmt.Errorf("Unknown key '%c'. Type ? for help.", rka.r)
 	}
 	return err, again, quit
 }

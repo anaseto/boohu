@@ -183,7 +183,7 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 		}
 		return nil, true, false
 	}
-	err, again, quit = ui.HandleCharacter(g, ev, r)
+	err, again, quit = ui.HandleKeyAction(g, runeKeyAction{r: r})
 	if err != nil {
 		again = true
 	}
