@@ -896,7 +896,7 @@ func (ui *termui) CharacterInfo(g *game) {
 	ui.DrawDungeonView(g, NoFlushMode)
 
 	b := bytes.Buffer{}
-	b.WriteString(formatText("Every year, your village sends someone to collect medicinal simella plants in the Underground. This year, the duty fell upon you, and so here you are. Your heart is teared between your will to be as helpful as possible to your village and your will to make it out alive.", TextWidth))
+	b.WriteString(formatText("Every year, your village sends someone to collect medicinal simella plants in the Underground. This year, the duty fell upon you, and so here you are. Your heart is torn between your will to be as helpful as possible to your village and your will to make it out alive.", TextWidth))
 	b.WriteString("\n\n")
 	b.WriteString(formatText(
 		fmt.Sprintf("You are wielding %s. %s", Indefinite(g.Player.Weapon.String(), false), g.Player.Weapon.Desc()), TextWidth))
