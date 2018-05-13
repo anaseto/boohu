@@ -290,6 +290,7 @@ func (ui *termui) MenuAction(n int) (m int, action configAction) {
 }
 
 func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (err error, again, quit, notarg bool) {
+	again = true
 	switch tev := termbox.PollEvent(); tev.Type {
 	case termbox.EventKey:
 		if tev.Ch == 0 {
