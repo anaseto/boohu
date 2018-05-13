@@ -1,12 +1,11 @@
 Break Out Of Hareka's Underground (Boohu) is a roguelike game mainly inspired from DCSS and its tavern, with some ideas from Brogue, but aiming for very short games, almost no character building, and a simplified inventory.
 
-Every year, your village sends someone to collect medicinal simella plants in
-the Underground.  This year, the duty fell upon you, and so here you are. Your
-heart is torn between your will to be as helpful as possible to your village
-and your will to make it out alive.  Deep in the Underground, magical
-stairs will lead you back to your village. Along the way, you will collect
-simellas, as well as various helpful items. You will also encounter monsters,
-which you can fight, or run away from, when you can...
+*Every year, the elders send someone to collect medicinal simella plants in the
+Underground.  This year, the honor fell upon you, and so here you are.
+According to the elders, deep in the Underground, magical stairs will lead you
+back to your village.  Along the way, you will collect simellas, as well as
+various items that will help you deal with monsters, which you may
+fight or flee...*
 
 ![Boohu introduction screen](https://raw.githubusercontent.com/anaseto/boohu-pages/master/intro-screen.png)
 
