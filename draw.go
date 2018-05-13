@@ -715,6 +715,10 @@ func (ui *termui) HandleKeyAction(g *game, rka runeKeyAction) (err error, again 
 			return err, again, quit
 		}
 	}
+	return ui.HandleKey(g, rka)
+}
+
+func (ui *termui) HandleKey(g *game, rka runeKeyAction) (err error, again bool, quit bool) {
 	switch rka.k {
 	case KeyW, KeyS, KeyN, KeyE, KeyNW, KeyNE, KeySW, KeySE:
 		err = g.MovePlayer(g.Player.Pos.To(KeyToDir(rka.k)), g.Ev)
@@ -739,10 +743,18 @@ func (ui *termui) HandleKeyAction(g *game, rka runeKeyAction) (err error, again 
 		stairs := g.StairsSlice()
 		sortedStairs := g.SortedNearestTo(stairs, g.Player.Pos)
 		if len(sortedStairs) > 0 {
+			stair := sortedStairs[0]
+			if g.Player.Pos == stair {
+				err = errors.New("You are already on the stairs.")
+				break
+			}
 			ex := &examiner{stairs: true}
-			err = ex.Action(g, sortedStairs[0])
+			err = ex.Action(g, stair)
 			if err == nil && !g.MoveToTarget(g.Ev) {
 				err = errors.New("You could not move toward stairs.")
+			}
+			if ex.Done() {
+				g.Targeting = nil
 			}
 		} else {
 			err = errors.New("You cannot go to any stairs.")
@@ -761,13 +773,8 @@ func (ui *termui) HandleKeyAction(g *game, rka runeKeyAction) (err error, again 
 	case KeyExplore:
 		err = g.Autoexplore(g.Ev)
 	case KeyExamine:
-		b := ui.Examine(g, nil)
+		err, again, quit = ui.Examine(g, nil)
 		ui.DrawDungeonView(g, NormalMode)
-		if !b {
-			again = true
-		} else if !g.MoveToTarget(g.Ev) {
-			again = true
-		}
 	case KeyHelp:
 		ui.KeysHelp(g)
 		again = true
@@ -814,8 +821,24 @@ func (ui *termui) HandleKeyAction(g *game, rka runeKeyAction) (err error, again 
 	case KeyConfigure:
 		ui.Configure(g)
 		again = true
+	case KeyDescription:
+		ocursor := ui.cursor
+		if ocursor.valid() {
+			ui.HideCursor()
+			ui.ViewPositionDescription(g, ocursor)
+			ui.SetCursor(ocursor)
+		}
+		again = true
+	case KeyExclude:
+		if ui.cursor.valid() {
+			ui.ExcludeZone(g, ui.cursor)
+		}
+		again = true
 	default:
 		err = fmt.Errorf("Unknown key '%c'. Type ? for help.", rka.r)
+	}
+	if err != nil {
+		again = true
 	}
 	return err, again, quit
 }
@@ -843,25 +866,22 @@ func (ui *termui) GoToPos(g *game, ev event, pos position) (err error, again boo
 	return err, again
 }
 
-func (ui *termui) ExaminePos(g *game, ev event, pos position) (again bool) {
+func (ui *termui) ExaminePos(g *game, ev event, pos position) (err error, again, quit bool) {
 	var start *position
 	if pos.valid() {
 		start = &pos
 	}
-	b := ui.Examine(g, start)
-	if !b || !g.MoveToTarget(ev) {
-		again = true
-	}
-	return again
+	err, again, quit = ui.Examine(g, start)
+	return err, again, quit
 }
 
-func (ui *termui) DrawKeysDescription(g *game, actions []string) {
+func (ui *termui) DrawKeysDescription(g *game, title string, actions []string) {
 	ui.DrawDungeonView(g, NoFlushMode)
 
 	if CustomKeys {
-		ui.DrawStyledTextLine(" Default Keys ", 0, HeaderLine)
+		ui.DrawStyledTextLine(fmt.Sprintf(" Default %s ", title), 0, HeaderLine)
 	} else {
-		ui.DrawStyledTextLine(" Keys ", 0, HeaderLine)
+		ui.DrawStyledTextLine(fmt.Sprintf(" %s ", title), 0, HeaderLine)
 	}
 	for i := 0; i < len(actions)-1; i += 2 {
 		bg := ui.ListItemBG(i / 2)
@@ -876,7 +896,7 @@ func (ui *termui) DrawKeysDescription(g *game, actions []string) {
 }
 
 func (ui *termui) KeysHelp(g *game) {
-	ui.DrawKeysDescription(g, []string{
+	ui.DrawKeysDescription(g, "Keys", []string{
 		"Movement", "h/j/k/l/y/u/b/n or numpad or mouse left",
 		"Rest", "r",
 		"Wait a turn", "“.” or 5",
@@ -898,7 +918,7 @@ func (ui *termui) KeysHelp(g *game) {
 }
 
 func (ui *termui) ExamineHelp(g *game) {
-	ui.DrawKeysDescription(g, []string{
+	ui.DrawKeysDescription(g, "Targeting Keys", []string{
 		"Move cursor", "h/j/k/l/y/u/b/n or numpad",
 		"Cycle through monsters", "+",
 		"Cycle through stairs", ">",
@@ -982,63 +1002,63 @@ func (ui *termui) DescribePosition(g *game, pos position, targ Targeter) {
 	if pos == g.Player.Pos {
 		desc = "This is you. "
 	}
+	see := "see"
+	if !g.Player.LOS[pos] {
+		see = "saw"
+	}
 	switch {
 	case !g.Dungeon.Cell(pos).Explored:
 		desc = "You do not know what is in there."
 	case !targ.Reachable(g, pos):
 		desc = "This is out of reach."
 	case mons.Exists() && g.Player.LOS[pos]:
-		desc += fmt.Sprintf("You see %s (%s).", mons.Kind.Indefinite(false), ui.MonsterInfo(mons))
+		desc += fmt.Sprintf("You %s %s (%s).", see, mons.Kind.Indefinite(false), ui.MonsterInfo(mons))
 	case g.Simellas[pos] > 0:
-		desc += fmt.Sprintf("You see some simellas (%d).", g.Simellas[pos])
+		desc += fmt.Sprintf("You %s some simellas (%d).", see, g.Simellas[pos])
 	case okCollectable && c != nil:
 		if c.Quantity > 1 {
-			desc += fmt.Sprintf("You see %d %s there.", c.Quantity, c.Consumable)
+			desc += fmt.Sprintf("You %s %d %s there.", see, c.Quantity, c.Consumable)
 		} else {
-			desc += fmt.Sprintf("You see %s there.", Indefinite(c.Consumable.String(), false))
+			desc += fmt.Sprintf("You %s %s there.", see, Indefinite(c.Consumable.String(), false))
 		}
 	case okEq:
-		desc += fmt.Sprintf("You see %s.", Indefinite(eq.String(), false))
+		desc += fmt.Sprintf("You %s %s.", see, Indefinite(eq.String(), false))
 	case okRod:
-		desc += fmt.Sprintf("You see a %v.", rod)
+		desc += fmt.Sprintf("You %s a %v.", see, rod)
 	case g.Stairs[pos]:
 		if g.Depth == g.MaxDepth() {
-			desc += "You see some glowing stairs."
+			desc += fmt.Sprintf("You %s some glowing stairs.", see)
 		} else {
-			desc += "You see stairs downwards."
+			desc += fmt.Sprintf("You %s stairs downwards.", see)
 		}
 	case g.Doors[pos]:
-		desc += "You see a door."
+		desc += fmt.Sprintf("You %s a door.", see)
 	case g.Dungeon.Cell(pos).T == WallCell:
-		desc += "You see a wall."
+		desc += fmt.Sprintf("You %s a wall.", see)
 	default:
 		if cld, ok := g.Clouds[pos]; ok {
 			if cld == CloudFire {
-				desc += "You see burning flames."
+				desc += fmt.Sprintf("You %s burning flames.", see)
 			} else {
-				desc += "You see a dense fog."
+				desc += fmt.Sprintf("You %s a dense fog.", see)
 			}
 		} else if _, ok := g.Fungus[pos]; ok {
-			desc += "You see dense foliage there."
+			desc += fmt.Sprintf("You %s dense foliage there.", see)
 		} else {
-			desc += "You see the ground."
+			desc += fmt.Sprintf("You %s the ground.", see)
 		}
 	}
 	g.InfoEntry = desc
 }
 
-func (ui *termui) Examine(g *game, start *position) bool {
+func (ui *termui) Examine(g *game, start *position) (err error, again, quit bool) {
 	ex := &examiner{}
-	err := ui.CursorAction(g, ex, start)
-	if err != nil {
-		g.Print(err.Error())
-		return false
-	}
-	return ex.done
+	err, again, quit = ui.CursorAction(g, ex, start)
+	return err, again, quit
 }
 
 func (ui *termui) ChooseTarget(g *game, targ Targeter) bool {
-	err := ui.CursorAction(g, targ, nil)
+	err, _, _ := ui.CursorAction(g, targ, nil)
 	if err != nil {
 		g.Print(err.Error())
 		return false
@@ -1124,29 +1144,35 @@ func (ui *termui) ExcludeZone(g *game, pos position) {
 	}
 }
 
-func (ui *termui) CursorMouseLeft(g *game, targ Targeter, pos position, data *examineData) bool {
+func (ui *termui) CursorMouseLeft(g *game, targ Targeter, pos position, data *examineData) (again, notarg bool) {
+	again = true
 	if data.npos == pos {
 		err := targ.Action(g, pos)
 		if err != nil {
 			g.Print(err.Error())
 		} else {
-			g.Targeting = &pos
-			return true
+			if g.MoveToTarget(g.Ev) {
+				again = false
+			}
+			if targ.Done() {
+				notarg = true
+			}
 		}
 	} else {
 		data.npos = pos
 	}
-	return false
+	return again, notarg
 }
 
-func (ui *termui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, data *examineData) bool {
+func (ui *termui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, data *examineData) (err error, again, quit, notarg bool) {
 	pos := data.npos
+	again = true
 	if rka.r != 0 {
 		var ok bool
 		rka.k, ok = runeTargetingKeyActions[rka.r]
 		if !ok {
 			g.Printf("Invalid targeting mode key '%c'. Type ? for help.", rka.r)
-			return false
+			return err, again, quit, notarg
 		}
 	}
 	if rka.k == KeyMenu {
@@ -1154,7 +1180,7 @@ func (ui *termui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, dat
 		rka.k, err = ui.SelectAction(g, menuTargetActions, g.Ev)
 		if err != nil {
 			g.Print(err.Error())
-			return false
+			return err, again, quit, notarg
 		}
 	}
 	switch rka.k {
@@ -1174,10 +1200,6 @@ func (ui *termui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, dat
 		ui.NextMonster(g, rka.r, pos, data)
 	case KeyNextObject:
 		ui.NextObject(g, pos, data)
-	case KeyDescription:
-		ui.HideCursor()
-		ui.ViewPositionDescription(g, pos)
-		ui.SetCursor(pos)
 	case KeyHelp:
 		ui.HideCursor()
 		ui.ExamineHelp(g)
@@ -1187,17 +1209,38 @@ func (ui *termui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, dat
 		if err != nil {
 			g.Print(err.Error())
 		} else {
-			return true
+			g.Targeting = nil
+			if g.MoveToTarget(g.Ev) {
+				again = false
+			}
+			if targ.Done() {
+				notarg = true
+			}
+			return err, again, quit, notarg
 		}
+	case KeyDescription:
+		ui.HideCursor()
+		ui.ViewPositionDescription(g, pos)
+		ui.SetCursor(pos)
 	case KeyExclude:
 		ui.ExcludeZone(g, pos)
 	case KeyEscape:
 		g.Targeting = nil
-		return true
+		notarg = true
+	case KeyExplore, KeyRest, KeyThrow, KeyDrink, KeyEvoke, KeyLogs, KeyEquip, KeyCharacterInfo:
+		if _, ok := targ.(*examiner); !ok {
+			break
+		}
+		err, again, quit = ui.HandleKey(g, rka)
+		if err != nil {
+			g.Print(err.Error())
+			notarg = true
+		}
+		g.Targeting = nil
 	default:
 		g.Printf("Invalid targeting mode key '%c'. Type ? for help.", rka.r)
 	}
-	return false
+	return err, again, quit, notarg
 }
 
 type examineData struct {
@@ -1209,7 +1252,7 @@ type examineData struct {
 	stairIndex   int
 }
 
-func (ui *termui) CursorAction(g *game, targ Targeter, start *position) error {
+func (ui *termui) CursorAction(g *game, targ Targeter, start *position) (err error, again, quit bool) {
 	pos := g.Player.Pos
 	if start != nil {
 		pos = *start
@@ -1225,7 +1268,6 @@ func (ui *termui) CursorAction(g *game, targ Targeter, start *position) error {
 			}
 		}
 	}
-	var err error
 	data := &examineData{
 		npos:    pos,
 		objects: []position{},
@@ -1255,8 +1297,9 @@ loop:
 		ui.SetCell(DungeonWidth, DungeonHeight, '┤', ColorFg, ColorBg)
 		ui.Flush()
 		data.npos = pos
-		b := ui.TargetModeEvent(g, targ, data)
-		if b {
+		var notarg bool
+		err, again, quit, notarg = ui.TargetModeEvent(g, targ, data)
+		if !again || notarg {
 			break loop
 		}
 		if data.npos.valid() {
@@ -1265,7 +1308,7 @@ loop:
 	}
 	g.Highlight = nil
 	ui.HideCursor()
-	return err
+	return err, again, quit
 }
 
 func (ui *termui) ViewPositionDescription(g *game, pos position) {
@@ -2216,14 +2259,24 @@ var menuActions = []keyAction{
 	KeyDescend,
 	KeyEquip,
 	KeyCharacterInfo,
+	KeyLogs,
 	KeyHelp,
 	KeySave,
 	KeyQuit,
 }
 
 var menuTargetActions = []keyAction{
+	KeyExplore,
+	KeyRest,
+	KeyThrow,
+	KeyDrink,
+	KeyEvoke,
+	KeyEquip,
 	KeyExclude,
 	KeyDescription,
+	KeyCharacterInfo,
+	KeyLogs,
+	KeyHelp,
 }
 
 func (ui *termui) SelectAction(g *game, actions []keyAction, ev event) (keyAction, error) {
@@ -2366,7 +2419,7 @@ getKey:
 		var err error
 		var again, quit bool
 		if g.Targeting != nil {
-			again = ui.ExaminePos(g, ev, *g.Targeting)
+			err, again, quit = ui.ExaminePos(g, ev, *g.Targeting)
 		} else {
 			ui.DrawDungeonView(g, NormalMode)
 			err, again, quit = ui.PlayerTurnEvent(g, ev)

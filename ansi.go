@@ -235,7 +235,7 @@ func (ui *termui) MenuAction(n int) (m int, action configAction) {
 	return n, action
 }
 
-func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) bool {
+func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (err error, again, quit, notarg bool) {
 	r := ui.ReadChar()
 	return ui.CursorKeyAction(g, targ, runeKeyAction{r: r}, data)
 }

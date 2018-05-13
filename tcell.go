@@ -171,12 +171,12 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 			} else if x > DungeonWidth || y > DungeonHeight {
 				again = true
 			} else {
-				again = ui.ExaminePos(g, ev, pos)
+				err, again, quit = ui.ExaminePos(g, ev, pos)
 			}
 		case tcell.Button3:
 			x, y := tev.Position()
 			pos := position{X: x, Y: y}
-			again = ui.ExaminePos(g, ev, pos)
+			err, again, quit = ui.ExaminePos(g, ev, pos)
 		}
 	}
 	if err != nil {
@@ -294,7 +294,8 @@ func (ui *termui) MenuAction(n int) (m int, action configAction) {
 	return n, action
 }
 
-func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) bool {
+func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (err error, again, quit, notarg bool) {
+	again = true
 	switch tev := ui.Screen.PollEvent().(type) {
 	case *tcell.EventKey:
 		r := tev.Rune()
@@ -309,36 +310,33 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) boo
 			r = '6'
 		case tcell.KeyEsc:
 			g.Targeting = nil
-			return true
+			notarg = true
+			return
 		case tcell.KeyEnter:
 			r = '.'
 		}
-		if ui.CursorKeyAction(g, targ, runeKeyAction{r: r}, data) {
-			return true
-		}
+		err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{r: r}, data)
 	case *tcell.EventMouse:
 		switch tev.Buttons() {
 		case tcell.Button1:
 			x, y := tev.Position()
 			if x > DungeonWidth && y == 0 {
-				// TODO: improve such that you can change M
-				return ui.CursorKeyAction(g, targ, runeKeyAction{k: KeyMenu}, data)
+				err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: KeyMenu}, data)
 			} else if x > DungeonWidth || y > DungeonHeight {
 				g.Targeting = nil
-				return true
-			}
-			if ui.CursorMouseLeft(g, targ, position{X: x, Y: y}, data) {
-				return true
+				notarg = true
+			} else {
+				again, notarg = ui.CursorMouseLeft(g, targ, position{X: x, Y: y}, data)
 			}
 		case tcell.Button3:
 			x, y := tev.Position()
 			data.npos = position{X: x, Y: y}
 		case tcell.Button2:
 			g.Targeting = nil
-			return true
+			notarg = true
 		}
 	}
-	return false
+	return err, again, quit, notarg
 }
 
 func (ui *termui) Select(g *game, ev event, l int) (index int, alternate bool, err error) {

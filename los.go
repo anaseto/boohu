@@ -119,9 +119,6 @@ func (g *game) ComputeLOS() {
 func (g *game) SeePosition(pos position) {
 	if !g.Dungeon.Cell(pos).Explored {
 		see := "see"
-		if !g.Player.LOS[pos] {
-			see = "saw"
-		}
 		if c, ok := g.Collectables[pos]; ok {
 			g.StopAuto()
 			if c.Quantity > 1 {

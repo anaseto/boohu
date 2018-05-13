@@ -158,11 +158,11 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 				} else if pos.X > DungeonWidth || pos.Y > DungeonHeight {
 					again = true
 				} else {
-					again = ui.ExaminePos(g, ev, pos)
+					err, again, quit = ui.ExaminePos(g, ev, pos)
 				}
 			case termbox.MouseRight:
 				pos := position{X: tev.MouseX, Y: tev.MouseY}
-				again = ui.ExaminePos(g, ev, pos)
+				err, again, quit = ui.ExaminePos(g, ev, pos)
 			}
 		}
 	}
@@ -289,7 +289,7 @@ func (ui *termui) MenuAction(n int) (m int, action configAction) {
 	return n, action
 }
 
-func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) bool {
+func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (err error, again, quit, notarg bool) {
 	switch tev := termbox.PollEvent(); tev.Type {
 	case termbox.EventKey:
 		if tev.Ch == 0 {
@@ -304,36 +304,34 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) boo
 				tev.Ch = '6'
 			case termbox.KeyEsc, termbox.KeySpace:
 				g.Targeting = nil
-				return true
+				notarg = true
+				return
 			case termbox.KeyEnter:
 				tev.Ch = '.'
 			}
 		}
-		if ui.CursorKeyAction(g, targ, runeKeyAction{r: tev.Ch}, data) {
-			return true
-		}
+		err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{r: tev.Ch}, data)
 	case termbox.EventMouse:
 		if tev.Ch == 0 {
 			switch tev.Key {
 			case termbox.MouseLeft:
 				if tev.MouseX > DungeonWidth && tev.MouseY == 0 {
-					return ui.CursorKeyAction(g, targ, runeKeyAction{k: KeyMenu}, data)
+					err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: KeyMenu}, data)
 				} else if tev.MouseX > DungeonWidth || tev.MouseY > DungeonHeight {
 					g.Targeting = nil
-					return true
-				}
-				if ui.CursorMouseLeft(g, targ, position{X: tev.MouseX, Y: tev.MouseY}, data) {
-					return true
+					notarg = true
+				} else {
+					again, notarg = ui.CursorMouseLeft(g, targ, position{X: tev.MouseX, Y: tev.MouseY}, data)
 				}
 			case termbox.MouseRight:
 				data.npos = position{X: tev.MouseX, Y: tev.MouseY}
 			case termbox.MouseMiddle:
 				g.Targeting = nil
-				return true
+				notarg = true
 			}
 		}
 	}
-	return false
+	return err, again, quit, notarg
 }
 
 func (ui *termui) Select(g *game, ev event, l int) (index int, alternate bool, err error) {

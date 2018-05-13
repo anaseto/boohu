@@ -356,10 +356,10 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 				} else if in.mouseX > DungeonWidth || in.mouseY > DungeonHeight {
 					again = true
 				} else {
-					again = ui.ExaminePos(g, ev, pos)
+					err, again, quit = ui.ExaminePos(g, ev, pos)
 				}
 			case 2:
-				again = ui.ExaminePos(g, ev, pos)
+				err, again, quit = ui.ExaminePos(g, ev, pos)
 			}
 		}
 	default:
@@ -457,12 +457,14 @@ func (ui *termui) MenuAction(n int) (m int, action configAction) {
 	return n, action
 }
 
-func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) bool {
+func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (err error, again, quit, notarg bool) {
+	again = true
 	in := ui.PollEvent()
 	switch in.key {
 	case "\x1b", "Escape", " ":
 		g.Targeting = nil
-		return true
+		notarg = true
+		return
 	case "Enter":
 		in.key = "."
 	case "":
@@ -470,22 +472,21 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) boo
 			switch in.button {
 			case 0:
 				if in.mouseX > DungeonWidth && in.mouseY == 0 {
-					return ui.CursorKeyAction(g, targ, runeKeyAction{k: KeyMenu}, data)
+					err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: KeyMenu}, data)
 				} else if in.mouseX > DungeonWidth || in.mouseY > DungeonHeight {
 					g.Targeting = nil
-					return true
-				}
-				if ui.CursorMouseLeft(g, targ, position{X: in.mouseX, Y: in.mouseY}, data) {
-					return true
+					notarg = true
+				} else {
+					again, notarg = ui.CursorMouseLeft(g, targ, position{X: in.mouseX, Y: in.mouseY}, data)
 				}
 			case 2:
 				data.npos = position{X: in.mouseX, Y: in.mouseY}
 			case 1:
 				g.Targeting = nil
-				return true
+				notarg = true
 			}
 		}
-		return false
+		return err, again, quit, notarg
 	case "ArrowLeft":
 		in.key = "4"
 	case "ArrowRight":
@@ -497,7 +498,8 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) boo
 	}
 	if utf8.RuneCountInString(in.key) > 1 {
 		g.Printf("Invalid key: “%s”.", in.key)
-		return false
+		notarg = true
+		return
 	}
 	return ui.CursorKeyAction(g, targ, runeKeyAction{r: ui.ReadKey(in.key)}, data)
 }
