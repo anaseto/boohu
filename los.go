@@ -102,8 +102,13 @@ func (g *game) ComputeLOS() {
 	}
 	g.Player.LOS = m
 	for _, mons := range g.Monsters {
-		if !mons.Seen && mons.Exists() && g.Player.LOS[mons.Pos] {
+		if mons.Exists() && g.Player.LOS[mons.Pos] {
+			g.StopAuto()
+			if mons.Seen {
+				continue
+			}
 			mons.Seen = true
+			g.Printf("You see %s (%v).", mons.Kind.Indefinite(false), mons.State)
 			if mons.Kind.Dangerousness() > 10 {
 				g.StoryPrint(mons.Kind.SeenStoryText())
 			}
@@ -113,22 +118,26 @@ func (g *game) ComputeLOS() {
 
 func (g *game) SeePosition(pos position) {
 	if !g.Dungeon.Cell(pos).Explored {
+		see := "see"
+		if !g.Player.LOS[pos] {
+			see = "saw"
+		}
 		if c, ok := g.Collectables[pos]; ok {
 			g.StopAuto()
 			if c.Quantity > 1 {
-				g.Printf("You see %d %s.", c.Quantity, c.Consumable.Plural())
+				g.Printf("You %s %d %s.", see, c.Quantity, c.Consumable.Plural())
 			} else {
-				g.Printf("You see %s.", Indefinite(c.Consumable.String(), false))
+				g.Printf("You %s %s.", see, Indefinite(c.Consumable.String(), false))
 			}
 		} else if _, ok := g.Stairs[pos]; ok {
 			g.StopAuto()
-			g.Printf("You see stairs.")
+			g.Printf("You %s stairs.", see)
 		} else if eq, ok := g.Equipables[pos]; ok {
 			g.StopAuto()
-			g.Printf("You see %s.", Indefinite(eq.String(), false))
+			g.Printf("You %s %s.", see, Indefinite(eq.String(), false))
 		} else if rod, ok := g.Rods[pos]; ok {
 			g.StopAuto()
-			g.Printf("You see %s.", Indefinite(rod.String(), false))
+			g.Printf("You %s %s.", see, Indefinite(rod.String(), false))
 		}
 		g.FairAction()
 		g.Dungeon.SetExplored(pos)

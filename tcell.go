@@ -305,11 +305,12 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) boo
 		case tcell.KeyRight:
 			r = '6'
 		case tcell.KeyEsc:
+			g.Targeting = nil
 			return true
 		case tcell.KeyEnter:
 			r = '.'
 		}
-		if ui.CursorCharAction(g, targ, runeKeyAction{r: r}, data) {
+		if ui.CursorKeyAction(g, targ, runeKeyAction{r: r}, data) {
 			return true
 		}
 	case *tcell.EventMouse:
@@ -318,8 +319,9 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) boo
 			x, y := tev.Position()
 			if x > DungeonWidth && y == 0 {
 				// TODO: improve such that you can change M
-				return ui.CursorCharAction(g, targ, runeKeyAction{k: KeyMenu}, data)
+				return ui.CursorKeyAction(g, targ, runeKeyAction{k: KeyMenu}, data)
 			} else if x > DungeonWidth || y > DungeonHeight {
+				g.Targeting = nil
 				return true
 			}
 			if ui.CursorMouseLeft(g, targ, position{X: x, Y: y}, data) {
@@ -329,6 +331,7 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) boo
 			x, y := tev.Position()
 			data.npos = position{X: x, Y: y}
 		case tcell.Button2:
+			g.Targeting = nil
 			return true
 		}
 	}

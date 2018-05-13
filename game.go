@@ -51,6 +51,7 @@ type game struct {
 	KilledMons          map[monsterKind]int
 	Scumming            int
 	Noise               map[position]bool
+	Targeting           *position
 }
 
 type Renderer interface {

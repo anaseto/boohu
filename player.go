@@ -155,14 +155,24 @@ func (g *game) GoToDir(dir direction, ev event) error {
 }
 
 func (g *game) MoveToTarget(ev event) bool {
-	if g.MonsterInLOS() == nil && g.AutoTarget != nil {
+	if g.AutoTarget != nil {
 		path := g.PlayerPath(g.Player.Pos, *g.AutoTarget)
-		if len(path) > 1 {
-			err := g.MovePlayer(path[len(path)-2], ev)
+		if g.MonsterInLOS() != nil {
+			g.AutoTarget = nil
+		}
+		if len(path) >= 1 {
+			var err error
+			if len(path) > 1 {
+				err = g.MovePlayer(path[len(path)-2], ev)
+			} else {
+				g.WaitTurn(ev)
+			}
 			if err != nil {
 				g.Print(err.Error())
 				g.AutoTarget = nil
 				return false
+			} else if g.AutoTarget != nil && g.Player.Pos == *g.AutoTarget {
+				g.AutoTarget = nil
 			}
 			return true
 		}
@@ -345,10 +355,6 @@ func (g *game) MovePlayer(pos position, ev event) error {
 			g.CollectGround()
 			g.ComputeLOS()
 			if g.Autoexploring {
-				mons := g.MonsterInLOS()
-				if mons.Exists() {
-					g.Printf("You see %s (%v).", mons.Kind.Indefinite(false), mons.State)
-				}
 				g.FairAction()
 			} else {
 				g.ScummingAction(ev)

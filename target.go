@@ -27,9 +27,6 @@ func (g *game) ComputePathHighlight(pos position) {
 }
 
 func (ex *examiner) Action(g *game, pos position) error {
-	if g.MonsterInLOS() != nil {
-		return errors.New("You cannot travel while there are monsters in view: one cell at a time.")
-	}
 	if g.ExclusionsMap[g.Player.Pos] {
 		return errors.New("You cannot travel while in an excluded area.")
 	}
@@ -51,6 +48,7 @@ func (ex *examiner) Action(g *game, pos position) error {
 	}
 	if c := g.Dungeon.Cell(pos); c.Explored && c.T == FreeCell {
 		g.AutoTarget = &pos
+		g.Targeting = &pos
 		ex.done = true
 		return nil
 	}

@@ -237,10 +237,7 @@ func (ui *termui) MenuAction(n int) (m int, action configAction) {
 
 func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) bool {
 	r := ui.ReadChar()
-	if r == '\x1b' || r == ' ' {
-		return true
-	}
-	return ui.CursorCharAction(g, targ, runeKeyAction{r: r}, data)
+	return ui.CursorKeyAction(g, targ, runeKeyAction{r: r}, data)
 }
 
 func (ui *termui) Select(g *game, ev event, l int) (index int, alternate bool, err error) {

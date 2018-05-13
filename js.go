@@ -354,7 +354,7 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 					}
 					return err, again, quit
 				}
-				err, again = ui.GoToPos(g, ev, pos)
+				again = ui.ExaminePos(g, ev, pos)
 			case 2:
 				again = ui.ExaminePos(g, ev, pos)
 			}
@@ -458,6 +458,7 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) boo
 	in := ui.PollEvent()
 	switch in.key {
 	case "\x1b", "Escape", " ":
+		g.Targeting = nil
 		return true
 	case "Enter":
 		in.key = "."
@@ -466,8 +467,9 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) boo
 			switch in.button {
 			case 0:
 				if in.mouseX > DungeonWidth && in.mouseY == 0 {
-					return ui.CursorCharAction(g, targ, runeKeyAction{k: KeyMenu}, data)
+					return ui.CursorKeyAction(g, targ, runeKeyAction{k: KeyMenu}, data)
 				} else if in.mouseX > DungeonWidth || in.mouseY > DungeonHeight {
+					g.Targeting = nil
 					return true
 				}
 				if ui.CursorMouseLeft(g, targ, position{X: in.mouseX, Y: in.mouseY}, data) {
@@ -476,6 +478,7 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) boo
 			case 2:
 				data.npos = position{X: in.mouseX, Y: in.mouseY}
 			case 1:
+				g.Targeting = nil
 				return true
 			}
 		}
@@ -493,7 +496,7 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) boo
 		g.Printf("Invalid key: “%s”.", in.key)
 		return false
 	}
-	return ui.CursorCharAction(g, targ, runeKeyAction{r: ui.ReadKey(in.key)}, data)
+	return ui.CursorKeyAction(g, targ, runeKeyAction{r: ui.ReadKey(in.key)}, data)
 }
 
 func (ui *termui) Select(g *game, ev event, l int) (index int, alternate bool, err error) {

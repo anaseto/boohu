@@ -649,42 +649,43 @@ func ApplyDefaultKeyBindings() {
 		'M': KeyMenu,
 	}
 	runeTargetingKeyActions = map[rune]keyAction{
-		'h': KeyW,
-		'j': KeyS,
-		'k': KeyN,
-		'l': KeyE,
-		'y': KeyNW,
-		'u': KeyNE,
-		'b': KeySW,
-		'n': KeySE,
-		'4': KeyW,
-		'2': KeyS,
-		'8': KeyN,
-		'6': KeyE,
-		'7': KeyNW,
-		'9': KeyNE,
-		'1': KeySW,
-		'3': KeySE,
-		'H': KeyRunW,
-		'J': KeyRunS,
-		'K': KeyRunN,
-		'L': KeyRunE,
-		'Y': KeyRunNW,
-		'U': KeyRunNE,
-		'B': KeyRunSW,
-		'N': KeyRunSE,
-		'>': KeyDescend,
-		'D': KeyDescend,
-		'-': KeyPreviousMonster,
-		'+': KeyNextMonster,
-		'o': KeyNextObject,
-		'v': KeyDescription,
-		'd': KeyDescription,
-		'.': KeyTarget,
-		'e': KeyExclude,
-		' ': KeyEscape,
-		'?': KeyHelp,
-		'M': KeyMenu,
+		'h':    KeyW,
+		'j':    KeyS,
+		'k':    KeyN,
+		'l':    KeyE,
+		'y':    KeyNW,
+		'u':    KeyNE,
+		'b':    KeySW,
+		'n':    KeySE,
+		'4':    KeyW,
+		'2':    KeyS,
+		'8':    KeyN,
+		'6':    KeyE,
+		'7':    KeyNW,
+		'9':    KeyNE,
+		'1':    KeySW,
+		'3':    KeySE,
+		'H':    KeyRunW,
+		'J':    KeyRunS,
+		'K':    KeyRunN,
+		'L':    KeyRunE,
+		'Y':    KeyRunNW,
+		'U':    KeyRunNE,
+		'B':    KeyRunSW,
+		'N':    KeyRunSE,
+		'>':    KeyDescend,
+		'D':    KeyDescend,
+		'-':    KeyPreviousMonster,
+		'+':    KeyNextMonster,
+		'o':    KeyNextObject,
+		'v':    KeyDescription,
+		'd':    KeyDescription,
+		'.':    KeyTarget,
+		'e':    KeyExclude,
+		' ':    KeyEscape,
+		'\x1b': KeyEscape,
+		'?':    KeyHelp,
+		'M':    KeyMenu,
 	}
 	CustomKeys = false
 }
@@ -848,7 +849,6 @@ func (ui *termui) ExaminePos(g *game, ev event, pos position) (again bool) {
 		start = &pos
 	}
 	b := ui.Examine(g, start)
-	ui.DrawDungeonView(g, NormalMode)
 	if !b || !g.MoveToTarget(ev) {
 		again = true
 	}
@@ -1130,6 +1130,7 @@ func (ui *termui) CursorMouseLeft(g *game, targ Targeter, pos position, data *ex
 		if err != nil {
 			g.Print(err.Error())
 		} else {
+			g.Targeting = &pos
 			return true
 		}
 	} else {
@@ -1138,7 +1139,7 @@ func (ui *termui) CursorMouseLeft(g *game, targ Targeter, pos position, data *ex
 	return false
 }
 
-func (ui *termui) CursorCharAction(g *game, targ Targeter, rka runeKeyAction, data *examineData) bool {
+func (ui *termui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, data *examineData) bool {
 	pos := data.npos
 	if rka.r != 0 {
 		var ok bool
@@ -1191,6 +1192,7 @@ func (ui *termui) CursorCharAction(g *game, targ Targeter, rka runeKeyAction, da
 	case KeyExclude:
 		ui.ExcludeZone(g, pos)
 	case KeyEscape:
+		g.Targeting = nil
 		return true
 	default:
 		g.Printf("Invalid targeting mode key '%c'. Type ? for help.", rka.r)
@@ -1228,7 +1230,7 @@ func (ui *termui) CursorAction(g *game, targ Targeter, start *position) error {
 		npos:    pos,
 		objects: []position{},
 	}
-	if _, ok := targ.(*examiner); ok && pos == g.Player.Pos {
+	if _, ok := targ.(*examiner); ok && pos == g.Player.Pos && start == nil {
 		ui.NextObject(g, position{-1, -1}, data)
 		if !data.npos.valid() {
 			ui.NextStair(g, data)
@@ -1376,7 +1378,11 @@ func (ui *termui) DrawDungeonView(g *game, m uiMode) {
 		ui.DrawAtPosition(g, pos, m == TargetingMode, r, fgColor, bgColor)
 	}
 	line := 0
-	ui.DrawColoredTextOnBG("→Menu", BarCol, line, ColorBlue, ColorBg)
+	if m == TargetingMode {
+		ui.DrawColoredTextOnBG("→Menu", BarCol, line, ColorCyan, ColorBg)
+	} else {
+		ui.DrawColoredTextOnBG("→Menu", BarCol, line, ColorBlue, ColorBg)
+	}
 	line++
 	ui.DrawText(fmt.Sprintf("[ %v (%d)", g.Player.Armour, g.Player.Armor()), BarCol, line)
 	line++
@@ -2202,7 +2208,6 @@ func (ui *termui) ActionItem(g *game, i, lnum int, ka keyAction, fg uicolor) {
 }
 
 var menuActions = []keyAction{
-	KeyExamine,
 	KeyExplore,
 	KeyRest,
 	KeyThrow,
@@ -2211,6 +2216,7 @@ var menuActions = []keyAction{
 	KeyDescend,
 	KeyEquip,
 	KeyCharacterInfo,
+	KeyHelp,
 	KeySave,
 	KeyQuit,
 }
@@ -2357,8 +2363,14 @@ func (ui *termui) Wizard(g *game) bool {
 func (ui *termui) HandlePlayerTurn(g *game, ev event) bool {
 getKey:
 	for {
-		ui.DrawDungeonView(g, NormalMode)
-		err, again, quit := ui.PlayerTurnEvent(g, ev)
+		var err error
+		var again, quit bool
+		if g.Targeting != nil {
+			again = ui.ExaminePos(g, ev, *g.Targeting)
+		} else {
+			ui.DrawDungeonView(g, NormalMode)
+			err, again, quit = ui.PlayerTurnEvent(g, ev)
+		}
 		if err != nil && err.Error() != "" {
 			g.Print(err.Error())
 		}
