@@ -496,7 +496,7 @@ func (k keyAction) NormalModeDescription() (text string) {
 	case KeyThrow:
 		text = "Throw item"
 	case KeyEvoke:
-		text = "Evoke rode"
+		text = "Evoke rod"
 	case KeyCharacterInfo:
 		text = "View Character and Quest Information"
 	case KeyLogs:
@@ -1172,7 +1172,7 @@ func (ui *termui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, dat
 		var ok bool
 		rka.k, ok = runeTargetingKeyActions[rka.r]
 		if !ok {
-			g.Printf("Invalid targeting mode key '%c'. Type ? for help.", rka.r)
+			err = fmt.Errorf("Invalid targeting mode key '%c'. Type ? for help.", rka.r)
 			return err, again, quit, notarg
 		}
 	}
@@ -1180,7 +1180,6 @@ func (ui *termui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, dat
 		var err error
 		rka.k, err = ui.SelectAction(g, menuTargetActions, g.Ev)
 		if err != nil {
-			g.Print(err.Error())
 			return err, again, quit, notarg
 		}
 	}
@@ -1206,18 +1205,16 @@ func (ui *termui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, dat
 		ui.ExamineHelp(g)
 		ui.SetCursor(pos)
 	case KeyTarget:
-		err := targ.Action(g, pos)
+		err = targ.Action(g, pos)
 		if err != nil {
-			g.Print(err.Error())
-		} else {
-			g.Targeting = nil
-			if g.MoveToTarget(g.Ev) {
-				again = false
-			}
-			if targ.Done() {
-				notarg = true
-			}
-			return err, again, quit, notarg
+			break
+		}
+		g.Targeting = nil
+		if g.MoveToTarget(g.Ev) {
+			again = false
+		}
+		if targ.Done() {
+			notarg = true
 		}
 	case KeyDescription:
 		ui.HideCursor()
@@ -1235,12 +1232,11 @@ func (ui *termui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, dat
 		}
 		err, again, quit = ui.HandleKey(g, rka)
 		if err != nil {
-			g.Print(err.Error())
 			notarg = true
 		}
 		g.Targeting = nil
 	default:
-		g.Printf("Invalid targeting mode key '%c'. Type ? for help.", rka.r)
+		err = fmt.Errorf("Invalid targeting mode key '%c'. Type ? for help.", rka.r)
 	}
 	return err, again, quit, notarg
 }
@@ -1307,6 +1303,9 @@ loop:
 		err, again, quit, notarg = ui.TargetModeEvent(g, targ, data)
 		if !again || notarg {
 			break loop
+		}
+		if err != nil {
+			g.Print(err.Error())
 		}
 		if data.npos.valid() {
 			pos = data.npos
