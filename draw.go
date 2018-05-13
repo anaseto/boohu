@@ -315,7 +315,8 @@ func (ui *termui) CleanError(err error) error {
 type keyAction int
 
 const (
-	KeyW keyAction = iota
+	KeyNothing keyAction = iota
+	KeyW
 	KeyS
 	KeyN
 	KeyE
