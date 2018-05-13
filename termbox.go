@@ -155,8 +155,11 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 						again = true
 					}
 					return err, again, quit
+				} else if pos.X > DungeonWidth || pos.Y > DungeonHeight {
+					again = true
+				} else {
+					again = ui.ExaminePos(g, ev, pos)
 				}
-				err, again = ui.GoToPos(g, ev, pos)
 			case termbox.MouseRight:
 				pos := position{X: tev.MouseX, Y: tev.MouseY}
 				again = ui.ExaminePos(g, ev, pos)

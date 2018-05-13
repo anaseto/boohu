@@ -353,8 +353,11 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 						again = true
 					}
 					return err, again, quit
+				} else if in.mouseX > DungeonWidth || in.mouseY > DungeonHeight {
+					again = true
+				} else {
+					again = ui.ExaminePos(g, ev, pos)
 				}
-				again = ui.ExaminePos(g, ev, pos)
 			case 2:
 				again = ui.ExaminePos(g, ev, pos)
 			}

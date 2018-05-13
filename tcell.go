@@ -168,8 +168,11 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 					again = true
 				}
 				return err, again, quit
+			} else if x > DungeonWidth || y > DungeonHeight {
+				again = true
+			} else {
+				again = ui.ExaminePos(g, ev, pos)
 			}
-			err, again = ui.GoToPos(g, ev, pos)
 		case tcell.Button3:
 			x, y := tev.Position()
 			pos := position{X: x, Y: y}
