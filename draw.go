@@ -2142,12 +2142,12 @@ func (ui *termui) SelectProjectile(g *game, ev event) error {
 		}
 		ui.DrawLine(len(cs) + 1)
 		ui.Flush()
-		index, alternate, noAction := ui.Select(g, ev, len(cs))
+		index, alternate, err := ui.Select(g, ev, len(cs))
 		if alternate {
 			desc = !desc
 			continue
 		}
-		if noAction == nil {
+		if err == nil {
 			ui.ConsumableItem(g, index, index+1, cs[index], ColorYellow)
 			ui.Flush()
 			time.Sleep(100 * time.Millisecond)
@@ -2155,9 +2155,9 @@ func (ui *termui) SelectProjectile(g *game, ev event) error {
 				ui.DrawDescription(g, cs[index].Desc())
 				continue
 			}
-			noAction = cs[index].Use(g, ev)
+			err = cs[index].Use(g, ev)
 		}
-		return noAction
+		return err
 	}
 }
 
@@ -2180,12 +2180,12 @@ func (ui *termui) SelectPotion(g *game, ev event) error {
 		}
 		ui.DrawLine(len(cs) + 1)
 		ui.Flush()
-		index, alternate, noAction := ui.Select(g, ev, len(cs))
+		index, alternate, err := ui.Select(g, ev, len(cs))
 		if alternate {
 			desc = !desc
 			continue
 		}
-		if noAction == nil {
+		if err == nil {
 			ui.ConsumableItem(g, index, index+1, cs[index], ColorYellow)
 			ui.Flush()
 			time.Sleep(100 * time.Millisecond)
@@ -2193,9 +2193,9 @@ func (ui *termui) SelectPotion(g *game, ev event) error {
 				ui.DrawDescription(g, cs[index].Desc())
 				continue
 			}
-			noAction = cs[index].Use(g, ev)
+			err = cs[index].Use(g, ev)
 		}
-		return noAction
+		return err
 	}
 }
 
@@ -2225,12 +2225,12 @@ func (ui *termui) SelectRod(g *game, ev event) error {
 		}
 		ui.DrawLine(len(rs) + 1)
 		ui.Flush()
-		index, alternate, noAction := ui.Select(g, ev, len(rs))
+		index, alternate, err := ui.Select(g, ev, len(rs))
 		if alternate {
 			desc = !desc
 			continue
 		}
-		if noAction == nil {
+		if err == nil {
 			ui.RodItem(g, index, index+1, rs[index], ColorYellow)
 			ui.Flush()
 			time.Sleep(100 * time.Millisecond)
@@ -2238,10 +2238,10 @@ func (ui *termui) SelectRod(g *game, ev event) error {
 				ui.DrawDescription(g, rs[index].Desc())
 				continue
 			}
-			noAction = rs[index].Use(g, ev)
+			err = rs[index].Use(g, ev)
 		}
 		ui.DrawDungeonView(g, NormalMode)
-		return noAction
+		return err
 	}
 }
 
@@ -2295,13 +2295,13 @@ func (ui *termui) SelectAction(g *game, actions []keyAction, ev event) (keyActio
 		}
 		ui.DrawLine(len(actions) + 1)
 		ui.Flush()
-		index, alt, noAction := ui.Select(g, ev, len(actions))
+		index, alt, err := ui.Select(g, ev, len(actions))
 		if alt {
 			continue
 		}
-		if noAction != nil {
+		if err != nil {
 			ui.DrawDungeonView(g, NoFlushMode)
-			return KeyExamine, noAction
+			return KeyExamine, err
 		}
 		ui.ActionItem(g, index, index+1, actions[index], ColorYellow)
 		ui.Flush()
