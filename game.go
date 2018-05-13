@@ -10,7 +10,7 @@ type game struct {
 	Monsters            []*monster
 	Bands               []monsterBand
 	Events              *eventQueue
-	CurEvent            event
+	Ev                  event
 	Highlight           map[position]bool // highlighted positions (e.g. targeted ray)
 	Collectables        map[position]*collectable
 	CollectableScore    int
@@ -556,14 +556,14 @@ func (g *game) FrundisInLevel() bool {
 	return false
 }
 
-func (g *game) Descend(ev event) bool {
+func (g *game) Descend() bool {
 	if g.Depth >= g.MaxDepth() {
 		g.Depth++
 		return true
 	}
 	g.Print("You descend deeper in the dungeon.")
 	g.Depth++
-	g.PushEvent(&simpleEvent{ERank: ev.Rank(), EAction: PlayerTurn})
+	g.PushEvent(&simpleEvent{ERank: g.Ev.Rank(), EAction: PlayerTurn})
 	g.InitLevel()
 	g.Save()
 	return false
@@ -658,7 +658,7 @@ loop:
 		}
 		ev := g.PopIEvent().Event
 		g.Turn = ev.Rank()
-		g.CurEvent = ev
+		g.Ev = ev
 		ev.Action(g)
 		if g.AutoNext {
 			continue loop

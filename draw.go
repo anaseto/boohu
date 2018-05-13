@@ -709,23 +709,23 @@ func (ui *termui) HandleKeyAction(g *game, rka runeKeyAction) (err error, again 
 		}
 	}
 	if rka.k == KeyMenu {
-		rka.k, err = ui.SelectAction(g, menuActions, g.CurEvent)
+		rka.k, err = ui.SelectAction(g, menuActions, g.Ev)
 		if err != nil {
 			return err, again, quit
 		}
 	}
 	switch rka.k {
 	case KeyW, KeyS, KeyN, KeyE, KeyNW, KeyNE, KeySW, KeySE:
-		err = g.MovePlayer(g.Player.Pos.To(KeyToDir(rka.k)), g.CurEvent)
+		err = g.MovePlayer(g.Player.Pos.To(KeyToDir(rka.k)), g.Ev)
 	case KeyRunW, KeyRunS, KeyRunN, KeyRunE, KeyRunNW, KeyRunNE, KeyRunSW, KeyRunSE:
-		err = g.GoToDir(KeyToDir(rka.k), g.CurEvent)
+		err = g.GoToDir(KeyToDir(rka.k), g.Ev)
 	case KeyWaitTurn:
-		g.WaitTurn(g.CurEvent)
+		g.WaitTurn(g.Ev)
 	case KeyRest:
-		err = g.Rest(g.CurEvent)
+		err = g.Rest(g.Ev)
 	case KeyDescend:
 		if g.Stairs[g.Player.Pos] {
-			if g.Descend(g.CurEvent) {
+			if g.Descend() {
 				ui.Win(g)
 				quit = true
 				return err, again, quit
@@ -740,31 +740,31 @@ func (ui *termui) HandleKeyAction(g *game, rka runeKeyAction) (err error, again 
 		if len(sortedStairs) > 0 {
 			ex := &examiner{stairs: true}
 			err = ex.Action(g, sortedStairs[0])
-			if err == nil && !g.MoveToTarget(g.CurEvent) {
+			if err == nil && !g.MoveToTarget(g.Ev) {
 				err = errors.New("You could not move toward stairs.")
 			}
 		} else {
 			err = errors.New("You cannot go to any stairs.")
 		}
 	case KeyEquip:
-		err = ui.Equip(g, g.CurEvent)
+		err = ui.Equip(g, g.Ev)
 	case KeyDrink:
-		err = ui.SelectPotion(g, g.CurEvent)
+		err = ui.SelectPotion(g, g.Ev)
 		err = ui.CleanError(err)
 	case KeyThrow:
-		err = ui.SelectProjectile(g, g.CurEvent)
+		err = ui.SelectProjectile(g, g.Ev)
 		err = ui.CleanError(err)
 	case KeyEvoke:
-		err = ui.SelectRod(g, g.CurEvent)
+		err = ui.SelectRod(g, g.Ev)
 		err = ui.CleanError(err)
 	case KeyExplore:
-		err = g.Autoexplore(g.CurEvent)
+		err = g.Autoexplore(g.Ev)
 	case KeyExamine:
 		b := ui.Examine(g, nil)
 		ui.DrawDungeonView(g, NormalMode)
 		if !b {
 			again = true
-		} else if !g.MoveToTarget(g.CurEvent) {
+		} else if !g.MoveToTarget(g.Ev) {
 			again = true
 		}
 	case KeyHelp:
@@ -777,7 +777,7 @@ func (ui *termui) HandleKeyAction(g *game, rka runeKeyAction) (err error, again 
 		ui.DrawPreviousLogs(g)
 		again = true
 	case KeySave:
-		g.CurEvent.Renew(g, 0)
+		g.Ev.Renew(g, 0)
 		err := g.Save()
 		if err != nil {
 			g.PrintfStyled("Error: %v", logError, err)
@@ -1150,7 +1150,7 @@ func (ui *termui) CursorCharAction(g *game, targ Targeter, rka runeKeyAction, da
 	}
 	if rka.k == KeyMenu {
 		var err error
-		rka.k, err = ui.SelectAction(g, menuTargetActions, g.CurEvent)
+		rka.k, err = ui.SelectAction(g, menuTargetActions, g.Ev)
 		if err != nil {
 			g.Print(err.Error())
 			return false
