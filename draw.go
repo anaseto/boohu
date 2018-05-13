@@ -1227,6 +1227,7 @@ func (ui *termui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, dat
 	case KeyEscape:
 		g.Targeting = nil
 		notarg = true
+		err = errors.New(DoNothing)
 	case KeyExplore, KeyRest, KeyThrow, KeyDrink, KeyEvoke, KeyLogs, KeyEquip, KeyCharacterInfo:
 		if _, ok := targ.(*examiner); !ok {
 			break

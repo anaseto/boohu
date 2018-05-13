@@ -379,8 +379,11 @@ func (p projectile) Use(g *game, ev event) error {
 	case ExplosiveMagara:
 		err = g.ThrowExplosiveMagara(ev)
 	}
+	if err != nil {
+		return err
+	}
 	g.UseConsumable(p)
-	return err
+	return nil
 }
 
 func (g *game) ThrowJavelin(ev event) error {
