@@ -822,19 +822,6 @@ func (ui *termui) HandleKey(g *game, rka runeKeyAction) (err error, again bool, 
 	case KeyConfigure:
 		ui.Configure(g)
 		again = true
-	case KeyDescription:
-		ocursor := ui.cursor
-		if ocursor.valid() {
-			ui.HideCursor()
-			ui.ViewPositionDescription(g, ocursor)
-			ui.SetCursor(ocursor)
-		}
-		again = true
-	case KeyExclude:
-		if ui.cursor.valid() {
-			ui.ExcludeZone(g, ui.cursor)
-		}
-		again = true
 	default:
 		err = fmt.Errorf("Unknown key '%c'. Type ? for help.", rka.r)
 	}
