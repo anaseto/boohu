@@ -325,6 +325,7 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (er
 			} else if x > DungeonWidth || y > DungeonHeight {
 				g.Targeting = nil
 				notarg = true
+				err = errors.New(DoNothing)
 			} else {
 				again, notarg = ui.CursorMouseLeft(g, targ, position{X: x, Y: y}, data)
 			}
