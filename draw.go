@@ -400,13 +400,14 @@ var configurableKeyActions = [...]keyAction{
 	KeyNextObject,
 	KeyDescription,
 	KeyTarget,
-	KeyExclude}
+	KeyExclude,
+	KeyMenu}
 
 var CustomKeys bool
 
 func FixedRuneKey(r rune) bool {
 	switch r {
-	case ' ', '?', '=', 'M':
+	case ' ', '?', '=':
 		return true
 	default:
 		return false
