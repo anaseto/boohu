@@ -1240,13 +1240,13 @@ func (g *game) MaxDanger() int {
 	for c, q := range g.Player.Consumables {
 		switch c {
 		case HealWoundsPotion, CBlinkPotion:
-			adjust += Min(5, g.Depth) * Min(q, g.Depth)
+			adjust += Min(5, g.Depth) * Min(q, Min(5, g.Depth))
 		case BerserkPotion, TeleportationPotion:
 			adjust += Min(3, g.Depth) * Min(q, 3)
-		case SwiftnessPotion, LignificationPotion, MagicPotion, WallPotion:
+		case SwiftnessPotion, LignificationPotion, MagicPotion, WallPotion, ExplosiveMagara:
 			adjust += Min(2, g.Depth) * Min(q, 3)
 		case Javelin, ConfusingDart:
-			adjust += Min(1, g.Depth) * Min(q, 10)
+			adjust += Min(1, g.Depth) * Min(q, 7)
 		}
 	}
 	for _, props := range g.Player.Rods {
@@ -1264,7 +1264,7 @@ func (g *game) MaxDanger() int {
 		adjust += g.MaxDepth() - g.Depth
 	}
 	if g.Depth > 3 && g.Player.Shield == NoShield && !g.Player.Weapon.TwoHanded() {
-		adjust -= Max(7-g.Depth, 0) * 2
+		adjust -= Min(g.Depth, 6) * 2
 	}
 	if g.Player.Weapon.TwoHanded() && g.Depth < 4 {
 		adjust += (4 - g.Depth) * 2
@@ -1276,7 +1276,7 @@ func (g *game) MaxDanger() int {
 		adjust += 4 + (3-g.Depth)*3
 	}
 	if g.Player.Armour == Robe {
-		adjust -= 2 * g.Depth
+		adjust -= 3 * g.Depth / 2
 	}
 	if max+adjust < max-max/3 {
 		max = max - max/3
