@@ -1258,7 +1258,7 @@ func (g *game) MaxDanger() int {
 		adjust += g.Depth
 	}
 	if g.Player.Weapon == Dagger {
-		adjust -= Min(3, g.Depth) * g.Depth
+		adjust -= Min(3, g.Depth) * Max(1, g.Depth-2)
 	}
 	if g.Player.Armour == PlateArmour {
 		adjust += g.MaxDepth() - g.Depth
