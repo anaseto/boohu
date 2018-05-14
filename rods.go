@@ -223,8 +223,8 @@ func (g *game) Blink(ev event) {
 }
 
 func (g *game) EvokeRodTeleportOther(ev event) error {
-	if !g.ui.ChooseTarget(g, &chooser{}) {
-		return errors.New(DoNothing)
+	if err := g.ui.ChooseTarget(g, &chooser{}); err != nil {
+		return err
 	}
 	mons, _ := g.MonsterAt(g.Player.Target)
 	// mons not nil (check done in the targeter)
@@ -233,8 +233,8 @@ func (g *game) EvokeRodTeleportOther(ev event) error {
 }
 
 func (g *game) EvokeRodLightningBolt(ev event) error {
-	if !g.ui.ChooseTarget(g, &chooser{flammable: true}) {
-		return errors.New(DoNothing)
+	if err := g.ui.ChooseTarget(g, &chooser{flammable: true}); err != nil {
+		return err
 	}
 	ray := g.Ray(g.Player.Target)
 	g.Print("A lightning bolt emerges straight from the rod.")
@@ -257,8 +257,8 @@ func (g *game) EvokeRodLightningBolt(ev event) error {
 }
 
 func (g *game) EvokeRodFireball(ev event) error {
-	if !g.ui.ChooseTarget(g, &chooser{area: true, minDist: true, flammable: true}) {
-		return errors.New(DoNothing)
+	if err := g.ui.ChooseTarget(g, &chooser{area: true, minDist: true, flammable: true}); err != nil {
+		return err
 	}
 	neighbors := g.Dungeon.FreeNeighbors(g.Player.Target)
 	g.Print("A fireball emerges straight from the rod.")
@@ -308,8 +308,8 @@ func (g *game) Fog(at position, radius int, ev event) {
 }
 
 func (g *game) EvokeRodDigging(ev event) error {
-	if !g.ui.ChooseTarget(g, &wallChooser{}) {
-		return errors.New(DoNothing)
+	if err := g.ui.ChooseTarget(g, &wallChooser{}); err != nil {
+		return err
 	}
 	pos := g.Player.Target
 	for i := 0; i < 3; i++ {
@@ -331,8 +331,8 @@ func (g *game) EvokeRodDigging(ev event) error {
 }
 
 func (g *game) EvokeRodShatter(ev event) error {
-	if !g.ui.ChooseTarget(g, &wallChooser{minDist: true}) {
-		return errors.New(DoNothing)
+	if err := g.ui.ChooseTarget(g, &wallChooser{minDist: true}); err != nil {
+		return err
 	}
 	neighbors := g.Dungeon.FreeNeighbors(g.Player.Target)
 	if RandInt(2) == 0 {
@@ -367,8 +367,8 @@ func (g *game) EvokeRodShatter(ev event) error {
 }
 
 func (g *game) EvokeRodObstruction(ev event) error {
-	if !g.ui.ChooseTarget(g, &chooser{needsFreeWay: true, free: true}) {
-		return errors.New(DoNothing)
+	if err := g.ui.ChooseTarget(g, &chooser{needsFreeWay: true, free: true}); err != nil {
+		return err
 	}
 	neighbors := g.Dungeon.FreeNeighbors(g.Player.Target)
 	for _, pos := range neighbors {
@@ -390,8 +390,8 @@ func (g *game) EvokeRodSwapping(ev event) error {
 	if g.Player.HasStatus(StatusLignification) {
 		return errors.New("You cannot use this rod while lignified.")
 	}
-	if !g.ui.ChooseTarget(g, &chooser{}) {
-		return errors.New(DoNothing)
+	if err := g.ui.ChooseTarget(g, &chooser{}); err != nil {
+		return err
 	}
 	mons, _ := g.MonsterAt(g.Player.Target)
 	// mons not nil (check done in the targeter)

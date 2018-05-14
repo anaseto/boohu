@@ -1047,13 +1047,15 @@ func (ui *termui) Examine(g *game, start *position) (err error, again, quit bool
 	return err, again, quit
 }
 
-func (ui *termui) ChooseTarget(g *game, targ Targeter) bool {
+func (ui *termui) ChooseTarget(g *game, targ Targeter) error {
 	err, _, _ := ui.CursorAction(g, targ, nil)
 	if err != nil {
-		g.Print(err.Error())
-		return false
+		return err
 	}
-	return targ.Done()
+	if !targ.Done() {
+		return errors.New(DoNothing)
+	}
+	return nil
 }
 
 func (ui *termui) NextMonster(g *game, r rune, pos position, data *examineData) {

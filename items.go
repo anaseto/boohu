@@ -292,8 +292,8 @@ func (g *game) QuaffCBlinkPotion(ev event) error {
 	if g.Player.HasStatus(StatusLignification) {
 		return errors.New("You cannot blink while lignified.")
 	}
-	if !g.ui.ChooseTarget(g, &chooser{free: true}) {
-		return errors.New(DoNothing)
+	if err := g.ui.ChooseTarget(g, &chooser{free: true}); err != nil {
+		return err
 	}
 	g.Player.Pos = g.Player.Target
 	g.Printf("You quaff the %s. You blink.", CBlinkPotion)
@@ -387,8 +387,8 @@ func (p projectile) Use(g *game, ev event) error {
 }
 
 func (g *game) ThrowJavelin(ev event) error {
-	if !g.ui.ChooseTarget(g, &chooser{needsFreeWay: true}) {
-		return errors.New(DoNothing)
+	if err := g.ui.ChooseTarget(g, &chooser{needsFreeWay: true}); err != nil {
+		return err
 	}
 	mons, _ := g.MonsterAt(g.Player.Target)
 	acc := RandInt(g.Player.RangedAccuracy())
@@ -427,8 +427,8 @@ func (g *game) ThrowJavelin(ev event) error {
 }
 
 func (g *game) ThrowConfusingDart(ev event) error {
-	if !g.ui.ChooseTarget(g, &chooser{needsFreeWay: true}) {
-		return errors.New(DoNothing)
+	if err := g.ui.ChooseTarget(g, &chooser{needsFreeWay: true}); err != nil {
+		return err
 	}
 	mons, _ := g.MonsterAt(g.Player.Target)
 	acc := RandInt(g.Player.RangedAccuracy())
@@ -450,8 +450,8 @@ func (g *game) ThrowConfusingDart(ev event) error {
 }
 
 func (g *game) ThrowExplosiveMagara(ev event) error {
-	if !g.ui.ChooseTarget(g, &chooser{area: true, minDist: true, flammable: true}) {
-		return errors.New(DoNothing)
+	if err := g.ui.ChooseTarget(g, &chooser{area: true, minDist: true, flammable: true}); err != nil {
+		return err
 	}
 	neighbors := g.Dungeon.FreeNeighbors(g.Player.Target)
 	g.Print("You throw the explosive magara, which gives a noisy pop.")

@@ -58,7 +58,7 @@ type Renderer interface {
 	ExploreStep(*game) bool
 	HandlePlayerTurn(*game, event) bool
 	Death(*game)
-	ChooseTarget(*game, Targeter) bool
+	ChooseTarget(*game, Targeter) error
 	CriticalHPWarning(*game)
 	ExplosionAnimation(*game, explosionStyle, position)
 	LightningBoltAnimation(*game, []position)
