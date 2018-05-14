@@ -287,6 +287,33 @@ func (d *dungeon) IsAreaFree(pos position, h, w int) bool {
 	return true
 }
 
+func (d *dungeon) RoomDigCanditate(pos position, h, w int) (ret bool) {
+	for i := pos.X; i < pos.X+w; i++ {
+		for j := pos.Y; j < pos.Y+h; j++ {
+			rpos := position{i, j}
+			if !rpos.valid() {
+				return false
+			}
+			if d.Cell(rpos).T == FreeCell {
+				ret = true
+			}
+		}
+	}
+	return ret
+}
+
+func (d *dungeon) DigArea(pos position, h, w int) {
+	for i := pos.X; i < pos.X+w; i++ {
+		for j := pos.Y; j < pos.Y+h; j++ {
+			rpos := position{i, j}
+			if !rpos.valid() {
+				continue
+			}
+			d.SetCell(rpos, FreeCell)
+		}
+	}
+}
+
 func (d *dungeon) BuildRoom(pos position, w, h int) map[position]bool {
 	spos := position{pos.X - 1, pos.Y - 1}
 	if !d.IsAreaFree(spos, h+2, w+2) {
@@ -315,19 +342,25 @@ func (d *dungeon) BuildRoom(pos position, w, h int) map[position]bool {
 	} else {
 		n := RandInt(2)
 		m := RandInt(2)
-		if n == 0 && m == 0 {
-			// round room
-			d.SetCell(pos, FreeCell)
-			d.SetCell(position{pos.X, pos.Y + h - 1}, FreeCell)
-			d.SetCell(position{pos.X + w - 1, pos.Y}, FreeCell)
-			d.SetCell(position{pos.X + w - 1, pos.Y + h - 1}, FreeCell)
-		}
+		//if n == 0 && m == 0 {
+		//// round room
+		//d.SetCell(pos, FreeCell)
+		//d.SetCell(position{pos.X, pos.Y + h - 1}, FreeCell)
+		//d.SetCell(position{pos.X + w - 1, pos.Y}, FreeCell)
+		//d.SetCell(position{pos.X + w - 1, pos.Y + h - 1}, FreeCell)
+		//}
 		for x := pos.X + 1 + m; x < pos.X+w-1; x += 2 {
 			for y := pos.Y + 1 + n; y < pos.Y+h-1; y += 2 {
 				d.SetCell(position{x, y}, WallCell)
 			}
 		}
 
+	}
+	area := make([]position, 9)
+	for _, p := range [4]position{pos, {pos.X, pos.Y + h - 1}, {pos.X + w - 1, pos.Y}, {pos.X + w - 1, pos.Y + h - 1}} {
+		if d.WallAreaCount(area, p, 1) == 4 {
+			d.SetCell(p, FreeCell)
+		}
 	}
 	doorsc := [4]position{
 		position{pos.X + w/2, pos.Y},
@@ -345,8 +378,24 @@ func (d *dungeon) BuildRoom(pos position, w, h int) map[position]bool {
 }
 
 func (d *dungeon) BuildSomeRoom(w, h int) map[position]bool {
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 200; i++ {
 		pos := d.FreeCell()
+		doors := d.BuildRoom(pos, w, h)
+		if doors != nil {
+			return doors
+		}
+	}
+	return nil
+}
+
+func (d *dungeon) DigSomeRoom(w, h int) map[position]bool {
+	for i := 0; i < 200; i++ {
+		pos := d.FreeCell()
+		dpos := position{pos.X - 1, pos.Y - 1}
+		if !d.RoomDigCanditate(dpos, h+2, w+2) {
+			continue
+		}
+		d.DigArea(dpos, h+2, w+2)
 		doors := d.BuildRoom(pos, w, h)
 		if doors != nil {
 			return doors
@@ -685,10 +734,31 @@ loop:
 			}
 		}
 	}
+	//g.Dungeon = d
+	//g.PutDoors(5)
+
+	doors := make(map[position]bool)
+	if RandInt(3) > 0 {
+		w, h := GenCaveRoomSize()
+		for pos := range d.DigSomeRoom(w, h) {
+			doors[pos] = true
+		}
+		if RandInt(3) == 0 {
+			w, h := GenCaveRoomSize()
+			for pos := range d.DigSomeRoom(w, h) {
+				doors[pos] = true
+			}
+		}
+	}
 	g.Dungeon = d
 	g.Fungus = make(map[position]vegetation)
 	g.DigFungus(RandInt(3))
 	g.PutDoors(5)
+	for pos := range doors {
+		if g.DoorCandidate(pos) && RandInt(100) > 20 {
+			g.Doors[pos] = true
+		}
+	}
 }
 
 func (d *dungeon) WallAreaCount(area []position, pos position, radius int) int {
