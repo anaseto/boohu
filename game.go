@@ -69,6 +69,7 @@ type Renderer interface {
 	MagicMappingAnimation(*game, []int)
 	HitAnimation(*game, position, bool)
 	WoundedAnimation(*game)
+	WallExplosionAnimation(*game, position)
 	ProjectileTrajectoryAnimation(*game, []position, uicolor)
 	DrawDungeonView(*game, uiMode)
 }

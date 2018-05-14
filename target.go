@@ -70,6 +70,7 @@ type chooser struct {
 	needsFreeWay bool
 	free         bool
 	flammable    bool
+	wall         bool
 }
 
 func (ch *chooser) ComputeHighlight(g *game, pos position) {
@@ -94,55 +95,63 @@ func (ch *chooser) Action(g *game, pos position) error {
 	if ch.minDist && pos.Distance(g.Player.Pos) <= 1 {
 		return errors.New("Invalid target: too close.")
 	}
-	if c := g.Dungeon.Cell(pos); c.Explored && c.T == FreeCell {
-		if (ch.area || ch.needsFreeWay) && !ch.freeWay(g, pos) {
-			return errors.New("Invalid target: there are monsters in the way.")
-		}
-		mons, _ := g.MonsterAt(pos)
-		if ch.free {
-			if mons.Exists() {
-				return errors.New("Invalid target: there is a monster there.")
-			}
-			if g.Player.Pos == pos {
-				return errors.New("Invalid target: you are here.")
-			}
-			g.Player.Target = pos
-			ch.done = true
-			return nil
-		}
-		if mons.Exists() || ch.flammable && ch.flammableInWay(g, pos) {
-			g.Player.Target = pos
-			ch.done = true
-			return nil
-		}
-		if ch.flammable && ch.flammableInWay(g, pos) {
-			g.Player.Target = pos
-			ch.done = true
-			return nil
-		}
-		if !ch.area {
-			return errors.New("You must target a monster.")
-		}
-		neighbors := g.Dungeon.FreeNeighbors(pos)
-		for _, npos := range neighbors {
-			mons, _ := g.MonsterAt(npos)
-			_, okFungus := g.Fungus[pos]
-			_, okDoors := g.Doors[pos]
-			if ch.flammable && (okFungus || okDoors) || mons.Exists() {
-				g.Player.Target = pos
-				ch.done = true
-				return nil
-			}
-		}
-		if ch.flammable {
-			return errors.New("Invalid target: no monsters nor flammable terrain in the area.")
-		}
-		return errors.New("Invalid target: no monsters in the area.")
+	c := g.Dungeon.Cell(pos)
+	if c.T == WallCell {
+		return errors.New("You cannot target a wall.")
 	}
-	if !g.Dungeon.Cell(pos).Explored {
-		return errors.New("You do not know what is in there.")
+	if (ch.area || ch.needsFreeWay) && !ch.freeWay(g, pos) {
+		return errors.New("Invalid target: there are monsters in the way.")
 	}
-	return errors.New("You cannot target a wall.")
+	mons, _ := g.MonsterAt(pos)
+	if ch.free {
+		if mons.Exists() {
+			return errors.New("Invalid target: there is a monster there.")
+		}
+		if g.Player.Pos == pos {
+			return errors.New("Invalid target: you are here.")
+		}
+		g.Player.Target = pos
+		ch.done = true
+		return nil
+	}
+	if mons.Exists() || ch.flammable && ch.flammableInWay(g, pos) {
+		g.Player.Target = pos
+		ch.done = true
+		return nil
+	}
+	if ch.flammable && ch.flammableInWay(g, pos) {
+		g.Player.Target = pos
+		ch.done = true
+		return nil
+	}
+	if !ch.area {
+		return errors.New("You must target a monster.")
+	}
+	neighbors := pos.ValidNeighbors()
+	for _, npos := range neighbors {
+		nc := g.Dungeon.Cell(npos)
+		if !ch.wall && nc.T == WallCell {
+			continue
+		}
+		mons, _ := g.MonsterAt(npos)
+		_, okFungus := g.Fungus[pos]
+		_, okDoors := g.Doors[pos]
+		if ch.flammable && (okFungus || okDoors) || mons.Exists() || nc.T == WallCell {
+			g.Player.Target = pos
+			ch.done = true
+			return nil
+		}
+	}
+	if ch.flammable && ch.wall {
+		return errors.New("Invalid target: no monsters, walls nor flammable terrain in the area.")
+	}
+	if ch.flammable {
+		return errors.New("Invalid target: no monsters nor flammable terrain in the area.")
+	}
+	if ch.wall {
+		return errors.New("Invalid target: no monsters nor walls in the area.")
+	}
+	return errors.New("Invalid target: no monsters in the area.")
 }
 
 func (ch *chooser) Done() bool {

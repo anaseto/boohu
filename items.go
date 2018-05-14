@@ -349,7 +349,7 @@ func (p projectile) Desc() (text string) {
 	case ConfusingDart:
 		text = "can be thrown to confuse foes. Confused monsters cannot move diagonally."
 	case ExplosiveMagara:
-		text = "can be thrown to cause a fire explosion halving HP of monsters in a square area."
+		text = "can be thrown to cause a fire explosion halving HP of monsters in a square area. It can occasionally destroy walls."
 	case Net:
 		text = "can be thrown to emprison your enemies."
 	}
@@ -450,10 +450,10 @@ func (g *game) ThrowConfusingDart(ev event) error {
 }
 
 func (g *game) ThrowExplosiveMagara(ev event) error {
-	if err := g.ui.ChooseTarget(g, &chooser{area: true, minDist: true, flammable: true}); err != nil {
+	if err := g.ui.ChooseTarget(g, &chooser{area: true, minDist: true, flammable: true, wall: true}); err != nil {
 		return err
 	}
-	neighbors := g.Dungeon.FreeNeighbors(g.Player.Target)
+	neighbors := g.Player.Target.ValidNeighbors()
 	g.Print("You throw the explosive magara, which gives a noisy pop.")
 	g.MakeNoise(18, g.Player.Target)
 	g.ui.ProjectileTrajectoryAnimation(g, g.Ray(g.Player.Target), ColorFgPlayer)
@@ -468,6 +468,15 @@ func (g *game) ThrowExplosiveMagara(ev event) error {
 			}
 			g.MakeNoise(12, mons.Pos)
 			mons.MakeHuntIfHurt(g)
+		} else if g.Dungeon.Cell(pos).T == WallCell && RandInt(2) == 0 {
+			g.Dungeon.SetCell(pos, FreeCell)
+			if !g.Player.LOS[pos] {
+				g.UnknownDig[pos] = true
+			} else {
+				g.ui.WallExplosionAnimation(g, pos)
+			}
+			g.MakeNoise(18, pos)
+			g.Fog(pos, 1, ev)
 		}
 	}
 

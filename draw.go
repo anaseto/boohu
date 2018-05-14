@@ -1519,6 +1519,16 @@ func (ui *termui) ExplosionAnimation(g *game, es explosionStyle, pos position) {
 	time.Sleep(25 * time.Millisecond)
 }
 
+func (ui *termui) WallExplosionAnimation(g *game, pos position) {
+	colors := [2]uicolor{ColorFgExplosionWallStart, ColorFgExplosionWallEnd}
+	for _, fg := range colors {
+		_, _, bgColor := ui.PositionDrawing(g, pos)
+		ui.DrawAtPosition(g, pos, true, '☼', fg, bgColor)
+		ui.Flush()
+		time.Sleep(25 * time.Millisecond)
+	}
+}
+
 func (ui *termui) LightningBoltAnimation(g *game, ray []position) {
 	ui.DrawDungeonView(g, NormalMode)
 	time.Sleep(25 * time.Millisecond)

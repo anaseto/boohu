@@ -218,6 +218,8 @@ func (g *game) ScummingAction(ev event) {
 			for _, pos := range neighbors {
 				if RandInt(3) != 0 {
 					g.Dungeon.SetCell(pos, FreeCell)
+					g.ui.WallExplosionAnimation(g, pos)
+					g.Fog(pos, 1, ev)
 				}
 			}
 			g.PrintStyled("You hear a terrible explosion coming from the ground. You are lignified.", logCritic)
