@@ -1102,6 +1102,15 @@ func (m *monster) Explode(g *game, ev event) {
 		} else if g.Player.Pos == pos {
 			dmg := g.Player.HP / 2
 			m.InflictDamage(g, dmg, 15)
+		} else if g.Dungeon.Cell(pos).T == WallCell && RandInt(2) == 0 {
+			g.Dungeon.SetCell(pos, FreeCell)
+			if !g.Player.LOS[pos] {
+				g.UnknownDig[pos] = true
+			} else {
+				g.ui.WallExplosionAnimation(g, pos)
+			}
+			g.MakeNoise(18, pos)
+			g.Fog(pos, 1, ev)
 		}
 	}
 }
