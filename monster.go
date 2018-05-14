@@ -1085,12 +1085,15 @@ func (m *monster) AbsorbMana(g *game, ev event) bool {
 }
 
 func (m *monster) Explode(g *game, ev event) {
-	neighbors := g.Dungeon.FreeNeighbors(m.Pos)
+	neighbors := m.Pos.ValidNeighbors()
 	g.MakeNoise(18, m.Pos)
 	g.Printf("%s blows with a noisy pop.", m.Kind.Definite(true))
 	g.ui.ExplosionAnimation(g, FireExplosion, m.Pos)
 	for _, pos := range append(neighbors, m.Pos) {
-		g.Burn(pos, ev)
+		c := g.Dungeon.Cell(pos)
+		if c.T == FreeCell {
+			g.Burn(pos, ev)
+		}
 		mons, _ := g.MonsterAt(pos)
 		if mons.Exists() {
 			mons.HP /= 2
@@ -1102,7 +1105,7 @@ func (m *monster) Explode(g *game, ev event) {
 		} else if g.Player.Pos == pos {
 			dmg := g.Player.HP / 2
 			m.InflictDamage(g, dmg, 15)
-		} else if g.Dungeon.Cell(pos).T == WallCell && RandInt(2) == 0 {
+		} else if c.T == WallCell && RandInt(2) == 0 {
 			g.Dungeon.SetCell(pos, FreeCell)
 			if !g.Player.LOS[pos] {
 				g.UnknownDig[pos] = true
