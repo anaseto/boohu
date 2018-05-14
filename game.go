@@ -261,9 +261,16 @@ func (g *game) InitPlayer() {
 	}
 	g.Player.Consumables = map[consumable]int{
 		HealWoundsPotion: 1,
-		Javelin:          3,
 	}
-	switch RandInt(6) {
+	switch RandInt(4) {
+	case 0:
+		g.Player.Consumables[ConfusingDart] = 2
+	case 1:
+		g.Player.Consumables[ExplosiveMagara] = 1
+	default:
+		g.Player.Consumables[Javelin] = 3
+	}
+	switch RandInt(8) {
 	case 0, 1:
 		g.Player.Consumables[TeleportationPotion] = 1
 	case 2, 3:
@@ -272,6 +279,10 @@ func (g *game) InitPlayer() {
 		g.Player.Consumables[SwiftnessPotion] = 1
 	case 5:
 		g.Player.Consumables[LignificationPotion] = 1
+	case 6:
+		g.Player.Consumables[WallPotion] = 1
+	case 7:
+		g.Player.Consumables[CBlinkPotion] = 1
 	}
 	g.Player.Rods = map[rod]*rodProps{}
 	g.Player.Statuses = map[status]int{}
