@@ -354,9 +354,7 @@ func (g *game) MovePlayer(pos position, ev event) error {
 			g.Player.Pos = pos
 			g.CollectGround()
 			g.ComputeLOS()
-			if g.Autoexploring {
-				g.FairAction()
-			} else {
+			if !g.Autoexploring {
 				g.ScummingAction(ev)
 			}
 			g.MakeMonstersAware()
