@@ -306,7 +306,7 @@ func (g *game) QuaffCBlinkPotion(ev event) error {
 type projectile int
 
 const (
-	Javelin projectile = iota
+	Javelin projectile = iota // TODO: remove javelin
 	ConfusingDart
 	ExplosiveMagara
 	// unimplemented
@@ -347,7 +347,7 @@ func (p projectile) Desc() (text string) {
 		// XXX
 		text = "can be thrown to foes, dealing up to 11 damage."
 	case ConfusingDart:
-		text = "can be thrown to confuse foes. Confused monsters cannot move diagonally."
+		text = "can be silently thrown to confuse foes, dealing up to 7 damage. Confused monsters cannot move diagonally."
 	case ExplosiveMagara:
 		text = "can be thrown to cause a fire explosion halving HP of monsters in a square area. It can occasionally destroy walls."
 	case Net:
@@ -437,14 +437,29 @@ func (g *game) ThrowConfusingDart(ev event) error {
 		evasion /= 2 + 1
 	}
 	if acc > evasion {
-		mons.EnterConfusion(g, ev)
-		g.PrintfStyled("Your %s hits the %s. The %s appears confused.", logPlayerHit, ConfusingDart, mons.Kind, mons.Kind)
-		g.ui.ThrowAnimation(g, g.Ray(mons.Pos), true)
+		bonus := 0
+		if g.Player.HasStatus(StatusBerserk) {
+			bonus += RandInt(5)
+		}
+		if g.Player.Aptitudes[AptStrong] {
+			bonus += 2
+		}
+		attack := g.HitDamage(DmgPhysical, 7+bonus, mons.Armor)
+		mons.HP -= attack
+		if mons.HP > 0 {
+			mons.EnterConfusion(g, ev)
+			g.PrintfStyled("Your %s hits the %s (%d dmg), who appears confused.", logPlayerHit, ConfusingDart, mons.Kind, attack, mons.Kind)
+			g.ui.ThrowAnimation(g, g.Ray(mons.Pos), true)
+			mons.MakeHuntIfHurt(g)
+		} else {
+			g.PrintfStyled("Your %s kills the %s.", logPlayerHit, ConfusingDart, mons.Kind)
+			g.ui.ThrowAnimation(g, g.Ray(mons.Pos), true)
+			g.HandleKill(mons, ev)
+		}
 	} else {
 		g.Printf("Your %s missed the %s.", ConfusingDart, mons.Kind)
 		g.ui.ThrowAnimation(g, g.Ray(mons.Pos), false)
 	}
-	mons.MakeHuntIfHurt(g)
 	ev.Renew(g, 10)
 	return nil
 }
@@ -505,9 +520,9 @@ var ConsumablesCollectData = map[consumable]collectData{
 	MagicPotion:         {rarity: 10, quantity: 1},
 	WallPotion:          {rarity: 12, quantity: 1},
 	CBlinkPotion:        {rarity: 12, quantity: 1},
-	Javelin:             {rarity: 3, quantity: 3},
-	ConfusingDart:       {rarity: 5, quantity: 2},
-	ExplosiveMagara:     {rarity: 12, quantity: 1},
+	//Javelin:             {rarity: 3, quantity: 3},
+	ConfusingDart:   {rarity: 3, quantity: 2},
+	ExplosiveMagara: {rarity: 8, quantity: 1},
 }
 
 type equipable interface {
