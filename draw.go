@@ -901,6 +901,7 @@ func (ui *termui) KeysHelp(g *game) {
 		"Write character dump to file", "#",
 		"Save and Quit", "S",
 		"Quit without saving", "Q",
+		"Action Menu", "M",
 		"Change key bindings", "=",
 	})
 }
