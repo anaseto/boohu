@@ -323,15 +323,12 @@ func (g *game) QuaffCBlinkPotion(ev event) error {
 type projectile int
 
 const (
-	Javelin projectile = iota // TODO: remove javelin
-	ConfusingDart
+	ConfusingDart projectile = iota
 	ExplosiveMagara
 )
 
 func (p projectile) String() (text string) {
 	switch p {
-	case Javelin:
-		text = "javelin"
 	case ConfusingDart:
 		text = "dart of confusion"
 	case ExplosiveMagara:
@@ -342,8 +339,6 @@ func (p projectile) String() (text string) {
 
 func (p projectile) Plural() (text string) {
 	switch p {
-	case Javelin:
-		text = "javelins"
 	case ConfusingDart:
 		text = "darts of confusion"
 	case ExplosiveMagara:
@@ -354,9 +349,6 @@ func (p projectile) Plural() (text string) {
 
 func (p projectile) Desc() (text string) {
 	switch p {
-	case Javelin:
-		// XXX
-		text = "can be thrown to foes, dealing up to 11 damage."
 	case ConfusingDart:
 		text = "can be silently thrown to confuse foes, dealing up to 7 damage. Confused monsters cannot move diagonally."
 	case ExplosiveMagara:
@@ -381,8 +373,6 @@ func (p projectile) Use(g *game, ev event) error {
 	}
 	var err error
 	switch p {
-	case Javelin:
-		err = g.ThrowJavelin(ev)
 	case ConfusingDart:
 		err = g.ThrowConfusingDart(ev)
 	case ExplosiveMagara:
@@ -392,46 +382,6 @@ func (p projectile) Use(g *game, ev event) error {
 		return err
 	}
 	g.UseConsumable(p)
-	return nil
-}
-
-func (g *game) ThrowJavelin(ev event) error {
-	if err := g.ui.ChooseTarget(g, &chooser{needsFreeWay: true}); err != nil {
-		return err
-	}
-	mons, _ := g.MonsterAt(g.Player.Target)
-	acc := RandInt(g.Player.RangedAccuracy())
-	evasion := RandInt(mons.Evasion)
-	if mons.State == Resting {
-		evasion /= 2 + 1
-	}
-	if acc > evasion {
-		noise := 12 + mons.Armor/3
-		g.MakeNoise(noise, mons.Pos)
-		bonus := 0
-		if g.Player.HasStatus(StatusBerserk) {
-			bonus += RandInt(5)
-		}
-		if g.Player.Aptitudes[AptStrong] {
-			bonus += 2
-		}
-		attack := g.HitDamage(DmgPhysical, 11+bonus, mons.Armor)
-		mons.HP -= attack
-		if mons.HP > 0 {
-			g.PrintfStyled("Your %s hits the %s (%d).", logPlayerHit, Javelin, mons.Kind, attack)
-			g.ui.ThrowAnimation(g, g.Ray(mons.Pos), true)
-			mons.MakeHuntIfHurt(g)
-		} else {
-			g.PrintfStyled("Your %s kills the %s.", logPlayerHit, Javelin, mons.Kind)
-			g.ui.ThrowAnimation(g, g.Ray(mons.Pos), true)
-			g.HandleKill(mons, ev)
-		}
-	} else {
-		g.Printf("Your %s missed the %s.", Javelin, mons.Kind)
-		g.ui.ThrowAnimation(g, g.Ray(mons.Pos), false)
-		mons.MakeHuntIfHurt(g)
-	}
-	ev.Renew(g, 10)
 	return nil
 }
 
@@ -530,9 +480,8 @@ var ConsumablesCollectData = map[consumable]collectData{
 	WallPotion:          {rarity: 12, quantity: 1},
 	CBlinkPotion:        {rarity: 12, quantity: 1},
 	DigPotion:           {rarity: 12, quantity: 1},
-	//Javelin:             {rarity: 3, quantity: 3},
-	ConfusingDart:   {rarity: 3, quantity: 2},
-	ExplosiveMagara: {rarity: 8, quantity: 1},
+	ConfusingDart:       {rarity: 3, quantity: 2},
+	ExplosiveMagara:     {rarity: 8, quantity: 1},
 }
 
 type equipable interface {

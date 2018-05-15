@@ -984,18 +984,18 @@ func (m *monster) ThrowJavelin(g *game, ev event) bool {
 	if hit {
 		noise := g.HitNoise()
 		g.MakeNoise(noise, g.Player.Pos)
-		g.Printf("%s throws %s at you (%d damage).", m.Kind.Definite(true), Indefinite(Javelin.String(), false), attack)
+		g.Printf("%s throws %s at you (%d damage).", m.Kind.Definite(true), Indefinite("javelin", false), attack)
 		m.InflictDamage(g, attack, 11)
 	} else if block {
 		if RandInt(3) == 0 {
-			g.Printf("You block %s's %s.", m.Kind.Indefinite(false), Javelin)
+			g.Printf("You block %s's %s.", m.Kind.Indefinite(false), "javelin")
 		} else if !g.Player.HasStatus(StatusDisabledShield) {
 			g.Player.Statuses[StatusDisabledShield] = 1
 			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 100 + RandInt(100), EAction: DisabledShieldEnd})
-			g.Printf("%s's %s gets fixed on your shield.", m.Kind.Indefinite(true), Javelin)
+			g.Printf("%s's %s gets fixed on your shield.", m.Kind.Indefinite(true), "javelin")
 		}
 	} else {
-		g.Printf("You dodge %s's %s.", m.Kind.Indefinite(false), Javelin)
+		g.Printf("You dodge %s's %s.", m.Kind.Indefinite(false), "javelin")
 	}
 	m.Statuses[MonsExhausted] = 1
 	g.PushEvent(&monsterEvent{ERank: ev.Rank() + 50 + RandInt(50), NMons: m.Index(g), EAction: MonsExhaustionEnd})
@@ -1251,11 +1251,11 @@ func (g *game) MaxDanger() int {
 		switch c {
 		case HealWoundsPotion, CBlinkPotion:
 			adjust += Min(5, g.Depth) * Min(q, Min(5, g.Depth))
-		case BerserkPotion, TeleportationPotion:
+		case TeleportationPotion, DigPotion, WallPotion:
 			adjust += Min(3, g.Depth) * Min(q, 3)
-		case SwiftnessPotion, LignificationPotion, MagicPotion, WallPotion, ExplosiveMagara:
+		case SwiftnessPotion, LignificationPotion, MagicPotion, BerserkPotion, ExplosiveMagara:
 			adjust += Min(2, g.Depth) * Min(q, 3)
-		case Javelin, ConfusingDart:
+		case ConfusingDart:
 			adjust += Min(1, g.Depth) * Min(q, 7)
 		}
 	}
