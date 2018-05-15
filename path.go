@@ -106,6 +106,7 @@ func (ap *autoexplorePath) Neighbors(pos position) []position {
 	nb := ap.neighbors[:0]
 	keep := func(npos position) bool {
 		if cld, ok := ap.game.Clouds[npos]; ok && cld == CloudFire && !ap.game.UnknownBurn[npos] {
+			// XXX little info leak
 			return false
 		}
 		return npos.valid() && d.Cell(npos).T != WallCell && !ap.game.ExclusionsMap[npos]
