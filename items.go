@@ -486,7 +486,7 @@ func (g *game) ThrowExplosiveMagara(ev event) error {
 		return err
 	}
 	neighbors := g.Player.Target.ValidNeighbors()
-	g.Print("You throw the explosive magara, which gives a noisy pop.")
+	g.Printf("You throw the explosive magara... %s", g.ExplosionSound())
 	g.MakeNoise(18, g.Player.Target)
 	g.ui.ProjectileTrajectoryAnimation(g, g.Ray(g.Player.Target), ColorFgPlayer)
 	g.ui.ExplosionAnimation(g, FireExplosion, g.Player.Target)

@@ -222,7 +222,7 @@ func (g *game) ScummingAction(ev event) {
 					g.Fog(pos, 1, ev)
 				}
 			}
-			g.PrintStyled("You hear a terrible explosion coming from the ground. You are lignified.", logCritic)
+			g.PrintfStyled("%s An explosion comes from the ground. You are lignified.", logCritic, g.ExplosionSound())
 			g.Player.Statuses[StatusLignification]++
 			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 240 + RandInt(10), EAction: LignificationEnd})
 		} else {
@@ -355,7 +355,7 @@ func (g *game) MovePlayer(pos position, ev event) error {
 		if c.T == WallCell {
 			g.Dungeon.SetCell(pos, FreeCell)
 			g.MakeNoise(18, pos)
-			g.CrackSound()
+			g.Print(g.CrackSound())
 			g.Fog(pos, 1, ev)
 		}
 		g.Player.Pos = pos
