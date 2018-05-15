@@ -44,8 +44,6 @@ const (
 	WallPotion
 	CBlinkPotion
 	DigPotion
-	// below unimplemented
-	ResistancePotion
 )
 
 func (p potion) String() (text string) {
@@ -73,8 +71,6 @@ func (p potion) String() (text string) {
 		text += " of controlled blink"
 	case DigPotion:
 		text += " of digging"
-	case ResistancePotion:
-		text += " of resistance"
 	}
 	return text
 }
@@ -108,8 +104,6 @@ func (p potion) Desc() (text string) {
 		text = "makes you blink to a targeted cell in your line of sight."
 	case DigPotion:
 		text = "makes you dig walls like an earth dragon."
-	case ResistancePotion:
-		text = "makes you resistant to the elements."
 	}
 	return fmt.Sprintf("The %s %s", p, text)
 }
