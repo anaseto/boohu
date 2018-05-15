@@ -335,9 +335,12 @@ func (g *game) CollectGround() {
 }
 
 func (g *game) MovePlayer(pos position, ev event) error {
-	c := g.Dungeon.Cell(pos)
-	if !pos.valid() || c.T == WallCell && !g.Player.HasStatus(StatusDig) {
+	if !pos.valid() {
 		return errors.New("You cannot move there.")
+	}
+	c := g.Dungeon.Cell(pos)
+	if c.T == WallCell && !g.Player.HasStatus(StatusDig) {
+		return errors.New("You cannot move into a wall.")
 	}
 	if g.Player.HasStatus(StatusConfusion) {
 		switch pos.Dir(g.Player.Pos) {
