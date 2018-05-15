@@ -14,9 +14,6 @@ const (
 	AptConfusingGas
 	AptSmoke
 	AptStrong
-	// below unimplemented
-	AptVampiric
-	AptReflect
 )
 
 func (ap aptitude) String() string {
@@ -44,10 +41,6 @@ func (ap aptitude) String() string {
 		text = "You occasionally release a confusing gas when hurt."
 	case AptSmoke:
 		text = "You occasionally get energic and smoke clouds when hurt."
-	case AptVampiric:
-		text = "You sometimes steal the life of those you strike."
-	case AptReflect:
-		text = "You sometimes reflect damage in combat."
 	}
 	return text
 }
