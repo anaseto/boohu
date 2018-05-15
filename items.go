@@ -180,7 +180,7 @@ func (g *game) QuaffBerserk(ev event) error {
 	if g.Player.HasStatus(StatusExhausted) {
 		return errors.New("You are too exhausted to berserk.")
 	}
-	g.Player.Statuses[StatusBerserk]++
+	g.Player.Statuses[StatusBerserk] = 1
 	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 65 + RandInt(20), EAction: BerserkEnd})
 	g.Printf("You quaff a %s. You feel a sudden urge to kill things.", BerserkPotion)
 	g.Player.HP += 10
@@ -222,9 +222,12 @@ func (g *game) QuaffDescent(ev event) error {
 }
 
 func (g *game) QuaffSwiftness(ev event) error {
+	if g.Player.HasStatus(StatusSwift) && g.Player.HasStatus(StatusAgile) {
+		return fmt.Errorf("You already quaffed a %s potion.", SwiftnessPotion)
+	}
 	g.Player.Statuses[StatusSwift]++
-	g.Player.Statuses[StatusAgile]++
 	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 85 + RandInt(20), EAction: HasteEnd})
+	g.Player.Statuses[StatusAgile]++
 	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 85 + RandInt(20), EAction: EvasionEnd})
 	g.Printf("You quaff the %s. You feel speedy and agile.", SwiftnessPotion)
 	return nil
@@ -241,7 +244,10 @@ func (g *game) QuaffDigPotion(ev event) error {
 }
 
 func (g *game) QuaffLignification(ev event) error {
-	g.Player.Statuses[StatusLignification]++
+	if g.Player.HasStatus(StatusLignification) {
+		return errors.New("You are already lignified.")
+	}
+	g.Player.Statuses[StatusLignification] = 1
 	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 150 + RandInt(100), EAction: LignificationEnd})
 	g.Printf("You quaff the %s. You feel rooted to the ground.", LignificationPotion)
 	g.Player.HP += 10

@@ -807,7 +807,7 @@ func (m *monster) HitSideEffects(g *game, ev event) {
 		}
 	case MonsGiantBee:
 		if RandInt(5) == 0 && !g.Player.HasStatus(StatusBerserk) && !g.Player.HasStatus(StatusExhausted) {
-			g.Player.Statuses[StatusBerserk]++
+			g.Player.Statuses[StatusBerserk] = 1
 			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 25 + RandInt(40), EAction: BerserkEnd})
 			g.Print("You feel a sudden urge to kill things.")
 		}
@@ -900,8 +900,6 @@ func (m *monster) TormentBolt(g *game, ev event) bool {
 	if blocked {
 		return false
 	}
-	//g.Player.Statuses[StatusSlow]++
-	//g.PushEvent(&simpleEvent{ERank: ev.Rank() + 50 + RandInt(50), EAction: SlowEnd})
 	hit := !m.Blocked(g)
 	g.MakeNoise(9, m.Pos)
 	if hit {
@@ -991,8 +989,8 @@ func (m *monster) ThrowJavelin(g *game, ev event) bool {
 	} else if block {
 		if RandInt(3) == 0 {
 			g.Printf("You block %s's %s.", m.Kind.Indefinite(false), Javelin)
-		} else {
-			g.Player.Statuses[StatusDisabledShield]++
+		} else if !g.Player.HasStatus(StatusDisabledShield) {
+			g.Player.Statuses[StatusDisabledShield] = 1
 			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 100 + RandInt(100), EAction: DisabledShieldEnd})
 			g.Printf("%s's %s gets fixed on your shield.", m.Kind.Indefinite(true), Javelin)
 		}

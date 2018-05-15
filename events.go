@@ -107,19 +107,19 @@ func (sev *simpleEvent) Action(g *game) {
 		g.Teleportation(sev)
 		g.Player.Statuses[StatusTele] = 0
 	case BerserkEnd:
-		g.Player.Statuses[StatusBerserk]--
-		g.Player.Statuses[StatusSlow]++
-		g.Player.Statuses[StatusExhausted]++
+		g.Player.Statuses[StatusBerserk] = 0
+		g.Player.Statuses[StatusSlow] = 1
+		g.Player.Statuses[StatusExhausted] = 1
 		g.Player.HP -= int(10 * g.Player.HP / Max(g.Player.HPMax(), g.Player.HP))
 		g.PrintStyled("You are no longer berserk.", logStatusEnd)
 		g.PushEvent(&simpleEvent{ERank: sev.Rank() + 90 + RandInt(40), EAction: SlowEnd})
 		g.PushEvent(&simpleEvent{ERank: sev.Rank() + 270 + RandInt(60), EAction: ExhaustionEnd})
 	case SlowEnd:
 		g.PrintStyled("You feel no longer slow.", logStatusEnd)
-		g.Player.Statuses[StatusSlow]--
+		g.Player.Statuses[StatusSlow] = 0
 	case ExhaustionEnd:
 		g.PrintStyled("You feel no longer exhausted.", logStatusEnd)
-		g.Player.Statuses[StatusExhausted]--
+		g.Player.Statuses[StatusExhausted] = 0
 	case HasteEnd:
 		g.Player.Statuses[StatusSwift]--
 		if g.Player.Statuses[StatusSwift] == 0 {
@@ -138,20 +138,20 @@ func (sev *simpleEvent) Action(g *game) {
 		}
 	case ConfusionEnd:
 		g.PrintStyled("You feel no longer confused.", logStatusEnd)
-		g.Player.Statuses[StatusConfusion]--
+		g.Player.Statuses[StatusConfusion] = 0
 	case NauseaEnd:
 		g.PrintStyled("You feel no longer sick.", logStatusEnd)
-		g.Player.Statuses[StatusNausea]--
+		g.Player.Statuses[StatusNausea] = 0
 	case DisabledShieldEnd:
 		g.PrintStyled("You manage to free your shield from the projectile.", logStatusEnd)
-		g.Player.Statuses[StatusDisabledShield]--
+		g.Player.Statuses[StatusDisabledShield] = 0
 	case CorrosionEnd:
 		g.Player.Statuses[StatusCorrosion]--
 		if g.Player.Statuses[StatusCorrosion] == 0 {
 			g.PrintStyled("Your equipment is now free from acid.", logStatusEnd)
 		}
 	case DigEnd:
-		g.Player.Statuses[StatusDig]--
+		g.Player.Statuses[StatusDig] = 0
 		if g.Player.Statuses[StatusDig] == 0 {
 			g.PrintStyled("You feel no longer like an earth dragon.", logStatusEnd)
 		}

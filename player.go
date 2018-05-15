@@ -223,7 +223,7 @@ func (g *game) ScummingAction(ev event) {
 				}
 			}
 			g.PrintfStyled("%s An explosion comes from the ground. You are lignified.", logCritic, g.ExplosionSound())
-			g.Player.Statuses[StatusLignification]++
+			g.Player.Statuses[StatusLignification] = 1
 			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 240 + RandInt(10), EAction: LignificationEnd})
 		} else {
 			delay := 20 + RandInt(5)
