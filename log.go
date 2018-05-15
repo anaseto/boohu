@@ -63,3 +63,14 @@ func (g *game) StoryPrint(s string) {
 func (g *game) StoryPrintf(format string, a ...interface{}) {
 	g.Story = append(g.Story, fmt.Sprintf("Depth %2d|Turn %7.1f| %s", g.Depth, float64(g.Turn)/10, fmt.Sprintf(format, a...)))
 }
+
+func (g *game) CrackSound() {
+	switch RandInt(3) {
+	case 0:
+		g.Print("Crack!")
+	case 1:
+		g.Print("Crash!")
+	case 2:
+		g.Print("Crunch!")
+	}
+}

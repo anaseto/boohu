@@ -43,6 +43,7 @@ const (
 	MagicPotion
 	WallPotion
 	CBlinkPotion
+	DigPotion
 	// below unimplemented
 	ResistancePotion
 )
@@ -70,6 +71,8 @@ func (p potion) String() (text string) {
 		text += " of walls"
 	case CBlinkPotion:
 		text += " of controlled blink"
+	case DigPotion:
+		text += " of digging"
 	case ResistancePotion:
 		text += " of resistance"
 	}
@@ -103,6 +106,8 @@ func (p potion) Desc() (text string) {
 		text = "replaces free cells around you with temporal walls."
 	case CBlinkPotion:
 		text = "makes you blink to a targeted cell in your line of sight."
+	case DigPotion:
+		text = "makes you dig walls like an earth dragon."
 	case ResistancePotion:
 		text = "makes you resistant to the elements."
 	}
@@ -151,6 +156,8 @@ func (p potion) Use(g *game, ev event) error {
 		err = g.QuaffWallPotion(ev)
 	case CBlinkPotion:
 		err = g.QuaffCBlinkPotion(ev)
+	case DigPotion:
+		err = g.QuaffDigPotion(ev)
 	}
 	if err != nil {
 		return err
@@ -226,6 +233,16 @@ func (g *game) QuaffSwiftness(ev event) error {
 	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 85 + RandInt(20), EAction: HasteEnd})
 	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 85 + RandInt(20), EAction: EvasionEnd})
 	g.Printf("You quaff the %s. You feel speedy and agile.", SwiftnessPotion)
+	return nil
+}
+
+func (g *game) QuaffDigPotion(ev event) error {
+	if g.Player.HasStatus(StatusDig) {
+		return errors.New("You are already digging.")
+	}
+	g.Player.Statuses[StatusDig] = 1
+	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 75 + RandInt(20), EAction: DigEnd})
+	g.Printf("You quaff the %s. You feel like an earth dragon.", DigPotion)
 	return nil
 }
 
@@ -520,6 +537,7 @@ var ConsumablesCollectData = map[consumable]collectData{
 	MagicPotion:         {rarity: 10, quantity: 1},
 	WallPotion:          {rarity: 12, quantity: 1},
 	CBlinkPotion:        {rarity: 12, quantity: 1},
+	DigPotion:           {rarity: 12, quantity: 1},
 	//Javelin:             {rarity: 3, quantity: 3},
 	ConfusingDart:   {rarity: 3, quantity: 2},
 	ExplosiveMagara: {rarity: 8, quantity: 1},

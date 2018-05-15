@@ -58,6 +58,7 @@ const (
 	NauseaEnd
 	DisabledShieldEnd
 	CorrosionEnd
+	DigEnd
 )
 
 func (g *game) PushEvent(ev event) {
@@ -148,6 +149,11 @@ func (sev *simpleEvent) Action(g *game) {
 		g.Player.Statuses[StatusCorrosion]--
 		if g.Player.Statuses[StatusCorrosion] == 0 {
 			g.PrintStyled("Your equipment is now free from acid.", logStatusEnd)
+		}
+	case DigEnd:
+		g.Player.Statuses[StatusDig]--
+		if g.Player.Statuses[StatusDig] == 0 {
+			g.PrintStyled("You feel no longer like an earth dragon.", logStatusEnd)
 		}
 	}
 }

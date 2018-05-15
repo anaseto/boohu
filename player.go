@@ -335,7 +335,8 @@ func (g *game) CollectGround() {
 }
 
 func (g *game) MovePlayer(pos position, ev event) error {
-	if !pos.valid() || g.Dungeon.Cell(pos).T == WallCell {
+	c := g.Dungeon.Cell(pos)
+	if !pos.valid() || c.T == WallCell && !g.Player.HasStatus(StatusDig) {
 		return errors.New("You cannot move there.")
 	}
 	if g.Player.HasStatus(StatusConfusion) {
@@ -346,32 +347,39 @@ func (g *game) MovePlayer(pos position, ev event) error {
 		}
 	}
 	delay := 10
-	switch g.Dungeon.Cell(pos).T {
-	case FreeCell:
-		mons, _ := g.MonsterAt(pos)
-		if !mons.Exists() {
-			if g.Player.HasStatus(StatusLignification) {
-				return errors.New("You cannot move while lignified")
-			}
-			g.Player.Pos = pos
-			g.CollectGround()
-			g.ComputeLOS()
-			if !g.Autoexploring {
-				g.ScummingAction(ev)
-			}
-			g.MakeMonstersAware()
-			if g.Player.Aptitudes[AptFast] {
-				// only fast for movement
+	mons, _ := g.MonsterAt(pos)
+	if !mons.Exists() {
+		if g.Player.HasStatus(StatusLignification) {
+			return errors.New("You cannot move while lignified")
+		}
+		if c.T == WallCell {
+			g.Dungeon.SetCell(pos, FreeCell)
+			g.MakeNoise(18, pos)
+			g.CrackSound()
+			g.Fog(pos, 1, ev)
+		}
+		g.Player.Pos = pos
+		g.CollectGround()
+		g.ComputeLOS()
+		if !g.Autoexploring {
+			g.ScummingAction(ev)
+		}
+		g.MakeMonstersAware()
+		if g.Player.Aptitudes[AptFast] {
+			// only fast for movement
+			delay -= 2
+		}
+		if g.Player.HasStatus(StatusSwift) {
+			// only fast for movement
+			if g.Player.HasStatus(StatusBerserk) {
 				delay -= 2
-			}
-			if g.Player.HasStatus(StatusSwift) {
-				// only fast for movement
+			} else {
 				delay -= 3
 			}
-		} else {
-			g.FairAction()
-			g.AttackMonster(mons, ev)
 		}
+	} else {
+		g.FairAction()
+		g.AttackMonster(mons, ev)
 	}
 	if g.Player.HasStatus(StatusBerserk) {
 		delay -= 3
