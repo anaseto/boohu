@@ -320,8 +320,6 @@ const (
 	Javelin projectile = iota // TODO: remove javelin
 	ConfusingDart
 	ExplosiveMagara
-	// unimplemented
-	Net
 )
 
 func (p projectile) String() (text string) {
@@ -332,8 +330,6 @@ func (p projectile) String() (text string) {
 		text = "dart of confusion"
 	case ExplosiveMagara:
 		text = "explosive magara"
-	case Net:
-		text = "throwing net"
 	}
 	return text
 }
@@ -346,8 +342,6 @@ func (p projectile) Plural() (text string) {
 		text = "darts of confusion"
 	case ExplosiveMagara:
 		text = "explosive magaras"
-	case Net:
-		text = "throwing nets"
 	}
 	return text
 }
@@ -361,8 +355,6 @@ func (p projectile) Desc() (text string) {
 		text = "can be silently thrown to confuse foes, dealing up to 7 damage. Confused monsters cannot move diagonally."
 	case ExplosiveMagara:
 		text = "can be thrown to cause a fire explosion halving HP of monsters in a square area. It can occasionally destroy walls."
-	case Net:
-		text = "can be thrown to emprison your enemies."
 	}
 	return fmt.Sprintf("The %s %s", p, text)
 }
