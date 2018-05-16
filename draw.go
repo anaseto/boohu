@@ -984,11 +984,21 @@ func (ui *termui) AptitudesText(g *game) string {
 }
 
 func (ui *termui) DescribePosition(g *game, pos position, targ Targeter) {
+	var desc string
+	switch {
+	case !g.Dungeon.Cell(pos).Explored:
+		desc = "You do not know what is in there."
+		g.InfoEntry = desc
+		return
+	case !targ.Reachable(g, pos):
+		desc = "This is out of reach."
+		g.InfoEntry = desc
+		return
+	}
 	mons, _ := g.MonsterAt(pos)
 	c, okCollectable := g.Collectables[pos]
 	eq, okEq := g.Equipables[pos]
 	rod, okRod := g.Rods[pos]
-	var desc string
 	if pos == g.Player.Pos {
 		desc = "This is you. "
 	}
@@ -996,13 +1006,10 @@ func (ui *termui) DescribePosition(g *game, pos position, targ Targeter) {
 	if !g.Player.LOS[pos] {
 		see = "saw"
 	}
+	if mons.Exists() && g.Player.LOS[pos] {
+		desc += fmt.Sprintf("You %s %s (%s). ", see, mons.Kind.Indefinite(false), ui.MonsterInfo(mons))
+	}
 	switch {
-	case !g.Dungeon.Cell(pos).Explored:
-		desc = "You do not know what is in there."
-	case !targ.Reachable(g, pos):
-		desc = "This is out of reach."
-	case mons.Exists() && g.Player.LOS[pos]:
-		desc += fmt.Sprintf("You %s %s (%s).", see, mons.Kind.Indefinite(false), ui.MonsterInfo(mons))
 	case g.Simellas[pos] > 0:
 		desc += fmt.Sprintf("You %s some simellas (%d).", see, g.Simellas[pos])
 	case okCollectable && c != nil:
@@ -1034,7 +1041,7 @@ func (ui *termui) DescribePosition(g *game, pos position, targ Targeter) {
 			}
 		} else if _, ok := g.Fungus[pos]; ok {
 			desc += fmt.Sprintf("You %s dense foliage there.", see)
-		} else {
+		} else if desc == "" {
 			desc += fmt.Sprintf("You %s the ground.", see)
 		}
 	}
