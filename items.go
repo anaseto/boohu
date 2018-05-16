@@ -407,7 +407,7 @@ func (g *game) ThrowConfusingDart(ev event) error {
 		mons.HP -= attack
 		if mons.HP > 0 {
 			mons.EnterConfusion(g, ev)
-			g.PrintfStyled("Your %s hits the %s (%d dmg), who appears confused.", logPlayerHit, ConfusingDart, mons.Kind, attack, mons.Kind)
+			g.PrintfStyled("Your %s hits the %s (%d dmg), who appears confused.", logPlayerHit, ConfusingDart, mons.Kind, attack)
 			g.ui.ThrowAnimation(g, g.Ray(mons.Pos), true)
 			mons.MakeHuntIfHurt(g)
 		} else {
