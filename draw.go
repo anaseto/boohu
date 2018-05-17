@@ -2181,16 +2181,16 @@ func (ui *termui) SelectProjectile(g *game, ev event) error {
 		if desc {
 			ui.DrawColoredText("Describe", 0, 0, ColorBlue)
 			col := utf8.RuneCountInString("Describe")
-			ui.DrawText(" which projectile? (press ? for throwing menu, esc or space to cancel)", col, 0)
+			ui.DrawText(" which projectile? (press ? or click here for throwing menu)", col, 0)
 		} else {
 			ui.DrawColoredText("Throw", 0, 0, ColorOrange)
 			col := utf8.RuneCountInString("Throw")
-			ui.DrawText(" which projectile? (press ? for describe menu, esc or space to cancel)", col, 0)
+			ui.DrawText(" which projectile? (press ? or click here for describe menu)", col, 0)
 		}
 		for i, c := range cs {
 			ui.ConsumableItem(g, i, i+1, c, ColorFg)
 		}
-		ui.DrawLine(len(cs) + 1)
+		ui.DrawTextLine(" press esc or space to cancel ", len(cs)+1)
 		ui.Flush()
 		index, alternate, err := ui.Select(g, ev, len(cs))
 		if alternate {
@@ -2219,16 +2219,16 @@ func (ui *termui) SelectPotion(g *game, ev event) error {
 		if desc {
 			ui.DrawColoredText("Describe", 0, 0, ColorBlue)
 			col := utf8.RuneCountInString("Describe")
-			ui.DrawText(" which potion? (press ? for quaff menu, esc or space to cancel)", col, 0)
+			ui.DrawText(" which potion? (press ? or click here for quaff menu)", col, 0)
 		} else {
 			ui.DrawColoredText("Drink", 0, 0, ColorGreen)
 			col := utf8.RuneCountInString("Drink")
-			ui.DrawText(" which potion? (press ? for description menu, esc or space to cancel)", col, 0)
+			ui.DrawText(" which potion? (press ? or click here for description menu)", col, 0)
 		}
 		for i, c := range cs {
 			ui.ConsumableItem(g, i, i+1, c, ColorFg)
 		}
-		ui.DrawLine(len(cs) + 1)
+		ui.DrawTextLine(" press esc or space to cancel ", len(cs)+1)
 		ui.Flush()
 		index, alternate, err := ui.Select(g, ev, len(cs))
 		if alternate {
@@ -2264,16 +2264,16 @@ func (ui *termui) SelectRod(g *game, ev event) error {
 		if desc {
 			ui.DrawColoredText("Describe", 0, 0, ColorBlue)
 			col := utf8.RuneCountInString("Describe")
-			ui.DrawText(" which rod? (press ? for evocation menu, esc or space to cancel)", col, 0)
+			ui.DrawText(" which rod? (press ? or click here for evocation menu)", col, 0)
 		} else {
 			ui.DrawColoredText("Evoke", 0, 0, ColorCyan)
 			col := utf8.RuneCountInString("Evoke")
-			ui.DrawText(" which rod? (press ? for description menu, esc or space to cancel)", col, 0)
+			ui.DrawText(" which rod? (press ? or click here for description menu)", col, 0)
 		}
 		for i, r := range rs {
 			ui.RodItem(g, i, i+1, r, ColorFg)
 		}
-		ui.DrawLine(len(rs) + 1)
+		ui.DrawTextLine(" press esc or space to cancel ", len(rs)+1)
 		ui.Flush()
 		index, alternate, err := ui.Select(g, ev, len(rs))
 		if alternate {
@@ -2328,11 +2328,11 @@ func (ui *termui) SelectAction(g *game, actions []keyAction, ev event) (keyActio
 		ui.DrawColoredTextOnBG("→Menu", BarCol, 0, ColorCyan, ColorBg)
 		ui.DrawColoredText("Choose", 0, 0, ColorCyan)
 		col := utf8.RuneCountInString("Choose")
-		ui.DrawText(" which action? (esc or space to cancel)", col, 0)
+		ui.DrawText(" which action?", col, 0)
 		for i, r := range actions {
 			ui.ActionItem(g, i, i+1, r, ColorFg)
 		}
-		ui.DrawLine(len(actions) + 1)
+		ui.DrawTextLine(" press esc or space to cancel ", len(actions)+1)
 		ui.Flush()
 		index, alt, err := ui.Select(g, ev, len(actions))
 		if alt {
