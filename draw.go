@@ -361,6 +361,7 @@ const (
 
 	KeyConfigure
 	KeyMenu
+	KeyNextStairs
 )
 
 var configurableKeyActions = [...]keyAction{
@@ -398,6 +399,7 @@ var configurableKeyActions = [...]keyAction{
 	KeyPreviousMonster,
 	KeyNextMonster,
 	KeyNextObject,
+	KeyNextStairs,
 	KeyDescription,
 	KeyTarget,
 	KeyExclude,
@@ -483,7 +485,7 @@ func (k keyAction) NormalModeDescription() (text string) {
 	case KeyWaitTurn:
 		text = "Wait a turn"
 	case KeyDescend:
-		text = "Use stairs"
+		text = "Descend stairs"
 	case KeyGoToStairs:
 		text = "Go to nearest stairs"
 	case KeyExplore:
@@ -509,7 +511,7 @@ func (k keyAction) NormalModeDescription() (text string) {
 	case KeyQuit:
 		text = "Quit without saving"
 	case KeyHelp:
-		text = "Help"
+		text = "Help (Keys)"
 	case KeyWizard:
 		text = "Wizard (debug) mode"
 	case KeyWizardInfo:
@@ -562,6 +564,8 @@ func (k keyAction) TargetingModeDescription() (text string) {
 		text = "Target next monster"
 	case KeyNextObject:
 		text = "Target next object"
+	case KeyNextStairs:
+		text = "Target next stairs"
 	case KeyDescription:
 		text = "View target description"
 	case KeyTarget:
@@ -586,6 +590,7 @@ func (k keyAction) TargetingModeKey() bool {
 		KeyPreviousMonster,
 		KeyNextMonster,
 		KeyNextObject,
+		KeyNextStairs,
 		KeyDescription,
 		KeyTarget,
 		KeyExclude,
@@ -637,7 +642,7 @@ func ApplyDefaultKeyBindings() {
 		'g': KeyEquip,
 		',': KeyEquip,
 		'q': KeyDrink,
-		'a': KeyDrink,
+		'd': KeyDrink,
 		't': KeyThrow,
 		'f': KeyThrow,
 		'v': KeyEvoke,
@@ -653,6 +658,7 @@ func ApplyDefaultKeyBindings() {
 		'@': KeyWizardInfo,
 		'=': KeyConfigure,
 		'M': KeyMenu,
+		'a': KeyMenu,
 	}
 	runeTargetingKeyActions = map[rune]keyAction{
 		'h':    KeyW,
@@ -679,8 +685,7 @@ func ApplyDefaultKeyBindings() {
 		'U':    KeyRunNE,
 		'B':    KeyRunSW,
 		'N':    KeyRunSE,
-		'>':    KeyDescend,
-		'D':    KeyDescend,
+		'>':    KeyNextStairs,
 		'-':    KeyPreviousMonster,
 		'+':    KeyNextMonster,
 		'o':    KeyNextObject,
@@ -827,6 +832,10 @@ func (ui *termui) HandleKey(g *game, rka runeKeyAction) (err error, again bool, 
 	case KeyConfigure:
 		ui.Configure(g)
 		again = true
+	case KeyDescription:
+		err = fmt.Errorf("Invalid action: no chosen target to describe.")
+	case KeyExclude:
+		err = fmt.Errorf("Invalid action: no chosen target for exclusion.")
 	default:
 		err = fmt.Errorf("Unknown key '%c'. Type ? for help.", rka.r)
 	}
@@ -893,20 +902,20 @@ func (ui *termui) KeysHelp(g *game) {
 		"Movement", "h/j/k/l/y/u/b/n or numpad or mouse left",
 		"Rest", "r",
 		"Wait a turn", "“.” or 5",
-		"Use stairs", "> or D",
+		"Descend stairs", "> or D",
 		"Go to nearest stairs", "G",
 		"Autoexplore", "o",
 		"Examine", "x or mouse right",
-		"Equip weapon/armour/...", "e or g",
-		"Quaff potion", "q or a",
-		"Throw item", "t or f",
-		"Evoke rod", "v or z",
+		"Equip/Get weapon/armour/...", "e or g",
+		"Quaff/Drink potion", "q or d",
+		"Throw/Fire item", "t or f",
+		"Evoke/Zap rod", "v or z",
 		"View Character and Quest Information", `% or C`,
 		"View previous messages", "m",
 		"Write character dump to file", "#",
 		"Save and Quit", "S",
 		"Quit without saving", "Q",
-		"Action Menu", "M",
+		"Action Menu", "a or M",
 		"Change key bindings", "=",
 	})
 }
@@ -1180,7 +1189,7 @@ func (ui *termui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, dat
 	}
 	if rka.k == KeyMenu {
 		var err error
-		rka.k, err = ui.SelectAction(g, menuTargetActions, g.Ev)
+		rka.k, err = ui.SelectAction(g, menuActions, g.Ev)
 		if err != nil {
 			return err, again, quit, notarg
 		}
@@ -1196,8 +1205,22 @@ func (ui *termui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, dat
 			}
 			data.npos = p
 		}
-	case KeyDescend:
+	case KeyNextStairs:
 		ui.NextStair(g, data)
+	case KeyDescend:
+		if g.Stairs[g.Player.Pos] {
+			again = false
+			g.Targeting = nil
+			notarg = true
+			if g.Descend() {
+				ui.Win(g)
+				quit = true
+				return err, again, quit, notarg
+			}
+			ui.DrawDungeonView(g, NormalMode)
+		} else {
+			err = errors.New("No stairs here.")
+		}
 	case KeyPreviousMonster, KeyNextMonster:
 		ui.NextMonster(g, rka.r, pos, data)
 	case KeyNextObject:
@@ -1237,6 +1260,25 @@ func (ui *termui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, dat
 			notarg = true
 		}
 		g.Targeting = nil
+	case KeySave:
+		g.Ev.Renew(g, 0)
+		g.Highlight = nil
+		g.Targeting = nil
+		err := g.Save()
+		if err != nil {
+			g.PrintfStyled("Error: %v", logError, err)
+			g.PrintStyled("Could not save game. --press any key to continue--", logError)
+			ui.DrawDungeonView(g, NormalMode)
+			ui.PressAnyKey()
+		}
+		notarg = true
+		again = false
+		quit = true
+	case KeyQuit:
+		if ui.Quit(g) {
+			quit = true
+			again = false
+		}
 	default:
 		err = fmt.Errorf("Invalid targeting mode key '%c'. Type ? for help.", rka.r)
 	}
@@ -1428,11 +1470,7 @@ func (ui *termui) DrawDungeonView(g *game, m uiMode) {
 		ui.DrawAtPosition(g, pos, m == TargetingMode, r, fgColor, bgColor)
 	}
 	line := 0
-	if m == TargetingMode {
-		ui.DrawColoredTextOnBG("→Menu", BarCol, line, ColorCyan, ColorBg)
-	} else {
-		ui.DrawColoredTextOnBG("→Menu", BarCol, line, ColorBlue, ColorBg)
-	}
+	ui.DrawColoredTextOnBG("→Menu", BarCol, line, ColorBlue, ColorBg)
 	line++
 	ui.DrawText(fmt.Sprintf("[ %v (%d)", g.Player.Armour, g.Player.Armor()), BarCol, line)
 	line++
@@ -2275,6 +2313,8 @@ var menuActions = []keyAction{
 	KeyEvoke,
 	KeyDescend,
 	KeyEquip,
+	KeyExclude,
+	KeyDescription,
 	KeyCharacterInfo,
 	KeyLogs,
 	KeyHelp,
@@ -2282,23 +2322,10 @@ var menuActions = []keyAction{
 	KeyQuit,
 }
 
-var menuTargetActions = []keyAction{
-	KeyExplore,
-	KeyRest,
-	KeyThrow,
-	KeyDrink,
-	KeyEvoke,
-	KeyEquip,
-	KeyExclude,
-	KeyDescription,
-	KeyCharacterInfo,
-	KeyLogs,
-	KeyHelp,
-}
-
 func (ui *termui) SelectAction(g *game, actions []keyAction, ev event) (keyAction, error) {
 	for {
 		ui.ClearLine(0)
+		ui.DrawColoredTextOnBG("→Menu", BarCol, 0, ColorCyan, ColorBg)
 		ui.DrawColoredText("Choose", 0, 0, ColorCyan)
 		col := utf8.RuneCountInString("Choose")
 		ui.DrawText(" which action? (esc or space to cancel)", col, 0)
