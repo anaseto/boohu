@@ -905,7 +905,7 @@ func (ui *termui) KeysHelp(g *game) {
 		"Descend stairs", "> or D",
 		"Go to nearest stairs", "G",
 		"Autoexplore", "o",
-		"Examine", "x or mouse right",
+		"Examine", "x or mouse left",
 		"Equip/Get weapon/armour/...", "e or g",
 		"Quaff/Drink potion", "q or d",
 		"Throw/Fire item", "t or f",
