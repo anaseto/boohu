@@ -514,6 +514,8 @@ func (k keyAction) NormalModeDescription() (text string) {
 		text = "Wizard (debug) mode"
 	case KeyWizardInfo:
 		text = "Wizard (debug) mode information"
+	case KeyMenu:
+		text = "Action Menu"
 	}
 	return text
 }
