@@ -570,6 +570,8 @@ func (k keyAction) TargetingModeDescription() (text string) {
 		text = "Toggle exclude area from auto-travel"
 	case KeyEscape:
 		text = "Quit targeting mode"
+	case KeyMenu:
+		text = "Action Menu"
 	}
 	return text
 }
