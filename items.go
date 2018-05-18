@@ -504,9 +504,6 @@ func (ar armour) Equip(g *game) {
 	oar := g.Player.Armour
 	g.Player.Armour = ar
 	if !g.FoundEquipables[ar] {
-		if g.FoundEquipables == nil {
-			g.FoundEquipables = map[equipable]bool{}
-		}
 		g.StoryPrintf("You found and put on %s.", Indefinite(ar.String(), false))
 		g.FoundEquipables[ar] = true
 	}
@@ -567,9 +564,6 @@ func (wp weapon) Equip(g *game) {
 	owp := g.Player.Weapon
 	g.Player.Weapon = wp
 	if !g.FoundEquipables[wp] {
-		if g.FoundEquipables == nil {
-			g.FoundEquipables = map[equipable]bool{}
-		}
 		g.StoryPrintf("You found and took %s.", Indefinite(wp.String(), false))
 		g.FoundEquipables[wp] = true
 	}
@@ -691,9 +685,6 @@ func (sh shield) Equip(g *game) {
 	osh := g.Player.Shield
 	g.Player.Shield = sh
 	if !g.FoundEquipables[sh] {
-		if g.FoundEquipables == nil {
-			g.FoundEquipables = map[equipable]bool{}
-		}
 		g.StoryPrintf("You found and put on %s.", Indefinite(sh.String(), false))
 		g.FoundEquipables[sh] = true
 	}
