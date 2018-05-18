@@ -313,6 +313,7 @@ func (g *game) InitLevel() {
 		g.KilledMons = map[monsterKind]int{}
 	}
 
+	g.MonstersPosCache = make([]int, DungeonNCells)
 	g.Player.Pos = g.FreeCell()
 
 	g.UnknownDig = map[position]bool{}

@@ -1224,9 +1224,6 @@ func (g *game) MonsterAt(pos position) *monster {
 	if !pos.valid() {
 		return nil
 	}
-	if len(g.MonstersPosCache) == 0 {
-		g.MonstersPosCache = make([]int, DungeonNCells)
-	}
 	i := g.MonstersPosCache[pos.idx()]
 	if i <= 0 {
 		return nil
@@ -1309,7 +1306,6 @@ func (g *game) MaxMonsters() int {
 
 func (g *game) GenMonsters() {
 	g.Monsters = []*monster{}
-	g.MonstersPosCache = make([]int, DungeonNCells)
 	g.Bands = []monsterBand{}
 	danger := g.MaxDanger()
 	nmons := g.MaxMonsters()
