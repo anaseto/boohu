@@ -37,7 +37,7 @@ func (g *game) losCost(pos position) int {
 	}
 	if _, ok := g.Doors[pos]; ok {
 		if pos != g.Player.Pos {
-			mons, _ := g.MonsterAt(pos)
+			mons := g.MonsterAt(pos)
 			if !mons.Exists() {
 				return g.LosRange()
 			}
@@ -212,7 +212,7 @@ func (g *game) ComputeNoise() {
 		if g.Player.LOS[pos] {
 			continue
 		}
-		mons, _ := g.MonsterAt(pos)
+		mons := g.MonsterAt(pos)
 		if mons.Exists() && mons.State != Resting && RandInt(3) == 0 {
 			switch mons.Kind {
 			case MonsMirrorSpecter, MonsGiantBee, MonsSatowalgaPlant:

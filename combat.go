@@ -94,7 +94,7 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 			neighbors = g.Dungeon.FreeNeighbors(g.Player.Pos)
 		}
 		for _, pos := range neighbors {
-			mons, _ := g.MonsterAt(pos)
+			mons := g.MonsterAt(pos)
 			if mons.Exists() {
 				g.HitMonster(DmgPhysical, mons, ev)
 			}
@@ -105,7 +105,7 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 		deltaY := mons.Pos.Y - g.Player.Pos.Y
 		behind := position{g.Player.Pos.X + 2*deltaX, g.Player.Pos.Y + 2*deltaY}
 		if behind.valid() {
-			mons, _ := g.MonsterAt(behind)
+			mons := g.MonsterAt(behind)
 			if mons.Exists() {
 				g.HitMonster(DmgPhysical, mons, ev)
 			}
@@ -130,7 +130,7 @@ func (g *game) HitConnected(pos position, dt dmgType, ev event) {
 	for len(stack) > 0 {
 		pos = stack[len(stack)-1]
 		stack = stack[:len(stack)-1]
-		mons, _ := g.MonsterAt(pos)
+		mons := g.MonsterAt(pos)
 		if !mons.Exists() {
 			continue
 		}

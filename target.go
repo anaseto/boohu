@@ -102,7 +102,7 @@ func (ch *chooser) Action(g *game, pos position) error {
 	if (ch.area || ch.needsFreeWay) && !ch.freeWay(g, pos) {
 		return errors.New("Invalid target: there are monsters in the way.")
 	}
-	mons, _ := g.MonsterAt(pos)
+	mons := g.MonsterAt(pos)
 	if ch.free {
 		if mons.Exists() {
 			return errors.New("Invalid target: there is a monster there.")
@@ -133,7 +133,7 @@ func (ch *chooser) Action(g *game, pos position) error {
 		if !ch.wall && nc.T == WallCell {
 			continue
 		}
-		mons, _ := g.MonsterAt(npos)
+		mons := g.MonsterAt(npos)
 		_, okFungus := g.Fungus[pos]
 		_, okDoors := g.Doors[pos]
 		if ch.flammable && (okFungus || okDoors) || mons.Exists() || nc.T == WallCell {
@@ -162,7 +162,7 @@ func (ch *chooser) freeWay(g *game, pos position) bool {
 	ray := g.Ray(pos)
 	tpos := pos
 	for _, rpos := range ray {
-		mons, _ := g.MonsterAt(rpos)
+		mons := g.MonsterAt(rpos)
 		if !mons.Exists() {
 			continue
 		}
@@ -215,7 +215,7 @@ func (ch *wallChooser) Action(g *game, pos position) error {
 		return errors.New("You cannot target an adjacent wall.")
 	}
 	for _, pos := range ray[1:] {
-		mons, _ := g.MonsterAt(pos)
+		mons := g.MonsterAt(pos)
 		if mons.Exists() {
 			return errors.New("There are monsters in the way.")
 		}

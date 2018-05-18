@@ -350,7 +350,7 @@ func (g *game) MovePlayer(pos position, ev event) error {
 		}
 	}
 	delay := 10
-	mons, _ := g.MonsterAt(pos)
+	mons := g.MonsterAt(pos)
 	if !mons.Exists() {
 		if g.Player.HasStatus(StatusLignification) {
 			return errors.New("You cannot move while lignified")

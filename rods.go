@@ -197,7 +197,7 @@ func (g *game) Blink(ev event) {
 		if g.Dungeon.Cell(pos).T != FreeCell {
 			continue
 		}
-		mons, _ := g.MonsterAt(pos)
+		mons := g.MonsterAt(pos)
 		if mons.Exists() {
 			continue
 		}
@@ -226,7 +226,7 @@ func (g *game) EvokeRodTeleportOther(ev event) error {
 	if err := g.ui.ChooseTarget(g, &chooser{}); err != nil {
 		return err
 	}
-	mons, _ := g.MonsterAt(g.Player.Target)
+	mons := g.MonsterAt(g.Player.Target)
 	// mons not nil (check done in the targeter)
 	mons.TeleportAway(g)
 	return nil
@@ -241,7 +241,7 @@ func (g *game) EvokeRodLightningBolt(ev event) error {
 	g.ui.LightningBoltAnimation(g, ray)
 	for _, pos := range ray {
 		g.Burn(pos, ev)
-		mons, _ := g.MonsterAt(pos)
+		mons := g.MonsterAt(pos)
 		if mons == nil {
 			continue
 		}
@@ -266,7 +266,7 @@ func (g *game) EvokeRodFireball(ev event) error {
 	g.ui.ExplosionAnimation(g, FireExplosion, g.Player.Target)
 	for _, pos := range append(neighbors, g.Player.Target) {
 		g.Burn(pos, ev)
-		mons, _ := g.MonsterAt(pos)
+		mons := g.MonsterAt(pos)
 		if mons == nil {
 			continue
 		}
@@ -351,7 +351,7 @@ func (g *game) EvokeRodShatter(ev event) error {
 		g.ui.ExplosionAnimation(g, AroundWallExplosion, g.Player.Target)
 	}
 	for _, pos := range neighbors {
-		mons, _ := g.MonsterAt(pos)
+		mons := g.MonsterAt(pos)
 		if !mons.Exists() {
 			continue
 		}
@@ -393,9 +393,11 @@ func (g *game) EvokeRodSwapping(ev event) error {
 	if err := g.ui.ChooseTarget(g, &chooser{}); err != nil {
 		return err
 	}
-	mons, _ := g.MonsterAt(g.Player.Target)
+	mons := g.MonsterAt(g.Player.Target)
 	// mons not nil (check done in the targeter)
-	mons.Pos, g.Player.Pos = g.Player.Pos, mons.Pos
+	ompos := mons.Pos
+	mons.MoveTo(g, g.Player.Pos)
+	g.Player.Pos = ompos
 	mons.MakeAware(g)
 	g.Printf("You swap positions with the %s.", mons.Kind)
 	g.ui.SwappingAnimation(g, mons.Pos, g.Player.Pos)

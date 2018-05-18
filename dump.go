@@ -247,7 +247,7 @@ func (g *game) DumpDungeon() string {
 				} else if _, ok := g.Doors[pos]; ok {
 					r = '+'
 				}
-				m, _ := g.MonsterAt(pos)
+				m := g.MonsterAt(pos)
 				if m.Exists() && (g.Player.LOS[m.Pos] || g.Wizard) {
 					r = m.Kind.Letter()
 				}

@@ -144,7 +144,7 @@ func (mp *monPath) Neighbors(pos position) []position {
 
 func (mp *monPath) Cost(from, to position) int {
 	g := mp.game
-	mons, _ := g.MonsterAt(to)
+	mons := g.MonsterAt(to)
 	if !mons.Exists() {
 		if mp.wall && g.Dungeon.Cell(to).T == WallCell && mp.monster.State != Hunting {
 			return 6

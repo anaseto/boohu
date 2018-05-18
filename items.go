@@ -288,7 +288,7 @@ func (g *game) QuaffMagicMapping(ev event) error {
 func (g *game) QuaffWallPotion(ev event) error {
 	neighbors := g.Dungeon.FreeNeighbors(g.Player.Pos)
 	for _, pos := range neighbors {
-		mons, _ := g.MonsterAt(pos)
+		mons := g.MonsterAt(pos)
 		if mons.Exists() {
 			continue
 		}
@@ -389,7 +389,7 @@ func (g *game) ThrowConfusingDart(ev event) error {
 	if err := g.ui.ChooseTarget(g, &chooser{needsFreeWay: true}); err != nil {
 		return err
 	}
-	mons, _ := g.MonsterAt(g.Player.Target)
+	mons := g.MonsterAt(g.Player.Target)
 	acc := RandInt(g.Player.RangedAccuracy())
 	evasion := RandInt(mons.Evasion)
 	if mons.State == Resting {
@@ -434,7 +434,7 @@ func (g *game) ThrowExplosiveMagara(ev event) error {
 	g.ui.ExplosionAnimation(g, FireExplosion, g.Player.Target)
 	for _, pos := range append(neighbors, g.Player.Target) {
 		g.Burn(pos, ev)
-		mons, _ := g.MonsterAt(pos)
+		mons := g.MonsterAt(pos)
 		if mons.Exists() {
 			mons.HP /= 2
 			if mons.HP == 0 {

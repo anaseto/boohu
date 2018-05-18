@@ -471,6 +471,7 @@ type monster struct {
 	Obstructing bool
 	FireReady   bool
 	Seen        bool
+	Index       int
 }
 
 func (m *monster) Init() {
@@ -505,7 +506,7 @@ func (m *monster) AlternatePlacement(g *game) *position {
 		if pos.Distance(g.Player.Pos) != 1 {
 			continue
 		}
-		mons, _ := g.MonsterAt(pos)
+		mons := g.MonsterAt(pos)
 		if mons.Exists() {
 			continue
 		}
@@ -556,10 +557,16 @@ func (m *monster) TeleportAway(g *game) {
 		g.Printf("%s teleports away.", m.Kind.Definite(true))
 	}
 	opos := m.Pos
-	m.Pos = pos
+	m.MoveTo(g, pos)
 	if g.Player.LOS[opos] {
 		g.ui.TeleportAnimation(g, opos, pos, false)
 	}
+}
+
+func (m *monster) MoveTo(g *game, pos position) {
+	g.MonstersPosCache[m.Pos.idx()] = 0
+	m.Pos = pos
+	g.MonstersPosCache[m.Pos.idx()] = m.Index + 1
 }
 
 func (m *monster) TeleportMonsterAway(g *game) bool {
@@ -568,7 +575,7 @@ func (m *monster) TeleportMonsterAway(g *game) bool {
 		if pos == m.Pos || RandInt(3) != 0 {
 			continue
 		}
-		mons, _ := g.MonsterAt(pos)
+		mons := g.MonsterAt(pos)
 		if mons.Exists() {
 			if g.Player.LOS[m.Pos] {
 				g.Print("Marevor makes some strange gestures.")
@@ -586,7 +593,7 @@ func (m *monster) AttackAction(g *game, ev event) {
 		m.Obstructing = false
 		pos := m.AlternatePlacement(g)
 		if pos != nil {
-			m.Pos = *pos
+			m.MoveTo(g, *pos)
 			ev.Renew(g, m.Kind.MovementDelay())
 			return
 		}
@@ -686,7 +693,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 		return
 	}
 	target := m.Path[len(m.Path)-2]
-	mons, _ := g.MonsterAt(target)
+	mons := g.MonsterAt(target)
 	switch {
 	case !mons.Exists():
 		recomputeLOS := g.Doors[m.Pos] || g.Doors[target]
@@ -702,7 +709,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 				g.Printf("%s You hear an earth-breaking noise.", g.CrackSound())
 				g.StopAuto()
 			}
-			m.Pos = target
+			m.MoveTo(g, target)
 			m.Path = m.Path[:len(m.Path)-1]
 			if recomputeLOS {
 				g.ComputeLOS()
@@ -710,7 +717,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 		} else if g.Dungeon.Cell(target).T == WallCell {
 			m.Path = m.APath(g, mpos, m.Target)
 		} else {
-			m.Pos = target
+			m.MoveTo(g, target)
 			if m.Kind.Ranged() && !m.FireReady && g.Player.LOS[m.Pos] {
 				m.FireReady = true
 			}
@@ -795,7 +802,7 @@ func (m *monster) EnterConfusion(g *game, ev event) {
 		m.Statuses[MonsConfused] = 1
 		m.Path = nil
 		g.PushEvent(&monsterEvent{
-			ERank: ev.Rank() + 50 + RandInt(100), NMons: m.Index(g), EAction: MonsConfusionEnd})
+			ERank: ev.Rank() + 50 + RandInt(100), NMons: m.Index, EAction: MonsConfusionEnd})
 	}
 }
 
@@ -822,7 +829,7 @@ func (m *monster) HitSideEffects(g *game, ev event) {
 		pos := g.Player.Pos.To(dir)
 		if RandInt(2) == 0 && !g.Player.HasStatus(StatusLignification) &&
 			pos.valid() && g.Dungeon.Cell(pos).T == FreeCell {
-			mons, _ := g.MonsterAt(pos)
+			mons := g.MonsterAt(pos)
 			if !mons.Exists() {
 				g.Player.Pos = pos
 				g.CollectGround()
@@ -875,7 +882,7 @@ func (m *monster) RangeBlocked(g *game) bool {
 	ray := g.Ray(m.Pos)
 	blocked := false
 	for _, pos := range ray[1:] {
-		mons, _ := g.MonsterAt(pos)
+		mons := g.MonsterAt(pos)
 		if mons == nil {
 			continue
 		}
@@ -883,16 +890,6 @@ func (m *monster) RangeBlocked(g *game) bool {
 		break
 	}
 	return blocked
-}
-
-func (m *monster) Index(g *game) int {
-	for i, mons := range g.Monsters {
-		if mons.Exists() && mons.Pos == m.Pos {
-			return i
-		}
-	}
-	// not reached
-	return 0
 }
 
 func (m *monster) TormentBolt(g *game, ev event) bool {
@@ -911,7 +908,7 @@ func (m *monster) TormentBolt(g *game, ev event) bool {
 		g.Printf("You block the %s's bolt of torment.", m.Kind)
 	}
 	m.Statuses[MonsExhausted] = 1
-	g.PushEvent(&monsterEvent{ERank: ev.Rank() + 100 + RandInt(50), NMons: m.Index(g), EAction: MonsExhaustionEnd})
+	g.PushEvent(&monsterEvent{ERank: ev.Rank() + 100 + RandInt(50), NMons: m.Index, EAction: MonsExhaustionEnd})
 	ev.Renew(g, m.Kind.AttackDelay())
 	return true
 }
@@ -998,7 +995,7 @@ func (m *monster) ThrowJavelin(g *game, ev event) bool {
 		g.Printf("You dodge %s's %s.", m.Kind.Indefinite(false), "javelin")
 	}
 	m.Statuses[MonsExhausted] = 1
-	g.PushEvent(&monsterEvent{ERank: ev.Rank() + 50 + RandInt(50), NMons: m.Index(g), EAction: MonsExhaustionEnd})
+	g.PushEvent(&monsterEvent{ERank: ev.Rank() + 50 + RandInt(50), NMons: m.Index, EAction: MonsExhaustionEnd})
 	ev.Renew(g, m.Kind.AttackDelay())
 	return true
 }
@@ -1077,7 +1074,7 @@ func (m *monster) AbsorbMana(g *game, ev event) bool {
 	g.Player.MP = 2 * g.Player.MP / 3
 	g.Printf("%s absorbs your mana.", m.Kind.Definite(true))
 	m.Statuses[MonsExhausted] = 1
-	g.PushEvent(&monsterEvent{ERank: ev.Rank() + 10 + RandInt(20), NMons: m.Index(g), EAction: MonsExhaustionEnd})
+	g.PushEvent(&monsterEvent{ERank: ev.Rank() + 10 + RandInt(20), NMons: m.Index, EAction: MonsExhaustionEnd})
 	ev.Renew(g, m.Kind.AttackDelay())
 	return true
 }
@@ -1092,7 +1089,7 @@ func (m *monster) Explode(g *game, ev event) {
 		if c.T == FreeCell {
 			g.Burn(pos, ev)
 		}
-		mons, _ := g.MonsterAt(pos)
+		mons := g.MonsterAt(pos)
 		if mons.Exists() {
 			mons.HP /= 2
 			if mons.HP == 0 {
@@ -1223,17 +1220,18 @@ func (m *monster) GatherBand(g *game) {
 	}
 }
 
-func (g *game) MonsterAt(pos position) (*monster, int) {
-	var mons *monster
-	var index int
-	for i, m := range g.Monsters {
-		if m.Pos == pos && m.HP > 0 {
-			mons = m
-			index = i
-			break
-		}
+func (g *game) MonsterAt(pos position) *monster {
+	if !pos.valid() {
+		return nil
 	}
-	return mons, index
+	if len(g.MonstersPosCache) == 0 {
+		g.MonstersPosCache = make([]int, DungeonNCells)
+	}
+	i := g.MonstersPosCache[pos.idx()]
+	if i <= 0 {
+		return nil
+	}
+	return g.Monsters[i-1]
 }
 
 func (g *game) Danger() int {
@@ -1311,10 +1309,12 @@ func (g *game) MaxMonsters() int {
 
 func (g *game) GenMonsters() {
 	g.Monsters = []*monster{}
+	g.MonstersPosCache = make([]int, DungeonNCells)
 	g.Bands = []monsterBand{}
 	danger := g.MaxDanger()
 	nmons := g.MaxMonsters()
 	nband := 0
+	i := 0
 	for danger > 0 && nmons > 0 {
 		for band, data := range MonsBands {
 			if RandInt(data.rarity*2) != 0 {
@@ -1335,9 +1335,11 @@ func (g *game) GenMonsters() {
 				}
 				mons := &monster{Kind: mk}
 				mons.Init()
-				mons.Pos = pos
+				mons.Index = i
 				mons.Band = nband
+				mons.MoveTo(g, pos)
 				g.Monsters = append(g.Monsters, mons)
+				i++
 				pos = g.FreeCellForBandMonster(pos)
 			}
 			nband++

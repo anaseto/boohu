@@ -8,6 +8,7 @@ type game struct {
 	Dungeon             *dungeon
 	Player              *player
 	Monsters            []*monster
+	MonstersPosCache    []int // position in dungeon
 	Bands               []monsterBand
 	Events              *eventQueue
 	Ev                  event
@@ -92,7 +93,7 @@ func (g *game) FreeCell() position {
 		if g.Player != nil && g.Player.Pos == pos {
 			continue
 		}
-		mons, _ := g.MonsterAt(pos)
+		mons := g.MonsterAt(pos)
 		if mons.Exists() {
 			continue
 		}
@@ -127,7 +128,7 @@ func (g *game) FreeCellForStatic() position {
 		if g.Player != nil && g.Player.Pos == pos {
 			continue
 		}
-		mons, _ := g.MonsterAt(pos)
+		mons := g.MonsterAt(pos)
 		if mons.Exists() {
 			continue
 		}
@@ -171,7 +172,7 @@ func (g *game) FreeCellForMonster() position {
 		if g.Player != nil && g.Player.Pos.Distance(pos) < 8 {
 			continue
 		}
-		mons, _ := g.MonsterAt(pos)
+		mons := g.MonsterAt(pos)
 		if mons.Exists() {
 			continue
 		}
@@ -192,7 +193,7 @@ func (g *game) FreeCellForBandMonster(pos position) position {
 		if g.Player != nil && g.Player.Pos.Distance(pos) < 8 {
 			continue
 		}
-		mons, _ := g.MonsterAt(pos)
+		mons := g.MonsterAt(pos)
 		if mons.Exists() {
 			continue
 		}

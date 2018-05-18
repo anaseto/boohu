@@ -1008,7 +1008,7 @@ func (ui *termui) DescribePosition(g *game, pos position, targ Targeter) {
 		g.InfoEntry = desc
 		return
 	}
-	mons, _ := g.MonsterAt(pos)
+	mons := g.MonsterAt(pos)
 	c, okCollectable := g.Collectables[pos]
 	eq, okEq := g.Equipables[pos]
 	rod, okRod := g.Rods[pos]
@@ -1365,7 +1365,7 @@ func (ui *termui) ViewPositionDescription(g *game, pos position) {
 		g.Print("No description: unknown place.")
 		return
 	}
-	mons, _ := g.MonsterAt(pos)
+	mons := g.MonsterAt(pos)
 	if mons.Exists() && g.Player.LOS[mons.Pos] {
 		ui.HideCursor()
 		ui.DrawMonsterDescription(g, mons)
@@ -1633,7 +1633,7 @@ func (ui *termui) HitAnimation(g *game, pos position, targeting bool) {
 		return
 	}
 	_, _, bgColor := ui.PositionDrawing(g, pos)
-	mons, _ := g.MonsterAt(pos)
+	mons := g.MonsterAt(pos)
 	if mons.Exists() {
 		ui.DrawAtPosition(g, pos, targeting, '¤', ColorFgAnimationHit, bgColor)
 	} else {
@@ -1750,7 +1750,7 @@ func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgCol
 				fgColor = ColorFgPlace
 			}
 			if g.Player.LOS[pos] || g.Wizard {
-				m, _ := g.MonsterAt(pos)
+				m := g.MonsterAt(pos)
 				if m.Exists() {
 					r = m.Kind.Letter()
 					if m.Status(MonsConfused) {

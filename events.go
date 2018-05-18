@@ -266,7 +266,7 @@ func (cev *cloudEvent) Action(g *game) {
 }
 
 func (g *game) BurnCreature(pos position, ev event) {
-	mons, _ := g.MonsterAt(pos)
+	mons := g.MonsterAt(pos)
 	if mons.Exists() {
 		mons.HP -= 1 + RandInt(10)
 		if mons.HP <= 0 {
