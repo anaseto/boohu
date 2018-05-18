@@ -505,7 +505,7 @@ func (k keyAction) NormalModeDescription() (text string) {
 	case KeyLogs:
 		text = "View previous messages"
 	case KeyDump:
-		text = "Write character dump to file"
+		text = "Write game statistics to file"
 	case KeySave:
 		text = "Save and Quit"
 	case KeyQuit:
@@ -915,7 +915,7 @@ func (ui *termui) KeysHelp(g *game) {
 		"Evoke/Zap rod", "v or z",
 		"View Character and Quest Information", `% or C`,
 		"View previous messages", "m",
-		"Write character dump to file", "#",
+		"Write game statistics to file", "#",
 		"Save and Quit", "S",
 		"Quit without saving", "Q",
 		"Action Menu", "a or M",
