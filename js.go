@@ -52,7 +52,7 @@ func (g *game) DataDir() (string, error) {
 }
 
 func (g *game) Save() error {
-	return nil // TODO remove when it works
+	return errors.New("Saving games is not available in the web html version.") // TODO remove when it works
 	save, err := g.GameSave()
 	if err != nil {
 		SaveError = err.Error()
@@ -112,6 +112,8 @@ func (g *game) Load() (bool, error) {
 func (g *game) WriteDump() error {
 	//storage := js.Global.Get("localStorage")
 	//storage.Call("setItem", "boohudump", g.Dump())
+	pre := js.Global.Get("document").Call("getElementById", "dump")
+	pre.Set("innerHTML", g.Dump())
 	return nil
 }
 
@@ -343,9 +345,6 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 	again = true
 	in := ui.PollEvent()
 	switch in.key {
-	case "S":
-		err = errors.New("Command not available for the web html5 version.")
-		return err, true, false
 	case "":
 		if in.mouse {
 			pos := position{X: in.mouseX, Y: in.mouseY}

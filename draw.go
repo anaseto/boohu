@@ -800,18 +800,21 @@ func (ui *termui) HandleKey(g *game, rka runeKeyAction) (err error, again bool, 
 		err := g.Save()
 		if err != nil {
 			g.PrintfStyled("Error: %v", logError, err)
-			g.PrintStyled("Could not save game. --press any key to continue--", logError)
-			ui.DrawDungeonView(g, NormalMode)
-			ui.PressAnyKey()
+			g.PrintStyled("Could not save game.", logError)
+		} else {
+			quit = true
 		}
-		quit = true
 	case KeyDump:
 		err := g.WriteDump()
 		if err != nil {
 			g.PrintStyled("Error writing dump to file.", logError)
 		} else {
 			dataDir, _ := g.DataDir()
-			g.Printf("Dump written to %s.", filepath.Join(dataDir, "dump"))
+			if dataDir != "" {
+				g.Printf("Dump written to %s.", filepath.Join(dataDir, "dump"))
+			} else {
+				g.Print("Dump written.")
+			}
 		}
 		again = true
 	case KeyWizardInfo:
@@ -1267,13 +1270,12 @@ func (ui *termui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, dat
 		err := g.Save()
 		if err != nil {
 			g.PrintfStyled("Error: %v", logError, err)
-			g.PrintStyled("Could not save game. --press any key to continue--", logError)
-			ui.DrawDungeonView(g, NormalMode)
-			ui.PressAnyKey()
+			g.PrintStyled("Could not save game.", logError)
+		} else {
+			notarg = true
+			again = false
+			quit = true
 		}
-		notarg = true
-		again = false
-		quit = true
 	case KeyQuit:
 		if ui.Quit(g) {
 			quit = true
