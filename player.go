@@ -19,7 +19,7 @@ type player struct {
 	Weapon      weapon
 	Shield      shield
 	Aptitudes   map[aptitude]bool
-	Rods        map[rod]*rodProps
+	Rods        map[rod]rodProps
 }
 
 func (p *player) HPMax() int {
@@ -319,7 +319,7 @@ func (g *game) CollectGround() {
 		}
 	}
 	if r, ok := g.Rods[pos]; ok {
-		g.Player.Rods[r] = &rodProps{Charge: r.MaxCharge() - 1}
+		g.Player.Rods[r] = rodProps{Charge: r.MaxCharge() - 1}
 		g.DijkstraMapRebuild = true
 		delete(g.Rods, pos)
 		g.Printf("You take a %s.", r)

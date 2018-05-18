@@ -169,7 +169,9 @@ func (r rod) Use(g *game, ev event) error {
 	if err != nil {
 		return err
 	}
-	rods[r].Charge--
+	rp := rods[r]
+	rp.Charge--
+	rods[r] = rp
 	g.Player.MP -= r.MPCost()
 	g.StoryPrintf("You evoked your %s.", r)
 	g.FairAction()
@@ -429,7 +431,7 @@ func (g *game) GenerateRod() {
 		if r.Rare() && RandInt(3) == 0 {
 			r = rod(RandInt(NumRods))
 		}
-		if g.Player.Rods[r] == nil && !g.GeneratedRods[r] {
+		if _, ok := g.Player.Rods[r]; !ok && !g.GeneratedRods[r] {
 			g.GeneratedRods[r] = true
 			g.Rods[pos] = r
 			return

@@ -1255,9 +1255,7 @@ func (g *game) MaxDanger() int {
 		}
 	}
 	for _, props := range g.Player.Rods {
-		if props != nil {
-			adjust += Min(props.Charge, 2) * Min(2, g.Depth)
-		}
+		adjust += Min(props.Charge, 2) * Min(2, g.Depth)
 	}
 	if g.Depth < g.MaxDepth() && g.Player.Consumables[DescentPotion] > 0 {
 		adjust += g.Depth

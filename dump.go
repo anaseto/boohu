@@ -64,10 +64,7 @@ func (g *game) DumpStatuses() string {
 
 func (g *game) SortedRods() rodSlice {
 	var rs rodSlice
-	for k, p := range g.Player.Rods {
-		if p == nil {
-			continue
-		}
+	for k, _ := range g.Player.Rods {
 		rs = append(rs, k)
 	}
 	sort.Sort(rs)

@@ -285,14 +285,14 @@ func (g *game) InitPlayer() {
 	case 8:
 		g.Player.Consumables[DigPotion] = 1
 	}
-	g.Player.Rods = map[rod]*rodProps{}
+	g.Player.Rods = map[rod]rodProps{}
 	g.Player.Statuses = map[status]int{}
 
 	// Testing
 	// g.Player.Aptitudes[AptSmoke] = true
-	//g.Player.Rods[RodSwapping] = &rodProps{Charge: 3}
-	//g.Player.Rods[RodFireball] = &rodProps{Charge: 3}
-	//g.Player.Rods[RodFog] = &rodProps{Charge: 3}
+	//g.Player.Rods[RodSwapping] = rodProps{Charge: 3}
+	//g.Player.Rods[RodFireball] = rodProps{Charge: 3}
+	//g.Player.Rods[RodFog] = rodProps{Charge: 3}
 	//g.Player.Consumables[MagicMappingPotion] = 1
 	//g.Player.Consumables[ExplosiveMagara] = 5
 	//g.Player.Consumables[DigPotion] = 5
@@ -411,9 +411,11 @@ func (g *game) InitLevel() {
 				rchg++
 			}
 			props.Charge += rchg
+			g.Player.Rods[r] = props
 		}
 		if props.Charge > r.MaxCharge() {
 			props.Charge = r.MaxCharge()
+			g.Player.Rods[r] = props
 		}
 	}
 
