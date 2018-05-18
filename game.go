@@ -33,7 +33,7 @@ type game struct {
 	Autoexploring       bool
 	DijkstraMapRebuild  bool
 	AutoTarget          position
-	AutoDir             *direction
+	AutoDir             direction
 	AutoHalt            bool
 	AutoNext            bool
 	ExclusionsMap       map[position]bool
@@ -647,7 +647,7 @@ func (g *game) AutoPlayer(ev event) bool {
 		if !g.ui.ExploreStep(g) && g.MoveToTarget(ev) {
 			return true
 		}
-	} else if g.AutoDir != nil {
+	} else if g.AutoDir != NoDir {
 		if !g.ui.ExploreStep(g) && g.AutoToDir(ev) {
 			return true
 		}

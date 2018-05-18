@@ -61,7 +61,8 @@ func (pos position) DistanceY(to position) int {
 type direction int
 
 const (
-	E direction = iota
+	NoDir direction = iota
+	E
 	ENE
 	NE
 	NNE

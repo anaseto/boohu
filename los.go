@@ -85,7 +85,7 @@ func (g *game) LosRange() int {
 
 func (g *game) StopAuto() {
 	g.AutoHalt = true
-	g.AutoDir = nil
+	g.AutoDir = NoDir
 	g.AutoTarget = InvalidPos
 	g.Resting = false
 }
