@@ -1401,7 +1401,7 @@ func (ui *termui) MonsterInfo(m *monster) string {
 	infos = append(infos, m.State.String())
 	for st, i := range m.Statuses {
 		if i > 0 {
-			infos = append(infos, st.String())
+			infos = append(infos, monsterStatus(st).String())
 		}
 	}
 	p := (m.HP * 100) / m.HPmax

@@ -32,6 +32,8 @@ const (
 	MonsAfraid
 )
 
+const NMonsStatus = 2
+
 func (st monsterStatus) String() (text string) {
 	switch st {
 	case MonsConfused:
@@ -465,7 +467,7 @@ type monster struct {
 	HP          int
 	Pos         position
 	State       monsterState
-	Statuses    map[monsterStatus]int
+	Statuses    [NMonsStatus]int
 	Target      position
 	Path        []position // cache
 	Obstructing bool
@@ -481,7 +483,6 @@ func (m *monster) Init() {
 	m.Accuracy = MonsData[m.Kind].accuracy
 	m.Armor = MonsData[m.Kind].armor
 	m.Evasion = MonsData[m.Kind].evasion
-	m.Statuses = map[monsterStatus]int{}
 	if m.Kind == MonsMarevorHelith {
 		m.State = Wandering
 	}
