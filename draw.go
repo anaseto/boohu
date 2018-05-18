@@ -1294,6 +1294,8 @@ type examineData struct {
 	stairIndex   int
 }
 
+var InvalidPos = position{-1, -1}
+
 func (ui *termui) CursorAction(g *game, targ Targeter, start *position) (err error, again, quit bool) {
 	pos := g.Player.Pos
 	if start != nil {
@@ -1315,7 +1317,7 @@ func (ui *termui) CursorAction(g *game, targ Targeter, start *position) (err err
 		objects: []position{},
 	}
 	if _, ok := targ.(*examiner); ok && pos == g.Player.Pos && start == nil {
-		ui.NextObject(g, position{-1, -1}, data)
+		ui.NextObject(g, InvalidPos, data)
 		if !data.npos.valid() {
 			ui.NextStair(g, data)
 		}
@@ -1323,7 +1325,7 @@ func (ui *termui) CursorAction(g *game, targ Targeter, start *position) (err err
 			pos = data.npos
 		}
 	}
-	opos := position{-1, -1}
+	opos := InvalidPos
 loop:
 	for {
 		err = nil

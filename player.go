@@ -155,30 +155,32 @@ func (g *game) GoToDir(dir direction, ev event) error {
 }
 
 func (g *game) MoveToTarget(ev event) bool {
-	if g.AutoTarget != nil {
-		path := g.PlayerPath(g.Player.Pos, *g.AutoTarget)
-		if g.MonsterInLOS() != nil {
-			g.AutoTarget = nil
-		}
-		if len(path) >= 1 {
-			var err error
-			if len(path) > 1 {
-				err = g.MovePlayer(path[len(path)-2], ev)
-			} else {
-				g.WaitTurn(ev)
-			}
-			if err != nil {
-				g.Print(err.Error())
-				g.AutoTarget = nil
-				return false
-			} else if g.AutoTarget != nil && g.Player.Pos == *g.AutoTarget {
-				g.AutoTarget = nil
-			}
-			return true
-		}
+	if !g.AutoTarget.valid() {
+		return false
 	}
-	g.AutoTarget = nil
-	return false
+	path := g.PlayerPath(g.Player.Pos, g.AutoTarget)
+	if g.MonsterInLOS() != nil {
+		g.AutoTarget = InvalidPos
+	}
+	if len(path) < 1 {
+		g.AutoTarget = InvalidPos
+		return false
+	}
+	var err error
+	if len(path) > 1 {
+		err = g.MovePlayer(path[len(path)-2], ev)
+	} else {
+		g.WaitTurn(ev)
+	}
+	if err != nil {
+		g.Print(err.Error())
+		g.AutoTarget = InvalidPos
+		return false
+	}
+	if g.AutoTarget.valid() && g.Player.Pos == g.AutoTarget {
+		g.AutoTarget = InvalidPos
+	}
+	return true
 }
 
 func (g *game) WaitTurn(ev event) {

@@ -47,7 +47,7 @@ func (ex *examiner) Action(g *game, pos position) error {
 		return errors.New("There is no safe path to this place.")
 	}
 	if c := g.Dungeon.Cell(pos); c.Explored && c.T == FreeCell {
-		g.AutoTarget = &pos
+		g.AutoTarget = pos
 		g.Targeting = &pos
 		ex.done = true
 		return nil

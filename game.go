@@ -32,7 +32,7 @@ type game struct {
 	Resting             bool
 	Autoexploring       bool
 	DijkstraMapRebuild  bool
-	AutoTarget          *position
+	AutoTarget          position
 	AutoDir             *direction
 	AutoHalt            bool
 	AutoNext            bool
@@ -643,7 +643,7 @@ func (g *game) AutoPlayer(ev event) bool {
 			}
 		}
 		g.Autoexploring = false
-	} else if g.AutoTarget != nil {
+	} else if g.AutoTarget.valid() {
 		if !g.ui.ExploreStep(g) && g.MoveToTarget(ev) {
 			return true
 		}

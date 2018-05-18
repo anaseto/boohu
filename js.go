@@ -252,7 +252,7 @@ func (ui *termui) FlushCallback(obj *js.Object) {
 }
 
 func (ui *termui) HideCursor() {
-	ui.cursor = position{-1, -1}
+	ui.cursor = InvalidPos
 }
 
 func (ui *termui) SetCursor(pos position) {
