@@ -13,7 +13,7 @@ type game struct {
 	Events              *eventQueue
 	Ev                  event
 	Highlight           map[position]bool // highlighted positions (e.g. targeted ray)
-	Collectables        map[position]*collectable
+	Collectables        map[position]collectable
 	CollectableScore    int
 	Equipables          map[position]equipable
 	Rods                map[position]rod
@@ -138,7 +138,7 @@ func (g *game) FreeCellForStatic() position {
 		if g.Simellas[pos] > 0 {
 			continue
 		}
-		if g.Collectables[pos] != nil {
+		if _, ok := g.Collectables[pos]; ok {
 			continue
 		}
 		if g.Stairs[pos] {
@@ -325,7 +325,7 @@ func (g *game) InitLevel() {
 	g.GenMonsters()
 
 	// Collectables
-	g.Collectables = make(map[position]*collectable)
+	g.Collectables = make(map[position]collectable)
 	g.GenCollectables()
 
 	// Equipment
@@ -476,7 +476,7 @@ func (g *game) GenCollectables() {
 			if r == 0 {
 				g.CollectableScore++
 				pos := g.FreeCellForStatic()
-				g.Collectables[pos] = &collectable{Consumable: c, Quantity: data.quantity}
+				g.Collectables[pos] = collectable{Consumable: c, Quantity: data.quantity}
 			}
 		}
 	}

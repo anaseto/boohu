@@ -1025,7 +1025,7 @@ func (ui *termui) DescribePosition(g *game, pos position, targ Targeter) {
 	switch {
 	case g.Simellas[pos] > 0:
 		desc += fmt.Sprintf("You %s some simellas (%d).", see, g.Simellas[pos])
-	case okCollectable && c != nil:
+	case okCollectable:
 		if c.Quantity > 1 {
 			desc += fmt.Sprintf("You %s %d %s there.", see, c.Quantity, c.Consumable)
 		} else {

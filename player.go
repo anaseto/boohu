@@ -308,7 +308,7 @@ func (g *game) CollectGround() {
 		g.DijkstraMapRebuild = true
 		delete(g.Simellas, pos)
 	}
-	if c, ok := g.Collectables[pos]; ok && c != nil {
+	if c, ok := g.Collectables[pos]; ok {
 		g.Player.Consumables[c.Consumable] += c.Quantity
 		g.DijkstraMapRebuild = true
 		delete(g.Collectables, pos)

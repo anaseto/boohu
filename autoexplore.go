@@ -37,7 +37,8 @@ func (g *game) AllExplored() bool {
 				continue
 			}
 		}
-		if !c.Explored || g.Simellas[pos] > 0 || g.Collectables[pos] != nil {
+		_, okc := g.Collectables[pos]
+		if !c.Explored || g.Simellas[pos] > 0 || okc {
 			return false
 		} else if _, ok := g.Rods[pos]; ok {
 			return false
@@ -59,7 +60,8 @@ func (g *game) AutoexploreSources() []int {
 		if g.ExclusionsMap[pos] {
 			continue
 		}
-		if !c.Explored || g.Simellas[pos] > 0 || g.Collectables[pos] != nil {
+		_, okc := g.Collectables[pos]
+		if !c.Explored || g.Simellas[pos] > 0 || okc {
 			sources = append(sources, i)
 		} else if _, ok := g.Rods[pos]; ok {
 			sources = append(sources, i)
