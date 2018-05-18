@@ -40,7 +40,7 @@ func (ex *examiner) Action(g *game, pos position) error {
 		return errors.New("You cannot travel into a wall.")
 	}
 	path := g.PlayerPath(g.Player.Pos, pos)
-	if path == nil {
+	if len(path) == 0 {
 		if ex.stairs {
 			return errors.New("There is no safe path to the nearest stairs.")
 		}
