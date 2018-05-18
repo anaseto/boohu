@@ -765,7 +765,7 @@ func (ui *termui) HandleKey(g *game, rka runeKeyAction) (err error, again bool, 
 				err = errors.New("You could not move toward stairs.")
 			}
 			if ex.Done() {
-				g.Targeting = nil
+				g.Targeting = InvalidPos
 			}
 		} else {
 			err = errors.New("You cannot go to any stairs.")
@@ -1210,7 +1210,7 @@ func (ui *termui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, dat
 	case KeyDescend:
 		if g.Stairs[g.Player.Pos] {
 			again = false
-			g.Targeting = nil
+			g.Targeting = InvalidPos
 			notarg = true
 			if g.Descend() {
 				ui.Win(g)
@@ -1234,7 +1234,7 @@ func (ui *termui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, dat
 		if err != nil {
 			break
 		}
-		g.Targeting = nil
+		g.Targeting = InvalidPos
 		if g.MoveToTarget(g.Ev) {
 			again = false
 		}
@@ -1248,7 +1248,7 @@ func (ui *termui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, dat
 	case KeyExclude:
 		ui.ExcludeZone(g, pos)
 	case KeyEscape:
-		g.Targeting = nil
+		g.Targeting = InvalidPos
 		notarg = true
 		err = errors.New(DoNothing)
 	case KeyExplore, KeyRest, KeyThrow, KeyDrink, KeyEvoke, KeyLogs, KeyEquip, KeyCharacterInfo:
@@ -1259,11 +1259,11 @@ func (ui *termui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, dat
 		if err != nil {
 			notarg = true
 		}
-		g.Targeting = nil
+		g.Targeting = InvalidPos
 	case KeySave:
 		g.Ev.Renew(g, 0)
 		g.Highlight = nil
-		g.Targeting = nil
+		g.Targeting = InvalidPos
 		err := g.Save()
 		if err != nil {
 			g.PrintfStyled("Error: %v", logError, err)
@@ -2464,8 +2464,8 @@ getKey:
 	for {
 		var err error
 		var again, quit bool
-		if g.Targeting != nil {
-			err, again, quit = ui.ExaminePos(g, ev, *g.Targeting)
+		if g.Targeting.valid() {
+			err, again, quit = ui.ExaminePos(g, ev, g.Targeting)
 		} else {
 			ui.DrawDungeonView(g, NormalMode)
 			err, again, quit = ui.PlayerTurnEvent(g, ev)

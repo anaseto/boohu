@@ -52,7 +52,7 @@ type game struct {
 	KilledMons          map[monsterKind]int
 	Scumming            int
 	Noise               map[position]bool
-	Targeting           *position
+	Targeting           position
 }
 
 type Renderer interface {
@@ -306,6 +306,8 @@ func (g *game) InitLevel() {
 	// Starting data
 	if g.Depth == 0 {
 		g.InitPlayer()
+		g.AutoTarget = InvalidPos
+		g.Targeting = InvalidPos
 		g.GeneratedRods = map[rod]bool{}
 		g.GeneratedEquipables = map[equipable]bool{}
 		g.FoundEquipables = map[equipable]bool{Robe: true, Dagger: true}

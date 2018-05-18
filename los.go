@@ -4,16 +4,7 @@ type raynode struct {
 	Cost int
 }
 
-type rayMap map[position]*raynode
-
-func (rm rayMap) get(p position) *raynode {
-	r, ok := rm[p]
-	if !ok {
-		r = &raynode{}
-		rm[p] = r
-	}
-	return r
-}
+type rayMap map[position]raynode
 
 func (g *game) bestParent(rm rayMap, from, pos position) (position, int) {
 	p := pos.Parents(from)
@@ -51,7 +42,7 @@ func (g *game) losCost(pos position) int {
 
 func (g *game) buildRayMap(from position, distance int) rayMap {
 	rm := rayMap{}
-	rm[from] = &raynode{Cost: 0}
+	rm[from] = raynode{Cost: 0}
 	for d := 1; d <= distance; d++ {
 		for x := -d + from.X; x <= d+from.X; x++ {
 			for _, pos := range []position{{x, from.Y + d}, {x, from.Y - d}} {
@@ -59,7 +50,7 @@ func (g *game) buildRayMap(from position, distance int) rayMap {
 					continue
 				}
 				_, c := g.bestParent(rm, from, pos)
-				rm[pos] = &raynode{Cost: c}
+				rm[pos] = raynode{Cost: c}
 			}
 		}
 		for y := -d + 1 + from.Y; y <= d-1+from.Y; y++ {
@@ -68,7 +59,7 @@ func (g *game) buildRayMap(from position, distance int) rayMap {
 					continue
 				}
 				_, c := g.bestParent(rm, from, pos)
-				rm[pos] = &raynode{Cost: c}
+				rm[pos] = raynode{Cost: c}
 			}
 		}
 	}

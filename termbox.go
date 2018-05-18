@@ -304,7 +304,7 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (er
 			case termbox.KeyArrowRight:
 				tev.Ch = '6'
 			case termbox.KeyEsc, termbox.KeySpace:
-				g.Targeting = nil
+				g.Targeting = InvalidPos
 				notarg = true
 				return
 			case termbox.KeyEnter:
@@ -319,7 +319,7 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (er
 				if tev.MouseX > DungeonWidth && tev.MouseY == 0 {
 					err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: KeyMenu}, data)
 				} else if tev.MouseX > DungeonWidth || tev.MouseY > DungeonHeight {
-					g.Targeting = nil
+					g.Targeting = InvalidPos
 					notarg = true
 					err = errors.New(DoNothing)
 				} else {
@@ -328,7 +328,7 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (er
 			case termbox.MouseRight:
 				data.npos = position{X: tev.MouseX, Y: tev.MouseY}
 			case termbox.MouseMiddle:
-				g.Targeting = nil
+				g.Targeting = InvalidPos
 				notarg = true
 			}
 		}

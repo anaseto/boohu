@@ -466,7 +466,7 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (er
 	in := ui.PollEvent()
 	switch in.key {
 	case "\x1b", "Escape", " ":
-		g.Targeting = nil
+		g.Targeting = InvalidPos
 		notarg = true
 		return
 	case "Enter":
@@ -478,7 +478,7 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (er
 				if in.mouseX > DungeonWidth && in.mouseY == 0 {
 					err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: KeyMenu}, data)
 				} else if in.mouseX > DungeonWidth || in.mouseY > DungeonHeight {
-					g.Targeting = nil
+					g.Targeting = InvalidPos
 					notarg = true
 					err = errors.New(DoNothing)
 				} else {
@@ -487,7 +487,7 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (er
 			case 2:
 				data.npos = position{X: in.mouseX, Y: in.mouseY}
 			case 1:
-				g.Targeting = nil
+				g.Targeting = InvalidPos
 				notarg = true
 			}
 		}

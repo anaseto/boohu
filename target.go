@@ -48,7 +48,7 @@ func (ex *examiner) Action(g *game, pos position) error {
 	}
 	if c := g.Dungeon.Cell(pos); c.Explored && c.T == FreeCell {
 		g.AutoTarget = pos
-		g.Targeting = &pos
+		g.Targeting = pos
 		ex.done = true
 		return nil
 	}
