@@ -8,10 +8,13 @@ type game struct {
 	Dungeon             *dungeon
 	Player              *player
 	Monsters            []*monster
-	MonstersPosCache    []int // position in dungeon
+	MonstersPosCache    []int // monster (dungeon index + 1) / no monster (0)
 	Bands               []monsterBand
 	Events              *eventQueue
 	Ev                  event
+	EventIndex          int
+	Depth               int
+	Turn                int
 	Highlight           map[position]bool // highlighted positions (e.g. targeted ray)
 	Collectables        map[position]collectable
 	CollectableScore    int
@@ -29,30 +32,27 @@ type game struct {
 	Simellas            map[position]int
 	UnknownDig          map[position]bool
 	UnknownBurn         map[position]bool
+	ExclusionsMap       map[position]bool
+	Noise               map[position]bool
 	Resting             bool
 	Autoexploring       bool
 	DijkstraMapRebuild  bool
+	Targeting           position
 	AutoTarget          position
 	AutoDir             direction
 	AutoHalt            bool
 	AutoNext            bool
-	ExclusionsMap       map[position]bool
-	Quit                bool
-	ui                  Renderer
-	Depth               int
-	Wizard              bool
 	Log                 []logEntry
 	LogIndex            int
 	LogNextTick         int
 	InfoEntry           string
 	Story               []string
-	Turn                int
-	EventIndex          int
 	Killed              int
 	KilledMons          map[monsterKind]int
 	Scumming            int
-	Noise               map[position]bool
-	Targeting           position
+	Quit                bool
+	Wizard              bool
+	ui                  Renderer
 }
 
 type Renderer interface {

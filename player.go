@@ -6,20 +6,20 @@ import (
 )
 
 type player struct {
-	LOS         map[position]bool
-	Rays        rayMap
-	Pos         position
 	HP          int
 	MP          int
-	Consumables map[consumable]int
 	Simellas    int
-	Target      position
-	Statuses    map[status]int
 	Armour      armour
 	Weapon      weapon
 	Shield      shield
-	Aptitudes   map[aptitude]bool
+	Consumables map[consumable]int
 	Rods        map[rod]rodProps
+	Aptitudes   map[aptitude]bool
+	Statuses    map[status]int
+	Pos         position
+	Target      position
+	LOS         map[position]bool
+	Rays        rayMap
 }
 
 func (p *player) HPMax() int {

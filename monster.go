@@ -459,21 +459,21 @@ var MonsBands = []monsterBandData{
 type monster struct {
 	Kind        monsterKind
 	Band        int
+	Index       int
 	Attack      int
 	Accuracy    int
 	Armor       int
 	Evasion     int
 	HPmax       int
 	HP          int
-	Pos         position
 	State       monsterState
 	Statuses    [NMonsStatus]int
+	Pos         position
 	Target      position
 	Path        []position // cache
 	Obstructing bool
 	FireReady   bool
 	Seen        bool
-	Index       int
 }
 
 func (m *monster) Init() {
