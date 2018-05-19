@@ -254,6 +254,7 @@ func (g *game) Rest(ev event) error {
 		!g.Player.HasStatus(StatusConfusion) && !g.Player.HasStatus(StatusLignification) {
 		return errors.New("You do not need to rest.")
 	}
+	g.Print("You rest for a while.")
 	g.WaitTurn(ev)
 	g.Stats.Rest++
 	g.Resting = true
