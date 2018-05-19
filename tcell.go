@@ -164,19 +164,13 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 			pos := position{X: x, Y: y}
 			if pos.X > DungeonWidth && pos.Y == 0 {
 				err, again, quit = ui.HandleKeyAction(g, runeKeyAction{k: KeyMenu})
-				if err != nil {
-					again = true
-				}
-				return err, again, quit
 			} else if x > DungeonWidth || y > DungeonHeight {
 				again = true
 			} else {
 				err, again, quit = ui.ExaminePos(g, ev, pos)
 			}
 		case tcell.Button3:
-			x, y := tev.Position()
-			pos := position{X: x, Y: y}
-			err, again, quit = ui.ExaminePos(g, ev, pos)
+			err, again, quit = ui.HandleKeyAction(g, runeKeyAction{k: KeyMenu})
 		}
 	}
 	if err != nil {
@@ -330,8 +324,7 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (er
 				again, notarg = ui.CursorMouseLeft(g, targ, position{X: x, Y: y}, data)
 			}
 		case tcell.Button3:
-			x, y := tev.Position()
-			data.npos = position{X: x, Y: y}
+			err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: KeyMenu}, data)
 		case tcell.Button2:
 			g.Targeting = InvalidPos
 			notarg = true

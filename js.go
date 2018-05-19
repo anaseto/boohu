@@ -362,7 +362,11 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 					err, again, quit = ui.ExaminePos(g, ev, pos)
 				}
 			case 2:
-				err, again, quit = ui.ExaminePos(g, ev, pos)
+				err, again, quit = ui.HandleKeyAction(g, runeKeyAction{k: KeyMenu})
+				if err != nil {
+					again = true
+				}
+				return err, again, quit
 			}
 		}
 	default:
@@ -484,7 +488,7 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (er
 					again, notarg = ui.CursorMouseLeft(g, targ, position{X: in.mouseX, Y: in.mouseY}, data)
 				}
 			case 2:
-				data.npos = position{X: in.mouseX, Y: in.mouseY}
+				err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: KeyMenu}, data)
 			case 1:
 				g.Targeting = InvalidPos
 				notarg = true

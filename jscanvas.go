@@ -16,6 +16,10 @@ type termui struct {
 
 func (ui *termui) InitElements() error {
 	canvas := js.Global.Get("document").Call("getElementById", "gamecanvas")
+	canvas.Call("addEventListener", "contextmenu", func(e *js.Object) bool {
+		e.Call("preventDefault")
+		return false
+	}, false)
 	ui.ctx = canvas.Call("getContext", "2d")
 	ui.ctx.Set("font", "18px monospace")
 	mesure := ui.ctx.Call("measureText", "W")
