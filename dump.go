@@ -73,7 +73,7 @@ func (g *game) SortedRods() rodSlice {
 
 func (g *game) SortedKilledMonsters() monsSlice {
 	var ms monsSlice
-	for mk, p := range g.KilledMons {
+	for mk, p := range g.Stats.KilledMons {
 		if p == 0 {
 			continue
 		}
@@ -171,7 +171,7 @@ func (g *game) Dump() string {
 	fmt.Fprintf(buf, "\n")
 	fmt.Fprintf(buf, "Miscellaneous:\n")
 	fmt.Fprintf(buf, "You collected %d simellas.\n", g.Player.Simellas)
-	fmt.Fprintf(buf, "You killed %d monsters.\n", g.Killed)
+	fmt.Fprintf(buf, "You killed %d monsters.\n", g.Stats.Killed)
 	fmt.Fprintf(buf, "You spent %.1f turns in the Underground.\n", float64(g.Turn)/10)
 	fmt.Fprintf(buf, "\n")
 	fmt.Fprintf(buf, "Last messages:\n")
@@ -194,7 +194,7 @@ func (g *game) Dump() string {
 }
 
 func (g *game) DumpStory() string {
-	return strings.Join(g.Story, "\n")
+	return strings.Join(g.Stats.Story, "\n")
 }
 
 func (g *game) DumpDungeon() string {
@@ -263,7 +263,7 @@ func (g *game) DumpedKilledMonsters() string {
 	fmt.Fprint(buf, "Killed Monsters:\n")
 	ms := g.SortedKilledMonsters()
 	for _, mk := range ms {
-		fmt.Fprintf(buf, "- %s: %d\n", mk, g.KilledMons[mk])
+		fmt.Fprintf(buf, "- %s: %d\n", mk, g.Stats.KilledMons[mk])
 	}
 	return buf.String()
 }
@@ -282,7 +282,7 @@ func (g *game) SimplifedDump(err error) string {
 		fmt.Fprintf(buf, "You are exploring depth %d of Hareka's Underground.\n", g.Depth)
 	}
 	fmt.Fprintf(buf, "You collected %d simellas.\n", g.Player.Simellas)
-	fmt.Fprintf(buf, "You killed %d monsters.\n", g.Killed)
+	fmt.Fprintf(buf, "You killed %d monsters.\n", g.Stats.Killed)
 	fmt.Fprintf(buf, "You spent %.1f turns in the Underground.\n", float64(g.Turn)/10)
 	fmt.Fprintf(buf, "\n")
 	if err != nil {

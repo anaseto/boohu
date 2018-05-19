@@ -216,8 +216,8 @@ func (g *game) HitMonster(dt dmgType, mons *monster, ev event) (hit bool) {
 }
 
 func (g *game) HandleKill(mons *monster, ev event) {
-	g.Killed++
-	g.KilledMons[mons.Kind]++
+	g.Stats.Killed++
+	g.Stats.KilledMons[mons.Kind]++
 	if mons.Kind == MonsExplosiveNadre {
 		mons.Explode(g, ev)
 	}

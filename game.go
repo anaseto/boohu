@@ -46,13 +46,17 @@ type game struct {
 	LogIndex            int
 	LogNextTick         int
 	InfoEntry           string
-	Story               []string
-	Killed              int
-	KilledMons          map[monsterKind]int
+	Stats               stats
 	Scumming            int
 	Quit                bool
 	Wizard              bool
 	ui                  Renderer
+}
+
+type stats struct {
+	Story      []string
+	Killed     int
+	KilledMons map[monsterKind]int
 }
 
 type Renderer interface {
@@ -312,7 +316,7 @@ func (g *game) InitLevel() {
 		g.GeneratedEquipables = map[equipable]bool{}
 		g.FoundEquipables = map[equipable]bool{Robe: true, Dagger: true}
 		g.GeneratedBands = map[monsterBand]int{}
-		g.KilledMons = map[monsterKind]int{}
+		g.Stats.KilledMons = map[monsterKind]int{}
 	}
 
 	g.MonstersPosCache = make([]int, DungeonNCells)
