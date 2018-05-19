@@ -380,7 +380,14 @@ func (g *game) InitLevel() {
 	g.Simellas = make(map[position]int)
 	for i := 0; i < 5; i++ {
 		pos := g.FreeCellForStatic()
-		g.Simellas[pos] = 1 + RandInt(g.Depth+g.Depth*g.Depth/10)
+		const rounds = 5
+		for j := 0; j < rounds; j++ {
+			g.Simellas[pos] += 1 + RandInt(g.Depth+g.Depth*g.Depth/10)
+		}
+		g.Simellas[pos] /= rounds
+		if g.Simellas[pos] == 0 {
+			g.Simellas[pos] = 1
+		}
 	}
 
 	// initialize LOS
