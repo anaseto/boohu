@@ -700,6 +700,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 		recomputeLOS := g.Doors[m.Pos] || g.Doors[target]
 		if m.Kind == MonsEarthDragon && g.Dungeon.Cell(target).T == WallCell {
 			g.Dungeon.SetCell(target, FreeCell)
+			g.Stats.Digs++
 			if !g.Player.LOS[target] {
 				g.UnknownDig[m.Pos] = true
 			}
@@ -748,7 +749,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	ev.Renew(g, m.Kind.MovementDelay())
 }
 
-func (m *monster) DramaticAdjustment(g *game, baseAttack, attack, evasion int) (int, int) {
+func (m *monster) DramaticAdjustment(g *game, baseAttack, attack, evasion, acc int) (int, int) {
 	if attack >= g.Player.HP {
 		// a little dramatic effect
 		if RandInt(2) == 0 {
@@ -761,6 +762,9 @@ func (m *monster) DramaticAdjustment(g *game, baseAttack, attack, evasion int) (
 			}
 		}
 	}
+	if m.Attack >= g.Player.HP && (acc <= evasion || attack < g.Player.HP) {
+		g.Stats.TimesLucky++
+	}
 	return attack, evasion
 }
 
@@ -772,7 +776,7 @@ func (m *monster) HitPlayer(g *game, ev event) {
 	evasion := RandInt(g.Player.Evasion())
 	acc := RandInt(m.Accuracy)
 	attack := g.HitDamage(DmgPhysical, m.Attack, g.Player.Armor())
-	attack, evasion = m.DramaticAdjustment(g, m.Attack, attack, evasion)
+	attack, evasion = m.DramaticAdjustment(g, m.Attack, attack, evasion, acc)
 	if acc > evasion {
 		if m.Blocked(g) {
 			g.Printf("You block the %s's attack with your %s.", m.Kind, g.Player.Shield)
@@ -937,7 +941,7 @@ func (m *monster) ThrowRock(g *game, ev event) bool {
 	evasion := RandInt(g.Player.Evasion())
 	acc := RandInt(m.Accuracy)
 	attack := g.HitDamage(DmgPhysical, 15, g.Player.Armor())
-	attack, evasion = m.DramaticAdjustment(g, 15, attack, evasion)
+	attack, evasion = m.DramaticAdjustment(g, 15, attack, evasion, acc)
 	if 3*acc/2 <= evasion {
 		// rocks are big and do not miss so often
 		hit = false
@@ -972,7 +976,7 @@ func (m *monster) ThrowJavelin(g *game, ev event) bool {
 	evasion := RandInt(g.Player.Evasion())
 	acc := RandInt(m.Accuracy)
 	attack := g.HitDamage(DmgPhysical, 11, g.Player.Armor())
-	attack, evasion = m.DramaticAdjustment(g, 11, attack, evasion)
+	attack, evasion = m.DramaticAdjustment(g, 11, attack, evasion, acc)
 	if acc <= evasion {
 		hit = false
 	} else {
@@ -1011,7 +1015,7 @@ func (m *monster) ThrowAcid(g *game, ev event) bool {
 	evasion := RandInt(g.Player.Evasion())
 	acc := RandInt(m.Accuracy)
 	attack := g.HitDamage(DmgPhysical, 12, g.Player.Armor())
-	attack, evasion = m.DramaticAdjustment(g, 12, attack, evasion)
+	attack, evasion = m.DramaticAdjustment(g, 12, attack, evasion, acc)
 	if acc <= evasion {
 		hit = false
 	} else {
@@ -1103,6 +1107,7 @@ func (m *monster) Explode(g *game, ev event) {
 			m.InflictDamage(g, dmg, 15)
 		} else if c.T == WallCell && RandInt(2) == 0 {
 			g.Dungeon.SetCell(pos, FreeCell)
+			g.Stats.Digs++
 			if !g.Player.LOS[pos] {
 				g.UnknownDig[pos] = true
 			} else {
@@ -1258,14 +1263,14 @@ func (g *game) MaxDanger() int {
 	for _, props := range g.Player.Rods {
 		adjust += Min(props.Charge, 2) * Min(2, g.Depth)
 	}
-	if g.Depth < g.MaxDepth() && g.Player.Consumables[DescentPotion] > 0 {
+	if g.Depth < MaxDepth && g.Player.Consumables[DescentPotion] > 0 {
 		adjust += g.Depth
 	}
 	if g.Player.Weapon == Dagger {
 		adjust -= Min(3, g.Depth) * Max(1, g.Depth-2)
 	}
 	if g.Player.Armour == PlateArmour {
-		adjust += g.MaxDepth() - g.Depth
+		adjust += MaxDepth - g.Depth
 	}
 	if g.Depth > 3 && g.Player.Shield == NoShield && !g.Player.Weapon.TwoHanded() {
 		adjust -= Min(g.Depth, 6) * 2
@@ -1274,7 +1279,7 @@ func (g *game) MaxDanger() int {
 		adjust += (4 - g.Depth) * 2
 	}
 	if g.Player.Armour == ChainMail || g.Player.Armour == LeatherArmour {
-		adjust += g.MaxDepth()/2 - g.Depth
+		adjust += MaxDepth/2 - g.Depth
 	}
 	if g.Player.Weapon != Dagger && g.Depth < 3 {
 		adjust += 4 + (3-g.Depth)*3
@@ -1289,7 +1294,7 @@ func (g *game) MaxDanger() int {
 	} else {
 		max = max + adjust
 	}
-	if g.MaxDepth()-g.Depth < g.Player.Consumables[MagicMappingPotion] {
+	if MaxDepth-g.Depth < g.Player.Consumables[MagicMappingPotion] {
 		max = max * 110 / 100
 	}
 	return max

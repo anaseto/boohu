@@ -53,12 +53,6 @@ type game struct {
 	ui                  Renderer
 }
 
-type stats struct {
-	Story      []string
-	Killed     int
-	KilledMons map[monsterKind]int
-}
-
 type Renderer interface {
 	ExploreStep(*game) bool
 	HandlePlayerTurn(*game, event) bool
@@ -228,9 +222,7 @@ func (g *game) FreeForStairs() position {
 	}
 }
 
-func (g *game) MaxDepth() int {
-	return 12
-}
+const MaxDepth = 12
 
 const (
 	DungeonHeight = 21
@@ -240,21 +232,19 @@ const (
 
 func (g *game) GenDungeon() {
 	g.Fungus = make(map[position]vegetation)
+	dg := GenRuinsMap
 	switch RandInt(6) {
 	//switch 0 {
 	case 0:
-		g.GenCaveMap(DungeonHeight, DungeonWidth)
-		g.Fungus = g.Foliage(DungeonHeight, DungeonWidth)
+		dg = GenCaveMap
 	case 1:
-		g.GenRoomMap(DungeonHeight, DungeonWidth)
+		dg = GenRoomMap
 	case 2:
-		g.GenCellularAutomataCaveMap(DungeonHeight, DungeonWidth)
-		g.Fungus = g.Foliage(DungeonHeight, DungeonWidth)
+		dg = GenCellularAutomataCaveMap
 	case 3:
-		g.GenCaveMapTree(DungeonHeight, DungeonWidth)
-	default:
-		g.GenRuinsMap(DungeonHeight, DungeonWidth)
+		dg = GenCaveMapTree
 	}
+	dg.Use(g)
 }
 
 func (g *game) InitPlayer() {
@@ -371,9 +361,9 @@ func (g *game) InitLevel() {
 	// Stairs
 	g.Stairs = make(map[position]bool)
 	nstairs := 1 + RandInt(3)
-	if g.Depth == g.MaxDepth() {
+	if g.Depth == MaxDepth {
 		nstairs = 1
-	} else if g.Depth == g.MaxDepth()-1 && nstairs > 2 {
+	} else if g.Depth == MaxDepth-1 && nstairs > 2 {
 		nstairs = 1 + RandInt(2)
 	}
 	for i := 0; i < nstairs; i++ {
@@ -398,7 +388,7 @@ func (g *game) InitLevel() {
 		g.Print("You're in Hareka's Underground searching for medicinal simellas. Good luck!")
 		g.PrintStyled("► Press ? for help or click on right upper →Menu button.", logSpecial)
 	}
-	if g.Depth == g.MaxDepth() {
+	if g.Depth == MaxDepth {
 		g.PrintStyled("You feel magic in the air. The way out is close.", logSpecial)
 	}
 	g.ComputeLOS()
@@ -581,12 +571,14 @@ func (g *game) FrundisInLevel() bool {
 }
 
 func (g *game) Descend() bool {
-	if g.Depth >= g.MaxDepth() {
+	g.LevelStats()
+	if g.Depth >= MaxDepth {
 		g.Depth++
 		return true
 	}
 	g.Print("You descend deeper in the dungeon.")
 	g.Depth++
+	g.Scumming = 0
 	g.PushEvent(&simpleEvent{ERank: g.Ev.Rank(), EAction: PlayerTurn})
 	g.InitLevel()
 	g.Save()
@@ -601,11 +593,15 @@ func (g *game) WizardMode() {
 
 func (g *game) AutoPlayer(ev event) bool {
 	if g.Resting {
-		if g.MonsterInLOS() == nil &&
+		mons := g.MonsterInLOS()
+		if mons == nil &&
 			(g.Player.HP < g.Player.HPMax() || g.Player.MP < g.Player.MPMax() || g.Player.HasStatus(StatusExhausted) ||
 				g.Player.HasStatus(StatusConfusion) || g.Player.HasStatus(StatusLignification)) {
 			g.WaitTurn(ev)
 			return true
+		}
+		if mons != nil {
+			g.Stats.RestInterrupt++
 		}
 		g.Resting = false
 	} else if g.Autoexploring {
@@ -669,6 +665,7 @@ loop:
 			if g.Wizard {
 				g.Player.HP = g.Player.HPMax()
 			} else {
+				g.LevelStats()
 				err := g.RemoveSaveFile()
 				if err != nil {
 					g.PrintfStyled("Error removing save file: %v", logError, err.Error())

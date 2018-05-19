@@ -174,6 +174,7 @@ func (r rod) Use(g *game, ev event) error {
 	rods[r] = rp
 	g.Player.MP -= r.MPCost()
 	g.StoryPrintf("You evoked your %s.", r)
+	g.Stats.UsedRod[r]++
 	g.FairAction()
 	ev.Renew(g, 7)
 	return nil
@@ -316,6 +317,7 @@ func (g *game) EvokeRodDigging(ev event) error {
 	pos := g.Player.Target
 	for i := 0; i < 3; i++ {
 		g.Dungeon.SetCell(pos, FreeCell)
+		g.Stats.Digs++
 		g.MakeNoise(17, pos)
 		g.Fog(pos, 1, ev)
 		pos = pos.To(pos.Dir(g.Player.Pos))
@@ -339,6 +341,7 @@ func (g *game) EvokeRodShatter(ev event) error {
 	neighbors := g.Dungeon.FreeNeighbors(g.Player.Target)
 	if RandInt(2) == 0 {
 		g.Dungeon.SetCell(g.Player.Target, FreeCell)
+		g.Stats.Digs++
 		g.ComputeLOS()
 		g.MakeMonstersAware()
 		g.MakeNoise(19, g.Player.Target)

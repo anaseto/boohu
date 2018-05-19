@@ -93,12 +93,14 @@ func (sev *simpleEvent) Action(g *game) {
 		g.LogNextTick = g.LogIndex
 		g.AutoNext = g.AutoPlayer(sev)
 		if g.AutoNext {
+			g.Stats.Turns++
 			return
 		}
 		g.Quit = g.ui.HandlePlayerTurn(g, sev)
 		if g.Quit {
 			return
 		}
+		g.TurnStats()
 	case HealPlayer:
 		g.HealPlayer(sev)
 	case MPRegen:
@@ -278,8 +280,14 @@ func (g *game) BurnCreature(pos position, ev event) {
 	}
 	if pos == g.Player.Pos {
 		damage := 1 + RandInt(10)
+		if damage > g.Player.HP {
+			damage = 1 + RandInt(10)
+		}
 		g.Player.HP -= damage
 		g.PrintfStyled("The fire burns you (%d damage).", logMonsterHit, damage)
+		if g.Player.HP+damage < 10 {
+			g.Stats.TimesLucky++
+		}
 	}
 }
 
@@ -292,6 +300,7 @@ func (g *game) Burn(pos position, ev event) {
 	if !okFungus && !okDoor {
 		return
 	}
+	g.Stats.Burns++
 	delete(g.Fungus, pos)
 	if _, ok := g.Doors[pos]; ok {
 		delete(g.Doors, pos)

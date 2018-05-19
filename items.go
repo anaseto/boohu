@@ -46,6 +46,8 @@ const (
 	DigPotion
 )
 
+const NumPotions = int(DigPotion) + 1
+
 func (p potion) String() (text string) {
 	text = "potion"
 	switch p {
@@ -156,6 +158,11 @@ func (p potion) Use(g *game, ev event) error {
 	if err != nil {
 		return err
 	}
+	//if p == DescentPotion {
+	//g.Stats.UsedPotion[g.Depth-1]++
+	//} else {
+	//g.Stats.UsedPotion[g.Depth]++
+	//}
 	ev.Renew(g, 5)
 	g.UseConsumable(p)
 	g.ui.DrinkingPotionAnimation(g)
@@ -211,10 +218,11 @@ func (g *game) QuaffDescent(ev event) error {
 	if g.Player.HasStatus(StatusLignification) {
 		return errors.New("You cannot descend while lignified.")
 	}
-	if g.Depth >= g.MaxDepth() {
+	if g.Depth >= MaxDepth {
 		return errors.New("You cannot descend more!")
 	}
 	g.Printf("You quaff the %s. You feel yourself falling through the ground.", DescentPotion)
+	g.LevelStats()
 	g.Depth++
 	g.InitLevel()
 	g.Save()
@@ -326,6 +334,8 @@ const (
 	ConfusingDart projectile = iota
 	ExplosiveMagara
 )
+
+const NumProjectiles = int(ExplosiveMagara) + 1
 
 func (p projectile) String() (text string) {
 	switch p {
@@ -444,6 +454,7 @@ func (g *game) ThrowExplosiveMagara(ev event) error {
 			mons.MakeHuntIfHurt(g)
 		} else if g.Dungeon.Cell(pos).T == WallCell && RandInt(2) == 0 {
 			g.Dungeon.SetCell(pos, FreeCell)
+			g.Stats.Digs++
 			if !g.Player.LOS[pos] {
 				g.UnknownDig[pos] = true
 			} else {

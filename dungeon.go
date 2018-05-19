@@ -22,6 +22,64 @@ const (
 	FreeCell
 )
 
+type dungen int
+
+const (
+	GenCaveMap dungen = iota
+	GenRoomMap
+	GenCellularAutomataCaveMap
+	GenCaveMapTree
+	GenRuinsMap
+)
+
+func (dg dungen) Use(g *game) {
+	switch dg {
+	case GenCaveMap:
+		g.GenCaveMap(DungeonHeight, DungeonWidth)
+	case GenRoomMap:
+		g.GenRoomMap(DungeonHeight, DungeonWidth)
+	case GenCellularAutomataCaveMap:
+		g.GenCellularAutomataCaveMap(DungeonHeight, DungeonWidth)
+	case GenCaveMapTree:
+		g.GenCaveMapTree(DungeonHeight, DungeonWidth)
+	case GenRuinsMap:
+		g.GenRuinsMap(DungeonHeight, DungeonWidth)
+	}
+	g.Stats.DLayout[g.Depth] = dg.String()
+}
+
+func (dg dungen) String() (text string) {
+	switch dg {
+	case GenCaveMap:
+		text = "OC"
+	case GenRoomMap:
+		text = "BR"
+	case GenCellularAutomataCaveMap:
+		text = "EC"
+	case GenCaveMapTree:
+		text = "TC"
+	case GenRuinsMap:
+		text = "RR"
+	}
+	return text
+}
+
+func (dg dungen) Description() (text string) {
+	switch dg {
+	case GenCaveMap:
+		text = "open cave"
+	case GenRoomMap:
+		text = "big rooms"
+	case GenCellularAutomataCaveMap:
+		text = "eight cave"
+	case GenCaveMapTree:
+		text = "tree-like cave"
+	case GenRuinsMap:
+		text = "ruined rooms"
+	}
+	return text
+}
+
 type room struct {
 	pos position
 	w   int
@@ -655,6 +713,7 @@ loop:
 			g.Doors[pos] = true
 		}
 	}
+	g.Fungus = g.Foliage(DungeonHeight, DungeonWidth)
 }
 
 func GenCaveRoomSize() (int, int) {
@@ -915,6 +974,7 @@ func (g *game) GenCellularAutomataCaveMap(h, w int) {
 			break
 		}
 	}
+	g.Fungus = g.Foliage(DungeonHeight, DungeonWidth)
 }
 
 type vegetation int

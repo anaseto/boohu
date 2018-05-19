@@ -222,6 +222,7 @@ func (g *game) ScummingAction(ev event) {
 					g.Dungeon.SetCell(pos, FreeCell)
 					g.ui.WallExplosionAnimation(g, pos)
 					g.Fog(pos, 1, ev)
+					g.Stats.Digs++
 				}
 			}
 			g.PrintfStyled("%s An explosion comes from the ground. You are lignified.", logCritic, g.ExplosionSound())
@@ -254,6 +255,7 @@ func (g *game) Rest(ev event) error {
 		return errors.New("You do not need to rest.")
 	}
 	g.WaitTurn(ev)
+	g.Stats.Rest++
 	g.Resting = true
 	return nil
 }
@@ -362,6 +364,7 @@ func (g *game) MovePlayer(pos position, ev event) error {
 			g.MakeNoise(18, pos)
 			g.Print(g.CrackSound())
 			g.Fog(pos, 1, ev)
+			g.Stats.Digs++
 		}
 		g.Player.Pos = pos
 		g.CollectGround()
@@ -382,6 +385,7 @@ func (g *game) MovePlayer(pos position, ev event) error {
 				delay -= 3
 			}
 		}
+		g.Stats.Moves++
 	} else {
 		g.FairAction()
 		g.AttackMonster(mons, ev)

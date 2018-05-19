@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -113,7 +114,7 @@ func (g *game) Dump() string {
 	if g.Wizard {
 		fmt.Fprintf(buf, "**WIZARD MODE**\n")
 	}
-	if g.Player.HP > 0 && g.Depth > g.MaxDepth() {
+	if g.Player.HP > 0 && g.Depth > MaxDepth {
 		fmt.Fprintf(buf, "You escaped from Hareka's Underground alive!\n")
 	} else if g.Player.HP <= 0 {
 		fmt.Fprintf(buf, "You died while exploring depth %d of Hareka's Underground.\n", g.Depth)
@@ -141,9 +142,9 @@ func (g *game) Dump() string {
 	rs := g.SortedRods()
 	if len(rs) > 0 {
 		fmt.Fprintf(buf, "Rods:\n")
-		for _, c := range rs {
-			fmt.Fprintf(buf, "- %s (%d/%d charges)\n",
-				c, g.Player.Rods[c].Charge, c.MaxCharge())
+		for _, r := range rs {
+			fmt.Fprintf(buf, "- %s (%d/%d charges) (used %d times)\n",
+				r, g.Player.Rods[r].Charge, r.MaxCharge(), g.Stats.UsedRod[r])
 		}
 	} else {
 		fmt.Fprintf(buf, "You do not have any rods.\n")
@@ -152,8 +153,8 @@ func (g *game) Dump() string {
 	ps := g.SortedPotions()
 	if len(ps) > 0 {
 		fmt.Fprintf(buf, "Potions:\n")
-		for _, c := range ps {
-			fmt.Fprintf(buf, "- %s (%d available)\n", c, g.Player.Consumables[c])
+		for _, p := range ps {
+			fmt.Fprintf(buf, "- %s (%d available)\n", p, g.Player.Consumables[p])
 		}
 	} else {
 		fmt.Fprintf(buf, "You do not have any potions.\n")
@@ -162,8 +163,8 @@ func (g *game) Dump() string {
 	ps = g.SortedProjectiles()
 	if len(ps) > 0 {
 		fmt.Fprintf(buf, "Projectiles:\n")
-		for _, c := range ps {
-			fmt.Fprintf(buf, "- %s (%d available)\n", c, g.Player.Consumables[c])
+		for _, p := range ps {
+			fmt.Fprintf(buf, "- %s (%d available)\n", p, g.Player.Consumables[p])
 		}
 	} else {
 		fmt.Fprintf(buf, "You do not have any projectiles.\n")
@@ -190,7 +191,77 @@ func (g *game) Dump() string {
 	fmt.Fprintf(buf, "\n")
 	fmt.Fprintf(buf, "Timeline:\n")
 	fmt.Fprintf(buf, g.DumpStory())
+	fmt.Fprintf(buf, "\n")
+	g.DetailedStatistics(buf)
 	return buf.String()
+}
+
+func (g *game) DetailedStatistics(w io.Writer) {
+	fmt.Fprintf(w, "\n")
+	fmt.Fprintf(w, "Statistics:\n")
+	fmt.Fprintf(w, "You had %d hits (%.1f per 100 turns), %d misses (%.1f), and %d moves (%.1f).\n",
+		g.Stats.Hits, float64(g.Stats.Hits)*100/float64(g.Stats.Turns+1),
+		g.Stats.Misses, float64(g.Stats.Misses)*100/float64(g.Stats.Turns+1),
+		g.Stats.Moves, float64(g.Stats.Moves)*100/float64(g.Stats.Turns+1))
+	fmt.Fprintf(w, "You were lucky %d times.\n", g.Stats.TimesLucky)
+	fmt.Fprintf(w, "There were %d fires.\n", g.Stats.Burns)
+	fmt.Fprintf(w, "There were %d destroyed walls.\n", g.Stats.Digs)
+	fmt.Fprintf(w, "You rested %d times (%d interruptions).\n", g.Stats.Rest, g.Stats.RestInterrupt)
+	fmt.Fprintf(w, "You spent %.1f%% turns wounded.\n", float64(g.Stats.TWounded)*100/float64(g.Stats.Turns+1))
+	fmt.Fprintf(w, "You spent %.1f%% turns with monsters in sight.\n", float64(g.Stats.TMonsLOS)*100/float64(g.Stats.Turns+1))
+	fmt.Fprintf(w, "You spent %.1f%% turns wounded with monsters in sight.\n", float64(g.Stats.TMWounded)*100/float64(g.Stats.Turns+1))
+	maxDepth := g.Depth
+	if g.Player.HP <= 0 {
+		maxDepth++
+	}
+	if maxDepth > MaxDepth+1 {
+		// should not happen
+		maxDepth = MaxDepth + 1
+	}
+	fmt.Fprintf(w, "\n")
+	hfmt := "%-23s"
+	fmt.Fprintf(w, hfmt, "Quantity/Depth")
+	for i := 0; i < maxDepth; i++ {
+		fmt.Fprintf(w, " %3d", i)
+	}
+	fmt.Fprintf(w, "\n")
+	fmt.Fprintf(w, hfmt, "Explored (%)")
+	for i, n := range g.Stats.DExplPerc {
+		if i >= maxDepth {
+			break
+		}
+		fmt.Fprintf(w, " %3d", n)
+	}
+	fmt.Fprintf(w, "\n")
+	fmt.Fprintf(w, hfmt, "Sleeping monsters (%)")
+	for i, n := range g.Stats.DSleepingPerc {
+		if i >= maxDepth {
+			break
+		}
+		fmt.Fprintf(w, " %3d", n)
+	}
+	fmt.Fprintf(w, "\n")
+	fmt.Fprintf(w, hfmt, "Dead monsters (%)")
+	for i, n := range g.Stats.DKilledPerc {
+		if i >= maxDepth {
+			break
+		}
+		fmt.Fprintf(w, " %3d", n)
+	}
+	fmt.Fprintf(w, "\n")
+	fmt.Fprintf(w, hfmt, "Dungeon Layout")
+	for i, s := range g.Stats.DLayout {
+		if i >= maxDepth {
+			break
+		}
+		fmt.Fprintf(w, " %3s", s)
+	}
+	fmt.Fprintf(w, "\n")
+	fmt.Fprintf(w, "\n")
+	fmt.Fprintf(w, "Legend:")
+	for _, c := range []dungen{GenCaveMap, GenRoomMap, GenCellularAutomataCaveMap, GenCaveMapTree, GenRuinsMap} {
+		fmt.Fprintf(w, " %s (%s)", c.Description(), c.String())
+	}
 }
 
 func (g *game) DumpStory() string {
@@ -274,7 +345,7 @@ func (g *game) SimplifedDump(err error) string {
 	if g.Wizard {
 		fmt.Fprintf(buf, "**WIZARD MODE**\n")
 	}
-	if g.Player.HP > 0 && g.Depth > g.MaxDepth() {
+	if g.Player.HP > 0 && g.Depth > MaxDepth {
 		fmt.Fprintf(buf, "You escaped from Hareka's Underground alive!\n")
 	} else if g.Player.HP <= 0 {
 		fmt.Fprintf(buf, "You died while exploring depth %d of Hareka's Underground.\n", g.Depth)

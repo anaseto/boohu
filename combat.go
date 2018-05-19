@@ -208,8 +208,10 @@ func (g *game) HitMonster(dt dmgType, mons *monster, ev event) (hit bool) {
 			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 30 + RandInt(20), EAction: NauseaEnd})
 			g.Print("The brizzia's corpse releases a nauseous gas. You feel sick.")
 		}
+		g.Stats.Hits++
 	} else {
 		g.Printf("You miss %s.", mons.Kind.Definite(false))
+		g.Stats.Misses++
 	}
 	mons.MakeHuntIfHurt(g)
 	return hit

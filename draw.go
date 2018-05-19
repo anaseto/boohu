@@ -1039,7 +1039,7 @@ func (ui *termui) DescribePosition(g *game, pos position, targ Targeter) {
 	case okRod:
 		desc += fmt.Sprintf("You %s a %v.", see, rod)
 	case g.Stairs[pos]:
-		if g.Depth == g.MaxDepth() {
+		if g.Depth == MaxDepth {
 			desc += fmt.Sprintf("You %s some glowing stairs.", see)
 		} else {
 			desc += fmt.Sprintf("You %s stairs downwards.", see)
@@ -1381,7 +1381,7 @@ func (ui *termui) ViewPositionDescription(g *game, pos position) {
 	} else if eq, ok := g.Equipables[pos]; ok {
 		ui.DrawDescription(g, eq.Desc())
 	} else if g.Stairs[pos] {
-		if g.Depth == g.MaxDepth() {
+		if g.Depth == MaxDepth {
 			ui.DrawDescription(g, "These shiny-looking stairs are in fact a magical monolith. It is said they were made some centuries ago by Marevor Helith. They will lead you back to your village.")
 		} else {
 			ui.DrawDescription(g, "Stairs lead to the next level of the Underground. There's no way back. Monsters do not follow you.")
@@ -1741,7 +1741,7 @@ func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgCol
 				fgColor = ColorFgCollectable
 			} else if _, ok := g.Stairs[pos]; ok {
 				r = '>'
-				if g.Depth == g.MaxDepth() {
+				if g.Depth == MaxDepth {
 					fgColor = ColorFgMagicPlace
 				} else {
 					fgColor = ColorFgPlace
@@ -1811,7 +1811,7 @@ func (ui *termui) DrawStatusBar(g *game, line int) {
 	line++
 	ui.DrawText(fmt.Sprintf("Simellas: %d", g.Player.Simellas), BarCol, line)
 	line++
-	if g.Depth > g.MaxDepth() {
+	if g.Depth > MaxDepth {
 		ui.DrawText("Depth: Out!", BarCol, line)
 	} else {
 		ui.DrawText(fmt.Sprintf("Depth: %d", g.Depth), BarCol, line)
