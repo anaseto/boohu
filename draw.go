@@ -1940,7 +1940,7 @@ func (ui *termui) DrawLog(g *game, lines int) {
 	}
 	l := len(g.Log) - 1
 	if l < lines {
-		lines = l
+		lines = l + 1
 	}
 	for i := lines; i > 0 && l >= 0; i-- {
 		cols := 0
