@@ -1041,18 +1041,18 @@ func (ui *termui) DescribePosition(g *game, pos position, targ Targeter) {
 		} else {
 			desc += fmt.Sprintf("You %s stairs downwards.", see)
 		}
-	case g.Doors[pos]:
+	case g.Doors[pos] || g.UnknownBurn[pos] == DoorBurn:
 		desc += fmt.Sprintf("You %s a door.", see)
-	case g.Dungeon.Cell(pos).T == WallCell:
+	case g.Dungeon.Cell(pos).T == WallCell || g.UnknownDig[pos]:
 		desc += fmt.Sprintf("You %s a wall.", see)
 	default:
-		if cld, ok := g.Clouds[pos]; ok {
+		if cld, ok := g.Clouds[pos]; ok && g.Player.LOS[pos] {
 			if cld == CloudFire {
 				desc += fmt.Sprintf("You %s burning flames.", see)
 			} else {
 				desc += fmt.Sprintf("You %s a dense fog.", see)
 			}
-		} else if _, ok := g.Fungus[pos]; ok {
+		} else if _, ok := g.Fungus[pos]; ok || g.UnknownBurn[pos] == FoliageBurn {
 			desc += fmt.Sprintf("You %s dense foliage there.", see)
 		} else if desc == "" {
 			desc += fmt.Sprintf("You %s the ground.", see)

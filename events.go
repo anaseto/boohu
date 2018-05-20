@@ -291,6 +291,14 @@ func (g *game) BurnCreature(pos position, ev event) {
 	}
 }
 
+type burn int
+
+const (
+	NoUnknownBurn burn = iota
+	FoliageBurn
+	DoorBurn
+)
+
 func (g *game) Burn(pos position, ev event) {
 	if _, ok := g.Clouds[pos]; ok {
 		return
@@ -301,14 +309,16 @@ func (g *game) Burn(pos position, ev event) {
 		return
 	}
 	g.Stats.Burns++
+	brn := FoliageBurn
 	delete(g.Fungus, pos)
 	if _, ok := g.Doors[pos]; ok {
 		delete(g.Doors, pos)
+		brn = DoorBurn
 		g.Print("The door vanishes in flames.")
 	}
 	g.Clouds[pos] = CloudFire
 	if !g.Player.LOS[pos] {
-		g.UnknownBurn[pos] = true
+		g.UnknownBurn[pos] = brn
 	}
 	g.PushEvent(&cloudEvent{ERank: ev.Rank() + 10, EAction: FireProgression, Pos: pos})
 	g.BurnCreature(pos, ev)

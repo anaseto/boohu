@@ -31,7 +31,7 @@ type game struct {
 	FoundEquipables     map[equipable]bool
 	Simellas            map[position]int
 	UnknownDig          map[position]bool
-	UnknownBurn         map[position]bool
+	UnknownBurn         map[position]burn
 	ExclusionsMap       map[position]bool
 	Noise               map[position]bool
 	Resting             bool
@@ -313,7 +313,7 @@ func (g *game) InitLevel() {
 	g.Player.Pos = g.FreeCell()
 
 	g.UnknownDig = map[position]bool{}
-	g.UnknownBurn = map[position]bool{}
+	g.UnknownBurn = map[position]burn{}
 	g.ExclusionsMap = map[position]bool{}
 	g.TemporalWalls = map[position]bool{}
 

@@ -139,7 +139,7 @@ func (g *game) SeePosition(pos position) {
 			g.Printf("There is no more a wall there.")
 			g.DijkstraMapRebuild = true
 		}
-		if cld, ok := g.Clouds[pos]; ok && cld == CloudFire && g.UnknownBurn[pos] {
+		if cld, ok := g.Clouds[pos]; ok && cld == CloudFire && g.UnknownBurn[pos] != NoUnknownBurn {
 			g.StopAuto()
 			g.Printf("There are flames there.")
 			g.DijkstraMapRebuild = true
@@ -149,7 +149,7 @@ func (g *game) SeePosition(pos position) {
 		delete(g.UnknownDig, pos)
 		delete(g.TemporalWalls, pos)
 	}
-	if g.UnknownBurn[pos] {
+	if _, ok := g.UnknownBurn[pos]; ok {
 		delete(g.UnknownBurn, pos)
 	}
 }
