@@ -1964,7 +1964,7 @@ func (ui *termui) DrawLog(g *game, lines int) {
 			l--
 		}
 		if l < 0 {
-			break
+			l = 0
 		}
 		col := 0
 		for ln := l; ln <= to; ln++ {
