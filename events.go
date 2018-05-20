@@ -290,7 +290,7 @@ func (g *game) BurnCreature(pos position, ev event) {
 			damage = 1 + RandInt(10)
 		}
 		g.Player.HP -= damage
-		g.PrintfStyled("The fire burns you (%d damage).", logMonsterHit, damage)
+		g.PrintfStyled("The fire burns you (%d dmg).", logMonsterHit, damage)
 		if g.Player.HP+damage < 10 {
 			g.Stats.TimesLucky++
 		}

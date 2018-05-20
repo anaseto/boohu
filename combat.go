@@ -198,10 +198,10 @@ func (g *game) HitMonster(dt dmgType, mons *monster, ev event) (hit bool) {
 		mons.HP -= attack
 		g.ui.HitAnimation(g, mons.Pos, false)
 		if mons.HP > 0 {
-			g.PrintfStyled("You hit %s (%d damage).", logPlayerHit, mons.Kind.Definite(false), attack)
+			g.PrintfStyled("You hit %s (%d dmg).", logPlayerHit, mons.Kind.Definite(false), attack)
 		} else if oldHP > 0 {
 			// test oldHP > 0 because of sword special attack
-			g.PrintfStyled("You kill %s (%d damage).", logPlayerHit, mons.Kind.Definite(false), attack)
+			g.PrintfStyled("You kill %s (%d dmg).", logPlayerHit, mons.Kind.Definite(false), attack)
 			g.HandleKill(mons, ev)
 		}
 		if mons.Kind == MonsBrizzia && RandInt(4) == 0 && !g.Player.HasStatus(StatusNausea) &&

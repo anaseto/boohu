@@ -796,7 +796,7 @@ func (m *monster) HitPlayer(g *game, ev event) {
 		}
 		noise := g.HitNoise()
 		g.MakeNoise(noise, g.Player.Pos)
-		g.PrintfStyled("%s hits you (%d damage).", logMonsterHit, m.Kind.Definite(true), attack)
+		g.PrintfStyled("%s hits you (%d dmg).", logMonsterHit, m.Kind.Definite(true), attack)
 		m.InflictDamage(g, attack, m.Attack)
 		if g.Player.HP <= 0 {
 			return
@@ -964,7 +964,7 @@ func (m *monster) ThrowRock(g *game, ev event) bool {
 	if hit {
 		noise := g.HitNoise()
 		g.MakeNoise(noise, g.Player.Pos)
-		g.PrintfStyled("%s throws a rock at you (%d damage).", logMonsterHit, m.Kind.Definite(true), attack)
+		g.PrintfStyled("%s throws a rock at you (%d dmg).", logMonsterHit, m.Kind.Definite(true), attack)
 		if RandInt(4) == 0 {
 			g.Confusion(ev)
 		}
@@ -998,7 +998,7 @@ func (m *monster) ThrowJavelin(g *game, ev event) bool {
 	if hit {
 		noise := g.HitNoise()
 		g.MakeNoise(noise, g.Player.Pos)
-		g.Printf("%s throws %s at you (%d damage).", m.Kind.Definite(true), Indefinite("javelin", false), attack)
+		g.Printf("%s throws %s at you (%d dmg).", m.Kind.Definite(true), Indefinite("javelin", false), attack)
 		m.InflictDamage(g, attack, 11)
 	} else if block {
 		if RandInt(3) == 0 {
@@ -1037,7 +1037,7 @@ func (m *monster) ThrowAcid(g *game, ev event) bool {
 	if hit {
 		noise := g.HitNoise()
 		g.MakeNoise(noise, g.Player.Pos)
-		g.Printf("%s throws acid at you (%d damage).", m.Kind.Definite(true), attack)
+		g.Printf("%s throws acid at you (%d dmg).", m.Kind.Definite(true), attack)
 		m.InflictDamage(g, attack, 11)
 		if RandInt(2) == 0 {
 			g.Corrosion(ev)

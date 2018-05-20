@@ -1938,14 +1938,40 @@ func (ui *termui) DrawLog(g *game, lines int) {
 	if min < 0 {
 		min = 0
 	}
-	for i, e := range g.Log[min:] {
-		fguicolor := ui.LogColor(e)
-		if e.Tick {
-			ui.DrawColoredText("•", 0, DungeonHeight+1+i, ColorYellow)
-			ui.DrawColoredText(e.String(), 2, DungeonHeight+1+i, fguicolor)
-		} else {
-			ui.DrawColoredText(e.String(), 0, DungeonHeight+1+i, fguicolor)
+	l := len(g.Log) - 1
+	for i := lines; i > 0; i-- {
+		cols := 0
+		first := true
+		to := l
+		for l >= 0 {
+			e := g.Log[l]
+			el := utf8.RuneCountInString(e.String())
+			if e.Tick {
+				el += 2
+			}
+			cols += el + 1
+			if !first && cols > DungeonWidth {
+				l++
+				break
+			}
+			if e.Tick || l <= i {
+				break
+			}
+			first = false
+			l--
 		}
+		col := 0
+		for ln := l; ln <= to; ln++ {
+			e := g.Log[ln]
+			fguicolor := ui.LogColor(e)
+			if e.Tick {
+				ui.DrawColoredText("•", 0, DungeonHeight+i, ColorYellow)
+				col += 2
+			}
+			ui.DrawColoredText(e.String(), col, DungeonHeight+i, fguicolor)
+			col += utf8.RuneCountInString(e.String()) + 1
+		}
+		l--
 	}
 }
 
