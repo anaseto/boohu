@@ -924,11 +924,11 @@ func (ui *termui) KeysHelp(g *game) {
 
 func (ui *termui) ExamineHelp(g *game) {
 	ui.DrawKeysDescription(g, "Targeting Keys", []string{
-		"Move cursor", "h/j/k/l/y/u/b/n or numpad",
+		"Move cursor", "h/j/k/l/y/u/b/n or numpad or mouse left",
 		"Cycle through monsters", "+",
 		"Cycle through stairs", ">",
 		"Cycle through objects", "o",
-		"Go to/select target", "“.” or enter",
+		"Go to/select target", "“.” or enter or mouse left",
 		"View target description", "v or d",
 		"Toggle exclude area from auto-travel", "e",
 	})
