@@ -2075,6 +2075,7 @@ func (ui *termui) DrawDescription(g *game, desc string) {
 	ui.DrawTextLine(" press esc or space to continue ", lines+2)
 	ui.Flush()
 	ui.WaitForContinue(g, lines+2)
+	ui.DrawDungeonView(g, NoFlushMode)
 }
 
 func (ui *termui) DrawText(text string, x, y int) {
