@@ -563,9 +563,9 @@ func (ar armour) String() string {
 func (ar armour) Short() string {
 	switch ar {
 	case Robe:
-		return "Ro"
+		return "Rb"
 	case LeatherArmour:
-		return "Le"
+		return "Lt"
 	case ChainMail:
 		return "Ch"
 	case PlateArmour:
@@ -652,19 +652,19 @@ func (wp weapon) String() string {
 func (wp weapon) Short() string {
 	switch wp {
 	case Dagger:
-		return "Da"
+		return "Dg"
 	case Axe:
 		return "Ax"
 	case BattleAxe:
-		return "Ba"
+		return "Bt"
 	case Spear:
 		return "Sp"
 	case Halberd:
-		return "Ha"
+		return "Hl"
 	case Sword:
 		return "Sw"
 	case DoubleSword:
-		return "Do"
+		return "Db"
 	case Frundis:
 		return "Fr"
 	case ElecWhip:
@@ -785,7 +785,7 @@ func (sh shield) String() (text string) {
 func (sh shield) Short() (text string) {
 	switch sh {
 	case Buckler:
-		text = "Bu"
+		text = "Bk"
 	case Shield:
 		text = "Sh"
 	}
