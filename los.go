@@ -75,6 +75,9 @@ func (g *game) LosRange() int {
 }
 
 func (g *game) StopAuto() {
+	if g.Autoexploring && !g.AutoHalt {
+		g.Print("You stop exploring.")
+	}
 	g.AutoHalt = true
 	g.AutoDir = NoDir
 	g.AutoTarget = InvalidPos

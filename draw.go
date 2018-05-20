@@ -1871,24 +1871,24 @@ func (ui *termui) DrawStatusLine(g *game) {
 	}
 	line := DungeonHeight
 	col := 2
-	simellas := fmt.Sprintf(" S: %d ", g.Player.Simellas)
+	simellas := fmt.Sprintf(" ♣:%d ", g.Player.Simellas)
 	ui.DrawText(simellas, col, line)
 	col += utf8.RuneCountInString(simellas)
 	var depth string
 	if g.Depth > MaxDepth {
 		depth = "D: Out! "
 	} else {
-		depth = fmt.Sprintf("D: %d ", g.Depth)
+		depth = fmt.Sprintf("D:%d ", g.Depth)
 	}
 	ui.DrawText(depth, col, line)
 	col += utf8.RuneCountInString(depth)
-	turns := fmt.Sprintf("T: %.1f ", float64(g.Turn)/10)
+	turns := fmt.Sprintf("T:%.1f ", float64(g.Turn)/10)
 	ui.DrawText(turns, col, line)
 	col += utf8.RuneCountInString(turns)
-	hp := fmt.Sprintf("HP: %2d ", g.Player.HP)
+	hp := fmt.Sprintf("HP:%2d ", g.Player.HP)
 	ui.DrawColoredText(hp, col, line, hpColor)
 	col += utf8.RuneCountInString(hp)
-	mp := fmt.Sprintf("MP: %2d ", g.Player.MP)
+	mp := fmt.Sprintf("MP:%2d ", g.Player.MP)
 	ui.DrawColoredText(mp, col, line, mpColor)
 	col += utf8.RuneCountInString(mp)
 	if len(sts) > 0 {
@@ -1904,7 +1904,7 @@ func (ui *termui) DrawStatusLine(g *game) {
 		}
 		var sttext string
 		if g.Player.Statuses[st] > 1 {
-			sttext = fmt.Sprintf("%s (%d) ", st.Short(), g.Player.Statuses[st])
+			sttext = fmt.Sprintf("%s(%d) ", st.Short(), g.Player.Statuses[st])
 		} else {
 			sttext = fmt.Sprintf("%s ", st.Short())
 		}

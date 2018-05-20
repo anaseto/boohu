@@ -617,14 +617,12 @@ func (g *game) AutoPlayer(ev event) bool {
 	} else if g.Autoexploring {
 		if g.ui.ExploreStep(g) {
 			g.AutoHalt = true
+			g.Print("Stopping, then.")
 		}
 		mons := g.MonsterInLOS()
 		switch {
-		case mons.Exists():
-			g.Print("You stop exploring.")
-		case g.AutoHalt:
-			// stop exploring for other reasons
-			g.Print("You stop exploring.")
+		case g.AutoHalt || mons != nil:
+			// stop exploring
 		default:
 			var n *position
 			var finished bool
