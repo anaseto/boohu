@@ -59,6 +59,7 @@ const (
 	DisabledShieldEnd
 	CorrosionEnd
 	DigEnd
+	SwapEnd
 )
 
 func (g *game) PushEvent(ev event) {
@@ -156,6 +157,11 @@ func (sev *simpleEvent) Action(g *game) {
 		g.Player.Statuses[StatusDig] = 0
 		if g.Player.Statuses[StatusDig] == 0 {
 			g.PrintStyled("You feel no longer like an earth dragon.", logStatusEnd)
+		}
+	case SwapEnd:
+		g.Player.Statuses[StatusSwap] = 0
+		if g.Player.Statuses[StatusSwap] == 0 {
+			g.PrintStyled("You feel no longer dancing.", logStatusEnd)
 		}
 	}
 }

@@ -400,6 +400,11 @@ func (g *game) EvokeRodSwapping(ev event) error {
 	}
 	mons := g.MonsterAt(g.Player.Target)
 	// mons not nil (check done in the targeter)
+	g.SwapWithMonster(mons)
+	return nil
+}
+
+func (g *game) SwapWithMonster(mons *monster) {
 	ompos := mons.Pos
 	mons.MoveTo(g, g.Player.Pos)
 	g.Player.Pos = ompos
@@ -409,7 +414,6 @@ func (g *game) EvokeRodSwapping(ev event) error {
 	g.CollectGround()
 	g.ComputeLOS()
 	g.MakeMonstersAware()
-	return nil
 }
 
 func (g *game) GeneratedRodsCount() int {

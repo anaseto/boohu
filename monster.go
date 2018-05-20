@@ -786,6 +786,10 @@ func (m *monster) HitPlayer(g *game, ev event) {
 			g.Printf("You block the %s's attack with your %s.", m.Kind, g.Player.Shield)
 			return
 		}
+		if g.Player.HasStatus(StatusSwap) {
+			g.SwapWithMonster(m)
+			return
+		}
 		noise := g.HitNoise()
 		g.MakeNoise(noise, g.Player.Pos)
 		g.PrintfStyled("%s hits you (%d damage).", logMonsterHit, m.Kind.Definite(true), attack)

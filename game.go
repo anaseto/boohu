@@ -261,9 +261,9 @@ func (g *game) InitPlayer() {
 	case 1:
 		g.Player.Consumables[ExplosiveMagara] = 1
 	default:
-		g.Player.Consumables[ConfusingDart] = 2
+		g.Player.Consumables[ConfusingDart] = 3
 	}
-	switch RandInt(9) {
+	switch RandInt(10) {
 	case 0, 1:
 		g.Player.Consumables[TeleportationPotion] = 1
 	case 2, 3:
@@ -278,6 +278,8 @@ func (g *game) InitPlayer() {
 		g.Player.Consumables[CBlinkPotion] = 1
 	case 8:
 		g.Player.Consumables[DigPotion] = 1
+	case 9:
+		g.Player.Consumables[SwapPotion] = 1
 	}
 	g.Player.Rods = map[rod]rodProps{}
 	g.Player.Statuses = map[status]int{}
@@ -290,6 +292,7 @@ func (g *game) InitPlayer() {
 	//g.Player.Consumables[MagicMappingPotion] = 1
 	//g.Player.Consumables[ExplosiveMagara] = 5
 	//g.Player.Consumables[DigPotion] = 5
+	//g.Player.Consumables[SwapPotion] = 5
 	//g.Player.Weapon = ElecWhip
 }
 

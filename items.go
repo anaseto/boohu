@@ -44,9 +44,10 @@ const (
 	WallPotion
 	CBlinkPotion
 	DigPotion
+	SwapPotion
 )
 
-const NumPotions = int(DigPotion) + 1
+const NumPotions = int(SwapPotion) + 1
 
 func (p potion) String() (text string) {
 	text = "potion"
@@ -73,6 +74,8 @@ func (p potion) String() (text string) {
 		text += " of controlled blink"
 	case DigPotion:
 		text += " of digging"
+	case SwapPotion:
+		text += " of swapping"
 	}
 	return text
 }
@@ -106,6 +109,8 @@ func (p potion) Desc() (text string) {
 		text = "makes you blink to a targeted cell in your line of sight."
 	case DigPotion:
 		text = "makes you dig walls like an earth dragon."
+	case SwapPotion:
+		text = "makes you swap positions with monsters instead of attacking."
 	}
 	return fmt.Sprintf("The %s %s", p, text)
 }
@@ -154,6 +159,8 @@ func (p potion) Use(g *game, ev event) error {
 		err = g.QuaffCBlinkPotion(ev)
 	case DigPotion:
 		err = g.QuaffDigPotion(ev)
+	case SwapPotion:
+		err = g.QuaffSwapPotion(ev)
 	}
 	if err != nil {
 		return err
@@ -215,9 +222,10 @@ func (g *game) QuaffMagic(ev event) error {
 }
 
 func (g *game) QuaffDescent(ev event) error {
-	if g.Player.HasStatus(StatusLignification) {
-		return errors.New("You cannot descend while lignified.")
-	}
+	// why not?
+	//if g.Player.HasStatus(StatusLignification) {
+	//return errors.New("You cannot descend while lignified.")
+	//}
 	if g.Depth >= MaxDepth {
 		return errors.New("You cannot descend more!")
 	}
@@ -248,6 +256,19 @@ func (g *game) QuaffDigPotion(ev event) error {
 	g.Player.Statuses[StatusDig] = 1
 	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 75 + RandInt(20), EAction: DigEnd})
 	g.Printf("You quaff the %s. You feel like an earth dragon.", DigPotion)
+	return nil
+}
+
+func (g *game) QuaffSwapPotion(ev event) error {
+	if g.Player.HasStatus(StatusLignification) {
+		return errors.New("You cannot drink this potion while lignified.")
+	}
+	if g.Player.HasStatus(StatusSwap) {
+		return errors.New("You are already swapping.")
+	}
+	g.Player.Statuses[StatusSwap] = 1
+	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 200 + RandInt(20), EAction: SwapEnd})
+	g.Printf("You quaff the %s. You feel like dancing.", SwapPotion)
 	return nil
 }
 
@@ -481,7 +502,7 @@ type collectData struct {
 
 var ConsumablesCollectData = map[consumable]collectData{
 	HealWoundsPotion:    {rarity: 6, quantity: 1},
-	TeleportationPotion: {rarity: 4, quantity: 1},
+	TeleportationPotion: {rarity: 5, quantity: 1},
 	BerserkPotion:       {rarity: 5, quantity: 1},
 	SwiftnessPotion:     {rarity: 6, quantity: 1},
 	DescentPotion:       {rarity: 15, quantity: 1},
@@ -491,7 +512,8 @@ var ConsumablesCollectData = map[consumable]collectData{
 	WallPotion:          {rarity: 12, quantity: 1},
 	CBlinkPotion:        {rarity: 12, quantity: 1},
 	DigPotion:           {rarity: 12, quantity: 1},
-	ConfusingDart:       {rarity: 3, quantity: 2},
+	SwapPotion:          {rarity: 12, quantity: 1},
+	ConfusingDart:       {rarity: 4, quantity: 3},
 	ExplosiveMagara:     {rarity: 8, quantity: 1},
 }
 

@@ -18,11 +18,12 @@ const (
 	StatusCorrosion
 	StatusFlames // fake status
 	StatusDig
+	StatusSwap
 )
 
 func (st status) Good() bool {
 	switch st {
-	case StatusBerserk, StatusSwift, StatusAgile, StatusDig:
+	case StatusBerserk, StatusSwift, StatusAgile, StatusDig, StatusSwap:
 		return true
 	default:
 		return false
@@ -66,6 +67,8 @@ func (st status) String() string {
 		return "Flames"
 	case StatusDig:
 		return "Dig"
+	case StatusSwap:
+		return "Swap"
 	default:
 		// should not happen
 		return "unknown"

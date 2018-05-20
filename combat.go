@@ -78,6 +78,8 @@ func (g *game) MakeNoise(noise int, at position) {
 
 func (g *game) AttackMonster(mons *monster, ev event) {
 	switch {
+	case g.Player.HasStatus(StatusSwap):
+		g.SwapWithMonster(mons)
 	case g.Player.Weapon == Frundis:
 		if !g.HitMonster(DmgPhysical, mons, ev) {
 			break
