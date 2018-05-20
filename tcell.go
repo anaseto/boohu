@@ -53,7 +53,7 @@ func (ui *termui) Clear() {
 func (ui *termui) Flush() {
 	ui.Screen.Show()
 	w, h := ui.Screen.Size()
-	if w <= UIWidth-5 || h <= UIHeight {
+	if w <= UIWidth-8 || h <= UIHeight-2 {
 		ui.small = true
 	} else {
 		ui.small = false
