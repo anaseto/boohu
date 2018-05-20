@@ -73,21 +73,21 @@ func (r rod) Desc() string {
 	var text string
 	switch r {
 	case RodDigging:
-		text = "digs through walls."
+		text = "digs through up to 3 walls in a given direction."
 	case RodBlink:
 		text = "makes you blink away within your line of sight."
 	case RodTeleportOther:
-		text = "teleports away one of your foes."
+		text = "teleports away one of your foes. Note that the monster remembers where it saw you last time."
 	case RodFog:
 		text = "creates a dense fog that reduces your (and monster's) line of sight."
 	case RodFireball:
-		text = "throws a 1-radius fireball at your foes."
+		text = "throws a 1-radius fireball at your foes. You cannot use it at melee range."
 	case RodLightningBolt:
 		text = "throws a lightning bolt through one or more enemies."
 	case RodObstruction:
 		text = "creates a temporary wall at targeted location."
 	case RodShatter:
-		text = "induces an explosion around a wall. The wall can disintegrate."
+		text = "induces an explosion around a wall, hurting adjacent monsters. The wall can disintegrate. You cannot use it at melee range."
 	case RodSwapping:
 		text = "makes you swap positions with a targeted monster."
 	case RodFear:
