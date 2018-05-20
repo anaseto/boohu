@@ -299,7 +299,7 @@ const (
 func (ui *termui) EnterWizard(g *game) {
 	if ui.Wizard(g) {
 		g.WizardMode()
-		ui.DrawDungeonView(g, NormalMode)
+		ui.DrawDungeonView(g, NoFlushMode)
 	} else {
 		g.Print(DoNothing)
 	}
@@ -785,7 +785,6 @@ func (ui *termui) HandleKey(g *game, rka runeKeyAction) (err error, again bool, 
 		err = g.Autoexplore(g.Ev)
 	case KeyExamine:
 		err, again, quit = ui.Examine(g, nil)
-		ui.DrawDungeonView(g, NormalMode)
 	case KeyHelp:
 		ui.KeysHelp(g)
 		again = true
@@ -968,7 +967,6 @@ func (ui *termui) CharacterInfo(g *game) {
 
 	ui.Flush()
 	ui.WaitForContinue(g, lines+2)
-	ui.DrawDungeonView(g, NormalMode)
 }
 
 func (ui *termui) WizardInfo(g *game) {
@@ -979,7 +977,6 @@ func (ui *termui) WizardInfo(g *game) {
 	ui.DrawText(b.String(), 0, 0)
 	ui.Flush()
 	ui.WaitForContinue(g, -1)
-	ui.DrawDungeonView(g, NormalMode)
 }
 
 func (ui *termui) AptitudesText(g *game) string {
@@ -1220,7 +1217,6 @@ func (ui *termui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, dat
 				quit = true
 				return err, again, quit, notarg
 			}
-			ui.DrawDungeonView(g, NormalMode)
 		} else {
 			err = errors.New("No stairs here.")
 		}
@@ -2295,7 +2291,6 @@ func (ui *termui) SelectRod(g *game, ev event) error {
 			}
 			err = rs[index].Use(g, ev)
 		}
-		ui.DrawDungeonView(g, NormalMode)
 		return err
 	}
 }
