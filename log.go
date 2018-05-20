@@ -19,9 +19,13 @@ type logEntry struct {
 	Index int
 	Tick  bool
 	Style logStyle
+	Dups  int
 }
 
 func (e logEntry) String() string {
+	if e.Dups > 0 {
+		return fmt.Sprintf("%s (%d×)", e.Text, e.Dups+1)
+	}
 	return e.Text
 }
 
@@ -49,10 +53,18 @@ func (g *game) PrintEntry(e logEntry) {
 	if e.Index == g.LogNextTick {
 		e.Tick = true
 	}
+	if !e.Tick && len(g.Log) > 0 {
+		le := g.Log[len(g.Log)-1]
+		if le.Text == e.Text {
+			le.Dups++
+			g.Log[len(g.Log)-1] = le
+			return
+		}
+	}
 	g.Log = append(g.Log, e)
 	g.LogIndex++
-	if len(g.Log) > 10000 {
-		g.Log = g.Log[5000:]
+	if len(g.Log) > 50000 {
+		g.Log = g.Log[40000:]
 	}
 }
 
