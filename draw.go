@@ -960,10 +960,19 @@ func (ui *termui) CharacterInfo(g *game) {
 	desc := b.String()
 	lines := strings.Count(desc, "\n")
 	for i := 0; i <= lines+2; i++ {
+		if i >= DungeonWidth {
+			ui.SetCell(DungeonWidth, i, '│', ColorFg, ColorBg)
+		}
 		ui.ClearLine(i)
 	}
 	ui.DrawText(desc, 0, 0)
-	ui.DrawTextLine(" press esc or space to continue ", lines+2)
+	escspace := " press esc or space to continue "
+	if lines+2 >= DungeonHeight {
+		ui.DrawTextLine(escspace, lines+2)
+		ui.SetCell(DungeonWidth, lines+2, '┘', ColorFg, ColorBg)
+	} else {
+		ui.DrawTextLine(escspace, lines+2)
+	}
 
 	ui.Flush()
 	ui.WaitForContinue(g, lines+2)
