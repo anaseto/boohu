@@ -238,6 +238,10 @@ func (ui *termui) Flush() {
 	js.Global.Get("window").Call("requestAnimationFrame", ui.FlushCallback)
 }
 
+func (ui *termui) Small() bool {
+	return false
+}
+
 func (ui *termui) FlushCallback(obj *js.Object) {
 	for i := 0; i < len(ui.cells); i++ {
 		if ui.cells[i] == ui.backBuffer[i] {

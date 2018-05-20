@@ -11,6 +11,7 @@ import (
 
 type termui struct {
 	cursor position
+	small  bool
 }
 
 func (ui *termui) Init() error {
@@ -35,6 +36,16 @@ func (ui *termui) Clear() {
 
 func (ui *termui) Flush() {
 	termbox.Flush()
+	w, h := termbox.Size()
+	if w <= UIWidth-5 || h <= UIHeight {
+		ui.small = true
+	} else {
+		ui.small = false
+	}
+}
+
+func (ui *termui) Small() bool {
+	return ui.small
 }
 
 func (ui *termui) Interrupt() {

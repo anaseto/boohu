@@ -107,6 +107,10 @@ func (ui *termui) Flush() {
 	ui.bStdout.Flush()
 }
 
+func (ui *termui) Small() bool {
+	return false
+}
+
 func (ui *termui) HideCursor() {
 	ui.cursor = InvalidPos
 }

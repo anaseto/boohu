@@ -74,3 +74,39 @@ func (st status) String() string {
 		return "unknown"
 	}
 }
+
+func (st status) Short() string {
+	switch st {
+	case StatusBerserk:
+		return "Be"
+	case StatusSlow:
+		return "Sl"
+	case StatusExhausted:
+		return "Ex"
+	case StatusSwift:
+		return "Sw"
+	case StatusLignification:
+		return "Li"
+	case StatusAgile:
+		return "Ag"
+	case StatusConfusion:
+		return "Co"
+	case StatusTele:
+		return "Te"
+	case StatusNausea:
+		return "Na"
+	case StatusDisabledShield:
+		return "-S"
+	case StatusCorrosion:
+		return "Co"
+	case StatusFlames:
+		return "Fl"
+	case StatusDig:
+		return "Di"
+	case StatusSwap:
+		return "Sw"
+	default:
+		// should not happen
+		return "?"
+	}
+}

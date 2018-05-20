@@ -1470,23 +1470,33 @@ func (ui *termui) DrawDungeonView(g *game, m uiMode) {
 		ui.DrawAtPosition(g, pos, m == TargetingMode, r, fgColor, bgColor)
 	}
 	line := 0
-	ui.DrawColoredTextOnBG("→Menu", BarCol, line, ColorBlue, ColorBg)
-	line++
-	ui.DrawText(fmt.Sprintf("[ %v (%d)", g.Player.Armour, g.Player.Armor()), BarCol, line)
-	line++
-	ui.DrawText(fmt.Sprintf(") %v (%d)", g.Player.Weapon, g.Player.Attack()), BarCol, line)
-	line++
-	if g.Player.Shield != NoShield {
-		if g.Player.Weapon.TwoHanded() {
-			ui.DrawText(fmt.Sprintf("] %v (unusable)", g.Player.Shield), BarCol, line)
-		} else {
-			ui.DrawText(fmt.Sprintf("] %v (%d)", g.Player.Shield, g.Player.Block()), BarCol, line)
+	if !ui.Small() {
+		ui.DrawColoredTextOnBG("→Menu", BarCol, line, ColorBlue, ColorBg)
+		line++
+		ui.DrawText(fmt.Sprintf("[ %v (%d)", g.Player.Armour, g.Player.Armor()), BarCol, line)
+		line++
+		ui.DrawText(fmt.Sprintf(") %v (%d)", g.Player.Weapon, g.Player.Attack()), BarCol, line)
+		line++
+		if g.Player.Shield != NoShield {
+			if g.Player.Weapon.TwoHanded() {
+				ui.DrawText(fmt.Sprintf("] %v (unusable)", g.Player.Shield), BarCol, line)
+			} else {
+				ui.DrawText(fmt.Sprintf("] %v (%d)", g.Player.Shield, g.Player.Block()), BarCol, line)
+			}
 		}
+		line++
+		line++
 	}
-	line++
-	line++
-	ui.DrawStatusBar(g, line)
-	ui.DrawLog(g)
+	if ui.Small() {
+		ui.DrawStatusLine(g)
+	} else {
+		ui.DrawStatusBar(g, line)
+	}
+	if ui.Small() {
+		ui.DrawLog(g, 2)
+	} else {
+		ui.DrawLog(g, 4)
+	}
 	if m != TargetingMode && m != NoFlushMode {
 		ui.Flush()
 	}
@@ -1831,6 +1841,78 @@ func (ui *termui) DrawStatusBar(g *game, line int) {
 	}
 }
 
+func (ui *termui) DrawStatusLine(g *game) {
+	sts := statusSlice{}
+	if cld, ok := g.Clouds[g.Player.Pos]; ok && cld == CloudFire {
+		g.Player.Statuses[StatusFlames] = 1
+		defer func() {
+			g.Player.Statuses[StatusFlames] = 0
+		}()
+	}
+	for st, c := range g.Player.Statuses {
+		if c > 0 {
+			sts = append(sts, st)
+		}
+	}
+	sort.Sort(sts)
+	hpColor := ColorFgHPok
+	switch {
+	case g.Player.HP*100/g.Player.HPMax() < 30:
+		hpColor = ColorFgHPcritical
+	case g.Player.HP*100/g.Player.HPMax() < 70:
+		hpColor = ColorFgHPwounded
+	}
+	mpColor := ColorFgMPok
+	switch {
+	case g.Player.MP*100/g.Player.MPMax() < 30:
+		mpColor = ColorFgMPcritical
+	case g.Player.MP*100/g.Player.MPMax() < 70:
+		mpColor = ColorFgMPpartial
+	}
+	line := DungeonHeight
+	col := 2
+	simellas := fmt.Sprintf(" S: %d ", g.Player.Simellas)
+	ui.DrawText(simellas, col, line)
+	col += utf8.RuneCountInString(simellas)
+	var depth string
+	if g.Depth > MaxDepth {
+		depth = "D: Out! "
+	} else {
+		depth = fmt.Sprintf("D: %d ", g.Depth)
+	}
+	ui.DrawText(depth, col, line)
+	col += utf8.RuneCountInString(depth)
+	turns := fmt.Sprintf("T: %.1f ", float64(g.Turn)/10)
+	ui.DrawText(turns, col, line)
+	col += utf8.RuneCountInString(turns)
+	hp := fmt.Sprintf("HP: %2d ", g.Player.HP)
+	ui.DrawColoredText(hp, col, line, hpColor)
+	col += utf8.RuneCountInString(hp)
+	mp := fmt.Sprintf("MP: %2d ", g.Player.MP)
+	ui.DrawColoredText(mp, col, line, mpColor)
+	col += utf8.RuneCountInString(mp)
+	if len(sts) > 0 {
+		ui.DrawText("| ", col, line)
+		col += 2
+	}
+	for _, st := range sts {
+		fg := ColorFgStatusOther
+		if st.Good() {
+			fg = ColorFgStatusGood
+		} else if st.Bad() {
+			fg = ColorFgStatusBad
+		}
+		var sttext string
+		if g.Player.Statuses[st] > 1 {
+			sttext = fmt.Sprintf("%s (%d) ", st.Short(), g.Player.Statuses[st])
+		} else {
+			sttext = fmt.Sprintf("%s ", st.Short())
+		}
+		ui.DrawColoredText(sttext, col, line, fg)
+		col += utf8.RuneCountInString(sttext)
+	}
+}
+
 func (ui *termui) LogColor(e logEntry) uicolor {
 	fg := ColorFg
 	// TODO: define uicolors?
@@ -1851,8 +1933,8 @@ func (ui *termui) LogColor(e logEntry) uicolor {
 	return fg
 }
 
-func (ui *termui) DrawLog(g *game) {
-	min := len(g.Log) - 4
+func (ui *termui) DrawLog(g *game, lines int) {
+	min := len(g.Log) - lines
 	if min < 0 {
 		min = 0
 	}
@@ -1995,7 +2077,11 @@ loop:
 }
 
 func (ui *termui) DrawPreviousLogs(g *game) {
-	lines := DungeonHeight + 4
+	bottom := 4
+	if ui.Small() {
+		bottom = 2
+	}
+	lines := DungeonHeight + bottom
 	nmax := len(g.Log) - lines
 	n := nmax
 loop:
@@ -2011,7 +2097,7 @@ loop:
 		if to >= len(g.Log) {
 			to = len(g.Log)
 		}
-		for i := 0; i < 4; i++ {
+		for i := 0; i < bottom; i++ {
 			ui.SetCell(DungeonWidth, DungeonHeight+i, '│', ColorFg, ColorBg)
 		}
 		for i := n; i < to; i++ {
@@ -2034,7 +2120,7 @@ loop:
 				ui.DrawColoredText(e.String(), 0, i-n, fguicolor)
 			}
 		}
-		for i := len(g.Log); i < DungeonHeight+4; i++ {
+		for i := len(g.Log); i < DungeonHeight+bottom; i++ {
 			ui.ClearLine(i - n)
 		}
 		ui.ClearLine(lines)
