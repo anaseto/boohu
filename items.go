@@ -255,7 +255,7 @@ func (g *game) QuaffLignification(ev event) error {
 	if g.Player.HasStatus(StatusLignification) {
 		return errors.New("You are already lignified.")
 	}
-	g.Player.Statuses[StatusLignification] = 1
+	g.Player.Statuses[StatusLignification]++
 	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 150 + RandInt(100), EAction: LignificationEnd})
 	g.Printf("You quaff the %s. You feel rooted to the ground.", LignificationPotion)
 	g.Player.HP += 10
