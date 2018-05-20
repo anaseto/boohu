@@ -78,7 +78,10 @@ func (g *game) StopAuto() {
 	g.AutoHalt = true
 	g.AutoDir = NoDir
 	g.AutoTarget = InvalidPos
-	g.Resting = false
+	if g.Resting {
+		g.Stats.RestInterrupt++
+		g.Resting = false
+	}
 }
 
 func (g *game) ComputeLOS() {

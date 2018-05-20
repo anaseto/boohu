@@ -607,7 +607,7 @@ func (g *game) AutoPlayer(ev event) bool {
 			g.WaitTurn(ev)
 			return true
 		}
-		if mons != nil {
+		if mons != nil && g.Resting {
 			g.Stats.RestInterrupt++
 		}
 		g.Resting = false

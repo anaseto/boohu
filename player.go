@@ -297,6 +297,7 @@ func (g *game) Teleportation(ev event) {
 		g.ComputeLOS()
 		g.MakeMonstersAware()
 	} else {
+		// should not happen
 		g.Print("Something went wrong with the teleportation.")
 	}
 }
