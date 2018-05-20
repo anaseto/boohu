@@ -565,6 +565,10 @@ func (m *monster) TeleportAway(g *game) {
 }
 
 func (m *monster) MoveTo(g *game, pos position) {
+	if !m.Seen && !g.Player.LOS[m.Pos] && g.Player.LOS[pos] {
+		m.Seen = true
+		g.Printf("%s (%v) comes into view.", m.Kind.Indefinite(true), m.State)
+	}
 	g.MonstersPosCache[m.Pos.idx()] = 0
 	m.Pos = pos
 	g.MonstersPosCache[m.Pos.idx()] = m.Index + 1
@@ -1221,7 +1225,6 @@ func (m *monster) GatherBand(g *game) {
 				mons.Target = m.Target
 				mons.State = m.State
 			}
-
 		}
 	}
 }
