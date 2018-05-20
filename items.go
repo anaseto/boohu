@@ -560,6 +560,22 @@ func (ar armour) String() string {
 	}
 }
 
+func (ar armour) Short() string {
+	switch ar {
+	case Robe:
+		return "Ro"
+	case LeatherArmour:
+		return "Le"
+	case ChainMail:
+		return "Ch"
+	case PlateArmour:
+		return "Pl"
+	default:
+		// should not happen
+		return "?"
+	}
+}
+
 func (ar armour) Desc() string {
 	var text string
 	switch ar {
@@ -630,6 +646,32 @@ func (wp weapon) String() string {
 	default:
 		// should not happen
 		return "some weapon"
+	}
+}
+
+func (wp weapon) Short() string {
+	switch wp {
+	case Dagger:
+		return "Da"
+	case Axe:
+		return "Ax"
+	case BattleAxe:
+		return "Ba"
+	case Spear:
+		return "Sp"
+	case Halberd:
+		return "Ha"
+	case Sword:
+		return "Sw"
+	case DoubleSword:
+		return "Do"
+	case Frundis:
+		return "Fr"
+	case ElecWhip:
+		return "Wh"
+	default:
+		// should not happen
+		return "?"
 	}
 }
 
@@ -736,6 +778,16 @@ func (sh shield) String() (text string) {
 		text = "buckler"
 	case Shield:
 		text = "shield"
+	}
+	return text
+}
+
+func (sh shield) Short() (text string) {
+	switch sh {
+	case Buckler:
+		text = "Bu"
+	case Shield:
+		text = "Sh"
 	}
 	return text
 }
