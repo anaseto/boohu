@@ -108,7 +108,7 @@ func (r rod) MaxCharge() (charges int) {
 	switch r {
 	case RodBlink:
 		charges = 5
-	case RodTeleportOther, RodDigging:
+	case RodDigging:
 		charges = 3
 	default:
 		charges = 4
