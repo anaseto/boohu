@@ -569,6 +569,10 @@ func (m *monster) MoveTo(g *game, pos position) {
 		m.Seen = true
 		g.Printf("%s (%v) comes into view.", m.Kind.Indefinite(true), m.State)
 	}
+	m.PlaceAt(g, pos)
+}
+
+func (m *monster) PlaceAt(g *game, pos position) {
 	g.MonstersPosCache[m.Pos.idx()] = 0
 	m.Pos = pos
 	g.MonstersPosCache[m.Pos.idx()] = m.Index + 1
@@ -1344,7 +1348,7 @@ func (g *game) GenMonsters() {
 				mons.Init()
 				mons.Index = i
 				mons.Band = nband
-				mons.MoveTo(g, pos)
+				mons.PlaceAt(g, pos)
 				g.Monsters = append(g.Monsters, mons)
 				i++
 				pos = g.FreeCellForBandMonster(pos)
