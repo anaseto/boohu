@@ -108,7 +108,7 @@ func (r rod) MaxCharge() (charges int) {
 	switch r {
 	case RodBlink:
 		charges = 5
-	case RodDigging:
+	case RodDigging, RodShatter:
 		charges = 3
 	default:
 		charges = 4
@@ -248,7 +248,12 @@ func (g *game) EvokeRodLightningBolt(ev event) error {
 		if mons == nil {
 			continue
 		}
-		mons.HP -= RandInt(21)
+		dmg := 0
+		for i := 0; i < 2; i++ {
+			dmg += RandInt(21)
+		}
+		dmg /= 2
+		mons.HP -= dmg
 		if mons.HP <= 0 {
 			g.Printf("%s is killed by the bolt.", mons.Kind.Indefinite(true))
 			g.HandleKill(mons, ev)
@@ -273,7 +278,12 @@ func (g *game) EvokeRodFireball(ev event) error {
 		if mons == nil {
 			continue
 		}
-		mons.HP -= RandInt(21)
+		dmg := 0
+		for i := 0; i < 2; i++ {
+			dmg += RandInt(21)
+		}
+		dmg /= 2
+		mons.HP -= dmg
 		if mons.HP <= 0 {
 			g.Printf("%s is killed by the fireball.", mons.Kind.Indefinite(true))
 			g.HandleKill(mons, ev)
@@ -339,28 +349,33 @@ func (g *game) EvokeRodShatter(ev event) error {
 		return err
 	}
 	neighbors := g.Dungeon.FreeNeighbors(g.Player.Target)
-	if RandInt(2) == 0 {
-		g.Dungeon.SetCell(g.Player.Target, FreeCell)
-		g.Stats.Digs++
-		g.ComputeLOS()
-		g.MakeMonstersAware()
-		g.MakeNoise(19, g.Player.Target)
-		g.Print("You see the wall disappear in a noisy explosion.")
-		g.ui.ProjectileTrajectoryAnimation(g, g.Ray(g.Player.Target), ColorFgExplosionWallStart)
-		g.ui.ExplosionAnimation(g, WallExplosion, g.Player.Target)
-		g.Fog(g.Player.Target, 2, ev)
-	} else {
-		g.MakeNoise(15, g.Player.Target)
-		g.Print("You see an explosion around the wall.")
-		g.ui.ProjectileTrajectoryAnimation(g, g.Ray(g.Player.Target), ColorFgExplosionWallStart)
-		g.ui.ExplosionAnimation(g, AroundWallExplosion, g.Player.Target)
-	}
+	//if RandInt(2) == 0 {
+	g.Dungeon.SetCell(g.Player.Target, FreeCell)
+	g.Stats.Digs++
+	g.ComputeLOS()
+	g.MakeMonstersAware()
+	g.MakeNoise(18, g.Player.Target)
+	g.Printf("%s The wall disappeared.", g.CrackSound())
+	g.ui.ProjectileTrajectoryAnimation(g, g.Ray(g.Player.Target), ColorFgExplosionWallStart)
+	g.ui.ExplosionAnimation(g, WallExplosion, g.Player.Target)
+	g.Fog(g.Player.Target, 2, ev)
+	//} else {
+	//g.MakeNoise(15, g.Player.Target)
+	//g.Print("You see an explosion around the wall.")
+	//g.ui.ProjectileTrajectoryAnimation(g, g.Ray(g.Player.Target), ColorFgExplosionWallStart)
+	//g.ui.ExplosionAnimation(g, AroundWallExplosion, g.Player.Target)
+	//}
 	for _, pos := range neighbors {
 		mons := g.MonsterAt(pos)
 		if !mons.Exists() {
 			continue
 		}
-		mons.HP -= RandInt(30)
+		dmg := 0
+		for i := 0; i < 3; i++ {
+			dmg += RandInt(30)
+		}
+		dmg /= 3
+		mons.HP -= dmg
 		if mons.HP <= 0 {
 			g.Printf("%s is killed by the explosion.", mons.Kind.Indefinite(true))
 			g.HandleKill(mons, ev)
