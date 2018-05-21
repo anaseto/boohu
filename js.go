@@ -122,20 +122,12 @@ func (g *game) WriteDump() error {
 func (ui *termui) Init() error {
 	ui.cells = make([]UICell, UIWidth*UIHeight)
 	js.Global.Get("document").Call("addEventListener", "keypress", func(e *js.Object) {
-		select {
-		case <-wants:
-			s := e.Get("key").String()
-			ch <- jsInput{key: s}
-		default:
-		}
+		s := e.Get("key").String()
+		ch <- jsInput{key: s}
 	})
 	js.Global.Get("document").Call("addEventListener", "mousedown", func(e *js.Object) {
-		select {
-		case <-wants:
-			x, y := ui.GetMousePos(e)
-			ch <- jsInput{mouse: true, mouseX: x, mouseY: y, button: e.Get("button").Int()}
-		default:
-		}
+		x, y := ui.GetMousePos(e)
+		ch <- jsInput{mouse: true, mouseX: x, mouseY: y, button: e.Get("button").Int()}
 	})
 	//js.Global.Get("document").Call("addEventListener", "mousemove", func(e *js.Object) {
 	//x, y := ui.GetMousePos(e)
@@ -208,12 +200,10 @@ func (ui *termui) ResetCells() {
 }
 
 var ch chan jsInput
-var wants chan bool
 var interrupt chan bool
 
 func init() {
-	ch = make(chan jsInput)
-	wants = make(chan bool)
+	ch = make(chan jsInput, 100)
 	interrupt = make(chan bool)
 }
 
@@ -290,8 +280,7 @@ func (ui *termui) ReadKey(s string) (r rune) {
 
 func (ui *termui) PollEvent() (in jsInput) {
 	select {
-	case wants <- true:
-		in = <-ch
+	case in = <-ch:
 	case in.interrupt = <-interrupt:
 	}
 	return in
