@@ -77,6 +77,10 @@ func (g *game) LosRange() int {
 func (g *game) StopAuto() {
 	if g.Autoexploring && !g.AutoHalt {
 		g.Print("You stop exploring.")
+	} else if g.AutoDir != NoDir {
+		g.Print("You stop.")
+	} else if g.AutoTarget != InvalidPos {
+		g.Print("You stop.")
 	}
 	g.AutoHalt = true
 	g.AutoDir = NoDir
@@ -100,8 +104,8 @@ func (g *game) ComputeLOS() {
 	g.Player.LOS = m
 	for _, mons := range g.Monsters {
 		if mons.Exists() && g.Player.LOS[mons.Pos] {
-			g.StopAuto()
 			if mons.Seen {
+				g.StopAuto()
 				continue
 			}
 			mons.Seen = true
@@ -109,6 +113,7 @@ func (g *game) ComputeLOS() {
 			if mons.Kind.Dangerousness() > 10 {
 				g.StoryPrint(mons.Kind.SeenStoryText())
 			}
+			g.StopAuto()
 		}
 	}
 }
@@ -117,34 +122,34 @@ func (g *game) SeePosition(pos position) {
 	if !g.Dungeon.Cell(pos).Explored {
 		see := "see"
 		if c, ok := g.Collectables[pos]; ok {
-			g.StopAuto()
 			if c.Quantity > 1 {
 				g.Printf("You %s %d %s.", see, c.Quantity, c.Consumable.Plural())
 			} else {
 				g.Printf("You %s %s.", see, Indefinite(c.Consumable.String(), false))
 			}
+			g.StopAuto()
 		} else if _, ok := g.Stairs[pos]; ok {
-			g.StopAuto()
 			g.Printf("You %s stairs.", see)
+			g.StopAuto()
 		} else if eq, ok := g.Equipables[pos]; ok {
-			g.StopAuto()
 			g.Printf("You %s %s.", see, Indefinite(eq.String(), false))
-		} else if rod, ok := g.Rods[pos]; ok {
 			g.StopAuto()
+		} else if rod, ok := g.Rods[pos]; ok {
 			g.Printf("You %s %s.", see, Indefinite(rod.String(), false))
+			g.StopAuto()
 		}
 		g.FairAction()
 		g.Dungeon.SetExplored(pos)
 		g.DijkstraMapRebuild = true
 	} else {
 		if g.UnknownDig[pos] {
-			g.StopAuto()
 			g.Printf("There is no more a wall there.")
+			g.StopAuto()
 			g.DijkstraMapRebuild = true
 		}
 		if cld, ok := g.Clouds[pos]; ok && cld == CloudFire && g.UnknownBurn[pos] != NoUnknownBurn {
-			g.StopAuto()
 			g.Printf("There are flames there.")
+			g.StopAuto()
 			g.DijkstraMapRebuild = true
 		}
 	}

@@ -565,9 +565,12 @@ func (m *monster) TeleportAway(g *game) {
 }
 
 func (m *monster) MoveTo(g *game, pos position) {
-	if !m.Seen && !g.Player.LOS[m.Pos] && g.Player.LOS[pos] {
-		m.Seen = true
-		g.Printf("%s (%v) comes into view.", m.Kind.Indefinite(true), m.State)
+	if !g.Player.LOS[m.Pos] && g.Player.LOS[pos] {
+		if !m.Seen {
+			m.Seen = true
+			g.Printf("%s (%v) comes into view.", m.Kind.Indefinite(true), m.State)
+		}
+		g.StopAuto()
 	}
 	m.PlaceAt(g, pos)
 }

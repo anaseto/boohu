@@ -619,9 +619,8 @@ func (g *game) AutoPlayer(ev event) bool {
 			g.AutoHalt = true
 			g.Print("Stopping, then.")
 		}
-		mons := g.MonsterInLOS()
 		switch {
-		case g.AutoHalt || mons != nil:
+		case g.AutoHalt:
 			// stop exploring
 		default:
 			var n *position
