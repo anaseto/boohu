@@ -289,6 +289,8 @@ func (g *game) InitPlayer() {
 	// g.Player.Aptitudes[AptSmoke] = true
 	//g.Player.Rods[RodSwapping] = rodProps{Charge: 3}
 	//g.Player.Rods[RodFireball] = rodProps{Charge: 3}
+	//g.Player.Rods[RodLightningBolt] = rodProps{Charge: 3}
+	//g.Player.Rods[RodShatter] = rodProps{Charge: 3}
 	//g.Player.Rods[RodFog] = rodProps{Charge: 3}
 	//g.Player.Consumables[MagicMappingPotion] = 1
 	//g.Player.Consumables[ExplosiveMagara] = 5

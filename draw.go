@@ -1568,14 +1568,11 @@ func (ui *termui) ExplosionAnimation(g *game, es explosionStyle, pos position) {
 		colors[1] = ColorFgExplosionWallEnd
 	}
 	for i := 0; i < 3; i++ {
+		nb := g.Dungeon.FreeNeighbors(pos)
 		if es != AroundWallExplosion {
-			fg := colors[RandInt(2)]
-			_, _, bgColor := ui.PositionDrawing(g, pos)
-			ui.DrawAtPosition(g, pos, true, '☼', fg, bgColor)
-			ui.Flush()
-			time.Sleep(25 * time.Millisecond)
+			nb = append(nb, pos)
 		}
-		for _, npos := range g.Dungeon.FreeNeighbors(pos) {
+		for _, npos := range nb {
 			fg := colors[RandInt(2)]
 			if !g.Player.LOS[npos] {
 				continue
@@ -1583,14 +1580,14 @@ func (ui *termui) ExplosionAnimation(g *game, es explosionStyle, pos position) {
 			_, _, bgColor := ui.PositionDrawing(g, npos)
 			mons := g.MonsterAt(npos)
 			r := ';'
-			switch RandInt(7) {
-			case 0:
+			switch RandInt(9) {
+			case 0, 6:
 				r = ','
 			case 1:
 				r = '}'
 			case 2:
 				r = '%'
-			case 3:
+			case 3, 7:
 				r = ':'
 			case 4:
 				r = '\\'
@@ -1600,7 +1597,8 @@ func (ui *termui) ExplosionAnimation(g *game, es explosionStyle, pos position) {
 			if mons.Exists() || g.Player.Pos == npos {
 				r = '¤'
 			}
-			ui.DrawAtPosition(g, npos, true, r, fg, bgColor)
+			//ui.DrawAtPosition(g, npos, true, r, fg, bgColor)
+			ui.DrawAtPosition(g, npos, true, r, bgColor, fg)
 		}
 		ui.Flush()
 		time.Sleep(100 * time.Millisecond)
@@ -1612,7 +1610,8 @@ func (ui *termui) WallExplosionAnimation(g *game, pos position) {
 	colors := [2]uicolor{ColorFgExplosionWallStart, ColorFgExplosionWallEnd}
 	for _, fg := range colors {
 		_, _, bgColor := ui.PositionDrawing(g, pos)
-		ui.DrawAtPosition(g, pos, true, '☼', fg, bgColor)
+		//ui.DrawAtPosition(g, pos, true, '☼', fg, bgColor)
+		ui.DrawAtPosition(g, pos, true, '☼', bgColor, fg)
 		ui.Flush()
 		time.Sleep(25 * time.Millisecond)
 	}
@@ -1622,8 +1621,9 @@ func (ui *termui) LightningBoltAnimation(g *game, ray []position) {
 	ui.DrawDungeonView(g, NormalMode)
 	time.Sleep(25 * time.Millisecond)
 	colors := [2]uicolor{ColorFgExplosionStart, ColorFgExplosionEnd}
-	for j, fg := range colors {
+	for j := 0; j < 3; j++ {
 		for i := len(ray) - 1; i >= 0; i-- {
+			fg := colors[RandInt(2)]
 			pos := ray[i]
 			_, _, bgColor := ui.PositionDrawing(g, pos)
 			mons := g.MonsterAt(pos)
@@ -1634,14 +1634,11 @@ func (ui *termui) LightningBoltAnimation(g *game, ray []position) {
 			if mons.Exists() {
 				r = '¤'
 			}
-			ui.DrawAtPosition(g, pos, true, r, fg, bgColor)
+			//ui.DrawAtPosition(g, pos, true, r, fg, bgColor)
+			ui.DrawAtPosition(g, pos, true, r, bgColor, fg)
 		}
 		ui.Flush()
-		if j == 0 {
-			time.Sleep(75 * time.Millisecond)
-		} else {
-			time.Sleep(125 * time.Millisecond)
-		}
+		time.Sleep(100 * time.Millisecond)
 	}
 	time.Sleep(25 * time.Millisecond)
 }
