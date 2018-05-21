@@ -90,6 +90,8 @@ func (ui *termui) Clear() {
 }
 
 func (ui *termui) Flush() {
+	var prevfg, prevbg uicolor
+	first := true
 	for i := 0; i < len(ui.cells); i++ {
 		if ui.cells[i] == ui.backBuffer[i] {
 			continue
@@ -97,13 +99,35 @@ func (ui *termui) Flush() {
 		cell := ui.cells[i]
 		x, y := ui.GetPos(i)
 		ui.MoveTo(x, y)
-		fmt.Fprintf(ui.bStdout, "\x1b[38;5;%dm", cell.fg)
-		fmt.Fprintf(ui.bStdout, "\x1b[48;5;%dm", cell.bg)
+		pfg := true
+		pbg := true
+		if first {
+			prevfg = cell.fg
+			prevbg = cell.bg
+			first = false
+		} else {
+			if prevfg == cell.fg {
+				pfg = false
+			} else {
+				prevfg = cell.fg
+			}
+			if prevbg == cell.bg {
+				pbg = false
+			} else {
+				prevbg = cell.bg
+			}
+		}
+		if pfg {
+			fmt.Fprintf(ui.bStdout, "\x1b[38;5;%dm", cell.fg)
+		}
+		if pbg {
+			fmt.Fprintf(ui.bStdout, "\x1b[48;5;%dm", cell.bg)
+		}
 		ui.bStdout.WriteRune(cell.r)
-		fmt.Fprintf(ui.bStdout, "\x1b[0m")
 		ui.backBuffer[i] = cell
 	}
 	ui.MoveTo(ui.cursor.X, ui.cursor.Y)
+	fmt.Fprintf(ui.bStdout, "\x1b[0m")
 	ui.bStdout.Flush()
 }
 
