@@ -1554,7 +1554,7 @@ func (ui *termui) ProjectileTrajectoryAnimation(g *game, ray []position, fg uico
 		r, fgColor, bgColor := ui.PositionDrawing(g, pos)
 		ui.DrawAtPosition(g, pos, true, '•', fg, bgColor)
 		ui.Flush()
-		time.Sleep(25 * time.Millisecond)
+		time.Sleep(30 * time.Millisecond)
 		ui.DrawAtPosition(g, pos, true, r, fgColor, bgColor)
 	}
 }
@@ -1567,7 +1567,7 @@ func (ui *termui) ExplosionAnimation(g *game, es explosionStyle, pos position) {
 		colors[0] = ColorFgExplosionWallStart
 		colors[1] = ColorFgExplosionWallEnd
 	}
-	for _, fg := range colors {
+	for i, fg := range colors {
 		if es != AroundWallExplosion {
 			_, _, bgColor := ui.PositionDrawing(g, pos)
 			ui.DrawAtPosition(g, pos, true, '☼', fg, bgColor)
@@ -1579,12 +1579,34 @@ func (ui *termui) ExplosionAnimation(g *game, es explosionStyle, pos position) {
 				continue
 			}
 			_, _, bgColor := ui.PositionDrawing(g, npos)
-			ui.DrawAtPosition(g, npos, true, '¤', fg, bgColor)
-			ui.Flush()
-			time.Sleep(10 * time.Millisecond)
+			mons := g.MonsterAt(npos)
+			r := ';'
+			switch RandInt(7) {
+			case 0:
+				r = ','
+			case 1:
+				r = '}'
+			case 2:
+				r = '%'
+			case 3:
+				r = ':'
+			case 4:
+				r = '\\'
+			case 5:
+				r = '~'
+			}
+			if mons.Exists() {
+				r = '¤'
+			}
+			ui.DrawAtPosition(g, npos, true, r, fg, bgColor)
+		}
+		ui.Flush()
+		if i == 0 {
+			time.Sleep(75 * time.Millisecond)
+		} else {
+			time.Sleep(125 * time.Millisecond)
 		}
 	}
-	time.Sleep(25 * time.Millisecond)
 }
 
 func (ui *termui) WallExplosionAnimation(g *game, pos position) {
@@ -1601,16 +1623,26 @@ func (ui *termui) LightningBoltAnimation(g *game, ray []position) {
 	ui.DrawDungeonView(g, NormalMode)
 	time.Sleep(25 * time.Millisecond)
 	colors := [2]uicolor{ColorFgExplosionStart, ColorFgExplosionEnd}
-	n := 0
-	for _, fg := range colors {
+	for j, fg := range colors {
 		for i := len(ray) - 1; i >= 0; i-- {
 			pos := ray[i]
 			_, _, bgColor := ui.PositionDrawing(g, pos)
-			ui.DrawAtPosition(g, pos, true, '☼', fg, bgColor)
-			ui.Flush()
-			time.Sleep(10 * time.Duration(2-n) * time.Millisecond)
+			mons := g.MonsterAt(pos)
+			r := '*'
+			if RandInt(2) == 0 {
+				r = '+'
+			}
+			if mons.Exists() {
+				r = '¤'
+			}
+			ui.DrawAtPosition(g, pos, true, r, fg, bgColor)
 		}
-		n++
+		ui.Flush()
+		if j == 0 {
+			time.Sleep(75 * time.Millisecond)
+		} else {
+			time.Sleep(125 * time.Millisecond)
+		}
 	}
 	time.Sleep(25 * time.Millisecond)
 }
@@ -2522,7 +2554,7 @@ func (ui *termui) Dump(g *game, err error) {
 
 func (ui *termui) CriticalHPWarning(g *game) {
 	g.PrintStyled("*** CRITICAL HP WARNING *** --press esc or space to continue--", logCritic)
-	ui.DrawDungeonView(g, NormalMode)
+	ui.DrawDungeonView(g, NoFlushMode)
 	r, fg, bg := ui.PositionDrawing(g, g.Player.Pos)
 	ui.DrawAtPosition(g, g.Player.Pos, false, r, ColorFgHPwounded, bg)
 	ui.Flush()
@@ -2558,6 +2590,15 @@ func (ui *termui) DrinkingPotionAnimation(g *game) {
 	ui.DrawAtPosition(g, g.Player.Pos, false, r, ColorYellow, bg)
 	ui.Flush()
 	time.Sleep(75 * time.Millisecond)
+	ui.DrawAtPosition(g, g.Player.Pos, false, r, fg, bg)
+	ui.Flush()
+}
+
+func (ui *termui) StatusEndAnimation(g *game) {
+	r, fg, bg := ui.PositionDrawing(g, g.Player.Pos)
+	ui.DrawAtPosition(g, g.Player.Pos, false, r, ColorViolet, bg)
+	ui.Flush()
+	time.Sleep(200 * time.Millisecond)
 	ui.DrawAtPosition(g, g.Player.Pos, false, r, fg, bg)
 	ui.Flush()
 }

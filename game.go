@@ -70,6 +70,7 @@ type Renderer interface {
 	WoundedAnimation(*game)
 	WallExplosionAnimation(*game, position)
 	ProjectileTrajectoryAnimation(*game, []position, uicolor)
+	StatusEndAnimation(*game)
 	DrawDungeonView(*game, uiMode)
 }
 
