@@ -107,7 +107,11 @@ func (sev *simpleEvent) Action(g *game) {
 	case MPRegen:
 		g.MPRegen(sev)
 	case Teleportation:
-		g.Teleportation(sev)
+		if !g.Player.HasStatus(StatusLignification) {
+			g.Teleportation(sev)
+		} else {
+			g.Print("Lignification prevented teleportation.")
+		}
 		g.Player.Statuses[StatusTele] = 0
 	case BerserkEnd:
 		g.Player.Statuses[StatusBerserk] = 0

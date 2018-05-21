@@ -781,7 +781,6 @@ func (m *monster) DramaticAdjustment(g *game, baseAttack, attack, evasion, acc i
 
 func (m *monster) HitPlayer(g *game, ev event) {
 	if g.Player.HP <= 0 {
-		// for hydras
 		return
 	}
 	evasion := RandInt(g.Player.Evasion())
@@ -793,7 +792,7 @@ func (m *monster) HitPlayer(g *game, ev event) {
 			g.Printf("You block the %s's attack with your %s.", m.Kind, g.Player.Shield)
 			return
 		}
-		if g.Player.HasStatus(StatusSwap) {
+		if g.Player.HasStatus(StatusSwap) && !g.Player.HasStatus(StatusLignification) {
 			g.SwapWithMonster(m)
 			return
 		}
