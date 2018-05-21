@@ -5,12 +5,82 @@ package main
 import (
 	"bufio"
 	"errors"
+	"flag"
 	"fmt"
 	"os"
 	"os/exec"
-	"time"
 	"unicode"
 )
+
+type ansiInput struct {
+	r         rune
+	interrupt bool
+}
+
+var ch chan ansiInput
+var interrupt chan bool
+
+func init() {
+	ch = make(chan ansiInput, 100)
+	interrupt = make(chan bool)
+}
+
+func main() {
+	opt := flag.Bool("s", false, "Use true 16-uicolor solarized palette")
+	optVersion := flag.Bool("v", false, "print version number")
+	optCenteredCamera := flag.Bool("c", false, "centered camera")
+	flag.Parse()
+	if *opt {
+		SolarizedPalette()
+	}
+	if *optVersion {
+		fmt.Println(Version)
+		os.Exit(0)
+	}
+	if *optCenteredCamera {
+		CenteredCamera = true
+	}
+
+	tui := &termui{}
+	err := tui.Init()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "boohu: %v\n", err)
+		os.Exit(1)
+	}
+	defer tui.Close()
+
+	ApplyDefaultKeyBindings()
+	tui.PostInit()
+	LinkColors()
+
+	go func() {
+		for {
+			r, _, err := tui.bStdin.ReadRune()
+			if err == nil {
+				ch <- ansiInput{r: r}
+			}
+		}
+	}()
+
+	tui.DrawWelcome()
+	g := &game{}
+	load, err := g.Load()
+	if !load {
+		g.InitLevel()
+	} else if err != nil {
+		g.InitLevel()
+		g.Print("Error loading saved game… starting new game.")
+	}
+	load, err = g.LoadConfig()
+	if load && err != nil {
+		g.Print("Error loading config file.")
+	} else if load {
+		CustomKeys = true
+	}
+
+	g.ui = tui
+	g.EventLoop()
+}
 
 type AnsiCell struct {
 	fg uicolor
@@ -152,22 +222,23 @@ func (ui *termui) SetCell(x, y int, r rune, fg, bg uicolor) {
 
 }
 
-func (ui *termui) ReadChar() rune {
-	r, _, _ := ui.bStdin.ReadRune()
-	return r
+func (ui *termui) Interrupt() {
+	interrupt <- true
 }
 
-func (ui *termui) ExploreStep(g *game) bool {
-	time.Sleep(10 * time.Millisecond)
-	ui.DrawDungeonView(g, NormalMode)
-	return false
+func (ui *termui) ReadChar() (in ansiInput) {
+	select {
+	case in = <-ch:
+	case in.interrupt = <-interrupt:
+	}
+	return in
 }
 
 func (ui *termui) WaitForContinue(g *game, line int) {
 loop:
 	for {
-		r := ui.ReadChar()
-		switch r {
+		in := ui.ReadChar()
+		switch in.r {
 		case '\x1b', ' ':
 			break loop
 		}
@@ -176,8 +247,8 @@ loop:
 
 func (ui *termui) PromptConfirmation(g *game) bool {
 	for {
-		r := ui.ReadChar()
-		switch r {
+		in := ui.ReadChar()
+		switch in.r {
 		case 'Y', 'y':
 			return true
 		default:
@@ -188,15 +259,18 @@ func (ui *termui) PromptConfirmation(g *game) bool {
 
 func (ui *termui) PressAnyKey() error {
 	for {
-		ui.ReadChar()
+		in := ui.ReadChar()
+		if in.interrupt {
+			return errors.New("interrupted")
+		}
 		return nil
 	}
 }
 
 func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit bool) {
 	again = true
-	r := ui.ReadChar()
-	switch r {
+	in := ui.ReadChar()
+	switch in.r {
 	case 'W':
 		ui.EnterWizard(g)
 		return nil, true, false
@@ -206,7 +280,7 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 		}
 		return nil, true, false
 	}
-	err, again, quit = ui.HandleKeyAction(g, runeKeyAction{r: r})
+	err, again, quit = ui.HandleKeyAction(g, runeKeyAction{r: in.r})
 	if err != nil {
 		again = true
 	}
@@ -214,8 +288,8 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 }
 
 func (ui *termui) Scroll(n int) (m int, quit bool) {
-	r := ui.ReadChar()
-	switch r {
+	in := ui.ReadChar()
+	switch in.r {
 	case '\x1b', ' ':
 		quit = true
 	case 'u':
@@ -232,19 +306,19 @@ func (ui *termui) Scroll(n int) (m int, quit bool) {
 
 func (ui *termui) ReadRuneKey() rune {
 	for {
-		r := ui.ReadChar()
-		if r == ' ' || r == '\x1b' {
+		in := ui.ReadChar()
+		if in.r == ' ' || in.r == '\x1b' {
 			return 0
 		}
-		if unicode.IsPrint(r) {
-			return r
+		if unicode.IsPrint(in.r) {
+			return in.r
 		}
 	}
 }
 
 func (ui *termui) MenuAction(n int) (m int, action configAction) {
-	r := ui.ReadChar()
-	switch r {
+	in := ui.ReadChar()
+	switch in.r {
 	case 'a':
 		action = ChangeConfig
 	case '\x1b', ' ':
@@ -264,21 +338,21 @@ func (ui *termui) MenuAction(n int) (m int, action configAction) {
 }
 
 func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (err error, again, quit, notarg bool) {
-	r := ui.ReadChar()
-	return ui.CursorKeyAction(g, targ, runeKeyAction{r: r}, data)
+	in := ui.ReadChar()
+	return ui.CursorKeyAction(g, targ, runeKeyAction{r: in.r}, data)
 }
 
 func (ui *termui) Select(g *game, ev event, l int) (index int, alternate bool, err error) {
 	for {
-		r := ui.ReadChar()
+		in := ui.ReadChar()
 		switch {
-		case r == '\x1b' || r == ' ':
+		case in.r == '\x1b' || in.r == ' ':
 			return -1, false, errors.New(DoNothing)
-		case 97 <= r && int(r) < 97+l:
-			return int(r - 97), false, nil
-		case r == '?':
+		case 97 <= in.r && int(in.r) < 97+l:
+			return int(in.r - 97), false, nil
+		case in.r == '?':
 			return -1, true, nil
-		case r == ' ':
+		case in.r == ' ':
 			return -1, false, errors.New(DoNothing)
 		}
 	}

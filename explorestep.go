@@ -1,5 +1,3 @@
-// +build !ansi
-
 package main
 
 import "time"

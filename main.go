@@ -1,4 +1,4 @@
-// +build !js
+// +build !js,!ansi
 
 package main
 
