@@ -29,6 +29,7 @@ func main() {
 	opt := flag.Bool("s", false, "Use true 16-uicolor solarized palette")
 	optVersion := flag.Bool("v", false, "print version number")
 	optCenteredCamera := flag.Bool("c", false, "centered camera")
+	optMinimalUI := flag.Bool("m", false, "80x24 minimal UI")
 	flag.Parse()
 	if *opt {
 		SolarizedPalette()
@@ -43,6 +44,9 @@ func main() {
 
 	tui := &termui{}
 	err := tui.Init()
+	if *optMinimalUI {
+		tui.minimal = true
+	}
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "boohu: %v\n", err)
 		os.Exit(1)
@@ -95,6 +99,7 @@ type termui struct {
 	backBuffer []AnsiCell
 	cursor     position
 	stty       string
+	minimal    bool
 }
 
 func (ui *termui) GetIndex(x, y int) int {
@@ -202,7 +207,7 @@ func (ui *termui) Flush() {
 }
 
 func (ui *termui) Small() bool {
-	return false
+	return ui.minimal
 }
 
 func (ui *termui) HideCursor() {
