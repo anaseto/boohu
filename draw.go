@@ -1717,7 +1717,7 @@ func (ui *termui) HitAnimation(g *game, pos position, targeting bool) {
 		ui.DrawAtPosition(g, pos, targeting, '∞', ColorFgAnimationHit, bgColor)
 	}
 	ui.Flush()
-	time.Sleep(75 * time.Millisecond)
+	time.Sleep(50 * time.Millisecond)
 }
 
 func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgColor uicolor) {
@@ -2589,11 +2589,11 @@ func (ui *termui) WoundedAnimation(g *game) {
 	r, _, bg := ui.PositionDrawing(g, g.Player.Pos)
 	ui.DrawAtPosition(g, g.Player.Pos, false, r, ColorFgHPwounded, bg)
 	ui.Flush()
-	time.Sleep(75 * time.Millisecond)
+	time.Sleep(50 * time.Millisecond)
 	if g.Player.HP <= 15 {
 		ui.DrawAtPosition(g, g.Player.Pos, false, r, ColorFgHPcritical, bg)
 		ui.Flush()
-		time.Sleep(75 * time.Millisecond)
+		time.Sleep(50 * time.Millisecond)
 	}
 }
 
