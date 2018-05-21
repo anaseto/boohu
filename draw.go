@@ -1512,7 +1512,8 @@ func (ui *termui) DrawDungeonView(g *game, m uiMode) {
 }
 
 func (ui *termui) SwappingAnimation(g *game, mpos, ppos position) {
-	time.Sleep(50 * time.Millisecond)
+	ui.DrawDungeonView(g, NormalMode)
+	time.Sleep(25 * time.Millisecond)
 	_, fgm, bgColorm := ui.PositionDrawing(g, mpos)
 	_, _, bgColorp := ui.PositionDrawing(g, ppos)
 	ui.DrawAtPosition(g, ppos, true, '¤', fgm, bgColorp)
@@ -1526,7 +1527,8 @@ func (ui *termui) SwappingAnimation(g *game, mpos, ppos position) {
 }
 
 func (ui *termui) TeleportAnimation(g *game, from, to position, showto bool) {
-	time.Sleep(50 * time.Millisecond)
+	ui.DrawDungeonView(g, NormalMode)
+	time.Sleep(25 * time.Millisecond)
 	r, fg, bgColorf := ui.PositionDrawing(g, from)
 	_, _, bgColort := ui.PositionDrawing(g, to)
 	ui.DrawAtPosition(g, from, true, '¤', ColorCyan, bgColorf)
@@ -1556,6 +1558,19 @@ func (ui *termui) ProjectileTrajectoryAnimation(g *game, ray []position, fg uico
 		ui.Flush()
 		time.Sleep(30 * time.Millisecond)
 		ui.DrawAtPosition(g, pos, true, r, fgColor, bgColor)
+	}
+}
+
+func (ui *termui) MonsterProjectileAnimation(g *game, ray []position, r rune, fg uicolor) {
+	ui.DrawDungeonView(g, NormalMode)
+	time.Sleep(25 * time.Millisecond)
+	for i := 0; i < len(ray); i++ {
+		pos := ray[i]
+		or, fgColor, bgColor := ui.PositionDrawing(g, pos)
+		ui.DrawAtPosition(g, pos, true, r, fg, bgColor)
+		ui.Flush()
+		time.Sleep(30 * time.Millisecond)
+		ui.DrawAtPosition(g, pos, true, or, fgColor, bgColor)
 	}
 }
 
@@ -1665,23 +1680,38 @@ func (ui *termui) ThrowAnimation(g *game, ray []position, hit bool) {
 		r, fgColor, bgColor := ui.PositionDrawing(g, pos)
 		ui.DrawAtPosition(g, pos, true, ui.ProjectileSymbol(pos.Dir(g.Player.Pos)), ColorFgProjectile, bgColor)
 		ui.Flush()
-		time.Sleep(25 * time.Millisecond)
+		time.Sleep(30 * time.Millisecond)
 		ui.DrawAtPosition(g, pos, true, r, fgColor, bgColor)
 	}
 	if hit {
 		pos := ray[0]
 		ui.HitAnimation(g, pos, true)
 	}
+	time.Sleep(30 * time.Millisecond)
+}
+
+func (ui *termui) MonsterJavelinAnimation(g *game, ray []position, hit bool) {
+	ui.DrawDungeonView(g, NormalMode)
 	time.Sleep(25 * time.Millisecond)
+	for i := 0; i < len(ray); i++ {
+		pos := ray[i]
+		r, fgColor, bgColor := ui.PositionDrawing(g, pos)
+		ui.DrawAtPosition(g, pos, true, ui.ProjectileSymbol(pos.Dir(g.Player.Pos)), ColorFgMonster, bgColor)
+		ui.Flush()
+		time.Sleep(30 * time.Millisecond)
+		ui.DrawAtPosition(g, pos, true, r, fgColor, bgColor)
+	}
+	time.Sleep(30 * time.Millisecond)
 }
 
 func (ui *termui) HitAnimation(g *game, pos position, targeting bool) {
 	if !g.Player.LOS[pos] {
 		return
 	}
+	ui.DrawDungeonView(g, NoFlushMode)
 	_, _, bgColor := ui.PositionDrawing(g, pos)
 	mons := g.MonsterAt(pos)
-	if mons.Exists() {
+	if mons.Exists() || pos == g.Player.Pos {
 		ui.DrawAtPosition(g, pos, targeting, '¤', ColorFgAnimationHit, bgColor)
 	} else {
 		ui.DrawAtPosition(g, pos, targeting, '∞', ColorFgAnimationHit, bgColor)
@@ -2550,16 +2580,7 @@ func (ui *termui) Dump(g *game, err error) {
 
 func (ui *termui) CriticalHPWarning(g *game) {
 	g.PrintStyled("*** CRITICAL HP WARNING *** --press esc or space to continue--", logCritic)
-	ui.DrawDungeonView(g, NoFlushMode)
-	r, fg, bg := ui.PositionDrawing(g, g.Player.Pos)
-	ui.DrawAtPosition(g, g.Player.Pos, false, r, ColorFgHPwounded, bg)
-	ui.Flush()
-	time.Sleep(75 * time.Millisecond)
-	ui.DrawAtPosition(g, g.Player.Pos, false, r, ColorFgHPcritical, bg)
-	ui.Flush()
-	time.Sleep(75 * time.Millisecond)
-	ui.DrawAtPosition(g, g.Player.Pos, false, r, fg, bg)
-	ui.Flush()
+	ui.DrawDungeonView(g, NormalMode)
 	ui.WaitForContinue(g, DungeonHeight)
 	g.Print("Ok. Be careful, then.")
 }

@@ -922,9 +922,11 @@ func (m *monster) TormentBolt(g *game, ev event) bool {
 		g.MakeNoise(12, g.Player.Pos)
 		damage := g.Player.HP - g.Player.HP/2
 		g.PrintfStyled("%s throws a bolt of torment at you.", logMonsterHit, m.Kind.Definite(true))
+		g.ui.MonsterProjectileAnimation(g, g.Ray(m.Pos), '*', ColorCyan)
 		m.InflictDamage(g, damage, 15)
 	} else {
 		g.Printf("You block the %s's bolt of torment.", m.Kind)
+		g.ui.MonsterProjectileAnimation(g, g.Ray(m.Pos), '*', ColorCyan)
 	}
 	m.Statuses[MonsExhausted] = 1
 	g.PushEvent(&monsterEvent{ERank: ev.Rank() + 100 + RandInt(50), NMons: m.Index, EAction: MonsExhaustionEnd})
@@ -967,14 +969,17 @@ func (m *monster) ThrowRock(g *game, ev event) bool {
 		noise := g.HitNoise()
 		g.MakeNoise(noise, g.Player.Pos)
 		g.PrintfStyled("%s throws a rock at you (%d dmg).", logMonsterHit, m.Kind.Definite(true), attack)
+		g.ui.MonsterProjectileAnimation(g, g.Ray(m.Pos), '●', ColorMagenta)
 		if RandInt(4) == 0 {
 			g.Confusion(ev)
 		}
 		m.InflictDamage(g, attack, 15)
 	} else if block {
 		g.Printf("You block %s's rock.", m.Kind.Indefinite(false))
+		g.ui.MonsterProjectileAnimation(g, g.Ray(m.Pos), '●', ColorMagenta)
 	} else {
 		g.Printf("You dodge %s's rock.", m.Kind.Indefinite(false))
+		g.ui.MonsterProjectileAnimation(g, g.Ray(m.Pos), '●', ColorMagenta)
 	}
 	ev.Renew(g, 2*m.Kind.AttackDelay())
 	return true
@@ -1001,17 +1006,21 @@ func (m *monster) ThrowJavelin(g *game, ev event) bool {
 		noise := g.HitNoise()
 		g.MakeNoise(noise, g.Player.Pos)
 		g.Printf("%s throws %s at you (%d dmg).", m.Kind.Definite(true), Indefinite("javelin", false), attack)
+		g.ui.MonsterJavelinAnimation(g, g.Ray(m.Pos), true)
 		m.InflictDamage(g, attack, 11)
 	} else if block {
 		if RandInt(3) == 0 {
 			g.Printf("You block %s's %s.", m.Kind.Indefinite(false), "javelin")
+			g.ui.MonsterJavelinAnimation(g, g.Ray(m.Pos), false)
 		} else if !g.Player.HasStatus(StatusDisabledShield) {
 			g.Player.Statuses[StatusDisabledShield] = 1
 			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 100 + RandInt(100), EAction: DisabledShieldEnd})
 			g.Printf("%s's %s gets fixed on your shield.", m.Kind.Indefinite(true), "javelin")
+			g.ui.MonsterJavelinAnimation(g, g.Ray(m.Pos), false)
 		}
 	} else {
 		g.Printf("You dodge %s's %s.", m.Kind.Indefinite(false), "javelin")
+		g.ui.MonsterJavelinAnimation(g, g.Ray(m.Pos), false)
 	}
 	m.Statuses[MonsExhausted] = 1
 	g.PushEvent(&monsterEvent{ERank: ev.Rank() + 50 + RandInt(50), NMons: m.Index, EAction: MonsExhaustionEnd})
@@ -1040,6 +1049,7 @@ func (m *monster) ThrowAcid(g *game, ev event) bool {
 		noise := g.HitNoise()
 		g.MakeNoise(noise, g.Player.Pos)
 		g.Printf("%s throws acid at you (%d dmg).", m.Kind.Definite(true), attack)
+		g.ui.MonsterProjectileAnimation(g, g.Ray(m.Pos), '*', ColorGreen)
 		m.InflictDamage(g, attack, 11)
 		if RandInt(2) == 0 {
 			g.Corrosion(ev)
@@ -1049,11 +1059,13 @@ func (m *monster) ThrowAcid(g *game, ev event) bool {
 		}
 	} else if block {
 		g.Printf("You block %s's acid projectile.", m.Kind.Indefinite(false))
+		g.ui.MonsterProjectileAnimation(g, g.Ray(m.Pos), '*', ColorGreen)
 		if RandInt(2) == 0 {
 			g.Corrosion(ev)
 		}
 	} else {
 		g.Printf("You dodge %s's acid projectile.", m.Kind.Indefinite(false))
+		g.ui.MonsterProjectileAnimation(g, g.Ray(m.Pos), '*', ColorGreen)
 	}
 	ev.Renew(g, m.Kind.AttackDelay())
 	return true

@@ -62,6 +62,8 @@ type Renderer interface {
 	ExplosionAnimation(*game, explosionStyle, position)
 	LightningBoltAnimation(*game, []position)
 	ThrowAnimation(*game, []position, bool)
+	MonsterJavelinAnimation(*game, []position, bool)
+	MonsterProjectileAnimation(*game, []position, rune, uicolor)
 	DrinkingPotionAnimation(*game)
 	SwappingAnimation(*game, position, position)
 	TeleportAnimation(*game, position, position, bool)
