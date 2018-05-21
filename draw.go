@@ -1567,14 +1567,16 @@ func (ui *termui) ExplosionAnimation(g *game, es explosionStyle, pos position) {
 		colors[0] = ColorFgExplosionWallStart
 		colors[1] = ColorFgExplosionWallEnd
 	}
-	for i, fg := range colors {
+	for i := 0; i < 3; i++ {
 		if es != AroundWallExplosion {
+			fg := colors[RandInt(2)]
 			_, _, bgColor := ui.PositionDrawing(g, pos)
 			ui.DrawAtPosition(g, pos, true, '☼', fg, bgColor)
 			ui.Flush()
 			time.Sleep(25 * time.Millisecond)
 		}
 		for _, npos := range g.Dungeon.FreeNeighbors(pos) {
+			fg := colors[RandInt(2)]
 			if !g.Player.LOS[npos] {
 				continue
 			}
@@ -1595,18 +1597,15 @@ func (ui *termui) ExplosionAnimation(g *game, es explosionStyle, pos position) {
 			case 5:
 				r = '~'
 			}
-			if mons.Exists() {
+			if mons.Exists() || g.Player.Pos == npos {
 				r = '¤'
 			}
 			ui.DrawAtPosition(g, npos, true, r, fg, bgColor)
 		}
 		ui.Flush()
-		if i == 0 {
-			time.Sleep(75 * time.Millisecond)
-		} else {
-			time.Sleep(125 * time.Millisecond)
-		}
+		time.Sleep(100 * time.Millisecond)
 	}
+	time.Sleep(20 * time.Millisecond)
 }
 
 func (ui *termui) WallExplosionAnimation(g *game, pos position) {
