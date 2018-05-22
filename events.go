@@ -310,6 +310,7 @@ func (g *game) BurnCreature(pos position, ev event) {
 		if g.Player.HP+damage < 10 {
 			g.Stats.TimesLucky++
 		}
+		g.StopAuto()
 	}
 }
 

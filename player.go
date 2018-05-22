@@ -250,6 +250,9 @@ func (g *game) Rest(ev event) error {
 	if g.MonsterInLOS() != nil {
 		return fmt.Errorf("You cannot sleep while monsters are in view.")
 	}
+	if cld, ok := g.Clouds[g.Player.Pos]; ok && cld == CloudFire {
+		return errors.New("You cannot rest on flames.")
+	}
 	if g.Player.HP == g.Player.HPMax() && g.Player.MP == g.Player.MPMax() && !g.Player.HasStatus(StatusExhausted) &&
 		!g.Player.HasStatus(StatusConfusion) && !g.Player.HasStatus(StatusLignification) {
 		return errors.New("You do not need to rest.")
