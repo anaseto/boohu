@@ -43,10 +43,12 @@ func main() {
 	}
 
 	tui := &termui{}
-	err := tui.Init()
 	if *optMinimalUI {
 		tui.minimal = true
+		UIHeight = 24
+		UIWidth = 80
 	}
+	err := tui.Init()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "boohu: %v\n", err)
 		os.Exit(1)

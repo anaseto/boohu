@@ -11,7 +11,7 @@ import (
 	"unicode/utf8"
 )
 
-const (
+var (
 	UIWidth  = 103
 	UIHeight = 27
 )
