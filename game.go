@@ -660,12 +660,15 @@ func (g *game) AutoPlayer(ev event) bool {
 	} else if g.AutoTarget.valid() {
 		if !g.ui.ExploreStep(g) && g.MoveToTarget(ev) {
 			return true
+		} else {
+			g.AutoTarget = InvalidPos
 		}
 	} else if g.AutoDir != NoDir {
 		if !g.ui.ExploreStep(g) && g.AutoToDir(ev) {
 			return true
+		} else {
+			g.AutoDir = NoDir
 		}
-
 	}
 	return false
 }
