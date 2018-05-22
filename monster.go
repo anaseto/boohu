@@ -572,7 +572,11 @@ func (m *monster) MoveTo(g *game, pos position) {
 		}
 		g.StopAuto()
 	}
+	recomputeLOS := g.Player.LOS[m.Pos] && g.Doors[m.Pos] || g.Player.LOS[pos] && g.Doors[pos]
 	m.PlaceAt(g, pos)
+	if recomputeLOS {
+		g.ComputeLOS()
+	}
 }
 
 func (m *monster) PlaceAt(g *game, pos position) {
@@ -708,7 +712,6 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	mons := g.MonsterAt(target)
 	switch {
 	case !mons.Exists():
-		recomputeLOS := g.Doors[m.Pos] || g.Doors[target]
 		if m.Kind == MonsEarthDragon && g.Dungeon.Cell(target).T == WallCell {
 			g.Dungeon.SetCell(target, FreeCell)
 			g.Stats.Digs++
@@ -724,9 +727,6 @@ func (m *monster) HandleTurn(g *game, ev event) {
 			}
 			m.MoveTo(g, target)
 			m.Path = m.Path[:len(m.Path)-1]
-			if recomputeLOS {
-				g.ComputeLOS()
-			}
 		} else if g.Dungeon.Cell(target).T == WallCell {
 			m.Path = m.APath(g, mpos, m.Target)
 		} else {
@@ -735,9 +735,6 @@ func (m *monster) HandleTurn(g *game, ev event) {
 				m.FireReady = true
 			}
 			m.Path = m.Path[:len(m.Path)-1]
-			if recomputeLOS {
-				g.ComputeLOS()
-			}
 		}
 	case !g.Player.LOS[mons.Pos] && g.Player.Pos.Distance(mons.Target) > 2 && mons.State != Hunting:
 		r := RandInt(5)
