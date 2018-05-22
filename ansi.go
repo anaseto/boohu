@@ -167,18 +167,21 @@ func (ui *termui) Clear() {
 func (ui *termui) Flush() {
 	var prevfg, prevbg uicolor
 	first := true
+	var prevx, prevy int
 	for i := 0; i < len(ui.cells); i++ {
 		if ui.cells[i] == ui.backBuffer[i] {
 			continue
 		}
 		cell := ui.cells[i]
 		x, y := ui.GetPos(i)
-		ui.MoveTo(x, y)
 		pfg := true
 		pbg := true
+		pxy := true
 		if first {
 			prevfg = cell.fg
 			prevbg = cell.bg
+			prevx = x
+			prevy = y
 			first = false
 		} else {
 			if prevfg == cell.fg {
@@ -191,6 +194,12 @@ func (ui *termui) Flush() {
 			} else {
 				prevbg = cell.bg
 			}
+			if x == prevx+1 && y == prevy {
+				pxy = false
+			}
+		}
+		if pxy {
+			ui.MoveTo(x, y)
 		}
 		if pfg {
 			fmt.Fprintf(ui.bStdout, "\x1b[38;5;%dm", cell.fg)
