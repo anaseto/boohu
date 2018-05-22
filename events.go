@@ -68,6 +68,11 @@ func (g *game) PushEvent(ev event) {
 	heap.Push(g.Events, iev)
 }
 
+func (g *game) PushAgainEvent(ev event) {
+	iev := iEvent{Event: ev, Index: 0}
+	heap.Push(g.Events, iev)
+}
+
 func (g *game) PopIEvent() iEvent {
 	iev := heap.Pop(g.Events).(iEvent)
 	return iev
@@ -84,7 +89,11 @@ func (sev *simpleEvent) Rank() int {
 
 func (sev *simpleEvent) Renew(g *game, delay int) {
 	sev.ERank += delay
-	g.PushEvent(sev)
+	if delay == 0 {
+		g.PushAgainEvent(sev)
+	} else {
+		g.PushEvent(sev)
+	}
 }
 
 func (sev *simpleEvent) Action(g *game) {
