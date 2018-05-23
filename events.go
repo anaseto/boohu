@@ -128,7 +128,7 @@ func (sev *simpleEvent) Action(g *game) {
 		g.Player.Statuses[StatusExhausted] = 1
 		g.Player.HP -= int(10 * g.Player.HP / Max(g.Player.HPMax(), g.Player.HP))
 		g.PrintStyled("You are no longer berserk.", logStatusEnd)
-		g.PushEvent(&simpleEvent{ERank: sev.Rank() + 90 + RandInt(40), EAction: SlowEnd})
+		g.PushEvent(&simpleEvent{ERank: sev.Rank() + 90 + RandInt(30), EAction: SlowEnd})
 		g.PushEvent(&simpleEvent{ERank: sev.Rank() + 270 + RandInt(60), EAction: ExhaustionEnd})
 		g.ui.StatusEndAnimation(g)
 	case SlowEnd:
