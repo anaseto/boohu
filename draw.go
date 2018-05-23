@@ -835,9 +835,9 @@ func (ui *termui) HandleKey(g *game, rka runeKeyAction) (err error, again bool, 
 		again = true
 	case KeyDescription:
 		ui.MenuSelectedAnimation(g, MenuView, false)
-		err = fmt.Errorf("Invalid action: no chosen target to describe.")
+		err = fmt.Errorf("You must chose a target to describe.")
 	case KeyExclude:
-		err = fmt.Errorf("Invalid action: no chosen target for exclusion.")
+		err = fmt.Errorf("You must chose a target for exclusion.")
 	default:
 		err = fmt.Errorf("Unknown key '%c'. Type ? for help.", rka.r)
 	}
