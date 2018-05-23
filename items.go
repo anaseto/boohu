@@ -341,11 +341,8 @@ func (g *game) QuaffCBlinkPotion(ev event) error {
 	if err := g.ui.ChooseTarget(g, &chooser{free: true}); err != nil {
 		return err
 	}
-	g.Player.Pos = g.Player.Target
 	g.Printf("You quaff the %s. You blink.", CBlinkPotion)
-	g.CollectGround()
-	g.ComputeLOS()
-	g.MakeMonstersAware()
+	g.PlacePlayerAt(g.Player.Target)
 	return nil
 }
 

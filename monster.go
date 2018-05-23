@@ -841,21 +841,24 @@ func (m *monster) HitSideEffects(g *game, ev event) {
 	case MonsAcidMound:
 		g.Corrosion(ev)
 	case MonsYack:
-		dir := g.Player.Pos.Dir(m.Pos)
-		pos := g.Player.Pos.To(dir)
-		if RandInt(2) == 0 && !g.Player.HasStatus(StatusLignification) &&
-			pos.valid() && g.Dungeon.Cell(pos).T == FreeCell {
-			mons := g.MonsterAt(pos)
-			if !mons.Exists() {
-				g.Player.Pos = pos
-				g.CollectGround()
-				g.ComputeLOS()
-				g.MakeMonstersAware()
-			}
+		if RandInt(2) == 0 && m.PushPlayer(g) {
 			g.Print("The yack pushes you.")
 		}
 	}
+}
 
+func (m *monster) PushPlayer(g *game) (pushed bool) {
+	dir := g.Player.Pos.Dir(m.Pos)
+	pos := g.Player.Pos.To(dir)
+	if !g.Player.HasStatus(StatusLignification) &&
+		pos.valid() && g.Dungeon.Cell(pos).T == FreeCell {
+		mons := g.MonsterAt(pos)
+		if !mons.Exists() {
+			g.PlacePlayerAt(pos)
+			pushed = true
+		}
+	}
+	return pushed
 }
 
 func (m *monster) RangedAttack(g *game, ev event) bool {

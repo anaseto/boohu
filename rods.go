@@ -217,12 +217,9 @@ func (g *game) Blink(ev event) {
 		npos = losPos[RandInt(len(losPos))]
 	}
 	opos := g.Player.Pos
-	g.Player.Pos = npos
 	g.Print("You blink away.")
 	g.ui.TeleportAnimation(g, opos, npos, true)
-	g.CollectGround()
-	g.ComputeLOS()
-	g.MakeMonstersAware()
+	g.PlacePlayerAt(npos)
 }
 
 func (g *game) EvokeRodTeleportOther(ev event) error {
@@ -421,14 +418,11 @@ func (g *game) EvokeRodSwapping(ev event) error {
 
 func (g *game) SwapWithMonster(mons *monster) {
 	ompos := mons.Pos
-	mons.MoveTo(g, g.Player.Pos)
-	g.Player.Pos = ompos
-	mons.MakeAware(g)
 	g.Printf("You swap positions with the %s.", mons.Kind)
 	g.ui.SwappingAnimation(g, mons.Pos, g.Player.Pos)
-	g.CollectGround()
-	g.ComputeLOS()
-	g.MakeMonstersAware()
+	mons.MoveTo(g, g.Player.Pos)
+	g.PlacePlayerAt(ompos)
+	mons.MakeAware(g)
 }
 
 func (g *game) GeneratedRodsCount() int {

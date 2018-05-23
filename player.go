@@ -293,12 +293,9 @@ func (g *game) Teleportation(ev event) {
 	if pos.valid() {
 		// should always happen
 		opos := g.Player.Pos
-		g.Player.Pos = pos
 		g.Print("You feel yourself teleported away.")
 		g.ui.TeleportAnimation(g, opos, pos, true)
-		g.CollectGround()
-		g.ComputeLOS()
-		g.MakeMonstersAware()
+		g.PlacePlayerAt(pos)
 	} else {
 		// should not happen
 		g.Print("Something went wrong with the teleportation.")
@@ -371,13 +368,10 @@ func (g *game) MovePlayer(pos position, ev event) error {
 			g.Fog(pos, 1, ev)
 			g.Stats.Digs++
 		}
-		g.Player.Pos = pos
-		g.CollectGround()
-		g.ComputeLOS()
+		g.PlacePlayerAt(pos)
 		if !g.Autoexploring {
 			g.ScummingAction(ev)
 		}
-		g.MakeMonstersAware()
 		if g.Player.Aptitudes[AptFast] {
 			// only fast for movement
 			delay -= 2
@@ -449,4 +443,11 @@ func (g *game) Confusion(ev event) {
 		g.PushEvent(&simpleEvent{ERank: ev.Rank() + 100 + RandInt(100), EAction: ConfusionEnd})
 		g.Print("You feel confused.")
 	}
+}
+
+func (g *game) PlacePlayerAt(pos position) {
+	g.Player.Pos = pos
+	g.CollectGround()
+	g.ComputeLOS()
+	g.MakeMonstersAware()
 }
