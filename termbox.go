@@ -160,9 +160,14 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 			switch tev.Key {
 			case termbox.MouseLeft:
 				pos := position{X: tev.MouseX, Y: tev.MouseY}
-				if pos.X > DungeonWidth && pos.Y == 0 {
-					err, again, quit = ui.HandleKeyAction(g, runeKeyAction{k: KeyMenu})
-				} else if pos.X > DungeonWidth || pos.Y > DungeonHeight {
+				if pos.Y == DungeonHeight {
+					m, ok := ui.WhichButton(pos.X)
+					if !ok {
+						again = true
+						break
+					}
+					err, again, quit = ui.HandleKeyAction(g, runeKeyAction{k: m.Key()})
+				} else if pos.X >= DungeonWidth || pos.Y >= DungeonHeight {
 					again = true
 				} else {
 					err, again, quit = ui.ExaminePos(g, ev, pos)
@@ -322,9 +327,16 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (er
 		if tev.Ch == 0 {
 			switch tev.Key {
 			case termbox.MouseLeft:
-				if tev.MouseX > DungeonWidth && tev.MouseY == 0 {
-					err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: KeyMenu}, data)
-				} else if tev.MouseX > DungeonWidth || tev.MouseY > DungeonHeight {
+				if tev.MouseY == DungeonHeight {
+					m, ok := ui.WhichButton(tev.MouseX)
+					if !ok {
+						g.Targeting = InvalidPos
+						notarg = true
+						err = errors.New(DoNothing)
+						break
+					}
+					err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: m.Key()}, data)
+				} else if tev.MouseX >= DungeonWidth || tev.MouseY >= DungeonHeight {
 					g.Targeting = InvalidPos
 					notarg = true
 					err = errors.New(DoNothing)

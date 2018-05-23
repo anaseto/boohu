@@ -402,8 +402,7 @@ var configurableKeyActions = [...]keyAction{
 	KeyNextStairs,
 	KeyDescription,
 	KeyTarget,
-	KeyExclude,
-	KeyMenu}
+	KeyExclude}
 
 var CustomKeys bool
 
@@ -657,8 +656,6 @@ func ApplyDefaultKeyBindings() {
 		'W': KeyWizard,
 		'@': KeyWizardInfo,
 		'=': KeyConfigure,
-		'M': KeyMenu,
-		'a': KeyMenu,
 	}
 	runeTargetingKeyActions = map[rune]keyAction{
 		'h':    KeyW,
@@ -696,7 +693,6 @@ func ApplyDefaultKeyBindings() {
 		' ':    KeyEscape,
 		'\x1b': KeyEscape,
 		'?':    KeyHelp,
-		'M':    KeyMenu,
 	}
 	CustomKeys = false
 }
@@ -723,6 +719,7 @@ func (ui *termui) HandleKeyAction(g *game, rka runeKeyAction) (err error, again 
 	if rka.k == KeyMenu {
 		rka.k, err = ui.SelectAction(g, menuActions, g.Ev)
 		if err != nil {
+			err = ui.CleanError(err)
 			return err, again, quit
 		}
 	}
@@ -739,6 +736,7 @@ func (ui *termui) HandleKey(g *game, rka runeKeyAction) (err error, again bool, 
 		g.WaitTurn(g.Ev)
 	case KeyRest:
 		err = g.Rest(g.Ev)
+		ui.MenuSelectedAnimation(g, MenuRest, err == nil)
 	case KeyDescend:
 		if g.Stairs[g.Player.Pos] {
 			if g.Descend() {
@@ -783,6 +781,7 @@ func (ui *termui) HandleKey(g *game, rka runeKeyAction) (err error, again bool, 
 		err = ui.CleanError(err)
 	case KeyExplore:
 		err = g.Autoexplore(g.Ev)
+		ui.MenuSelectedAnimation(g, MenuExplore, err == nil)
 	case KeyExamine:
 		err, again, quit = ui.Examine(g, nil)
 	case KeyHelp:
@@ -835,6 +834,7 @@ func (ui *termui) HandleKey(g *game, rka runeKeyAction) (err error, again bool, 
 		ui.Configure(g)
 		again = true
 	case KeyDescription:
+		ui.MenuSelectedAnimation(g, MenuView, false)
 		err = fmt.Errorf("Invalid action: no chosen target to describe.")
 	case KeyExclude:
 		err = fmt.Errorf("Invalid action: no chosen target for exclusion.")
@@ -917,7 +917,6 @@ func (ui *termui) KeysHelp(g *game) {
 		"Write game statistics to file", "#",
 		"Save and Quit", "S",
 		"Quit without saving", "Q",
-		"Action Menu", "a or M",
 		"Change key bindings", "=",
 	})
 }
@@ -1200,6 +1199,7 @@ func (ui *termui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, dat
 		var err error
 		rka.k, err = ui.SelectAction(g, menuActions, g.Ev)
 		if err != nil {
+			err = ui.CleanError(err)
 			return err, again, quit, notarg
 		}
 	}
@@ -1371,9 +1371,11 @@ loop:
 
 func (ui *termui) ViewPositionDescription(g *game, pos position) {
 	if !g.Dungeon.Cell(pos).Explored {
+		ui.MenuSelectedAnimation(g, MenuView, false)
 		g.Print("No description: unknown place.")
 		return
 	}
+	ui.MenuSelectedAnimation(g, MenuView, true)
 	mons := g.MonsterAt(pos)
 	if mons.Exists() && g.Player.LOS[mons.Pos] {
 		ui.HideCursor()
@@ -1400,7 +1402,6 @@ func (ui *termui) ViewPositionDescription(g *game, pos position) {
 	} else {
 		g.Print("Nothing worth of description here.")
 	}
-
 }
 
 func (ui *termui) MonsterInfo(m *monster) string {
@@ -1500,6 +1501,7 @@ func (ui *termui) DrawDungeonView(g *game, m uiMode) {
 		ui.DrawStatusLine(g)
 	} else {
 		ui.DrawStatusBar(g, line)
+		ui.DrawMenus(g)
 	}
 	if ui.Small() {
 		ui.DrawLog(g, 2)
@@ -1991,6 +1993,97 @@ func (ui *termui) DrawStatusLine(g *game) {
 	}
 }
 
+type menu int
+
+const (
+	MenuRest menu = iota
+	MenuExplore
+	MenuThrow
+	MenuDrink
+	MenuEvoke
+	MenuView
+	MenuOther
+)
+
+func (m menu) String() (text string) {
+	switch m {
+	case MenuRest:
+		text = "rest"
+	case MenuExplore:
+		text = "explore"
+	case MenuThrow:
+		text = "throw"
+	case MenuDrink:
+		text = "drink"
+	case MenuEvoke:
+		text = "evoke"
+	case MenuView:
+		text = "view"
+	case MenuOther:
+		text = "other"
+	}
+	return "[" + text + "]"
+}
+
+func (m menu) Key() (key keyAction) {
+	switch m {
+	case MenuRest:
+		key = KeyRest
+	case MenuExplore:
+		key = KeyExplore
+	case MenuThrow:
+		key = KeyThrow
+	case MenuDrink:
+		key = KeyDrink
+	case MenuEvoke:
+		key = KeyEvoke
+	case MenuView:
+		key = KeyDescription
+	case MenuOther:
+		key = KeyMenu
+	}
+	return key
+}
+
+var MenuCols = [][2]int{
+	MenuRest:    {0, 0},
+	MenuExplore: {0, 0},
+	MenuThrow:   {0, 0},
+	MenuDrink:   {0, 0},
+	MenuEvoke:   {0, 0},
+	MenuView:    {0, 0},
+	MenuOther:   {0, 0}}
+
+func init() {
+	for i := range MenuCols {
+		runes := utf8.RuneCountInString(menu(i).String())
+		if i == 0 {
+			MenuCols[0] = [2]int{7, 7 + runes}
+			continue
+		}
+		MenuCols[i] = [2]int{MenuCols[i-1][1] + 2, MenuCols[i-1][1] + 2 + runes}
+	}
+}
+
+func (ui *termui) WhichButton(col int) (menu, bool) {
+	if ui.Small() {
+		return MenuOther, false
+	}
+	for i, cols := range MenuCols {
+		if col >= cols[0] && col < cols[1] {
+			return menu(i), true
+		}
+	}
+	return MenuOther, false
+}
+
+func (ui *termui) DrawMenus(g *game) {
+	line := DungeonHeight
+	for i, cols := range MenuCols {
+		ui.DrawColoredText(menu(i).String(), cols[0], line, ColorViolet)
+	}
+}
+
 func (ui *termui) LogColor(e logEntry) uicolor {
 	fg := ColorFg
 	// TODO: define uicolors?
@@ -2375,6 +2468,9 @@ func (ui *termui) SelectProjectile(g *game, ev event) error {
 	for {
 		cs := g.SortedProjectiles()
 		ui.ClearLine(0)
+		if !ui.Small() {
+			ui.DrawColoredText(MenuThrow.String(), MenuCols[MenuThrow][0], DungeonHeight, ColorCyan)
+		}
 		if desc {
 			ui.DrawColoredText("Describe", 0, 0, ColorBlue)
 			col := utf8.RuneCountInString("Describe")
@@ -2413,6 +2509,9 @@ func (ui *termui) SelectPotion(g *game, ev event) error {
 	for {
 		cs := g.SortedPotions()
 		ui.ClearLine(0)
+		if !ui.Small() {
+			ui.DrawColoredText(MenuDrink.String(), MenuCols[MenuDrink][0], DungeonHeight, ColorCyan)
+		}
 		if desc {
 			ui.DrawColoredText("Describe", 0, 0, ColorBlue)
 			col := utf8.RuneCountInString("Describe")
@@ -2458,6 +2557,9 @@ func (ui *termui) SelectRod(g *game, ev event) error {
 	for {
 		rs := g.SortedRods()
 		ui.ClearLine(0)
+		if !ui.Small() {
+			ui.DrawColoredText(MenuEvoke.String(), MenuCols[MenuEvoke][0], DungeonHeight, ColorCyan)
+		}
 		if desc {
 			ui.DrawColoredText("Describe", 0, 0, ColorBlue)
 			col := utf8.RuneCountInString("Describe")
@@ -2502,15 +2604,9 @@ func (ui *termui) ActionItem(g *game, i, lnum int, ka keyAction, fg uicolor) {
 }
 
 var menuActions = []keyAction{
-	KeyExplore,
-	KeyRest,
-	KeyThrow,
-	KeyDrink,
-	KeyEvoke,
 	KeyDescend,
 	KeyEquip,
 	KeyExclude,
-	KeyDescription,
 	KeyCharacterInfo,
 	KeyLogs,
 	KeyHelp,
@@ -2521,7 +2617,9 @@ var menuActions = []keyAction{
 func (ui *termui) SelectAction(g *game, actions []keyAction, ev event) (keyAction, error) {
 	for {
 		ui.ClearLine(0)
-		ui.DrawColoredTextOnBG("→Menu", BarCol, 0, ColorCyan, ColorBg)
+		if !ui.Small() {
+			ui.DrawColoredText(MenuOther.String(), MenuCols[MenuOther][0], DungeonHeight, ColorCyan)
+		}
 		ui.DrawColoredText("Choose", 0, 0, ColorCyan)
 		col := utf8.RuneCountInString("Choose")
 		ui.DrawText(" which action?", col, 0)
@@ -2618,6 +2716,19 @@ func (ui *termui) StatusEndAnimation(g *game) {
 	time.Sleep(200 * time.Millisecond)
 	ui.DrawAtPosition(g, g.Player.Pos, false, r, fg, bg)
 	ui.Flush()
+}
+
+func (ui *termui) MenuSelectedAnimation(g *game, m menu, ok bool) {
+	if !ui.Small() {
+		if ok {
+			ui.DrawColoredText(m.String(), MenuCols[m][0], DungeonHeight, ColorCyan)
+		} else {
+			ui.DrawColoredText(m.String(), MenuCols[m][0], DungeonHeight, ColorMagenta)
+		}
+		ui.Flush()
+		time.Sleep(25 * time.Millisecond)
+		ui.DrawColoredText(m.String(), MenuCols[m][0], DungeonHeight, ColorViolet)
+	}
 }
 
 func (ui *termui) MagicMappingAnimation(g *game, border []int) {

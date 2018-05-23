@@ -229,7 +229,7 @@ func (g *game) QuaffDescent(ev event) error {
 	if g.Depth >= MaxDepth {
 		return errors.New("You cannot descend more!")
 	}
-	g.Printf("You quaff the %s. You feel yourself falling through the ground.", DescentPotion)
+	g.Printf("You quaff the %s. You fall through the ground.", DescentPotion)
 	g.LevelStats()
 	g.Depth++
 	g.InitLevel()
