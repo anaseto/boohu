@@ -1527,8 +1527,6 @@ func (ui *termui) SwappingAnimation(g *game, mpos, ppos position) {
 }
 
 func (ui *termui) TeleportAnimation(g *game, from, to position, showto bool) {
-	ui.DrawDungeonView(g, NormalMode)
-	time.Sleep(25 * time.Millisecond)
 	r, fg, bgColorf := ui.PositionDrawing(g, from)
 	_, _, bgColort := ui.PositionDrawing(g, to)
 	ui.DrawAtPosition(g, from, true, '¤', ColorCyan, bgColorf)
