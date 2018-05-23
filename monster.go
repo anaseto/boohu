@@ -305,7 +305,7 @@ var MonsBands = []monsterBandData{
 	LoneHydra:          {rarity: 45, minDepth: 8, maxDepth: 13, monster: MonsHydra},
 	LoneSpider:         {rarity: 20, minDepth: 3, maxDepth: 13, monster: MonsSpider},
 	LoneBlinkingFrog:   {rarity: 50, minDepth: 5, maxDepth: 13, monster: MonsBlinkingFrog},
-	LoneCyclop:         {rarity: 45, minDepth: 5, maxDepth: 13, monster: MonsCyclop},
+	LoneCyclop:         {rarity: 35, minDepth: 5, maxDepth: 13, monster: MonsCyclop},
 	LoneLich:           {rarity: 70, minDepth: 9, maxDepth: 13, monster: MonsLich},
 	LoneEarthDragon:    {rarity: 80, minDepth: 10, maxDepth: 13, monster: MonsEarthDragon},
 	LoneSpecter:        {rarity: 70, minDepth: 6, maxDepth: 13, monster: MonsMirrorSpecter},
@@ -338,7 +338,7 @@ var MonsBands = []monsterBandData{
 	},
 	BandBlinkingFrogs: {
 		distribution: map[monsterKind]monsInterval{MonsBlinkingFrog: {2, 4}},
-		rarity:       70, minDepth: 9, maxDepth: 13, band: true,
+		rarity:       65, minDepth: 9, maxDepth: 13, band: true,
 	},
 	BandSatowalga: {
 		distribution: map[monsterKind]monsInterval{
@@ -353,7 +353,7 @@ var MonsBands = []monsterBandData{
 			MonsGiantBee:       {1, 1},
 			MonsBrizzia:        {0, 1},
 		},
-		rarity: 65, minDepth: 8, maxDepth: 13, band: true,
+		rarity: 60, minDepth: 8, maxDepth: 13, band: true,
 	},
 	BandYacks: {
 		distribution: map[monsterKind]monsInterval{MonsYack: {2, 5}},
@@ -365,7 +365,7 @@ var MonsBands = []monsterBandData{
 	},
 	BandSkeletonWarrior: {
 		distribution: map[monsterKind]monsInterval{MonsSkeletonWarrior: {2, 3}},
-		rarity:       45, minDepth: 8, maxDepth: 13, band: true,
+		rarity:       60, minDepth: 8, maxDepth: 13, band: true,
 	},
 	UBandWorms: {
 		distribution: map[monsterKind]monsInterval{MonsWorm: {3, 4}, MonsSpider: {1, 1}},
