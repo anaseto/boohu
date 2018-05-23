@@ -1481,8 +1481,6 @@ func (ui *termui) DrawDungeonView(g *game, m uiMode) {
 	}
 	line := 0
 	if !ui.Small() {
-		ui.DrawColoredTextOnBG("→Menu", BarCol, line, ColorBlue, ColorBg)
-		line++
 		ui.DrawText(fmt.Sprintf("[ %v (%d)", g.Player.Armour, g.Player.Armor()), BarCol, line)
 		line++
 		ui.DrawText(fmt.Sprintf(") %v (%d)", g.Player.Weapon, g.Player.Attack()), BarCol, line)
