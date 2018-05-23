@@ -387,20 +387,22 @@ func (g *game) EvokeRodObstruction(ev event) error {
 	if err := g.ui.ChooseTarget(g, &chooser{needsFreeWay: true, free: true}); err != nil {
 		return err
 	}
-	neighbors := g.Dungeon.FreeNeighbors(g.Player.Target)
-	for _, pos := range neighbors {
-		g.MakeNoise(18, pos)
-		break
-	}
-	g.Dungeon.SetCell(g.Player.Target, WallCell)
-	delete(g.Clouds, g.Player.Target)
-	if g.TemporalWalls != nil {
-		g.TemporalWalls[g.Player.Target] = true
-	}
-	g.PushEvent(&cloudEvent{ERank: ev.Rank() + 200 + RandInt(50), Pos: g.Player.Target, EAction: ObstructionEnd})
+	g.TemporalWallAt(g.Player.Target, ev)
 	g.Printf("You see a wall appear from nothing.")
-	g.ComputeLOS()
 	return nil
+}
+
+func (g *game) TemporalWallAt(pos position, ev event) {
+	if g.Dungeon.Cell(pos).T == WallCell {
+		return
+	}
+	g.Dungeon.SetCell(pos, WallCell)
+	delete(g.Clouds, pos)
+	if g.TemporalWalls != nil {
+		g.TemporalWalls[pos] = true
+	}
+	g.PushEvent(&cloudEvent{ERank: ev.Rank() + 200 + RandInt(50), Pos: pos, EAction: ObstructionEnd})
+	g.ComputeLOS()
 }
 
 func (g *game) EvokeRodSwapping(ev event) error {

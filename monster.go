@@ -958,7 +958,7 @@ func (m *monster) ThrowRock(g *game, ev event) bool {
 	acc := RandInt(m.Accuracy)
 	attack := g.HitDamage(DmgPhysical, 15, g.Player.Armor())
 	attack, evasion = m.DramaticAdjustment(g, 15, attack, evasion, acc)
-	if 3*acc/2 <= evasion {
+	if 4*acc/3 <= evasion {
 		// rocks are big and do not miss so often
 		hit = false
 	} else {
@@ -970,16 +970,29 @@ func (m *monster) ThrowRock(g *game, ev event) bool {
 		g.MakeNoise(noise, g.Player.Pos)
 		g.PrintfStyled("%s throws a rock at you (%d dmg).", logMonsterHit, m.Kind.Definite(true), attack)
 		g.ui.MonsterProjectileAnimation(g, g.Ray(m.Pos), '●', ColorMagenta)
-		if RandInt(4) == 0 {
-			g.Confusion(ev)
+		oppos := g.Player.Pos
+		if m.PushPlayer(g) {
+			g.TemporalWallAt(oppos, ev)
+		} else {
+			ray := g.Ray(m.Pos)
+			if len(ray) > 0 {
+				g.TemporalWallAt(ray[len(ray)-1], ev)
+			}
 		}
 		m.InflictDamage(g, attack, 15)
 	} else if block {
 		g.Printf("You block %s's rock.", m.Kind.Indefinite(false))
 		g.ui.MonsterProjectileAnimation(g, g.Ray(m.Pos), '●', ColorMagenta)
+		ray := g.Ray(m.Pos)
+		if len(ray) > 0 {
+			g.TemporalWallAt(ray[len(ray)-1], ev)
+		}
 	} else {
 		g.Printf("You dodge %s's rock.", m.Kind.Indefinite(false))
 		g.ui.MonsterProjectileAnimation(g, g.Ray(m.Pos), '●', ColorMagenta)
+		dir := g.Player.Pos.Dir(m.Pos)
+		pos := g.Player.Pos.To(dir)
+		g.TemporalWallAt(pos, ev)
 	}
 	ev.Renew(g, 2*m.Kind.AttackDelay())
 	return true
