@@ -267,7 +267,7 @@ func (g *game) QuaffSwapPotion(ev event) error {
 		return errors.New("You are already swapping.")
 	}
 	g.Player.Statuses[StatusSwap] = 1
-	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 200 + RandInt(20), EAction: SwapEnd})
+	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 170 + RandInt(50), EAction: SwapEnd})
 	g.Printf("You quaff the %s. You feel like dancing.", SwapPotion)
 	return nil
 }
