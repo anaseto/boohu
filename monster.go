@@ -771,7 +771,7 @@ func (m *monster) InvertFoliage(g *game) {
 		delete(g.Fungus, m.Pos)
 	}
 	if !g.Player.LOS[m.Pos] {
-		g.WrongFoliage[m.Pos] = true
+		g.WrongFoliage[m.Pos] = !g.WrongFoliage[m.Pos]
 	}
 }
 
