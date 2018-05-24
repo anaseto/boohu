@@ -1049,9 +1049,10 @@ func (ui *termui) DescribePosition(g *game, pos position, targ Targeter) {
 		} else {
 			desc += fmt.Sprintf("You %s stairs downwards.", see)
 		}
-	case g.Doors[pos] || g.UnknownBurn[pos] == DoorBurn:
+	case g.Doors[pos] || g.WrongDoor[pos]:
 		desc += fmt.Sprintf("You %s a door.", see)
-	case g.Dungeon.Cell(pos).T == WallCell || g.UnknownDig[pos]:
+	case g.Dungeon.Cell(pos).T == WallCell || g.WrongWall[pos]:
+		// TODO: revise if a monster ever creates walls outside of LOS
 		desc += fmt.Sprintf("You %s a wall.", see)
 	default:
 		if cld, ok := g.Clouds[pos]; ok && g.Player.LOS[pos] {
@@ -1060,7 +1061,7 @@ func (ui *termui) DescribePosition(g *game, pos position, targ Targeter) {
 			} else {
 				desc += fmt.Sprintf("You %s a dense fog.", see)
 			}
-		} else if _, ok := g.Fungus[pos]; ok || g.UnknownBurn[pos] == FoliageBurn {
+		} else if _, ok := g.Fungus[pos]; ok && !g.WrongFoliage[pos] || !ok && g.WrongFoliage[pos] {
 			desc += fmt.Sprintf("You %s dense foliage there.", see)
 		} else if desc == "" {
 			desc += fmt.Sprintf("You %s the ground.", see)
@@ -1759,9 +1760,6 @@ func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgCol
 		} else if pos.X%2 == 0 && pos.Y%2 == 1 {
 			bgColor = ColorBgLOSalt
 		}
-		//if _, ok := g.Clouds[pos]; ok {
-		//bgColor = ColorBgCloud
-		//}
 	} else {
 		fgColor = ColorFgDark
 		bgColor = ColorBgDark
@@ -1775,8 +1773,12 @@ func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgCol
 		if g.TemporalWalls[pos] {
 			fgColor = ColorFgMagicPlace
 		}
+		if g.WrongWall[pos] {
+			// TODO: not reached, but could eventually someday
+			r = '.'
+		}
 	case FreeCell:
-		if g.UnknownDig[pos] {
+		if g.WrongWall[pos] {
 			r = '#'
 			if g.TemporalWalls[pos] {
 				fgColor = ColorFgMagicPlace
@@ -1789,10 +1791,7 @@ func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgCol
 			fgColor = ColorFgPlayer
 		default:
 			r = '.'
-			if _, ok := g.Fungus[pos]; ok {
-				r = '"'
-			}
-			if _, ok := g.UnknownBurn[pos]; ok {
+			if _, ok := g.Fungus[pos]; ok && !g.WrongFoliage[pos] || !ok && g.WrongFoliage[pos] {
 				r = '"'
 			}
 			if cld, ok := g.Clouds[pos]; ok && g.Player.LOS[pos] {

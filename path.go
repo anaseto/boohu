@@ -32,11 +32,11 @@ func (pp *playerPath) Neighbors(pos position) []position {
 	d := pp.game.Dungeon
 	nb := pp.neighbors[:0]
 	keep := func(npos position) bool {
-		if cld, ok := pp.game.Clouds[npos]; ok && cld == CloudFire && pp.game.UnknownBurn[npos] == NoUnknownBurn {
+		if cld, ok := pp.game.Clouds[npos]; ok && cld == CloudFire && !(pp.game.WrongDoor[npos] || pp.game.WrongFoliage[npos]) {
 			return false
 		}
 		return npos.valid() && d.Cell(npos).T != WallCell &&
-			d.Cell(npos).Explored && !pp.game.UnknownDig[npos] && !pp.game.ExclusionsMap[npos]
+			d.Cell(npos).Explored && !pp.game.WrongWall[npos] && !pp.game.ExclusionsMap[npos]
 	}
 	if pp.game.Player.HasStatus(StatusConfusion) {
 		nb = pos.CardinalNeighbors(nb, keep)
@@ -105,7 +105,7 @@ func (ap *autoexplorePath) Neighbors(pos position) []position {
 	d := ap.game.Dungeon
 	nb := ap.neighbors[:0]
 	keep := func(npos position) bool {
-		if cld, ok := ap.game.Clouds[npos]; ok && cld == CloudFire && ap.game.UnknownBurn[npos] == NoUnknownBurn {
+		if cld, ok := ap.game.Clouds[npos]; ok && cld == CloudFire && !(ap.game.WrongDoor[npos] || ap.game.WrongFoliage[npos]) {
 			// XXX little info leak
 			return false
 		}

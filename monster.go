@@ -716,7 +716,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 			g.Dungeon.SetCell(target, FreeCell)
 			g.Stats.Digs++
 			if !g.Player.LOS[target] {
-				g.UnknownDig[m.Pos] = true
+				g.WrongWall[m.Pos] = true
 			}
 			g.MakeNoise(18, m.Pos)
 			g.Fog(m.Pos, 1, ev)
@@ -1148,7 +1148,7 @@ func (m *monster) Explode(g *game, ev event) {
 			g.Dungeon.SetCell(pos, FreeCell)
 			g.Stats.Digs++
 			if !g.Player.LOS[pos] {
-				g.UnknownDig[pos] = true
+				g.WrongWall[pos] = true
 			} else {
 				g.ui.WallExplosionAnimation(g, pos)
 			}

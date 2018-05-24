@@ -142,23 +142,26 @@ func (g *game) SeePosition(pos position) {
 		g.Dungeon.SetExplored(pos)
 		g.DijkstraMapRebuild = true
 	} else {
-		if g.UnknownDig[pos] {
+		if g.WrongWall[pos] {
 			g.Printf("There is no more a wall there.")
 			g.StopAuto()
 			g.DijkstraMapRebuild = true
 		}
-		if cld, ok := g.Clouds[pos]; ok && cld == CloudFire && g.UnknownBurn[pos] != NoUnknownBurn {
+		if cld, ok := g.Clouds[pos]; ok && cld == CloudFire && (g.WrongDoor[pos] || g.WrongFoliage[pos]) {
 			g.Printf("There are flames there.")
 			g.StopAuto()
 			g.DijkstraMapRebuild = true
 		}
 	}
-	if g.UnknownDig[pos] {
-		delete(g.UnknownDig, pos)
+	if g.WrongWall[pos] {
+		delete(g.WrongWall, pos)
 		delete(g.TemporalWalls, pos)
 	}
-	if _, ok := g.UnknownBurn[pos]; ok {
-		delete(g.UnknownBurn, pos)
+	if _, ok := g.WrongDoor[pos]; ok {
+		delete(g.WrongDoor, pos)
+	}
+	if _, ok := g.WrongFoliage[pos]; ok {
+		delete(g.WrongFoliage, pos)
 	}
 }
 

@@ -474,7 +474,7 @@ func (g *game) ThrowExplosiveMagara(ev event) error {
 			g.Dungeon.SetCell(pos, FreeCell)
 			g.Stats.Digs++
 			if !g.Player.LOS[pos] {
-				g.UnknownDig[pos] = true
+				g.WrongWall[pos] = true
 			} else {
 				g.ui.WallExplosionAnimation(g, pos)
 			}

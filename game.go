@@ -30,8 +30,9 @@ type game struct {
 	GeneratedRods       map[rod]bool
 	FoundEquipables     map[equipable]bool
 	Simellas            map[position]int
-	UnknownDig          map[position]bool
-	UnknownBurn         map[position]burn
+	WrongWall           map[position]bool
+	WrongFoliage        map[position]bool
+	WrongDoor           map[position]bool
 	ExclusionsMap       map[position]bool
 	Noise               map[position]bool
 	Resting             bool
@@ -320,8 +321,9 @@ func (g *game) InitLevel() {
 	g.MonstersPosCache = make([]int, DungeonNCells)
 	g.Player.Pos = g.FreeCell()
 
-	g.UnknownDig = map[position]bool{}
-	g.UnknownBurn = map[position]burn{}
+	g.WrongWall = map[position]bool{}
+	g.WrongFoliage = map[position]bool{}
+	g.WrongDoor = map[position]bool{}
 	g.ExclusionsMap = map[position]bool{}
 	g.TemporalWalls = map[position]bool{}
 

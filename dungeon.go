@@ -735,7 +735,7 @@ func (g *game) HasFreeExploredNeighbor(pos position) bool {
 	neighbors := pos.ValidNeighbors()
 	for _, pos := range neighbors {
 		c := d.Cell(pos)
-		if c.T == FreeCell && c.Explored && !g.UnknownDig[pos] {
+		if c.T == FreeCell && c.Explored && !g.WrongWall[pos] {
 			return true
 		}
 	}
