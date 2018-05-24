@@ -172,7 +172,7 @@ var MonsData = []monsterData{
 	MonsGoblin:          {10, 7, 10, 15, 14, 0, 12, 'g', "goblin", 2},
 	MonsOgre:            {10, 15, 12, 28, 13, 0, 8, 'O', "ogre", 6},
 	MonsCyclop:          {10, 12, 12, 28, 13, 0, 8, 'C', "cyclop", 9},
-	MonsWorm:            {12, 9, 10, 25, 13, 0, 10, 'w', "worm", 3},
+	MonsWorm:            {12, 9, 10, 25, 13, 0, 10, 'w', "farmer worm", 3},
 	MonsBrizzia:         {12, 10, 10, 30, 13, 0, 10, 'z', "brizzia", 7},
 	MonsAcidMound:       {10, 9, 10, 19, 15, 0, 8, 'a', "acid mound", 7},
 	MonsHound:           {8, 9, 10, 15, 14, 0, 12, 'h', "hound", 4},
@@ -195,7 +195,7 @@ var monsDesc = []string{
 	MonsGoblin:          "Goblins are little humanoid creatures. They often appear in group.",
 	MonsOgre:            "Ogres are big clunky humanoids that can hit really hard.",
 	MonsCyclop:          "Cyclops are very similar to ogres, but they also like to throw rocks at their foes (for up to 15 damage). The rocks can block your way for a while.",
-	MonsWorm:            "Worms are ugly slow moving creatures, but surprisingly hardy at times.",
+	MonsWorm:            "Farmer worms are ugly slow moving creatures, but surprisingly hardy at times, and they furrow as they move, helping new foliage to grow.",
 	MonsBrizzia:         "Brizzias are big slow moving biped creatures. They are quite hardy, and when hurt they can cause nausea, impeding the use of potions.",
 	MonsAcidMound:       "Acid mounds are acidic creatures. They can temporally corrode your equipment.",
 	MonsHound:           "Hounds are fast moving carnivore quadrupeds. They sometimes attack in group.",
@@ -220,6 +220,7 @@ const (
 	LoneGoblin monsterBand = iota
 	LoneOgre
 	LoneWorm
+	LoneRareWorm
 	LoneBrizzia
 	LoneHound
 	LoneHydra
@@ -300,6 +301,7 @@ var MonsBands = []monsterBandData{
 	LoneGoblin:         {rarity: 10, minDepth: 0, maxDepth: 5, monster: MonsGoblin},
 	LoneOgre:           {rarity: 15, minDepth: 2, maxDepth: 11, monster: MonsOgre},
 	LoneWorm:           {rarity: 10, minDepth: 0, maxDepth: 6, monster: MonsWorm},
+	LoneRareWorm:       {rarity: 90, minDepth: 7, maxDepth: 13, monster: MonsWorm},
 	LoneBrizzia:        {rarity: 90, minDepth: 7, maxDepth: 13, monster: MonsBrizzia},
 	LoneHound:          {rarity: 20, minDepth: 1, maxDepth: 8, monster: MonsHound},
 	LoneHydra:          {rarity: 45, minDepth: 8, maxDepth: 13, monster: MonsHydra},
@@ -725,11 +727,13 @@ func (m *monster) HandleTurn(g *game, ev event) {
 				g.Printf("%s You hear an earth-breaking noise.", g.CrackSound())
 				g.StopAuto()
 			}
+			m.InvertFoliage(g)
 			m.MoveTo(g, target)
 			m.Path = m.Path[:len(m.Path)-1]
 		} else if g.Dungeon.Cell(target).T == WallCell {
 			m.Path = m.APath(g, mpos, m.Target)
 		} else {
+			m.InvertFoliage(g)
 			m.MoveTo(g, target)
 			if m.Kind.Ranged() && !m.FireReady && g.Player.LOS[m.Pos] {
 				m.FireReady = true
@@ -755,6 +759,20 @@ func (m *monster) HandleTurn(g *game, ev event) {
 		m.Path = m.APath(g, mpos, m.Target)
 	}
 	ev.Renew(g, m.Kind.MovementDelay())
+}
+
+func (m *monster) InvertFoliage(g *game) {
+	if m.Kind != MonsWorm {
+		return
+	}
+	if _, ok := g.Fungus[m.Pos]; !ok {
+		g.Fungus[m.Pos] = foliage
+	} else {
+		delete(g.Fungus, m.Pos)
+	}
+	if !g.Player.LOS[m.Pos] {
+		g.WrongFoliage[m.Pos] = true
+	}
 }
 
 func (m *monster) DramaticAdjustment(g *game, baseAttack, attack, evasion, acc int) (int, int) {
