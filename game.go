@@ -530,7 +530,7 @@ loop:
 				// unique
 				return
 			}
-			n := 30
+			n := 50
 			if wps[i].TwoHanded() && g.Depth < 3 {
 				n *= (3 - g.Depth)
 			}
