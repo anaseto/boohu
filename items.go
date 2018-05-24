@@ -45,9 +45,10 @@ const (
 	CBlinkPotion
 	DigPotion
 	SwapPotion
+	DreamPotion
 )
 
-const NumPotions = int(SwapPotion) + 1
+const NumPotions = int(DreamPotion) + 1
 
 func (p potion) String() (text string) {
 	text = "potion"
@@ -76,6 +77,8 @@ func (p potion) String() (text string) {
 		text += " of digging"
 	case SwapPotion:
 		text += " of swapping"
+	case DreamPotion:
+		text += " of dreams"
 	}
 	return text
 }
@@ -111,6 +114,8 @@ func (p potion) Desc() (text string) {
 		text = "makes you dig walls like an earth dragon."
 	case SwapPotion:
 		text = "makes you swap positions with monsters instead of attacking."
+	case DreamPotion:
+		text = "shows you the position of monsters sleeping at drink time."
 	}
 	return fmt.Sprintf("The %s %s", p, text)
 }
@@ -161,6 +166,8 @@ func (p potion) Use(g *game, ev event) error {
 		err = g.QuaffDigPotion(ev)
 	case SwapPotion:
 		err = g.QuaffSwapPotion(ev)
+	case DreamPotion:
+		err = g.QuaffDreamPotion(ev)
 	}
 	if err != nil {
 		return err
@@ -311,6 +318,16 @@ func (g *game) QuaffMagicMapping(ev event) error {
 		}
 	}
 	g.Printf("You quaff the %s. You feel wiser.", MagicMappingPotion)
+	return nil
+}
+
+func (g *game) QuaffDreamPotion(ev event) error {
+	for _, mons := range g.Monsters {
+		if mons.Exists() && mons.State == Resting && !g.Player.LOS[mons.Pos] {
+			g.DreamingMonster[mons.Pos] = true
+		}
+	}
+	g.Printf("You quaff the %s. You perceive monsters' dreams.", DreamPotion)
 	return nil
 }
 
@@ -498,20 +515,21 @@ type collectData struct {
 }
 
 var ConsumablesCollectData = map[consumable]collectData{
-	HealWoundsPotion:    {rarity: 6, quantity: 1},
+	ConfusingDart:       {rarity: 4, quantity: 3},
+	ExplosiveMagara:     {rarity: 8, quantity: 1},
 	TeleportationPotion: {rarity: 5, quantity: 1},
 	BerserkPotion:       {rarity: 5, quantity: 1},
+	HealWoundsPotion:    {rarity: 6, quantity: 1},
 	SwiftnessPotion:     {rarity: 6, quantity: 1},
-	DescentPotion:       {rarity: 15, quantity: 1},
 	LignificationPotion: {rarity: 8, quantity: 1},
-	MagicMappingPotion:  {rarity: 15, quantity: 1},
 	MagicPotion:         {rarity: 10, quantity: 1},
 	WallPotion:          {rarity: 12, quantity: 1},
 	CBlinkPotion:        {rarity: 12, quantity: 1},
 	DigPotion:           {rarity: 12, quantity: 1},
 	SwapPotion:          {rarity: 12, quantity: 1},
-	ConfusingDart:       {rarity: 4, quantity: 3},
-	ExplosiveMagara:     {rarity: 8, quantity: 1},
+	DescentPotion:       {rarity: 15, quantity: 1},
+	MagicMappingPotion:  {rarity: 15, quantity: 1},
+	DreamPotion:         {rarity: 15, quantity: 1},
 }
 
 type equipable interface {

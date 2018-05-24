@@ -163,6 +163,9 @@ func (g *game) SeePosition(pos position) {
 	if _, ok := g.WrongFoliage[pos]; ok {
 		delete(g.WrongFoliage, pos)
 	}
+	if _, ok := g.DreamingMonster[pos]; ok {
+		delete(g.DreamingMonster, pos)
+	}
 }
 
 func (g *game) ComputeExclusion(pos position, toggle bool) {

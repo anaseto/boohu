@@ -1726,15 +1726,18 @@ func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgCol
 	bgColor = ColorBg
 	if !c.Explored && !g.Wizard {
 		r = ' '
+		bgColor = ColorBgDark
 		if g.HasFreeExploredNeighbor(pos) {
 			r = '¤'
 			fgColor = ColorFgDark
-			bgColor = ColorBgDark
+		}
+		if g.DreamingMonster[pos] {
+			r = '☻'
+			fgColor = ColorFgSleepingMonster
 		}
 		if g.Noise[pos] {
 			r = '♫'
 			fgColor = ColorFgWanderingMonster
-			bgColor = ColorBgDark
 		}
 		return
 	}
@@ -1840,6 +1843,9 @@ func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgCol
 			} else if !g.Wizard && g.Noise[pos] {
 				r = '♫'
 				fgColor = ColorFgWanderingMonster
+			} else if !g.Wizard && g.DreamingMonster[pos] {
+				r = '☻'
+				fgColor = ColorFgSleepingMonster
 			}
 		}
 	}

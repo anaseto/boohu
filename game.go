@@ -35,6 +35,7 @@ type game struct {
 	WrongDoor           map[position]bool
 	ExclusionsMap       map[position]bool
 	Noise               map[position]bool
+	DreamingMonster     map[position]bool
 	Resting             bool
 	Autoexploring       bool
 	DijkstraMapRebuild  bool
@@ -299,6 +300,7 @@ func (g *game) InitPlayer() {
 	//g.Player.Consumables[ExplosiveMagara] = 5
 	//g.Player.Consumables[DigPotion] = 5
 	//g.Player.Consumables[SwapPotion] = 5
+	//g.Player.Consumables[DreamPotion] = 5
 	//g.Player.Weapon = ElecWhip
 }
 
@@ -326,6 +328,7 @@ func (g *game) InitLevel() {
 	g.WrongDoor = map[position]bool{}
 	g.ExclusionsMap = map[position]bool{}
 	g.TemporalWalls = map[position]bool{}
+	g.DreamingMonster = map[position]bool{}
 
 	// Monsters
 	g.GenMonsters()
