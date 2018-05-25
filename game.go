@@ -612,7 +612,7 @@ func (g *game) ApplyRest() {
 		}
 		mons.HP = mons.HPmax
 	}
-	if RandInt(2) > 0 {
+	if RandInt(5) > 2 {
 		rmons := []int{}
 		for i, mons := range g.Monsters {
 			if mons.Exists() && mons.State == Resting {
