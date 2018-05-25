@@ -352,24 +352,20 @@ func (g *game) InitLevel() {
 
 	// Rods
 	g.Rods = map[position]rod{}
-	r := 27*(g.GeneratedRodsCount()+1) - 7*g.Depth - 1
-	if r < -3 {
-		r = 0
-	} else if r < 2 {
-		r = 2
-	}
-	if RandInt(r) == 0 && g.GeneratedRodsCount() < 3 {
+	r := 15 + 4*g.GeneratedRodsCount() - g.Depth
+	if RandInt(r) == 0 && g.GeneratedRodsCount() < 3 ||
+		g.GeneratedRodsCount() == 0 && g.Depth > 4 ||
+		g.GeneratedRodsCount() == 1 && g.Depth > 8 ||
+		g.GeneratedRodsCount() == 2 && g.Depth > 11 {
 		g.GenerateRod()
 	}
 
 	// Aptitudes/Mutations
-	r = 30*g.Player.AptitudeCount() - 8*g.Depth + 2
-	if r < -2 {
-		r = 0
-	} else if r < 2 {
-		r = 2
-	}
-	if RandInt(r) == 0 && g.Depth > 0 && g.Player.AptitudeCount() < 3 {
+	r = 15 + 3*g.Player.AptitudeCount() - g.Depth
+	if RandInt(r) == 0 && g.Depth > 0 && g.Player.AptitudeCount() < 3 ||
+		g.Player.AptitudeCount() == 0 && g.Depth > 1 ||
+		g.Player.AptitudeCount() == 1 && g.Depth > 4 ||
+		g.Player.AptitudeCount() == 2 && g.Depth > 8 {
 		apt, ok := g.RandomApt()
 		if ok {
 			g.ApplyAptitude(apt)
