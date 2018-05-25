@@ -352,8 +352,8 @@ func (g *game) InitLevel() {
 
 	// Rods
 	g.Rods = map[position]rod{}
-	r := 15 + 4*g.GeneratedRodsCount() - g.Depth
-	if RandInt(r) == 0 && g.GeneratedRodsCount() < 3 ||
+	r := g.Depth - 4*g.GeneratedRodsCount()
+	if r > 0 && RandInt((6-r)*3) == 0 && g.GeneratedRodsCount() < 3 ||
 		g.GeneratedRodsCount() == 0 && g.Depth > 4 ||
 		g.GeneratedRodsCount() == 1 && g.Depth > 8 ||
 		g.GeneratedRodsCount() == 2 && g.Depth > 11 {
