@@ -641,7 +641,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	mpos := m.Pos
 	m.MakeAware(g)
 	if m.State == Resting {
-		wander := RandInt(250 + 7*Max(600-(g.DepthPlayerTurn+1), 0))
+		wander := RandInt(250 + 6*Max(800-(g.DepthPlayerTurn+1), 0))
 		if wander == 0 {
 			m.NaturalAwake(g)
 		}
