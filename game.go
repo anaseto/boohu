@@ -363,7 +363,7 @@ func (g *game) InitLevel() {
 	}
 
 	// Aptitudes/Mutations
-	r = 30*g.Player.AptitudeCount() - 6*g.Depth + 2
+	r = 30*g.Player.AptitudeCount() - 8*g.Depth + 2
 	if r < -2 {
 		r = 0
 	} else if r < 2 {
