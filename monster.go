@@ -630,16 +630,20 @@ func (m *monster) AttackAction(g *game, ev event) {
 	}
 }
 
+func (m *monster) NaturalAwake(g *game) {
+	m.Target = g.FreeCell()
+	m.State = Wandering
+	m.GatherBand(g)
+}
+
 func (m *monster) HandleTurn(g *game, ev event) {
 	ppos := g.Player.Pos
 	mpos := m.Pos
 	m.MakeAware(g)
 	if m.State == Resting {
-		wander := RandInt(1500)
+		wander := RandInt(250 + 7*Max(600-(g.DepthPlayerTurn+1), 0))
 		if wander == 0 {
-			m.Target = g.FreeCell()
-			m.State = Wandering
-			m.GatherBand(g)
+			m.NaturalAwake(g)
 		}
 		ev.Renew(g, m.Kind.MovementDelay())
 		return

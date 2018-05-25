@@ -45,8 +45,6 @@ type simpleAction int
 
 const (
 	PlayerTurn simpleAction = iota
-	HealPlayer
-	MPRegen
 	Teleportation
 	BerserkEnd
 	SlowEnd
@@ -103,7 +101,7 @@ func (sev *simpleEvent) Action(g *game) {
 		g.LogNextTick = g.LogIndex
 		g.AutoNext = g.AutoPlayer(sev)
 		if g.AutoNext {
-			g.Stats.Turns++
+			g.TurnStats()
 			return
 		}
 		g.Quit = g.ui.HandlePlayerTurn(g, sev)
@@ -111,10 +109,6 @@ func (sev *simpleEvent) Action(g *game) {
 			return
 		}
 		g.TurnStats()
-	case HealPlayer:
-		g.HealPlayer(sev)
-	case MPRegen:
-		g.MPRegen(sev)
 	case Teleportation:
 		if !g.Player.HasStatus(StatusLignification) {
 			g.Teleportation(sev)
@@ -195,7 +189,6 @@ type monsterAction int
 
 const (
 	MonsterTurn monsterAction = iota
-	HealMonster
 	MonsConfusionEnd
 	MonsExhaustionEnd
 )
@@ -216,11 +209,6 @@ func (mev *monsterEvent) Action(g *game) {
 		mons := g.Monsters[mev.NMons]
 		if mons.Exists() {
 			mons.HandleTurn(g, mev)
-		}
-	case HealMonster:
-		mons := g.Monsters[mev.NMons]
-		if mons.Exists() {
-			mons.Heal(g, mev)
 		}
 	case MonsConfusionEnd:
 		mons := g.Monsters[mev.NMons]

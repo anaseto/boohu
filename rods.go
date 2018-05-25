@@ -437,6 +437,14 @@ func (g *game) GeneratedRodsCount() int {
 	return count
 }
 
+func (g *game) RandomRod() rod {
+	r := rod(RandInt(NumRods))
+	if r.Rare() && RandInt(3) == 0 {
+		r = rod(RandInt(NumRods))
+	}
+	return r
+}
+
 func (g *game) GenerateRod() {
 	count := 0
 	for {
@@ -445,14 +453,28 @@ func (g *game) GenerateRod() {
 			panic("GenerateRod")
 		}
 		pos := g.FreeCellForStatic()
-		r := rod(RandInt(NumRods))
-		if r.Rare() && RandInt(3) == 0 {
-			r = rod(RandInt(NumRods))
-		}
+		r := g.RandomRod()
 		if _, ok := g.Player.Rods[r]; !ok && !g.GeneratedRods[r] {
 			g.GeneratedRods[r] = true
 			g.Rods[pos] = r
 			return
+		}
+	}
+}
+
+func (g *game) RechargeRods() {
+	for r, props := range g.Player.Rods {
+		if props.Charge < r.MaxCharge() {
+			rchg := RandInt(1 + r.Rate())
+			if rchg == 0 && RandInt(2) == 0 {
+				rchg++
+			}
+			props.Charge += rchg
+			g.Player.Rods[r] = props
+		}
+		if props.Charge > r.MaxCharge() {
+			props.Charge = r.MaxCharge()
+			g.Player.Rods[r] = props
 		}
 	}
 }

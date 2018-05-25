@@ -480,7 +480,7 @@ func (k keyAction) NormalModeDescription() (text string) {
 	case KeyRunSE:
 		text = "Travel south east"
 	case KeyRest:
-		text = "Rest"
+		text = "Rest (until status free or regen)"
 	case KeyWaitTurn:
 		text = "Wait a turn"
 	case KeyDescend:
@@ -510,7 +510,7 @@ func (k keyAction) NormalModeDescription() (text string) {
 	case KeyQuit:
 		text = "Quit without saving"
 	case KeyHelp:
-		text = "Help (Keys)"
+		text = "Help (keys and mouse)"
 	case KeyWizard:
 		text = "Wizard (debug) mode"
 	case KeyWizardInfo:
@@ -902,8 +902,8 @@ func (ui *termui) DrawKeysDescription(g *game, title string, actions []string) {
 func (ui *termui) KeysHelp(g *game) {
 	ui.DrawKeysDescription(g, "Keys", []string{
 		"Movement", "h/j/k/l/y/u/b/n or numpad or mouse left",
-		"Rest", "r",
-		"Wait a turn", "“.” or 5",
+		"Wait a turn", "“.” or 5 or mouse left on @",
+		"Rest (until status free or regen)", "r",
 		"Descend stairs", "> or D",
 		"Go to nearest stairs", "G",
 		"Autoexplore", "o",
@@ -922,7 +922,7 @@ func (ui *termui) KeysHelp(g *game) {
 }
 
 func (ui *termui) ExamineHelp(g *game) {
-	ui.DrawKeysDescription(g, "Targeting Keys", []string{
+	ui.DrawKeysDescription(g, "Examine/Travel/Targeting Keys", []string{
 		"Move cursor", "h/j/k/l/y/u/b/n or numpad or mouse left",
 		"Cycle through monsters", "+",
 		"Cycle through stairs", ">",
@@ -2494,7 +2494,7 @@ func (ui *termui) SelectProjectile(g *game, ev event) error {
 		if err == nil {
 			ui.ConsumableItem(g, index, index+1, cs[index], ColorYellow)
 			ui.Flush()
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(75 * time.Millisecond)
 			if desc {
 				ui.DrawDescription(g, cs[index].Desc())
 				continue
@@ -2535,7 +2535,7 @@ func (ui *termui) SelectPotion(g *game, ev event) error {
 		if err == nil {
 			ui.ConsumableItem(g, index, index+1, cs[index], ColorYellow)
 			ui.Flush()
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(75 * time.Millisecond)
 			if desc {
 				ui.DrawDescription(g, cs[index].Desc())
 				continue
@@ -2583,7 +2583,7 @@ func (ui *termui) SelectRod(g *game, ev event) error {
 		if err == nil {
 			ui.RodItem(g, index, index+1, rs[index], ColorYellow)
 			ui.Flush()
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(75 * time.Millisecond)
 			if desc {
 				ui.DrawDescription(g, rs[index].Desc())
 				continue
@@ -2639,7 +2639,7 @@ func (ui *termui) SelectAction(g *game, actions []keyAction, ev event) (keyActio
 		}
 		ui.ActionItem(g, index, index+1, actions[index], ColorYellow)
 		ui.Flush()
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(75 * time.Millisecond)
 		ui.DrawDungeonView(g, NoFlushMode)
 		return actions[index], nil
 	}

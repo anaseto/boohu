@@ -14,6 +14,7 @@ type game struct {
 	Ev                  event
 	EventIndex          int
 	Depth               int
+	DepthPlayerTurn     int
 	Turn                int
 	Highlight           map[position]bool // highlighted positions (e.g. targeted ray)
 	Collectables        map[position]collectable
@@ -37,6 +38,7 @@ type game struct {
 	Noise               map[position]bool
 	DreamingMonster     map[position]bool
 	Resting             bool
+	RestingTurns        int
 	Autoexploring       bool
 	DijkstraMapRebuild  bool
 	Targeting           position
@@ -286,7 +288,8 @@ func (g *game) InitPlayer() {
 	case 9:
 		g.Player.Consumables[SwapPotion] = 1
 	}
-	g.Player.Rods = map[rod]rodProps{}
+	r := g.RandomRod()
+	g.Player.Rods = map[rod]rodProps{r: rodProps{r.MaxCharge() - 1}}
 	g.Player.Statuses = map[status]int{}
 
 	// Testing
@@ -349,7 +352,7 @@ func (g *game) InitLevel() {
 
 	// Rods
 	g.Rods = map[position]rod{}
-	r := 7*(g.GeneratedRodsCount()+1) - 2*(g.Depth+1)
+	r := 27*(g.GeneratedRodsCount()+1) - 7*g.Depth - 1
 	if r < -3 {
 		r = 0
 	} else if r < 2 {
@@ -420,19 +423,8 @@ func (g *game) InitLevel() {
 	}
 
 	// recharge rods
-	for r, props := range g.Player.Rods {
-		if props.Charge < r.MaxCharge() {
-			rchg := RandInt(1 + r.Rate())
-			if rchg == 0 && RandInt(2) == 0 {
-				rchg++
-			}
-			props.Charge += rchg
-			g.Player.Rods[r] = props
-		}
-		if props.Charge > r.MaxCharge() {
-			props.Charge = r.MaxCharge()
-			g.Player.Rods[r] = props
-		}
+	if g.Depth > 0 {
+		g.RechargeRods()
 	}
 
 	// clouds
@@ -443,14 +435,11 @@ func (g *game) InitLevel() {
 		g.Events = &eventQueue{}
 		heap.Init(g.Events)
 		g.PushEvent(&simpleEvent{ERank: 0, EAction: PlayerTurn})
-		g.PushEvent(&simpleEvent{ERank: 50, EAction: HealPlayer})
-		g.PushEvent(&simpleEvent{ERank: 100, EAction: MPRegen})
 	} else {
 		g.CleanEvents()
 	}
 	for i := range g.Monsters {
 		g.PushEvent(&monsterEvent{ERank: g.Turn + 1, EAction: MonsterTurn, NMons: i})
-		g.PushEvent(&monsterEvent{ERank: g.Turn + 50, EAction: HealMonster, NMons: i})
 	}
 }
 
@@ -598,6 +587,7 @@ func (g *game) Descend() bool {
 	}
 	g.Print("You descend deeper in the dungeon.")
 	g.Depth++
+	g.DepthPlayerTurn = 0
 	g.Scumming = 0
 	g.PushEvent(&simpleEvent{ERank: g.Ev.Rank(), EAction: PlayerTurn})
 	g.InitLevel()
@@ -611,17 +601,47 @@ func (g *game) WizardMode() {
 	g.PrintStyled("You are now in wizard mode and cannot obtain winner status.", logSpecial)
 }
 
+func (g *game) ApplyRest() {
+	g.Player.HP = g.Player.HPMax()
+	g.Player.MP = g.Player.MPMax()
+	for _, mons := range g.Monsters {
+		if !mons.Exists() {
+			continue
+		}
+		mons.HP = mons.HPmax
+	}
+	if RandInt(2) > 0 {
+		rmons := []int{}
+		for i, mons := range g.Monsters {
+			if mons.Exists() && mons.State == Resting {
+				rmons = append(rmons, i)
+			}
+		}
+		if len(rmons) > 0 {
+			g.Monsters[rmons[RandInt(len(rmons))]].NaturalAwake(g)
+		}
+	}
+	g.Stats.Rest++
+	g.PrintStyled("You feel fresh again. Some monsters might have awaken.", logStatusEnd)
+}
+
 func (g *game) AutoPlayer(ev event) bool {
 	if g.Resting {
+		const enoughRestTurns = 15
 		mons := g.MonsterInLOS()
-		if mons == nil &&
-			(g.Player.HP < g.Player.HPMax() || g.Player.MP < g.Player.MPMax() || g.Player.HasStatus(StatusExhausted) ||
-				g.Player.HasStatus(StatusConfusion) || g.Player.HasStatus(StatusLignification)) {
+		sr := g.StatusRest()
+		if mons == nil && (sr || g.NeedsRegenRest() && g.RestingTurns >= 0) && g.RestingTurns < enoughRestTurns {
 			g.WaitTurn(ev)
+			if !sr && g.RestingTurns >= 0 {
+				g.RestingTurns++
+			}
 			return true
 		}
-		if mons != nil && g.Resting {
+		if g.RestingTurns >= enoughRestTurns {
+			g.ApplyRest()
+		} else if mons != nil {
 			g.Stats.RestInterrupt++
+			g.Print("You could not sleep.")
 		}
 		g.Resting = false
 	} else if g.Autoexploring {

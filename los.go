@@ -88,6 +88,7 @@ func (g *game) StopAuto() {
 	if g.Resting {
 		g.Stats.RestInterrupt++
 		g.Resting = false
+		g.Print("You could not sleep.")
 	}
 }
 

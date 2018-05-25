@@ -23,7 +23,7 @@ type player struct {
 }
 
 func (p *player) HPMax() int {
-	hpmax := 40
+	hpmax := 42
 	if p.Aptitudes[AptHealthy] {
 		hpmax += 10
 	}
@@ -31,7 +31,7 @@ func (p *player) HPMax() int {
 }
 
 func (p *player) MPMax() int {
-	mpmax := 10
+	mpmax := 11
 	if p.Aptitudes[AptMagic] {
 		mpmax += 5
 	}
@@ -199,7 +199,7 @@ func (g *game) ExistsMonster() bool {
 }
 
 func (g *game) ScummingAction(ev event) {
-	if g.Player.HP == g.Player.HPMax() && g.Player.MP == g.Player.MPMax() {
+	if g.MonsterInLOS() == nil {
 		g.Scumming++
 	}
 	if g.Scumming == 100 {
@@ -240,7 +240,7 @@ func (g *game) ScummingAction(ev event) {
 }
 
 func (g *game) FairAction() {
-	g.Scumming -= 10
+	g.Scumming -= 15
 	if g.Scumming < 0 {
 		g.Scumming = 0
 	}
@@ -253,15 +253,30 @@ func (g *game) Rest(ev event) error {
 	if cld, ok := g.Clouds[g.Player.Pos]; ok && cld == CloudFire {
 		return errors.New("You cannot rest on flames.")
 	}
-	if g.Player.HP == g.Player.HPMax() && g.Player.MP == g.Player.MPMax() && !g.Player.HasStatus(StatusExhausted) &&
-		!g.Player.HasStatus(StatusConfusion) && !g.Player.HasStatus(StatusLignification) {
+	if !g.NeedsRegenRest() && !g.StatusRest() {
 		return errors.New("You do not need to rest.")
 	}
-	g.Print("You rest for a while.")
 	g.WaitTurn(ev)
-	g.Stats.Rest++
 	g.Resting = true
+	g.RestingTurns = 0
+	if g.StatusRest() {
+		g.RestingTurns = -1 // not true resting, just waiting for status end
+	}
+	g.FairAction()
 	return nil
+}
+
+func (g *game) StatusRest() bool {
+	for _, q := range g.Player.Statuses {
+		if q > 0 {
+			return true
+		}
+	}
+	return false
+}
+
+func (g *game) NeedsRegenRest() bool {
+	return g.Player.HP < g.Player.HPMax() || g.Player.MP < g.Player.MPMax()
 }
 
 func (g *game) Equip(ev event) error {

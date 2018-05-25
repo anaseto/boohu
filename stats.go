@@ -28,6 +28,7 @@ type stats struct {
 
 func (g *game) TurnStats() {
 	g.Stats.Turns++
+	g.DepthPlayerTurn++
 	if g.Player.HP < g.Player.HPMax() {
 		g.Stats.TWounded++
 	}
