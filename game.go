@@ -612,7 +612,8 @@ func (g *game) ApplyRest() {
 		}
 		mons.HP = mons.HPmax
 	}
-	if RandInt(5) > 2 {
+	if g.DepthPlayerTurn < 100 && RandInt(5) > 2 || g.DepthPlayerTurn >= 100 && g.DepthPlayerTurn < 250 && RandInt(2) == 0 ||
+		g.DepthPlayerTurn >= 250 && RandInt(3) > 0 {
 		rmons := []int{}
 		for i, mons := range g.Monsters {
 			if mons.Exists() && mons.State == Resting {

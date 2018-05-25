@@ -1137,10 +1137,10 @@ func (m *monster) AbsorbMana(g *game, ev event) bool {
 	if g.Player.MP == 0 {
 		return false
 	}
-	g.Player.MP = 2 * g.Player.MP / 3
+	g.Player.MP -= 1
 	g.Printf("%s absorbs your mana.", m.Kind.Definite(true))
 	m.Statuses[MonsExhausted] = 1
-	g.PushEvent(&monsterEvent{ERank: ev.Rank() + 10 + RandInt(20), NMons: m.Index, EAction: MonsExhaustionEnd})
+	g.PushEvent(&monsterEvent{ERank: ev.Rank() + 10 + RandInt(10), NMons: m.Index, EAction: MonsExhaustionEnd})
 	ev.Renew(g, m.Kind.AttackDelay())
 	return true
 }

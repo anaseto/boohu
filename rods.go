@@ -107,7 +107,7 @@ type rodProps struct {
 func (r rod) MaxCharge() (charges int) {
 	switch r {
 	case RodBlink:
-		charges = 5
+		charges = 6
 	case RodDigging, RodShatter:
 		charges = 3
 	default:
@@ -125,15 +125,16 @@ func (r rod) Rate() int {
 }
 
 func (r rod) MPCost() (mp int) {
-	switch r {
-	case RodBlink:
-		mp = 3
-	case RodTeleportOther, RodDigging, RodShatter:
-		mp = 5
-	default:
-		mp = 4
-	}
-	return mp
+	return 1
+	//switch r {
+	//case RodBlink:
+	//mp = 3
+	//case RodTeleportOther, RodDigging, RodShatter:
+	//mp = 5
+	//default:
+	//mp = 4
+	//}
+	//return mp
 }
 
 func (r rod) Use(g *game, ev event) error {
