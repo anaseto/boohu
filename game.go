@@ -353,7 +353,7 @@ func (g *game) InitLevel() {
 	// Rods
 	g.Rods = map[position]rod{}
 	r := 27*(g.GeneratedRodsCount()+1) - 7*g.Depth - 1
-	if r < -2 {
+	if r < -3 {
 		r = 0
 	} else if r < 2 {
 		r = 2
