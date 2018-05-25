@@ -353,19 +353,21 @@ func (g *game) InitLevel() {
 	// Rods
 	g.Rods = map[position]rod{}
 	r := 27*(g.GeneratedRodsCount()+1) - 7*g.Depth - 1
-	if r < -3 {
+	if r < -2 {
 		r = 0
 	} else if r < 2 {
-		r = 1
+		r = 2
 	}
 	if RandInt(r) == 0 && g.GeneratedRodsCount() < 3 {
 		g.GenerateRod()
 	}
 
 	// Aptitudes/Mutations
-	r = 5*g.Player.AptitudeCount() - g.Depth + 2
-	if r < 2 {
-		r = 1
+	r = 30*g.Player.AptitudeCount() - 6*g.Depth + 2
+	if r < -2 {
+		r = 0
+	} else if r < 2 {
+		r = 2
 	}
 	if RandInt(r) == 0 && g.Depth > 0 && g.Player.AptitudeCount() < 3 {
 		apt, ok := g.RandomApt()
