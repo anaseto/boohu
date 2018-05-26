@@ -5,6 +5,7 @@ import "sort"
 type dungeonPath struct {
 	dungeon   *dungeon
 	neighbors [8]position
+	wcost     int
 }
 
 func (dp *dungeonPath) Neighbors(pos position) []position {
@@ -14,6 +15,9 @@ func (dp *dungeonPath) Neighbors(pos position) []position {
 
 func (dp *dungeonPath) Cost(from, to position) int {
 	if dp.dungeon.Cell(to).T == WallCell {
+		if dp.wcost > 0 {
+			return dp.wcost
+		}
 		return 4
 	}
 	return 1
@@ -182,7 +186,7 @@ func (g *game) PlayerPath(from, to position) []position {
 func (g *game) SortedNearestTo(cells []position, to position) []position {
 	ps := posSlice{}
 	for _, pos := range cells {
-		pp := &dungeonPath{dungeon: g.Dungeon}
+		pp := &dungeonPath{dungeon: g.Dungeon, wcost: unreachable}
 		_, cost, found := AstarPath(pp, pos, to)
 		if found {
 			ps = append(ps, posCost{pos, cost})
