@@ -73,6 +73,9 @@ func (g *game) Load() (bool, error) {
 	if err != nil {
 		return true, err
 	}
+	if lg.Version != Version {
+		return true, fmt.Errorf("saved game for previous version %s.", lg.Version)
+	}
 	*g = *lg
 	return true, nil
 }

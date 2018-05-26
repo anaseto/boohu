@@ -54,6 +54,7 @@ type game struct {
 	Scumming            int
 	Quit                bool
 	Wizard              bool
+	Version             string
 	ui                  Renderer
 }
 
@@ -321,6 +322,7 @@ func (g *game) InitLevel() {
 		g.FoundEquipables = map[equipable]bool{Robe: true, Dagger: true}
 		g.GeneratedBands = map[monsterBand]int{}
 		g.Stats.KilledMons = map[monsterKind]int{}
+		g.Version = Version
 	}
 
 	g.MonstersPosCache = make([]int, DungeonNCells)
