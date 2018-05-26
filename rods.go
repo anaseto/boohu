@@ -239,7 +239,7 @@ func (g *game) EvokeRodLightningBolt(ev event) error {
 	}
 	ray := g.Ray(g.Player.Target)
 	g.MakeNoise(MagicCastNoise, g.Player.Pos)
-	g.Print("A lightning bolt emerges straight from the rod.")
+	g.Print("Whoosh! A lightning bolt emerges straight from the rod.")
 	g.ui.LightningBoltAnimation(g, ray)
 	for _, pos := range ray {
 		g.Burn(pos, ev)
@@ -269,7 +269,7 @@ func (g *game) EvokeRodFireball(ev event) error {
 	}
 	neighbors := g.Dungeon.FreeNeighbors(g.Player.Target)
 	g.MakeNoise(MagicExplosionNoise, g.Player.Target)
-	g.Print("A fireball emerges straight from the rod.")
+	g.Printf("A fireball emerges straight from the rod... %s", g.ExplosionSound())
 	g.ui.ProjectileTrajectoryAnimation(g, g.Ray(g.Player.Target), ColorFgExplosionStart)
 	g.ui.ExplosionAnimation(g, FireExplosion, g.Player.Target)
 	for _, pos := range append(neighbors, g.Player.Target) {

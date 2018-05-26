@@ -2,16 +2,20 @@
 
 package main
 
-func (g *game) HitDamage(dt dmgType, base int, armor int) int {
+func (g *game) HitDamage(dt dmgType, base int, armor int) (attack int, clang bool) {
 	min := base / 2
-	attack := min + RandInt(base-min+1)
+	attack = min + RandInt(base-min+1)
 	if dt == DmgPhysical {
-		attack -= RandInt(armor + 1)
+		absorb := RandInt(armor + 1)
+		if absorb > 0 && absorb >= 2*armor/3 && RandInt(2) == 0 {
+			clang = true
+		}
+		attack -= absorb
 	}
 	if attack < 0 {
 		attack = 0
 	}
-	return attack
+	return attack, clang
 }
 
 func (m *monster) InflictDamage(g *game, damage, max int) {
@@ -149,7 +153,7 @@ func (g *game) HitConnected(pos position, dt dmgType, ev event) {
 	}
 }
 
-func (g *game) HitNoise() int {
+func (g *game) HitNoise(clang bool) int {
 	noise := BaseHitNoise
 	if g.Player.Weapon == Frundis {
 		noise -= 2
@@ -157,7 +161,9 @@ func (g *game) HitNoise() int {
 	if g.Player.Armour == Robe {
 		noise -= 1
 	}
-	noise += g.Player.Armor() / 2
+	if clang {
+		noise += g.Player.Armor()
+	}
 	return noise
 }
 
@@ -180,13 +186,15 @@ func (g *game) HitMonster(dt dmgType, mons *monster, ev event) (hit bool) {
 		if g.Player.Weapon == Frundis || g.Player.Weapon == Dagger {
 			noise -= 2
 		}
-		noise += mons.Armor / 2
-		g.MakeNoise(noise, mons.Pos)
 		bonus := 0
 		if g.Player.HasStatus(StatusBerserk) {
 			bonus += 2 + RandInt(4)
 		}
-		attack := g.HitDamage(dt, g.Player.Attack()+bonus, mons.Armor)
+		attack, clang := g.HitDamage(dt, g.Player.Attack()+bonus, mons.Armor)
+		if clang {
+			noise += mons.Armor
+		}
+		g.MakeNoise(noise, mons.Pos)
 		if mons.State == Resting {
 			if g.Player.Weapon == Dagger {
 				attack *= 4
@@ -194,14 +202,22 @@ func (g *game) HitMonster(dt dmgType, mons *monster, ev event) (hit bool) {
 				attack *= 2
 			}
 		}
+		var sclang string
+		if clang {
+			if mons.Armor > 3 {
+				sclang = " ♫ Clang!"
+			} else {
+				sclang = " ♪ Clang!"
+			}
+		}
 		oldHP := mons.HP
 		mons.HP -= attack
 		g.ui.HitAnimation(g, mons.Pos, false)
 		if mons.HP > 0 {
-			g.PrintfStyled("You hit %s (%d dmg).", logPlayerHit, mons.Kind.Definite(false), attack)
+			g.PrintfStyled("You hit %s (%d dmg).%s", logPlayerHit, mons.Kind.Definite(false), attack, sclang)
 		} else if oldHP > 0 {
 			// test oldHP > 0 because of sword special attack
-			g.PrintfStyled("You kill %s (%d dmg).", logPlayerHit, mons.Kind.Definite(false), attack)
+			g.PrintfStyled("You kill %s (%d dmg).%s", logPlayerHit, mons.Kind.Definite(false), attack, sclang)
 			g.HandleKill(mons, ev)
 		}
 		if mons.Kind == MonsBrizzia && RandInt(4) == 0 && !g.Player.HasStatus(StatusNausea) &&
@@ -242,4 +258,14 @@ const (
 	MagicExplosionNoise = 16
 	MagicCastNoise      = 16
 	BaseHitNoise        = 11
+	ShieldBlockNoise    = 15
 )
+
+func (g *game) ArmourClang() (sclang string) {
+	if g.Player.Armor() > 3 {
+		sclang = " Clang!"
+	} else {
+		sclang = " Smash!"
+	}
+	return sclang
+}

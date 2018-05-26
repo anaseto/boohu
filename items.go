@@ -449,7 +449,7 @@ func (g *game) ThrowConfusingDart(ev event) error {
 		if g.Player.Aptitudes[AptStrong] {
 			bonus += 2
 		}
-		attack := g.HitDamage(DmgPhysical, 7+bonus, mons.Armor)
+		attack, _ := g.HitDamage(DmgPhysical, 7+bonus, mons.Armor) // no clang with darts
 		mons.HP -= attack
 		if mons.HP > 0 {
 			mons.EnterConfusion(g, ev)
@@ -600,9 +600,9 @@ func (ar armour) Desc() string {
 	case LeatherArmour:
 		text = "A leather armour provides some protection against blows."
 	case ChainMail:
-		text = "A chain mail provides more protection than a leather armour, but the blows you receive are louder."
+		text = "A chain mail provides more protection than a leather armour."
 	case PlateArmour:
-		text = "A plate armour provides great protection against blows, but blows you receive are quite noisy."
+		text = "A plate armour provides great protection against blows."
 	}
 	return text
 }
@@ -811,9 +811,9 @@ func (sh shield) Short() (text string) {
 func (sh shield) Desc() (text string) {
 	switch sh {
 	case Buckler:
-		text = "A buckler is a small shield that can sometimes block attacks, including some magical attacks. You cannot use it if you are wielding a two-handed weapon."
+		text = "A buckler is a small shield that can block attacks. You cannot use it if you are wielding a two-handed weapon."
 	case Shield:
-		text = "A shield can block attacks, including some magical attacks. You cannot use it if you are wielding a two-handed weapon."
+		text = "A shield can block attacks. You cannot use it if you are wielding a two-handed weapon."
 	}
 	return text
 }
