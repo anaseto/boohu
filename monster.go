@@ -792,7 +792,7 @@ func (m *monster) DramaticAdjustment(g *game, baseAttack, attack, evasion, acc i
 			}
 		}
 	}
-	if m.Attack >= g.Player.HP && (acc <= evasion || attack < g.Player.HP) {
+	if baseAttack >= g.Player.HP && (acc <= evasion || attack < g.Player.HP) {
 		g.Stats.TimesLucky++
 	}
 	return attack, evasion, clang
@@ -1090,8 +1090,9 @@ func (m *monster) ThrowAcid(g *game, ev event) bool {
 	hit := true
 	evasion := RandInt(g.Player.Evasion())
 	acc := RandInt(m.Accuracy)
-	attack, clang := g.HitDamage(DmgPhysical, 12, g.Player.Armor())
-	attack, evasion, clang = m.DramaticAdjustment(g, 12, attack, evasion, acc, clang)
+	acdmg := 12
+	attack, clang := g.HitDamage(DmgPhysical, acdmg, g.Player.Armor())
+	attack, evasion, clang = m.DramaticAdjustment(g, acdmg, attack, evasion, acc, clang)
 	if acc <= evasion {
 		hit = false
 	} else {
@@ -1103,7 +1104,7 @@ func (m *monster) ThrowAcid(g *game, ev event) bool {
 		g.MakeNoise(noise, g.Player.Pos)
 		g.Printf("%s throws acid at you (%d dmg).", m.Kind.Definite(true), attack)
 		g.ui.MonsterProjectileAnimation(g, g.Ray(m.Pos), '*', ColorGreen)
-		m.InflictDamage(g, attack, 11)
+		m.InflictDamage(g, attack, acdmg)
 		if RandInt(2) == 0 {
 			g.Corrosion(ev)
 			if RandInt(2) == 0 {
