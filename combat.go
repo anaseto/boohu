@@ -250,7 +250,8 @@ func (g *game) HandleKill(mons *monster, ev event) {
 }
 
 const (
-	WallNoise           = 17
+	WallNoise           = 18
+	TemporalWallNoise   = 16
 	ExplosionHitNoise   = 13
 	ExplosionNoise      = 18
 	MagicHitNoise       = 15
