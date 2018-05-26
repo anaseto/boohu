@@ -1325,7 +1325,7 @@ func (g *game) Danger() int {
 }
 
 func (g *game) MaxDanger() int {
-	max := 20 + 10*g.Depth + g.Depth*g.Depth/3
+	max := 18 + 10*g.Depth + g.Depth*g.Depth/3
 	adjust := -2 * g.Depth
 	for c, q := range g.Player.Consumables {
 		switch c {
@@ -1397,6 +1397,8 @@ func (g *game) GenMonsters() {
 	nmons := g.MaxMonsters()
 	nband := 0
 	i := 0
+	repeat := 0
+loop:
 	for danger > 0 && nmons > 0 {
 		for band, data := range MonsBands {
 			if RandInt(data.rarity*2) != 0 {
@@ -1410,11 +1412,18 @@ func (g *game) GenMonsters() {
 			g.Bands = append(g.Bands, monsterBand(band))
 			pos := g.FreeCellForMonster()
 			for _, mk := range monsters {
-				danger -= mk.Dangerousness()
-				nmons--
-				if danger <= 0 || nmons <= 0 {
+				if nmons-1 <= 0 {
 					return
 				}
+				if danger-mk.Dangerousness() <= 0 {
+					if repeat > 10 {
+						return
+					}
+					repeat++
+					continue loop
+				}
+				danger -= mk.Dangerousness()
+				nmons--
 				mons := &monster{Kind: mk}
 				mons.Init()
 				mons.Index = i
