@@ -580,6 +580,7 @@ func (g *game) FrundisInLevel() bool {
 func (g *game) Descend() bool {
 	g.LevelStats()
 	if g.Depth >= MaxDepth {
+		g.StoryPrint("You escaped!")
 		g.Depth++
 		return true
 	}
