@@ -1357,6 +1357,9 @@ func (g *game) MaxDanger() int {
 	if MaxDepth-g.Depth < g.Player.Consumables[MagicMappingPotion] {
 		max = max * 110 / 100
 	}
+	if MaxDepth-g.Depth < g.Player.Consumables[DreamPotion] {
+		max = max * 105 / 100
+	}
 	return max
 }
 
