@@ -528,9 +528,9 @@ var ConsumablesCollectData = map[consumable]collectData{
 	CBlinkPotion:        {rarity: 12, quantity: 1},
 	DigPotion:           {rarity: 12, quantity: 1},
 	SwapPotion:          {rarity: 12, quantity: 1},
-	DescentPotion:       {rarity: 15, quantity: 1},
-	MagicMappingPotion:  {rarity: 15, quantity: 1},
-	DreamPotion:         {rarity: 15, quantity: 1},
+	DescentPotion:       {rarity: 17, quantity: 1},
+	MagicMappingPotion:  {rarity: 17, quantity: 1},
+	DreamPotion:         {rarity: 17, quantity: 1},
 }
 
 type equipable interface {
