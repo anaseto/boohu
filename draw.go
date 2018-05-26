@@ -1969,7 +1969,7 @@ func (ui *termui) DrawStatusLine(g *game) {
 	hp := fmt.Sprintf("HP:%2d ", g.Player.HP)
 	ui.DrawColoredText(hp, col, line, hpColor)
 	col += utf8.RuneCountInString(hp)
-	mp := fmt.Sprintf("MP:%2d ", g.Player.MP)
+	mp := fmt.Sprintf("MP:%d ", g.Player.MP)
 	ui.DrawColoredText(mp, col, line, mpColor)
 	col += utf8.RuneCountInString(mp)
 	if len(sts) > 0 {
