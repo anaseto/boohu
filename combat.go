@@ -150,7 +150,7 @@ func (g *game) HitConnected(pos position, dt dmgType, ev event) {
 }
 
 func (g *game) HitNoise() int {
-	noise := 12
+	noise := BaseHitNoise
 	if g.Player.Weapon == Frundis {
 		noise -= 2
 	}
@@ -176,11 +176,11 @@ func (g *game) HitMonster(dt dmgType, mons *monster, ev event) (hit bool) {
 	}
 	if acc > evasion {
 		hit = true
-		noise := 12
+		noise := BaseHitNoise
 		if g.Player.Weapon == Frundis || g.Player.Weapon == Dagger {
 			noise -= 2
 		}
-		noise += mons.Armor / 3
+		noise += mons.Armor / 2
 		g.MakeNoise(noise, mons.Pos)
 		bonus := 0
 		if g.Player.HasStatus(StatusBerserk) {
@@ -232,3 +232,14 @@ func (g *game) HandleKill(mons *monster, ev event) {
 		g.StoryPrintf("You killed %s.", mons.Kind.Indefinite(false))
 	}
 }
+
+const (
+	WallNoise           = 17
+	ExplosionHitNoise   = 13
+	ExplosionNoise      = 18
+	MagicHitNoise       = 15
+	BarkNoise           = 13
+	MagicExplosionNoise = 16
+	MagicCastNoise      = 16
+	BaseHitNoise        = 11
+)

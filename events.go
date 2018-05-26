@@ -262,7 +262,7 @@ func (cev *cloudEvent) Action(g *game) {
 			break
 		}
 		g.Dungeon.SetCell(cev.Pos, FreeCell)
-		g.MakeNoise(15, cev.Pos)
+		g.MakeNoise(WallNoise, cev.Pos)
 		g.Fog(cev.Pos, 1, &simpleEvent{ERank: cev.Rank()})
 		g.ComputeLOS()
 	case FireProgression:

@@ -340,7 +340,6 @@ func (g *game) QuaffWallPotion(ev event) error {
 		if mons.Exists() {
 			continue
 		}
-		g.MakeNoise(15, pos)
 		g.Dungeon.SetCell(pos, WallCell)
 		delete(g.Clouds, g.Player.Target)
 		if g.TemporalWalls != nil {
@@ -476,7 +475,7 @@ func (g *game) ThrowExplosiveMagara(ev event) error {
 	}
 	neighbors := g.Player.Target.ValidNeighbors()
 	g.Printf("You throw the explosive magara... %s", g.ExplosionSound())
-	g.MakeNoise(18, g.Player.Target)
+	g.MakeNoise(ExplosionNoise, g.Player.Target)
 	g.ui.ProjectileTrajectoryAnimation(g, g.Ray(g.Player.Target), ColorFgPlayer)
 	g.ui.ExplosionAnimation(g, FireExplosion, g.Player.Target)
 	for _, pos := range append(neighbors, g.Player.Target) {
@@ -487,7 +486,7 @@ func (g *game) ThrowExplosiveMagara(ev event) error {
 			if mons.HP == 0 {
 				mons.HP = 1
 			}
-			g.MakeNoise(12, mons.Pos)
+			g.MakeNoise(ExplosionHitNoise, mons.Pos)
 			mons.MakeHuntIfHurt(g)
 		} else if g.Dungeon.Cell(pos).T == WallCell && RandInt(2) == 0 {
 			g.Dungeon.SetCell(pos, FreeCell)
@@ -497,7 +496,7 @@ func (g *game) ThrowExplosiveMagara(ev event) error {
 			} else {
 				g.ui.WallExplosionAnimation(g, pos)
 			}
-			g.MakeNoise(18, pos)
+			g.MakeNoise(WallNoise, pos)
 			g.Fog(pos, 1, ev)
 		}
 	}

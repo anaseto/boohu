@@ -724,7 +724,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 			if !g.Player.LOS[target] {
 				g.WrongWall[m.Pos] = true
 			}
-			g.MakeNoise(18, m.Pos)
+			g.MakeNoise(WallNoise, m.Pos)
 			g.Fog(m.Pos, 1, ev)
 			if g.Player.Pos.Distance(target) < 12 {
 				// XXX use dijkstra distance ?
@@ -941,7 +941,7 @@ func (m *monster) TormentBolt(g *game, ev event) bool {
 	hit := !m.Blocked(g)
 	g.MakeNoise(9, m.Pos)
 	if hit {
-		g.MakeNoise(12, g.Player.Pos)
+		g.MakeNoise(MagicHitNoise, g.Player.Pos)
 		damage := g.Player.HP - g.Player.HP/2
 		g.PrintfStyled("%s throws a bolt of torment at you.", logMonsterHit, m.Kind.Definite(true))
 		g.ui.MonsterProjectileAnimation(g, g.Ray(m.Pos), '*', ColorCyan)
@@ -1147,7 +1147,7 @@ func (m *monster) AbsorbMana(g *game, ev event) bool {
 
 func (m *monster) Explode(g *game, ev event) {
 	neighbors := m.Pos.ValidNeighbors()
-	g.MakeNoise(18, m.Pos)
+	g.MakeNoise(WallNoise, m.Pos)
 	g.Printf("%s %s blows with a noisy pop.", g.ExplosionSound(), m.Kind.Definite(true))
 	g.ui.ExplosionAnimation(g, FireExplosion, m.Pos)
 	for _, pos := range append(neighbors, m.Pos) {
@@ -1161,7 +1161,7 @@ func (m *monster) Explode(g *game, ev event) {
 			if mons.HP == 0 {
 				mons.HP = 1
 			}
-			g.MakeNoise(12, mons.Pos)
+			g.MakeNoise(ExplosionHitNoise, mons.Pos)
 			mons.MakeHuntIfHurt(g)
 		} else if g.Player.Pos == pos {
 			dmg := g.Player.HP / 2
@@ -1174,7 +1174,7 @@ func (m *monster) Explode(g *game, ev event) {
 			} else {
 				g.ui.WallExplosionAnimation(g, pos)
 			}
-			g.MakeNoise(18, pos)
+			g.MakeNoise(WallNoise, pos)
 			g.Fog(pos, 1, ev)
 		}
 	}
@@ -1193,7 +1193,7 @@ func (m *monster) MakeHuntIfHurt(g *game) {
 		}
 		if m.Kind == MonsHound {
 			g.Printf("%s barks.", m.Kind.Definite(true))
-			g.MakeNoise(12, m.Pos)
+			g.MakeNoise(BarkNoise, m.Pos)
 		}
 	}
 }
@@ -1250,7 +1250,7 @@ func (m *monster) MakeAware(g *game) {
 	}
 	if m.State != Hunting && m.Kind == MonsHound {
 		g.Printf("%s barks.", m.Kind.Definite(true))
-		g.MakeNoise(12, m.Pos)
+		g.MakeNoise(BarkNoise, m.Pos)
 	}
 	m.MakeHunt(g)
 }
