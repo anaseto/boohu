@@ -1325,7 +1325,7 @@ func (g *game) Danger() int {
 }
 
 func (g *game) MaxDanger() int {
-	max := 18 + 10*g.Depth + g.Depth*g.Depth/3
+	max := 18 + 9*g.Depth + g.Depth/2 + g.Depth*g.Depth/3
 	adjust := -2 * g.Depth
 	for c, q := range g.Player.Consumables {
 		switch c {
