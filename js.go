@@ -38,7 +38,7 @@ func main() {
 	g.ui = tui
 	g.EventLoop()
 	tui.Clear()
-	tui.DrawText("Refresh the page to start again", 0, 0)
+	tui.DrawText("Refresh the page to start again.\nYou can find last game statistics below.", 0, 0)
 	tui.DrawText(SaveError, 0, 1)
 	tui.Flush()
 }
