@@ -256,8 +256,8 @@ func (g *game) GenDungeon() {
 
 func (g *game) InitPlayer() {
 	g.Player = &player{
-		HP:        40,
-		MP:        10,
+		HP:        42,
+		MP:        3,
 		Simellas:  0,
 		Aptitudes: map[aptitude]bool{},
 	}
