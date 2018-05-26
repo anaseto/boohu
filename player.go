@@ -378,7 +378,7 @@ func (g *game) MovePlayer(pos position, ev event) error {
 		}
 		if c.T == WallCell {
 			g.Dungeon.SetCell(pos, FreeCell)
-			g.MakeNoise(18, pos)
+			g.MakeNoise(WallNoise, pos)
 			g.Print(g.CrackSound())
 			g.Fog(pos, 1, ev)
 			g.Stats.Digs++

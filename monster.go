@@ -724,7 +724,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 			if !g.Player.LOS[target] {
 				g.WrongWall[m.Pos] = true
 			}
-			g.MakeNoise(18, m.Pos)
+			g.MakeNoise(WallNoise, m.Pos)
 			g.Fog(m.Pos, 1, ev)
 			if g.Player.Pos.Distance(target) < 12 {
 				// XXX use dijkstra distance ?
@@ -779,11 +779,11 @@ func (m *monster) InvertFoliage(g *game) {
 	}
 }
 
-func (m *monster) DramaticAdjustment(g *game, baseAttack, attack, evasion, acc int) (int, int) {
+func (m *monster) DramaticAdjustment(g *game, baseAttack, attack, evasion, acc int, clang bool) (int, int, bool) {
 	if attack >= g.Player.HP {
 		// a little dramatic effect
 		if RandInt(2) == 0 {
-			attack = g.HitDamage(DmgPhysical, baseAttack, g.Player.Armor())
+			attack, clang = g.HitDamage(DmgPhysical, baseAttack, g.Player.Armor())
 		}
 		if attack >= g.Player.HP {
 			n := RandInt(g.Player.Evasion())
@@ -795,7 +795,7 @@ func (m *monster) DramaticAdjustment(g *game, baseAttack, attack, evasion, acc i
 	if m.Attack >= g.Player.HP && (acc <= evasion || attack < g.Player.HP) {
 		g.Stats.TimesLucky++
 	}
-	return attack, evasion
+	return attack, evasion, clang
 }
 
 func (m *monster) HitPlayer(g *game, ev event) {
@@ -804,20 +804,25 @@ func (m *monster) HitPlayer(g *game, ev event) {
 	}
 	evasion := RandInt(g.Player.Evasion())
 	acc := RandInt(m.Accuracy)
-	attack := g.HitDamage(DmgPhysical, m.Attack, g.Player.Armor())
-	attack, evasion = m.DramaticAdjustment(g, m.Attack, attack, evasion, acc)
+	attack, clang := g.HitDamage(DmgPhysical, m.Attack, g.Player.Armor())
+	attack, evasion, clang = m.DramaticAdjustment(g, m.Attack, attack, evasion, acc, clang)
 	if acc > evasion {
 		if m.Blocked(g) {
-			g.Printf("You block the %s's attack with your %s.", m.Kind, g.Player.Shield)
+			g.Printf("Clang! You block %s's attack.", m.Kind.Definite(false))
+			g.MakeNoise(ShieldBlockNoise, g.Player.Pos)
 			return
 		}
 		if g.Player.HasStatus(StatusSwap) && !g.Player.HasStatus(StatusLignification) {
 			g.SwapWithMonster(m)
 			return
 		}
-		noise := g.HitNoise()
+		noise := g.HitNoise(clang)
 		g.MakeNoise(noise, g.Player.Pos)
-		g.PrintfStyled("%s hits you (%d dmg).", logMonsterHit, m.Kind.Definite(true), attack)
+		var sclang string
+		if clang {
+			sclang = g.ArmourClang()
+		}
+		g.PrintfStyled("%s hits you (%d dmg).%s", logMonsterHit, m.Kind.Definite(true), attack, sclang)
 		m.InflictDamage(g, attack, m.Attack)
 		if g.Player.HP <= 0 {
 			return
@@ -941,7 +946,7 @@ func (m *monster) TormentBolt(g *game, ev event) bool {
 	hit := !m.Blocked(g)
 	g.MakeNoise(9, m.Pos)
 	if hit {
-		g.MakeNoise(12, g.Player.Pos)
+		g.MakeNoise(MagicHitNoise, g.Player.Pos)
 		damage := g.Player.HP - g.Player.HP/2
 		g.PrintfStyled("%s throws a bolt of torment at you.", logMonsterHit, m.Kind.Definite(true))
 		g.ui.MonsterProjectileAnimation(g, g.Ray(m.Pos), '*', ColorCyan)
@@ -978,8 +983,9 @@ func (m *monster) ThrowRock(g *game, ev event) bool {
 	hit := true
 	evasion := RandInt(g.Player.Evasion())
 	acc := RandInt(m.Accuracy)
-	attack := g.HitDamage(DmgPhysical, 15, g.Player.Armor())
-	attack, evasion = m.DramaticAdjustment(g, 15, attack, evasion, acc)
+	const rockdmg = 15
+	attack, clang := g.HitDamage(DmgPhysical, rockdmg, g.Player.Armor())
+	attack, evasion, clang = m.DramaticAdjustment(g, rockdmg, attack, evasion, acc, clang)
 	if 4*acc/3 <= evasion {
 		// rocks are big and do not miss so often
 		hit = false
@@ -988,9 +994,13 @@ func (m *monster) ThrowRock(g *game, ev event) bool {
 		hit = !block
 	}
 	if hit {
-		noise := g.HitNoise()
+		noise := g.HitNoise(clang)
 		g.MakeNoise(noise, g.Player.Pos)
-		g.PrintfStyled("%s throws a rock at you (%d dmg).", logMonsterHit, m.Kind.Definite(true), attack)
+		var sclang string
+		if clang {
+			sclang = g.ArmourClang()
+		}
+		g.PrintfStyled("%s throws a rock at you (%d dmg).%s", logMonsterHit, m.Kind.Definite(true), attack, sclang)
 		g.ui.MonsterProjectileAnimation(g, g.Ray(m.Pos), '●', ColorMagenta)
 		oppos := g.Player.Pos
 		if m.PushPlayer(g) {
@@ -1001,9 +1011,10 @@ func (m *monster) ThrowRock(g *game, ev event) bool {
 				g.TemporalWallAt(ray[len(ray)-1], ev)
 			}
 		}
-		m.InflictDamage(g, attack, 15)
+		m.InflictDamage(g, attack, rockdmg)
 	} else if block {
-		g.Printf("You block %s's rock.", m.Kind.Indefinite(false))
+		g.Printf("You block %s's rock. Clang!", m.Kind.Indefinite(false))
+		g.MakeNoise(ShieldBlockNoise, g.Player.Pos)
 		g.ui.MonsterProjectileAnimation(g, g.Ray(m.Pos), '●', ColorMagenta)
 		ray := g.Ray(m.Pos)
 		if len(ray) > 0 {
@@ -1029,8 +1040,9 @@ func (m *monster) ThrowJavelin(g *game, ev event) bool {
 	hit := true
 	evasion := RandInt(g.Player.Evasion())
 	acc := RandInt(m.Accuracy)
-	attack := g.HitDamage(DmgPhysical, 11, g.Player.Armor())
-	attack, evasion = m.DramaticAdjustment(g, 11, attack, evasion, acc)
+	const jdmg = 11
+	attack, clang := g.HitDamage(DmgPhysical, jdmg, g.Player.Armor())
+	attack, evasion, clang = m.DramaticAdjustment(g, jdmg, attack, evasion, acc, clang)
 	if acc <= evasion {
 		hit = false
 	} else {
@@ -1038,19 +1050,25 @@ func (m *monster) ThrowJavelin(g *game, ev event) bool {
 		hit = !block
 	}
 	if hit {
-		noise := g.HitNoise()
+		noise := g.HitNoise(clang)
 		g.MakeNoise(noise, g.Player.Pos)
-		g.Printf("%s throws %s at you (%d dmg).", m.Kind.Definite(true), Indefinite("javelin", false), attack)
+		var sclang string
+		if clang {
+			sclang = g.ArmourClang()
+		}
+		g.Printf("%s throws %s at you (%d dmg).%s", m.Kind.Definite(true), Indefinite("javelin", false), attack, sclang)
 		g.ui.MonsterJavelinAnimation(g, g.Ray(m.Pos), true)
-		m.InflictDamage(g, attack, 11)
+		m.InflictDamage(g, attack, jdmg)
 	} else if block {
 		if RandInt(3) == 0 {
-			g.Printf("You block %s's %s.", m.Kind.Indefinite(false), "javelin")
+			g.Printf("You block %s's %s. Clang!", m.Kind.Indefinite(false), "javelin")
+			g.MakeNoise(ShieldBlockNoise, g.Player.Pos)
 			g.ui.MonsterJavelinAnimation(g, g.Ray(m.Pos), false)
 		} else if !g.Player.HasStatus(StatusDisabledShield) {
 			g.Player.Statuses[StatusDisabledShield] = 1
 			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 100 + RandInt(100), EAction: DisabledShieldEnd})
 			g.Printf("%s's %s gets fixed on your shield.", m.Kind.Indefinite(true), "javelin")
+			g.MakeNoise(ShieldBlockNoise, g.Player.Pos)
 			g.ui.MonsterJavelinAnimation(g, g.Ray(m.Pos), false)
 		}
 	} else {
@@ -1072,8 +1090,8 @@ func (m *monster) ThrowAcid(g *game, ev event) bool {
 	hit := true
 	evasion := RandInt(g.Player.Evasion())
 	acc := RandInt(m.Accuracy)
-	attack := g.HitDamage(DmgPhysical, 12, g.Player.Armor())
-	attack, evasion = m.DramaticAdjustment(g, 12, attack, evasion, acc)
+	attack, clang := g.HitDamage(DmgPhysical, 12, g.Player.Armor())
+	attack, evasion, clang = m.DramaticAdjustment(g, 12, attack, evasion, acc, clang)
 	if acc <= evasion {
 		hit = false
 	} else {
@@ -1081,7 +1099,7 @@ func (m *monster) ThrowAcid(g *game, ev event) bool {
 		hit = !block
 	}
 	if hit {
-		noise := g.HitNoise()
+		noise := g.HitNoise(false) // no clang with acid projectiles
 		g.MakeNoise(noise, g.Player.Pos)
 		g.Printf("%s throws acid at you (%d dmg).", m.Kind.Definite(true), attack)
 		g.ui.MonsterProjectileAnimation(g, g.Ray(m.Pos), '*', ColorGreen)
@@ -1094,6 +1112,7 @@ func (m *monster) ThrowAcid(g *game, ev event) bool {
 		}
 	} else if block {
 		g.Printf("You block %s's acid projectile.", m.Kind.Indefinite(false))
+		g.MakeNoise(BaseHitNoise, g.Player.Pos) // no real clang
 		g.ui.MonsterProjectileAnimation(g, g.Ray(m.Pos), '*', ColorGreen)
 		if RandInt(2) == 0 {
 			g.Corrosion(ev)
@@ -1147,7 +1166,7 @@ func (m *monster) AbsorbMana(g *game, ev event) bool {
 
 func (m *monster) Explode(g *game, ev event) {
 	neighbors := m.Pos.ValidNeighbors()
-	g.MakeNoise(18, m.Pos)
+	g.MakeNoise(WallNoise, m.Pos)
 	g.Printf("%s %s blows with a noisy pop.", g.ExplosionSound(), m.Kind.Definite(true))
 	g.ui.ExplosionAnimation(g, FireExplosion, m.Pos)
 	for _, pos := range append(neighbors, m.Pos) {
@@ -1161,7 +1180,7 @@ func (m *monster) Explode(g *game, ev event) {
 			if mons.HP == 0 {
 				mons.HP = 1
 			}
-			g.MakeNoise(12, mons.Pos)
+			g.MakeNoise(ExplosionHitNoise, mons.Pos)
 			mons.MakeHuntIfHurt(g)
 		} else if g.Player.Pos == pos {
 			dmg := g.Player.HP / 2
@@ -1174,7 +1193,7 @@ func (m *monster) Explode(g *game, ev event) {
 			} else {
 				g.ui.WallExplosionAnimation(g, pos)
 			}
-			g.MakeNoise(18, pos)
+			g.MakeNoise(WallNoise, pos)
 			g.Fog(pos, 1, ev)
 		}
 	}
@@ -1193,7 +1212,7 @@ func (m *monster) MakeHuntIfHurt(g *game) {
 		}
 		if m.Kind == MonsHound {
 			g.Printf("%s barks.", m.Kind.Definite(true))
-			g.MakeNoise(12, m.Pos)
+			g.MakeNoise(BarkNoise, m.Pos)
 		}
 	}
 }
@@ -1250,7 +1269,7 @@ func (m *monster) MakeAware(g *game) {
 	}
 	if m.State != Hunting && m.Kind == MonsHound {
 		g.Printf("%s barks.", m.Kind.Definite(true))
-		g.MakeNoise(12, m.Pos)
+		g.MakeNoise(BarkNoise, m.Pos)
 	}
 	m.MakeHunt(g)
 }

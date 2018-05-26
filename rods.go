@@ -238,7 +238,8 @@ func (g *game) EvokeRodLightningBolt(ev event) error {
 		return err
 	}
 	ray := g.Ray(g.Player.Target)
-	g.Print("A lightning bolt emerges straight from the rod.")
+	g.MakeNoise(MagicCastNoise, g.Player.Pos)
+	g.Print("Whoosh! A lightning bolt emerges straight from the rod.")
 	g.ui.LightningBoltAnimation(g, ray)
 	for _, pos := range ray {
 		g.Burn(pos, ev)
@@ -256,7 +257,7 @@ func (g *game) EvokeRodLightningBolt(ev event) error {
 			g.Printf("%s is killed by the bolt.", mons.Kind.Indefinite(true))
 			g.HandleKill(mons, ev)
 		}
-		g.MakeNoise(12, mons.Pos)
+		g.MakeNoise(MagicHitNoise, mons.Pos)
 		mons.MakeHuntIfHurt(g)
 	}
 	return nil
@@ -267,7 +268,8 @@ func (g *game) EvokeRodFireball(ev event) error {
 		return err
 	}
 	neighbors := g.Dungeon.FreeNeighbors(g.Player.Target)
-	g.Print("A fireball emerges straight from the rod.")
+	g.MakeNoise(MagicExplosionNoise, g.Player.Target)
+	g.Printf("A fireball emerges straight from the rod... %s", g.ExplosionSound())
 	g.ui.ProjectileTrajectoryAnimation(g, g.Ray(g.Player.Target), ColorFgExplosionStart)
 	g.ui.ExplosionAnimation(g, FireExplosion, g.Player.Target)
 	for _, pos := range append(neighbors, g.Player.Target) {
@@ -286,7 +288,7 @@ func (g *game) EvokeRodFireball(ev event) error {
 			g.Printf("%s is killed by the fireball.", mons.Kind.Indefinite(true))
 			g.HandleKill(mons, ev)
 		}
-		g.MakeNoise(12, mons.Pos)
+		g.MakeNoise(MagicHitNoise, mons.Pos)
 		mons.MakeHuntIfHurt(g)
 	}
 	return nil
@@ -326,7 +328,7 @@ func (g *game) EvokeRodDigging(ev event) error {
 	for i := 0; i < 3; i++ {
 		g.Dungeon.SetCell(pos, FreeCell)
 		g.Stats.Digs++
-		g.MakeNoise(17, pos)
+		g.MakeNoise(WallNoise, pos)
 		g.Fog(pos, 1, ev)
 		pos = pos.To(pos.Dir(g.Player.Pos))
 		if !g.Player.LOS[pos] {
@@ -352,7 +354,7 @@ func (g *game) EvokeRodShatter(ev event) error {
 	g.Stats.Digs++
 	g.ComputeLOS()
 	g.MakeMonstersAware()
-	g.MakeNoise(18, g.Player.Target)
+	g.MakeNoise(WallNoise, g.Player.Target)
 	g.Printf("%s The wall disappeared.", g.CrackSound())
 	g.ui.ProjectileTrajectoryAnimation(g, g.Ray(g.Player.Target), ColorFgExplosionWallStart)
 	g.ui.ExplosionAnimation(g, WallExplosion, g.Player.Target)
@@ -378,7 +380,7 @@ func (g *game) EvokeRodShatter(ev event) error {
 			g.Printf("%s is killed by the explosion.", mons.Kind.Indefinite(true))
 			g.HandleKill(mons, ev)
 		}
-		g.MakeNoise(12, mons.Pos)
+		g.MakeNoise(ExplosionHitNoise, mons.Pos)
 		mons.MakeHuntIfHurt(g)
 	}
 	return nil

@@ -256,8 +256,8 @@ func (g *game) GenDungeon() {
 
 func (g *game) InitPlayer() {
 	g.Player = &player{
-		HP:        40,
-		MP:        10,
+		HP:        42,
+		MP:        3,
 		Simellas:  0,
 		Aptitudes: map[aptitude]bool{},
 	}
@@ -580,10 +580,12 @@ func (g *game) FrundisInLevel() bool {
 func (g *game) Descend() bool {
 	g.LevelStats()
 	if g.Depth >= MaxDepth {
+		g.StoryPrint("You escaped!")
 		g.Depth++
 		return true
 	}
 	g.Print("You descend deeper in the dungeon.")
+	g.StoryPrint("You descended deeper in the dungeon.")
 	g.Depth++
 	g.DepthPlayerTurn = 0
 	g.Scumming = 0

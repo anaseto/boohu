@@ -238,6 +238,7 @@ func (g *game) QuaffDescent(ev event) error {
 	}
 	g.Printf("You quaff the %s. You fall through the ground.", DescentPotion)
 	g.LevelStats()
+	g.StoryPrint("You descended deeper in the dungeon.")
 	g.Depth++
 	g.DepthPlayerTurn = 0
 	g.InitLevel()
@@ -339,7 +340,6 @@ func (g *game) QuaffWallPotion(ev event) error {
 		if mons.Exists() {
 			continue
 		}
-		g.MakeNoise(15, pos)
 		g.Dungeon.SetCell(pos, WallCell)
 		delete(g.Clouds, g.Player.Target)
 		if g.TemporalWalls != nil {
@@ -449,7 +449,7 @@ func (g *game) ThrowConfusingDart(ev event) error {
 		if g.Player.Aptitudes[AptStrong] {
 			bonus += 2
 		}
-		attack := g.HitDamage(DmgPhysical, 7+bonus, mons.Armor)
+		attack, _ := g.HitDamage(DmgPhysical, 7+bonus, mons.Armor) // no clang with darts
 		mons.HP -= attack
 		if mons.HP > 0 {
 			mons.EnterConfusion(g, ev)
@@ -475,7 +475,7 @@ func (g *game) ThrowExplosiveMagara(ev event) error {
 	}
 	neighbors := g.Player.Target.ValidNeighbors()
 	g.Printf("You throw the explosive magara... %s", g.ExplosionSound())
-	g.MakeNoise(18, g.Player.Target)
+	g.MakeNoise(ExplosionNoise, g.Player.Target)
 	g.ui.ProjectileTrajectoryAnimation(g, g.Ray(g.Player.Target), ColorFgPlayer)
 	g.ui.ExplosionAnimation(g, FireExplosion, g.Player.Target)
 	for _, pos := range append(neighbors, g.Player.Target) {
@@ -486,7 +486,7 @@ func (g *game) ThrowExplosiveMagara(ev event) error {
 			if mons.HP == 0 {
 				mons.HP = 1
 			}
-			g.MakeNoise(12, mons.Pos)
+			g.MakeNoise(ExplosionHitNoise, mons.Pos)
 			mons.MakeHuntIfHurt(g)
 		} else if g.Dungeon.Cell(pos).T == WallCell && RandInt(2) == 0 {
 			g.Dungeon.SetCell(pos, FreeCell)
@@ -496,7 +496,7 @@ func (g *game) ThrowExplosiveMagara(ev event) error {
 			} else {
 				g.ui.WallExplosionAnimation(g, pos)
 			}
-			g.MakeNoise(18, pos)
+			g.MakeNoise(WallNoise, pos)
 			g.Fog(pos, 1, ev)
 		}
 	}
@@ -600,9 +600,9 @@ func (ar armour) Desc() string {
 	case LeatherArmour:
 		text = "A leather armour provides some protection against blows."
 	case ChainMail:
-		text = "A chain mail provides more protection than a leather armour, but the blows you receive are louder."
+		text = "A chain mail provides more protection than a leather armour."
 	case PlateArmour:
-		text = "A plate armour provides great protection against blows, but blows you receive are quite noisy."
+		text = "A plate armour provides great protection against blows."
 	}
 	return text
 }
@@ -811,9 +811,9 @@ func (sh shield) Short() (text string) {
 func (sh shield) Desc() (text string) {
 	switch sh {
 	case Buckler:
-		text = "A buckler is a small shield that can sometimes block attacks, including some magical attacks. You cannot use it if you are wielding a two-handed weapon."
+		text = "A buckler is a small shield that can block attacks. You cannot use it if you are wielding a two-handed weapon."
 	case Shield:
-		text = "A shield can block attacks, including some magical attacks. You cannot use it if you are wielding a two-handed weapon."
+		text = "A shield can block attacks. You cannot use it if you are wielding a two-handed weapon."
 	}
 	return text
 }
