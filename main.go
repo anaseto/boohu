@@ -12,7 +12,7 @@ import (
 var MinimalUI bool
 
 func main() {
-	opt := flag.Bool("s", false, "Use true 16-uicolor solarized palette")
+	opt := flag.Bool("s", false, "Use true 16-color solarized palette")
 	optVersion := flag.Bool("v", false, "print version number")
 	optCenteredCamera := flag.Bool("c", false, "centered camera")
 	optMinimalUI := flag.Bool("m", false, "80x24 minimal UI")
