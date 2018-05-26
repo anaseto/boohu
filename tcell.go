@@ -61,7 +61,7 @@ func (ui *termui) Flush() {
 }
 
 func (ui *termui) Small() bool {
-	return ui.small
+	return ui.small || MinimalUI
 }
 
 func (ui *termui) Interrupt() {

@@ -5,27 +5,18 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"os"
 	"runtime"
-	"runtime/pprof"
 )
 
+var MinimalUI bool
+
 func main() {
-	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to `file`")
 	opt := flag.Bool("s", false, "Use true 16-uicolor solarized palette")
 	optVersion := flag.Bool("v", false, "print version number")
 	optCenteredCamera := flag.Bool("c", false, "centered camera")
+	optMinimalUI := flag.Bool("m", false, "80x24 minimal UI")
 	flag.Parse()
-	if *cpuprofile != "" {
-		// profiling
-		f, err := os.Create(*cpuprofile)
-		if err != nil {
-			log.Fatal(err)
-		}
-		pprof.StartCPUProfile(f)
-		defer pprof.StopCPUProfile()
-	}
 	if *opt {
 		SolarizedPalette()
 	}
@@ -35,6 +26,9 @@ func main() {
 	}
 	if *optCenteredCamera {
 		CenteredCamera = true
+	}
+	if *optMinimalUI {
+		MinimalUI = true
 	}
 
 	tui := &termui{}
@@ -59,7 +53,8 @@ func main() {
 		g.InitLevel()
 	} else if err != nil {
 		g.InitLevel()
-		g.Print("Error loading saved game… starting new game.")
+		g.PrintfStyled("Error: %v", logError, err)
+		g.PrintStyled("Could not load saved game… starting new game.", logError)
 	}
 	load, err = g.LoadConfig()
 	if load && err != nil {
