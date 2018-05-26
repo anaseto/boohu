@@ -238,6 +238,7 @@ func (g *game) QuaffDescent(ev event) error {
 	}
 	g.Printf("You quaff the %s. You fall through the ground.", DescentPotion)
 	g.LevelStats()
+	g.StoryPrint("You descended deeper in the dungeon.")
 	g.Depth++
 	g.DepthPlayerTurn = 0
 	g.InitLevel()

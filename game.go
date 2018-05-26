@@ -584,6 +584,7 @@ func (g *game) Descend() bool {
 		return true
 	}
 	g.Print("You descend deeper in the dungeon.")
+	g.StoryPrint("You descended deeper in the dungeon.")
 	g.Depth++
 	g.DepthPlayerTurn = 0
 	g.Scumming = 0
