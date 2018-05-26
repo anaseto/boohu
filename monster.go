@@ -693,7 +693,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 			}
 		}
 	}
-	if len(m.Path) == 0 || len(m.Path) < 2 {
+	if len(m.Path) < 2 {
 		switch m.State {
 		case Wandering:
 			keepWandering := RandInt(100)
@@ -731,7 +731,6 @@ func (m *monster) HandleTurn(g *game, ev event) {
 				g.Printf("%s You hear an earth-breaking noise.", g.CrackSound())
 				g.StopAuto()
 			}
-			m.InvertFoliage(g)
 			m.MoveTo(g, target)
 			m.Path = m.Path[:len(m.Path)-1]
 		} else if g.Dungeon.Cell(target).T == WallCell {
@@ -744,6 +743,19 @@ func (m *monster) HandleTurn(g *game, ev event) {
 			}
 			m.Path = m.Path[:len(m.Path)-1]
 		}
+	case m.State == Hunting && mons.State != Hunting:
+		r := RandInt(5)
+		if r == 0 {
+			mons.Target = m.Target
+			mons.State = Wandering
+			mons.GatherBand(g)
+		} else if (r == 1 || r == 2) && g.Player.Pos.Distance(mons.Target) > 2 {
+			mons.Target = g.FreeCell()
+			mons.State = Wandering
+			mons.GatherBand(g)
+		} else {
+			m.Path = m.APath(g, mpos, m.Target)
+		}
 	case !g.Player.LOS[mons.Pos] && g.Player.Pos.Distance(mons.Target) > 2 && mons.State != Hunting:
 		r := RandInt(5)
 		if r == 0 {
@@ -753,11 +765,20 @@ func (m *monster) HandleTurn(g *game, ev event) {
 			mons.Target = g.FreeCell()
 			mons.State = Wandering
 			mons.GatherBand(g)
+		} else {
+			m.Path = m.APath(g, mpos, m.Target)
 		}
 	case mons.Pos.Distance(g.Player.Pos) == 1:
 		m.Path = m.APath(g, mpos, m.Target)
 		if len(m.Path) < 2 || m.Path[len(m.Path)-2] == mons.Pos {
 			mons.Obstructing = true
+		}
+	case mons.State == Hunting && m.State == Hunting:
+		if RandInt(5) == 0 {
+			m.Target = mons.Target
+			m.Path = m.APath(g, mpos, m.Target)
+		} else {
+			m.Path = m.APath(g, mpos, m.Target)
 		}
 	default:
 		m.Path = m.APath(g, mpos, m.Target)
