@@ -775,12 +775,12 @@ loop:
 		digs++
 	}
 	doors := make(map[position]bool)
-	if RandInt(3) > 0 {
+	if RandInt(4) > 0 {
 		w, h := GenCaveRoomSize()
 		for pos := range d.BuildSomeRoom(w, h) {
 			doors[pos] = true
 		}
-		if RandInt(3) == 0 {
+		if RandInt(4) == 0 {
 			w, h := GenCaveRoomSize()
 			for pos := range d.BuildSomeRoom(w, h) {
 				doors[pos] = true
