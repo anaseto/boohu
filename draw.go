@@ -1044,10 +1044,10 @@ func (ui *termui) DescribePosition(g *game, pos position, targ Targeter) {
 	case okCollectable:
 		if c.Quantity > 1 {
 			desc = ui.AddComma(see, desc)
-			desc += fmt.Sprintf("%d %s there", c.Quantity, c.Consumable)
+			desc += fmt.Sprintf("%d %s", c.Quantity, c.Consumable)
 		} else {
 			desc = ui.AddComma(see, desc)
-			desc += fmt.Sprintf("%s there", Indefinite(c.Consumable.String(), false))
+			desc += fmt.Sprintf("%s", Indefinite(c.Consumable.String(), false))
 		}
 	case okEq:
 		desc = ui.AddComma(see, desc)
