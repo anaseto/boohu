@@ -1216,10 +1216,12 @@ func (g *game) GenBSPMap(h, w int) {
 			}
 		}
 	}
-	r := rooms[RandInt(len(rooms))]
-	for x := r.pos.X + 1; x < r.pos.X+r.w-1; x++ {
-		for y := r.pos.Y + 1; y < r.pos.Y+r.h-1; y++ {
-			fungus[position{x, y}] = foliage
+	for i := 0; i <= RandInt(2); i++ {
+		r := rooms[RandInt(len(rooms))]
+		for x := r.pos.X + 1; x < r.pos.X+r.w-1; x++ {
+			for y := r.pos.Y + 1; y < r.pos.Y+r.h-1; y++ {
+				fungus[position{x, y}] = foliage
+			}
 		}
 	}
 	g.Fungus = fungus
