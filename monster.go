@@ -790,12 +790,17 @@ func (m *monster) InvertFoliage(g *game) {
 	if m.Kind != MonsWorm {
 		return
 	}
+	invert := false
 	if _, ok := g.Fungus[m.Pos]; !ok {
-		g.Fungus[m.Pos] = foliage
+		if _, ok := g.Doors[m.Pos]; !ok {
+			g.Fungus[m.Pos] = foliage
+			invert = true
+		}
 	} else {
 		delete(g.Fungus, m.Pos)
+		invert = true
 	}
-	if !g.Player.LOS[m.Pos] {
+	if !g.Player.LOS[m.Pos] && invert {
 		g.WrongFoliage[m.Pos] = !g.WrongFoliage[m.Pos]
 	}
 }

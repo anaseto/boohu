@@ -1032,40 +1032,39 @@ func (ui *termui) DescribePosition(g *game, pos position, targ Targeter) {
 	}
 	switch {
 	case g.Simellas[pos] > 0:
-		desc += fmt.Sprintf("You %s some simellas (%d).", see, g.Simellas[pos])
+		desc += fmt.Sprintf("You %s some simellas (%d). ", see, g.Simellas[pos])
 	case okCollectable:
 		if c.Quantity > 1 {
-			desc += fmt.Sprintf("You %s %d %s there.", see, c.Quantity, c.Consumable)
+			desc += fmt.Sprintf("You %s %d %s there. ", see, c.Quantity, c.Consumable)
 		} else {
-			desc += fmt.Sprintf("You %s %s there.", see, Indefinite(c.Consumable.String(), false))
+			desc += fmt.Sprintf("You %s %s there. ", see, Indefinite(c.Consumable.String(), false))
 		}
 	case okEq:
-		desc += fmt.Sprintf("You %s %s.", see, Indefinite(eq.String(), false))
+		desc += fmt.Sprintf("You %s %s. ", see, Indefinite(eq.String(), false))
 	case okRod:
-		desc += fmt.Sprintf("You %s a %v.", see, rod)
+		desc += fmt.Sprintf("You %s a %v. ", see, rod)
 	case g.Stairs[pos]:
 		if g.Depth == MaxDepth {
-			desc += fmt.Sprintf("You %s some glowing stairs.", see)
+			desc += fmt.Sprintf("You %s some glowing stairs. ", see)
 		} else {
-			desc += fmt.Sprintf("You %s stairs downwards.", see)
+			desc += fmt.Sprintf("You %s stairs downwards. ", see)
 		}
 	case g.Doors[pos] || g.WrongDoor[pos]:
-		desc += fmt.Sprintf("You %s a door.", see)
+		desc += fmt.Sprintf("You %s a door. ", see)
 	case g.Dungeon.Cell(pos).T == WallCell || g.WrongWall[pos]:
 		// TODO: revise if a monster ever creates walls outside of LOS
-		desc += fmt.Sprintf("You %s a wall.", see)
-	default:
-		if cld, ok := g.Clouds[pos]; ok && g.Player.LOS[pos] {
-			if cld == CloudFire {
-				desc += fmt.Sprintf("You %s burning flames.", see)
-			} else {
-				desc += fmt.Sprintf("You %s a dense fog.", see)
-			}
-		} else if _, ok := g.Fungus[pos]; ok && !g.WrongFoliage[pos] || !ok && g.WrongFoliage[pos] {
-			desc += fmt.Sprintf("You %s dense foliage there.", see)
-		} else if desc == "" {
-			desc += fmt.Sprintf("You %s the ground.", see)
+		desc += fmt.Sprintf("You %s a wall. ", see)
+	}
+	if cld, ok := g.Clouds[pos]; ok && g.Player.LOS[pos] {
+		if cld == CloudFire {
+			desc += fmt.Sprintf("You %s burning flames.", see)
+		} else {
+			desc += fmt.Sprintf("You %s a dense fog.", see)
 		}
+	} else if _, ok := g.Fungus[pos]; ok && !g.WrongFoliage[pos] || !ok && g.WrongFoliage[pos] {
+		desc += fmt.Sprintf("You %s foliage there.", see)
+	} else if desc == "" {
+		desc += fmt.Sprintf("You %s the ground.", see)
 	}
 	g.InfoEntry = desc
 }

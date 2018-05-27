@@ -596,6 +596,9 @@ func (g *game) GenRuinsMap(h, w int) {
 	for pos := range doors {
 		if g.DoorCandidate(pos) && RandInt(100) > 20 {
 			g.Doors[pos] = true
+			if _, ok := g.Fungus[pos]; ok {
+				delete(g.Fungus, pos)
+			}
 		}
 	}
 }
@@ -790,13 +793,16 @@ loop:
 		}
 	}
 	g.Dungeon = d
+	g.Fungus = g.Foliage(DungeonHeight, DungeonWidth)
 	g.PutDoors(5)
 	for pos := range doors {
 		if g.DoorCandidate(pos) && RandInt(100) > 20 {
 			g.Doors[pos] = true
+			if _, ok := g.Fungus[pos]; ok {
+				delete(g.Fungus, pos)
+			}
 		}
 	}
-	g.Fungus = g.Foliage(DungeonHeight, DungeonWidth)
 }
 
 func GenCaveRoomSize() (int, int) {
@@ -889,6 +895,9 @@ loop:
 	for pos := range doors {
 		if g.DoorCandidate(pos) && RandInt(100) > 20 {
 			g.Doors[pos] = true
+			if _, ok := g.Fungus[pos]; ok {
+				delete(g.Fungus, pos)
+			}
 		}
 	}
 }
@@ -1076,6 +1085,9 @@ loop:
 	for pos := range doors {
 		if g.DoorCandidate(pos) && RandInt(100) > 20 {
 			g.Doors[pos] = true
+			if _, ok := g.Fungus[pos]; ok {
+				delete(g.Fungus, pos)
+			}
 		}
 	}
 	return true
@@ -1202,7 +1214,7 @@ func (g *game) GenBSPMap(h, w int) {
 	empty := 0
 	for _, r := range rooms {
 		var doors map[position]bool
-		if RandInt(2+special) == 0 && r.w%2 == 1 && r.h%2 == 1 && r.w >= 5 && r.h >= 5 {
+		if RandInt(2+special/3) == 0 && r.w%2 == 1 && r.h%2 == 1 && r.w >= 5 && r.h >= 5 {
 			doors = d.BuildRoom(r.pos, r.w, r.h, true)
 			special++
 		} else if empty > 0 || RandInt(20) > 0 {
@@ -1278,7 +1290,7 @@ func (g *game) Foliage(h, w int) map[position]vegetation {
 	}
 	fungus := make(map[position]vegetation)
 	for i, c := range d.Cells {
-		if c.T == FreeCell {
+		if _, ok := g.Doors[idxtopos(i)]; !ok && c.T == FreeCell {
 			fungus[idxtopos(i)] = foliage
 		}
 	}
@@ -1316,6 +1328,9 @@ func (g *game) PutDoors(percentage int) {
 		pos := idxtopos(i)
 		if g.DoorCandidate(pos) && RandInt(100) < percentage {
 			g.Doors[pos] = true
+			if _, ok := g.Fungus[pos]; ok {
+				delete(g.Fungus, pos)
+			}
 		}
 	}
 }
