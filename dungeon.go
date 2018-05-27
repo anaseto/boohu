@@ -618,12 +618,8 @@ func (g *game) DigFungus(n int) {
 		if count < 3 {
 			continue
 		}
-		//dig := RandInt(2) == 0
-		dig := true // looks always better
 		for pos := range conn {
-			if dig {
-				d.SetCell(pos, FreeCell)
-			}
+			d.SetCell(pos, FreeCell)
 			g.Fungus[pos] = foliage
 		}
 		n--
@@ -884,8 +880,6 @@ loop:
 			}
 		}
 	}
-	//g.Dungeon = d
-	//g.PutDoors(5)
 
 	doors := d.DigSomeRooms(5)
 	g.Dungeon = d
