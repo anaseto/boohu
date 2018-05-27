@@ -7,6 +7,7 @@ import (
 )
 
 type dungeon struct {
+	Gen   dungen
 	Cells []cell
 }
 
@@ -48,6 +49,7 @@ func (dg dungen) Use(g *game) {
 	case GenBSPMap:
 		g.GenBSPMap(DungeonHeight, DungeonWidth)
 	}
+	g.Dungeon.Gen = dg
 	g.Stats.DLayout[g.Depth] = dg.String()
 }
 
