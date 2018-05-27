@@ -618,7 +618,8 @@ func (g *game) DigFungus(n int) {
 		if count < 3 {
 			continue
 		}
-		dig := RandInt(2) == 0
+		//dig := RandInt(2) == 0
+		dig := true // looks always better
 		for pos := range conn {
 			if dig {
 				d.SetCell(pos, FreeCell)
