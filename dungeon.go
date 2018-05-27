@@ -82,7 +82,7 @@ func (dg dungen) Description() (text string) {
 	case GenRuinsMap:
 		text = "ruined rooms"
 	case GenBSPMap:
-		text = "abandonned town"
+		text = "deserted town"
 	}
 	return text
 }
