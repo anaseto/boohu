@@ -30,6 +30,7 @@ const (
 	GenCellularAutomataCaveMap
 	GenCaveMapTree
 	GenRuinsMap
+	GenBSPMap
 )
 
 func (dg dungen) Use(g *game) {
@@ -44,6 +45,8 @@ func (dg dungen) Use(g *game) {
 		g.GenCaveMapTree(DungeonHeight, DungeonWidth)
 	case GenRuinsMap:
 		g.GenRuinsMap(DungeonHeight, DungeonWidth)
+	case GenBSPMap:
+		g.GenBSPMap(DungeonHeight, DungeonWidth)
 	}
 	g.Stats.DLayout[g.Depth] = dg.String()
 }
@@ -60,6 +63,8 @@ func (dg dungen) String() (text string) {
 		text = "TC"
 	case GenRuinsMap:
 		text = "RR"
+	case GenBSPMap:
+		text = "AT"
 	}
 	return text
 }
@@ -76,6 +81,8 @@ func (dg dungen) Description() (text string) {
 		text = "tree-like cave"
 	case GenRuinsMap:
 		text = "ruined rooms"
+	case GenBSPMap:
+		text = "abandonned town"
 	}
 	return text
 }
@@ -1075,6 +1082,136 @@ func (g *game) GenCellularAutomataCaveMap(h, w int) {
 		}
 	}
 	g.Fungus = g.Foliage(DungeonHeight, DungeonWidth)
+}
+
+func (d *dungeon) SimpleRoom(r room) map[position]bool {
+	for i := r.pos.X; i < r.pos.X+r.w; i++ {
+		d.SetCell(position{i, r.pos.Y}, WallCell)
+		d.SetCell(position{i, r.pos.Y + r.h - 1}, WallCell)
+	}
+	for i := r.pos.Y; i < r.pos.Y+r.h; i++ {
+		d.SetCell(position{r.pos.X, i}, WallCell)
+		d.SetCell(position{r.pos.X + r.w - 1, i}, WallCell)
+	}
+	doorsc := [4]position{
+		position{r.pos.X + r.w/2, r.pos.Y},
+		position{r.pos.X + r.w/2, r.pos.Y + r.h - 1},
+		position{r.pos.X, r.pos.Y + r.h/2},
+		position{r.pos.X + r.w - 1, r.pos.Y + r.h/2},
+	}
+	doors := make(map[position]bool)
+	for i := 0; i < 3+RandInt(2); i++ {
+		dpos := doorsc[RandInt(4)]
+		doors[dpos] = true
+		d.SetCell(dpos, FreeCell)
+	}
+	return doors
+}
+
+func (g *game) GenBSPMap(h, w int) {
+	rooms := []room{}
+	crooms := []room{{pos: position{1, 1}, w: DungeonWidth - 2, h: DungeonHeight - 2}}
+	big := 0
+	for len(crooms) > 0 {
+		r := crooms[0]
+		crooms = crooms[1:]
+		if r.h <= 8 && r.w <= 10 {
+			switch RandInt(6) {
+			case 0:
+				if r.h >= 6 {
+					r.h--
+					if RandInt(2) == 0 {
+						r.pos.Y++
+					}
+				}
+			case 1:
+				if r.w >= 8 {
+					r.w--
+					if RandInt(2) == 0 {
+						r.pos.X++
+					}
+				}
+			}
+			rooms = append(rooms, r)
+			continue
+		}
+		if RandInt(2+big) == 0 && (r.h <= 12 && r.w <= 20) {
+			big++
+			switch RandInt(4) {
+			case 0:
+				r.h--
+				if RandInt(2) == 0 {
+					r.pos.Y++
+				}
+			case 1:
+				r.w--
+				if RandInt(2) == 0 {
+					r.pos.X++
+				}
+			}
+			rooms = append(rooms, r)
+			continue
+		}
+		horizontal := false
+		if r.h > 8 && r.w > 10 && r.w < 40 && RandInt(4) == 0 {
+			horizontal = true
+		} else if r.h > 8 && r.w <= 10+RandInt(3) {
+			horizontal = true
+		}
+		if horizontal {
+			h := r.h/2 - r.h/4 + RandInt(1+r.h/2)
+			if h <= 3 {
+				h++
+			}
+			if r.h-h-1 <= 3 {
+				h--
+			}
+			crooms = append(crooms, room{r.pos, r.w, h}, room{position{r.pos.X, r.pos.Y + 1 + h}, r.w, r.h - h - 1})
+		} else {
+			w := r.w/2 - r.w/4 + RandInt(1+r.w/2)
+			if w <= 3 {
+				w++
+			}
+			if r.w-w-1 <= 3 {
+				w--
+			}
+			crooms = append(crooms, room{r.pos, w, r.h}, room{position{r.pos.X + 1 + w, r.pos.Y}, r.w - w - 1, r.h})
+		}
+	}
+
+	d := &dungeon{}
+	d.Cells = make([]cell, h*w)
+	for i := 0; i < DungeonNCells; i++ {
+		d.SetCell(idxtopos(i), FreeCell)
+	}
+	g.Dungeon = d
+	g.Doors = map[position]bool{}
+	fungus := make(map[position]vegetation)
+	special := 0
+	empty := 0
+	for _, r := range rooms {
+		var doors map[position]bool
+		if RandInt(2+special) == 0 && r.w%2 == 1 && r.h%2 == 1 && r.w >= 5 && r.h >= 5 {
+			doors = d.BuildRoom(r.pos, r.w, r.h, true)
+			special++
+		} else if empty > 0 || RandInt(20) > 0 {
+			doors = d.SimpleRoom(r)
+		} else {
+			empty++
+		}
+		for pos := range doors {
+			if g.DoorCandidate(pos) && RandInt(100) > 10 {
+				g.Doors[pos] = true
+			}
+		}
+	}
+	r := rooms[RandInt(len(rooms))]
+	for x := r.pos.X + 1; x < r.pos.X+r.w-1; x++ {
+		for y := r.pos.Y + 1; y < r.pos.Y+r.h-1; y++ {
+			fungus[position{x, y}] = foliage
+		}
+	}
+	g.Fungus = fungus
 }
 
 type vegetation int

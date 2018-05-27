@@ -9,14 +9,14 @@ import (
 func BenchmarkCellularAutomataCaveMap(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		g := &game{}
-		g.GenCellularAutomataCaveMap(21, 79)
+		g.GenCellularAutomataCaveMap(DungeonHeight, DungeonWidth)
 	}
 }
 
 func TestCellularAutomataCaveMap(t *testing.T) {
 	for i := 0; i < 100; i++ {
 		g := &game{}
-		g.GenCellularAutomataCaveMap(21, 79)
+		g.GenCellularAutomataCaveMap(DungeonHeight, DungeonWidth)
 		if !g.Dungeon.connex() {
 			t.Errorf("Not connex:\n%s\n", g.Dungeon.String())
 		}
@@ -26,7 +26,7 @@ func TestCellularAutomataCaveMap(t *testing.T) {
 func TestCaveMap(t *testing.T) {
 	for i := 0; i < 100; i++ {
 		g := &game{}
-		g.GenCaveMap(21, 79)
+		g.GenCaveMap(DungeonHeight, DungeonWidth)
 		if !g.Dungeon.connex() {
 			t.Errorf("Not connex:\n%s\n", g.Dungeon.String())
 		}
@@ -36,7 +36,7 @@ func TestCaveMap(t *testing.T) {
 func TestCaveMapTree(t *testing.T) {
 	for i := 0; i < 100; i++ {
 		g := &game{}
-		g.GenCaveMapTree(21, 79)
+		g.GenCaveMapTree(DungeonHeight, DungeonWidth)
 		if !g.Dungeon.connex() {
 			t.Errorf("Not connex:\n%s\n", g.Dungeon.String())
 		}
@@ -46,7 +46,17 @@ func TestCaveMapTree(t *testing.T) {
 func TestRuinsMap(t *testing.T) {
 	for i := 0; i < 100; i++ {
 		g := &game{}
-		g.GenRuinsMap(21, 79)
+		g.GenRuinsMap(DungeonHeight, DungeonWidth)
+		if !g.Dungeon.connex() {
+			t.Errorf("Not connex:\n%s\n", g.Dungeon.String())
+		}
+	}
+}
+
+func TestBSPMap(t *testing.T) {
+	for i := 0; i < 100; i++ {
+		g := &game{}
+		g.GenBSPMap(DungeonHeight, DungeonWidth)
 		if !g.Dungeon.connex() {
 			t.Errorf("Not connex:\n%s\n", g.Dungeon.String())
 		}
@@ -71,7 +81,7 @@ func (d *dungeon) String() string {
 func TestRoomMap(t *testing.T) {
 	for i := 0; i < 100; i++ {
 		g := &game{}
-		g.GenRoomMap(21, 79)
+		g.GenRoomMap(DungeonHeight, DungeonWidth)
 		if !g.Dungeon.connex() {
 			t.Errorf("Not connex:\n%s\n", g.Dungeon.String())
 		}

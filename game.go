@@ -251,6 +251,8 @@ func (g *game) GenDungeon() {
 		dg = GenCellularAutomataCaveMap
 	case 3:
 		dg = GenCaveMapTree
+	case 4:
+		dg = GenBSPMap
 	}
 	dg.Use(g)
 }
