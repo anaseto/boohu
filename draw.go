@@ -1062,7 +1062,7 @@ func (ui *termui) DescribePosition(g *game, pos position, targ Targeter) {
 			desc += fmt.Sprintf("You %s a dense fog.", see)
 		}
 	} else if _, ok := g.Fungus[pos]; ok && !g.WrongFoliage[pos] || !ok && g.WrongFoliage[pos] {
-		desc += fmt.Sprintf("You %s foliage there.", see)
+		desc += fmt.Sprintf("You %s foliage.", see)
 	} else if desc == "" {
 		desc += fmt.Sprintf("You %s the ground.", see)
 	}
