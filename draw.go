@@ -1004,6 +1004,12 @@ func (ui *termui) AptitudesText(g *game) string {
 	return text
 }
 
+func (ui *termui) AddComma(see, s string) string {
+	if len(s) > 0 {
+		return s + ", "
+	}
+	return fmt.Sprintf("You %s %s", see, s)
+}
 func (ui *termui) DescribePosition(g *game, pos position, targ Targeter) {
 	var desc string
 	switch {
@@ -1021,52 +1027,66 @@ func (ui *termui) DescribePosition(g *game, pos position, targ Targeter) {
 	eq, okEq := g.Equipables[pos]
 	rod, okRod := g.Rods[pos]
 	if pos == g.Player.Pos {
-		desc = "This is you. "
+		desc = "This is you"
 	}
 	see := "see"
 	if !g.Player.LOS[pos] {
 		see = "saw"
 	}
 	if mons.Exists() && g.Player.LOS[pos] {
-		desc += fmt.Sprintf("You %s %s (%s). ", see, mons.Kind.Indefinite(false), ui.MonsterInfo(mons))
+		desc = ui.AddComma(see, desc)
+		desc += fmt.Sprintf("%s (%s)", mons.Kind.Indefinite(false), ui.MonsterInfo(mons))
 	}
 	switch {
 	case g.Simellas[pos] > 0:
-		desc += fmt.Sprintf("You %s some simellas (%d). ", see, g.Simellas[pos])
+		desc = ui.AddComma(see, desc)
+		desc += fmt.Sprintf("some simellas (%d)", g.Simellas[pos])
 	case okCollectable:
 		if c.Quantity > 1 {
-			desc += fmt.Sprintf("You %s %d %s there. ", see, c.Quantity, c.Consumable)
+			desc = ui.AddComma(see, desc)
+			desc += fmt.Sprintf("%d %s there", c.Quantity, c.Consumable)
 		} else {
-			desc += fmt.Sprintf("You %s %s there. ", see, Indefinite(c.Consumable.String(), false))
+			desc = ui.AddComma(see, desc)
+			desc += fmt.Sprintf("%s there", Indefinite(c.Consumable.String(), false))
 		}
 	case okEq:
-		desc += fmt.Sprintf("You %s %s. ", see, Indefinite(eq.String(), false))
+		desc = ui.AddComma(see, desc)
+		desc += fmt.Sprintf("%s", Indefinite(eq.String(), false))
 	case okRod:
-		desc += fmt.Sprintf("You %s a %v. ", see, rod)
+		desc = ui.AddComma(see, desc)
+		desc += fmt.Sprintf("a %v", rod)
 	case g.Stairs[pos]:
 		if g.Depth == MaxDepth {
-			desc += fmt.Sprintf("You %s some glowing stairs. ", see)
+			desc = ui.AddComma(see, desc)
+			desc += fmt.Sprintf("glowing stairs")
 		} else {
-			desc += fmt.Sprintf("You %s stairs downwards. ", see)
+			desc = ui.AddComma(see, desc)
+			desc += fmt.Sprintf("stairs downwards")
 		}
 	case g.Doors[pos] || g.WrongDoor[pos]:
-		desc += fmt.Sprintf("You %s a door. ", see)
+		desc = ui.AddComma(see, desc)
+		desc += fmt.Sprintf("a door")
 	case g.Dungeon.Cell(pos).T == WallCell || g.WrongWall[pos]:
 		// TODO: revise if a monster ever creates walls outside of LOS
-		desc += fmt.Sprintf("You %s a wall. ", see)
+		desc = ui.AddComma(see, desc)
+		desc += fmt.Sprintf("a wall")
 	}
 	if cld, ok := g.Clouds[pos]; ok && g.Player.LOS[pos] {
 		if cld == CloudFire {
-			desc += fmt.Sprintf("You %s burning flames.", see)
+			desc = ui.AddComma(see, desc)
+			desc += fmt.Sprintf("burning flames")
 		} else {
-			desc += fmt.Sprintf("You %s a dense fog.", see)
+			desc = ui.AddComma(see, desc)
+			desc += fmt.Sprintf("a dense fog")
 		}
 	} else if _, ok := g.Fungus[pos]; ok && !g.WrongFoliage[pos] || !ok && g.WrongFoliage[pos] {
-		desc += fmt.Sprintf("You %s foliage.", see)
+		desc = ui.AddComma(see, desc)
+		desc += fmt.Sprintf("foliage")
 	} else if desc == "" {
-		desc += fmt.Sprintf("You %s the ground.", see)
+		desc = ui.AddComma(see, desc)
+		desc += fmt.Sprintf("the ground")
 	}
-	g.InfoEntry = desc
+	g.InfoEntry = desc + "."
 }
 
 func (ui *termui) Examine(g *game, start *position) (err error, again, quit bool) {
