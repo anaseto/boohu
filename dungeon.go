@@ -591,7 +591,7 @@ func (g *game) GenRuinsMap(h, w int) {
 	doors := d.DigSomeRooms(5)
 	g.Dungeon = d
 	g.Fungus = make(map[position]vegetation)
-	g.DigFungus(RandInt(3))
+	g.DigFungus(1 + RandInt(2))
 	g.PutDoors(30)
 	for pos := range doors {
 		if g.DoorCandidate(pos) && RandInt(100) > 20 {
@@ -618,8 +618,9 @@ func (g *game) DigFungus(n int) {
 		if count < 3 {
 			continue
 		}
+		dig := RandInt(2) == 0
 		for pos := range conn {
-			if RandInt(2) == 0 {
+			if dig {
 				d.SetCell(pos, FreeCell)
 			}
 			g.Fungus[pos] = foliage
@@ -640,6 +641,7 @@ func (g *game) GenRoomMap(h, w int) {
 	d := &dungeon{}
 	d.Cells = make([]cell, h*w)
 	rooms := []room{}
+	cols := 0
 	for i := 0; i < 35; i++ {
 		var ro room
 		count := 100
@@ -656,12 +658,13 @@ func (g *game) GenRoomMap(h, w int) {
 		}
 
 		d.DigRoom(ro)
-		if RandInt(35) == 0 {
+		if RandInt(10+15*cols) == 0 {
 			if RandInt(2) == 0 {
 				d.PutCols(ro)
 			} else {
 				d.PutDiagCols(ro)
 			}
+			cols++
 		}
 		rooms = append(rooms, ro)
 	}
@@ -886,7 +889,7 @@ loop:
 	doors := d.DigSomeRooms(5)
 	g.Dungeon = d
 	g.Fungus = make(map[position]vegetation)
-	g.DigFungus(RandInt(3))
+	g.DigFungus(1 + RandInt(2))
 	g.PutDoors(5)
 	for pos := range doors {
 		if g.DoorCandidate(pos) && RandInt(100) > 20 {
