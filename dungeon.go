@@ -551,7 +551,7 @@ func (g *game) GenRuinsMap(h, w int) {
 	d := &dungeon{}
 	d.Cells = make([]cell, h*w)
 	rooms := []room{}
-	for i := 0; i < 45; i++ {
+	for i := 0; i < 43; i++ {
 		var ro room
 		count := 100
 		for count > 0 {
@@ -567,7 +567,7 @@ func (g *game) GenRuinsMap(h, w int) {
 		}
 
 		d.DigRoom(ro)
-		if RandInt(45) == 0 {
+		if RandInt(60) == 0 {
 			if RandInt(2) == 0 {
 				d.PutCols(ro)
 			} else {
@@ -586,10 +586,16 @@ func (g *game) GenRuinsMap(h, w int) {
 		}
 		rooms = append(rooms, ro)
 	}
+	doors := d.DigSomeRooms(3)
 	g.Dungeon = d
 	g.Fungus = make(map[position]vegetation)
 	g.DigFungus(RandInt(3))
 	g.PutDoors(20)
+	for pos := range doors {
+		if g.DoorCandidate(pos) && RandInt(100) > 20 {
+			g.Doors[pos] = true
+		}
+	}
 }
 
 func (g *game) DigFungus(n int) {
@@ -875,8 +881,21 @@ loop:
 	//g.Dungeon = d
 	//g.PutDoors(5)
 
+	doors := d.DigSomeRooms(5)
+	g.Dungeon = d
+	g.Fungus = make(map[position]vegetation)
+	g.DigFungus(RandInt(3))
+	g.PutDoors(5)
+	for pos := range doors {
+		if g.DoorCandidate(pos) && RandInt(100) > 20 {
+			g.Doors[pos] = true
+		}
+	}
+}
+
+func (d *dungeon) DigSomeRooms(chances int) map[position]bool {
 	doors := make(map[position]bool)
-	if RandInt(3) > 0 {
+	if RandInt(chances) > 0 {
 		w, h := GenCaveRoomSize()
 		for pos := range d.DigSomeRoom(w, h) {
 			doors[pos] = true
@@ -888,15 +907,7 @@ loop:
 			}
 		}
 	}
-	g.Dungeon = d
-	g.Fungus = make(map[position]vegetation)
-	g.DigFungus(RandInt(3))
-	g.PutDoors(5)
-	for pos := range doors {
-		if g.DoorCandidate(pos) && RandInt(100) > 20 {
-			g.Doors[pos] = true
-		}
-	}
+	return doors
 }
 
 func (d *dungeon) WallAreaCount(area []position, pos position, radius int) int {
