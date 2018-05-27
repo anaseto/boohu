@@ -1404,6 +1404,8 @@ func (g *game) MaxDanger() int {
 	switch g.Dungeon.Gen {
 	case GenCaveMapTree:
 		max = max * 90 / 100
+	case GenRuinsMap:
+		max = max * 105 / 100
 	case GenBSPMap:
 		max = max * 110 / 100
 	}

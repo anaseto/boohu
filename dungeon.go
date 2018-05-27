@@ -592,7 +592,7 @@ func (g *game) GenRuinsMap(h, w int) {
 	g.Dungeon = d
 	g.Fungus = make(map[position]vegetation)
 	g.DigFungus(RandInt(3))
-	g.PutDoors(20)
+	g.PutDoors(30)
 	for pos := range doors {
 		if g.DoorCandidate(pos) && RandInt(100) > 20 {
 			g.Doors[pos] = true
