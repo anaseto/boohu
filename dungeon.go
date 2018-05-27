@@ -586,7 +586,7 @@ func (g *game) GenRuinsMap(h, w int) {
 		}
 		rooms = append(rooms, ro)
 	}
-	doors := d.DigSomeRooms(3)
+	doors := d.DigSomeRooms(5)
 	g.Dungeon = d
 	g.Fungus = make(map[position]vegetation)
 	g.DigFungus(RandInt(3))
