@@ -261,7 +261,7 @@ func (g *game) DetailedStatistics(w io.Writer) {
 	fmt.Fprintf(w, "Legend:")
 	for i, c := range []dungen{GenCaveMap, GenRoomMap, GenCellularAutomataCaveMap, GenCaveMapTree, GenRuinsMap, GenBSPMap} {
 		if i == 4 {
-			fmt.Fprintf(w, "\n        ")
+			fmt.Fprintf(w, "\n       ")
 		}
 		fmt.Fprintf(w, " %s (%s)", c.Description(), c.String())
 	}
