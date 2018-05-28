@@ -598,14 +598,7 @@ func (g *game) GenRuinsMap(h, w int) {
 	g.Fungus = make(map[position]vegetation)
 	g.DigFungus(1 + RandInt(2))
 	g.PutDoors(30)
-	for pos := range doors {
-		if g.DoorCandidate(pos) && RandInt(100) > 20 {
-			g.Doors[pos] = true
-			if _, ok := g.Fungus[pos]; ok {
-				delete(g.Fungus, pos)
-			}
-		}
-	}
+	g.PutDoorsList(doors, 20)
 }
 
 func (g *game) DigFungus(n int) {
@@ -698,7 +691,20 @@ func (g *game) GenRoomMap(h, w int) {
 		}
 	}
 	g.Dungeon = d
+	doors := d.DigSomeRooms(5)
 	g.PutDoors(90)
+	g.PutDoorsList(doors, 10)
+}
+
+func (g *game) PutDoorsList(doors map[position]bool, threshold int) {
+	for pos := range doors {
+		if g.DoorCandidate(pos) && RandInt(100) > threshold {
+			g.Doors[pos] = true
+			if _, ok := g.Fungus[pos]; ok {
+				delete(g.Fungus, pos)
+			}
+		}
+	}
 }
 
 func (d *dungeon) FreeCell() position {
@@ -923,14 +929,7 @@ loop:
 	g.Fungus = make(map[position]vegetation)
 	g.DigFungus(1 + RandInt(2))
 	g.PutDoors(5)
-	for pos := range doors {
-		if g.DoorCandidate(pos) && RandInt(100) > 20 {
-			g.Doors[pos] = true
-			if _, ok := g.Fungus[pos]; ok {
-				delete(g.Fungus, pos)
-			}
-		}
-	}
+	g.PutDoorsList(doors, 20)
 }
 
 func (d *dungeon) DigSomeRooms(chances int) map[position]bool {
