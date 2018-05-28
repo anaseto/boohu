@@ -242,7 +242,7 @@ func (g *game) GenDungeon() {
 	g.Fungus = make(map[position]vegetation)
 	dg := GenRuinsMap
 	switch RandInt(7) {
-	//switch 5 {
+	//switch 3 {
 	case 0:
 		dg = GenCaveMap
 	case 1:

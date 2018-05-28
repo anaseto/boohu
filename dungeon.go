@@ -524,8 +524,13 @@ func (d *dungeon) DigSomeRoom(w, h int) map[position]bool {
 }
 
 func (d *dungeon) DigIsolatedRoom(w, h int) map[position]bool {
-	for i := 0; i < 3000; i++ {
-		pos := d.WallCell()
+	i := RandInt(DungeonNCells)
+	for j := 0; j < DungeonNCells; j++ {
+		i = (i + 1) % DungeonNCells
+		pos := idxtopos(i)
+		if d.Cells[i].T == FreeCell {
+			continue
+		}
 		dpos := position{pos.X - 1, pos.Y - 1}
 		if !d.IsolatedRoomDigCanditate(dpos, h+2, w+2) {
 			continue
@@ -605,8 +610,13 @@ func (g *game) GenRuinsMap(h, w int) {
 
 func (g *game) DigFungus(n int) {
 	d := g.Dungeon
+	count := 0
 	fungus := g.Foliage(DungeonHeight, DungeonWidth)
+loop:
 	for i := 0; i < 100; i++ {
+		if count > 100 {
+			break loop
+		}
 		if n <= 0 {
 			break
 		}
@@ -616,7 +626,8 @@ func (g *game) DigFungus(n int) {
 		}
 		conn, count := d.Connected(pos, func(npos position) bool {
 			_, ok := fungus[npos]
-			return ok && d.IsFreeCell(npos)
+			//return ok && d.IsFreeCell(npos)
+			return ok
 		})
 		if count < 3 {
 			continue
@@ -624,6 +635,10 @@ func (g *game) DigFungus(n int) {
 		for pos := range conn {
 			d.SetCell(pos, FreeCell)
 			g.Fungus[pos] = foliage
+			count++
+			if count > 150 {
+				break loop
+			}
 		}
 		n--
 	}
@@ -780,17 +795,33 @@ loop:
 		digs++
 	}
 	doors := make(map[position]bool)
+	rooms := 0
 	if RandInt(4) > 0 {
 		w, h := GenCaveRoomSize()
+		rooms++
 		for pos := range d.BuildSomeRoom(w, h) {
 			doors[pos] = true
 		}
-		if RandInt(4) == 0 {
+		if RandInt(7) == 0 {
+			rooms++
 			w, h := GenCaveRoomSize()
 			for pos := range d.BuildSomeRoom(w, h) {
 				doors[pos] = true
 			}
+
 		}
+	}
+	if RandInt(1+rooms) == 0 {
+		w, h := GenLittleRoomSize()
+		i := 0
+		for pos := range d.DigIsolatedRoom(w, h) {
+			doors[pos] = true
+			if i == 0 {
+				d.ConnectIsolatedRoom(pos)
+			}
+			i++
+		}
+
 	}
 	g.Dungeon = d
 	g.Fungus = g.Foliage(DungeonHeight, DungeonWidth)
@@ -1058,7 +1089,7 @@ loop:
 		digs++
 	}
 	doors := make(map[position]bool)
-	if RandInt(3) > 0 {
+	if RandInt(5) > 0 {
 		w, h := GenLittleRoomSize()
 		i := 0
 		for pos := range d.DigIsolatedRoom(w, h) {
@@ -1068,7 +1099,7 @@ loop:
 			}
 			i++
 		}
-		if RandInt(3) == 0 {
+		if RandInt(4) == 0 {
 			w, h := GenCaveRoomSize()
 			i := 0
 			for pos := range d.DigIsolatedRoom(w, h) {
@@ -1209,7 +1240,6 @@ func (g *game) GenBSPMap(h, w int) {
 	}
 	g.Dungeon = d
 	g.Doors = map[position]bool{}
-	fungus := make(map[position]vegetation)
 	special := 0
 	empty := 0
 	for _, r := range rooms {
@@ -1219,6 +1249,20 @@ func (g *game) GenBSPMap(h, w int) {
 			special++
 		} else if empty > 0 || RandInt(20) > 0 {
 			doors = d.SimpleRoom(r)
+			if RandInt(2) == 0 && r.w >= 7 && r.h >= 7 {
+				rn := r
+				rn.pos.X++
+				rn.pos.Y++
+				rn.h--
+				rn.h--
+				rn.w--
+				rn.w--
+				if RandInt(2) == 0 {
+					d.PutCols(rn)
+				} else {
+					d.PutDiagCols(rn)
+				}
+			}
 		} else {
 			empty++
 		}
@@ -1228,15 +1272,16 @@ func (g *game) GenBSPMap(h, w int) {
 			}
 		}
 	}
+	g.Fungus = make(map[position]vegetation)
+	g.DigFungus(RandInt(3))
 	for i := 0; i <= RandInt(2); i++ {
 		r := rooms[RandInt(len(rooms))]
 		for x := r.pos.X + 1; x < r.pos.X+r.w-1; x++ {
 			for y := r.pos.Y + 1; y < r.pos.Y+r.h-1; y++ {
-				fungus[position{x, y}] = foliage
+				g.Fungus[position{x, y}] = foliage
 			}
 		}
 	}
-	g.Fungus = fungus
 }
 
 type vegetation int
