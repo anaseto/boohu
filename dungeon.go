@@ -625,13 +625,13 @@ loop:
 		if count < 3 {
 			continue
 		}
-		for pos := range conn {
-			d.SetCell(pos, FreeCell)
-			g.Fungus[pos] = foliage
+		if len(conn) > 150 {
+			continue
+		}
+		for cpos := range conn {
+			d.SetCell(cpos, FreeCell)
+			g.Fungus[cpos] = foliage
 			count++
-			if count > 150 {
-				break loop
-			}
 		}
 		n--
 	}
