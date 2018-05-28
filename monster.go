@@ -1411,8 +1411,10 @@ func (g *game) MaxDanger() int {
 		max = max * 90 / 100
 	case GenCaveMap:
 		max = max * 95 / 100
-	case GenRuinsMap, GenRoomMap:
+	case GenRoomMap:
 		max = max * 105 / 100
+	case GenRuinsMap:
+		max = max * 108 / 100
 	case GenBSPMap:
 		max = max * 115 / 100
 	}

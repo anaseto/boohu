@@ -110,7 +110,12 @@ func (g *game) FreeCell() position {
 func (g *game) FreeCellForImportantStair() position {
 	for {
 		pos := g.FreeCellForStatic()
-		if pos.Distance(g.Player.Pos) > 12+RandInt(10) {
+		adjust := 0
+		for i := 0; i < 3; i++ {
+			adjust += RandInt(30)
+		}
+		adjust /= 3
+		if pos.Distance(g.Player.Pos) > 12+adjust {
 			return pos
 		}
 	}
