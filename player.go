@@ -169,6 +169,9 @@ func (g *game) MoveToTarget(ev event) bool {
 	var err error
 	if len(path) > 1 {
 		err = g.MovePlayer(path[len(path)-2], ev)
+		if g.ExclusionsMap[path[len(path)-2]] {
+			g.AutoTarget = InvalidPos
+		}
 	} else {
 		g.WaitTurn(ev)
 	}
