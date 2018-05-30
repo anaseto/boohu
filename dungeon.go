@@ -1261,6 +1261,11 @@ func (g *game) GenBSPMap(h, w int) {
 				} else {
 					d.PutDiagCols(rn)
 				}
+			} else if RandInt(1+special/2) == 0 && r.w >= 11 && r.h >= 9 {
+				sx := (r.w - 11) / 2
+				sy := (r.h - 9) / 2
+				doors = d.BuildRoom(position{r.pos.X + 2 + sx, r.pos.Y + 2 + sy}, 7, 5, true)
+				special++
 			}
 		} else {
 			empty++
