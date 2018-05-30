@@ -66,7 +66,7 @@ func (dg dungen) String() (text string) {
 	case GenRuinsMap:
 		text = "RR"
 	case GenBSPMap:
-		text = "AT"
+		text = "DT"
 	}
 	return text
 }
