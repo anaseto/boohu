@@ -11,7 +11,7 @@
 .\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 .\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 .\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-.Dd May 29, 2018
+.Dd May 31, 2018
 .Dt BOOHU 6
 .Os
 .Sh NAME
@@ -21,8 +21,10 @@
 .Nm
 .Op Fl c
 .Op Fl m
+.Op Fl o
 .Op Fl s
 .Op Fl v
+.Op Fl x
 .Sh DESCRIPTION
 Break Out Of Hareka's Underground (Boohu) is a roguelike game mainly inspired
 from DCSS and its tavern, with some ideas from Brogue, but aiming for very
@@ -42,11 +44,15 @@ The options are as follows:
 .It Fl c
 Use a centered camera.
 .It Fl m
-Use minimal 80x24 display.
+Use minimal 80x24 display layout.
+.It Fl o
+Use 8-color palette.
 .It Fl s
 Use the 16-color solarized palette.
 .It Fl v
 Print version number.
+.It Fl x
+Use xterm 256-color palette (solarized approximation). This is the default.
 .El
 .Sh FILES
 .Bl -tag -width Ds -compact

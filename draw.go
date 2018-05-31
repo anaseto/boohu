@@ -161,7 +161,7 @@ const (
 	Silver
 )
 
-func WindowsPalette() {
+func Simple8ColorPalette() {
 	ColorBase03 = Black
 	ColorBase02 = Black
 	ColorBase01 = Silver

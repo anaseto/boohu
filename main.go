@@ -12,13 +12,21 @@ import (
 var MinimalUI bool
 
 func main() {
-	opt := flag.Bool("s", false, "Use true 16-color solarized palette")
+	optSolarized := flag.Bool("s", false, "Use true 16-color solarized palette")
 	optVersion := flag.Bool("v", false, "print version number")
 	optCenteredCamera := flag.Bool("c", false, "centered camera")
 	optMinimalUI := flag.Bool("m", false, "80x24 minimal UI")
+	color8 := false
+	if runtime.GOOS == "windows" {
+		color8 = true
+	}
+	opt8colors := flag.Bool("o", color8, "use only 8-color palette")
+	opt256colors := flag.Bool("x", !color8, "use xterm 256-color palette (solarized approximation)")
 	flag.Parse()
-	if *opt {
+	if *optSolarized {
 		SolarizedPalette()
+	} else if color8 && !*opt256colors || !color8 && *opt8colors {
+		Simple8ColorPalette()
 	}
 	if *optVersion {
 		fmt.Println(Version)
@@ -39,9 +47,6 @@ func main() {
 	}
 	defer tui.Close()
 
-	if runtime.GOOS == "windows" {
-		WindowsPalette()
-	}
 	ApplyDefaultKeyBindings()
 	tui.PostInit()
 	LinkColors()
