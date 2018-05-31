@@ -1033,6 +1033,13 @@ func (ui *termui) DescribePosition(g *game, pos position, targ Targeter) {
 	if !g.Player.LOS[pos] {
 		see = "saw"
 	}
+	if g.Dungeon.Cell(pos).T == WallCell || g.WrongWall[pos] {
+		// TODO: revise if a monster ever creates walls outside of LOS
+		desc = ui.AddComma(see, "")
+		desc += fmt.Sprintf("a wall")
+		g.InfoEntry = desc + "."
+		return
+	}
 	if mons.Exists() && g.Player.LOS[pos] {
 		desc = ui.AddComma(see, desc)
 		desc += fmt.Sprintf("%s (%s)", mons.Kind.Indefinite(false), ui.MonsterInfo(mons))
@@ -1066,10 +1073,6 @@ func (ui *termui) DescribePosition(g *game, pos position, targ Targeter) {
 	case g.Doors[pos] || g.WrongDoor[pos]:
 		desc = ui.AddComma(see, desc)
 		desc += fmt.Sprintf("a door")
-	case g.Dungeon.Cell(pos).T == WallCell || g.WrongWall[pos]:
-		// TODO: revise if a monster ever creates walls outside of LOS
-		desc = ui.AddComma(see, desc)
-		desc += fmt.Sprintf("a wall")
 	}
 	if cld, ok := g.Clouds[pos]; ok && g.Player.LOS[pos] {
 		if cld == CloudFire {
