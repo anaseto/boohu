@@ -14,8 +14,10 @@ Screenshot
 
 [![Introduction Screeshot](https://raw.githubusercontent.com/anaseto/boohu-pages/master/screenshot.png)](https://anaseto.github.io/boohu-pages/)
 
-Follow the link on the image to see a little introduction screencast and some
-short animations.
+You can visit the [introduction
+page](https://anaseto.github.io/boohu-pages/)
+for more informations, screenshots and asciicasts. You will also be able to
+play in the browser.
 
 Install
 -------
