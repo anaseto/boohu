@@ -156,7 +156,7 @@ func (g *game) HitConnected(pos position, dt dmgType, ev event) {
 func (g *game) HitNoise(clang bool) int {
 	noise := BaseHitNoise
 	if g.Player.Weapon == Frundis {
-		noise -= 2
+		noise -= 4
 	}
 	if g.Player.Armour == Robe {
 		noise -= 1
@@ -183,8 +183,11 @@ func (g *game) HitMonster(dt dmgType, mons *monster, ev event) (hit bool) {
 	if acc > evasion {
 		hit = true
 		noise := BaseHitNoise
-		if g.Player.Weapon == Frundis || g.Player.Weapon == Dagger {
+		if g.Player.Weapon == Dagger {
 			noise -= 2
+		}
+		if g.Player.Weapon == Frundis {
+			noise -= 4
 		}
 		bonus := 0
 		if g.Player.HasStatus(StatusBerserk) {
