@@ -107,7 +107,7 @@ type rodProps struct {
 func (r rod) MaxCharge() (charges int) {
 	switch r {
 	case RodBlink:
-		charges = 6
+		charges = 5
 	case RodDigging, RodShatter:
 		charges = 3
 	default:
@@ -213,9 +213,11 @@ func (g *game) Blink(ev event) {
 		return
 	}
 	npos := losPos[RandInt(len(losPos))]
-	if npos.Distance(g.Player.Pos) <= 3 {
-		// Give close cells less chance to make blinking more useful
-		npos = losPos[RandInt(len(losPos))]
+	for i := 0; i < 4; i++ {
+		pos := losPos[RandInt(len(losPos))]
+		if npos.Distance(g.Player.Pos) < pos.Distance(g.Player.Pos) {
+			npos = pos
+		}
 	}
 	opos := g.Player.Pos
 	g.Print("You blink away.")
