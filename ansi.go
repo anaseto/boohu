@@ -30,6 +30,7 @@ func main() {
 	optVersion := flag.Bool("v", false, "print version number")
 	optCenteredCamera := flag.Bool("c", false, "centered camera")
 	optMinimalUI := flag.Bool("m", false, "80x24 minimal UI")
+	optNoAnim := flag.Bool("n", false, "no animations")
 	flag.Parse()
 	if *opt {
 		SolarizedPalette()
@@ -40,6 +41,9 @@ func main() {
 	}
 	if *optCenteredCamera {
 		CenteredCamera = true
+	}
+	if *optNoAnim {
+		DisableAnimations = true
 	}
 
 	tui := &termui{}

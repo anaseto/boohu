@@ -12,8 +12,9 @@ import (
 )
 
 var (
-	UIWidth  = 103
-	UIHeight = 27
+	UIWidth                = 103
+	UIHeight               = 27
+	DisableAnimations bool = false
 )
 
 type uicolor int
@@ -1535,6 +1536,9 @@ func (ui *termui) DrawDungeonView(g *game, m uiMode) {
 }
 
 func (ui *termui) SwappingAnimation(g *game, mpos, ppos position) {
+	if DisableAnimations {
+		return
+	}
 	ui.DrawDungeonView(g, NormalMode)
 	time.Sleep(25 * time.Millisecond)
 	_, fgm, bgColorm := ui.PositionDrawing(g, mpos)
@@ -1550,6 +1554,9 @@ func (ui *termui) SwappingAnimation(g *game, mpos, ppos position) {
 }
 
 func (ui *termui) TeleportAnimation(g *game, from, to position, showto bool) {
+	if DisableAnimations {
+		return
+	}
 	_, _, bgColorf := ui.PositionDrawing(g, from)
 	_, _, bgColort := ui.PositionDrawing(g, to)
 	ui.DrawAtPosition(g, from, true, '¤', ColorCyan, bgColorf)
@@ -1572,6 +1579,9 @@ const (
 )
 
 func (ui *termui) ProjectileTrajectoryAnimation(g *game, ray []position, fg uicolor) {
+	if DisableAnimations {
+		return
+	}
 	for i := len(ray) - 1; i >= 0; i-- {
 		pos := ray[i]
 		r, fgColor, bgColor := ui.PositionDrawing(g, pos)
@@ -1583,6 +1593,9 @@ func (ui *termui) ProjectileTrajectoryAnimation(g *game, ray []position, fg uico
 }
 
 func (ui *termui) MonsterProjectileAnimation(g *game, ray []position, r rune, fg uicolor) {
+	if DisableAnimations {
+		return
+	}
 	ui.DrawDungeonView(g, NormalMode)
 	time.Sleep(25 * time.Millisecond)
 	for i := 0; i < len(ray); i++ {
@@ -1596,6 +1609,9 @@ func (ui *termui) MonsterProjectileAnimation(g *game, ray []position, r rune, fg
 }
 
 func (ui *termui) ExplosionAnimation(g *game, es explosionStyle, pos position) {
+	if DisableAnimations {
+		return
+	}
 	ui.DrawDungeonView(g, NormalMode)
 	time.Sleep(20 * time.Millisecond)
 	colors := [2]uicolor{ColorFgExplosionStart, ColorFgExplosionEnd}
@@ -1643,6 +1659,9 @@ func (ui *termui) ExplosionAnimation(g *game, es explosionStyle, pos position) {
 }
 
 func (ui *termui) WallExplosionAnimation(g *game, pos position) {
+	if DisableAnimations {
+		return
+	}
 	colors := [2]uicolor{ColorFgExplosionWallStart, ColorFgExplosionWallEnd}
 	for _, fg := range colors {
 		_, _, bgColor := ui.PositionDrawing(g, pos)
@@ -1654,6 +1673,9 @@ func (ui *termui) WallExplosionAnimation(g *game, pos position) {
 }
 
 func (ui *termui) LightningBoltAnimation(g *game, ray []position) {
+	if DisableAnimations {
+		return
+	}
 	ui.DrawDungeonView(g, NormalMode)
 	time.Sleep(25 * time.Millisecond)
 	colors := [2]uicolor{ColorFgExplosionStart, ColorFgExplosionEnd}
@@ -1694,6 +1716,9 @@ func (ui *termui) ProjectileSymbol(dir direction) (r rune) {
 }
 
 func (ui *termui) ThrowAnimation(g *game, ray []position, hit bool) {
+	if DisableAnimations {
+		return
+	}
 	ui.DrawDungeonView(g, NormalMode)
 	time.Sleep(25 * time.Millisecond)
 	for i := len(ray) - 1; i >= 0; i-- {
@@ -1712,6 +1737,9 @@ func (ui *termui) ThrowAnimation(g *game, ray []position, hit bool) {
 }
 
 func (ui *termui) MonsterJavelinAnimation(g *game, ray []position, hit bool) {
+	if DisableAnimations {
+		return
+	}
 	ui.DrawDungeonView(g, NormalMode)
 	time.Sleep(25 * time.Millisecond)
 	for i := 0; i < len(ray); i++ {
@@ -1726,6 +1754,9 @@ func (ui *termui) MonsterJavelinAnimation(g *game, ray []position, hit bool) {
 }
 
 func (ui *termui) HitAnimation(g *game, pos position, targeting bool) {
+	if DisableAnimations {
+		return
+	}
 	if !g.Player.LOS[pos] {
 		return
 	}
@@ -2707,6 +2738,9 @@ func (ui *termui) CriticalHPWarning(g *game) {
 }
 
 func (ui *termui) WoundedAnimation(g *game) {
+	if DisableAnimations {
+		return
+	}
 	r, _, bg := ui.PositionDrawing(g, g.Player.Pos)
 	ui.DrawAtPosition(g, g.Player.Pos, false, r, ColorFgHPwounded, bg)
 	ui.Flush()
@@ -2719,6 +2753,9 @@ func (ui *termui) WoundedAnimation(g *game) {
 }
 
 func (ui *termui) DrinkingPotionAnimation(g *game) {
+	if DisableAnimations {
+		return
+	}
 	ui.DrawDungeonView(g, NormalMode)
 	time.Sleep(50 * time.Millisecond)
 	r, fg, bg := ui.PositionDrawing(g, g.Player.Pos)
@@ -2733,6 +2770,9 @@ func (ui *termui) DrinkingPotionAnimation(g *game) {
 }
 
 func (ui *termui) StatusEndAnimation(g *game) {
+	if DisableAnimations {
+		return
+	}
 	r, fg, bg := ui.PositionDrawing(g, g.Player.Pos)
 	ui.DrawAtPosition(g, g.Player.Pos, false, r, ColorViolet, bg)
 	ui.Flush()
@@ -2742,6 +2782,9 @@ func (ui *termui) StatusEndAnimation(g *game) {
 }
 
 func (ui *termui) MenuSelectedAnimation(g *game, m menu, ok bool) {
+	if DisableAnimations {
+		return
+	}
 	if !ui.Small() {
 		if ok {
 			ui.DrawColoredText(m.String(), MenuCols[m][0], DungeonHeight, ColorCyan)
@@ -2755,6 +2798,9 @@ func (ui *termui) MenuSelectedAnimation(g *game, m menu, ok bool) {
 }
 
 func (ui *termui) MagicMappingAnimation(g *game, border []int) {
+	if DisableAnimations {
+		return
+	}
 	for _, i := range border {
 		pos := idxtopos(i)
 		r, fg, bg := ui.PositionDrawing(g, pos)

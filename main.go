@@ -22,6 +22,7 @@ func main() {
 	}
 	opt8colors := flag.Bool("o", color8, "use only 8-color palette")
 	opt256colors := flag.Bool("x", !color8, "use xterm 256-color palette (solarized approximation)")
+	optNoAnim := flag.Bool("n", false, "no animations")
 	flag.Parse()
 	if *optSolarized {
 		SolarizedPalette()
@@ -37,6 +38,9 @@ func main() {
 	}
 	if *optMinimalUI {
 		MinimalUI = true
+	}
+	if *optNoAnim {
+		DisableAnimations = true
 	}
 
 	tui := &termui{}
