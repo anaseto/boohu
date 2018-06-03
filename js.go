@@ -441,7 +441,7 @@ func (ui *termui) ReadRuneKey() rune {
 	}
 }
 
-func (ui *termui) MenuAction(n int) (m int, action configAction) {
+func (ui *termui) KeyMenuAction(n int) (m int, action keyConfigAction) {
 	in := ui.PollEvent()
 	switch in.key {
 	case "a":
@@ -458,6 +458,19 @@ func (ui *termui) MenuAction(n int) (m int, action configAction) {
 		n--
 	case "R":
 		action = ResetConfig
+	case "":
+		if in.mouse {
+			y := in.mouseY
+			x := in.mouseX
+			switch in.button {
+			case 0:
+				if x > DungeonWidth || y > DungeonHeight {
+					action = QuitConfig
+				}
+			case 1:
+				action = QuitConfig
+			}
+		}
 	}
 	return n, action
 }
@@ -517,7 +530,7 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (er
 	return ui.CursorKeyAction(g, targ, runeKeyAction{r: ui.ReadKey(in.key)}, data)
 }
 
-func (ui *termui) Select(g *game, ev event, l int) (index int, alternate bool, err error) {
+func (ui *termui) Select(g *game, l int) (index int, alternate bool, err error) {
 	for {
 		in := ui.PollEvent()
 		r := ui.ReadKey(in.key)

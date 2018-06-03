@@ -87,10 +87,7 @@ func (g *game) SaveConfig() error {
 		return err
 	}
 	saveFile := filepath.Join(dataDir, "config.gob")
-	c := &config{
-		RuneNormalModeKeys: runeNormalKeyActions,
-		RuneTargetModeKeys: runeTargetingKeyActions}
-	data, err := c.ConfigSave()
+	data, err := gameConfig.ConfigSave()
 	if err != nil {
 		g.Print(err.Error())
 		return err
@@ -122,11 +119,12 @@ func (g *game) LoadConfig() (bool, error) {
 	if err != nil {
 		return true, err
 	}
-	if c.RuneNormalModeKeys != nil {
-		runeNormalKeyActions = c.RuneNormalModeKeys
+	gameConfig = *c
+	if gameConfig.RuneNormalModeKeys == nil || gameConfig.RuneTargetModeKeys == nil {
+		ApplyDefaultKeyBindings()
 	}
-	if c.RuneTargetModeKeys != nil {
-		runeTargetingKeyActions = c.RuneTargetModeKeys
+	if gameConfig.DarkLOS {
+		ApplyDarkLOS()
 	}
 	return true, nil
 }

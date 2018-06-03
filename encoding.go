@@ -29,6 +29,8 @@ func (g *game) GameSave() ([]byte, error) {
 type config struct {
 	RuneNormalModeKeys map[rune]keyAction
 	RuneTargetModeKeys map[rune]keyAction
+	DarkLOS            bool
+	Version            string
 }
 
 func (c *config) ConfigSave() ([]byte, error) {

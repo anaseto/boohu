@@ -262,7 +262,7 @@ func (ui *termui) ReadRuneKey() rune {
 	}
 }
 
-func (ui *termui) MenuAction(n int) (m int, action configAction) {
+func (ui *termui) KeyMenuAction(n int) (m int, action keyConfigAction) {
 	switch tev := ui.Screen.PollEvent().(type) {
 	case *tcell.EventKey:
 		r := tev.Rune()
@@ -293,6 +293,11 @@ func (ui *termui) MenuAction(n int) (m int, action configAction) {
 		}
 	case *tcell.EventMouse:
 		switch tev.Buttons() {
+		case tcell.Button1:
+			x, y := tev.Position()
+			if x > DungeonWidth || y > DungeonHeight {
+				action = QuitConfig
+			}
 		case tcell.WheelUp:
 			n -= 2
 		case tcell.WheelDown:
@@ -356,7 +361,7 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (er
 	return err, again, quit, notarg
 }
 
-func (ui *termui) Select(g *game, ev event, l int) (index int, alternate bool, err error) {
+func (ui *termui) Select(g *game, l int) (index int, alternate bool, err error) {
 	for {
 		switch tev := ui.Screen.PollEvent().(type) {
 		case *tcell.EventKey:

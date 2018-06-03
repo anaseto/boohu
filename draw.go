@@ -113,6 +113,30 @@ func LinkColors() {
 	ColorFgWanderingMonster = ColorOrange
 }
 
+func ApplyDarkLOS() {
+	if ColorBg == Black && ColorBgLOS == Silver {
+		ColorFgLOS = Green
+		ColorBgLOS = Black
+		ColorBgLOSalt = Black
+	} else {
+		ColorBgLOSalt = ColorBase02
+		ColorBgLOS = ColorBase02
+		ColorFgLOS = ColorBase1
+	}
+}
+
+func ApplyLightLOS() {
+	if ColorBg == Black && ColorBgLOS == Black {
+		ColorFgLOS = Black
+		ColorBgLOS = Silver
+		ColorBgLOSalt = Silver
+	} else {
+		ColorBgLOSalt = ColorBase2
+		ColorBgLOS = ColorBase3
+		ColorFgLOS = ColorBase00
+	}
+}
+
 func SolarizedPalette() {
 	ColorBase03 = 8
 	ColorBase02 = 0
@@ -512,6 +536,8 @@ func (k keyAction) NormalModeDescription() (text string) {
 		text = "Quit without saving"
 	case KeyHelp:
 		text = "Help (keys and mouse)"
+	case KeyConfigure:
+		text = "Settings and key bindings"
 	case KeyWizard:
 		text = "Wizard (debug) mode"
 	case KeyWizardInfo:
@@ -601,11 +627,10 @@ func (k keyAction) TargetingModeKey() bool {
 	}
 }
 
-var runeNormalKeyActions map[rune]keyAction
-var runeTargetingKeyActions map[rune]keyAction
+var gameConfig config
 
 func ApplyDefaultKeyBindings() {
-	runeNormalKeyActions = map[rune]keyAction{
+	gameConfig.RuneNormalModeKeys = map[rune]keyAction{
 		'h': KeyW,
 		'j': KeyS,
 		'k': KeyN,
@@ -658,7 +683,7 @@ func ApplyDefaultKeyBindings() {
 		'@': KeyWizardInfo,
 		'=': KeyConfigure,
 	}
-	runeTargetingKeyActions = map[rune]keyAction{
+	gameConfig.RuneTargetModeKeys = map[rune]keyAction{
 		'h':    KeyW,
 		'j':    KeyS,
 		'k':    KeyN,
@@ -706,7 +731,7 @@ type runeKeyAction struct {
 func (ui *termui) HandleKeyAction(g *game, rka runeKeyAction) (err error, again bool, quit bool) {
 	if rka.r != 0 {
 		var ok bool
-		rka.k, ok = runeNormalKeyActions[rka.r]
+		rka.k, ok = gameConfig.RuneNormalModeKeys[rka.r]
 		if !ok {
 			switch rka.r {
 			case 's':
@@ -832,7 +857,7 @@ func (ui *termui) HandleKey(g *game, rka runeKeyAction) (err error, again bool, 
 		}
 		return nil, true, false
 	case KeyConfigure:
-		ui.Configure(g)
+		err = ui.HandleSettingAction(g)
 		again = true
 	case KeyDescription:
 		ui.MenuSelectedAnimation(g, MenuView, false)
@@ -918,7 +943,7 @@ func (ui *termui) KeysHelp(g *game) {
 		"Write game statistics to file", "#",
 		"Save and Quit", "S",
 		"Quit without saving", "Q",
-		"Change key bindings", "=",
+		"Change settings and key bindings", "=",
 	})
 }
 
@@ -1213,7 +1238,7 @@ func (ui *termui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, dat
 	again = true
 	if rka.r != 0 {
 		var ok bool
-		rka.k, ok = runeTargetingKeyActions[rka.r]
+		rka.k, ok = gameConfig.RuneTargetModeKeys[rka.r]
 		if !ok {
 			err = fmt.Errorf("Invalid targeting mode key '%c'. Type ? for help.", rka.r)
 			return err, again, quit, notarg
@@ -2217,12 +2242,12 @@ func InRuneSlice(r rune, s []rune) bool {
 
 func (ui *termui) RunesForKeyAction(k keyAction) string {
 	runes := []rune{}
-	for r, ka := range runeNormalKeyActions {
+	for r, ka := range gameConfig.RuneNormalModeKeys {
 		if k == ka && !InRuneSlice(r, runes) {
 			runes = append(runes, r)
 		}
 	}
-	for r, ka := range runeTargetingKeyActions {
+	for r, ka := range gameConfig.RuneTargetModeKeys {
 		if k == ka && !InRuneSlice(r, runes) {
 			runes = append(runes, r)
 		}
@@ -2233,16 +2258,16 @@ func (ui *termui) RunesForKeyAction(k keyAction) string {
 	return text
 }
 
-type configAction int
+type keyConfigAction int
 
 const (
-	NavigateConfig configAction = iota
+	NavigateConfig keyConfigAction = iota
 	ChangeConfig
 	ResetConfig
 	QuitConfig
 )
 
-func (ui *termui) Configure(g *game) {
+func (ui *termui) ChangeKeys(g *game) {
 	lines := DungeonHeight
 	nmax := len(configurableKeyActions) - lines
 	n := 0
@@ -2279,8 +2304,8 @@ loop:
 		ui.DrawStyledTextLine(" add key (a) up/down (arrows/u/d) reset (R) quit (esc or space) ", lines, FooterLine)
 		ui.Flush()
 
-		var action configAction
-		s, action = ui.MenuAction(s)
+		var action keyConfigAction
+		s, action = ui.KeyMenuAction(s)
 		if s >= len(configurableKeyActions) {
 			s = len(configurableKeyActions) - 1
 		}
@@ -2308,14 +2333,14 @@ loop:
 			CustomKeys = true
 			ka := configurableKeyActions[s]
 			if ka.NormalModeKey() {
-				runeNormalKeyActions[r] = ka
+				gameConfig.RuneNormalModeKeys[r] = ka
 			} else {
-				delete(runeNormalKeyActions, r)
+				delete(gameConfig.RuneNormalModeKeys, r)
 			}
 			if ka.TargetingModeKey() {
-				runeTargetingKeyActions[r] = ka
+				gameConfig.RuneTargetModeKeys[r] = ka
 			} else {
-				delete(runeTargetingKeyActions, r)
+				delete(gameConfig.RuneTargetModeKeys, r)
 			}
 			err := g.SaveConfig()
 			if err != nil {
@@ -2325,7 +2350,8 @@ loop:
 			break loop
 		case ResetConfig:
 			ApplyDefaultKeyBindings()
-			err := g.RemoveDataFile("config.gob")
+			err := g.SaveConfig()
+			//err := g.RemoveDataFile("config.gob")
 			if err != nil {
 				g.Print(err.Error())
 			}
@@ -2539,8 +2565,8 @@ func (ui *termui) SelectProjectile(g *game, ev event) error {
 		}
 		ui.DrawTextLine(" press esc or space to cancel ", len(cs)+1)
 		ui.Flush()
-		index, alternate, err := ui.Select(g, ev, len(cs))
-		if alternate {
+		index, alt, err := ui.Select(g, len(cs))
+		if alt {
 			desc = !desc
 			continue
 		}
@@ -2580,8 +2606,8 @@ func (ui *termui) SelectPotion(g *game, ev event) error {
 		}
 		ui.DrawTextLine(" press esc or space to cancel ", len(cs)+1)
 		ui.Flush()
-		index, alternate, err := ui.Select(g, ev, len(cs))
-		if alternate {
+		index, alt, err := ui.Select(g, len(cs))
+		if alt {
 			desc = !desc
 			continue
 		}
@@ -2628,8 +2654,8 @@ func (ui *termui) SelectRod(g *game, ev event) error {
 		}
 		ui.DrawTextLine(" press esc or space to cancel ", len(rs)+1)
 		ui.Flush()
-		index, alternate, err := ui.Select(g, ev, len(rs))
-		if alternate {
+		index, alt, err := ui.Select(g, len(rs))
+		if alt {
 			desc = !desc
 			continue
 		}
@@ -2664,6 +2690,7 @@ var menuActions = []keyAction{
 	KeyCharacterInfo,
 	KeyLogs,
 	KeyHelp,
+	KeyConfigure,
 	KeySave,
 	KeyQuit,
 }
@@ -2682,7 +2709,7 @@ func (ui *termui) SelectAction(g *game, actions []keyAction, ev event) (keyActio
 		}
 		ui.DrawTextLine(" press esc or space to cancel ", len(actions)+1)
 		ui.Flush()
-		index, alt, err := ui.Select(g, ev, len(actions))
+		index, alt, err := ui.Select(g, len(actions))
 		if alt {
 			continue
 		}
@@ -2696,6 +2723,84 @@ func (ui *termui) SelectAction(g *game, actions []keyAction, ev event) (keyActio
 		ui.DrawDungeonView(g, NoFlushMode)
 		return actions[index], nil
 	}
+}
+
+type setting int
+
+const (
+	setKeys setting = iota
+	invertLOS
+)
+
+func (s setting) String() (text string) {
+	switch s {
+	case setKeys:
+		text = "Change key bindings"
+	case invertLOS:
+		text = "Toggle dark/light LOS"
+	}
+	return text
+}
+
+var settingsActions = []setting{
+	setKeys,
+	invertLOS,
+}
+
+func (ui *termui) ConfItem(g *game, i, lnum int, s setting, fg uicolor) {
+	bg := ui.ListItemBG(i)
+	ui.ClearLineWithColor(lnum, bg)
+	ui.DrawColoredTextOnBG(fmt.Sprintf("%c - %s", rune(i+97), s), 0, lnum, fg, bg)
+}
+
+func (ui *termui) SelectConfigure(g *game, actions []setting) (setting, error) {
+	for {
+		ui.ClearLine(0)
+		ui.DrawColoredText("Perform", 0, 0, ColorCyan)
+		col := utf8.RuneCountInString("Perform")
+		ui.DrawText(" which change?", col, 0)
+		for i, r := range actions {
+			ui.ConfItem(g, i, i+1, r, ColorFg)
+		}
+		ui.DrawTextLine(" press esc or space to cancel ", len(actions)+1)
+		ui.Flush()
+		index, alt, err := ui.Select(g, len(actions))
+		if alt {
+			continue
+		}
+		if err != nil {
+			ui.DrawDungeonView(g, NoFlushMode)
+			return setKeys, err
+		}
+		ui.ConfItem(g, index, index+1, actions[index], ColorYellow)
+		ui.Flush()
+		time.Sleep(75 * time.Millisecond)
+		ui.DrawDungeonView(g, NoFlushMode)
+		return actions[index], nil
+	}
+}
+
+func (ui *termui) HandleSettingAction(g *game) error {
+	s, err := ui.SelectConfigure(g, settingsActions)
+	if err != nil {
+		return err
+	}
+	switch s {
+	case setKeys:
+		ui.ChangeKeys(g)
+	case invertLOS:
+		gameConfig.DarkLOS = !gameConfig.DarkLOS
+		err := g.SaveConfig()
+		if err != nil {
+			g.Print(err.Error())
+		}
+		if gameConfig.DarkLOS {
+			ApplyDarkLOS()
+		} else {
+			ApplyLightLOS()
+		}
+	}
+	return nil
 }
 
 func (ui *termui) Death(g *game) {
