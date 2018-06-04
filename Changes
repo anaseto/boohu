@@ -32,14 +32,11 @@ Game related changes:
 User interface:
 
 + Improved mouse support: now there are several buttons for the more common
-  actions
-  ([screenshot](https://anaseto.github.io/boohu-pages/screenshots/big.png)),
-  instead of one huge menu.
-+ New compact alternative style for 80x24 terminals ([screenshot](https://anaseto.github.io/boohu-pages/screenshots/compact.png).
+  actions, instead of one huge menu.
++ New compact alternative style for 80x24 terminals.
 + The game tries to display several log messages in one line when there is
   enough room for it (the algorithm could still be improved).
-+ Improved animations. (e.g. [fireball](https://anaseto.github.io/boohu-pages/asciinema/fireball.html))
-  Animations can be disabled with `-n` option.
++ Improved animations. Animations can be disabled with `-n` option.
 
 A few bug fixes and many other little improvements.
 -----------------------------------------------------------------------------
