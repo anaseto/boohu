@@ -17,17 +17,12 @@ Screenshot
 You can visit the [game's
 page](https://download.tuxfamily.org/boohu/index.html)
 for more informations, tips, screenshots and asciicasts. You will also be able
-to play in the browser.
+to play in the browser and download pre-build binaries for the latest release.
 
 Install
 -------
 
-*main repo being migrated to tuxfamily*
-
-You can download binaries on the [releases
-page](https://github.com/anaseto/boohu/releases).
-
-You can also build from source by following these steps:
+You build from source by following these steps:
 
 + Install the [go compiler](https://golang.org/).
 + Set `$GOPATH` variable (for example `export GOPATH=$HOME/go`).
