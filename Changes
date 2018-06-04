@@ -1,0 +1,129 @@
+v0.8.0 2018-06-02
+
+Game related changes:
+
++ No more automatic HP and MP regeneration: now you have to rest. This
+  is inspired from TGGW, but adapted to Boohu's fast-paced flow and
+  DCSS-like short temporal effects: you have to wait for your status to wear
+  off before resting (the first attempt waits for this), and then you attempt
+  to rest and are successful at it if you are not interrumpted by monsters
+  during a few turns. You replenish HP and MP, monsters do too, and some
+  monsters might awake when you rest, so that you want to avoid doing it too
+  often.
++ Reworked cyclops: less accurate, rocks do never confuse, but the rocks create
+  temporal obstacles (walls) for the player. The placement of the rock depends on
+  whether the player dodged (rock behind the player), blocked with the shield
+  (rock in front of the player), or got hit (the rock takes player cell if
+  possible, and the player gets 1 cell moved backwards).
++ Renamed worms into farmer worms: they now furrow and help foliage grow as
+  they move.
++ New potion of digging that lets you walk into walls for a few turns.
++ New potion of dreams: you get the current location of sleeping monsters.
++ New potion of swapping that makes you dance with monsters (swap positions)
+  when you move or are hit by them.
++ Explosive magara and nadre explosions now can occasionally destroy walls.
++ Removed javelines: some of their damage integrated in darts of confusion,
+  which are more funny and versatile.
++ Improvements in dungeon generation: new town-like map generator,
+  special rooms and/or foliage in most maps.
++ Improved morgue files. They now show some miscellaneous statistics at the
+  end, including some per-depth statistics.
+
+User interface:
+
++ Improved mouse support: now there are several buttons for the more common
+  actions
+  ([screenshot](https://anaseto.github.io/boohu-pages/screenshots/big.png)),
+  instead of one huge menu.
++ New compact alternative style for 80x24 terminals ([screenshot](https://anaseto.github.io/boohu-pages/screenshots/compact.png).
++ The game tries to display several log messages in one line when there is
+  enough room for it (the algorithm could still be improved).
++ Improved animations. (e.g. [fireball](https://anaseto.github.io/boohu-pages/asciinema/fireball.html))
+  Animations can be disabled with `-n` option.
+
+A few bug fixes and many other little improvements.
+-----------------------------------------------------------------------------
+v0.7.1 2018-05-09
+
+Bugfix release. Fix a crash with “G” when no safe path to stairs.
+-----------------------------------------------------------------------------
+v0.7 2018-05-08
+
+User interface:
+
++ Animations: combat, explosions, magic mapping, menu selections …
++ Better usage of screen for menus (try to show as much of the map at any time).
++ Rebindable key bindings.
++ Many little look improvements.
+
+Game:
+
++ New narrative: you're searching medicinal simella Underground plants for your village.
++ Gold replaced by simella plants.
++ Foliage and doors can be burned by fire explosions and lightning. Fire spreads. As a result, terrain is now fully destructible.
++ New projectile: explosive magara. Similar to a nadre explosion.
++ Simpler and more correct system for zone exclusion.
++ Miscellaneous bug fixes and improvements.
+-----------------------------------------------------------------------------
+v0.6.1 2018-04-28
+
+Bugfix release : fix an information leak in position description.
+-----------------------------------------------------------------------------
+v0.6 2018-04-27
+
+Game:
+
++ New rod of swapping that makes you swap positions with a monster.
++ New weapon: lightning whip which hits a monster and every monster connected  to it (inspired from minmay's TOME4 Harbinger addon class).
++ New potion of swiftness: replaces potions of running and evasion.
++ Some minor tweaks in generation of weapons.
++ Aptitude “regenerate quickly” is no more.
+
+Dungeon generation:
+
++ Sometimes special rooms with colums appear in cave-like maps.
++ Add sometimes cave-like vegetation in ruin and tree-like cave maps.
++ Add special rooms with columns in maps with rooms.
+
+User interface:
+
++ Better behaved auto-exploration, in particular with respect to excluded areas.
++ Various improvements in log messages and timeline of character dump. In particular, the timeline keeps track of dangerous monster you see in addition to dangerous you kill.
+-----------------------------------------------------------------------------
+v0.5 2018-04-14
+
+Highlights:
+
++ new unique monster: Marevor, which can teleport people around
++ new unique weapon: staff Frundis, which can confuse, generate fog and reduce noise
++ new monster: oklob plant, doesn't move but can throw confusing acid projectiles
++ actions which destoy walls produce some fog now
++ improvements in auto-exploration (smarter and faster)
++ little improvements to monster hunting
++ new command line option -c: use centered camera
++ new experimental javascript backend for the browser (still lacking some features)
++ miscellaneous improvements, bug fixes and optimizations
+-----------------------------------------------------------------------------
+v0.4 2017-10-29
+
+New features highlight:
+
++ New terrain feature: dense foliage reducing your line of sight.
++ New terrain feature: doors that automatically open and close.
++ New monsters: explosive nadre, acid mound, brizzias, blinking frog, mirror specter.
++ Several new potions: potion of walls, potion of controlled blink.
++ New feature: you hear footsteps.
++ New aptitudes: smoke, confusing gas.
+
+User interface:
+
++ Mouse support for movement and targetting.
++ Colored console messages.
+
+And many other small improvements and fixes.
+-----------------------------------------------------------------------------
+v0.3 2017-10-01
+-----------------------------------------------------------------------------
+v0.2 2017-09-22
+-----------------------------------------------------------------------------
+v0.1 2017-09-16
