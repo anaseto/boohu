@@ -22,6 +22,8 @@ play in the browser.
 Install
 -------
 
+*main repo being migrated to tuxfamily*
+
 You can download binaries on the [releases
 page](https://github.com/anaseto/boohu/releases).
 
