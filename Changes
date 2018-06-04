@@ -55,9 +55,11 @@ User interface:
 
 Game:
 
-+ New narrative: you're searching medicinal simella Underground plants for your village.
++ New narrative: you're searching medicinal simella Underground plants for your
+  village.
 + Gold replaced by simella plants.
-+ Foliage and doors can be burned by fire explosions and lightning. Fire spreads. As a result, terrain is now fully destructible.
++ Foliage and doors can be burned by fire explosions and lightning. Fire
+  spreads. As a result, terrain is now fully destructible.
 + New projectile: explosive magara. Similar to a nadre explosion.
 + Simpler and more correct system for zone exclusion.
 + Miscellaneous bug fixes and improvements.
@@ -71,7 +73,8 @@ v0.6 2018-04-27
 Game:
 
 + New rod of swapping that makes you swap positions with a monster.
-+ New weapon: lightning whip which hits a monster and every monster connected  to it (inspired from minmay's TOME4 Harbinger addon class).
++ New weapon: lightning whip which hits a monster and every monster connected
+  to it (inspired from minmay's TOME4 Harbinger addon class).
 + New potion of swiftness: replaces potions of running and evasion.
 + Some minor tweaks in generation of weapons.
 + Aptitude “regenerate quickly” is no more.
@@ -85,7 +88,9 @@ Dungeon generation:
 User interface:
 
 + Better behaved auto-exploration, in particular with respect to excluded areas.
-+ Various improvements in log messages and timeline of character dump. In particular, the timeline keeps track of dangerous monster you see in addition to dangerous you kill.
++ Various improvements in log messages and timeline of character dump. In
+  particular, the timeline keeps track of dangerous monster you see in addition
+  to dangerous you kill.
 -----------------------------------------------------------------------------
 v0.5 2018-04-14
 
