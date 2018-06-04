@@ -7,15 +7,15 @@ back to your village.  Along the way, you will collect simellas, as well as
 various items that will help you deal with monsters, which you may
 fight or flee...*
 
-![Boohu introduction screen](https://raw.githubusercontent.com/anaseto/boohu-pages/master/intro-screen.png)
+![Boohu introduction screen](https://download.tuxfamily.org/boohu/intro-screen.png)
 
 Screenshot
 ----------
 
-[![Introduction Screeshot](https://raw.githubusercontent.com/anaseto/boohu-pages/master/screenshot.png)](https://anaseto.github.io/boohu-pages/)
+[![Introduction Screeshot](https://download.tuxfamily.org/boohu/screenshot.png)](https://download.tuxfamily.org/boohu/index.html)
 
-You can visit the [introduction
-page](https://anaseto.github.io/boohu-pages/)
+You can visit the [game's
+page](https://download.tuxfamily.org/boohu/index.html)
 for more informations, screenshots and asciicasts. You will also be able to
 play in the browser.
 
@@ -32,7 +32,7 @@ You can also build from source by following these steps:
 + Install the [go compiler](https://golang.org/).
 + Set `$GOPATH` variable (for example `export GOPATH=$HOME/go`).
 + Add `$GOPATH/bin` to your `$PATH` (for example `export PATH="$PATH:$GOPATH/bin"`).
-+ Use the command `go get -u github.com/anaseto/boohu`.
++ Use the command `go get -u https://git.tuxfamily.org/boohu/boohu.git`.
   
 The `boohu` command should now be available.
 
