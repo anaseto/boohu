@@ -16,8 +16,8 @@ Screenshot
 
 You can visit the [game's
 page](https://download.tuxfamily.org/boohu/index.html)
-for more informations, screenshots and asciicasts. You will also be able to
-play in the browser.
+for more informations, tips, screenshots and asciicasts. You will also be able
+to play in the browser.
 
 Install
 -------
@@ -54,18 +54,3 @@ use the `-s` option: `boohu -s` to use the 16-color palette, which
 will display nicely if the [solarized](http://ethanschoonover.com/solarized)
 palette is used. Configurations are available for most terminal emulators, otherwise, colors may have to be configured manually to one's liking in
 the terminal emulator options.
-
-Basic Survival Tips
--------------
-
-+ Position yourself to fight one enemy at a time whenever possible.
-+ Fight far enough from unknown terrain if you can: combat is noisy, more
-  monsters will come if they hear it.
-+ Use your potions, projectiles and rods. With experience you learn when you
-  can spare them, and when you should use them, but dying with a potion of heal
-  wounds in the inventory should never be a thing.
-+ Avoid dead-ends if you do not have any means of escape, such as potions of
-  teleportation, unless no better options are available.
-+ You do not have to kill every monster. You want, though, to find as many items
-  as you can, but survival comes first.
-+ Use doors and dense foliage to break line of sight with monsters.
