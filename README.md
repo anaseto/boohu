@@ -27,9 +27,10 @@ You build from source by following these steps:
 + Install the [go compiler](https://golang.org/).
 + Set `$GOPATH` variable (for example `export GOPATH=$HOME/go`).
 + Add `$GOPATH/bin` to your `$PATH` (for example `export PATH="$PATH:$GOPATH/bin"`).
-+ Use the command `go get -u https://git.tuxfamily.org/boohu/boohu.git`.
++ Use the command `go get -u git.tuxfamily.org/boohu/boohu.git`.
   
-The `boohu` command should now be available.
+The `boohu` command should now be available (you may to have to rename it to
+remove the `.git` suffix).
 
 The only dependency outside of the go standard library is the lightweight
 curses-like library [termbox-go](https://github.com/nsf/termbox-go), which is
