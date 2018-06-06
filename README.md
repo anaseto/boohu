@@ -9,27 +9,27 @@ fight or flee...*
 
 ![Boohu introduction screen](https://download.tuxfamily.org/boohu/intro-screen.png)
 
-Screenshot
-----------
+Screenshot and Website
+----------------------
 
 [![Introduction Screeshot](https://download.tuxfamily.org/boohu/screenshot.png)](https://download.tuxfamily.org/boohu/index.html)
 
 You can visit the [game's
-page](https://download.tuxfamily.org/boohu/index.html)
+website](https://download.tuxfamily.org/boohu/index.html)
 for more informations, tips, screenshots and asciicasts. You will also be able
 to play in the browser and download pre-build binaries for the latest release.
 
-Install
--------
+Install from Sources
+--------------------
 
-You build from source by following these steps:
+You can build from source by following these steps:
 
 + Install the [go compiler](https://golang.org/).
 + Set `$GOPATH` variable (for example `export GOPATH=$HOME/go`).
 + Add `$GOPATH/bin` to your `$PATH` (for example `export PATH="$PATH:$GOPATH/bin"`).
 + Use the command `go get -u git.tuxfamily.org/boohu/boohu.git`.
   
-The `boohu` command should now be available (you may to have to rename it to
+The `boohu` command should now be available (you may have to rename it to
 remove the `.git` suffix).
 
 The only dependency outside of the go standard library is the lightweight
