@@ -764,7 +764,16 @@ func (ui *termui) HandleKey(g *game, rka runeKeyAction) (err error, again bool, 
 		err = g.Rest(g.Ev)
 		ui.MenuSelectedAnimation(g, MenuRest, err == nil)
 	case KeyDescend:
-		if _, ok := g.Stairs[g.Player.Pos]; ok {
+		if stair, ok := g.Stairs[g.Player.Pos]; ok {
+			if g.Depth == WinDepth && stair == NormalStair {
+				g.Print("Do you really want to dive in optional depths? [y/N]")
+				ui.DrawDungeonView(g, NormalMode)
+				dive := ui.PromptConfirmation(g)
+				if !dive {
+					err = errors.New("Keep going in current level, then.")
+					break
+				}
+			}
 			if g.Descend() {
 				ui.Win(g)
 				quit = true

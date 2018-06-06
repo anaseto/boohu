@@ -14,6 +14,7 @@ type game struct {
 	Ev                  event
 	EventIndex          int
 	Depth               int
+	ExploredLevels      int
 	DepthPlayerTurn     int
 	Turn                int
 	Highlight           map[position]bool // highlighted positions (e.g. targeted ray)
@@ -613,6 +614,7 @@ func (g *game) Descend() bool {
 	g.LevelStats()
 	if stair, ok := g.Stairs[g.Player.Pos]; ok && stair == WinStair {
 		g.StoryPrint("You escaped!")
+		g.ExploredLevels = g.Depth + 1
 		g.Depth = -1
 		return true
 	}
