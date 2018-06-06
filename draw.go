@@ -764,7 +764,7 @@ func (ui *termui) HandleKey(g *game, rka runeKeyAction) (err error, again bool, 
 		err = g.Rest(g.Ev)
 		ui.MenuSelectedAnimation(g, MenuRest, err == nil)
 	case KeyDescend:
-		if g.Stairs[g.Player.Pos] {
+		if _, ok := g.Stairs[g.Player.Pos]; ok {
 			if g.Descend() {
 				ui.Win(g)
 				quit = true
@@ -1070,6 +1070,7 @@ func (ui *termui) DescribePosition(g *game, pos position, targ Targeter) {
 		desc = ui.AddComma(see, desc)
 		desc += fmt.Sprintf("%s (%s)", mons.Kind.Indefinite(false), ui.MonsterInfo(mons))
 	}
+	stair, okStair := g.Stairs[pos]
 	switch {
 	case g.Simellas[pos] > 0:
 		desc = ui.AddComma(see, desc)
@@ -1088,8 +1089,8 @@ func (ui *termui) DescribePosition(g *game, pos position, targ Targeter) {
 	case okRod:
 		desc = ui.AddComma(see, desc)
 		desc += fmt.Sprintf("a %v", rod)
-	case g.Stairs[pos]:
-		if g.Depth == MaxDepth {
+	case okStair:
+		if stair == WinStair {
 			desc = ui.AddComma(see, desc)
 			desc += fmt.Sprintf("glowing stairs")
 		} else {
@@ -1266,7 +1267,7 @@ func (ui *termui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, dat
 	case KeyNextStairs:
 		ui.NextStair(g, data)
 	case KeyDescend:
-		if g.Stairs[g.Player.Pos] {
+		if _, ok := g.Stairs[g.Player.Pos]; ok {
 			again = false
 			g.Targeting = InvalidPos
 			notarg = true
@@ -1436,11 +1437,19 @@ func (ui *termui) ViewPositionDescription(g *game, pos position) {
 		ui.DrawDescription(g, r.Desc())
 	} else if eq, ok := g.Equipables[pos]; ok {
 		ui.DrawDescription(g, eq.Desc())
-	} else if g.Stairs[pos] {
-		if g.Depth == MaxDepth {
-			ui.DrawDescription(g, "These shiny-looking stairs are in fact a magical monolith. It is said they were made some centuries ago by Marevor Helith. They will lead you back to your village.")
+	} else if stair, ok := g.Stairs[pos]; ok {
+		if stair == WinStair {
+			desc := "These shiny-looking stairs are in fact a magical monolith. It is said they were made some centuries ago by Marevor Helith. They will lead you back to your village."
+			if g.Depth < MaxDepth {
+				desc += " Note that this is not the last floor, so you may want to find a normal stair and continue collecting simellas, if you're courageous enough."
+			}
+			ui.DrawDescription(g, desc)
 		} else {
-			ui.DrawDescription(g, "Stairs lead to the next level of the Underground. There's no way back. Monsters do not follow you.")
+			desc := "Stairs lead to the next level of the Underground. There's no way back. Monsters do not follow you."
+			if g.Depth == WinDepth {
+				desc += " If you're afraid, you could instead just win by taking the magical stairs somewhere in the same map."
+			}
+			ui.DrawDescription(g, desc)
 		}
 	} else if g.Doors[pos] {
 		ui.DrawDescription(g, "A closed door blocks your line of sight. Doors open automatically when you or a monster stand on them. Doors are flammable.")
@@ -1890,9 +1899,9 @@ func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgCol
 			} else if rod, ok := g.Rods[pos]; ok {
 				r = rod.Letter()
 				fgColor = ColorFgCollectable
-			} else if _, ok := g.Stairs[pos]; ok {
+			} else if stair, ok := g.Stairs[pos]; ok {
 				r = '>'
-				if g.Depth == MaxDepth {
+				if stair == WinStair {
 					fgColor = ColorFgMagicPlace
 				} else {
 					fgColor = ColorFgPlace
@@ -1965,7 +1974,7 @@ func (ui *termui) DrawStatusBar(g *game, line int) {
 	line++
 	ui.DrawText(fmt.Sprintf("Simellas: %d", g.Player.Simellas), BarCol, line)
 	line++
-	if g.Depth > MaxDepth {
+	if g.Depth == -1 {
 		ui.DrawText("Depth: Out!", BarCol, line)
 	} else {
 		ui.DrawText(fmt.Sprintf("Depth: %d", g.Depth), BarCol, line)
@@ -2034,7 +2043,7 @@ func (ui *termui) DrawStatusLine(g *game) {
 	ui.DrawText(simellas, col, line)
 	col += utf8.RuneCountInString(simellas)
 	var depth string
-	if g.Depth > MaxDepth {
+	if g.Depth == -1 {
 		depth = "D: Out! "
 	} else {
 		depth = fmt.Sprintf("D:%d ", g.Depth)

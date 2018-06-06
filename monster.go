@@ -258,6 +258,14 @@ const (
 	USatowalga
 	UDragon
 	UMarevorHelith
+	UXCyclops
+	UXLiches
+	UXFrogRanged
+	UXExplosive
+	UXHounds
+	UXSatowalga
+	UXSpecters
+	UXDisabling
 )
 
 type monsInterval struct {
@@ -454,7 +462,61 @@ var MonsBands = []monsterBandData{
 			MonsMarevorHelith: {1, 1},
 			MonsLich:          {0, 1},
 		},
-		rarity: 100, minDepth: 7, maxDepth: 12, band: true, unique: true,
+		rarity: 100, minDepth: 7, maxDepth: 15, band: true, unique: true,
+	},
+	UXCyclops: {
+		distribution: map[monsterKind]monsInterval{
+			MonsCyclop: {3, 3},
+		},
+		rarity: 100, minDepth: 13, maxDepth: 15, band: true, unique: true,
+	},
+	UXLiches: {
+		distribution: map[monsterKind]monsInterval{
+			MonsLich: {2, 2},
+		},
+		rarity: 100, minDepth: 14, maxDepth: 15, band: true, unique: true,
+	},
+	UXFrogRanged: {
+		distribution: map[monsterKind]monsInterval{
+			MonsBlinkingFrog: {2, 2},
+			MonsCyclop:       {1, 1},
+			MonsLich:         {1, 1},
+		},
+		rarity: 100, minDepth: 14, maxDepth: 15, band: true, unique: true,
+	},
+	UXExplosive: {
+		distribution: map[monsterKind]monsInterval{
+			MonsExplosiveNadre: {5, 5},
+		},
+		rarity: 100, minDepth: 13, maxDepth: 15, band: true, unique: true,
+	},
+	UXHounds: {
+		distribution: map[monsterKind]monsInterval{
+			MonsHound: {6, 6},
+		},
+		rarity: 100, minDepth: 14, maxDepth: 15, band: true, unique: true,
+	},
+	UXSatowalga: {
+		distribution: map[monsterKind]monsInterval{
+			MonsSatowalgaPlant: {3, 3},
+		},
+		rarity: 100, minDepth: 13, maxDepth: 15, band: true, unique: true,
+	},
+	UXSpecters: {
+		distribution: map[monsterKind]monsInterval{
+			MonsMirrorSpecter: {3, 3},
+		},
+		rarity: 100, minDepth: 14, maxDepth: 15, band: true, unique: true,
+	},
+	UXDisabling: {
+		distribution: map[monsterKind]monsInterval{
+			MonsExplosiveNadre: {1, 1},
+			MonsSpider:         {1, 1},
+			MonsBrizzia:        {1, 1},
+			MonsGiantBee:       {1, 1},
+			MonsMirrorSpecter:  {1, 1},
+		},
+		rarity: 100, minDepth: 15, maxDepth: 15, band: true, unique: true,
 	},
 }
 
@@ -1376,7 +1438,7 @@ func (g *game) MaxDanger() int {
 		adjust -= Min(3, g.Depth) * Max(1, g.Depth-2)
 	}
 	if g.Player.Armour == PlateArmour {
-		adjust += MaxDepth - g.Depth
+		adjust += WinDepth - Min(g.Depth, WinDepth)
 	}
 	if g.Depth > 3 && g.Player.Shield == NoShield && !g.Player.Weapon.TwoHanded() {
 		adjust -= Min(g.Depth, 6) * 2
@@ -1385,7 +1447,7 @@ func (g *game) MaxDanger() int {
 		adjust += (4 - g.Depth) * 2
 	}
 	if g.Player.Armour == ChainMail || g.Player.Armour == LeatherArmour {
-		adjust += MaxDepth/2 - g.Depth
+		adjust += WinDepth/2 - g.Depth
 	}
 	if g.Player.Weapon != Dagger && g.Depth < 3 {
 		adjust += 4 + (3-g.Depth)*3
@@ -1400,10 +1462,10 @@ func (g *game) MaxDanger() int {
 	} else {
 		max = max + adjust
 	}
-	if MaxDepth-g.Depth < g.Player.Consumables[MagicMappingPotion] {
+	if WinDepth-g.Depth < g.Player.Consumables[MagicMappingPotion] {
 		max = max * 110 / 100
 	}
-	if MaxDepth-g.Depth < g.Player.Consumables[DreamPotion] {
+	if WinDepth-g.Depth < g.Player.Consumables[DreamPotion] {
 		max = max * 105 / 100
 	}
 	switch g.Dungeon.Gen {
@@ -1423,8 +1485,16 @@ func (g *game) MaxDanger() int {
 
 func (g *game) MaxMonsters() int {
 	max := 13 + 3*g.Depth
-	if max > 33 {
+	if max > 33 && g.Depth <= WinDepth {
 		max = 33
+	} else if max > 36 {
+		max = 36
+	}
+	switch g.Dungeon.Gen {
+	case GenCaveMapTree, GenCaveMap:
+		max = max * 90 / 100
+	case GenBSPMap:
+		max = max * 110 / 100
 	}
 	return max
 }

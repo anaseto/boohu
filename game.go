@@ -2,7 +2,7 @@ package main
 
 import "container/heap"
 
-var Version string = "v0.8"
+var Version string = "v0.9-dev"
 
 type game struct {
 	Dungeon             *dungeon
@@ -21,7 +21,7 @@ type game struct {
 	CollectableScore    int
 	Equipables          map[position]equipable
 	Rods                map[position]rod
-	Stairs              map[position]bool
+	Stairs              map[position]stair
 	Clouds              map[position]cloud
 	Fungus              map[position]vegetation
 	Doors               map[position]bool
@@ -107,15 +107,15 @@ func (g *game) FreeCell() position {
 	}
 }
 
-func (g *game) FreeCellForImportantStair() position {
+func (g *game) FreeCellForStair(dist int) position {
 	for {
 		pos := g.FreeCellForStatic()
 		adjust := 0
 		for i := 0; i < 4; i++ {
-			adjust += RandInt(50)
+			adjust += RandInt(dist)
 		}
 		adjust /= 4
-		if pos.Distance(g.Player.Pos) > 12+adjust {
+		if pos.Distance(g.Player.Pos) > 6+adjust {
 			return pos
 		}
 	}
@@ -152,7 +152,7 @@ func (g *game) FreeCellForStatic() position {
 		if _, ok := g.Collectables[pos]; ok {
 			continue
 		}
-		if g.Stairs[pos] {
+		if _, ok := g.Stairs[pos]; ok {
 			continue
 		}
 		if _, ok := g.Rods[pos]; ok {
@@ -235,7 +235,8 @@ func (g *game) FreeForStairs() position {
 	}
 }
 
-const MaxDepth = 12
+const MaxDepth = 15
+const WinDepth = 12
 
 const (
 	DungeonHeight = 21
@@ -382,21 +383,34 @@ func (g *game) InitLevel() {
 	}
 
 	// Stairs
-	g.Stairs = make(map[position]bool)
-	nstairs := 1 + RandInt(3)
-	if g.Depth == MaxDepth {
+	g.Stairs = make(map[position]stair)
+	nstairs := 2
+	if RandInt(3) == 0 {
+		if RandInt(2) == 0 {
+			nstairs++
+		} else {
+			nstairs--
+		}
+	}
+	if g.Depth >= WinDepth {
 		nstairs = 1
-	} else if g.Depth == MaxDepth-1 && nstairs > 2 {
-		nstairs = 1 + RandInt(2)
+	} else if g.Depth == WinDepth-1 && nstairs > 2 {
+		nstairs = 2
 	}
 	for i := 0; i < nstairs; i++ {
 		var pos position
-		if g.Depth > 9 {
-			pos = g.FreeCellForImportantStair()
-		} else {
-			pos = g.FreeCellForStatic()
+		if g.Depth >= WinDepth {
+			pos = g.FreeCellForStair(60)
+			g.Stairs[pos] = WinStair
 		}
-		g.Stairs[pos] = true
+		if g.Depth < MaxDepth {
+			if g.Depth > 9 {
+				pos = g.FreeCellForStair(40)
+			} else {
+				pos = g.FreeCellForStair(0)
+			}
+			g.Stairs[pos] = NormalStair
+		}
 	}
 
 	// Simellas
@@ -418,8 +432,10 @@ func (g *game) InitLevel() {
 		g.Print("You're in Hareka's Underground searching for medicinal simellas. Good luck!")
 		g.PrintStyled("► Press ? for help on keys or use the mouse and [buttons].", logSpecial)
 	}
-	if g.Depth == MaxDepth {
-		g.PrintStyled("You feel magic in the air. The way out is close.", logSpecial)
+	if g.Depth == WinDepth {
+		g.PrintStyled("You feel magic in the air. A first way out is close!", logSpecial)
+	} else if g.Depth == MaxDepth {
+		g.PrintStyled("If rumors are true, you reached the bottom!", logSpecial)
 	}
 	g.ComputeLOS()
 	g.MakeMonstersAware()
@@ -466,8 +482,8 @@ func (g *game) CleanEvents() {
 
 func (g *game) StairsSlice() []position {
 	stairs := []position{}
-	for stairPos, b := range g.Stairs {
-		if b && g.Dungeon.Cell(stairPos).Explored {
+	for stairPos, _ := range g.Stairs {
+		if g.Dungeon.Cell(stairPos).Explored {
 			stairs = append(stairs, stairPos)
 		}
 	}
@@ -479,9 +495,14 @@ func (g *game) GenCollectables() {
 	for i := 0; i < rounds; i++ {
 		for c, data := range ConsumablesCollectData {
 			var r int
-			if g.CollectableScore >= 5*(g.Depth+1)/3 {
+			dfactor := g.Depth + 1
+			if g.Depth >= WinDepth {
+				// more items in last levels
+				dfactor += g.Depth - WinDepth + 1
+			}
+			if g.CollectableScore >= 5*dfactor/3 {
 				r = RandInt(data.rarity * rounds * 4)
-			} else if g.CollectableScore < 4*(g.Depth+1)/3 {
+			} else if g.CollectableScore < 4*dfactor/3 {
 				r = RandInt(data.rarity * rounds / 4)
 			} else {
 				r = RandInt(data.rarity * rounds)
@@ -511,6 +532,8 @@ func (g *game) GenWeapon() {
 		}
 	} else if g.Player.Weapon != Dagger {
 		n *= 2
+	} else if g.Depth >= WinDepth {
+		n = 2
 	}
 	r := RandInt(n)
 	if r != 0 && !g.SeenGoodWeapon() && g.Depth > 3 {
@@ -588,9 +611,9 @@ func (g *game) FrundisInLevel() bool {
 
 func (g *game) Descend() bool {
 	g.LevelStats()
-	if g.Depth >= MaxDepth {
+	if stair, ok := g.Stairs[g.Player.Pos]; ok && stair == WinStair {
 		g.StoryPrint("You escaped!")
-		g.Depth++
+		g.Depth = -1
 		return true
 	}
 	g.Print("You descend deeper in the dungeon.")
@@ -606,7 +629,7 @@ func (g *game) Descend() bool {
 
 func (g *game) WizardMode() {
 	g.Wizard = true
-	g.Player.Consumables[DescentPotion] = 12
+	g.Player.Consumables[DescentPotion] = 15
 	g.PrintStyled("You are now in wizard mode and cannot obtain winner status.", logSpecial)
 }
 

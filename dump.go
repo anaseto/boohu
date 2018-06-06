@@ -114,7 +114,7 @@ func (g *game) Dump() string {
 	if g.Wizard {
 		fmt.Fprintf(buf, "**WIZARD MODE**\n")
 	}
-	if g.Player.HP > 0 && g.Depth > MaxDepth {
+	if g.Player.HP > 0 && g.Depth == -1 {
 		fmt.Fprintf(buf, "You escaped from Hareka's Underground alive!\n")
 	} else if g.Player.HP <= 0 {
 		fmt.Fprintf(buf, "You died while exploring depth %d of Hareka's Underground.\n", g.Depth)
@@ -216,7 +216,7 @@ func (g *game) DetailedStatistics(w io.Writer) {
 	}
 	if maxDepth > MaxDepth+1 {
 		// should not happen
-		maxDepth = MaxDepth + 1
+		maxDepth = -1
 	}
 	fmt.Fprintf(w, "\n")
 	hfmt := "%-23s"
@@ -348,7 +348,7 @@ func (g *game) SimplifedDump(err error) string {
 	if g.Wizard {
 		fmt.Fprintf(buf, "**WIZARD MODE**\n")
 	}
-	if g.Player.HP > 0 && g.Depth > MaxDepth {
+	if g.Player.HP > 0 && g.Depth == -1 {
 		fmt.Fprintf(buf, "You escaped from Hareka's Underground alive!\n")
 	} else if g.Player.HP <= 0 {
 		fmt.Fprintf(buf, "You died while exploring depth %d of Hareka's Underground.\n", g.Depth)
