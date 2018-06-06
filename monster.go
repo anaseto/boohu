@@ -1113,7 +1113,9 @@ func (m *monster) ThrowRock(g *game, ev event) bool {
 		g.ui.MonsterProjectileAnimation(g, g.Ray(m.Pos), '●', ColorMagenta)
 		dir := g.Player.Pos.Dir(m.Pos)
 		pos := g.Player.Pos.To(dir)
-		g.TemporalWallAt(pos, ev)
+		if pos.valid() {
+			g.TemporalWallAt(pos, ev)
+		}
 	}
 	ev.Renew(g, 2*m.Kind.AttackDelay())
 	return true
