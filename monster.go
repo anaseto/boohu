@@ -262,7 +262,7 @@ const (
 	UXLiches
 	UXFrogRanged
 	UXExplosive
-	UXHounds
+	UXWarriors
 	UXSatowalga
 	UXSpecters
 	UXDisabling
@@ -490,9 +490,10 @@ var MonsBands = []monsterBandData{
 		},
 		rarity: 100, minDepth: 13, maxDepth: 15, band: true, unique: true,
 	},
-	UXHounds: {
+	UXWarriors: {
 		distribution: map[monsterKind]monsInterval{
-			MonsHound: {6, 6},
+			MonsHound:         {2, 2},
+			MonsGoblinWarrior: {3, 3},
 		},
 		rarity: 100, minDepth: 14, maxDepth: 15, band: true, unique: true,
 	},
