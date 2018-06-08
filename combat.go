@@ -200,7 +200,7 @@ const (
 func (g *game) HitMonster(dt dmgType, mons *monster, ev event) (hit bool) {
 	maxacc := g.Player.Accuracy()
 	if g.Player.Weapon == Sabre && mons.HP > 0 {
-		maxacc += int(5 * (-1 + float64(mons.HPmax)/float64(mons.HP)))
+		maxacc += int(6 * (-1 + float64(mons.HPmax)/float64(mons.HP)))
 	}
 	acc := RandInt(maxacc)
 	evasion := RandInt(mons.Evasion)
