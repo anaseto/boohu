@@ -188,7 +188,11 @@ func (g *game) MoveToTarget(ev event) bool {
 
 func (g *game) WaitTurn(ev event) {
 	// XXX Really wait for 10 ?
-	g.ScummingAction(ev)
+	grade := 3
+	if len(g.Noise) > 0 {
+		grade = 1
+	}
+	g.ScummingAction(ev, grade)
 	ev.Renew(g, 10)
 }
 
@@ -201,9 +205,9 @@ func (g *game) MonsterCount() (count int) {
 	return count
 }
 
-func (g *game) ScummingAction(ev event) {
+func (g *game) ScummingAction(ev event, grade int) {
 	if g.MonsterInLOS() == nil {
-		g.Scumming++
+		g.Scumming += grade
 	} else {
 		g.Scumming--
 		if g.Scumming < 0 {
@@ -393,7 +397,7 @@ func (g *game) MovePlayer(pos position, ev event) error {
 		}
 		g.PlacePlayerAt(pos)
 		if !g.Autoexploring {
-			g.ScummingAction(ev)
+			g.ScummingAction(ev, 1)
 		}
 		if g.Player.Aptitudes[AptFast] {
 			// only fast for movement
