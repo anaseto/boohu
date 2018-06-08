@@ -192,27 +192,32 @@ func (g *game) WaitTurn(ev event) {
 	ev.Renew(g, 10)
 }
 
-func (g *game) ExistsMonster() bool {
+func (g *game) MonsterCount() (count int) {
 	for _, mons := range g.Monsters {
 		if mons.Exists() {
-			return true
+			count++
 		}
 	}
-	return false
+	return count
 }
 
 func (g *game) ScummingAction(ev event) {
 	if g.MonsterInLOS() == nil {
 		g.Scumming++
+	} else {
+		g.Scumming--
+		if g.Scumming < 0 {
+			g.Scumming = 0
+		}
 	}
 	if g.Scumming == 100 {
-		if g.ExistsMonster() {
+		if g.MonsterCount() > 4 {
 			g.PrintStyled("You feel a little bored.", logCritic)
 			g.StopAuto()
 		}
 	}
 	if g.Scumming > 120 {
-		if !g.ExistsMonster() {
+		if g.MonsterCount() <= 4 {
 			g.Scumming = 0
 			return
 		}
