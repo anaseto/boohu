@@ -141,7 +141,6 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 65 + RandInt(20), EAction: BerserkEnd})
 			g.Printf("Your sword insurges you to kill things.", BerserkPotion)
 		}
-	case g.Player.Weapon == DancingRapier:
 	default:
 		g.HitMonster(DmgPhysical, mons, ev)
 		//if (g.Player.Weapon == Sword || g.Player.Weapon == DoubleSword) && RandInt(4) == 0 {
