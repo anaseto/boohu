@@ -125,6 +125,7 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 65 + RandInt(20), EAction: BerserkEnd})
 			g.Printf("Your sword insurges you to kill things.", BerserkPotion)
 		}
+	case g.Player.Weapon == DancingRapier:
 	default:
 		g.HitMonster(DmgPhysical, mons, ev)
 		//if (g.Player.Weapon == Sword || g.Player.Weapon == DoubleSword) && RandInt(4) == 0 {
@@ -184,7 +185,7 @@ const (
 func (g *game) HitMonster(dt dmgType, mons *monster, ev event) (hit bool) {
 	maxacc := g.Player.Accuracy()
 	if g.Player.Weapon == Sabre && mons.HP > 0 {
-		maxacc += int(5 * (-1 + float64(mons.HPMax)/float64(mons.HP)))
+		maxacc += int(5 * (-1 + float64(mons.HPmax)/float64(mons.HP)))
 	}
 	acc := RandInt(maxacc)
 	evasion := RandInt(mons.Evasion)
