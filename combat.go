@@ -118,11 +118,17 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 		}
 	case g.Player.Weapon == ElecWhip:
 		g.HitConnected(mons.Pos, DmgMagical, ev)
+	case g.Player.Weapon == BerserkSword:
+		g.HitMonster(DmgPhysical, mons, ev)
+		if RandInt(20) == 0 && !g.Player.HasStatus(StatusExhausted) && !g.Player.HasStatus(StatusBerserk) {
+			g.Player.Statuses[StatusBerserk] = 1
+			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 65 + RandInt(20), EAction: BerserkEnd})
+		}
 	default:
 		g.HitMonster(DmgPhysical, mons, ev)
-		if (g.Player.Weapon == Sword || g.Player.Weapon == DoubleSword) && RandInt(4) == 0 {
-			g.HitMonster(DmgPhysical, mons, ev)
-		}
+		//if (g.Player.Weapon == Sword || g.Player.Weapon == DoubleSword) && RandInt(4) == 0 {
+		//g.HitMonster(DmgPhysical, mons, ev)
+		//}
 	}
 }
 

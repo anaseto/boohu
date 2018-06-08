@@ -519,12 +519,12 @@ func (g *game) GenCollectables() {
 }
 
 func (g *game) SeenGoodWeapon() bool {
-	return g.GeneratedEquipables[Sword] || g.GeneratedEquipables[DoubleSword] || g.GeneratedEquipables[Spear] || g.GeneratedEquipables[Halberd] ||
+	return g.GeneratedEquipables[Sword] || g.GeneratedEquipables[BerserkSword] || g.GeneratedEquipables[Spear] || g.GeneratedEquipables[Halberd] ||
 		g.GeneratedEquipables[Axe] || g.GeneratedEquipables[BattleAxe] || g.GeneratedEquipables[Frundis] || g.GeneratedEquipables[ElecWhip]
 }
 
 func (g *game) GenWeapon() {
-	wps := [9]weapon{Dagger, Axe, BattleAxe, Spear, Halberd, Sword, DoubleSword, Frundis, ElecWhip}
+	wps := [9]weapon{Dagger, Axe, BattleAxe, Spear, Halberd, Sword, BerserkSword, Frundis, ElecWhip}
 	n := 11
 	if !g.SeenGoodWeapon() {
 		n -= 4 * g.Depth

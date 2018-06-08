@@ -620,7 +620,7 @@ const (
 	Spear
 	Halberd
 	Sword
-	DoubleSword
+	BerserkSword
 	Frundis
 	ElecWhip
 )
@@ -653,8 +653,8 @@ func (wp weapon) String() string {
 		return "halberd"
 	case Sword:
 		return "sword"
-	case DoubleSword:
-		return "double sword"
+	case BerserkSword:
+		return "berserk sword"
 	case Frundis:
 		return "staff Frundis"
 	case ElecWhip:
@@ -679,8 +679,8 @@ func (wp weapon) Short() string {
 		return "Hl"
 	case Sword:
 		return "Sw"
-	case DoubleSword:
-		return "Db"
+	case BerserkSword:
+		return "Br"
 	case Frundis:
 		return "Fr"
 	case ElecWhip:
@@ -706,8 +706,8 @@ func (wp weapon) Desc() string {
 		text = "An halberd is a big two-handed weapon that can hit two opponents in a row at once. Useful in corridors."
 	case Sword:
 		text = "A sword is a one-handed weapon that occasionally gets additional free hits."
-	case DoubleSword:
-		text = "A double sword is a big two-handed weapon that occasionally gets additional free hits."
+	case BerserkSword:
+		text = "A berserk sword is a big two-handed weapon that occasionally makes you berserk, which may not be what you want."
 	case Frundis:
 		text = "Frundis is a musician and harmonist, which happens to be a two-handed staff too. It may occasionally confuse monsters on hit. It magically helps reducing noise in combat too."
 	case ElecWhip:
@@ -720,7 +720,9 @@ func (wp weapon) Attack() int {
 	switch wp {
 	case Axe, Spear, Sword:
 		return 11
-	case BattleAxe, Halberd, DoubleSword:
+	case BerserkSword:
+		return 17
+	case BattleAxe, Halberd:
 		return 15
 	case Frundis:
 		return 13
@@ -735,7 +737,7 @@ func (wp weapon) Attack() int {
 
 func (wp weapon) TwoHanded() bool {
 	switch wp {
-	case BattleAxe, Halberd, DoubleSword, Frundis:
+	case BattleAxe, Halberd, BerserkSword, Frundis:
 		return true
 	default:
 		return false
