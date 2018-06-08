@@ -619,7 +619,7 @@ const (
 	BattleAxe
 	Spear
 	Halberd
-	Sword
+	Sabre
 	BerserkSword
 	Frundis
 	ElecWhip
@@ -651,8 +651,8 @@ func (wp weapon) String() string {
 		return "spear"
 	case Halberd:
 		return "halberd"
-	case Sword:
-		return "sword"
+	case Sabre:
+		return "sabre"
 	case BerserkSword:
 		return "berserk sword"
 	case Frundis:
@@ -677,8 +677,8 @@ func (wp weapon) Short() string {
 		return "Sp"
 	case Halberd:
 		return "Hl"
-	case Sword:
-		return "Sw"
+	case Sabre:
+		return "Sb"
 	case BerserkSword:
 		return "Br"
 	case Frundis:
@@ -704,8 +704,8 @@ func (wp weapon) Desc() string {
 		text = "A spear is a one-handed weapon that can hit two opponents in a row at once. Useful in corridors."
 	case Halberd:
 		text = "An halberd is a big two-handed weapon that can hit two opponents in a row at once. Useful in corridors."
-	case Sword:
-		text = "A sword is a one-handed weapon that occasionally gets additional free hits."
+	case Sabre:
+		text = "A sabre is a one-handed weapon. It is more accurate against injured opponents."
 	case BerserkSword:
 		text = "A berserk sword is a big two-handed weapon that occasionally makes you berserk, which may not be what you want."
 	case Frundis:
@@ -718,7 +718,7 @@ func (wp weapon) Desc() string {
 
 func (wp weapon) Attack() int {
 	switch wp {
-	case Axe, Spear, Sword:
+	case Axe, Spear, Sabre:
 		return 11
 	case BerserkSword:
 		return 17
