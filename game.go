@@ -520,31 +520,47 @@ func (g *game) GenCollectables() {
 	}
 }
 
-func (g *game) SeenGoodWeapon() bool {
+func (g *game) SeenGoodWeapons() (count int) {
 	for eq, b := range g.GeneratedEquipables {
 		w, ok := eq.(weapon)
 		if ok && b && w != Dagger {
-			return true
+			count++
 		}
 	}
-	return false
+	return count
 }
 
 func (g *game) GenWeapon() {
 	wps := [10]weapon{Dagger, Axe, BattleAxe, Spear, Halberd, Sabre, DancingRapier, BerserkSword, Frundis, ElecWhip}
-	n := 11
-	if !g.SeenGoodWeapon() {
+	n := 11 + 5*g.SeenGoodWeapons()
+	if g.SeenGoodWeapons() > 2 {
+		return
+	}
+	if g.SeenGoodWeapons() == 0 {
 		n -= 4 * g.Depth
 		if n < 2 {
-			n = 2
+			if g.Depth < 4 {
+				n = 2
+			} else {
+				n = 1
+			}
+		}
+	} else if g.SeenGoodWeapons() == 1 {
+		n -= 4 * (g.Depth - 6)
+		if n < 2 {
+			if g.Depth < 11 {
+				n = 2
+			} else {
+				n = 1
+			}
 		}
 	} else if g.Player.Weapon != Dagger {
-		n *= 2
+		n += 10
 	} else if g.Depth >= WinDepth {
 		n = 2
 	}
 	r := RandInt(n)
-	if r != 0 && !g.SeenGoodWeapon() && g.Depth > 3 {
+	if r != 0 && g.SeenGoodWeapons() == 0 && g.Depth > 3 {
 		r = RandInt(n)
 	}
 	if r != 0 {
@@ -553,9 +569,9 @@ func (g *game) GenWeapon() {
 loop:
 	for {
 		for i := 0; i < len(wps); i++ {
-			if wps[i] == Frundis && g.GeneratedEquipables[Frundis] {
-				// unique
-				return
+			if g.GeneratedEquipables[wps[i]] {
+				// do not generate duplicates
+				continue
 			}
 			n := 50
 			if wps[i].TwoHanded() && g.Depth < 3 {
