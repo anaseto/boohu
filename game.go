@@ -315,6 +315,7 @@ func (g *game) InitPlayer() {
 	//g.Player.Consumables[SwapPotion] = 5
 	//g.Player.Consumables[DreamPotion] = 5
 	//g.Player.Weapon = ElecWhip
+	//g.Player.Weapon = DancingRapier
 }
 
 func (g *game) InitLevel() {

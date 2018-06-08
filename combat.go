@@ -107,9 +107,8 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 		}
 	case g.Player.Weapon.Pierce():
 		g.HitMonster(DmgPhysical, mons, ev)
-		deltaX := mons.Pos.X - g.Player.Pos.X
-		deltaY := mons.Pos.Y - g.Player.Pos.Y
-		behind := position{g.Player.Pos.X + 2*deltaX, g.Player.Pos.Y + 2*deltaY}
+		dir := mons.Pos.Dir(g.Player.Pos)
+		behind := g.Player.Pos.To(dir).To(dir)
 		if behind.valid() {
 			mons := g.MonsterAt(behind)
 			if mons.Exists() {
@@ -118,6 +117,23 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 		}
 	case g.Player.Weapon == ElecWhip:
 		g.HitConnected(mons.Pos, DmgMagical, ev)
+	case g.Player.Weapon == DancingRapier:
+		g.HitMonster(DmgPhysical, mons, ev)
+		if mons.Exists() {
+			dir := mons.Pos.Dir(g.Player.Pos)
+			behind := g.Player.Pos.To(dir).To(dir)
+			if behind.valid() {
+				mons := g.MonsterAt(behind)
+				if mons.Exists() {
+					g.HitMonster(DmgPhysical, mons, ev)
+				}
+			}
+			ompos := mons.Pos
+			mons.MoveTo(g, g.Player.Pos)
+			g.PlacePlayerAt(ompos)
+		} else {
+			g.PlacePlayerAt(mons.Pos)
+		}
 	case g.Player.Weapon == BerserkSword:
 		g.HitMonster(DmgPhysical, mons, ev)
 		if RandInt(20) == 0 && !g.Player.HasStatus(StatusExhausted) && !g.Player.HasStatus(StatusBerserk) {
