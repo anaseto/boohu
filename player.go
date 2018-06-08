@@ -413,6 +413,9 @@ func (g *game) MovePlayer(pos position, ev event) error {
 	if g.Player.HasStatus(StatusSlow) {
 		delay += 3
 	}
+	if delay < 2 {
+		delay = 2
+	}
 	ev.Renew(g, delay)
 	return nil
 }
