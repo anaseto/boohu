@@ -373,10 +373,10 @@ func (g *game) InitLevel() {
 
 	// Aptitudes/Mutations
 	r = 15 + 3*g.Player.AptitudeCount() - g.Depth
-	if RandInt(r) == 0 && g.Depth > 0 && g.Player.AptitudeCount() < 3 ||
+	if RandInt(r) == 0 && g.Depth > 0 && g.Player.AptitudeCount() < 2 ||
 		g.Player.AptitudeCount() == 0 && g.Depth > 1 ||
-		g.Player.AptitudeCount() == 1 && g.Depth > 4 ||
-		g.Player.AptitudeCount() == 2 && g.Depth > 8 {
+		g.Player.AptitudeCount() == 1 && g.Depth > 5 {
+		//g.Player.AptitudeCount() == 2 && g.Depth > 8 {
 		apt, ok := g.RandomApt()
 		if ok {
 			g.ApplyAptitude(apt)
