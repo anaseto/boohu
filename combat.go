@@ -191,7 +191,6 @@ func (g *game) HarKarAttack(mons *monster, ev event) {
 }
 
 func (g *game) HitConnected(pos position, dt dmgType, ev event) {
-	// inspired from TOME4's Harbinger addon class
 	d := g.Dungeon
 	conn := map[position]bool{}
 	stack := []position{pos}

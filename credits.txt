@@ -1,0 +1,27 @@
+This file lists some great influences for many Boohu features.
+
+-----------------------------------------------------------------------
+DCSS is a source of inspiration for many things.
+
+Statuses: berserk, swift, agile, slow, exhaustion, lignification,
+corrosion, teletransportation, as well as a deeply positional confusion
+status from this tavern thread:
+
+	https://crawl.develz.org/tavern/viewtopic.php?f=17&t=24108&sid=cb465fe78aba3b9074a32efc2a835d80#p318813
+
+Many potions also come from there (sometimes replacing a scroll).
+-----------------------------------------------------------------------
+Brogue inspired spear/halberd attack pattern, as well as the axe/battle
+axe one (similar to DCSS, but no distinction between primary and
+secondary targets). Acid mounds also come from there. Dense foliage was
+inspired by Brogue's. It shares with Boohu a non-XP system, though Boohu
+does not have potions of strengh/life nor enchant scrolls: only
+aptitudes and immutable items.
+-----------------------------------------------------------------------
+There are two features inspired from Tome4, more precisely from minmay's
+Harbinger class (ligthning whip uses the ligthning arc idea), and from
+nsrr's white monk class (har-kar guantlets make a swift strike
+passively).
+-----------------------------------------------------------------------
+Automatic doors are inspired from Cogmind, but are open only if there is
+someone right on the door.
