@@ -624,6 +624,7 @@ const (
 	BerserkSword
 	Frundis
 	ElecWhip
+	HarKarGuantlets
 )
 
 func (wp weapon) Equip(g *game) {
@@ -662,6 +663,8 @@ func (wp weapon) String() string {
 		return "staff Frundis"
 	case ElecWhip:
 		return "lightning whip"
+	case HarKarGuantlets:
+		return "har-kar guantlets"
 	default:
 		// should not happen
 		return "some weapon"
@@ -690,6 +693,8 @@ func (wp weapon) Short() string {
 		return "Fr"
 	case ElecWhip:
 		return "Wh"
+	case HarKarGuantlets:
+		return "Hk"
 	default:
 		// should not happen
 		return "?"
@@ -719,13 +724,15 @@ func (wp weapon) Desc() string {
 		text = "Frundis is a musician and harmonist, which happens to be a two-handed staff too. It may occasionally confuse monsters on hit. It magically helps reducing noise in combat too."
 	case ElecWhip:
 		text = "The lightning whip is a one-handed weapon that inflicts electrical damage to a monster and any foes connected to it."
+	case HarKarGuantlets:
+		text = "Har-kar guantlets are an unarmed combat weapon. They allow you to make a wind attack, passing over two or more foes in a direction."
 	}
 	return fmt.Sprintf("%s It can hit for up to %d damage.", text, wp.Attack())
 }
 
 func (wp weapon) Attack() int {
 	switch wp {
-	case Axe, Spear, Sabre, DancingRapier:
+	case Axe, Spear, Sabre, DancingRapier, HarKarGuantlets:
 		return 11
 	case BerserkSword:
 		return 17
@@ -744,7 +751,7 @@ func (wp weapon) Attack() int {
 
 func (wp weapon) TwoHanded() bool {
 	switch wp {
-	case BattleAxe, Halberd, BerserkSword, Frundis:
+	case BattleAxe, Halberd, BerserkSword, Frundis, HarKarGuantlets:
 		return true
 	default:
 		return false

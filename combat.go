@@ -134,6 +134,8 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 		} else {
 			g.PlacePlayerAt(mons.Pos)
 		}
+	case g.Player.Weapon == HarKarGuantlets:
+		g.HarKarAttack(mons, ev)
 	case g.Player.Weapon == BerserkSword:
 		g.HitMonster(DmgPhysical, mons, ev)
 		if RandInt(20) == 0 && !g.Player.HasStatus(StatusExhausted) && !g.Player.HasStatus(StatusBerserk) {
@@ -143,9 +145,40 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 		}
 	default:
 		g.HitMonster(DmgPhysical, mons, ev)
-		//if (g.Player.Weapon == Sword || g.Player.Weapon == DoubleSword) && RandInt(4) == 0 {
-		//g.HitMonster(DmgPhysical, mons, ev)
-		//}
+	}
+}
+
+func (g *game) HarKarAttack(mons *monster, ev event) {
+	dir := mons.Pos.Dir(g.Player.Pos)
+	pos := g.Player.Pos
+	count := 0
+	for {
+		pos = pos.To(dir)
+		if !pos.valid() || g.Dungeon.Cell(pos).T != FreeCell {
+			break
+		}
+		m := g.MonsterAt(pos)
+		if !m.Exists() {
+			break
+		}
+		count++
+	}
+	if count >= 2 && pos.valid() && g.Dungeon.Cell(pos).T == FreeCell {
+		pos = g.Player.Pos
+		for {
+			pos = pos.To(dir)
+			if !pos.valid() || g.Dungeon.Cell(pos).T != FreeCell {
+				break
+			}
+			m := g.MonsterAt(pos)
+			if !m.Exists() {
+				break
+			}
+			g.HitMonster(DmgPhysical, m, ev)
+		}
+		g.PlacePlayerAt(pos)
+	} else {
+		g.HitMonster(DmgPhysical, mons, ev)
 	}
 }
 

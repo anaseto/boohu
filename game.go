@@ -317,6 +317,7 @@ func (g *game) InitPlayer() {
 	//g.Player.Weapon = ElecWhip
 	//g.Player.Weapon = DancingRapier
 	//g.Player.Weapon = Sabre
+	g.Player.Weapon = HarKarGuantlets
 }
 
 func (g *game) InitLevel() {
