@@ -17,7 +17,7 @@ Screenshot and Website
 You can visit the [game's
 website](https://download.tuxfamily.org/boohu/index.html)
 for more informations, tips, screenshots and asciicasts. You will also be able
-to play in the browser and download pre-build binaries for the latest release.
+to play in the browser and download pre-built binaries for the latest release.
 
 Install from Sources
 --------------------
