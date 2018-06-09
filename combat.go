@@ -228,7 +228,11 @@ func (g *game) HitNoise(clang bool) int {
 		noise -= 1
 	}
 	if clang {
-		noise += g.Player.Armor()
+		arnoise := g.Player.Armor()
+		if arnoise > 7 {
+			arnoise = 7
+		}
+		noise += arnoise
 	}
 	return noise
 }
