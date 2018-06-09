@@ -134,7 +134,7 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 		} else {
 			g.PlacePlayerAt(mons.Pos)
 		}
-	case g.Player.Weapon == HarKarGuantlets:
+	case g.Player.Weapon == HarKarGauntlets:
 		g.HarKarAttack(mons, ev)
 	case g.Player.Weapon == BerserkSword:
 		g.HitMonster(DmgPhysical, mons, ev)
