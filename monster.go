@@ -1539,7 +1539,7 @@ func (g *game) MaxDanger() int {
 	if g.Player.Weapon == Dagger {
 		adjust -= Min(3, g.Depth) * Max(1, g.Depth-2)
 	}
-	if g.Player.Armour == PonderousnessPlates {
+	if g.Player.Armour != Robe && g.Player.Armour != LeatherArmour {
 		adjust += WinDepth - Min(g.Depth, WinDepth)
 	}
 	if g.Depth > 3 && g.Player.Shield == NoShield && !g.Player.Weapon.TwoHanded() {
@@ -1548,7 +1548,7 @@ func (g *game) MaxDanger() int {
 	if g.Player.Weapon.TwoHanded() && g.Depth < 4 {
 		adjust += (4 - g.Depth) * 2
 	}
-	if g.Player.Armour == ChainMail || g.Player.Armour == LeatherArmour {
+	if g.Player.Armour == LeatherArmour {
 		adjust += WinDepth/2 - g.Depth
 	}
 	if g.Player.Weapon != Dagger && g.Depth < 3 {
