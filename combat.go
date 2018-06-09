@@ -100,7 +100,7 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 		}
 		if RandInt(4) == 0 {
 			mons.EnterConfusion(g, ev)
-			g.PrintfStyled("Frundis glows… the %s appears confused.", logPlayerHit, mons.Kind)
+			g.PrintfStyled("Frundis glows… %s appears confused.", logPlayerHit, mons.Kind.Definite(false))
 		}
 	case g.Player.Weapon.Cleave():
 		var neighbors []position
@@ -344,4 +344,58 @@ func (g *game) ArmourClang() (sclang string) {
 		sclang = " Smash!"
 	}
 	return sclang
+}
+
+func (g *game) BlockEffects(m *monster) {
+	switch g.Player.Shield {
+	case EarthShield:
+		dir := m.Pos.Dir(g.Player.Pos)
+		lat := g.Player.Pos.Laterals(dir)
+		for _, pos := range lat {
+			if !pos.valid() {
+				continue
+			}
+			if RandInt(4) == 0 && g.Dungeon.Cell(pos).T == WallCell {
+				g.Dungeon.SetCell(pos, FreeCell)
+				g.Stats.Digs++
+				g.MakeNoise(WallNoise, pos)
+				g.Fog(pos, 1, g.Ev)
+			}
+		}
+	case BashingShield:
+		if m.Kind == MonsSatowalgaPlant || m.Pos.Distance(g.Player.Pos) > 1 {
+			break
+		}
+		if RandInt(3) == 0 {
+			break
+		}
+		dir := m.Pos.Dir(g.Player.Pos)
+		pos := m.Pos
+		for i := 0; i < 3; i++ {
+			npos := pos.To(dir)
+			if !npos.valid() || g.Dungeon.Cell(npos).T == WallCell {
+				break
+			}
+			mons := g.MonsterAt(npos)
+			if mons.Exists() {
+				break
+			}
+			pos = npos
+		}
+		if !m.Status(MonsExhausted) {
+			m.Statuses[MonsExhausted] = 1
+			g.PushEvent(&monsterEvent{ERank: g.Ev.Rank() + 100 + RandInt(50), NMons: m.Index, EAction: MonsExhaustionEnd})
+		}
+		if pos != m.Pos {
+			m.MoveTo(g, pos)
+		}
+	case ConfusingShield:
+		if m.Pos.Distance(g.Player.Pos) > 1 {
+			break
+		}
+		if RandInt(4) == 0 {
+			m.EnterConfusion(g, g.Ev)
+			g.Printf("%s appears confused.", m.Kind.Definite(true))
+		}
+	}
 }

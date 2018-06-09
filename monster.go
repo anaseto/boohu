@@ -899,6 +899,7 @@ func (m *monster) HitPlayer(g *game, ev event) {
 		if m.Blocked(g) {
 			g.Printf("Clang! You block %s's attack.", m.Kind.Definite(false))
 			g.MakeNoise(ShieldBlockNoise, g.Player.Pos)
+			g.BlockEffects(m)
 			return
 		}
 		if g.Player.HasStatus(StatusSwap) && !g.Player.HasStatus(StatusLignification) {
@@ -1042,6 +1043,7 @@ func (m *monster) TormentBolt(g *game, ev event) bool {
 		m.InflictDamage(g, damage, 15)
 	} else {
 		g.Printf("You block the %s's bolt of torment.", m.Kind)
+		g.BlockEffects(m)
 		g.ui.MonsterProjectileAnimation(g, g.Ray(m.Pos), '*', ColorCyan)
 	}
 	m.Statuses[MonsExhausted] = 1
@@ -1104,6 +1106,7 @@ func (m *monster) ThrowRock(g *game, ev event) bool {
 	} else if block {
 		g.Printf("You block %s's rock. Clang!", m.Kind.Indefinite(false))
 		g.MakeNoise(ShieldBlockNoise, g.Player.Pos)
+		g.BlockEffects(m)
 		g.ui.MonsterProjectileAnimation(g, g.Ray(m.Pos), '●', ColorMagenta)
 		ray := g.Ray(m.Pos)
 		if len(ray) > 0 {
@@ -1154,6 +1157,7 @@ func (m *monster) ThrowJavelin(g *game, ev event) bool {
 		if RandInt(3) == 0 {
 			g.Printf("You block %s's %s. Clang!", m.Kind.Indefinite(false), "javelin")
 			g.MakeNoise(ShieldBlockNoise, g.Player.Pos)
+			g.BlockEffects(m)
 			g.ui.MonsterJavelinAnimation(g, g.Ray(m.Pos), false)
 		} else if !g.Player.HasStatus(StatusDisabledShield) {
 			g.Player.Statuses[StatusDisabledShield] = 1

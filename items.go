@@ -806,7 +806,9 @@ type shield int
 const (
 	NoShield shield = iota
 	Buckler
-	Shield
+	ConfusingShield
+	EarthShield
+	BashingShield
 )
 
 func (sh shield) Equip(g *game) {
@@ -829,8 +831,12 @@ func (sh shield) String() (text string) {
 	switch sh {
 	case Buckler:
 		text = "buckler"
-	case Shield:
-		text = "shield"
+	case ConfusingShield:
+		text = "confusing shield"
+	case EarthShield:
+		text = "earth shield"
+	case BashingShield:
+		text = "bashing shield"
 	}
 	return text
 }
@@ -839,8 +845,12 @@ func (sh shield) Short() (text string) {
 	switch sh {
 	case Buckler:
 		text = "Bk"
-	case Shield:
-		text = "Sh"
+	case ConfusingShield:
+		text = "Cn"
+	case EarthShield:
+		text = "Er"
+	case BashingShield:
+		text = "Bs"
 	}
 	return text
 }
@@ -848,9 +858,13 @@ func (sh shield) Short() (text string) {
 func (sh shield) Desc() (text string) {
 	switch sh {
 	case Buckler:
-		text = "A buckler is a small shield that can block attacks. You cannot use it if you are wielding a two-handed weapon."
-	case Shield:
-		text = "A shield can block attacks. You cannot use it if you are wielding a two-handed weapon."
+		text = "A buckler is a small shield that can block attacks. (incompatible with two-handed weapon)"
+	case ConfusingShield:
+		text = "A confusing shield blocks attacks, sometimes confusing monsters. (incompatible with two-handed weapon)"
+	case EarthShield:
+		text = "An earth shield offers great protection, but impact sound can disintegrate nearby walls. (incompatible with two-handed weapon)"
+	case BashingShield:
+		text = "A bashing shield can block attacks and push ennemies away. (incompatible with two-handed weapon)"
 	}
 	return text
 }
@@ -863,8 +877,10 @@ func (sh shield) Block() (block int) {
 	switch sh {
 	case Buckler:
 		block += 6
-	case Shield:
+	case ConfusingShield, BashingShield:
 		block += 9
+	case EarthShield:
+		block += 15
 	}
 	return block
 }
@@ -884,13 +900,4 @@ func (data equipableData) FavorableRoll(lateness int) int {
 		r = RandInt(ratio)
 	}
 	return r
-}
-
-var EquipablesRepartitionData = map[equipable]equipableData{
-	//Robe:          {5, 0},
-	//LeatherArmour: {5, 0},
-	//ChainMail:     {10, 3},
-	//PlateArmour:   {15, 6},
-	Buckler: {10, 2},
-	Shield:  {15, 5},
 }

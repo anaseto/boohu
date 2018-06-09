@@ -318,6 +318,7 @@ func (g *game) InitPlayer() {
 	//g.Player.Weapon = DancingRapier
 	//g.Player.Weapon = Sabre
 	//g.Player.Weapon = HarKarGauntlets
+	//g.Player.Shield = EarthShield
 }
 
 func (g *game) InitLevel() {
@@ -356,17 +357,9 @@ func (g *game) InitLevel() {
 
 	// Equipment
 	g.Equipables = make(map[position]equipable)
-	for eq, data := range EquipablesRepartitionData {
-		if _, ok := eq.(weapon); ok {
-			continue
-		}
-		if _, ok := eq.(armour); ok {
-			continue
-		}
-		g.GenEquip(eq, data)
-	}
 	g.GenWeapon()
 	g.GenArmour()
+	g.GenShield()
 
 	// Rods
 	g.Rods = map[position]rod{}
@@ -545,6 +538,73 @@ func (g *game) SeenGoodArmour() (count int) {
 	return count
 }
 
+func (g *game) SeenGoodShield() (count int) {
+	for eq, b := range g.GeneratedEquipables {
+		sh, ok := eq.(shield)
+		if ok && b && sh != Buckler {
+			count++
+		}
+	}
+	return count
+}
+
+func (g *game) GenShield() {
+	ars := [4]shield{Buckler, ConfusingShield, BashingShield, EarthShield}
+	n := 11 + 5*g.SeenGoodShield()
+	if g.SeenGoodShield() == 2 {
+		return
+	}
+	if g.SeenGoodShield() == 0 {
+		n -= 2 * g.Depth
+		if n < 2 {
+			if g.Depth < 6 {
+				n = 2
+			} else {
+				n = 1
+			}
+		}
+	} else if g.SeenGoodShield() == 1 {
+		n -= 4 * (g.Depth - 7)
+		if n < 2 {
+			if g.Depth < 12 {
+				n = 2
+			} else {
+				n = 1
+			}
+		}
+	} else if g.Player.Shield != NoShield && g.Player.Shield != Buckler {
+		n += 10
+	} else if g.Depth > WinDepth {
+		n = 2
+	}
+	r := RandInt(n)
+	if r != 0 {
+		if !g.GeneratedEquipables[Buckler] && (g.Depth > 0 && RandInt(2) == 0 || g.Depth > 3) {
+			pos := g.FreeCellForStatic()
+			g.Equipables[pos] = Buckler
+			g.GeneratedEquipables[Buckler] = true
+		}
+		return
+	}
+loop:
+	for {
+		for i := 0; i < len(ars); i++ {
+			if g.GeneratedEquipables[ars[i]] {
+				// do not generate duplicates
+				continue
+			}
+			n := 50
+			r := RandInt(n)
+			if r == 0 {
+				pos := g.FreeCellForStatic()
+				g.Equipables[pos] = ars[i]
+				g.GeneratedEquipables[ars[i]] = true
+				break loop
+			}
+		}
+	}
+}
+
 func (g *game) GenArmour() {
 	ars := [7]armour{Robe, LeatherArmour, ChainMail, PonderousnessPlates, SpeedRobe, CelmistRobe, HarmonistRobe}
 	n := 11 + 5*g.SeenGoodArmour()
@@ -576,7 +636,7 @@ func (g *game) GenArmour() {
 	}
 	r := RandInt(n)
 	if r != 0 {
-		if !g.GeneratedEquipables[LeatherArmour] && (RandInt(2) == 0 || g.Depth > 3) {
+		if !g.GeneratedEquipables[LeatherArmour] && (RandInt(2) == 0 || g.Depth >= 3) {
 			pos := g.FreeCellForStatic()
 			g.Equipables[pos] = LeatherArmour
 			g.GeneratedEquipables[LeatherArmour] = true
@@ -602,7 +662,6 @@ loop:
 				break loop
 			}
 		}
-
 	}
 }
 
@@ -663,32 +722,6 @@ loop:
 		}
 
 	}
-}
-
-func (g *game) GenEquip(eq equipable, data equipableData) {
-	depthAdjust := data.minDepth - g.Depth
-	var r int
-	if depthAdjust >= 0 {
-		r = RandInt(data.rarity * (depthAdjust + 1) * (depthAdjust + 1))
-	} else {
-		switch eq.(type) {
-		case shield:
-			if !g.GeneratedEquipables[eq] {
-				r = data.FavorableRoll(-depthAdjust)
-			} else {
-				r = RandInt(data.rarity * 2)
-			}
-		default:
-			// not reached
-			return
-		}
-	}
-	if r == 0 {
-		pos := g.FreeCellForStatic()
-		g.Equipables[pos] = eq
-		g.GeneratedEquipables[eq] = true
-	}
-
 }
 
 func (g *game) FrundisInLevel() bool {

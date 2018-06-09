@@ -263,3 +263,27 @@ func (pos position) idx() int {
 func (pos position) valid() bool {
 	return pos.Y >= 0 && pos.Y < DungeonHeight && pos.X >= 0 && pos.X < DungeonWidth
 }
+
+func (pos position) Laterals(dir direction) []position {
+	switch dir {
+	case E, ENE, ESE:
+		return []position{pos.NE(), pos.SE()}
+	case NE:
+		return []position{pos.E(), pos.N()}
+	case N, NNE, NNW:
+		return []position{pos.NW(), pos.NE()}
+	case NW:
+		return []position{pos.W(), pos.N()}
+	case W, WNW, WSW:
+		return []position{pos.SW(), pos.NW()}
+	case SW:
+		return []position{pos.W(), pos.S()}
+	case S, SSW, SSE:
+		return []position{pos.SW(), pos.SE()}
+	case SE:
+		return []position{pos.S(), pos.E()}
+	default:
+		// should not happen
+		return []position{}
+	}
+}
