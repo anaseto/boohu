@@ -389,32 +389,32 @@ var MonsBands = []monsterBandData{
 	},
 	BandMadNixes: {
 		distribution: map[monsterKind]monsInterval{
-			MonsMadNixe: {2, 2},
+			MonsMadNixe: {1, 1},
 			MonsSpider:  {1, 1},
 			MonsHound:   {1, 1},
 		},
-		rarity: 100, minDepth: 13, maxDepth: 15, band: true,
+		rarity: 110, minDepth: 13, maxDepth: 15, band: true,
 	},
 	BandMadNixesDragon: {
 		distribution: map[monsterKind]monsInterval{
 			MonsMadNixe:     {1, 1},
 			MonsEarthDragon: {1, 1},
 		},
-		rarity: 100, minDepth: 13, maxDepth: 15, band: true,
+		rarity: 110, minDepth: 13, maxDepth: 15, band: true,
 	},
 	BandMadNixesHydra: {
 		distribution: map[monsterKind]monsInterval{
 			MonsMadNixe: {1, 1},
 			MonsHydra:   {1, 1},
 		},
-		rarity: 100, minDepth: 13, maxDepth: 15, band: true,
+		rarity: 110, minDepth: 13, maxDepth: 15, band: true,
 	},
 	BandMadNixesFrogs: {
 		distribution: map[monsterKind]monsInterval{
 			MonsMadNixe:      {1, 1},
 			MonsBlinkingFrog: {2, 2},
 		},
-		rarity: 100, minDepth: 13, maxDepth: 15, band: true,
+		rarity: 110, minDepth: 13, maxDepth: 15, band: true,
 	},
 	UBandWorms: {
 		distribution: map[monsterKind]monsInterval{MonsWorm: {3, 4}, MonsSpider: {1, 1}},
@@ -570,14 +570,14 @@ var MonsBands = []monsterBandData{
 			MonsMirrorSpecter: {1, 1},
 			MonsMadNixe:       {1, 1},
 		},
-		rarity: 100, minDepth: 14, maxDepth: 15, band: true, unique: true,
+		rarity: 110, minDepth: 14, maxDepth: 15, band: true, unique: true,
 	},
 	UXMadNixeCyclop: {
 		distribution: map[monsterKind]monsInterval{
 			MonsCyclop:  {1, 1},
 			MonsMadNixe: {1, 1},
 		},
-		rarity: 100, minDepth: 14, maxDepth: 15, band: true, unique: true,
+		rarity: 110, minDepth: 14, maxDepth: 15, band: true, unique: true,
 	},
 }
 
