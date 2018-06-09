@@ -746,7 +746,7 @@ func (wp weapon) Desc() string {
 	case ElecWhip:
 		text = "The lightning whip is a one-handed weapon that inflicts electrical damage to a monster and any foes connected to it."
 	case HarKarGauntlets:
-		text = "Har-kar gauntlets are an unarmed combat weapon. They allow you to make a wind attack, passing over two or more foes in a direction."
+		text = "Har-kar gauntlets are an unarmed combat weapon. They allow you to make a wind attack, passing over foes in a direction."
 	}
 	return fmt.Sprintf("%s It can hit for up to %d damage.", text, wp.Attack())
 }

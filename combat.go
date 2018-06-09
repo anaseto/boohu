@@ -161,7 +161,6 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 func (g *game) HarKarAttack(mons *monster, ev event) {
 	dir := mons.Pos.Dir(g.Player.Pos)
 	pos := g.Player.Pos
-	count := 0
 	for {
 		pos = pos.To(dir)
 		if !pos.valid() || g.Dungeon.Cell(pos).T != FreeCell {
@@ -171,9 +170,8 @@ func (g *game) HarKarAttack(mons *monster, ev event) {
 		if !m.Exists() {
 			break
 		}
-		count++
 	}
-	if count >= 2 && pos.valid() && g.Dungeon.Cell(pos).T == FreeCell {
+	if pos.valid() && g.Dungeon.Cell(pos).T == FreeCell {
 		pos = g.Player.Pos
 		for {
 			pos = pos.To(dir)
