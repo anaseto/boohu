@@ -903,8 +903,8 @@ func (m *monster) HandleTurn(g *game, ev event) {
 		if len(m.Path) < 2 || m.Path[len(m.Path)-2] == mons.Pos {
 			mons.Obstructing = true
 		}
-	case mons.State == Hunting && m.State == Hunting:
-		if RandInt(5) == 0 {
+	case mons.State == Hunting && m.State == Hunting || !g.Player.LOS[m.Target]:
+		if RandInt(4) == 0 {
 			m.Target = mons.Target
 			m.Path = m.APath(g, mpos, m.Target)
 		} else {
