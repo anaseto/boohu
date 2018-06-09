@@ -866,10 +866,10 @@ func (data equipableData) FavorableRoll(lateness int) int {
 }
 
 var EquipablesRepartitionData = map[equipable]equipableData{
-	Robe:          {5, 0},
-	LeatherArmour: {5, 0},
-	ChainMail:     {10, 3},
-	PlateArmour:   {15, 6},
-	Buckler:       {10, 2},
-	Shield:        {15, 5},
+	//Robe:          {5, 0},
+	//LeatherArmour: {5, 0},
+	//ChainMail:     {10, 3},
+	//PlateArmour:   {15, 6},
+	Buckler: {10, 2},
+	Shield:  {15, 5},
 }
