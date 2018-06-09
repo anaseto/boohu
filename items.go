@@ -546,7 +546,7 @@ const (
 	Robe armour = iota
 	LeatherArmour
 	ChainMail
-	PlateArmour
+	PonderousnessPlates
 	SpeedRobe
 	CelmistRobe
 	HarmonistRobe
@@ -571,7 +571,7 @@ func (ar armour) String() string {
 		return "leather armour"
 	case ChainMail:
 		return "chain mail"
-	case PlateArmour:
+	case PonderousnessPlates:
 		return "ponderousness plates"
 	case SpeedRobe:
 		return "robe of speed"
@@ -593,7 +593,7 @@ func (ar armour) Short() string {
 		return "Lt"
 	case ChainMail:
 		return "Ch"
-	case PlateArmour:
+	case PonderousnessPlates:
 		return "Pl"
 	case SpeedRobe:
 		return "Sp"
@@ -616,7 +616,7 @@ func (ar armour) Desc() string {
 		text = "A leather armour provides some protection against blows."
 	case ChainMail:
 		text = "A chain mail provides good protection against blows, at a minor evasion cost."
-	case PlateArmour:
+	case PonderousnessPlates:
 		text = "Ponderousness plates provide great protection against blows, but make you move slower and less good at evading blows."
 	case SpeedRobe:
 		text = "The speed robe makes you move faster, but makes you frail."

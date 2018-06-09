@@ -546,7 +546,7 @@ func (g *game) SeenGoodArmour() (count int) {
 }
 
 func (g *game) GenArmour() {
-	ars := [7]armour{Robe, LeatherArmour, ChainMail, PlateArmour, SpeedRobe, CelmistRobe, HarmonistRobe}
+	ars := [7]armour{Robe, LeatherArmour, ChainMail, PonderousnessPlates, SpeedRobe, CelmistRobe, HarmonistRobe}
 	n := 11 + 5*g.SeenGoodArmour()
 	if g.SeenGoodArmour() > 2 {
 		return
