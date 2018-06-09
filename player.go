@@ -117,7 +117,7 @@ func (p *player) Evasion() int {
 	case ChainMail:
 		ev -= 1
 	case PonderousnessPlates:
-		ev -= 3
+		ev -= 2
 	}
 	if p.HasStatus(StatusAgile) {
 		ev += 7
