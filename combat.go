@@ -2,11 +2,21 @@
 
 package main
 
+import "math"
+
+func (g *game) Absorb(armor int) int {
+	absorb := 0
+	for i := 0; i < 2; i++ {
+		absorb += RandInt(armor + 1)
+	}
+	return int(math.Round(float64(absorb) / 3))
+}
+
 func (g *game) HitDamage(dt dmgType, base int, armor int) (attack int, clang bool) {
 	min := base / 2
 	attack = min + RandInt(base-min+1)
 	if dt == DmgPhysical {
-		absorb := RandInt(armor + 1)
+		absorb := g.Absorb(armor)
 		if absorb > 0 && absorb >= 2*armor/3 && RandInt(2) == 0 {
 			clang = true
 		}

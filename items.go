@@ -547,6 +547,9 @@ const (
 	LeatherArmour
 	ChainMail
 	PlateArmour
+	SpeedRobe
+	CelmistRobe
+	HarmonistRobe
 )
 
 func (ar armour) Equip(g *game) {
@@ -569,7 +572,13 @@ func (ar armour) String() string {
 	case ChainMail:
 		return "chain mail"
 	case PlateArmour:
-		return "plate armour"
+		return "ponderousness plates"
+	case SpeedRobe:
+		return "robe of speed"
+	case CelmistRobe:
+		return "celmist robe"
+	case HarmonistRobe:
+		return "harmonist robe"
 	default:
 		// should not happen
 		return "some piece of armour"
@@ -586,6 +595,12 @@ func (ar armour) Short() string {
 		return "Ch"
 	case PlateArmour:
 		return "Pl"
+	case SpeedRobe:
+		return "Sp"
+	case CelmistRobe:
+		return "Cl"
+	case HarmonistRobe:
+		return "Hr"
 	default:
 		// should not happen
 		return "?"
@@ -600,9 +615,15 @@ func (ar armour) Desc() string {
 	case LeatherArmour:
 		text = "A leather armour provides some protection against blows."
 	case ChainMail:
-		text = "A chain mail provides more protection than a leather armour."
+		text = "A chain mail provides good protection against blows, at a minor evasion cost."
 	case PlateArmour:
-		text = "A plate armour provides great protection against blows."
+		text = "Ponderousness plates provide great protection against blows, but make you move slower and less good at evading blows."
+	case SpeedRobe:
+		text = "The speed robe makes you move faster, but makes you frail."
+	case CelmistRobe:
+		text = "The celmist robe improves your magic reserves and rod recharge rate."
+	case HarmonistRobe:
+		text = "The harmonist robe makes you harder to detect."
 	}
 	return text
 }

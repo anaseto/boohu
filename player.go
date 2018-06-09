@@ -27,6 +27,9 @@ func (p *player) HPMax() int {
 	if p.Aptitudes[AptHealthy] {
 		hpmax += 10
 	}
+	if p.Armour == SpeedRobe {
+		hpmax -= 10
+	}
 	return hpmax
 }
 
@@ -34,6 +37,9 @@ func (p *player) MPMax() int {
 	mpmax := 3
 	if p.Aptitudes[AptMagic] {
 		mpmax += 2
+	}
+	if p.Armour == CelmistRobe {
+		mpmax += 1
 	}
 	return mpmax
 }
@@ -60,9 +66,9 @@ func (p *player) Armor() int {
 	case LeatherArmour:
 		ar += 3
 	case ChainMail:
-		ar += 4
-	case PlateArmour:
 		ar += 6
+	case PlateArmour:
+		ar += 10
 	}
 	if p.Aptitudes[AptScales] {
 		ar += 2
@@ -106,6 +112,12 @@ func (p *player) Evasion() int {
 	ev := 15
 	if p.Aptitudes[AptAgile] {
 		ev += 3
+	}
+	switch p.Armour {
+	case ChainMail:
+		ev -= 1
+	case PlateArmour:
+		ev -= 3
 	}
 	if p.HasStatus(StatusAgile) {
 		ev += 7
@@ -403,13 +415,15 @@ func (g *game) MovePlayer(pos position, ev event) error {
 			// only fast for movement
 			delay -= 2
 		}
+		switch g.Player.Armour {
+		case PlateArmour:
+			delay += 2
+		case SpeedRobe:
+			delay -= 3
+		}
 		if g.Player.HasStatus(StatusSwift) {
 			// only fast for movement
-			if g.Player.HasStatus(StatusBerserk) {
-				delay -= 2
-			} else {
-				delay -= 3
-			}
+			delay -= 3
 		}
 		g.Stats.Moves++
 	} else {
@@ -422,8 +436,8 @@ func (g *game) MovePlayer(pos position, ev event) error {
 	if g.Player.HasStatus(StatusSlow) {
 		delay += 3
 	}
-	if delay < 2 {
-		delay = 2
+	if delay < 3 {
+		delay = 3
 	}
 	ev.Renew(g, delay)
 	return nil

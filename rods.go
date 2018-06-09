@@ -474,6 +474,9 @@ func (g *game) RechargeRods() {
 			if rchg == 0 && RandInt(2) == 0 {
 				rchg++
 			}
+			if g.Player.Armour == CelmistRobe && RandInt(3) > 0 {
+				rchg++
+			}
 			props.Charge += rchg
 			g.Player.Rods[r] = props
 		}

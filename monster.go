@@ -1335,6 +1335,9 @@ func (m *monster) MakeAware(g *game) {
 		if g.Player.Aptitudes[AptStealthyMovement] {
 			r *= 2
 		}
+		if g.Player.Armour == HarmonistRobe {
+			r = r * 3 / 2
+		}
 		if r > 5 {
 			return
 		}
@@ -1348,6 +1351,9 @@ func (m *monster) MakeAware(g *game) {
 		r := RandInt(30 + adjust)
 		if g.Player.Aptitudes[AptStealthyMovement] {
 			r += 5
+		}
+		if g.Player.Armour == HarmonistRobe {
+			r += 3
 		}
 		if r >= 25 {
 			return

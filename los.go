@@ -71,6 +71,9 @@ func (g *game) LosRange() int {
 	if g.Player.Aptitudes[AptStealthyLOS] {
 		losRange -= 2
 	}
+	if g.Player.Armour == HarmonistRobe {
+		losRange -= 1
+	}
 	return losRange
 }
 
