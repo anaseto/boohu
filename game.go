@@ -52,7 +52,7 @@ type game struct {
 	LogNextTick         int
 	InfoEntry           string
 	Stats               stats
-	Scumming            int
+	Boredom             int
 	Quit                bool
 	Wizard              bool
 	Version             string
@@ -712,7 +712,7 @@ func (g *game) Descend() bool {
 	g.StoryPrint("You descended deeper in the dungeon.")
 	g.Depth++
 	g.DepthPlayerTurn = 0
-	g.Scumming = 0
+	g.Boredom = 0
 	g.PushEvent(&simpleEvent{ERank: g.Ev.Rank(), EAction: PlayerTurn})
 	g.InitLevel()
 	g.Save()

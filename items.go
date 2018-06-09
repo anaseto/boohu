@@ -27,7 +27,7 @@ func (g *game) UseConsumable(c consumable) {
 	if g.Player.Consumables[c] <= 0 {
 		delete(g.Player.Consumables, c)
 	}
-	g.FairAction()
+	g.FunAction()
 }
 
 type potion int

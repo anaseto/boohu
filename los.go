@@ -142,7 +142,7 @@ func (g *game) SeePosition(pos position) {
 			g.Printf("You %s %s.", see, Indefinite(rod.String(), false))
 			g.StopAuto()
 		}
-		g.FairAction()
+		g.FunAction()
 		g.Dungeon.SetExplored(pos)
 		g.DijkstraMapRebuild = true
 	} else {

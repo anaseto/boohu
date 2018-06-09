@@ -204,7 +204,7 @@ func (g *game) WaitTurn(ev event) {
 	if len(g.Noise) > 0 || g.StatusRest() {
 		grade = 1
 	}
-	g.ScummingAction(ev, grade)
+	g.BoredomAction(ev, grade)
 	ev.Renew(g, 10)
 }
 
@@ -217,24 +217,24 @@ func (g *game) MonsterCount() (count int) {
 	return count
 }
 
-func (g *game) ScummingAction(ev event, grade int) {
+func (g *game) BoredomAction(ev event, grade int) {
 	if g.MonsterInLOS() == nil {
-		g.Scumming += grade
+		g.Boredom += grade
 	} else {
-		g.Scumming--
-		if g.Scumming < 0 {
-			g.Scumming = 0
+		g.Boredom--
+		if g.Boredom < 0 {
+			g.Boredom = 0
 		}
 	}
-	if g.Scumming == 100 {
+	if g.Boredom == 100 {
 		if g.MonsterCount() > 4 {
 			g.PrintStyled("You feel a little bored.", logCritic)
 			g.StopAuto()
 		}
 	}
-	if g.Scumming > 120 {
+	if g.Boredom > 120 {
 		if g.MonsterCount() <= 4 {
-			g.Scumming = 0
+			g.Boredom = 0
 			return
 		}
 		g.Player.HP = g.Player.HP / 2
@@ -258,15 +258,15 @@ func (g *game) ScummingAction(ev event, grade int) {
 			g.PushEvent(&simpleEvent{ERank: ev.Rank() + delay, EAction: Teleportation})
 			g.PrintStyled("Something hurt you! You feel unstable.", logCritic)
 		}
-		g.Scumming = 0
+		g.Boredom = 0
 		g.StopAuto()
 	}
 }
 
-func (g *game) FairAction() {
-	g.Scumming -= 15
-	if g.Scumming < 0 {
-		g.Scumming = 0
+func (g *game) FunAction() {
+	g.Boredom -= 15
+	if g.Boredom < 0 {
+		g.Boredom = 0
 	}
 }
 
@@ -286,7 +286,7 @@ func (g *game) Rest(ev event) error {
 	if g.StatusRest() {
 		g.RestingTurns = -1 // not true resting, just waiting for status end
 	}
-	g.FairAction()
+	g.FunAction()
 	return nil
 }
 
@@ -409,7 +409,7 @@ func (g *game) MovePlayer(pos position, ev event) error {
 		}
 		g.PlacePlayerAt(pos)
 		if !g.Autoexploring {
-			g.ScummingAction(ev, 1)
+			g.BoredomAction(ev, 1)
 		}
 		if g.Player.Aptitudes[AptFast] {
 			// only fast for movement
@@ -427,7 +427,7 @@ func (g *game) MovePlayer(pos position, ev event) error {
 		}
 		g.Stats.Moves++
 	} else {
-		g.FairAction()
+		g.FunAction()
 		g.AttackMonster(mons, ev)
 	}
 	if g.Player.HasStatus(StatusBerserk) {
