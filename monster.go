@@ -276,6 +276,7 @@ const (
 	UXDisabling
 	UXMadNixeSpecter
 	UXMadNixeCyclop
+	UXMadNixes
 )
 
 type monsInterval struct {
@@ -578,6 +579,12 @@ var MonsBands = []monsterBandData{
 			MonsMadNixe: {1, 1},
 		},
 		rarity: 110, minDepth: 14, maxDepth: 15, band: true, unique: true,
+	},
+	UXMadNixes: {
+		distribution: map[monsterKind]monsInterval{
+			MonsMadNixe: {3, 3},
+		},
+		rarity: 200, minDepth: 14, maxDepth: 15, band: true, unique: true,
 	},
 }
 
