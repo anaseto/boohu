@@ -68,6 +68,7 @@ const (
 	MonsAcidMound
 	MonsExplosiveNadre
 	MonsSatowalgaPlant
+	MonsMadNixe
 	MonsMarevorHelith
 )
 
@@ -101,7 +102,7 @@ func (mk monsterKind) Dangerousness() int {
 
 func (mk monsterKind) Ranged() bool {
 	switch mk {
-	case MonsLich, MonsCyclop, MonsGoblinWarrior, MonsSatowalgaPlant:
+	case MonsLich, MonsCyclop, MonsGoblinWarrior, MonsSatowalgaPlant, MonsMadNixe:
 		return true
 	default:
 		return false
@@ -188,7 +189,8 @@ var MonsData = []monsterData{
 	MonsMirrorSpecter:   {10, 9, 10, 18, 15, 0, 17, 'm', "mirror specter", 11},
 	MonsExplosiveNadre:  {10, 4, 10, 1, 14, 0, 10, 'n', "explosive nadre", 5},
 	MonsSatowalgaPlant:  {10, 12, 12, 30, 15, 0, 4, 'P', "satowalga plant", 7},
-	MonsMarevorHelith:   {10, 0, 10, 99, 18, 10, 15, 'M', "Marevor Helith", 18},
+	MonsMadNixe:         {10, 10, 10, 20, 15, 0, 15, 'N', "mad nixe", 12},
+	MonsMarevorHelith:   {10, 0, 10, 97, 18, 10, 15, 'M', "Marevor Helith", 18},
 }
 
 var monsDesc = []string{
@@ -211,6 +213,7 @@ var monsDesc = []string{
 	MonsMirrorSpecter:   "Mirror specters are very insubstantial creatures. They can absorb your mana.",
 	MonsExplosiveNadre:  "Explosive nadres are very frail creatures that explode upon dying, halving HP of any adjacent creatures and occasionally destroying walls.",
 	MonsSatowalgaPlant:  "Satowalga Plants are static bushes that throw acidic projectiles at you, sometimes corroding and confusing you.",
+	MonsMadNixe:         "Mad nixes are magical humanoids that can attract you to them.",
 	MonsMarevorHelith:   "Marevor Helith is an ancient undead nakrus very fond of teleporting people away.",
 }
 
@@ -244,12 +247,17 @@ const (
 	BandExplosive
 	BandGiantBees
 	BandSkeletonWarrior
+	BandMadNixes
+	BandMadNixesDragon
+	BandMadNixesHydra
+	BandMadNixesFrogs
 	UBandWorms
 	UBandGoblinsEasy
 	UBandFrogs
 	UBandOgres
 	UBandGoblins
 	UBandBeeYacks
+	UBandMadNixes
 	UHydras
 	UExplosiveNadres
 	ULich
@@ -266,6 +274,8 @@ const (
 	UXSatowalga
 	UXSpecters
 	UXDisabling
+	UXMadNixeSpecter
+	UXMadNixeCyclop
 )
 
 type monsInterval struct {
@@ -377,6 +387,35 @@ var MonsBands = []monsterBandData{
 		distribution: map[monsterKind]monsInterval{MonsSkeletonWarrior: {2, 3}},
 		rarity:       60, minDepth: 8, maxDepth: 13, band: true,
 	},
+	BandMadNixes: {
+		distribution: map[monsterKind]monsInterval{
+			MonsMadNixe: {2, 2},
+			MonsSpider:  {1, 1},
+			MonsHound:   {1, 1},
+		},
+		rarity: 100, minDepth: 13, maxDepth: 15, band: true,
+	},
+	BandMadNixesDragon: {
+		distribution: map[monsterKind]monsInterval{
+			MonsMadNixe:     {1, 1},
+			MonsEarthDragon: {1, 1},
+		},
+		rarity: 100, minDepth: 13, maxDepth: 15, band: true,
+	},
+	BandMadNixesHydra: {
+		distribution: map[monsterKind]monsInterval{
+			MonsMadNixe: {1, 1},
+			MonsHydra:   {1, 1},
+		},
+		rarity: 100, minDepth: 13, maxDepth: 15, band: true,
+	},
+	BandMadNixesFrogs: {
+		distribution: map[monsterKind]monsInterval{
+			MonsMadNixe:      {1, 1},
+			MonsBlinkingFrog: {2, 2},
+		},
+		rarity: 100, minDepth: 13, maxDepth: 15, band: true,
+	},
 	UBandWorms: {
 		distribution: map[monsterKind]monsInterval{MonsWorm: {3, 4}, MonsSpider: {1, 1}},
 		rarity:       50, minDepth: 4, maxDepth: 4, band: true, unique: true,
@@ -409,7 +448,14 @@ var MonsBands = []monsterBandData{
 			MonsYack:     {3, 4},
 			MonsGiantBee: {2, 2},
 		},
-		rarity: 30, minDepth: 9, maxDepth: 9, band: true, unique: true,
+		rarity: 45, minDepth: 9, maxDepth: 9, band: true, unique: true,
+	},
+	UBandMadNixes: {
+		distribution: map[monsterKind]monsInterval{
+			MonsMadNixe: {2, 2},
+			MonsSpider:  {1, 1},
+		},
+		rarity: 40, minDepth: 9, maxDepth: 9, band: true, unique: true,
 	},
 	UHydras: {
 		distribution: map[monsterKind]monsInterval{
@@ -518,6 +564,20 @@ var MonsBands = []monsterBandData{
 			MonsMirrorSpecter:  {1, 1},
 		},
 		rarity: 100, minDepth: 15, maxDepth: 15, band: true, unique: true,
+	},
+	UXMadNixeSpecter: {
+		distribution: map[monsterKind]monsInterval{
+			MonsMirrorSpecter: {1, 1},
+			MonsMadNixe:       {1, 1},
+		},
+		rarity: 100, minDepth: 14, maxDepth: 15, band: true, unique: true,
+	},
+	UXMadNixeCyclop: {
+		distribution: map[monsterKind]monsInterval{
+			MonsCyclop:  {1, 1},
+			MonsMadNixe: {1, 1},
+		},
+		rarity: 100, minDepth: 14, maxDepth: 15, band: true, unique: true,
 	},
 }
 
@@ -1010,6 +1070,8 @@ func (m *monster) RangedAttack(g *game, ev event) bool {
 		return m.ThrowJavelin(g, ev)
 	case MonsSatowalgaPlant:
 		return m.ThrowAcid(g, ev)
+	case MonsMadNixe:
+		return m.NixeAttraction(g, ev)
 	}
 	return false
 }
@@ -1217,6 +1279,26 @@ func (m *monster) ThrowAcid(g *game, ev event) bool {
 		g.Printf("You dodge %s's acid projectile.", m.Kind.Indefinite(false))
 		g.ui.MonsterProjectileAnimation(g, g.Ray(m.Pos), '*', ColorGreen)
 	}
+	ev.Renew(g, m.Kind.AttackDelay())
+	return true
+}
+
+func (m *monster) NixeAttraction(g *game, ev event) bool {
+	blocked := m.RangeBlocked(g)
+	if blocked {
+		return false
+	}
+	g.MakeNoise(9, m.Pos)
+	g.PrintfStyled("%s uses energies to lure you.", logMonsterHit, m.Kind.Definite(true))
+	ray := g.Ray(m.Pos)
+	g.ui.MonsterProjectileAnimation(g, ray, 'θ', ColorCyan) // TODO: improve
+	if len(ray) > 1 {
+		// should always be the case
+		g.ui.TeleportAnimation(g, g.Player.Pos, ray[1], true)
+		g.PlacePlayerAt(ray[1])
+	}
+	m.Statuses[MonsExhausted] = 1
+	g.PushEvent(&monsterEvent{ERank: ev.Rank() + 100 + RandInt(50), NMons: m.Index, EAction: MonsExhaustionEnd})
 	ev.Renew(g, m.Kind.AttackDelay())
 	return true
 }
