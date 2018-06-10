@@ -61,6 +61,7 @@ const (
 	MonsHydra
 	MonsSkeletonWarrior
 	MonsSpider
+	MonsWingedMilfid
 	MonsBlinkingFrog
 	MonsLich
 	MonsEarthDragon
@@ -183,6 +184,7 @@ var MonsData = []monsterData{
 	MonsHydra:           {10, 9, 10, 45, 13, 0, 6, 'H', "hydra", 15},
 	MonsSkeletonWarrior: {10, 12, 10, 25, 15, 4, 12, 'S', "skeleton warrior", 10},
 	MonsSpider:          {8, 7, 10, 13, 17, 0, 15, 's', "spider", 6},
+	MonsWingedMilfid:    {8, 9, 10, 17, 15, 0, 13, 'W', "winged milfid", 7},
 	MonsBlinkingFrog:    {10, 10, 10, 20, 15, 0, 12, 'F', "blinking frog", 7},
 	MonsLich:            {10, 10, 10, 23, 15, 3, 12, 'L', "lich", 17},
 	MonsEarthDragon:     {10, 14, 10, 40, 14, 6, 8, 'D', "earth dragon", 20},
@@ -207,6 +209,7 @@ var monsDesc = []string{
 	MonsHydra:           "Hydras are enormous creatures with four heads that can hit you each at once.",
 	MonsSkeletonWarrior: "Skeleton warriors are good fighters, and are equipped with a chain mail.",
 	MonsSpider:          "Spiders are fast moving fragile creatures, whose bite can confuse you.",
+	MonsWingedMilfid:    "Winged milfids are fast moving humanoids that can fly over you and make you swap positions.",
 	MonsBlinkingFrog:    "Blinking frogs are big frog-like unstable creatures, whose bite can make you blink away.",
 	MonsLich:            "Liches are non-living mages wearing a leather armour. They can throw a bolt of torment at you, halving your HP.",
 	MonsEarthDragon:     "Earth dragons are big and hardy creatures that wander in the Underground. It is said they are to credit for many tunnels.",
@@ -228,6 +231,7 @@ const (
 	LoneHound
 	LoneHydra
 	LoneSpider
+	LoneMilfid
 	LoneBlinkingFrog
 	LoneCyclop
 	LoneLich
@@ -237,15 +241,28 @@ const (
 	LoneExplosiveNadre
 	LoneSatowalgaPlant
 	BandGoblins
+	BandGoblinsMany
+	BandGoblinsHound
+	BandGoblinsOgre
 	BandGoblinsWithWarriors
+	BandGoblinsWithWarriorsMilfid
+	BandGoblinsWithWarriorsHound
+	BandGoblinsWithWarriorsOgre
 	BandGoblinWarriors
+	BandGoblinWarriorsMilfid
 	BandHounds
-	BandYacks
+	BandHoundsMany
+	BandYacksGoblin
+	BandYacksMilfid
+	BandYacksMany
 	BandSpiders
+	BandSpidersMilfid
+	BandWingedMilfids
 	BandSatowalga
 	BandBlinkingFrogs
 	BandExplosive
 	BandGiantBees
+	BandGiantBeesMany
 	BandSkeletonWarrior
 	BandMadNixes
 	BandMadNixesDragon
@@ -271,12 +288,14 @@ const (
 	UXFrogRanged
 	UXExplosive
 	UXWarriors
-	UXSatowalga
+	UXSatowalgaNixe
 	UXSpecters
 	UXDisabling
 	UXMadNixeSpecter
 	UXMadNixeCyclop
 	UXMadNixes
+	UXMilfidYack
+	UXVariedWarriors
 )
 
 type monsInterval struct {
@@ -325,6 +344,7 @@ var MonsBands = []monsterBandData{
 	LoneHound:          {rarity: 20, minDepth: 1, maxDepth: 8, monster: MonsHound},
 	LoneHydra:          {rarity: 45, minDepth: 8, maxDepth: 13, monster: MonsHydra},
 	LoneSpider:         {rarity: 20, minDepth: 3, maxDepth: 13, monster: MonsSpider},
+	LoneMilfid:         {rarity: 100, minDepth: 5, maxDepth: 13, monster: MonsWingedMilfid},
 	LoneBlinkingFrog:   {rarity: 50, minDepth: 5, maxDepth: 13, monster: MonsBlinkingFrog},
 	LoneCyclop:         {rarity: 35, minDepth: 5, maxDepth: 13, monster: MonsCyclop},
 	LoneLich:           {rarity: 70, minDepth: 9, maxDepth: 13, monster: MonsLich},
@@ -334,28 +354,80 @@ var MonsBands = []monsterBandData{
 	LoneExplosiveNadre: {rarity: 55, minDepth: 4, maxDepth: 7, monster: MonsExplosiveNadre},
 	LoneSatowalgaPlant: {rarity: 80, minDepth: 5, maxDepth: 13, monster: MonsSatowalgaPlant},
 	BandGoblins: {
-		distribution: map[monsterKind]monsInterval{MonsGoblin: {2, 4}},
-		rarity:       10, minDepth: 1, maxDepth: 5, band: true,
+		distribution: map[monsterKind]monsInterval{MonsGoblin: {2, 3}},
+		rarity:       17, minDepth: 1, maxDepth: 5, band: true,
+	},
+	BandGoblinsMany: {
+		distribution: map[monsterKind]monsInterval{MonsGoblin: {4, 4}},
+		rarity:       75, minDepth: 2, maxDepth: 5, band: true,
+	},
+	BandGoblinsHound: {
+		distribution: map[monsterKind]monsInterval{MonsGoblin: {2, 2}, MonsHound: {1, 1}},
+		rarity:       25, minDepth: 1, maxDepth: 5, band: true,
+	},
+	BandGoblinsOgre: {
+		distribution: map[monsterKind]monsInterval{MonsGoblin: {1, 1}, MonsOgre: {1, 1}},
+		rarity:       75, minDepth: 3, maxDepth: 5, band: true,
 	},
 	BandGoblinsWithWarriors: {
 		distribution: map[monsterKind]monsInterval{
-			MonsGoblin:        {3, 5},
-			MonsGoblinWarrior: {0, 2}},
-		rarity: 12, minDepth: 5, maxDepth: 9, band: true,
+			MonsGoblin:        {3, 3},
+			MonsGoblinWarrior: {2, 2}},
+		rarity: 50, minDepth: 5, maxDepth: 9, band: true,
+	},
+	BandGoblinsWithWarriorsMilfid: {
+		distribution: map[monsterKind]monsInterval{
+			MonsGoblin:        {3, 3},
+			MonsGoblinWarrior: {1, 1},
+			MonsWingedMilfid:  {1, 1}},
+		rarity: 50, minDepth: 5, maxDepth: 9, band: true,
+	},
+	BandGoblinsWithWarriorsHound: {
+		distribution: map[monsterKind]monsInterval{
+			MonsGoblin:        {3, 3},
+			MonsGoblinWarrior: {1, 1},
+			MonsHound:         {1, 1}},
+		rarity: 50, minDepth: 5, maxDepth: 9, band: true,
+	},
+	BandGoblinsWithWarriorsOgre: {
+		distribution: map[monsterKind]monsInterval{
+			MonsGoblin:        {3, 3},
+			MonsGoblinWarrior: {1, 1},
+			MonsOgre:          {1, 1}},
+		rarity: 50, minDepth: 5, maxDepth: 9, band: true,
 	},
 	BandGoblinWarriors: {
 		distribution: map[monsterKind]monsInterval{
-			MonsGoblin:        {0, 1},
-			MonsGoblinWarrior: {2, 4}},
-		rarity: 45, minDepth: 10, maxDepth: 13, band: true,
+			MonsGoblin:        {1, 1},
+			MonsGoblinWarrior: {3, 3}},
+		rarity: 80, minDepth: 10, maxDepth: 13, band: true,
+	},
+	BandGoblinWarriorsMilfid: {
+		distribution: map[monsterKind]monsInterval{
+			MonsGoblin:        {1, 1},
+			MonsGoblinWarrior: {2, 2},
+			MonsWingedMilfid:  {1, 1}},
+		rarity: 100, minDepth: 10, maxDepth: 13, band: true,
 	},
 	BandHounds: {
-		distribution: map[monsterKind]monsInterval{MonsHound: {2, 3}},
-		rarity:       20, minDepth: 2, maxDepth: 10, band: true,
+		distribution: map[monsterKind]monsInterval{MonsHound: {2, 2}, MonsGoblin: {1, 1}},
+		rarity:       35, minDepth: 2, maxDepth: 10, band: true,
+	},
+	BandHoundsMany: {
+		distribution: map[monsterKind]monsInterval{MonsHound: {3, 3}},
+		rarity:       65, minDepth: 2, maxDepth: 10, band: true,
 	},
 	BandSpiders: {
-		distribution: map[monsterKind]monsInterval{MonsSpider: {2, 4}},
-		rarity:       25, minDepth: 5, maxDepth: 13, band: true,
+		distribution: map[monsterKind]monsInterval{MonsSpider: {2, 3}},
+		rarity:       35, minDepth: 5, maxDepth: 13, band: true,
+	},
+	BandSpidersMilfid: {
+		distribution: map[monsterKind]monsInterval{MonsSpider: {2, 2}, MonsWingedMilfid: {1, 1}},
+		rarity:       75, minDepth: 5, maxDepth: 13, band: true,
+	},
+	BandWingedMilfids: {
+		distribution: map[monsterKind]monsInterval{MonsWingedMilfid: {2, 3}},
+		rarity:       65, minDepth: 7, maxDepth: 13, band: true,
 	},
 	BandBlinkingFrogs: {
 		distribution: map[monsterKind]monsInterval{MonsBlinkingFrog: {2, 4}},
@@ -376,13 +448,25 @@ var MonsBands = []monsterBandData{
 		},
 		rarity: 60, minDepth: 8, maxDepth: 13, band: true,
 	},
-	BandYacks: {
-		distribution: map[monsterKind]monsInterval{MonsYack: {2, 5}},
-		rarity:       15, minDepth: 5, maxDepth: 11, band: true,
+	BandYacksGoblin: {
+		distribution: map[monsterKind]monsInterval{MonsYack: {2, 2}, MonsGoblin: {1, 1}},
+		rarity:       50, minDepth: 5, maxDepth: 11, band: true,
+	},
+	BandYacksMilfid: {
+		distribution: map[monsterKind]monsInterval{MonsYack: {2, 2}, MonsWingedMilfid: {1, 1}},
+		rarity:       80, minDepth: 5, maxDepth: 11, band: true,
+	},
+	BandYacksMany: {
+		distribution: map[monsterKind]monsInterval{MonsYack: {4, 5}},
+		rarity:       50, minDepth: 5, maxDepth: 11, band: true,
 	},
 	BandGiantBees: {
-		distribution: map[monsterKind]monsInterval{MonsGiantBee: {2, 5}},
-		rarity:       30, minDepth: 6, maxDepth: 13, band: true,
+		distribution: map[monsterKind]monsInterval{MonsGiantBee: {2, 3}},
+		rarity:       55, minDepth: 6, maxDepth: 13, band: true,
+	},
+	BandGiantBeesMany: {
+		distribution: map[monsterKind]monsInterval{MonsGiantBee: {4, 5}},
+		rarity:       90, minDepth: 6, maxDepth: 13, band: true,
 	},
 	BandSkeletonWarrior: {
 		distribution: map[monsterKind]monsInterval{MonsSkeletonWarrior: {2, 3}},
@@ -423,8 +507,8 @@ var MonsBands = []monsterBandData{
 	},
 	UBandGoblinsEasy: {
 		distribution: map[monsterKind]monsInterval{
-			MonsGoblin: {3, 5},
-			MonsHound:  {1, 2},
+			MonsGoblin: {3, 4},
+			MonsHound:  {2, 2},
 		},
 		rarity: 30, minDepth: 5, maxDepth: 5, band: true, unique: true,
 	},
@@ -544,11 +628,12 @@ var MonsBands = []monsterBandData{
 		},
 		rarity: 100, minDepth: 14, maxDepth: 15, band: true, unique: true,
 	},
-	UXSatowalga: {
+	UXSatowalgaNixe: {
 		distribution: map[monsterKind]monsInterval{
-			MonsSatowalgaPlant: {3, 3},
+			MonsSatowalgaPlant: {2, 2},
+			MonsMadNixe:        {1, 1},
 		},
-		rarity: 100, minDepth: 13, maxDepth: 15, band: true, unique: true,
+		rarity: 110, minDepth: 15, maxDepth: 15, band: true, unique: true,
 	},
 	UXSpecters: {
 		distribution: map[monsterKind]monsInterval{
@@ -585,6 +670,21 @@ var MonsBands = []monsterBandData{
 			MonsMadNixe: {3, 3},
 		},
 		rarity: 200, minDepth: 14, maxDepth: 15, band: true, unique: true,
+	},
+	UXMilfidYack: {
+		distribution: map[monsterKind]monsInterval{
+			MonsWingedMilfid: {2, 2},
+			MonsYack:         {3, 3},
+		},
+		rarity: 110, minDepth: 14, maxDepth: 15, band: true, unique: true,
+	},
+	UXVariedWarriors: {
+		distribution: map[monsterKind]monsInterval{
+			MonsGoblinWarrior:   {1, 1},
+			MonsWingedMilfid:    {1, 1},
+			MonsSkeletonWarrior: {1, 1},
+		},
+		rarity: 100, minDepth: 13, maxDepth: 15, band: true, unique: true,
 	},
 }
 
@@ -1028,6 +1128,16 @@ func (m *monster) HitSideEffects(g *game, ev event) {
 		if RandInt(2) == 0 && m.PushPlayer(g) {
 			g.Print("The yack pushes you.")
 		}
+	case MonsWingedMilfid:
+		if m.Status(MonsExhausted) {
+			break
+		}
+		ompos := m.Pos
+		m.MoveTo(g, g.Player.Pos)
+		g.PlacePlayerAt(ompos)
+		g.Print("The flying milfid makes you swap positions.")
+		m.Statuses[MonsExhausted] = 1
+		g.PushEvent(&monsterEvent{ERank: ev.Rank() + 50 + RandInt(50), NMons: m.Index, EAction: MonsExhaustionEnd})
 	}
 }
 
