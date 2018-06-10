@@ -617,7 +617,7 @@ func (ar armour) Desc() string {
 	case ChainMail:
 		text = "A chain mail provides good protection against blows, at a minor evasion cost."
 	case PonderousnessPlates:
-		text = "Ponderousness plates provide great protection against blows, but make you move slower and less good at evading blows."
+		text = "Ponderousness plates provide great protection against blows, but make you move slower and a little less good at evading blows."
 	case SpeedRobe:
 		text = "The speed robe makes you move faster, but makes you frail."
 	case CelmistRobe:

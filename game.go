@@ -319,6 +319,7 @@ func (g *game) InitPlayer() {
 	//g.Player.Weapon = Sabre
 	//g.Player.Weapon = HarKarGauntlets
 	//g.Player.Shield = EarthShield
+	//g.Player.Armour = PonderousnessPlates
 }
 
 func (g *game) InitLevel() {
