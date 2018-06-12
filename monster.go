@@ -380,7 +380,7 @@ var MonsBands = []monsterBandData{
 			MonsGoblin:        {3, 3},
 			MonsGoblinWarrior: {1, 1},
 			MonsWingedMilfid:  {1, 1}},
-		rarity: 50, minDepth: 5, maxDepth: 9, band: true,
+		rarity: 70, minDepth: 5, maxDepth: 9, band: true,
 	},
 	BandGoblinsWithWarriorsHound: {
 		distribution: map[monsterKind]monsInterval{
@@ -427,7 +427,7 @@ var MonsBands = []monsterBandData{
 	},
 	BandWingedMilfids: {
 		distribution: map[monsterKind]monsInterval{MonsWingedMilfid: {2, 3}},
-		rarity:       65, minDepth: 7, maxDepth: 13, band: true,
+		rarity:       85, minDepth: 7, maxDepth: 13, band: true,
 	},
 	BandBlinkingFrogs: {
 		distribution: map[monsterKind]monsInterval{MonsBlinkingFrog: {2, 4}},
