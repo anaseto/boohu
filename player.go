@@ -28,7 +28,7 @@ func (p *player) HPMax() int {
 		hpmax += 10
 	}
 	if p.Armour == SpeedRobe {
-		hpmax -= 10
+		hpmax -= 5
 	}
 	return hpmax
 }
