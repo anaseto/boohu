@@ -303,7 +303,8 @@ func (g *game) InitPlayer() {
 	g.Player.Statuses = map[status]int{}
 
 	// Testing
-	// g.Player.Aptitudes[AptSmoke] = true
+	//g.Player.Aptitudes[AptStealthyLOS] = true
+	//g.Player.Aptitudes[AptStealthyMovement] = true
 	//g.Player.Rods[RodSwapping] = rodProps{Charge: 3}
 	//g.Player.Rods[RodFireball] = rodProps{Charge: 3}
 	//g.Player.Rods[RodLightningBolt] = rodProps{Charge: 3}
@@ -320,6 +321,7 @@ func (g *game) InitPlayer() {
 	//g.Player.Weapon = HarKarGauntlets
 	//g.Player.Shield = EarthShield
 	//g.Player.Armour = PonderousnessPlates
+	//g.Player.Armour = HarmonistRobe
 }
 
 func (g *game) InitLevel() {

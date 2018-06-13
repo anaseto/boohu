@@ -1529,36 +1529,46 @@ func (m *monster) MakeAware(g *game) {
 		return
 	}
 	if m.State == Resting {
-		adjust := (m.Pos.Distance(g.Player.Pos) - g.LosRange()/2 + 1)
-		if g.Player.Aptitudes[AptStealthyLOS] {
-			adjust += 1
-		}
-		adjust *= adjust
-		r := RandInt(25 + 3*adjust)
+		adjust := g.LosRange() - m.Pos.Distance(g.Player.Pos)
+		max := 28
 		if g.Player.Aptitudes[AptStealthyMovement] {
-			r *= 2
+			max += 3
 		}
 		if g.Player.Armour == HarmonistRobe {
-			r = r * 3 / 2
+			max += 3
 		}
-		if r > 5 {
+		r := RandInt(max - 4*adjust)
+		fact := 2
+		if m.Pos.Distance(g.Player.Pos) > 1 {
+			fact = 3
+		}
+		if g.Player.Aptitudes[AptStealthyMovement] {
+			r *= fact
+		}
+		if g.Player.Armour == HarmonistRobe {
+			r *= fact
+		}
+		if r >= 5 {
 			return
 		}
 	}
 	if m.State == Wandering {
-		adjust := (m.Pos.Distance(g.Player.Pos) - g.LosRange()/2 + 1)
-		if g.Player.Aptitudes[AptStealthyLOS] {
-			adjust += 1
-		}
-		adjust *= adjust
-		r := RandInt(30 + adjust)
+		adjust := g.LosRange() - m.Pos.Distance(g.Player.Pos)
+		max := 37
 		if g.Player.Aptitudes[AptStealthyMovement] {
-			r += 5
+			max += 5
 		}
 		if g.Player.Armour == HarmonistRobe {
-			r += 3
+			max += 5
 		}
-		if r >= 25 {
+		r := RandInt(max - 4*adjust)
+		if g.Player.Aptitudes[AptStealthyMovement] {
+			r *= 2
+		}
+		if g.Player.Armour == HarmonistRobe {
+			r *= 2
+		}
+		if r >= 25 && m.Pos.Distance(g.Player.Pos) > 1 {
 			return
 		}
 	}
