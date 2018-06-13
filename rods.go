@@ -469,7 +469,11 @@ func (g *game) GenerateRod() {
 
 func (g *game) RechargeRods() {
 	for r, props := range g.Player.Rods {
-		if props.Charge < r.MaxCharge() {
+		max := r.MaxCharge()
+		if g.Player.Armour == CelmistRobe {
+			max++
+		}
+		if props.Charge < max {
 			rchg := RandInt(1 + r.Rate())
 			if rchg == 0 && RandInt(2) == 0 {
 				rchg++
@@ -480,8 +484,8 @@ func (g *game) RechargeRods() {
 			props.Charge += rchg
 			g.Player.Rods[r] = props
 		}
-		if props.Charge > r.MaxCharge() {
-			props.Charge = r.MaxCharge()
+		if props.Charge > max {
+			props.Charge = max
 			g.Player.Rods[r] = props
 		}
 	}

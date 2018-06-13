@@ -322,6 +322,7 @@ func (g *game) InitPlayer() {
 	//g.Player.Shield = EarthShield
 	//g.Player.Armour = PonderousnessPlates
 	//g.Player.Armour = HarmonistRobe
+	//g.Player.Armour = CelmistRobe
 }
 
 func (g *game) InitLevel() {
