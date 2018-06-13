@@ -138,10 +138,12 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 					g.HitMonster(DmgPhysical, mons, ev)
 				}
 			}
-			ompos := mons.Pos
-			mons.MoveTo(g, g.Player.Pos)
-			g.PlacePlayerAt(ompos)
-		} else {
+			if !g.Player.HasStatus(StatusLignification) {
+				ompos := mons.Pos
+				mons.MoveTo(g, g.Player.Pos)
+				g.PlacePlayerAt(ompos)
+			}
+		} else if !g.Player.HasStatus(StatusLignification) {
 			g.PlacePlayerAt(mons.Pos)
 		}
 	case g.Player.Weapon == HarKarGauntlets:
@@ -184,7 +186,9 @@ func (g *game) HarKarAttack(mons *monster, ev event) {
 			}
 			g.HitMonster(DmgPhysical, m, ev)
 		}
-		g.PlacePlayerAt(pos)
+		if !g.Player.HasStatus(StatusLignification) {
+			g.PlacePlayerAt(pos)
+		}
 	} else {
 		g.HitMonster(DmgPhysical, mons, ev)
 	}

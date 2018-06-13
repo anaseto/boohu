@@ -1129,7 +1129,7 @@ func (m *monster) HitSideEffects(g *game, ev event) {
 			g.Print("The yack pushes you.")
 		}
 	case MonsWingedMilfid:
-		if m.Status(MonsExhausted) {
+		if m.Status(MonsExhausted) || g.Player.HasStatus(StatusLignification) {
 			break
 		}
 		ompos := m.Pos
