@@ -39,7 +39,7 @@ func (p *player) MPMax() int {
 		mpmax += 2
 	}
 	if p.Armour == CelmistRobe {
-		mpmax += 1
+		mpmax += 2
 	}
 	return mpmax
 }
