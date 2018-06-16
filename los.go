@@ -74,6 +74,12 @@ func (g *game) LosRange() int {
 	if g.Player.Armour == HarmonistRobe {
 		losRange -= 1
 	}
+	if g.Player.HasStatus(StatusShadows) {
+		losRange = 1
+	}
+	if losRange < 1 {
+		losRange = 1
+	}
 	return losRange
 }
 

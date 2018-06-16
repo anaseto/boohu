@@ -45,6 +45,7 @@ const (
 	CBlinkPotion
 	DigPotion
 	SwapPotion
+	ShadowsPotion
 	DreamPotion
 )
 
@@ -77,6 +78,8 @@ func (p potion) String() (text string) {
 		text += " of digging"
 	case SwapPotion:
 		text += " of swapping"
+	case ShadowsPotion:
+		text += " of shadows"
 	case DreamPotion:
 		text += " of dreams"
 	}
@@ -114,6 +117,8 @@ func (p potion) Desc() (text string) {
 		text = "makes you dig walls like an earth dragon."
 	case SwapPotion:
 		text = "makes you swap positions with monsters instead of attacking."
+	case ShadowsPotion:
+		text = "reduces your line of sight range to 1."
 	case DreamPotion:
 		text = "shows you the position of monsters sleeping at drink time."
 	}
@@ -166,6 +171,8 @@ func (p potion) Use(g *game, ev event) error {
 		err = g.QuaffDigPotion(ev)
 	case SwapPotion:
 		err = g.QuaffSwapPotion(ev)
+	case ShadowsPotion:
+		err = g.QuaffShadowsPotion(ev)
 	case DreamPotion:
 		err = g.QuaffDreamPotion(ev)
 	}
@@ -278,6 +285,17 @@ func (g *game) QuaffSwapPotion(ev event) error {
 	g.Player.Statuses[StatusSwap] = 1
 	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 130 + RandInt(41), EAction: SwapEnd})
 	g.Printf("You quaff the %s. You feel like dancing.", SwapPotion)
+	return nil
+}
+
+func (g *game) QuaffShadowsPotion(ev event) error {
+	if g.Player.HasStatus(StatusShadows) {
+		return errors.New("You are already surrounded by shadows.")
+	}
+	g.Player.Statuses[StatusShadows] = 1
+	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 130 + RandInt(41), EAction: ShadowsEnd})
+	g.Printf("You quaff the %s. You feel surrounded by shadows.", ShadowsPotion)
+	g.ComputeLOS()
 	return nil
 }
 
@@ -518,19 +536,20 @@ type collectData struct {
 var ConsumablesCollectData = map[consumable]collectData{
 	ConfusingDart:       {rarity: 4, quantity: 3},
 	ExplosiveMagara:     {rarity: 8, quantity: 1},
-	TeleportationPotion: {rarity: 5, quantity: 1},
-	BerserkPotion:       {rarity: 5, quantity: 1},
+	TeleportationPotion: {rarity: 6, quantity: 1},
+	BerserkPotion:       {rarity: 6, quantity: 1},
 	HealWoundsPotion:    {rarity: 6, quantity: 1},
 	SwiftnessPotion:     {rarity: 6, quantity: 1},
-	LignificationPotion: {rarity: 8, quantity: 1},
-	MagicPotion:         {rarity: 10, quantity: 1},
+	LignificationPotion: {rarity: 9, quantity: 1},
+	MagicPotion:         {rarity: 9, quantity: 1},
 	WallPotion:          {rarity: 12, quantity: 1},
 	CBlinkPotion:        {rarity: 12, quantity: 1},
 	DigPotion:           {rarity: 12, quantity: 1},
 	SwapPotion:          {rarity: 12, quantity: 1},
-	DescentPotion:       {rarity: 17, quantity: 1},
-	MagicMappingPotion:  {rarity: 17, quantity: 1},
-	DreamPotion:         {rarity: 17, quantity: 1},
+	ShadowsPotion:       {rarity: 15, quantity: 1},
+	DescentPotion:       {rarity: 18, quantity: 1},
+	MagicMappingPotion:  {rarity: 18, quantity: 1},
+	DreamPotion:         {rarity: 18, quantity: 1},
 }
 
 type equipable interface {

@@ -315,6 +315,7 @@ func (g *game) InitPlayer() {
 	//g.Player.Consumables[DigPotion] = 5
 	//g.Player.Consumables[SwapPotion] = 5
 	//g.Player.Consumables[DreamPotion] = 5
+	//g.Player.Consumables[ShadowsPotion] = 5
 	//g.Player.Weapon = ElecWhip
 	//g.Player.Weapon = DancingRapier
 	//g.Player.Weapon = Sabre

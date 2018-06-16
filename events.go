@@ -58,6 +58,7 @@ const (
 	CorrosionEnd
 	DigEnd
 	SwapEnd
+	ShadowsEnd
 )
 
 func (g *game) PushEvent(ev event) {
@@ -180,6 +181,12 @@ func (sev *simpleEvent) Action(g *game) {
 		g.Player.Statuses[StatusSwap] = 0
 		if g.Player.Statuses[StatusSwap] == 0 {
 			g.PrintStyled("You feel no longer dancing.", logStatusEnd)
+			g.ui.StatusEndAnimation(g)
+		}
+	case ShadowsEnd:
+		g.Player.Statuses[StatusShadows] = 0
+		if g.Player.Statuses[StatusShadows] == 0 {
+			g.PrintStyled("Shadows leaved you.", logStatusEnd)
 			g.ui.StatusEndAnimation(g)
 		}
 	}
