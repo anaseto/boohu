@@ -188,6 +188,8 @@ func (sev *simpleEvent) Action(g *game) {
 		if g.Player.Statuses[StatusShadows] == 0 {
 			g.PrintStyled("Shadows leaved you.", logStatusEnd)
 			g.ui.StatusEndAnimation(g)
+			g.ComputeLOS()
+			g.MakeMonstersAware()
 		}
 	}
 }
