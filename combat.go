@@ -6,7 +6,7 @@ import "math"
 
 func (g *game) Absorb(armor int) int {
 	absorb := 0
-	for i := 0; i < 2; i++ {
+	for i := 0; i <= 2; i++ {
 		absorb += RandInt(armor + 1)
 	}
 	return int(math.Round(float64(absorb) / 3))
