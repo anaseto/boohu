@@ -1650,7 +1650,7 @@ func (g *game) MaxDanger() int {
 			adjust += Min(5, g.Depth) * Min(q, Min(5, g.Depth))
 		case TeleportationPotion, DigPotion, WallPotion:
 			adjust += Min(3, g.Depth) * Min(q, 3)
-		case SwiftnessPotion, LignificationPotion, MagicPotion, BerserkPotion, ExplosiveMagara:
+		case SwiftnessPotion, LignificationPotion, MagicPotion, BerserkPotion, ExplosiveMagara, ShadowsPotion:
 			adjust += Min(2, g.Depth) * Min(q, 3)
 		case ConfusingDart:
 			adjust += Min(1, g.Depth) * Min(q, 7)
@@ -1690,10 +1690,10 @@ func (g *game) MaxDanger() int {
 	} else {
 		max = max + adjust
 	}
-	if WinDepth-g.Depth < g.Player.Consumables[MagicMappingPotion] {
+	if g.Player.Consumables[MagicMappingPotion] > 0 && WinDepth-g.Depth < g.Player.Consumables[MagicMappingPotion] {
 		max = max * 110 / 100
 	}
-	if WinDepth-g.Depth < g.Player.Consumables[DreamPotion] {
+	if g.Player.Consumables[DreamPotion] > 0 && WinDepth-g.Depth < g.Player.Consumables[DreamPotion] {
 		max = max * 105 / 100
 	}
 	switch g.Dungeon.Gen {
