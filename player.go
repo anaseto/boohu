@@ -70,9 +70,9 @@ func (p *player) Armor() int {
 	case ChainMail:
 		ar += 6
 	case ScintillatingPlates:
-		ar += 8
+		ar += 7
 	case PonderousnessPlates:
-		ar += 11
+		ar += 10
 	}
 	if p.Aptitudes[AptScales] {
 		ar += 2
