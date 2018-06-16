@@ -75,6 +75,7 @@ type Renderer interface {
 	TeleportAnimation(*game, position, position, bool)
 	MagicMappingAnimation(*game, []int)
 	HitAnimation(*game, position, bool)
+	LightningHitAnimation(*game, []position)
 	WoundedAnimation(*game)
 	WallExplosionAnimation(*game, position)
 	ProjectileTrajectoryAnimation(*game, []position, uicolor)
@@ -307,6 +308,7 @@ func (g *game) InitPlayer() {
 	//g.Player.Aptitudes[AptStealthyMovement] = true
 	//g.Player.Rods[RodSwapping] = rodProps{Charge: 3}
 	//g.Player.Rods[RodFireball] = rodProps{Charge: 3}
+	//g.Player.Rods[RodLightning] = rodProps{Charge: 3}
 	//g.Player.Rods[RodLightningBolt] = rodProps{Charge: 3}
 	//g.Player.Rods[RodShatter] = rodProps{Charge: 3}
 	//g.Player.Rods[RodFog] = rodProps{Charge: 3}

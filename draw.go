@@ -1816,6 +1816,28 @@ func (ui *termui) HitAnimation(g *game, pos position, targeting bool) {
 	time.Sleep(50 * time.Millisecond)
 }
 
+func (ui *termui) LightningHitAnimation(g *game, targets []position) {
+	if DisableAnimations {
+		return
+	}
+	ui.DrawDungeonView(g, NormalMode)
+	time.Sleep(25 * time.Millisecond)
+	colors := [2]uicolor{ColorFgExplosionStart, ColorFgExplosionEnd}
+	for j := 0; j < 2; j++ {
+		for _, pos := range targets {
+			_, _, bgColor := ui.PositionDrawing(g, pos)
+			mons := g.MonsterAt(pos)
+			if mons.Exists() || pos == g.Player.Pos {
+				ui.DrawAtPosition(g, pos, false, '¤', bgColor, colors[RandInt(2)])
+			} else {
+				ui.DrawAtPosition(g, pos, false, '∞', bgColor, colors[RandInt(2)])
+			}
+		}
+		ui.Flush()
+		time.Sleep(100 * time.Millisecond)
+	}
+}
+
 func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgColor uicolor) {
 	m := g.Dungeon
 	c := m.Cell(pos)

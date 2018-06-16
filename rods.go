@@ -13,6 +13,7 @@ const (
 	RodTeleportOther
 	RodFireBolt
 	RodFireBall
+	RodLightning
 	RodFog
 	RodObstruction
 	RodShatter
@@ -55,6 +56,8 @@ func (r rod) String() string {
 		text = "rod of fireball"
 	case RodFireBolt:
 		text = "rod of fire bolt"
+	case RodLightning:
+		text = "rod of lightning"
 	case RodObstruction:
 		text = "rod of obstruction"
 	case RodShatter:
@@ -84,6 +87,8 @@ func (r rod) Desc() string {
 		text = "throws a 1-radius fireball at your foes. You cannot use it at melee range."
 	case RodFireBolt:
 		text = "throws a fire bolt through one or more enemies."
+	case RodLightning:
+		text = "deals electrical damage to foes connected to you."
 	case RodObstruction:
 		text = "creates a temporary wall at targeted location."
 	case RodShatter:
@@ -152,9 +157,11 @@ func (r rod) Use(g *game, ev event) error {
 	case RodTeleportOther:
 		err = g.EvokeRodTeleportOther(ev)
 	case RodFireBolt:
-		err = g.EvokeRodLightningBolt(ev)
+		err = g.EvokeRodFireBolt(ev)
 	case RodFireBall:
 		err = g.EvokeRodFireball(ev)
+	case RodLightning:
+		err = g.EvokeRodLightning(ev)
 	case RodFog:
 		err = g.EvokeRodFog(ev)
 	case RodDigging:
@@ -235,7 +242,7 @@ func (g *game) EvokeRodTeleportOther(ev event) error {
 	return nil
 }
 
-func (g *game) EvokeRodLightningBolt(ev event) error {
+func (g *game) EvokeRodFireBolt(ev event) error {
 	if err := g.ui.ChooseTarget(g, &chooser{flammable: true}); err != nil {
 		return err
 	}
@@ -293,6 +300,65 @@ func (g *game) EvokeRodFireball(ev event) error {
 		g.MakeNoise(MagicHitNoise, mons.Pos)
 		mons.MakeHuntIfHurt(g)
 	}
+	return nil
+}
+
+func (g *game) EvokeRodLightning(ev event) error {
+	d := g.Dungeon
+	conn := map[position]bool{}
+	nb := make([]position, 0, 8)
+	nb = g.Player.Pos.Neighbors(nb, func(npos position) bool {
+		return npos.valid() && d.Cell(npos).T != WallCell
+	})
+	stack := []position{}
+	g.MakeNoise(MagicCastNoise, g.Player.Pos)
+	g.Print("Whoosh! Lightning emerges straight from the rod.")
+	for _, pos := range nb {
+		mons := g.MonsterAt(pos)
+		if !mons.Exists() {
+			continue
+		}
+		stack = append(stack, pos)
+		conn[pos] = true
+	}
+	if len(stack) == 0 {
+		return errors.New("There are no adjacent monsters.")
+	}
+	var pos position
+	targets := []position{}
+	for len(stack) > 0 {
+		pos = stack[len(stack)-1]
+		stack = stack[:len(stack)-1]
+		g.Burn(pos, ev)
+		mons := g.MonsterAt(pos)
+		if !mons.Exists() {
+			continue
+		}
+		targets = append(targets, pos)
+		dmg := 0
+		for i := 0; i < 2; i++ {
+			dmg += RandInt(17)
+		}
+		dmg /= 2
+		mons.HP -= dmg
+		if mons.HP <= 0 {
+			g.Printf("%s is killed by lightning.", mons.Kind.Indefinite(true))
+			g.HandleKill(mons, ev)
+		}
+		g.MakeNoise(MagicHitNoise, mons.Pos)
+		mons.MakeHuntIfHurt(g)
+		nb = pos.Neighbors(nb, func(npos position) bool {
+			return npos.valid() && d.Cell(npos).T != WallCell
+		})
+		for _, npos := range nb {
+			if !conn[npos] {
+				conn[npos] = true
+				stack = append(stack, npos)
+			}
+		}
+	}
+	g.ui.LightningHitAnimation(g, targets)
+
 	return nil
 }
 
