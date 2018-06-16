@@ -20,12 +20,17 @@ type player struct {
 	Target      position
 	LOS         map[position]bool
 	Rays        rayMap
+	Bored       int
 }
 
 func (p *player) HPMax() int {
 	hpmax := 42
 	if p.Aptitudes[AptHealthy] {
 		hpmax += 10
+	}
+	hpmax -= 3 * p.Bored
+	if hpmax < 21 {
+		hpmax = 21
 	}
 	return hpmax
 }
@@ -215,48 +220,30 @@ func (g *game) MonsterCount() (count int) {
 }
 
 func (g *game) BoredomAction(ev event, grade int) {
+	obor := g.Boredom
 	if g.MonsterInLOS() == nil {
 		g.Boredom += grade
 	} else {
 		g.Boredom--
 		if g.Boredom < 0 {
 			g.Boredom = 0
+			g.Player.Bored = 0
 		}
+		return
 	}
-	if g.Boredom == 100 {
+	if g.Boredom >= 120 && obor < 120 {
 		if g.MonsterCount() > 4 {
-			g.PrintStyled("You feel a little bored.", logCritic)
+			g.PrintStyled("You feel a little bored, your health could decline.", logCritic)
 			g.StopAuto()
 		}
 	}
-	if g.Boredom > 120 {
-		if g.MonsterCount() <= 4 {
-			g.Boredom = 0
-			return
-		}
-		g.Player.HP = g.Player.HP / 2
-		if RandInt(2) == 0 {
-			g.MakeNoise(100, g.Player.Pos)
-			neighbors := g.Player.Pos.ValidNeighbors()
-			for _, pos := range neighbors {
-				if RandInt(3) != 0 {
-					g.Dungeon.SetCell(pos, FreeCell)
-					g.ui.WallExplosionAnimation(g, pos)
-					g.Fog(pos, 1, ev)
-					g.Stats.Digs++
-				}
-			}
-			g.PrintfStyled("%s An explosion comes from the ground. You are lignified.", logCritic, g.ExplosionSound())
-			g.Player.Statuses[StatusLignification]++
-			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 240 + RandInt(10), EAction: LignificationEnd})
-		} else {
-			delay := 20 + RandInt(5)
-			g.Player.Statuses[StatusTele] = 1
-			g.PushEvent(&simpleEvent{ERank: ev.Rank() + delay, EAction: Teleportation})
-			g.PrintStyled("Something hurt you! You feel unstable.", logCritic)
-		}
-		g.Boredom = 0
+	if g.Boredom >= 130 && (obor/10 != g.Boredom/10) {
+		g.Player.Bored++
+		g.PrintStyled("You feel unhealthy.", logCritic)
 		g.StopAuto()
+		if g.Player.HP > g.Player.HPMax() {
+			g.Player.HP -= 3
+		}
 	}
 }
 
@@ -264,6 +251,7 @@ func (g *game) FunAction() {
 	g.Boredom -= 15
 	if g.Boredom < 0 {
 		g.Boredom = 0
+		g.Player.Bored = 0
 	}
 }
 
