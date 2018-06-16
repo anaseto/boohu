@@ -11,7 +11,7 @@ const (
 	RodDigging rod = iota
 	RodBlink
 	RodTeleportOther
-	RodLightningBolt
+	RodFireBolt
 	RodFireball
 	RodFog
 	RodObstruction
@@ -53,8 +53,8 @@ func (r rod) String() string {
 		text = "rod of fear"
 	case RodFireball:
 		text = "rod of fireball"
-	case RodLightningBolt:
-		text = "rod of lightning bolt"
+	case RodFireBolt:
+		text = "rod of fire bolt"
 	case RodObstruction:
 		text = "rod of obstruction"
 	case RodShatter:
@@ -82,8 +82,8 @@ func (r rod) Desc() string {
 		text = "creates a dense fog that reduces your (and monster's) line of sight."
 	case RodFireball:
 		text = "throws a 1-radius fireball at your foes. You cannot use it at melee range."
-	case RodLightningBolt:
-		text = "throws a lightning bolt through one or more enemies."
+	case RodFireBolt:
+		text = "throws a fire bolt through one or more enemies."
 	case RodObstruction:
 		text = "creates a temporary wall at targeted location."
 	case RodShatter:
@@ -151,7 +151,7 @@ func (r rod) Use(g *game, ev event) error {
 		err = g.EvokeRodBlink(ev)
 	case RodTeleportOther:
 		err = g.EvokeRodTeleportOther(ev)
-	case RodLightningBolt:
+	case RodFireBolt:
 		err = g.EvokeRodLightningBolt(ev)
 	case RodFireball:
 		err = g.EvokeRodFireball(ev)
@@ -241,7 +241,7 @@ func (g *game) EvokeRodLightningBolt(ev event) error {
 	}
 	ray := g.Ray(g.Player.Target)
 	g.MakeNoise(MagicCastNoise, g.Player.Pos)
-	g.Print("Whoosh! A lightning bolt emerges straight from the rod.")
+	g.Print("Whoosh! A fire bolt emerges straight from the rod.")
 	g.ui.LightningBoltAnimation(g, ray)
 	for _, pos := range ray {
 		g.Burn(pos, ev)
