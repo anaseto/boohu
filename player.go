@@ -69,8 +69,10 @@ func (p *player) Armor() int {
 		ar += 3
 	case ChainMail:
 		ar += 6
+	case ScintillatingPlates:
+		ar += 8
 	case PonderousnessPlates:
-		ar += 10
+		ar += 11
 	}
 	if p.Aptitudes[AptScales] {
 		ar += 2
@@ -116,7 +118,7 @@ func (p *player) Evasion() int {
 		ev += 3
 	}
 	switch p.Armour {
-	case ChainMail:
+	case ChainMail, ScintillatingPlates:
 		ev -= 1
 	case PonderousnessPlates:
 		ev -= 2

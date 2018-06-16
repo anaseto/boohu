@@ -326,6 +326,7 @@ func (g *game) InitPlayer() {
 	//g.Player.Armour = PonderousnessPlates
 	//g.Player.Armour = HarmonistRobe
 	//g.Player.Armour = CelmistRobe
+	//g.Player.Armour = ScintillatingPlates
 }
 
 func (g *game) InitLevel() {
@@ -613,7 +614,7 @@ loop:
 }
 
 func (g *game) GenArmour() {
-	ars := [7]armour{Robe, LeatherArmour, ChainMail, PonderousnessPlates, SpeedRobe, CelmistRobe, HarmonistRobe}
+	ars := [8]armour{Robe, LeatherArmour, ChainMail, ScintillatingPlates, PonderousnessPlates, SpeedRobe, CelmistRobe, HarmonistRobe}
 	n := 11 + 5*g.SeenGoodArmour()
 	if g.SeenGoodArmour() > 2 {
 		return

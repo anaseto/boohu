@@ -68,6 +68,9 @@ func (g *game) buildRayMap(from position, distance int) rayMap {
 
 func (g *game) LosRange() int {
 	losRange := 6
+	if g.Player.Armour == ScintillatingPlates {
+		losRange++
+	}
 	if g.Player.Aptitudes[AptStealthyLOS] {
 		losRange -= 2
 	}
