@@ -462,6 +462,7 @@ func (k keyAction) NormalModeKey() bool {
 		KeyHelp,
 		KeySave,
 		KeyQuit,
+		KeyConfigure,
 		KeyWizard,
 		KeyWizardInfo:
 		return true
