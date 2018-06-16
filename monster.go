@@ -1032,6 +1032,8 @@ func (m *monster) InvertFoliage(g *game) {
 	}
 	if !g.Player.LOS[m.Pos] && invert {
 		g.WrongFoliage[m.Pos] = !g.WrongFoliage[m.Pos]
+	} else if invert {
+		g.ComputeLOS()
 	}
 }
 
