@@ -12,7 +12,7 @@ const (
 	RodBlink
 	RodTeleportOther
 	RodFireBolt
-	RodFireball
+	RodFireBall
 	RodFog
 	RodObstruction
 	RodShatter
@@ -51,7 +51,7 @@ func (r rod) String() string {
 		text = "rod of fog"
 	case RodFear:
 		text = "rod of fear"
-	case RodFireball:
+	case RodFireBall:
 		text = "rod of fireball"
 	case RodFireBolt:
 		text = "rod of fire bolt"
@@ -80,7 +80,7 @@ func (r rod) Desc() string {
 		text = "teleports away one of your foes. Note that the monster remembers where it saw you last time."
 	case RodFog:
 		text = "creates a dense fog that reduces your (and monster's) line of sight."
-	case RodFireball:
+	case RodFireBall:
 		text = "throws a 1-radius fireball at your foes. You cannot use it at melee range."
 	case RodFireBolt:
 		text = "throws a fire bolt through one or more enemies."
@@ -153,7 +153,7 @@ func (r rod) Use(g *game, ev event) error {
 		err = g.EvokeRodTeleportOther(ev)
 	case RodFireBolt:
 		err = g.EvokeRodLightningBolt(ev)
-	case RodFireball:
+	case RodFireBall:
 		err = g.EvokeRodFireball(ev)
 	case RodFog:
 		err = g.EvokeRodFog(ev)
