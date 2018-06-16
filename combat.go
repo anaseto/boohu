@@ -226,7 +226,7 @@ func (g *game) HitNoise(clang bool) int {
 		noise -= 4
 	}
 	if g.Player.Armour == HarmonistRobe {
-		noise -= 2
+		noise -= 3
 	}
 	if g.Player.Armour == Robe {
 		noise -= 1
@@ -265,7 +265,7 @@ func (g *game) HitMonster(dt dmgType, mons *monster, ev event) (hit bool) {
 			noise -= 2
 		}
 		if g.Player.Armour == HarmonistRobe {
-			noise -= 2
+			noise -= 3
 		}
 		if g.Player.Weapon == Frundis {
 			noise -= 4

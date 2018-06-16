@@ -1537,13 +1537,16 @@ func (m *monster) MakeAware(g *game) {
 			max += 3
 		}
 		if g.Player.Armour == HarmonistRobe {
-			max += 3
+			max += 10
 		}
-		r := RandInt(max - 4*adjust)
+		stealth := max - 4*adjust
 		fact := 2
 		if m.Pos.Distance(g.Player.Pos) > 1 {
 			fact = 3
+		} else if stealth > 15 {
+			stealth = 15
 		}
+		r := RandInt(stealth)
 		if g.Player.Aptitudes[AptStealthyMovement] {
 			r *= fact
 		}
@@ -1561,9 +1564,10 @@ func (m *monster) MakeAware(g *game) {
 			max += 5
 		}
 		if g.Player.Armour == HarmonistRobe {
-			max += 5
+			max += 10
 		}
-		r := RandInt(max - 4*adjust)
+		stealth := max - 4*adjust
+		r := RandInt(stealth)
 		if g.Player.Aptitudes[AptStealthyMovement] {
 			r *= 2
 		}
