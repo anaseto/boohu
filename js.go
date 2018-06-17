@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"runtime"
 	"strings"
 	"unicode"
 	"unicode/utf8"
@@ -53,7 +54,9 @@ func (g *game) DataDir() (string, error) {
 }
 
 func (g *game) Save() error {
-	//return errors.New("Saving games is not available in the web html version.") // TODO remove when it works
+	if runtime.GOARCH != "wasm" {
+		return errors.New("Saving games is not available in the web html version.") // TODO remove when it works
+	}
 	save, err := g.GameSave()
 	if err != nil {
 		SaveError = err.Error()
