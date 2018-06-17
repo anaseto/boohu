@@ -779,13 +779,13 @@ func (wp weapon) Desc() string {
 
 func (wp weapon) Attack() int {
 	switch wp {
-	case Axe, Spear, Sabre, DancingRapier, HarKarGauntlets:
+	case Axe, Spear, Sabre, DancingRapier:
 		return 11
 	case BerserkSword:
 		return 17
 	case BattleAxe, Halberd:
 		return 15
-	case Frundis:
+	case Frundis, HarKarGauntlets:
 		return 13
 	case Dagger:
 		return 9
