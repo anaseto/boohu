@@ -11,7 +11,8 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/gopherjs/gopherjs/js"
+	//"github.com/gopherjs/gopherjs/js"
+	"github.com/hajimehoshi/gopherwasm/js"
 )
 
 func main() {
@@ -52,7 +53,7 @@ func (g *game) DataDir() (string, error) {
 }
 
 func (g *game) Save() error {
-	return errors.New("Saving games is not available in the web html version.") // TODO remove when it works
+	//return errors.New("Saving games is not available in the web html version.") // TODO remove when it works
 	save, err := g.GameSave()
 	if err != nil {
 		SaveError = err.Error()
@@ -121,15 +122,15 @@ func (g *game) WriteDump() error {
 
 func (ui *termui) Init() error {
 	ui.cells = make([]UICell, UIWidth*UIHeight)
-	js.Global.Get("document").Call("addEventListener", "keypress", func(e *js.Object) {
+	js.Global.Get("document").Call("addEventListener", "keypress", js.NewEventCallback(0, func(e js.Value) {
 		s := e.Get("key").String()
 		ch <- jsInput{key: s}
-	})
-	js.Global.Get("document").Call("addEventListener", "mousedown", func(e *js.Object) {
+	}))
+	js.Global.Get("document").Call("addEventListener", "mousedown", js.NewEventCallback(0, func(e js.Value) {
 		x, y := ui.GetMousePos(e)
 		ch <- jsInput{mouse: true, mouseX: x, mouseY: y, button: e.Get("button").Int()}
-	})
-	//js.Global.Get("document").Call("addEventListener", "mousemove", func(e *js.Object) {
+	}))
+	//js.Global.Get("document").Call("addEventListener", "mousemove", func(e js.Value) {
 	//x, y := ui.GetMousePos(e)
 	//ui.mouse = position{x, y}
 	//})
@@ -225,14 +226,14 @@ func (ui *termui) Clear() {
 }
 
 func (ui *termui) Flush() {
-	js.Global.Get("window").Call("requestAnimationFrame", ui.FlushCallback)
+	js.Global.Get("window").Call("requestAnimationFrame", js.NewEventCallback(0, ui.FlushCallback))
 }
 
 func (ui *termui) Small() bool {
 	return false
 }
 
-func (ui *termui) FlushCallback(obj *js.Object) {
+func (ui *termui) FlushCallback(obj js.Value) {
 	for i := 0; i < len(ui.cells); i++ {
 		if ui.cells[i] == ui.backBuffer[i] {
 			continue

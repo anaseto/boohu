@@ -2,34 +2,32 @@
 
 package main
 
-import "github.com/gopherjs/gopherjs/js"
+import "github.com/hajimehoshi/gopherwasm/js"
 
 type termui struct {
 	cells      []UICell
 	backBuffer []UICell
 	cursor     position
-	display    *js.Object
-	cache      map[UICell]*js.Object
-	ctx        *js.Object
+	display    js.Value
+	cache      map[UICell]js.Value
+	ctx        js.Value
 	width      int
 }
 
 func (ui *termui) InitElements() error {
 	canvas := js.Global.Get("document").Call("getElementById", "gamecanvas")
-	canvas.Call("addEventListener", "contextmenu", func(e *js.Object) bool {
-		e.Call("preventDefault")
-		return false
-	}, false)
+	canvas.Call("addEventListener", "contextmenu", js.NewEventCallback(js.PreventDefault, func(e js.Value) {
+	}), false)
 	ui.ctx = canvas.Call("getContext", "2d")
 	ui.ctx.Set("font", "18px monospace")
 	mesure := ui.ctx.Call("measureText", "W")
 	ui.width = mesure.Get("width").Int() + 1
-	ui.cache = make(map[UICell]*js.Object)
+	ui.cache = make(map[UICell]js.Value)
 	return nil
 }
 
 func (ui *termui) Draw(cell UICell, x, y int) {
-	var canvas *js.Object
+	var canvas js.Value
 	if cv, ok := ui.cache[cell]; ok {
 		canvas = cv
 	} else {
@@ -47,7 +45,7 @@ func (ui *termui) Draw(cell UICell, x, y int) {
 	ui.ctx.Call("drawImage", canvas, x*ui.width, 22*y)
 }
 
-func (ui *termui) GetMousePos(evt *js.Object) (x, y int) {
+func (ui *termui) GetMousePos(evt js.Value) (x, y int) {
 	canvas := js.Global.Get("document").Call("getElementById", "gamecanvas")
 	rect := canvas.Call("getBoundingClientRect")
 	x = evt.Get("clientX").Int() - rect.Get("left").Int()
