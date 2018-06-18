@@ -67,6 +67,8 @@ func (p *player) Armor() int {
 	switch p.Armour {
 	case LeatherArmour:
 		ar += 3
+	case SmokingScales:
+		ar += 4
 	case ChainMail:
 		ar += 6
 	case ScintillatingPlates:
@@ -396,10 +398,6 @@ func (g *game) MovePlayer(pos position, ev event) error {
 			g.Fog(pos, 1, ev)
 			g.Stats.Digs++
 		}
-		g.PlacePlayerAt(pos)
-		if !g.Autoexploring {
-			g.BoredomAction(ev, 1)
-		}
 		if g.Player.Aptitudes[AptFast] {
 			// only fast for movement
 			delay -= 2
@@ -409,12 +407,22 @@ func (g *game) MovePlayer(pos position, ev event) error {
 			delay += 2
 		case SpeedRobe:
 			delay -= 3
+		case SmokingScales:
+			_, ok := g.Clouds[g.Player.Pos]
+			if !ok {
+				g.Clouds[g.Player.Pos] = CloudFog
+				g.PushEvent(&cloudEvent{ERank: ev.Rank() + 20 + RandInt(10), EAction: CloudEnd, Pos: g.Player.Pos})
+			}
 		}
 		if g.Player.HasStatus(StatusSwift) {
 			// only fast for movement
 			delay -= 3
 		}
 		g.Stats.Moves++
+		g.PlacePlayerAt(pos)
+		if !g.Autoexploring {
+			g.BoredomAction(ev, 1)
+		}
 	} else {
 		g.FunAction()
 		g.AttackMonster(mons, ev)
