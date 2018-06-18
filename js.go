@@ -95,7 +95,7 @@ func (g *game) Load() (bool, error) {
 		return true, errors.New("localStorage not found")
 	}
 	save := storage.Call("getItem", "boohusave")
-	if !save.Bool() {
+	if !save.Bool() || runtime.GOARCH != "wasm" {
 		return false, nil
 	}
 	s, err := base64.StdEncoding.DecodeString(save.String())
