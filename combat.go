@@ -2,14 +2,17 @@
 
 package main
 
-import "math"
-
 func (g *game) Absorb(armor int) int {
 	absorb := 0
 	for i := 0; i <= 2; i++ {
 		absorb += RandInt(armor + 1)
 	}
-	return int(math.Round(float64(absorb) / 3))
+	q := absorb / 3
+	r := absorb % 3
+	if r == 2 {
+		q++
+	}
+	return q
 }
 
 func (g *game) HitDamage(dt dmgType, base int, armor int) (attack int, clang bool) {
