@@ -65,10 +65,8 @@ func (p *player) RangedAccuracy() int {
 func (p *player) Armor() int {
 	ar := 0
 	switch p.Armour {
-	case LeatherArmour:
+	case LeatherArmour, SmokingScales:
 		ar += 3
-	case SmokingScales:
-		ar += 4
 	case ChainMail:
 		ar += 6
 	case ScintillatingPlates:
