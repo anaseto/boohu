@@ -65,8 +65,10 @@ func (p *player) RangedAccuracy() int {
 func (p *player) Armor() int {
 	ar := 0
 	switch p.Armour {
-	case LeatherArmour, SmokingScales:
+	case LeatherArmour:
 		ar += 3
+	case SmokingScales:
+		ar += 4
 	case ChainMail:
 		ar += 6
 	case ScintillatingPlates:
@@ -409,7 +411,7 @@ func (g *game) MovePlayer(pos position, ev event) error {
 			_, ok := g.Clouds[g.Player.Pos]
 			if !ok {
 				g.Clouds[g.Player.Pos] = CloudFog
-				g.PushEvent(&cloudEvent{ERank: ev.Rank() + 20 + RandInt(10), EAction: CloudEnd, Pos: g.Player.Pos})
+				g.PushEvent(&cloudEvent{ERank: ev.Rank() + 15 + RandInt(10), EAction: CloudEnd, Pos: g.Player.Pos})
 			}
 		}
 		if g.Player.HasStatus(StatusSwift) {
