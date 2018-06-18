@@ -559,14 +559,14 @@ func (g *game) SeenGoodShield() (count int) {
 
 func (g *game) GenShield() {
 	ars := [4]shield{Buckler, ConfusingShield, BashingShield, EarthShield}
-	n := 11 + 5*g.SeenGoodShield()
+	n := 12 + 5*g.SeenGoodShield()
 	if g.SeenGoodShield() == 2 {
 		return
 	}
 	if g.SeenGoodShield() == 0 {
 		n -= 2 * g.Depth
 		if n < 2 {
-			if g.Depth < 6 {
+			if g.Depth < 8 {
 				n = 2
 			} else {
 				n = 1
