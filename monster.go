@@ -1621,7 +1621,7 @@ func (m *monster) GatherBand(g *game) {
 				continue
 			}
 			n, ok := nm[mons.Pos]
-			if !ok || n.Cost > 4 {
+			if !ok || n.Cost > 4 || mons.State == Resting && mons.Status(MonsExhausted) && RandInt(2) == 0 {
 				continue
 			}
 			r := RandInt(100)

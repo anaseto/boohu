@@ -81,6 +81,9 @@ func (g *game) MakeNoise(noise int, at position) {
 		if m.State == Resting {
 			v /= 2
 		}
+		if m.Status(MonsExhausted) {
+			v = 2 * v / 3
+		}
 		if v > r {
 			if g.Player.LOS[m.Pos] {
 				m.MakeHunt(g)
