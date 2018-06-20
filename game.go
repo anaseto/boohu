@@ -475,7 +475,7 @@ func (g *game) InitLevel() {
 		g.CleanEvents()
 	}
 	for i := range g.Monsters {
-		g.PushEvent(&monsterEvent{ERank: g.Turn + 1, EAction: MonsterTurn, NMons: i})
+		g.PushEvent(&monsterEvent{ERank: g.Turn + RandInt(10), EAction: MonsterTurn, NMons: i})
 	}
 }
 
