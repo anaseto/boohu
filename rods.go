@@ -250,15 +250,22 @@ func (g *game) EvokeRodTeleportOther(ev event) error {
 }
 
 func (g *game) EvokeRodSleeping(ev event) error {
-	if err := g.ui.ChooseTarget(g, &chooser{}); err != nil {
+	if err := g.ui.ChooseTarget(g, &chooser{area: true, minDist: true}); err != nil {
 		return err
 	}
-	mons := g.MonsterAt(g.Player.Target)
-	// mons not nil (check done in the targeter)
-	mons.State = Resting
-	if !mons.Status(MonsExhausted) {
-		mons.Statuses[MonsExhausted] = 1
-		g.PushEvent(&monsterEvent{ERank: ev.Rank() + 30 + RandInt(20), NMons: mons.Index, EAction: MonsExhaustionEnd})
+	neighbors := g.Dungeon.FreeNeighbors(g.Player.Target)
+	g.Print("A sleeping ball emerges straight from the rod.")
+	g.ui.ProjectileTrajectoryAnimation(g, g.Ray(g.Player.Target), ColorFgSleepingMonster)
+	for _, pos := range append(neighbors, g.Player.Target) {
+		mons := g.MonsterAt(pos)
+		if !mons.Exists() {
+			continue
+		}
+		mons.State = Resting
+		if !mons.Status(MonsExhausted) {
+			mons.Statuses[MonsExhausted] = 1
+			g.PushEvent(&monsterEvent{ERank: ev.Rank() + 30 + RandInt(20), NMons: mons.Index, EAction: MonsExhaustionEnd})
+		}
 	}
 	return nil
 }
