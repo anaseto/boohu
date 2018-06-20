@@ -17,6 +17,7 @@ const (
 	RodFog
 	RodObstruction
 	RodShatter
+	RodSleeping
 	RodSwapping
 	// below unimplemented
 	RodConfusingClouds
@@ -62,6 +63,8 @@ func (r rod) String() string {
 		text = "rod of obstruction"
 	case RodShatter:
 		text = "rod of shatter"
+	case RodSleeping:
+		text = "rod of sleeping"
 	case RodSwapping:
 		text = "rod of swapping"
 	case RodFreezingClouds:
@@ -93,6 +96,8 @@ func (r rod) Desc() string {
 		text = "creates a temporary wall at targeted location."
 	case RodShatter:
 		text = "induces an explosion around a wall, hurting adjacent monsters. The wall can disintegrate. You cannot use it at melee range."
+	case RodSleeping:
+		text = "induces sleeping and exhaustion in targeted monster."
 	case RodSwapping:
 		text = "makes you swap positions with a targeted monster."
 	case RodFear:
@@ -170,6 +175,8 @@ func (r rod) Use(g *game, ev event) error {
 		err = g.EvokeRodObstruction(ev)
 	case RodShatter:
 		err = g.EvokeRodShatter(ev)
+	case RodSleeping:
+		err = g.EvokeRodSleeping(ev)
 	case RodSwapping:
 		err = g.EvokeRodSwapping(ev)
 	}
@@ -239,6 +246,20 @@ func (g *game) EvokeRodTeleportOther(ev event) error {
 	mons := g.MonsterAt(g.Player.Target)
 	// mons not nil (check done in the targeter)
 	mons.TeleportAway(g)
+	return nil
+}
+
+func (g *game) EvokeRodSleeping(ev event) error {
+	if err := g.ui.ChooseTarget(g, &chooser{}); err != nil {
+		return err
+	}
+	mons := g.MonsterAt(g.Player.Target)
+	// mons not nil (check done in the targeter)
+	mons.State = Resting
+	if !mons.Status(MonsExhausted) {
+		mons.Statuses[MonsExhausted] = 1
+		g.PushEvent(&monsterEvent{ERank: ev.Rank() + 30 + RandInt(20), NMons: mons.Index, EAction: MonsExhaustionEnd})
+	}
 	return nil
 }
 

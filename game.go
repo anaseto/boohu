@@ -312,6 +312,7 @@ func (g *game) InitPlayer() {
 	//g.Player.Rods[RodLightningBolt] = rodProps{Charge: 3}
 	//g.Player.Rods[RodShatter] = rodProps{Charge: 3}
 	//g.Player.Rods[RodFog] = rodProps{Charge: 3}
+	//g.Player.Rods[RodSleeping] = rodProps{Charge: 3}
 	//g.Player.Consumables[MagicMappingPotion] = 1
 	//g.Player.Consumables[ExplosiveMagara] = 5
 	//g.Player.Consumables[DigPotion] = 5
