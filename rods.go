@@ -97,7 +97,7 @@ func (r rod) Desc() string {
 	case RodShatter:
 		text = "induces an explosion around a wall, hurting adjacent monsters. The wall can disintegrate. You cannot use it at melee range."
 	case RodSleeping:
-		text = "induces sleeping and exhaustion in targeted monster."
+		text = "induces sleeping and exhaustion for monsters in the targeted area."
 	case RodSwapping:
 		text = "makes you swap positions with a targeted monster."
 	case RodFear:
