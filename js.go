@@ -37,6 +37,12 @@ func main() {
 		g.InitLevel()
 		g.Printf("Error loading saved game… starting new game. (%v)", err)
 	}
+	load, err = g.LoadConfig()
+	if load && err != nil {
+		g.Print("Error loading config file.")
+	} else if load {
+		CustomKeys = true
+	}
 	g.ui = tui
 	g.EventLoop()
 	tui.Clear()
@@ -74,6 +80,22 @@ func (g *game) Save() error {
 }
 
 func (g *game) SaveConfig() error {
+	if runtime.GOARCH != "wasm" {
+		return nil
+	}
+	conf, err := gameConfig.ConfigSave()
+	if err != nil {
+		SaveError = err.Error()
+		return err
+	}
+	storage := js.Global.Get("localStorage")
+	if !storage.Bool() {
+		SaveError = "localStorage not found"
+		return errors.New("localStorage not found")
+	}
+	s := base64.StdEncoding.EncodeToString(conf)
+	storage.Call("setItem", "boohuconfig", s)
+	SaveError = "no errors"
 	return nil
 }
 
@@ -110,6 +132,33 @@ func (g *game) Load() (bool, error) {
 
 	// // XXX: gob encoding works badly with gopherjs, it seems, some maps get broken
 
+	return true, nil
+}
+
+func (g *game) LoadConfig() (bool, error) {
+	storage := js.Global.Get("localStorage")
+	if !storage.Bool() {
+		return true, errors.New("localStorage not found")
+	}
+	conf := storage.Call("getItem", "boohuconfig")
+	if !conf.Bool() || runtime.GOARCH != "wasm" {
+		return false, nil
+	}
+	s, err := base64.StdEncoding.DecodeString(conf.String())
+	if err != nil {
+		return true, err
+	}
+	c, err := g.DecodeConfigSave(s)
+	if err != nil {
+		return true, err
+	}
+	gameConfig = *c
+	if gameConfig.RuneNormalModeKeys == nil || gameConfig.RuneTargetModeKeys == nil {
+		ApplyDefaultKeyBindings()
+	}
+	if gameConfig.DarkLOS {
+		ApplyDarkLOS()
+	}
 	return true, nil
 }
 
