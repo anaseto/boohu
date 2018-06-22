@@ -1328,6 +1328,8 @@ func (ui *termui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, dat
 			notarg = true
 		}
 		g.Targeting = InvalidPos
+	case KeyConfigure:
+		err = ui.HandleSettingAction(g)
 	case KeySave:
 		g.Ev.Renew(g, 0)
 		g.Highlight = nil
