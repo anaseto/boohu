@@ -104,7 +104,7 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 		if !g.HitMonster(DmgPhysical, mons, ev) {
 			break
 		}
-		if RandInt(4) == 0 {
+		if RandInt(2) == 0 {
 			mons.EnterConfusion(g, ev)
 			g.PrintfStyled("Frundis glows… %s appears confused.", logPlayerHit, mons.Kind.Definite(false))
 		}
