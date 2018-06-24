@@ -18,12 +18,13 @@ func (g *game) Absorb(armor int) int {
 func (g *game) HitDamage(dt dmgType, base int, armor int) (attack int, clang bool) {
 	min := base / 2
 	attack = min + RandInt(base-min+1)
-	if dt == DmgPhysical {
-		absorb := g.Absorb(armor)
-		if absorb > 0 && absorb >= 2*armor/3 && RandInt(2) == 0 {
-			clang = true
-		}
-		attack -= absorb
+	absorb := g.Absorb(armor)
+	if dt == DmgMagical {
+		absorb /= 2
+	}
+	attack -= absorb
+	if absorb > 0 && absorb >= 2*armor/3 && RandInt(2) == 0 {
+		clang = true
 	}
 	if attack < 0 {
 		attack = 0
