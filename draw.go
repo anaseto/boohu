@@ -1406,11 +1406,13 @@ loop:
 		ui.SetCursor(pos)
 		ui.DrawDungeonView(g, TargetingMode)
 		ui.DrawInfoLine(g.InfoEntry)
-		st := " Examine/Travel (? for help) "
-		if _, ok := targ.(*examiner); !ok {
-			st = " Targeting (? for help) "
+		if !ui.Small() {
+			st := " Examine/Travel (? for help) "
+			if _, ok := targ.(*examiner); !ok {
+				st = " Targeting (? for help) "
+			}
+			ui.DrawStyledTextLine(st, DungeonHeight+2, FooterLine)
 		}
-		ui.DrawStyledTextLine(st, DungeonHeight+2, FooterLine)
 		ui.SetCell(DungeonWidth, DungeonHeight, '┤', ColorFg, ColorBg)
 		ui.Flush()
 		data.npos = pos
