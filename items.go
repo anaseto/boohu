@@ -922,15 +922,3 @@ type equipableData struct {
 	rarity   int
 	minDepth int
 }
-
-func (data equipableData) FavorableRoll(lateness int) int {
-	ratio := data.rarity / (2 * lateness)
-	if ratio < 2 {
-		ratio = 2
-	}
-	r := RandInt(ratio)
-	if r != 0 && ratio == 2 && lateness >= 3 {
-		r = RandInt(ratio)
-	}
-	return r
-}
