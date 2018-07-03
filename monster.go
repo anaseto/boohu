@@ -246,6 +246,8 @@ const (
 	LoneEarlySpecter
 	LoneEarlySatowalgaPlant
 	LoneEarlyEarthDragon
+	LoneEarlyHydra
+	LoneEarlyLich
 	BandGoblins
 	BandGoblinsMany
 	BandGoblinsHound
@@ -365,7 +367,9 @@ var MonsBands = []monsterBandData{
 	LoneEarlyBrizzia:        {rarity: 200, minDepth: 1, maxDepth: 6, monster: MonsBrizzia, unique: true},
 	LoneEarlySpecter:        {rarity: 150, minDepth: 1, maxDepth: 5, monster: MonsMirrorSpecter, unique: true},
 	LoneEarlySatowalgaPlant: {rarity: 150, minDepth: 1, maxDepth: 4, monster: MonsSatowalgaPlant, unique: true},
-	LoneEarlyEarthDragon:    {rarity: 350, minDepth: 5, maxDepth: 7, monster: MonsEarthDragon, unique: true},
+	LoneEarlyEarthDragon:    {rarity: 350, minDepth: 6, maxDepth: 7, monster: MonsEarthDragon, unique: true},
+	LoneEarlyHydra:          {rarity: 350, minDepth: 4, maxDepth: 5, monster: MonsHydra, unique: true},
+	LoneEarlyLich:           {rarity: 350, minDepth: 5, maxDepth: 6, monster: MonsLich, unique: true},
 	BandGoblins: {
 		distribution: map[monsterKind]monsInterval{MonsGoblin: {2, 3}},
 		rarity:       17, minDepth: 1, maxDepth: 5, band: true,
