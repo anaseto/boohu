@@ -240,6 +240,12 @@ const (
 	LoneAcidMound
 	LoneExplosiveNadre
 	LoneSatowalgaPlant
+	LoneEarlyNixe
+	LoneEarlyAcidMound
+	LoneEarlyBrizzia
+	LoneEarlySpecter
+	LoneEarlySatowalgaPlant
+	LoneEarlyEarthDragon
 	BandGoblins
 	BandGoblinsMany
 	BandGoblinsHound
@@ -337,23 +343,29 @@ func (g *game) GenBand(mbd monsterBandData, band monsterBand) []monsterKind {
 }
 
 var MonsBands = []monsterBandData{
-	LoneGoblin:         {rarity: 10, minDepth: 0, maxDepth: 5, monster: MonsGoblin},
-	LoneOgre:           {rarity: 15, minDepth: 2, maxDepth: 11, monster: MonsOgre},
-	LoneWorm:           {rarity: 10, minDepth: 0, maxDepth: 6, monster: MonsWorm},
-	LoneRareWorm:       {rarity: 90, minDepth: 7, maxDepth: 13, monster: MonsWorm},
-	LoneBrizzia:        {rarity: 90, minDepth: 7, maxDepth: 13, monster: MonsBrizzia},
-	LoneHound:          {rarity: 20, minDepth: 1, maxDepth: 8, monster: MonsHound},
-	LoneHydra:          {rarity: 45, minDepth: 8, maxDepth: 13, monster: MonsHydra},
-	LoneSpider:         {rarity: 20, minDepth: 3, maxDepth: 13, monster: MonsSpider},
-	LoneMilfid:         {rarity: 100, minDepth: 3, maxDepth: 13, monster: MonsWingedMilfid},
-	LoneBlinkingFrog:   {rarity: 50, minDepth: 4, maxDepth: 13, monster: MonsBlinkingFrog},
-	LoneCyclop:         {rarity: 35, minDepth: 4, maxDepth: 13, monster: MonsCyclop},
-	LoneLich:           {rarity: 70, minDepth: 9, maxDepth: 13, monster: MonsLich},
-	LoneEarthDragon:    {rarity: 80, minDepth: 10, maxDepth: 13, monster: MonsEarthDragon},
-	LoneSpecter:        {rarity: 70, minDepth: 6, maxDepth: 13, monster: MonsMirrorSpecter},
-	LoneAcidMound:      {rarity: 70, minDepth: 6, maxDepth: 13, monster: MonsAcidMound},
-	LoneExplosiveNadre: {rarity: 55, minDepth: 3, maxDepth: 7, monster: MonsExplosiveNadre},
-	LoneSatowalgaPlant: {rarity: 80, minDepth: 5, maxDepth: 13, monster: MonsSatowalgaPlant},
+	LoneGoblin:              {rarity: 10, minDepth: 0, maxDepth: 5, monster: MonsGoblin},
+	LoneOgre:                {rarity: 15, minDepth: 2, maxDepth: 11, monster: MonsOgre},
+	LoneWorm:                {rarity: 10, minDepth: 0, maxDepth: 6, monster: MonsWorm},
+	LoneRareWorm:            {rarity: 90, minDepth: 7, maxDepth: 13, monster: MonsWorm},
+	LoneBrizzia:             {rarity: 90, minDepth: 7, maxDepth: 13, monster: MonsBrizzia},
+	LoneHound:               {rarity: 20, minDepth: 1, maxDepth: 8, monster: MonsHound},
+	LoneHydra:               {rarity: 45, minDepth: 8, maxDepth: 13, monster: MonsHydra},
+	LoneSpider:              {rarity: 20, minDepth: 3, maxDepth: 13, monster: MonsSpider},
+	LoneMilfid:              {rarity: 100, minDepth: 3, maxDepth: 13, monster: MonsWingedMilfid},
+	LoneBlinkingFrog:        {rarity: 50, minDepth: 4, maxDepth: 13, monster: MonsBlinkingFrog},
+	LoneCyclop:              {rarity: 35, minDepth: 4, maxDepth: 13, monster: MonsCyclop},
+	LoneLich:                {rarity: 70, minDepth: 9, maxDepth: 13, monster: MonsLich},
+	LoneEarthDragon:         {rarity: 80, minDepth: 10, maxDepth: 13, monster: MonsEarthDragon},
+	LoneSpecter:             {rarity: 70, minDepth: 6, maxDepth: 13, monster: MonsMirrorSpecter},
+	LoneAcidMound:           {rarity: 70, minDepth: 6, maxDepth: 13, monster: MonsAcidMound},
+	LoneExplosiveNadre:      {rarity: 55, minDepth: 3, maxDepth: 7, monster: MonsExplosiveNadre},
+	LoneSatowalgaPlant:      {rarity: 80, minDepth: 5, maxDepth: 13, monster: MonsSatowalgaPlant},
+	LoneEarlyNixe:           {rarity: 200, minDepth: 1, maxDepth: 7, monster: MonsMadNixe, unique: true},
+	LoneEarlyAcidMound:      {rarity: 150, minDepth: 1, maxDepth: 5, monster: MonsAcidMound, unique: true},
+	LoneEarlyBrizzia:        {rarity: 200, minDepth: 1, maxDepth: 6, monster: MonsBrizzia, unique: true},
+	LoneEarlySpecter:        {rarity: 150, minDepth: 1, maxDepth: 5, monster: MonsMirrorSpecter, unique: true},
+	LoneEarlySatowalgaPlant: {rarity: 150, minDepth: 1, maxDepth: 4, monster: MonsSatowalgaPlant, unique: true},
+	LoneEarlyEarthDragon:    {rarity: 350, minDepth: 5, maxDepth: 7, monster: MonsEarthDragon, unique: true},
 	BandGoblins: {
 		distribution: map[monsterKind]monsInterval{MonsGoblin: {2, 3}},
 		rarity:       17, minDepth: 1, maxDepth: 5, band: true,
