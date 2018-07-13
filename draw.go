@@ -1553,15 +1553,15 @@ func (ui *termui) DrawDungeonView(g *game, m uiMode) {
 	}
 	line := 0
 	if !ui.Small() {
-		ui.DrawText(fmt.Sprintf("[ %v (%d)", g.Player.Armour, g.Player.Armor()), BarCol, line)
+		ui.DrawText(fmt.Sprintf("[ %v(%d)", g.Player.Armour, g.Player.Armor()), BarCol, line)
 		line++
-		ui.DrawText(fmt.Sprintf(") %v (%d)", g.Player.Weapon, g.Player.Attack()), BarCol, line)
+		ui.DrawText(fmt.Sprintf(") %v(%d)", g.Player.Weapon, g.Player.Attack()), BarCol, line)
 		line++
 		if g.Player.Shield != NoShield {
 			if g.Player.Weapon.TwoHanded() {
 				ui.DrawText(fmt.Sprintf("] %v (unusable)", g.Player.Shield), BarCol, line)
 			} else {
-				ui.DrawText(fmt.Sprintf("] %v (%d)", g.Player.Shield, g.Player.Block()), BarCol, line)
+				ui.DrawText(fmt.Sprintf("] %v(%d)", g.Player.Shield, g.Player.Block()), BarCol, line)
 			}
 		}
 		line++
@@ -2026,7 +2026,7 @@ func (ui *termui) DrawStatusBar(g *game, line int) {
 			fg = ColorFgStatusBad
 		}
 		if g.Player.Statuses[st] > 1 {
-			ui.DrawColoredText(fmt.Sprintf("%s (%d)", st, g.Player.Statuses[st]), BarCol, line, fg)
+			ui.DrawColoredText(fmt.Sprintf("%s(%d)", st, g.Player.Statuses[st]), BarCol, line, fg)
 		} else {
 			ui.DrawColoredText(st.String(), BarCol, line, fg)
 		}
