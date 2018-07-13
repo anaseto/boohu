@@ -226,15 +226,26 @@ func (g *game) ComputeRayHighlight(pos position) {
 
 func (g *game) ComputeNoise() {
 	dij := &noisePath{game: g}
-	nm := Dijkstra(dij, []position{g.Player.Pos}, g.LosRange()+2)
+	rg := g.LosRange() + 2
+	if rg <= 5 {
+		rg++
+	}
+	if g.Player.Aptitudes[AptHear] {
+		rg++
+	}
+	nm := Dijkstra(dij, []position{g.Player.Pos}, rg)
 	count := 0
 	noise := map[position]bool{}
+	rmax := 3
+	if g.Player.Aptitudes[AptHear] {
+		rmax--
+	}
 	for pos := range nm {
 		if g.Player.LOS[pos] {
 			continue
 		}
 		mons := g.MonsterAt(pos)
-		if mons.Exists() && mons.State != Resting && RandInt(3) == 0 {
+		if mons.Exists() && mons.State != Resting && RandInt(rmax) == 0 {
 			switch mons.Kind {
 			case MonsMirrorSpecter, MonsGiantBee, MonsSatowalgaPlant:
 				// no footsteps

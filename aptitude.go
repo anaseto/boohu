@@ -13,6 +13,7 @@ const (
 	AptMagic
 	AptConfusingGas
 	AptSmoke
+	AptHear
 	AptStrong
 )
 
@@ -31,6 +32,8 @@ func (ap aptitude) String() string {
 		text = "You move stealthily."
 	case AptScales:
 		text = "You are covered by scales."
+	case AptHear:
+		text = "You have good ears."
 	case AptStrong:
 		text = "You are strong."
 	case AptMagic:
