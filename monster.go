@@ -202,7 +202,7 @@ var monsDesc = []string{
 	MonsWorm:            "Farmer worms are ugly slow moving creatures, but surprisingly hardy at times, and they furrow as they move, helping new foliage to grow.",
 	MonsBrizzia:         "Brizzias are big slow moving biped creatures. They are quite hardy, and when hurt they can cause nausea, impeding the use of potions.",
 	MonsAcidMound:       "Acid mounds are acidic creatures. They can temporally corrode your equipment.",
-	MonsHound:           "Hounds are fast moving carnivore quadrupeds. They sometimes attack in group.",
+	MonsHound:           "Hounds are fast moving carnivore quadrupeds. They can bark. They can smell you.",
 	MonsYack:            "Yacks are quite large herbivorous quadrupeds. They tend to form large groups. They can push you one cell away.",
 	MonsGiantBee:        "Giant bees are fragile, but extremely fast moving creatures. Their bite can sometimes enrage you.",
 	MonsGoblinWarrior:   "Goblin warriors are goblins that learned to fight, and got equipped with a leather armour. They can throw javelins.",
@@ -350,7 +350,7 @@ var MonsBands = []monsterBandData{
 	LoneWorm:                {rarity: 10, minDepth: 0, maxDepth: 6, monster: MonsWorm},
 	LoneRareWorm:            {rarity: 90, minDepth: 7, maxDepth: 13, monster: MonsWorm},
 	LoneBrizzia:             {rarity: 90, minDepth: 7, maxDepth: 13, monster: MonsBrizzia},
-	LoneHound:               {rarity: 20, minDepth: 1, maxDepth: 8, monster: MonsHound},
+	LoneHound:               {rarity: 25, minDepth: 1, maxDepth: 8, monster: MonsHound},
 	LoneHydra:               {rarity: 45, minDepth: 8, maxDepth: 13, monster: MonsHydra},
 	LoneSpider:              {rarity: 20, minDepth: 3, maxDepth: 13, monster: MonsSpider},
 	LoneMilfid:              {rarity: 100, minDepth: 3, maxDepth: 13, monster: MonsWingedMilfid},
@@ -428,11 +428,11 @@ var MonsBands = []monsterBandData{
 	},
 	BandHounds: {
 		distribution: map[monsterKind]monsInterval{MonsHound: {2, 2}, MonsGoblin: {1, 1}},
-		rarity:       35, minDepth: 2, maxDepth: 10, band: true,
+		rarity:       55, minDepth: 2, maxDepth: 10, band: true,
 	},
 	BandHoundsMany: {
 		distribution: map[monsterKind]monsInterval{MonsHound: {3, 3}},
-		rarity:       65, minDepth: 2, maxDepth: 10, band: true,
+		rarity:       100, minDepth: 2, maxDepth: 10, band: true,
 	},
 	BandSpiders: {
 		distribution: map[monsterKind]monsInterval{MonsSpider: {2, 3}},
@@ -524,7 +524,7 @@ var MonsBands = []monsterBandData{
 	},
 	UBandGoblinsEasy: {
 		distribution: map[monsterKind]monsInterval{
-			MonsGoblin: {3, 4},
+			MonsGoblin: {3, 3},
 			MonsHound:  {2, 2},
 		},
 		rarity: 30, minDepth: 5, maxDepth: 5, band: true, unique: true,
@@ -539,9 +539,9 @@ var MonsBands = []monsterBandData{
 	},
 	UBandGoblins: {
 		distribution: map[monsterKind]monsInterval{
-			MonsGoblin:        {2, 3},
+			MonsGoblin:        {3, 3},
 			MonsGoblinWarrior: {2, 2},
-			MonsHound:         {1, 2},
+			MonsHound:         {1, 1},
 		},
 		rarity: 30, minDepth: 8, maxDepth: 8, band: true, unique: true,
 	},
@@ -961,7 +961,12 @@ func (m *monster) HandleTurn(g *game, ev event) {
 			m.GatherBand(g)
 		case Hunting:
 			// pick a random cell: more escape strategies for the player
-			m.Target = g.FreeCell()
+			if m.Kind == MonsHound && m.Pos.Distance(g.Player.Pos) <= 6 &&
+				!(g.Player.Aptitudes[AptStealthyMovement] && RandInt(2) == 0) {
+				m.Target = g.Player.Pos
+			} else {
+				m.Target = g.FreeCell()
+			}
 			m.State = Wandering
 			m.GatherBand(g)
 		}
