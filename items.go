@@ -761,9 +761,9 @@ func (wp weapon) Desc() string {
 	case Dagger:
 		text = "A dagger is the most basic weapon. Great against sleeping monsters, but that's all."
 	case Axe:
-		text = "An axe is a one-handed weapon that can hit at once any foes adjacent to you."
+		text = "An axe is a one-handed weapon that can hit at once any foes adjacent to you, dealing extra damage in the open."
 	case BattleAxe:
-		text = "A battle axe is a big two-handed weapon that can hit at once any foes adjacent to you."
+		text = "A battle axe is a big two-handed weapon that can hit at once any foes adjacent to you, dealing extra damage in the open."
 	case Spear:
 		text = "A spear is a one-handed weapon that can hit two opponents in a row at once. Useful in corridors."
 	case Halberd:

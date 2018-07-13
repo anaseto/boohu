@@ -97,6 +97,19 @@ func (g *game) MakeNoise(noise int, at position) {
 	}
 }
 
+func (g *game) InOpenMons(mons *monster) bool {
+	neighbors := g.Dungeon.FreeNeighbors(g.Player.Pos)
+	for _, pos := range neighbors {
+		if pos.Distance(mons.Pos) > 1 {
+			continue
+		}
+		if g.Dungeon.Cell(pos).T == WallCell {
+			return false
+		}
+	}
+	return true
+}
+
 func (g *game) AttackMonster(mons *monster, ev event) {
 	switch {
 	case g.Player.HasStatus(StatusSwap) && !g.Player.HasStatus(StatusLignification):
@@ -281,7 +294,11 @@ func (g *game) HitMonster(dt dmgType, mons *monster, ev event) (hit bool) {
 		if g.Player.HasStatus(StatusBerserk) {
 			bonus += 2 + RandInt(4)
 		}
-		attack, clang := g.HitDamage(dt, g.Player.Attack()+bonus, mons.Armor)
+		pa := g.Player.Attack() + bonus
+		if g.Player.Weapon.Cleave() && g.InOpenMons(mons) {
+			pa += 1 + RandInt(2)
+		}
+		attack, clang := g.HitDamage(dt, pa, mons.Armor)
 		if clang {
 			noise += mons.Armor
 		}
