@@ -296,7 +296,11 @@ func (g *game) HitMonster(dt dmgType, mons *monster, ev event) (hit bool) {
 		}
 		pa := g.Player.Attack() + bonus
 		if g.Player.Weapon.Cleave() && g.InOpenMons(mons) {
-			pa += 1 + RandInt(2)
+			if g.Player.Attack() >= 15 {
+				pa += 1 + RandInt(3)
+			} else {
+				pa += 1 + RandInt(2)
+			}
 		}
 		attack, clang := g.HitDamage(dt, pa, mons.Armor)
 		if clang {
