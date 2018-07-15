@@ -96,6 +96,9 @@ func (p *player) Attack() int {
 	if p.Aptitudes[AptStrong] {
 		attack += attack / 5
 	}
+	if bonus := p.Statuses[StatusSlay]; bonus > 0 {
+		attack += bonus
+	}
 	if p.HasStatus(StatusCorrosion) {
 		penalty := p.Statuses[StatusCorrosion]
 		if penalty > 5 {
@@ -387,6 +390,9 @@ func (g *game) MovePlayer(pos position, ev event) error {
 	}
 	delay := 10
 	mons := g.MonsterAt(pos)
+	if g.Player.Weapon == DefenderFlail && !mons.Exists() {
+		mons = g.AttractMonster(pos)
+	}
 	if !mons.Exists() {
 		if g.Player.HasStatus(StatusLignification) {
 			return errors.New("You cannot move while lignified")
@@ -422,6 +428,9 @@ func (g *game) MovePlayer(pos position, ev event) error {
 		g.PlacePlayerAt(pos)
 		if !g.Autoexploring {
 			g.BoredomAction(ev, 1)
+		}
+		if g.Player.Statuses[StatusSlay] > 0 {
+			g.Player.Statuses[StatusSlay] /= 2
 		}
 	} else {
 		g.FunAction()

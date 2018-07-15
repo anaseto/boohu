@@ -679,6 +679,7 @@ const (
 	Frundis
 	ElecWhip
 	HarKarGauntlets
+	DefenderFlail
 )
 
 func (wp weapon) Equip(g *game) {
@@ -719,6 +720,8 @@ func (wp weapon) String() string {
 		return "lightning whip"
 	case HarKarGauntlets:
 		return "har-kar gauntlets"
+	case DefenderFlail:
+		return "defender mace"
 	default:
 		// should not happen
 		return "some weapon"
@@ -749,6 +752,8 @@ func (wp weapon) Short() string {
 		return "Wh"
 	case HarKarGauntlets:
 		return "Hk"
+	case DefenderFlail:
+		return "Fl"
 	default:
 		// should not happen
 		return "?"
@@ -780,6 +785,8 @@ func (wp weapon) Desc() string {
 		text = "The lightning whip is a one-handed weapon that inflicts electrical damage to a monster and any foes connected to it."
 	case HarKarGauntlets:
 		text = "Har-kar gauntlets are an unarmed combat weapon. They allow you to make a wind attack, passing over foes in a direction."
+	case DefenderFlail:
+		text = "The defender flail is a one-handed weapon that moves foes toward you, and hits harder as you keep attacking without moving."
 	}
 	return fmt.Sprintf("%s It can hit for up to %d damage.", text, wp.Attack())
 }
@@ -794,6 +801,8 @@ func (wp weapon) Attack() int {
 		return 15
 	case Frundis, HarKarGauntlets:
 		return 13
+	case DefenderFlail:
+		return 10
 	case Dagger:
 		return 9
 	case ElecWhip:

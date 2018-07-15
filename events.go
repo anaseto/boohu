@@ -59,6 +59,7 @@ const (
 	DigEnd
 	SwapEnd
 	ShadowsEnd
+	SlayEnd
 )
 
 func (g *game) PushEvent(ev event) {
@@ -187,6 +188,17 @@ func (sev *simpleEvent) Action(g *game) {
 		g.Player.Statuses[StatusShadows] = 0
 		if g.Player.Statuses[StatusShadows] == 0 {
 			g.PrintStyled("Shadows leaved you.", logStatusEnd)
+			g.ui.StatusEndAnimation(g)
+			g.ComputeLOS()
+			g.MakeMonstersAware()
+		}
+	case SlayEnd:
+		if g.Player.Statuses[StatusSlay] <= 0 {
+			break
+		}
+		g.Player.Statuses[StatusSlay]--
+		if g.Player.Statuses[StatusSlay] == 0 {
+			g.PrintStyled("You feel no longer slaying.", logStatusEnd)
 			g.ui.StatusEndAnimation(g)
 			g.ComputeLOS()
 			g.MakeMonstersAware()

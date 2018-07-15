@@ -175,9 +175,26 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 65 + RandInt(20), EAction: BerserkEnd})
 			g.Printf("Your sword insurges you to kill things.", BerserkPotion)
 		}
+	case g.Player.Weapon == DefenderFlail:
+		g.HitMonster(DmgPhysical, mons, ev)
+		g.Player.Statuses[StatusSlay]++
+		g.PushEvent(&simpleEvent{ERank: ev.Rank() + 60, EAction: SlayEnd})
 	default:
 		g.HitMonster(DmgPhysical, mons, ev)
 	}
+}
+
+func (g *game) AttractMonster(pos position) *monster {
+	dir := pos.Dir(g.Player.Pos)
+	for cpos := pos.To(dir); g.Player.LOS[cpos]; cpos = cpos.To(dir) {
+		mons := g.MonsterAt(cpos)
+		if mons.Exists() {
+			mons.MoveTo(g, pos)
+			g.ui.TeleportAnimation(g, cpos, pos, false)
+			return mons
+		}
+	}
+	return nil
 }
 
 func (g *game) HarKarAttack(mons *monster, ev event) {
