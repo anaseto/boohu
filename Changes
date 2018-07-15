@@ -11,15 +11,18 @@ Items and Monsters:
   two-handed weapon that has a particular attack patern: if there is a free cell
   after monsters in a given direction, you hit every monster in the path and move
   after them, which can be very useful in corridors, as well as for escaping.
-+ Double sword got renamed into berserk sword, and it inflicts on you kind of
-  berserkitis (you occasionally get berserk after hitting foes).
++ Double sword got renamed into berserk sword, which occasionally makes you
+  berserk when attacking while severely injured.
 + Sword got renamed into sabre, and its mechanics were changed too: now this
   weapon has better accuracy the more injured the monster is.
 + New dancing rapier weapon: it makes you swap positions with monsters you
-  attack, attempting a hit to any monster behind in the same direction.
+  attack, attempting a hit to any monster behind in the same direction, with
+  extra damage.
 + Axes now deal 1-2 extra damage in open areas - actually when neighbor
   cells common to you and the monster do not have any walls. The idea is
   to make risky non-corridor fights potentially optimal with axes.
++ New defender flail weapon: it hits harder the more you keep attacking without
+  moving; moreover, moving toward a monster moves the monster to you instead.
 + New robes: speed robe, celmist robe and harmonist robe. These armours give
   you no physical protection. The first make you speedy. The celmist robe makes
   you better at using rods (better recharge rate, more mana and an extra charge),
