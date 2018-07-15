@@ -211,7 +211,7 @@ func (g *game) HarKarAttack(mons *monster, ev event) {
 			break
 		}
 	}
-	if pos.valid() && g.Dungeon.Cell(pos).T == FreeCell {
+	if pos.valid() && g.Dungeon.Cell(pos).T == FreeCell && !g.Player.HasStatus(StatusLignification) {
 		pos = g.Player.Pos
 		for {
 			pos = pos.To(dir)
@@ -224,8 +224,11 @@ func (g *game) HarKarAttack(mons *monster, ev event) {
 			}
 			g.HitMonster(DmgPhysical, g.Player.Attack(), m, ev)
 		}
-		if !g.Player.HasStatus(StatusLignification) {
-			g.PlacePlayerAt(pos)
+		g.PlacePlayerAt(pos)
+		behind := pos.To(dir)
+		m := g.MonsterAt(behind)
+		if m.Exists() {
+			g.HitMonster(DmgPhysical, g.Player.Attack(), m, ev)
 		}
 	} else {
 		g.HitMonster(DmgPhysical, g.Player.Attack(), mons, ev)
