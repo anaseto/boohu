@@ -9,8 +9,9 @@ Items and Monsters:
   dense foliage are not always enough to flee from them.
 + New weapon: har-kar gauntlets which you used “unarmed”: it is a (weak)
   two-handed weapon that has a particular attack patern: if there is a free cell
-  after monsters in a given direction, you hit every monster in the path and move
-  after them, which can be very useful in corridors, as well as for escaping.
+  after monsters in a given direction, you hit every monster in the path, move
+  after them, and hit another monster (if any), which can be very useful in
+  corridors, as well as for escaping.
 + Double sword got renamed into berserk sword, which occasionally makes you
   berserk when attacking while severely injured.
 + Sword got renamed into sabre, and its mechanics were changed too: now this
