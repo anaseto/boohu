@@ -96,9 +96,6 @@ func (p *player) Attack() int {
 	if p.Aptitudes[AptStrong] {
 		attack += attack / 5
 	}
-	if bonus := p.Statuses[StatusSlay]; bonus > 0 {
-		attack += bonus
-	}
 	if p.HasStatus(StatusCorrosion) {
 		penalty := p.Statuses[StatusCorrosion]
 		if penalty > 5 {

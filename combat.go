@@ -115,7 +115,7 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 	case g.Player.HasStatus(StatusSwap) && !g.Player.HasStatus(StatusLignification):
 		g.SwapWithMonster(mons)
 	case g.Player.Weapon == Frundis:
-		if !g.HitMonster(DmgPhysical, mons, ev) {
+		if !g.HitMonster(DmgPhysical, g.Player.Attack(), mons, ev) {
 			break
 		}
 		if RandInt(2) == 0 {
@@ -132,55 +132,54 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 		for _, pos := range neighbors {
 			mons := g.MonsterAt(pos)
 			if mons.Exists() {
-				g.HitMonster(DmgPhysical, mons, ev)
+				g.HitMonster(DmgPhysical, g.Player.Attack(), mons, ev)
 			}
 		}
 	case g.Player.Weapon.Pierce():
-		g.HitMonster(DmgPhysical, mons, ev)
+		g.HitMonster(DmgPhysical, g.Player.Attack(), mons, ev)
 		dir := mons.Pos.Dir(g.Player.Pos)
 		behind := g.Player.Pos.To(dir).To(dir)
 		if behind.valid() {
 			mons := g.MonsterAt(behind)
 			if mons.Exists() {
-				g.HitMonster(DmgPhysical, mons, ev)
+				g.HitMonster(DmgPhysical, g.Player.Attack(), mons, ev)
 			}
 		}
 	case g.Player.Weapon == ElecWhip:
 		g.HitConnected(mons.Pos, DmgMagical, ev)
 	case g.Player.Weapon == DancingRapier:
-		g.HitMonster(DmgPhysical, mons, ev)
-		if mons.Exists() {
-			dir := mons.Pos.Dir(g.Player.Pos)
+		ompos := mons.Pos
+		g.HitMonster(DmgPhysical, g.Player.Attack(), mons, ev)
+		if !g.Player.HasStatus(StatusLignification) {
+			dir := ompos.Dir(g.Player.Pos)
 			behind := g.Player.Pos.To(dir).To(dir)
 			if behind.valid() {
 				mons := g.MonsterAt(behind)
 				if mons.Exists() {
-					g.HitMonster(DmgPhysical, mons, ev)
+					g.HitMonster(DmgPhysical, g.Player.Attack()+3, mons, ev)
 				}
 			}
-			if !g.Player.HasStatus(StatusLignification) {
-				ompos := mons.Pos
+			if mons.Exists() {
 				mons.MoveTo(g, g.Player.Pos)
-				g.PlacePlayerAt(ompos)
 			}
-		} else if !g.Player.HasStatus(StatusLignification) {
-			g.PlacePlayerAt(mons.Pos)
+			g.PlacePlayerAt(ompos)
 		}
 	case g.Player.Weapon == HarKarGauntlets:
 		g.HarKarAttack(mons, ev)
 	case g.Player.Weapon == BerserkSword:
-		g.HitMonster(DmgPhysical, mons, ev)
+		g.HitMonster(DmgPhysical, g.Player.Attack(), mons, ev)
 		if RandInt(20) == 0 && !g.Player.HasStatus(StatusExhausted) && !g.Player.HasStatus(StatusBerserk) {
 			g.Player.Statuses[StatusBerserk] = 1
 			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 65 + RandInt(20), EAction: BerserkEnd})
 			g.Printf("Your sword insurges you to kill things.", BerserkPotion)
 		}
 	case g.Player.Weapon == DefenderFlail:
-		g.HitMonster(DmgPhysical, mons, ev)
+		bonus := g.Player.Statuses[StatusSlay]
+		g.HitMonster(DmgPhysical, g.Player.Attack()+bonus, mons, ev)
 		g.Player.Statuses[StatusSlay]++
 		g.PushEvent(&simpleEvent{ERank: ev.Rank() + 60, EAction: SlayEnd})
 	default:
-		g.HitMonster(DmgPhysical, mons, ev)
+		g.HitMonster(DmgPhysical, g.Player.Attack(), mons, ev)
 	}
 }
 
@@ -221,13 +220,13 @@ func (g *game) HarKarAttack(mons *monster, ev event) {
 			if !m.Exists() {
 				break
 			}
-			g.HitMonster(DmgPhysical, m, ev)
+			g.HitMonster(DmgPhysical, g.Player.Attack(), m, ev)
 		}
 		if !g.Player.HasStatus(StatusLignification) {
 			g.PlacePlayerAt(pos)
 		}
 	} else {
-		g.HitMonster(DmgPhysical, mons, ev)
+		g.HitMonster(DmgPhysical, g.Player.Attack(), mons, ev)
 	}
 }
 
@@ -244,7 +243,7 @@ func (g *game) HitConnected(pos position, dt dmgType, ev event) {
 		if !mons.Exists() {
 			continue
 		}
-		g.HitMonster(dt, mons, ev)
+		g.HitMonster(dt, g.Player.Attack(), mons, ev)
 		nb = pos.Neighbors(nb, func(npos position) bool {
 			return npos.valid() && d.Cell(npos).T != WallCell
 		})
@@ -285,7 +284,7 @@ const (
 	DmgMagical
 )
 
-func (g *game) HitMonster(dt dmgType, mons *monster, ev event) (hit bool) {
+func (g *game) HitMonster(dt dmgType, dmg int, mons *monster, ev event) (hit bool) {
 	maxacc := g.Player.Accuracy()
 	if g.Player.Weapon == Sabre && mons.HP > 0 {
 		maxacc += int(6 * (-1 + float64(mons.HPmax)/float64(mons.HP)))
@@ -311,7 +310,7 @@ func (g *game) HitMonster(dt dmgType, mons *monster, ev event) (hit bool) {
 		if g.Player.HasStatus(StatusBerserk) {
 			bonus += 2 + RandInt(4)
 		}
-		pa := g.Player.Attack() + bonus
+		pa := dmg + bonus
 		if g.Player.Weapon.Cleave() && g.InOpenMons(mons) {
 			if g.Player.Attack() >= 15 {
 				pa += 1 + RandInt(3)
