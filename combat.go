@@ -168,10 +168,12 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 		g.HarKarAttack(mons, ev)
 	case g.Player.Weapon == BerserkSword:
 		g.HitMonster(DmgPhysical, g.Player.Attack(), mons, ev)
-		if RandInt(20) == 0 && !g.Player.HasStatus(StatusExhausted) && !g.Player.HasStatus(StatusBerserk) {
+		HPrate := g.Player.HP * 100 / g.Player.HPMax()
+		if HPrate < 50 && RandInt(HPrate/4) == 0 && !g.Player.HasStatus(StatusExhausted) && !g.Player.HasStatus(StatusBerserk) {
 			g.Player.Statuses[StatusBerserk] = 1
 			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 65 + RandInt(20), EAction: BerserkEnd})
-			g.Printf("Your sword insurges you to kill things.", BerserkPotion)
+			g.Print("Your sword insurges you to kill things.")
+			g.Player.HP += 10
 		}
 	case g.Player.Weapon == DefenderFlail:
 		bonus := g.Player.Statuses[StatusSlay]

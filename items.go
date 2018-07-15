@@ -778,7 +778,7 @@ func (wp weapon) Desc() string {
 	case DancingRapier:
 		text = "A dancing rapier is a one-handed weapon. It makes you swap with your foe and can hit another monster behind with extra damage."
 	case BerserkSword:
-		text = "A berserk sword is a big two-handed weapon that occasionally makes you berserk, which may not be what you want."
+		text = "A berserk sword is a big two-handed weapon that can make you berserk when attacking while injured."
 	case Frundis:
 		text = "Frundis is a musician and harmonist, which happens to be a two-handed staff too. It may occasionally confuse monsters on hit. It magically helps reducing noise in combat too."
 	case ElecWhip:
