@@ -10,6 +10,7 @@ type game struct {
 	Monsters            []*monster
 	MonstersPosCache    []int // monster (dungeon index + 1) / no monster (0)
 	Bands               []monsterBand
+	BandData            []monsterBandData
 	Events              *eventQueue
 	Ev                  event
 	EventIndex          int
@@ -27,7 +28,8 @@ type game struct {
 	Fungus              map[position]vegetation
 	Doors               map[position]bool
 	TemporalWalls       map[position]bool
-	GeneratedBands      map[monsterBand]int
+	GeneratedUniques    map[monsterBand]int
+	SpecialBands        map[int][]monsterBandData
 	GeneratedEquipables map[equipable]bool
 	GeneratedRods       map[rod]bool
 	FoundEquipables     map[equipable]bool
@@ -334,6 +336,27 @@ func (g *game) InitPlayer() {
 	//g.Player.Armour = SmokingScales
 }
 
+func (g *game) InitSpecialBands() {
+	g.SpecialBands = map[int][]monsterBandData{}
+	sb := MonsSpecialBands[RandInt(len(MonsSpecialBands))]
+	depth := sb.minDepth + RandInt(sb.maxDepth-sb.minDepth+1)
+	g.SpecialBands[depth] = sb.bands
+	seb := MonsSpecialEndBands[RandInt(len(MonsSpecialEndBands))]
+	if RandInt(4) == 0 {
+		if RandInt(5) > 1 {
+			g.SpecialBands[13] = seb.bands
+		} else {
+			g.SpecialBands[12] = seb.bands
+		}
+	} else if RandInt(5) > 0 {
+		if RandInt(3) > 0 {
+			g.SpecialBands[15] = seb.bands
+		} else {
+			g.SpecialBands[14] = seb.bands
+		}
+	}
+}
+
 func (g *game) InitLevel() {
 	// Dungeon terrain
 	g.GenDungeon()
@@ -346,8 +369,9 @@ func (g *game) InitLevel() {
 		g.GeneratedRods = map[rod]bool{}
 		g.GeneratedEquipables = map[equipable]bool{}
 		g.FoundEquipables = map[equipable]bool{Robe: true, Dagger: true}
-		g.GeneratedBands = map[monsterBand]int{}
+		g.GeneratedUniques = map[monsterBand]int{}
 		g.Stats.KilledMons = map[monsterKind]int{}
+		g.InitSpecialBands()
 		g.Version = Version
 	}
 
@@ -362,6 +386,10 @@ func (g *game) InitLevel() {
 	g.DreamingMonster = map[position]bool{}
 
 	// Monsters
+	g.BandData = MonsBands
+	if bd, ok := g.SpecialBands[g.Depth]; ok {
+		g.BandData = bd
+	}
 	g.GenMonsters()
 
 	// Collectables
