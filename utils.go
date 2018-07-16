@@ -6,7 +6,6 @@ import (
 	"log"
 	"math/big"
 	"strings"
-	"unicode/utf8"
 )
 
 func Abs(x int) int {
@@ -44,8 +43,7 @@ func Max(x, y int) int {
 
 func Indefinite(s string, upper bool) (text string) {
 	if len(s) > 0 {
-		r, _ := utf8.DecodeLastRuneInString(s)
-		if r == 's' {
+		if s == HarKarGauntlets.String() {
 			if upper {
 				return strings.ToUpper(s[0:1]) + s[1:]
 			}
