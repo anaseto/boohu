@@ -407,7 +407,7 @@ func (g *game) MovePlayer(pos position, ev event) error {
 		}
 		switch g.Player.Armour {
 		case PonderousnessPlates:
-			delay += 2
+			delay += 3
 		case SpeedRobe:
 			delay -= 3
 		case SmokingScales:
