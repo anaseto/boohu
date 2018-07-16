@@ -174,6 +174,12 @@ func (g *game) Dump() string {
 	fmt.Fprintf(buf, "You collected %d simellas.\n", g.Player.Simellas)
 	fmt.Fprintf(buf, "You killed %d monsters.\n", g.Stats.Killed)
 	fmt.Fprintf(buf, "You spent %.1f turns in the Underground.\n", float64(g.Turn)/10)
+	maxDepth := Max(g.Depth+1, g.ExploredLevels)
+	s := "s"
+	if maxDepth == 1 {
+		s = ""
+	}
+	fmt.Fprintf(buf, "You explored %d level%s out of %d.\n", maxDepth, s, MaxDepth+1)
 	fmt.Fprintf(buf, "\n")
 	fmt.Fprintf(buf, "Last messages:\n")
 	for i := len(g.Log) - 10; i < len(g.Log); i++ {
@@ -358,6 +364,12 @@ func (g *game) SimplifedDump(err error) string {
 	fmt.Fprintf(buf, "You collected %d simellas.\n", g.Player.Simellas)
 	fmt.Fprintf(buf, "You killed %d monsters.\n", g.Stats.Killed)
 	fmt.Fprintf(buf, "You spent %.1f turns in the Underground.\n", float64(g.Turn)/10)
+	maxDepth := Max(g.Depth+1, g.ExploredLevels)
+	s := "s"
+	if maxDepth == 1 {
+		s = ""
+	}
+	fmt.Fprintf(buf, "You explored %d level%s out of %d.\n", maxDepth, s, MaxDepth+1)
 	fmt.Fprintf(buf, "\n")
 	if err != nil {
 		fmt.Fprintf(buf, "Error writing dump: %v.\n", err)
