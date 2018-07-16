@@ -1115,6 +1115,9 @@ func (ui *termui) DescribePosition(g *game, pos position, targ Targeter) {
 		if cld == CloudFire {
 			desc = ui.AddComma(see, desc)
 			desc += fmt.Sprintf("burning flames")
+		} else if cld == CloudNight {
+			desc = ui.AddComma(see, desc)
+			desc += fmt.Sprintf("night clouds")
 		} else {
 			desc = ui.AddComma(see, desc)
 			desc += fmt.Sprintf("a dense fog")
@@ -1928,6 +1931,8 @@ func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgCol
 				r = '§'
 				if cld == CloudFire {
 					fgColor = ColorFgWanderingMonster
+				} else if cld == CloudNight {
+					fgColor = ColorFgSleepingMonster
 				}
 			}
 			if c, ok := g.Collectables[pos]; ok {

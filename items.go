@@ -387,6 +387,7 @@ type projectile int
 const (
 	ConfusingDart projectile = iota
 	ExplosiveMagara
+	NightMagara
 )
 
 const NumProjectiles = int(ExplosiveMagara) + 1
@@ -397,6 +398,8 @@ func (p projectile) String() (text string) {
 		text = "dart of confusion"
 	case ExplosiveMagara:
 		text = "explosive magara"
+	case NightMagara:
+		text = "night magara"
 	}
 	return text
 }
@@ -407,6 +410,8 @@ func (p projectile) Plural() (text string) {
 		text = "darts of confusion"
 	case ExplosiveMagara:
 		text = "explosive magaras"
+	case NightMagara:
+		text = "night magaras"
 	}
 	return text
 }
@@ -417,6 +422,8 @@ func (p projectile) Desc() (text string) {
 		text = "can be silently thrown to confuse foes, dealing up to 7 damage. Confused monsters cannot move diagonally."
 	case ExplosiveMagara:
 		text = "can be thrown to cause a fire explosion halving HP of monsters in a square area. It can occasionally destroy walls."
+	case NightMagara:
+		text = "can be thrown at a monster to produce sleep inducing clouds in a 2-radius area. You are affected too by the clouds, but they will slow your actions instead."
 	}
 	return fmt.Sprintf("The %s %s", p, text)
 }
@@ -441,6 +448,8 @@ func (p projectile) Use(g *game, ev event) error {
 		err = g.ThrowConfusingDart(ev)
 	case ExplosiveMagara:
 		err = g.ThrowExplosiveMagara(ev)
+	case NightMagara:
+		err = g.ThrowNightMagara(ev)
 	}
 	if err != nil {
 		return err
@@ -523,6 +532,31 @@ func (g *game) ThrowExplosiveMagara(ev event) error {
 	return nil
 }
 
+func (g *game) NightFog(at position, radius int, ev event) {
+	dij := &normalPath{game: g}
+	nm := Dijkstra(dij, []position{at}, radius)
+	for pos := range nm {
+		_, ok := g.Clouds[pos]
+		if !ok {
+			g.Clouds[pos] = CloudNight
+			g.PushEvent(&cloudEvent{ERank: ev.Rank() + 10, EAction: NightProgression, Pos: pos})
+		}
+	}
+	g.ComputeLOS()
+}
+
+func (g *game) ThrowNightMagara(ev event) error {
+	if err := g.ui.ChooseTarget(g, &chooser{needsFreeWay: true}); err != nil {
+		return err
+	}
+	g.Print("You throw the night magara… Clouds come out of it.")
+	g.ui.ProjectileTrajectoryAnimation(g, g.Ray(g.Player.Target), ColorFgPlayer)
+	g.NightFog(g.Player.Target, 2, ev)
+
+	ev.Renew(g, 10)
+	return nil
+}
+
 type collectable struct {
 	Consumable consumable
 	Quantity   int
@@ -536,6 +570,7 @@ type collectData struct {
 var ConsumablesCollectData = map[consumable]collectData{
 	ConfusingDart:       {rarity: 4, quantity: 3},
 	ExplosiveMagara:     {rarity: 8, quantity: 1},
+	NightMagara:         {rarity: 10, quantity: 1},
 	TeleportationPotion: {rarity: 6, quantity: 1},
 	BerserkPotion:       {rarity: 6, quantity: 1},
 	HealWoundsPotion:    {rarity: 6, quantity: 1},

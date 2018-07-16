@@ -395,6 +395,7 @@ type cloud int
 const (
 	CloudFog cloud = iota
 	CloudFire
+	CloudNight
 )
 
 func (g *game) EvokeRodFog(ev event) error {

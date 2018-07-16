@@ -120,7 +120,7 @@ func (sev *simpleEvent) Action(g *game) {
 		g.Player.Statuses[StatusTele] = 0
 	case BerserkEnd:
 		g.Player.Statuses[StatusBerserk] = 0
-		g.Player.Statuses[StatusSlow] = 1
+		g.Player.Statuses[StatusSlow]++
 		g.Player.Statuses[StatusExhausted] = 1
 		g.Player.HP -= int(10 * g.Player.HP / Max(g.Player.HPMax(), g.Player.HP))
 		g.PrintStyled("You are no longer berserk.", logStatusEnd)
@@ -128,9 +128,11 @@ func (sev *simpleEvent) Action(g *game) {
 		g.PushEvent(&simpleEvent{ERank: sev.Rank() + 270 + RandInt(60), EAction: ExhaustionEnd})
 		g.ui.StatusEndAnimation(g)
 	case SlowEnd:
-		g.PrintStyled("You feel no longer slow.", logStatusEnd)
-		g.Player.Statuses[StatusSlow] = 0
-		g.ui.StatusEndAnimation(g)
+		g.Player.Statuses[StatusSlow]--
+		if g.Player.Statuses[StatusSlow] <= 0 {
+			g.PrintStyled("You feel no longer slow.", logStatusEnd)
+			g.ui.StatusEndAnimation(g)
+		}
 	case ExhaustionEnd:
 		g.PrintStyled("You feel no longer exhausted.", logStatusEnd)
 		g.Player.Statuses[StatusExhausted] = 0
@@ -256,6 +258,7 @@ const (
 	CloudEnd cloudAction = iota
 	ObstructionEnd
 	FireProgression
+	NightProgression
 )
 
 type cloudEvent struct {
@@ -304,6 +307,36 @@ func (cev *cloudEvent) Action(g *game) {
 			g.Burn(pos, cev)
 		}
 		cev.Renew(g, 10)
+	case NightProgression:
+		if _, ok := g.Clouds[cev.Pos]; !ok {
+			break
+		}
+		g.MakeCreatureSleep(cev.Pos, cev)
+		if RandInt(20) == 0 {
+			delete(g.Clouds, cev.Pos)
+			g.ComputeLOS()
+			break
+		}
+		cev.Renew(g, 10)
+	}
+}
+
+func (g *game) MakeCreatureSleep(pos position, ev event) {
+	if pos == g.Player.Pos {
+		g.Player.Statuses[StatusSlow]++
+		g.PushEvent(&simpleEvent{ERank: ev.Rank() + 30 + RandInt(10), EAction: SlowEnd})
+		g.Print("The night clouds make you feel sleepy.")
+		return
+	}
+	mons := g.MonsterAt(pos)
+	if !mons.Exists() || (RandInt(2) == 0 && mons.Status(MonsExhausted)) {
+		// do not always make already exhausted monsters sleep (they were probably awaken)
+		return
+	}
+	mons.State = Resting
+	if !mons.Status(MonsExhausted) {
+		mons.Statuses[MonsExhausted] = 1
+		g.PushEvent(&monsterEvent{ERank: ev.Rank() + 30 + RandInt(10), NMons: mons.Index, EAction: MonsExhaustionEnd})
 	}
 }
 

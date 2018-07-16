@@ -319,6 +319,7 @@ func (g *game) InitPlayer() {
 	//g.Player.Rods[RodSleeping] = rodProps{Charge: 3}
 	//g.Player.Consumables[MagicMappingPotion] = 1
 	//g.Player.Consumables[ExplosiveMagara] = 5
+	//g.Player.Consumables[NightMagara] = 5
 	//g.Player.Consumables[DigPotion] = 5
 	//g.Player.Consumables[SwapPotion] = 5
 	//g.Player.Consumables[DreamPotion] = 5

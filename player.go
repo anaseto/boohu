@@ -437,7 +437,7 @@ func (g *game) MovePlayer(pos position, ev event) error {
 		delay -= 3
 	}
 	if g.Player.HasStatus(StatusSlow) {
-		delay += 3
+		delay += 3 * g.Player.Statuses[StatusSlow]
 	}
 	if delay < 3 {
 		delay = 3
