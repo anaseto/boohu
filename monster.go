@@ -971,7 +971,7 @@ func init() {
 			{Monster: MonsHydra, Rarity: 30},
 			{Distribution: map[monsterKind]monsInterval{
 				MonsWorm: {3, 3}, MonsSpider: {2, 2},
-			}, Rarity: 500, Band: true},
+			}, Rarity: 300, Band: true},
 			{Distribution: map[monsterKind]monsInterval{
 				MonsHydra: {1, 1}, MonsGoblin: {3, 3},
 			}, Rarity: 45, Band: true},
@@ -1004,10 +1004,10 @@ func init() {
 			{Monster: MonsLich, Rarity: 30},
 			{Distribution: map[monsterKind]monsInterval{
 				MonsSkeletonWarrior: {1, 2}, MonsHound: {1, 1},
-			}, Rarity: 500, Band: true},
+			}, Rarity: 400, Band: true},
 			{Distribution: map[monsterKind]monsInterval{
 				MonsSkeletonWarrior: {1, 2}, MonsAcidMound: {1, 1},
-			}, Rarity: 500, Band: true},
+			}, Rarity: 400, Band: true},
 			{Distribution: map[monsterKind]monsInterval{
 				MonsLich: {1, 1}, MonsGoblin: {3, 3},
 			}, Rarity: 45, Band: true},
@@ -1029,6 +1029,9 @@ func init() {
 			{Distribution: map[monsterKind]monsInterval{
 				MonsLich: {1, 1}, MonsMadNixe: {1, 1},
 			}, Rarity: 100, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsLich: {1, 1}, MonsMirrorSpecter: {1, 1},
+			}, Rarity: 75, Band: true},
 			{Distribution: map[monsterKind]monsInterval{
 				MonsLich: {2, 2}, MonsSkeletonWarrior: {2, 2},
 			}, Rarity: 200, Band: true},
