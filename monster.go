@@ -1309,6 +1309,26 @@ func init() {
 				MonsEarthDragon: {1, 1}, MonsMirrorSpecter: {1, 1},
 			}, Rarity: 50, Band: true},
 		}},
+		{bands: []monsterBandData{ // terrible goblin warriors
+			{Distribution: map[monsterKind]monsInterval{
+				MonsGoblinWarrior: {2, 2}, MonsHound: {5, 5},
+			}, Rarity: 50, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsGoblinWarrior: {2, 2}, MonsHydra: {1, 1},
+			}, Rarity: 100, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsGoblinWarrior: {2, 2}, MonsBrizzia: {1, 1},
+			}, Rarity: 75, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsGoblinWarrior: {2, 2}, MonsSpider: {1, 1},
+			}, Rarity: 75, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsGoblinWarrior: {2, 2}, MonsMadNixe: {1, 1},
+			}, Rarity: 75, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsGoblinWarrior: {2, 2}, MonsYack: {3, 3},
+			}, Rarity: 75, Band: true},
+		}},
 	}
 	for _, sb := range MonsSpecialEndBands {
 		for i, _ := range sb.bands {
