@@ -550,7 +550,7 @@ func (g *game) ThrowNightMagara(ev event) error {
 		return err
 	}
 	g.Print("You throw the night magara… Clouds come out of it.")
-	g.ui.ProjectileTrajectoryAnimation(g, g.Ray(g.Player.Target), ColorFgPlayer)
+	g.ui.ProjectileTrajectoryAnimation(g, g.Ray(g.Player.Target), ColorFgSleepingMonster)
 	g.NightFog(g.Player.Target, 2, ev)
 
 	ev.Renew(g, 10)
