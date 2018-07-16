@@ -1478,7 +1478,11 @@ func (ui *termui) ViewPositionDescription(g *game, pos position) {
 
 func (ui *termui) MonsterInfo(m *monster) string {
 	infos := []string{}
-	infos = append(infos, m.State.String())
+	state := m.State.String()
+	if m.Kind == MonsSatowalgaPlant && m.State == Wandering {
+		state = "awaken"
+	}
+	infos = append(infos, state)
 	for st, i := range m.Statuses {
 		if i > 0 {
 			infos = append(infos, monsterStatus(st).String())
