@@ -1332,6 +1332,33 @@ func init() {
 				MonsGoblinWarrior: {2, 2}, MonsYack: {3, 3},
 			}, Rarity: 75, Band: true},
 		}},
+		{bands: []monsterBandData{ // terrible acid mounds
+			{Monster: MonsAcidMound, Rarity: 50},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsHound: {1, 1}, MonsAcidMound: {3, 3},
+			}, Rarity: 45, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsAcidMound: {3, 3}, MonsExplosiveNadre: {2, 2},
+			}, Rarity: 45, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsAcidMound: {2, 2}, MonsHydra: {1, 1},
+			}, Rarity: 55, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsOgre: {2, 2}, MonsAcidMound: {2, 2},
+			}, Rarity: 55, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsAcidMound: {2, 2}, MonsSpider: {3, 3},
+			}, Rarity: 65, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsAcidMound: {3, 3}, MonsWingedMilfid: {2, 2},
+			}, Rarity: 150, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsAcidMound: {2, 2}, MonsBrizzia: {2, 2},
+			}, Rarity: 100, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsAcidMound: {2, 2}, MonsMadNixe: {1, 1}, MonsSatowalgaPlant: {1, 1},
+			}, Rarity: 200, Band: true},
+		}},
 	}
 	for _, sb := range MonsSpecialEndBands {
 		for i, _ := range sb.bands {
