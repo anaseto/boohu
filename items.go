@@ -961,8 +961,3 @@ func (sh shield) Block() (block int) {
 	}
 	return block
 }
-
-type equipableData struct {
-	rarity   int
-	minDepth int
-}
