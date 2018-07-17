@@ -418,6 +418,7 @@ func (g *game) BlockEffects(m *monster) {
 				g.Stats.Digs++
 				g.MakeNoise(WallNoise+1, pos)
 				g.Fog(pos, 1, g.Ev)
+				g.Print("The blocking sound destroys a wall.")
 			}
 		}
 	case BashingShield:
@@ -446,6 +447,7 @@ func (g *game) BlockEffects(m *monster) {
 		}
 		if pos != m.Pos {
 			m.MoveTo(g, pos)
+			g.Printf("%s is repelled away.", m.Kind.Definite(true))
 		}
 	case ConfusingShield:
 		if m.Pos.Distance(g.Player.Pos) > 1 {
