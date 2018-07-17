@@ -22,6 +22,9 @@ func (ui *termui) InitElements() error {
 	ui.ctx.Set("font", "18px monospace")
 	mesure := ui.ctx.Call("measureText", "W")
 	ui.width = mesure.Get("width").Int() + 1
+	canvas.Set("height", 22*UIHeight)
+	canvas.Set("width", ui.width*UIWidth)
+	ui.ctx.Set("font", "18px monospace") // seems to be needed again
 	ui.cache = make(map[UICell]js.Value)
 	return nil
 }
