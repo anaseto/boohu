@@ -1566,7 +1566,7 @@ func (ui *termui) DrawDungeonView(g *game, m uiMode) {
 		line++
 		if g.Player.Shield != NoShield {
 			if g.Player.Weapon.TwoHanded() {
-				ui.DrawText(fmt.Sprintf("] %v (unusable)", g.Player.Shield), BarCol, line)
+				ui.DrawText(fmt.Sprintf("] %v (-)", g.Player.Shield), BarCol, line)
 			} else {
 				ui.DrawText(fmt.Sprintf("] %v(%d)", g.Player.Shield, g.Player.Block()), BarCol, line)
 			}
