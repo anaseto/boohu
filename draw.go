@@ -13,7 +13,7 @@ import (
 
 var (
 	UIWidth                = 103
-	UIHeight               = 27
+	UIHeight               = 26
 	DisableAnimations bool = false
 )
 
@@ -2080,7 +2080,7 @@ func (ui *termui) DrawStatusLine(g *game) {
 	ui.DrawText(armour, col, line)
 	col += utf8.RuneCountInString(armour)
 	if g.Player.Shield != NoShield {
-		shield := fmt.Sprintf("[%s ", g.Player.Shield.Short())
+		shield := fmt.Sprintf("]%s ", g.Player.Shield.Short())
 		ui.DrawText(shield, col, line)
 		col += utf8.RuneCountInString(shield)
 	}
