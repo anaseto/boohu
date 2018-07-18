@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	UIWidth                = 103
+	UIWidth                = 100
 	UIHeight               = 26
 	DisableAnimations bool = false
 )
@@ -1560,15 +1560,15 @@ func (ui *termui) DrawDungeonView(g *game, m uiMode) {
 	}
 	line := 0
 	if !ui.Small() {
-		ui.DrawText(fmt.Sprintf("[ %v(%d)", g.Player.Armour, g.Player.Armor()), BarCol, line)
+		ui.DrawText(fmt.Sprintf("[ %v", g.Player.Armour), BarCol, line)
 		line++
-		ui.DrawText(fmt.Sprintf(") %v(%d)", g.Player.Weapon, g.Player.Attack()), BarCol, line)
+		ui.DrawText(fmt.Sprintf(") %v", g.Player.Weapon), BarCol, line)
 		line++
 		if g.Player.Shield != NoShield {
 			if g.Player.Weapon.TwoHanded() {
-				ui.DrawText(fmt.Sprintf("] %v (-)", g.Player.Shield), BarCol, line)
+				ui.DrawText(fmt.Sprintf("] (unusable)", g.Player.Shield), BarCol, line)
 			} else {
-				ui.DrawText(fmt.Sprintf("] %v(%d)", g.Player.Shield, g.Player.Block()), BarCol, line)
+				ui.DrawText(fmt.Sprintf("] %v", g.Player.Shield), BarCol, line)
 			}
 		}
 		line++
