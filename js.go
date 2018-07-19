@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"image/color"
 	"log"
 	"runtime"
 	"strings"
@@ -235,6 +236,46 @@ func (c uicolor) String() string {
 		color = "#fdf6e3"
 	}
 	return color
+}
+
+func (c uicolor) Color() color.Color {
+	cl := color.RGBA{}
+	opaque := uint8(255)
+	switch c {
+	case 0:
+		cl = color.RGBA{7, 54, 66, opaque}
+	case 1:
+		cl = color.RGBA{211, 1, 2, opaque}
+	case 2:
+		cl = color.RGBA{133, 153, 0, opaque}
+	case 3:
+		cl = color.RGBA{181, 137, 0, opaque}
+	case 4:
+		cl = color.RGBA{38, 139, 210, opaque}
+	case 5:
+		cl = color.RGBA{211, 54, 130, opaque}
+	case 6:
+		cl = color.RGBA{42, 161, 152, opaque}
+	case 7:
+		cl = color.RGBA{238, 232, 213, opaque}
+	case 8:
+		cl = color.RGBA{0, 43, 54, opaque}
+	case 9:
+		cl = color.RGBA{203, 75, 22, opaque}
+	case 10:
+		cl = color.RGBA{88, 110, 117, opaque}
+	case 11:
+		cl = color.RGBA{101, 123, 131, opaque}
+	case 12:
+		cl = color.RGBA{131, 148, 150, opaque}
+	case 13:
+		cl = color.RGBA{108, 113, 196, opaque}
+	case 14:
+		cl = color.RGBA{147, 161, 161, opaque}
+	case 15:
+		cl = color.RGBA{253, 246, 227, opaque}
+	}
+	return cl
 }
 
 func (ui *termui) GetIndex(x, y int) int {
