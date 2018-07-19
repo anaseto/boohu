@@ -5,7 +5,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/gopherjs/gopherjs/js"
+	"github.com/gopherjs/gopherwasm/js"
 )
 
 type termui struct {
@@ -17,7 +17,7 @@ type termui struct {
 }
 
 func (ui *termui) InitElements() error {
-	doc := js.Global.Get("document")
+	doc := js.Global().Get("document")
 	pre := doc.Call("getElementById", "game")
 	for y := 0; y < UIHeight; y++ {
 		for x := 0; x < UIWidth; x++ {

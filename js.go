@@ -12,8 +12,8 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"github.com/gopherjs/gopherwasm/js"
 	//"github.com/gopherjs/gopherjs/js"
-	"github.com/hajimehoshi/gopherwasm/js"
 )
 
 func main() {
@@ -68,8 +68,8 @@ func (g *game) Save() error {
 		SaveError = err.Error()
 		return err
 	}
-	storage := js.Global.Get("localStorage")
-	if !storage.Bool() {
+	storage := js.Global().Get("localStorage")
+	if storage.Type() != js.TypeObject {
 		SaveError = "localStorage not found"
 		return errors.New("localStorage not found")
 	}
@@ -88,8 +88,8 @@ func (g *game) SaveConfig() error {
 		SaveError = err.Error()
 		return err
 	}
-	storage := js.Global.Get("localStorage")
-	if !storage.Bool() {
+	storage := js.Global().Get("localStorage")
+	if storage.Type() != js.TypeObject {
 		SaveError = "localStorage not found"
 		return errors.New("localStorage not found")
 	}
@@ -100,24 +100,24 @@ func (g *game) SaveConfig() error {
 }
 
 func (g *game) RemoveSaveFile() error {
-	storage := js.Global.Get("localStorage")
+	storage := js.Global().Get("localStorage")
 	storage.Call("removeItem", "boohusave")
 	return nil
 }
 
 func (g *game) RemoveDataFile(file string) error {
-	storage := js.Global.Get("localStorage")
+	storage := js.Global().Get("localStorage")
 	storage.Call("removeItem", file)
 	return nil
 }
 
 func (g *game) Load() (bool, error) {
-	storage := js.Global.Get("localStorage")
-	if !storage.Bool() {
+	storage := js.Global().Get("localStorage")
+	if storage.Type() != js.TypeObject {
 		return true, errors.New("localStorage not found")
 	}
 	save := storage.Call("getItem", "boohusave")
-	if !save.Bool() || runtime.GOARCH != "wasm" {
+	if save.Type() != js.TypeString || runtime.GOARCH != "wasm" {
 		return false, nil
 	}
 	s, err := base64.StdEncoding.DecodeString(save.String())
@@ -136,12 +136,12 @@ func (g *game) Load() (bool, error) {
 }
 
 func (g *game) LoadConfig() (bool, error) {
-	storage := js.Global.Get("localStorage")
-	if !storage.Bool() {
+	storage := js.Global().Get("localStorage")
+	if storage.Type() != js.TypeObject {
 		return true, errors.New("localStorage not found")
 	}
 	conf := storage.Call("getItem", "boohuconfig")
-	if !conf.Bool() || runtime.GOARCH != "wasm" {
+	if conf.Type() != js.TypeString || runtime.GOARCH != "wasm" {
 		return false, nil
 	}
 	s, err := base64.StdEncoding.DecodeString(conf.String())
@@ -165,7 +165,7 @@ func (g *game) LoadConfig() (bool, error) {
 func (g *game) WriteDump() error {
 	//storage := js.Global.Get("localStorage")
 	//storage.Call("setItem", "boohudump", g.Dump())
-	pre := js.Global.Get("document").Call("getElementById", "dump")
+	pre := js.Global().Get("document").Call("getElementById", "dump")
 	pre.Set("innerHTML", g.Dump())
 	return nil
 }
@@ -174,15 +174,15 @@ func (g *game) WriteDump() error {
 
 func (ui *termui) Init() error {
 	ui.cells = make([]UICell, UIWidth*UIHeight)
-	js.Global.Get("document").Call("addEventListener", "keypress", js.NewEventCallback(0, func(e js.Value) {
+	js.Global().Get("document").Call("addEventListener", "keypress", js.NewEventCallback(0, func(e js.Value) {
 		s := e.Get("key").String()
 		ch <- jsInput{key: s}
 	}))
-	js.Global.Get("document").Call("addEventListener", "mousedown", js.NewEventCallback(0, func(e js.Value) {
+	js.Global().Get("document").Call("addEventListener", "mousedown", js.NewEventCallback(0, func(e js.Value) {
 		x, y := ui.GetMousePos(e)
 		ch <- jsInput{mouse: true, mouseX: x, mouseY: y, button: e.Get("button").Int()}
 	}))
-	//js.Global.Get("document").Call("addEventListener", "mousemove", func(e js.Value) {
+	//js.Global().Get("document").Call("addEventListener", "mousemove", func(e js.Value) {
 	//x, y := ui.GetMousePos(e)
 	//ui.mouse = position{x, y}
 	//})
@@ -278,7 +278,7 @@ func (ui *termui) Clear() {
 }
 
 func (ui *termui) Flush() {
-	js.Global.Get("window").Call("requestAnimationFrame", js.NewEventCallback(0, ui.FlushCallback))
+	js.Global().Get("window").Call("requestAnimationFrame", js.NewEventCallback(0, ui.FlushCallback))
 }
 
 func (ui *termui) Small() bool {

@@ -2,7 +2,7 @@
 
 package main
 
-import "github.com/hajimehoshi/gopherwasm/js"
+import "github.com/gopherjs/gopherwasm/js"
 
 type termui struct {
 	cells      []UICell
@@ -15,7 +15,7 @@ type termui struct {
 }
 
 func (ui *termui) InitElements() error {
-	canvas := js.Global.Get("document").Call("getElementById", "gamecanvas")
+	canvas := js.Global().Get("document").Call("getElementById", "gamecanvas")
 	canvas.Call("addEventListener", "contextmenu", js.NewEventCallback(js.PreventDefault, func(e js.Value) {
 	}), false)
 	ui.ctx = canvas.Call("getContext", "2d")
@@ -34,7 +34,7 @@ func (ui *termui) Draw(cell UICell, x, y int) {
 	if cv, ok := ui.cache[cell]; ok {
 		canvas = cv
 	} else {
-		canvas = js.Global.Get("document").Call("createElement", "canvas")
+		canvas = js.Global().Get("document").Call("createElement", "canvas")
 		ctx := canvas.Call("getContext", "2d")
 		canvas.Set("width", ui.width)
 		canvas.Set("height", 22)
@@ -49,7 +49,7 @@ func (ui *termui) Draw(cell UICell, x, y int) {
 }
 
 func (ui *termui) GetMousePos(evt js.Value) (x, y int) {
-	canvas := js.Global.Get("document").Call("getElementById", "gamecanvas")
+	canvas := js.Global().Get("document").Call("getElementById", "gamecanvas")
 	rect := canvas.Call("getBoundingClientRect")
 	x = evt.Get("clientX").Int() - rect.Get("left").Int()
 	y = evt.Get("clientY").Int() - rect.Get("top").Int()
