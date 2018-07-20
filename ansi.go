@@ -242,6 +242,10 @@ func (ui *termui) SetCell(x, y int, r rune, fg, bg uicolor) {
 
 }
 
+func (ui *termui) SetMapCell(x, y int, r rune, fg, bg uicolor) {
+	ui.SetCell(x, y, r, fg, bg)
+}
+
 func (ui *termui) Interrupt() {
 	interrupt <- true
 }

@@ -1529,16 +1529,16 @@ func (ui *termui) DrawAtPosition(g *game, pos position, targeting bool, r rune, 
 			return
 		}
 		x, y := ui.CameraOffset(g, pos, targeting)
-		ui.SetCell(x, y, r, fg, bg)
+		ui.SetMapCell(x, y, r, fg, bg)
 		if ui.InViewBorder(g, pos, targeting) && g.Dungeon.Border(pos) {
 			for _, opos := range pos.OutsideNeighbors() {
 				xo, yo := ui.CameraOffset(g, opos, targeting)
-				ui.SetCell(xo, yo, '#', ColorFg, ColorBgBorder)
+				ui.SetMapCell(xo, yo, '#', ColorFg, ColorBgBorder)
 			}
 		}
 		return
 	}
-	ui.SetCell(pos.X, pos.Y, r, fg, bg)
+	ui.SetMapCell(pos.X, pos.Y, r, fg, bg)
 }
 
 const BarCol = DungeonWidth + 2

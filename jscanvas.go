@@ -23,14 +23,19 @@ type termui struct {
 	height     int
 }
 
-var Tiles bool = false
+var Tiles bool = true
 
 func (ui *termui) InitElements() error {
 	canvas := js.Global().Get("document").Call("getElementById", "gamecanvas")
 	canvas.Call("addEventListener", "contextmenu", js.NewEventCallback(js.PreventDefault, func(e js.Value) {
 	}), false)
 	ui.ctx = canvas.Call("getContext", "2d")
-	ui.ctx.Set("font", "18px monospace")
+	ui.ctx.Set("imageSmoothingEnabled", false)
+	if Tiles {
+		ui.ctx.Set("font", "22px monospace")
+	} else {
+		ui.ctx.Set("font", "18px monospace")
+	}
 	if Tiles {
 		ui.width = 16
 		ui.height = 24
@@ -43,16 +48,61 @@ func (ui *termui) InitElements() error {
 		canvas.Set("height", ui.height*UIHeight)
 		canvas.Set("width", ui.width*UIWidth)
 	}
-	ui.ctx.Set("font", "18px monospace") // seems to be needed again
+	// seems to be needed again
+	if Tiles {
+		ui.ctx.Set("font", "22px monospace")
+	} else {
+		ui.ctx.Set("font", "18px monospace")
+	}
 	ui.cache = make(map[UICell]js.Value)
 	return nil
 }
 
 var TileImgs map[string][]byte
 
+var MapNames = map[rune]string{
+	'¤':  "frontier",
+	'☻':  "dreaming",
+	'♫':  "footseps",
+	'#':  "wall",
+	'@':  "player",
+	'§':  "fog",
+	'♣':  "simella",
+	'+':  "door",
+	'.':  "ground",
+	'"':  "foliage",
+	'•':  "tick",
+	'●':  "rock",
+	',':  "comma",
+	'}':  "rbrace",
+	'%':  "percent",
+	':':  "colon",
+	'\\': "backslash",
+	'~':  "tilde",
+	'☼':  "sun",
+	'*':  "asterisc",
+	'—':  "hbar",
+	'/':  "slash",
+	'|':  "vbar",
+	'∞':  "kill",
+	' ':  "space",
+	'[':  "lbracket",
+	']':  "rbracket",
+	')':  "rparen",
+	'(':  "lparen",
+	'>':  "stairs",
+	'!':  "potion",
+}
+
 func getImage(cell UICell) []byte {
-	buf := make([]byte, len(TileImgs["img"]))
-	base64.StdEncoding.Decode(buf, TileImgs["img"]) // TODO: check error
+	pngImg := TileImgs["map-notile"]
+	if im, ok := TileImgs["map-"+string(cell.r)]; ok {
+		pngImg = im
+	} else if im, ok := TileImgs["map-"+MapNames[cell.r]]; ok {
+		pngImg = im
+	}
+	buf := make([]byte, len(pngImg))
+	base64.StdEncoding.Decode(buf, pngImg) // TODO: check error
 	br := bytes.NewReader(buf)
 	img, err := png.Decode(br)
 	if err != nil {
@@ -84,10 +134,11 @@ func (ui *termui) Draw(cell UICell, x, y int) {
 		canvas = cv
 	} else {
 		canvas = js.Global().Get("document").Call("createElement", "canvas")
-		if Tiles {
+		if Tiles && cell.inMap {
 			canvas.Set("width", 16)
 			canvas.Set("height", 24)
 			ctx := canvas.Call("getContext", "2d")
+			ctx.Set("imageSmoothingEnabled", false)
 			buf := getImage(cell)
 			ta := js.TypedArrayOf(buf)
 			ca := js.Global().Get("Uint8ClampedArray").New(ta)
@@ -98,11 +149,16 @@ func (ui *termui) Draw(cell UICell, x, y int) {
 			canvas.Set("width", ui.width)
 			canvas.Set("height", ui.height)
 			ctx := canvas.Call("getContext", "2d")
+			ctx.Set("imageSmoothingEnabled", false)
 			ctx.Set("font", ui.ctx.Get("font"))
 			ctx.Set("fillStyle", cell.bg.String())
 			ctx.Call("fillRect", 0, 0, ui.width, ui.height)
 			ctx.Set("fillStyle", cell.fg.String())
-			ctx.Call("fillText", string(cell.r), 0, 18)
+			if Tiles {
+				ctx.Call("fillText", string(cell.r), 0, 18)
+			} else {
+				ctx.Call("fillText", string(cell.r), 0, 18)
+			}
 		}
 		ui.cache[cell] = canvas
 	}
@@ -114,5 +170,6 @@ func (ui *termui) GetMousePos(evt js.Value) (x, y int) {
 	rect := canvas.Call("getBoundingClientRect")
 	x = evt.Get("clientX").Int() - rect.Get("left").Int()
 	y = evt.Get("clientY").Int() - rect.Get("top").Int()
-	return (x - ui.width/2) / ui.width, (y - (ui.height/2 - 3)) / ui.height
+	return (x - (ui.width-1)/2) / ui.width, (y - (ui.height/2 - 4)) / ui.height
+	//return (x - ui.width/2) / ui.width, (y - ui.height/2) / ui.height
 }

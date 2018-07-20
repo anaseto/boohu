@@ -194,9 +194,10 @@ func (ui *termui) Init() error {
 }
 
 type UICell struct {
-	fg uicolor
-	bg uicolor
-	r  rune
+	fg    uicolor
+	bg    uicolor
+	r     rune
+	inMap bool
 }
 
 func (c uicolor) String() string {
@@ -332,9 +333,9 @@ func (ui *termui) FlushCallback(obj js.Value) {
 			continue
 		}
 		cell := ui.cells[i]
-		if cell.r == ' ' {
-			cell.r = ' '
-		}
+		//if cell.r == ' ' {
+		//cell.r = ' '
+		//}
 		x, y := ui.GetPos(i)
 		ui.Draw(cell, x, y)
 		ui.backBuffer[i] = cell
@@ -355,6 +356,14 @@ func (ui *termui) SetCell(x, y int, r rune, fg, bg uicolor) {
 		return
 	}
 	ui.cells[ui.GetIndex(x, y)] = UICell{fg: fg, bg: bg, r: r}
+}
+
+func (ui *termui) SetMapCell(x, y int, r rune, fg, bg uicolor) {
+	i := ui.GetIndex(x, y)
+	if i >= len(ui.cells) {
+		return
+	}
+	ui.cells[ui.GetIndex(x, y)] = UICell{fg: fg, bg: bg, r: r, inMap: true}
 }
 
 type jsInput struct {
