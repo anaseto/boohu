@@ -63,7 +63,7 @@ var TileImgs map[string][]byte
 var MapNames = map[rune]string{
 	'¤':  "frontier",
 	'☻':  "dreaming",
-	'♫':  "footseps",
+	'♫':  "footsteps",
 	'#':  "wall",
 	'@':  "player",
 	'§':  "fog",
