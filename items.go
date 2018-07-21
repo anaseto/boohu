@@ -756,7 +756,7 @@ func (wp weapon) String() string {
 	case HarKarGauntlets:
 		return "har-kar gauntlets"
 	case DefenderFlail:
-		return "defender mace"
+		return "defender flail"
 	default:
 		// should not happen
 		return "some weapon"
