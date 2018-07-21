@@ -2513,6 +2513,9 @@ func (ui *termui) DrawColoredTextOnBG(text string, x, y int, fg, bg uicolor) {
 			col = 0
 			continue
 		}
+		if x+col >= UIWidth {
+			break
+		}
 		ui.SetCell(x+col, y, r, fg, bg)
 		col++
 	}
