@@ -62,6 +62,8 @@ var TileImgs map[string][]byte
 
 var MapNames = map[rune]string{
 	'¤':  "frontier",
+	'√':  "hit",
+	'Φ':  "magic",
 	'☻':  "dreaming",
 	'♫':  "footsteps",
 	'#':  "wall",
@@ -94,12 +96,63 @@ var MapNames = map[rune]string{
 	'!':  "potion",
 }
 
+var LetterNames = map[rune]string{
+	'(':  "lparen",
+	')':  "rparen",
+	'@':  "player",
+	'{':  "lbrace",
+	'}':  "rbrace",
+	'[':  "lbracket",
+	']':  "rbracket",
+	'♪':  "music1",
+	'♫':  "music2",
+	'•':  "tick",
+	'♣':  "simella",
+	' ':  "space",
+	'!':  "exclamation",
+	'?':  "interrogation",
+	',':  "comma",
+	':':  "colon",
+	';':  "semicolon",
+	'\'': "quote",
+	'—':  "longhyphen",
+	'-':  "hyphen",
+	'|':  "pipe",
+	'/':  "slash",
+	'\\': "backslash",
+	'%':  "percent",
+	'┐':  "boxne",
+	'┤':  "boxe",
+	'│':  "vbar",
+	'┘':  "boxse",
+	'─':  "hbar",
+	'►':  "arrow",
+	'×':  "times",
+	'.':  "dot",
+	'#':  "hash",
+	'"':  "quotes",
+	'+':  "plus",
+	'«':  "frenchlquotes",
+	'»':  "frenchrquotes",
+	'>':  "gt",
+}
+
 func getImage(cell UICell) []byte {
-	pngImg := TileImgs["map-notile"]
-	if im, ok := TileImgs["map-"+string(cell.r)]; ok {
-		pngImg = im
-	} else if im, ok := TileImgs["map-"+MapNames[cell.r]]; ok {
-		pngImg = im
+	var pngImg []byte
+	if cell.inMap {
+		pngImg = TileImgs["map-notile"]
+		if im, ok := TileImgs["map-"+string(cell.r)]; ok {
+			pngImg = im
+		} else if im, ok := TileImgs["map-"+MapNames[cell.r]]; ok {
+			pngImg = im
+		}
+	} else {
+		pngImg = TileImgs["map-notile"]
+		if im, ok := TileImgs["letter-"+string(cell.r)]; ok {
+			pngImg = im
+		} else if im, ok := TileImgs["letter-"+LetterNames[cell.r]]; ok {
+			pngImg = im
+		}
 	}
 	buf := make([]byte, len(pngImg))
 	base64.StdEncoding.Decode(buf, pngImg) // TODO: check error
@@ -134,7 +187,7 @@ func (ui *termui) Draw(cell UICell, x, y int) {
 		canvas = cv
 	} else {
 		canvas = js.Global().Get("document").Call("createElement", "canvas")
-		if Tiles && cell.inMap {
+		if Tiles {
 			canvas.Set("width", 16)
 			canvas.Set("height", 24)
 			ctx := canvas.Call("getContext", "2d")
@@ -154,11 +207,11 @@ func (ui *termui) Draw(cell UICell, x, y int) {
 			ctx.Set("fillStyle", cell.bg.String())
 			ctx.Call("fillRect", 0, 0, ui.width, ui.height)
 			ctx.Set("fillStyle", cell.fg.String())
-			if Tiles {
-				ctx.Call("fillText", string(cell.r), 0, 18)
-			} else {
-				ctx.Call("fillText", string(cell.r), 0, 18)
-			}
+			//if Tiles {
+			//ctx.Call("fillText", string(cell.r), 0, 18)
+			//} else {
+			ctx.Call("fillText", string(cell.r), 0, 18)
+			//}
 		}
 		ui.cache[cell] = canvas
 	}

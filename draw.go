@@ -1598,12 +1598,12 @@ func (ui *termui) SwappingAnimation(g *game, mpos, ppos position) {
 	time.Sleep(25 * time.Millisecond)
 	_, fgm, bgColorm := ui.PositionDrawing(g, mpos)
 	_, _, bgColorp := ui.PositionDrawing(g, ppos)
-	ui.DrawAtPosition(g, mpos, true, '¤', fgm, bgColorp)
-	ui.DrawAtPosition(g, ppos, true, '¤', ColorFgPlayer, bgColorm)
+	ui.DrawAtPosition(g, mpos, true, 'Φ', fgm, bgColorp)
+	ui.DrawAtPosition(g, ppos, true, 'Φ', ColorFgPlayer, bgColorm)
 	ui.Flush()
 	time.Sleep(75 * time.Millisecond)
-	ui.DrawAtPosition(g, mpos, true, '¤', ColorFgPlayer, bgColorp)
-	ui.DrawAtPosition(g, ppos, true, '¤', fgm, bgColorm)
+	ui.DrawAtPosition(g, mpos, true, 'Φ', ColorFgPlayer, bgColorp)
+	ui.DrawAtPosition(g, ppos, true, 'Φ', fgm, bgColorm)
 	ui.Flush()
 	time.Sleep(75 * time.Millisecond)
 }
@@ -1614,12 +1614,12 @@ func (ui *termui) TeleportAnimation(g *game, from, to position, showto bool) {
 	}
 	_, _, bgColorf := ui.PositionDrawing(g, from)
 	_, _, bgColort := ui.PositionDrawing(g, to)
-	ui.DrawAtPosition(g, from, true, '¤', ColorCyan, bgColorf)
+	ui.DrawAtPosition(g, from, true, 'Φ', ColorCyan, bgColorf)
 	ui.Flush()
 	time.Sleep(75 * time.Millisecond)
 	if showto {
-		ui.DrawAtPosition(g, from, true, '¤', ColorBlue, bgColorf)
-		ui.DrawAtPosition(g, to, true, '¤', ColorCyan, bgColort)
+		ui.DrawAtPosition(g, from, true, 'Φ', ColorBlue, bgColorf)
+		ui.DrawAtPosition(g, to, true, 'Φ', ColorCyan, bgColort)
 		ui.Flush()
 		time.Sleep(75 * time.Millisecond)
 	}
@@ -1702,7 +1702,7 @@ func (ui *termui) ExplosionAnimation(g *game, es explosionStyle, pos position) {
 				r = '~'
 			}
 			if mons.Exists() || g.Player.Pos == npos {
-				r = '¤'
+				r = '√'
 			}
 			//ui.DrawAtPosition(g, npos, true, r, fg, bgColor)
 			ui.DrawAtPosition(g, npos, true, r, bgColor, fg)
@@ -1745,7 +1745,7 @@ func (ui *termui) LightningBoltAnimation(g *game, ray []position) {
 				r = '+'
 			}
 			if mons.Exists() {
-				r = '¤'
+				r = '√'
 			}
 			//ui.DrawAtPosition(g, pos, true, r, fg, bgColor)
 			ui.DrawAtPosition(g, pos, true, r, bgColor, fg)
@@ -1819,7 +1819,7 @@ func (ui *termui) HitAnimation(g *game, pos position, targeting bool) {
 	_, _, bgColor := ui.PositionDrawing(g, pos)
 	mons := g.MonsterAt(pos)
 	if mons.Exists() || pos == g.Player.Pos {
-		ui.DrawAtPosition(g, pos, targeting, '¤', ColorFgAnimationHit, bgColor)
+		ui.DrawAtPosition(g, pos, targeting, '√', ColorFgAnimationHit, bgColor)
 	} else {
 		ui.DrawAtPosition(g, pos, targeting, '∞', ColorFgAnimationHit, bgColor)
 	}
@@ -1839,7 +1839,7 @@ func (ui *termui) LightningHitAnimation(g *game, targets []position) {
 			_, _, bgColor := ui.PositionDrawing(g, pos)
 			mons := g.MonsterAt(pos)
 			if mons.Exists() || pos == g.Player.Pos {
-				ui.DrawAtPosition(g, pos, false, '¤', bgColor, colors[RandInt(2)])
+				ui.DrawAtPosition(g, pos, false, '√', bgColor, colors[RandInt(2)])
 			} else {
 				ui.DrawAtPosition(g, pos, false, '∞', bgColor, colors[RandInt(2)])
 			}
