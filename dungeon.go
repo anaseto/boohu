@@ -1161,6 +1161,87 @@ func (d *dungeon) SimpleRoom(r room) map[position]bool {
 	return doors
 }
 
+func (g *game) ExtendEdgeRoom(r room, doors map[position]bool) room {
+	if g.Dungeon.Cell(r.pos).T != WallCell {
+		return r
+	}
+	extend := false
+	if r.pos.X+r.w+1 == DungeonWidth {
+		for i := r.pos.Y + 1; i < r.pos.Y+r.h-1; i++ {
+			g.Dungeon.SetCell(position{DungeonWidth - 2, i}, FreeCell)
+			g.Dungeon.SetCell(position{DungeonWidth - 1, i}, WallCell)
+		}
+		g.Dungeon.SetCell(position{DungeonWidth - 1, r.pos.Y}, WallCell)
+		g.Dungeon.SetCell(position{DungeonWidth - 1, r.pos.Y + r.h - 1}, WallCell)
+		r.w++
+		extend = true
+	}
+	if r.pos.X == 1 {
+		for i := r.pos.Y + 1; i < r.pos.Y+r.h-1; i++ {
+			g.Dungeon.SetCell(position{1, i}, FreeCell)
+			g.Dungeon.SetCell(position{0, i}, WallCell)
+		}
+		g.Dungeon.SetCell(position{0, r.pos.Y}, WallCell)
+		g.Dungeon.SetCell(position{0, r.pos.Y + r.h - 1}, WallCell)
+		r.w++
+		r.pos.X--
+		extend = true
+	}
+	if r.pos.Y+r.h+1 == DungeonHeight {
+		for i := r.pos.X + 1; i < r.pos.X+r.w-1; i++ {
+			g.Dungeon.SetCell(position{i, DungeonHeight - 2}, FreeCell)
+			g.Dungeon.SetCell(position{i, DungeonHeight - 1}, WallCell)
+		}
+		g.Dungeon.SetCell(position{r.pos.X, DungeonHeight - 1}, WallCell)
+		g.Dungeon.SetCell(position{r.pos.X + r.w - 1, DungeonHeight - 1}, WallCell)
+		r.h++
+		extend = true
+	}
+	if r.pos.Y == 1 {
+		for i := r.pos.X + 1; i < r.pos.X+r.w-1; i++ {
+			g.Dungeon.SetCell(position{i, 1}, FreeCell)
+			g.Dungeon.SetCell(position{i, 0}, WallCell)
+		}
+		g.Dungeon.SetCell(position{r.pos.X, 0}, WallCell)
+		g.Dungeon.SetCell(position{r.pos.X + r.w - 1, 0}, WallCell)
+		r.h++
+		r.pos.Y--
+		extend = true
+	}
+	if !extend {
+		return r
+	}
+	for pos := range doors {
+		if pos.X == 1 || pos.X == DungeonWidth-2 || pos.Y == 1 || pos.Y == DungeonHeight-2 {
+			delete(g.Doors, pos)
+			continue
+		}
+	}
+	doorsc := [4]position{
+		position{r.pos.X + r.w/2, r.pos.Y},
+		position{r.pos.X + r.w/2, r.pos.Y + r.h - 1},
+		position{r.pos.X, r.pos.Y + r.h/2},
+		position{r.pos.X + r.w - 1, r.pos.Y + r.h/2},
+	}
+	ndoorsc := []position{}
+	ndoors := 0
+	for _, pos := range doorsc {
+		if pos.X == 0 || pos.X == DungeonWidth-1 || pos.Y == 0 || pos.Y == DungeonHeight-1 {
+			continue
+		}
+		if g.Doors[pos] {
+			ndoors++
+		}
+		ndoorsc = append(ndoorsc, pos)
+	}
+	for i := 0; i < 1+RandInt(2-ndoors); i++ {
+		dpos := ndoorsc[RandInt(len(ndoorsc))]
+		g.Doors[dpos] = true
+		g.Dungeon.SetCell(dpos, FreeCell)
+	}
+	return r
+}
+
 func (g *game) GenBSPMap(h, w int) {
 	rooms := []room{}
 	crooms := []room{{pos: position{1, 1}, w: DungeonWidth - 2, h: DungeonHeight - 2}}
@@ -1241,7 +1322,7 @@ func (g *game) GenBSPMap(h, w int) {
 	g.Doors = map[position]bool{}
 	special := 0
 	empty := 0
-	for _, r := range rooms {
+	for i, r := range rooms {
 		var doors map[position]bool
 		if RandInt(2+special/3) == 0 && r.w%2 == 1 && r.h%2 == 1 && r.w >= 5 && r.h >= 5 {
 			doors = d.BuildRoom(r.pos, r.w, r.h, true)
@@ -1274,6 +1355,10 @@ func (g *game) GenBSPMap(h, w int) {
 			if g.DoorCandidate(pos) && RandInt(100) > 10 {
 				g.Doors[pos] = true
 			}
+		}
+		if RandInt(2) == 0 {
+			r = g.ExtendEdgeRoom(r, doors)
+			rooms[i] = r
 		}
 	}
 	g.Fungus = make(map[position]vegetation)
