@@ -422,11 +422,14 @@ loop:
 		case "Escape", " ":
 			break loop
 		}
+		if in.mouse && in.button == -1 {
+			continue
+		}
 		if in.mouse && line >= 0 {
 			if in.mouseY > line || in.mouseX > DungeonWidth {
 				break loop
 			}
-		} else if in.mouse && in.button != -1 {
+		} else if in.mouse {
 			break loop
 		}
 	}
