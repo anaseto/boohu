@@ -29,6 +29,7 @@ func (ui *termui) InitElements() error {
 	canvas := js.Global().Get("document").Call("getElementById", "gamecanvas")
 	canvas.Call("addEventListener", "contextmenu", js.NewEventCallback(js.PreventDefault, func(e js.Value) {
 	}), false)
+	canvas.Call("setAttribute", "tabindex", "1")
 	ui.ctx = canvas.Call("getContext", "2d")
 	ui.ctx.Set("imageSmoothingEnabled", false)
 	//if Tiles {
@@ -234,6 +235,7 @@ func (ui *termui) GetMousePos(evt js.Value) (x, y int) {
 	rect := canvas.Call("getBoundingClientRect")
 	x = evt.Get("clientX").Int() - rect.Get("left").Int()
 	y = evt.Get("clientY").Int() - rect.Get("top").Int()
-	return (x - (ui.width-1)/2) / ui.width, (y - (ui.height/2 - 4)) / ui.height
+	//return (x - (ui.width)/2 + 5) / ui.width, (y - ui.height/2 + 10) / ui.height
+	return (x - 1) / ui.width, (y - 1) / ui.height
 	//return (x - ui.width/2) / ui.width, (y - ui.height/2) / ui.height
 }

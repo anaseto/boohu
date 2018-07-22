@@ -4,6 +4,12 @@ html{
 	color:#657b83;
 	font-size:16px;
 }
+canvas:focus {
+	outline: black 5px solid;
+}
+canvas:hover {
+	outline: black 5px solid;
+}
 body {
 	margin-left:5%;
 }

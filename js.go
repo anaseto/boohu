@@ -175,14 +175,23 @@ func (g *game) WriteDump() error {
 
 func (ui *termui) Init() error {
 	ui.cells = make([]UICell, UIWidth*UIHeight)
-	js.Global().Get("document").Call("addEventListener", "keypress", js.NewEventCallback(0, func(e js.Value) {
-		s := e.Get("key").String()
-		ch <- jsInput{key: s}
-	}))
-	js.Global().Get("document").Call("addEventListener", "mousedown", js.NewEventCallback(0, func(e js.Value) {
-		x, y := ui.GetMousePos(e)
-		ch <- jsInput{mouse: true, mouseX: x, mouseY: y, button: e.Get("button").Int()}
-	}))
+	js.Global().Get("document").Call("getElementById", "gamecanvas").Call(
+		"addEventListener", "keypress", js.NewEventCallback(0, func(e js.Value) {
+			s := e.Get("key").String()
+			ch <- jsInput{key: s}
+		}))
+	js.Global().Get("document").Call(
+		"addEventListener", "keypress", js.NewEventCallback(0, func(e js.Value) {
+			s := e.Get("key").String()
+			if s == " " {
+				e.Call("preventDefault")
+			}
+		}))
+	js.Global().Get("document").Call("getElementById", "gamecanvas").Call(
+		"addEventListener", "mousedown", js.NewEventCallback(0, func(e js.Value) {
+			x, y := ui.GetMousePos(e)
+			ch <- jsInput{mouse: true, mouseX: x, mouseY: y, button: e.Get("button").Int()}
+		}))
 	//js.Global().Get("document").Call("addEventListener", "mousemove", func(e js.Value) {
 	//x, y := ui.GetMousePos(e)
 	//ui.mouse = position{x, y}
