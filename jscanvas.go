@@ -135,6 +135,16 @@ var LetterNames = map[rune]string{
 	'«':  "frenchlquotes",
 	'»':  "frenchrquotes",
 	'>':  "gt",
+	'¤':  "frontier",
+	'√':  "hit",
+	'Φ':  "magic",
+	'§':  "fog",
+	'●':  "rock",
+	'~':  "tilde",
+	'☼':  "sun",
+	'*':  "asterisc",
+	'∞':  "kill",
+	'☻':  "dreaming",
 }
 
 func getImage(cell UICell) []byte {
