@@ -6,6 +6,8 @@ import (
 	"testing"
 )
 
+var Rounds = 100
+
 func BenchmarkCellularAutomataCaveMap(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		g := &game{}
@@ -14,7 +16,7 @@ func BenchmarkCellularAutomataCaveMap(b *testing.B) {
 }
 
 func TestCellularAutomataCaveMap(t *testing.T) {
-	for i := 0; i < 100; i++ {
+	for i := 0; i < Rounds; i++ {
 		g := &game{}
 		g.GenCellularAutomataCaveMap(DungeonHeight, DungeonWidth)
 		if !g.Dungeon.connex() {
@@ -24,7 +26,7 @@ func TestCellularAutomataCaveMap(t *testing.T) {
 }
 
 func TestCaveMap(t *testing.T) {
-	for i := 0; i < 100; i++ {
+	for i := 0; i < Rounds; i++ {
 		g := &game{}
 		g.GenCaveMap(DungeonHeight, DungeonWidth)
 		if !g.Dungeon.connex() {
@@ -34,7 +36,7 @@ func TestCaveMap(t *testing.T) {
 }
 
 func TestCaveMapTree(t *testing.T) {
-	for i := 0; i < 100; i++ {
+	for i := 0; i < Rounds; i++ {
 		g := &game{}
 		g.GenCaveMapTree(DungeonHeight, DungeonWidth)
 		if !g.Dungeon.connex() {
@@ -44,7 +46,7 @@ func TestCaveMapTree(t *testing.T) {
 }
 
 func TestRuinsMap(t *testing.T) {
-	for i := 0; i < 100; i++ {
+	for i := 0; i < Rounds; i++ {
 		g := &game{}
 		g.GenRuinsMap(DungeonHeight, DungeonWidth)
 		if !g.Dungeon.connex() {
@@ -54,7 +56,7 @@ func TestRuinsMap(t *testing.T) {
 }
 
 func TestBSPMap(t *testing.T) {
-	for i := 0; i < 100; i++ {
+	for i := 0; i < Rounds; i++ {
 		g := &game{}
 		g.GenBSPMap(DungeonHeight, DungeonWidth)
 		if !g.Dungeon.connex() {
@@ -79,7 +81,7 @@ func (d *dungeon) String() string {
 }
 
 func TestRoomMap(t *testing.T) {
-	for i := 0; i < 100; i++ {
+	for i := 0; i < Rounds; i++ {
 		g := &game{}
 		g.GenRoomMap(DungeonHeight, DungeonWidth)
 		if !g.Dungeon.connex() {
