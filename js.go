@@ -624,6 +624,7 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (er
 				if g.Targeting == mpos {
 					break
 				}
+				g.Targeting = InvalidPos
 				fallthrough
 			case 0:
 				if in.mouseY == DungeonHeight {
@@ -649,8 +650,7 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (er
 					err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: KeyDescription}, data)
 				}
 			case 1:
-				g.Targeting = InvalidPos
-				notarg = true
+				err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: KeyExclude}, data)
 			}
 		}
 		return err, again, quit, notarg

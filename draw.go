@@ -965,7 +965,7 @@ func (ui *termui) ExamineHelp(g *game) {
 		"Cycle through objects", "o",
 		"Go to/select target", "“.” or enter or mouse left",
 		"View target description", "v or d or mouse right",
-		"Toggle exclude area from auto-travel", "e",
+		"Toggle exclude area from auto-travel", "e or mouse middle",
 	})
 }
 

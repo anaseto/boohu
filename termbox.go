@@ -360,8 +360,7 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (er
 					err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: KeyDescription}, data)
 				}
 			case termbox.MouseMiddle:
-				g.Targeting = InvalidPos
-				notarg = true
+				err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: KeyExclude}, data)
 			}
 		}
 	}
