@@ -418,7 +418,7 @@ func (g *game) BlockEffects(m *monster) {
 				g.Stats.Digs++
 				g.MakeNoise(WallNoise+1, pos)
 				g.Fog(pos, 1, g.Ev)
-				g.Print("The blocking sound destroys a wall.")
+				g.Print("The blocking sound destructs a wall.")
 			}
 		}
 	case BashingShield:

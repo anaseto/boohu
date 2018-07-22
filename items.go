@@ -421,7 +421,7 @@ func (p projectile) Desc() (text string) {
 	case ConfusingDart:
 		text = "can be silently thrown to confuse foes, dealing up to 7 damage. Confused monsters cannot move diagonally."
 	case ExplosiveMagara:
-		text = "can be thrown to cause a fire explosion halving HP of monsters in a square area. It can occasionally destroy walls."
+		text = "can be thrown to cause a fire explosion halving HP of monsters in a square area. It can occasionally destruct walls."
 	case NightMagara:
 		text = "can be thrown at a monster to produce sleep inducing clouds in a 2-radius area. You are affected too by the clouds, but they will slow your actions instead."
 	}

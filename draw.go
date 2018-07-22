@@ -1474,8 +1474,10 @@ func (ui *termui) ViewPositionDescription(g *game, pos position) {
 		ui.DrawDescription(g, "A simella is a plant with big white flowers which are used in the Underground for their medicinal properties. They can also make tasty infusions. You were actually sent here by your village to collect as many as possible of those plants.")
 	} else if _, ok := g.Fungus[pos]; ok && g.Dungeon.Cell(pos).T == FreeCell {
 		ui.DrawDescription(g, "Blue dense foliage grows in the Underground. It is difficult to see through, and is flammable.")
+	} else if g.Dungeon.Cell(pos).T == WallCell {
+		ui.DrawDescription(g, "A wall is an impassable pile of rocks. It can be destructed by using some items.")
 	} else {
-		g.Print("Nothing worth of description here.")
+		ui.DrawDescription(g, "This is just plain ground.")
 	}
 }
 
