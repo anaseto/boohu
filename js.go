@@ -192,6 +192,15 @@ func (ui *termui) Init() error {
 			x, y := ui.GetMousePos(e)
 			ch <- jsInput{mouse: true, mouseX: x, mouseY: y, button: e.Get("button").Int()}
 		}))
+	js.Global().Get("document").Call("getElementById", "gamecanvas").Call(
+		"addEventListener", "mousemove", js.NewEventCallback(0, func(e js.Value) {
+			x, y := ui.GetMousePos(e)
+			if x != ui.mousepos.X || y != ui.mousepos.Y {
+				ui.mousepos.X = x
+				ui.mousepos.Y = y
+				ch <- jsInput{mouse: true, mouseX: x, mouseY: y, button: -1}
+			}
+		}))
 	//js.Global().Get("document").Call("addEventListener", "mousemove", func(e js.Value) {
 	//x, y := ui.GetMousePos(e)
 	//ui.mouse = position{x, y}
@@ -322,6 +331,8 @@ func (ui *termui) Close() {
 func (ui *termui) PostInit() {
 	SolarizedPalette()
 	ui.HideCursor()
+	//MenuCols[MenuOther] = MenuCols[MenuView]
+	//MenuCols[MenuView] = [2]int{-1, -1}
 }
 
 func (ui *termui) Clear() {
@@ -359,12 +370,17 @@ func (ui *termui) SetCursor(pos position) {
 	ui.cursor = pos
 }
 
+//func (ui *termui) IsMapCell(x, y int) bool {
+//	i := ui.GetIndex(x, y)
+//	return i < len(ui.cells) && ui.cells[i].inMap
+//}
+
 func (ui *termui) SetCell(x, y int, r rune, fg, bg uicolor) {
 	i := ui.GetIndex(x, y)
 	if i >= len(ui.cells) {
 		return
 	}
-	ui.cells[ui.GetIndex(x, y)] = UICell{fg: fg, bg: bg, r: r}
+	ui.cells[i] = UICell{fg: fg, bg: bg, r: r}
 }
 
 func (ui *termui) SetMapCell(x, y int, r rune, fg, bg uicolor) {
@@ -372,7 +388,7 @@ func (ui *termui) SetMapCell(x, y int, r rune, fg, bg uicolor) {
 	if i >= len(ui.cells) {
 		return
 	}
-	ui.cells[ui.GetIndex(x, y)] = UICell{fg: fg, bg: bg, r: r, inMap: true}
+	ui.cells[i] = UICell{fg: fg, bg: bg, r: r, inMap: true}
 }
 
 type jsInput struct {
@@ -398,12 +414,6 @@ func (ui *termui) PollEvent() (in jsInput) {
 	return in
 }
 
-//func (ui *termui) ExploreStep(g *game) bool {
-//time.Sleep(5 * time.Millisecond)
-//ui.DrawDungeonView(g, NormalMode)
-//return false
-//}
-
 func (ui *termui) WaitForContinue(g *game, line int) {
 loop:
 	for {
@@ -416,7 +426,7 @@ loop:
 			if in.mouseY > line || in.mouseX > DungeonWidth {
 				break loop
 			}
-		} else if in.mouse {
+		} else if in.mouse && in.button != -1 {
 			break loop
 		}
 	}
@@ -440,7 +450,7 @@ func (ui *termui) PressAnyKey() error {
 		if e.interrupt {
 			return errors.New("interrupted")
 		}
-		if e.key != "" || e.mouse {
+		if e.key != "" || (e.mouse && e.button != -1) {
 			return nil
 		}
 	}
@@ -454,6 +464,12 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 		if in.mouse {
 			pos := position{X: in.mouseX, Y: in.mouseY}
 			switch in.button {
+			case -1:
+				if in.mouseX >= DungeonWidth || in.mouseY >= DungeonHeight {
+					again = true
+					break
+				}
+				fallthrough
 			case 0:
 				if in.mouseY == DungeonHeight {
 					m, ok := ui.WhichButton(in.mouseX)
@@ -600,6 +616,15 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (er
 	case "":
 		if in.mouse {
 			switch in.button {
+			case -1:
+				if in.mouseY >= DungeonHeight || in.mouseX >= DungeonWidth {
+					break
+				}
+				mpos := position{in.mouseX, in.mouseY}
+				if g.Targeting == mpos {
+					break
+				}
+				fallthrough
 			case 0:
 				if in.mouseY == DungeonHeight {
 					m, ok := ui.WhichButton(in.mouseX)
@@ -618,7 +643,11 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (er
 					again, notarg = ui.CursorMouseLeft(g, targ, position{X: in.mouseX, Y: in.mouseY}, data)
 				}
 			case 2:
-				err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: KeyMenu}, data)
+				if in.mouseY >= DungeonHeight || in.mouseX >= DungeonWidth {
+					err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: KeyMenu}, data)
+				} else {
+					err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: KeyDescription}, data)
+				}
 			case 1:
 				g.Targeting = InvalidPos
 				notarg = true

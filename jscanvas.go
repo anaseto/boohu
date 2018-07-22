@@ -21,9 +21,10 @@ type termui struct {
 	ctx        js.Value
 	width      int
 	height     int
+	mousepos   position
 }
 
-var Tiles bool = false
+var Tiles bool = true
 
 func (ui *termui) InitElements() error {
 	canvas := js.Global().Get("document").Call("getElementById", "gamecanvas")
@@ -235,7 +236,5 @@ func (ui *termui) GetMousePos(evt js.Value) (x, y int) {
 	rect := canvas.Call("getBoundingClientRect")
 	x = evt.Get("clientX").Int() - rect.Get("left").Int()
 	y = evt.Get("clientY").Int() - rect.Get("top").Int()
-	//return (x - (ui.width)/2 + 5) / ui.width, (y - ui.height/2 + 10) / ui.height
 	return (x - 1) / ui.width, (y - 1) / ui.height
-	//return (x - ui.width/2) / ui.width, (y - ui.height/2) / ui.height
 }

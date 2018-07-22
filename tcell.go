@@ -356,7 +356,12 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (er
 				again, notarg = ui.CursorMouseLeft(g, targ, position{X: x, Y: y}, data)
 			}
 		case tcell.Button3:
-			err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: KeyMenu}, data)
+			x, y := tev.Position()
+			if y >= DungeonHeight || x >= DungeonWidth {
+				err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: KeyMenu}, data)
+			} else {
+				err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: KeyDescription}, data)
+			}
 		case tcell.Button2:
 			g.Targeting = InvalidPos
 			notarg = true

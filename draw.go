@@ -870,7 +870,7 @@ func (ui *termui) HandleKey(g *game, rka runeKeyAction) (err error, again bool, 
 		err = ui.HandleSettingAction(g)
 		again = true
 	case KeyDescription:
-		ui.MenuSelectedAnimation(g, MenuView, false)
+		//ui.MenuSelectedAnimation(g, MenuView, false)
 		err = fmt.Errorf("You must choose a target to describe.")
 	case KeyExclude:
 		err = fmt.Errorf("You must choose a target for exclusion.")
@@ -964,7 +964,7 @@ func (ui *termui) ExamineHelp(g *game) {
 		"Cycle through stairs", ">",
 		"Cycle through objects", "o",
 		"Go to/select target", "“.” or enter or mouse left",
-		"View target description", "v or d",
+		"View target description", "v or d or mouse right",
 		"Toggle exclude area from auto-travel", "e",
 	})
 }
@@ -1438,11 +1438,11 @@ loop:
 
 func (ui *termui) ViewPositionDescription(g *game, pos position) {
 	if !g.Dungeon.Cell(pos).Explored {
-		ui.MenuSelectedAnimation(g, MenuView, false)
+		//ui.MenuSelectedAnimation(g, MenuView, false)
 		g.Print("No description: unknown place.")
 		return
 	}
-	ui.MenuSelectedAnimation(g, MenuView, true)
+	//ui.MenuSelectedAnimation(g, MenuView, true)
 	mons := g.MonsterAt(pos)
 	if mons.Exists() && g.Player.LOS[mons.Pos] {
 		ui.HideCursor()
@@ -2134,7 +2134,7 @@ const (
 	MenuThrow
 	MenuDrink
 	MenuEvoke
-	MenuView
+	//MenuView
 	MenuOther
 )
 
@@ -2150,8 +2150,8 @@ func (m menu) String() (text string) {
 		text = "drink"
 	case MenuEvoke:
 		text = "evoke"
-	case MenuView:
-		text = "view"
+	//case MenuView:
+	//text = "view"
 	case MenuOther:
 		text = "other"
 	}
@@ -2170,8 +2170,8 @@ func (m menu) Key() (key keyAction) {
 		key = KeyDrink
 	case MenuEvoke:
 		key = KeyEvoke
-	case MenuView:
-		key = KeyDescription
+	//case MenuView:
+	//key = KeyDescription
 	case MenuOther:
 		key = KeyMenu
 	}
@@ -2184,8 +2184,8 @@ var MenuCols = [][2]int{
 	MenuThrow:   {0, 0},
 	MenuDrink:   {0, 0},
 	MenuEvoke:   {0, 0},
-	MenuView:    {0, 0},
-	MenuOther:   {0, 0}}
+	//MenuView:    {0, 0},
+	MenuOther: {0, 0}}
 
 func init() {
 	for i := range MenuCols {
@@ -2203,7 +2203,7 @@ func (ui *termui) WhichButton(col int) (menu, bool) {
 		return MenuOther, false
 	}
 	for i, cols := range MenuCols {
-		if col >= cols[0] && col < cols[1] {
+		if cols[0] >= 0 && col >= cols[0] && col < cols[1] {
 			return menu(i), true
 		}
 	}
@@ -2213,7 +2213,9 @@ func (ui *termui) WhichButton(col int) (menu, bool) {
 func (ui *termui) DrawMenus(g *game) {
 	line := DungeonHeight
 	for i, cols := range MenuCols {
-		ui.DrawColoredText(menu(i).String(), cols[0], line, ColorViolet)
+		if cols[0] >= 0 {
+			ui.DrawColoredText(menu(i).String(), cols[0], line, ColorViolet)
+		}
 	}
 }
 
@@ -2743,7 +2745,7 @@ func (ui *termui) ActionItem(g *game, i, lnum int, ka keyAction, fg uicolor) {
 var menuActions = []keyAction{
 	KeyDescend,
 	KeyEquip,
-	KeyExclude,
+	//KeyExclude,
 	KeyCharacterInfo,
 	KeyLogs,
 	KeyHelp,
