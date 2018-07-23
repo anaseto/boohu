@@ -87,6 +87,7 @@ var MapNames = map[rune]string{
 	'(':  "lparen",
 	'>':  "stairs",
 	'!':  "potion",
+	';':  "semicolon",
 }
 
 var LetterNames = map[rune]string{
