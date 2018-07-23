@@ -1438,6 +1438,9 @@ loop:
 		data.npos = pos
 		var notarg bool
 		err, again, quit, notarg = ui.TargetModeEvent(g, targ, data)
+		if err != nil {
+			err = ui.CleanError(err)
+		}
 		if !again || notarg {
 			break loop
 		}
@@ -1455,11 +1458,9 @@ loop:
 
 func (ui *termui) ViewPositionDescription(g *game, pos position) {
 	if !g.Dungeon.Cell(pos).Explored {
-		//ui.MenuSelectedAnimation(g, MenuView, false)
-		g.Print("No description: unknown place.")
+		ui.DrawDescription(g, "This place is unknown to you.")
 		return
 	}
-	//ui.MenuSelectedAnimation(g, MenuView, true)
 	mons := g.MonsterAt(pos)
 	if mons.Exists() && g.Player.LOS[mons.Pos] {
 		ui.HideCursor()

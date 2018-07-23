@@ -685,10 +685,16 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (er
 						ui.DrawMenus(g)
 						ui.Flush()
 					}
+					g.Targeting = InvalidPos
+					notarg = true
+					err = errors.New(DoNothing)
 					break
 				}
 				ui.menuHover = -1
 				if in.mouseY >= DungeonHeight || in.mouseX >= DungeonWidth {
+					g.Targeting = InvalidPos
+					notarg = true
+					err = errors.New(DoNothing)
 					break
 				}
 				mpos := position{in.mouseX, in.mouseY}
