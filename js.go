@@ -208,6 +208,7 @@ func (ui *termui) Init() error {
 				ch <- jsInput{mouse: true, mouseX: x, mouseY: y, button: -1}
 			}
 		}))
+	ui.menuHover = -1
 	ui.ResetCells()
 	ui.backBuffer = make([]UICell, UIWidth*UIHeight)
 	ui.InitElements()
@@ -492,6 +493,21 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 			pos := position{X: in.mouseX, Y: in.mouseY}
 			switch in.button {
 			case -1:
+				if in.mouseY == DungeonHeight {
+					m, ok := ui.WhichButton(in.mouseX)
+					omh := ui.menuHover
+					if ok {
+						ui.menuHover = m
+					} else {
+						ui.menuHover = -1
+					}
+					if ui.menuHover != omh {
+						ui.DrawMenus(g)
+						ui.Flush()
+					}
+					break
+				}
+				ui.menuHover = -1
 				if in.mouseX >= DungeonWidth || in.mouseY >= DungeonHeight {
 					again = true
 					break
@@ -630,6 +646,19 @@ func (ui *termui) KeyMenuAction(n int) (m int, action keyConfigAction) {
 	return n, action
 }
 
+func (ui *termui) DrawMenus(g *game) {
+	line := DungeonHeight
+	for i, cols := range MenuCols {
+		if cols[0] >= 0 {
+			if menu(i) == ui.menuHover {
+				ui.DrawColoredText(menu(i).String(), cols[0], line, ColorBlue)
+			} else {
+				ui.DrawColoredText(menu(i).String(), cols[0], line, ColorViolet)
+			}
+		}
+	}
+}
+
 func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (err error, again, quit, notarg bool) {
 	again = true
 	in := ui.PollEvent()
@@ -644,6 +673,21 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (er
 		if in.mouse {
 			switch in.button {
 			case -1:
+				if in.mouseY == DungeonHeight {
+					m, ok := ui.WhichButton(in.mouseX)
+					omh := ui.menuHover
+					if ok {
+						ui.menuHover = m
+					} else {
+						ui.menuHover = -1
+					}
+					if ui.menuHover != omh {
+						ui.DrawMenus(g)
+						ui.Flush()
+					}
+					break
+				}
+				ui.menuHover = -1
 				if in.mouseY >= DungeonHeight || in.mouseX >= DungeonWidth {
 					break
 				}

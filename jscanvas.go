@@ -22,6 +22,7 @@ type termui struct {
 	width      int
 	height     int
 	mousepos   position
+	menuHover  menu
 }
 
 func (ui *termui) InitElements() error {

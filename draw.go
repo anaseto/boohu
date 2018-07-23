@@ -2233,15 +2233,6 @@ func (ui *termui) WhichButton(col int) (menu, bool) {
 	return MenuOther, false
 }
 
-func (ui *termui) DrawMenus(g *game) {
-	line := DungeonHeight
-	for i, cols := range MenuCols {
-		if cols[0] >= 0 {
-			ui.DrawColoredText(menu(i).String(), cols[0], line, ColorViolet)
-		}
-	}
-}
-
 func (ui *termui) LogColor(e logEntry) uicolor {
 	fg := ColorFg
 	// TODO: define uicolors?
