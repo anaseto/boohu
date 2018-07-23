@@ -14,7 +14,6 @@ import (
 	"unicode/utf8"
 
 	"github.com/gopherjs/gopherwasm/js"
-	//"github.com/gopherjs/gopherjs/js"
 )
 
 func main() {
@@ -26,6 +25,7 @@ func main() {
 	defer tui.Close()
 
 	ApplyDefaultKeyBindings()
+	gameConfig.Tiles = true
 	tui.PostInit()
 	LinkColors()
 
@@ -201,10 +201,6 @@ func (ui *termui) Init() error {
 				ch <- jsInput{mouse: true, mouseX: x, mouseY: y, button: -1}
 			}
 		}))
-	//js.Global().Get("document").Call("addEventListener", "mousemove", func(e js.Value) {
-	//x, y := ui.GetMousePos(e)
-	//ui.mouse = position{x, y}
-	//})
 	ui.ResetCells()
 	ui.backBuffer = make([]UICell, UIWidth*UIHeight)
 	ui.InitElements()
@@ -333,6 +329,7 @@ func (ui *termui) PostInit() {
 	ui.HideCursor()
 	//MenuCols[MenuOther] = MenuCols[MenuView]
 	//MenuCols[MenuView] = [2]int{-1, -1}
+	settingsActions = append(settingsActions, toggleTiles)
 }
 
 func (ui *termui) Clear() {

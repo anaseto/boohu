@@ -2791,6 +2791,7 @@ type setting int
 const (
 	setKeys setting = iota
 	invertLOS
+	toggleTiles
 )
 
 func (s setting) String() (text string) {
@@ -2799,6 +2800,8 @@ func (s setting) String() (text string) {
 		text = "Change key bindings"
 	case invertLOS:
 		text = "Toggle dark/light LOS"
+	case toggleTiles:
+		text = "Toggle Tiles/Ascii display"
 	}
 	return text
 }
@@ -2860,6 +2863,8 @@ func (ui *termui) HandleSettingAction(g *game) error {
 		} else {
 			ApplyLightLOS()
 		}
+	case toggleTiles:
+		ui.ApplyToggleTiles()
 	}
 	return nil
 }

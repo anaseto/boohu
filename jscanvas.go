@@ -24,8 +24,6 @@ type termui struct {
 	mousepos   position
 }
 
-var Tiles bool = true
-
 func (ui *termui) InitElements() error {
 	canvas := js.Global().Get("document").Call("getElementById", "gamecanvas")
 	canvas.Call("addEventListener", "contextmenu", js.NewEventCallback(js.PreventDefault, func(e js.Value) {
@@ -33,31 +31,24 @@ func (ui *termui) InitElements() error {
 	canvas.Call("setAttribute", "tabindex", "1")
 	ui.ctx = canvas.Call("getContext", "2d")
 	ui.ctx.Set("imageSmoothingEnabled", false)
-	//if Tiles {
-	//ui.ctx.Set("font", "22px monospace")
-	//} else {
-	//ui.ctx.Set("font", "18px monospace")
-	//}
-	//if Tiles {
 	ui.width = 16
 	ui.height = 24
 	canvas.Set("height", 24*UIHeight)
 	canvas.Set("width", 16*UIWidth)
-	//} else {
-	//ui.height = 22
-	//mesure := ui.ctx.Call("measureText", "W")
-	//ui.width = mesure.Get("width").Int() + 1
-	//canvas.Set("height", ui.height*UIHeight)
-	//canvas.Set("width", ui.width*UIWidth)
-	//}
-	// seems to be needed again
-	//if Tiles {
-	//ui.ctx.Set("font", "22px monospace")
-	//} else {
-	//ui.ctx.Set("font", "18px monospace")
-	//}
 	ui.cache = make(map[UICell]js.Value)
 	return nil
+}
+
+func (ui *termui) ApplyToggleTiles() {
+	gameConfig.Tiles = !gameConfig.Tiles
+	for c, _ := range ui.cache {
+		if c.inMap {
+			delete(ui.cache, c)
+		}
+	}
+	for i := 0; i < len(ui.backBuffer); i++ {
+		ui.backBuffer[i] = UICell{}
+	}
 }
 
 var TileImgs map[string][]byte
@@ -152,7 +143,7 @@ var LetterNames = map[rune]string{
 
 func getImage(cell UICell) []byte {
 	var pngImg []byte
-	if cell.inMap && Tiles {
+	if cell.inMap && gameConfig.Tiles {
 		pngImg = TileImgs["map-notile"]
 		if im, ok := TileImgs["map-"+string(cell.r)]; ok {
 			pngImg = im
@@ -200,7 +191,7 @@ func (ui *termui) Draw(cell UICell, x, y int) {
 		canvas = cv
 	} else {
 		canvas = js.Global().Get("document").Call("createElement", "canvas")
-		//if Tiles {
+		//if gameConfig.Tiles {
 		canvas.Set("width", 16)
 		canvas.Set("height", 24)
 		ctx := canvas.Call("getContext", "2d")
@@ -211,21 +202,6 @@ func (ui *termui) Draw(cell UICell, x, y int) {
 		imgdata := js.Global().Get("ImageData").New(ca, 16, 24)
 		ctx.Call("putImageData", imgdata, 0, 0)
 		ta.Release()
-		//} else {
-		//canvas.Set("width", ui.width)
-		//canvas.Set("height", ui.height)
-		//ctx := canvas.Call("getContext", "2d")
-		//ctx.Set("imageSmoothingEnabled", false)
-		//ctx.Set("font", ui.ctx.Get("font"))
-		//ctx.Set("fillStyle", cell.bg.String())
-		//ctx.Call("fillRect", 0, 0, ui.width, ui.height)
-		//ctx.Set("fillStyle", cell.fg.String())
-		////if Tiles {
-		////ctx.Call("fillText", string(cell.r), 0, 18)
-		////} else {
-		//ctx.Call("fillText", string(cell.r), 0, 18)
-		////}
-		//}
 		ui.cache[cell] = canvas
 	}
 	ui.ctx.Call("drawImage", canvas, x*ui.width, ui.height*y)

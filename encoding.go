@@ -30,6 +30,7 @@ type config struct {
 	RuneNormalModeKeys map[rune]keyAction
 	RuneTargetModeKeys map[rune]keyAction
 	DarkLOS            bool
+	Tiles              bool
 	Version            string
 }
 

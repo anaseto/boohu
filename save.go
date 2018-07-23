@@ -144,3 +144,6 @@ func (g *game) RemoveDataFile(file string) error {
 	}
 	return nil
 }
+
+func (ui *termui) ApplyToggleTiles() {
+}
