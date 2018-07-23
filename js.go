@@ -45,6 +45,10 @@ func main() {
 		g.Print("Error loading config file.")
 	} else if load {
 		CustomKeys = true
+		if gameConfig.Small {
+			gameConfig.Small = false
+			tui.ApplyToggleLayout()
+		}
 	}
 	g.ui = tui
 	g.EventLoop()
@@ -52,6 +56,7 @@ func main() {
 	tui.DrawText("Refresh the page to start again.\nYou can find last game statistics below.", 0, 0)
 	tui.DrawText(SaveError, 0, 1)
 	tui.Flush()
+	tui.PressAnyKey()
 }
 
 var SaveError string
