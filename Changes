@@ -40,9 +40,9 @@ Items and Monsters:
 + New shields: bashing, confusing and earth shields that occasionally on block
   have a special effect. Bashing moves the monsters several squares away in a
   direction. Confusing just confuses the monster. The earth shield gives much
-  more protection than the others, but impacts produce a sound that can destruct
-  nearby walls, which sometimes can be bad (for example in a corridor) or good
-  (due to the resulting fog).
+  more protection than the others, but impacts produce a noisy sound that can
+  destruct nearby walls, which sometimes can be bad (for example in a corridor)
+  or good (due to the resulting fog).
 + New rod: rod of lightning, an electricity attack to every monster connected
   to you (similar to lightning whip, but for a rod). A little less strong per
   monster than fireball, but probably stronger overall.
@@ -67,9 +67,12 @@ Other gameplay changes:
 
 User Interface:
 
++ New web version with 16x24 tiles, and much improved mouse support.
 + There is now a setting in-game to change default LOS color to a dark one, for
   less contrast.
 + Now in compact 80x24 layout you see a log line even in target mode.
++ Improved the settings menu: now you can toggle normal/compact layout and
+  tiles/ascii mode.
 
 -----------------------------------------------------------------------------
 v0.8.0 2018-06-02
