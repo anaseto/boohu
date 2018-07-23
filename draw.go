@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
+	"runtime"
 	"sort"
 	"strings"
 	"time"
@@ -274,7 +275,11 @@ func (ui *termui) DrawWelcome() {
 	ui.DrawDark("────│/\\/\\/\\/\\/\\/\\/\\│────", col, line, ColorText, false)
 	line++
 	line++
-	ui.DrawDark("───Press any key to continue───", col-3, line, ColorFg, false)
+	if runtime.GOOS == "js" {
+		ui.DrawDark("───Click on the image to play───", col-3, line, ColorFg, false)
+	} else {
+		ui.DrawDark("───Press any key to continue───", col-3, line, ColorFg, false)
+	}
 	ui.Flush()
 	ui.PressAnyKey()
 }
