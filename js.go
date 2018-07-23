@@ -28,6 +28,8 @@ func main() {
 	gameConfig.Tiles = true
 	tui.PostInit()
 	LinkColors()
+	gameConfig.DarkLOS = true
+	ApplyDarkLOS()
 
 	tui.DrawWelcome()
 	g := &game{}
@@ -157,8 +159,8 @@ func (g *game) LoadConfig() (bool, error) {
 	if gameConfig.RuneNormalModeKeys == nil || gameConfig.RuneTargetModeKeys == nil {
 		ApplyDefaultKeyBindings()
 	}
-	if gameConfig.DarkLOS {
-		ApplyDarkLOS()
+	if !gameConfig.DarkLOS {
+		ApplyLightLOS()
 	}
 	return true, nil
 }
