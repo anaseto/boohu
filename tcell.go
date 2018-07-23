@@ -50,18 +50,24 @@ func (ui *termui) Clear() {
 	}
 }
 
+var SmallScreen = false
+
 func (ui *termui) Flush() {
 	ui.Screen.Show()
 	w, h := ui.Screen.Size()
 	if w <= UIWidth-8 || h <= UIHeight-2 {
-		ui.small = true
+		SmallScreen = true
 	} else {
-		ui.small = false
+		SmallScreen = false
 	}
 }
 
+func (ui *termui) ApplyToggleLayout() {
+	gameConfig.Small = !gameConfig.Small
+}
+
 func (ui *termui) Small() bool {
-	return ui.small || MinimalUI
+	return gameConfig.Small || SmallScreen
 }
 
 func (ui *termui) Interrupt() {

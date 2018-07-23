@@ -342,8 +342,28 @@ func (ui *termui) Flush() {
 	js.Global().Get("window").Call("requestAnimationFrame", js.NewEventCallback(0, ui.FlushCallback))
 }
 
+func (ui *termui) ApplyToggleLayout() {
+	gameConfig.Small = !gameConfig.Small
+	if gameConfig.Small {
+		ui.ResetCells()
+		ui.Flush()
+		UIHeight = 24
+		UIWidth = 80
+	} else {
+		UIHeight = 26
+		UIWidth = 100
+	}
+	canvas := js.Global().Get("document").Call("getElementById", "gamecanvas")
+	canvas.Set("height", 24*UIHeight)
+	canvas.Set("width", 16*UIWidth)
+	ui.cache = make(map[UICell]js.Value)
+	ui.cells = make([]UICell, UIWidth*UIHeight)
+	ui.ResetCells()
+	ui.backBuffer = make([]UICell, UIWidth*UIHeight)
+}
+
 func (ui *termui) Small() bool {
-	return false
+	return gameConfig.Small
 }
 
 func (ui *termui) FlushCallback(obj js.Value) {

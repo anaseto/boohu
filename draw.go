@@ -2807,6 +2807,7 @@ type setting int
 const (
 	setKeys setting = iota
 	invertLOS
+	toggleLayout
 	toggleTiles
 )
 
@@ -2816,6 +2817,8 @@ func (s setting) String() (text string) {
 		text = "Change key bindings"
 	case invertLOS:
 		text = "Toggle dark/light LOS"
+	case toggleLayout:
+		text = "Toggle normal/compact layout"
 	case toggleTiles:
 		text = "Toggle Tiles/Ascii display"
 	}
@@ -2825,6 +2828,7 @@ func (s setting) String() (text string) {
 var settingsActions = []setting{
 	setKeys,
 	invertLOS,
+	toggleLayout,
 }
 
 func (ui *termui) ConfItem(g *game, i, lnum int, s setting, fg uicolor) {
@@ -2879,8 +2883,18 @@ func (ui *termui) HandleSettingAction(g *game) error {
 		} else {
 			ApplyLightLOS()
 		}
+	case toggleLayout:
+		ui.ApplyToggleLayout()
+		err := g.SaveConfig()
+		if err != nil {
+			g.Print(err.Error())
+		}
 	case toggleTiles:
 		ui.ApplyToggleTiles()
+		err := g.SaveConfig()
+		if err != nil {
+			g.Print(err.Error())
+		}
 	}
 	return nil
 }

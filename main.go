@@ -9,13 +9,10 @@ import (
 	"runtime"
 )
 
-var MinimalUI bool
-
 func main() {
 	optSolarized := flag.Bool("s", false, "Use true 16-color solarized palette")
 	optVersion := flag.Bool("v", false, "print version number")
 	optCenteredCamera := flag.Bool("c", false, "centered camera")
-	optMinimalUI := flag.Bool("m", false, "80x24 minimal UI")
 	color8 := false
 	if runtime.GOOS == "windows" {
 		color8 = true
@@ -35,9 +32,6 @@ func main() {
 	}
 	if *optCenteredCamera {
 		CenteredCamera = true
-	}
-	if *optMinimalUI {
-		MinimalUI = true
 	}
 	if *optNoAnim {
 		DisableAnimations = true

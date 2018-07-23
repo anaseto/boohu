@@ -48,7 +48,7 @@ func main() {
 
 	tui := &termui{}
 	if *optMinimalUI {
-		tui.minimal = true
+		gameConfig.Small = true
 		UIHeight = 24
 		UIWidth = 80
 	}
@@ -105,7 +105,6 @@ type termui struct {
 	backBuffer []AnsiCell
 	cursor     position
 	stty       string
-	minimal    bool
 }
 
 func (ui *termui) GetIndex(x, y int) int {
@@ -221,8 +220,24 @@ func (ui *termui) Flush() {
 	ui.bStdout.Flush()
 }
 
+func (ui *termui) ApplyToggleLayout() {
+	gameConfig.Small = !gameConfig.Small
+	if gameConfig.Small {
+		ui.ResetCells()
+		ui.Flush()
+		UIHeight = 24
+		UIWidth = 80
+	} else {
+		UIHeight = 26
+		UIWidth = 100
+	}
+	ui.cells = make([]AnsiCell, UIWidth*UIHeight)
+	ui.ResetCells()
+	ui.backBuffer = make([]AnsiCell, UIWidth*UIHeight)
+}
+
 func (ui *termui) Small() bool {
-	return ui.minimal
+	return gameConfig.Small
 }
 
 func (ui *termui) HideCursor() {
