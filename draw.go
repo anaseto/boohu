@@ -211,70 +211,70 @@ func (ui *termui) DrawWelcome() {
 	line := 5
 	rcol := col + 20
 	ColorText := ColorFgHPok
-	ui.DrawDark(fmt.Sprintf("       Boohu %s", Version), col, line-2, ColorText)
-	ui.DrawDark("────│\\/\\/\\/\\/\\/\\/\\/│────", col, line, ColorText)
+	ui.DrawDark(fmt.Sprintf("       Boohu %s", Version), col, line-2, ColorText, false)
+	ui.DrawDark("────│\\/\\/\\/\\/\\/\\/\\/│────", col, line, ColorText, false)
 	line++
-	ui.DrawDark("##", col, line, ColorFgDark)
-	ui.DrawLight("#", col+2, line, ColorFgLOS)
-	ui.DrawLightAlt("#", col+3, line, ColorFgLOS)
-	ui.DrawDark("│              │", col+4, line, ColorText)
-	ui.DrawDark("####", rcol, line, ColorFgDark)
+	ui.DrawDark("##", col, line, ColorFgDark, true)
+	ui.DrawLight("#", col+2, line, ColorFgLOS, true)
+	ui.DrawLightAlt("#", col+3, line, ColorFgLOS, true)
+	ui.DrawDark("│              │", col+4, line, ColorText, false)
+	ui.DrawDark("####", rcol, line, ColorFgDark, true)
 	line++
-	ui.DrawDark("#.", col, line, ColorFgDark)
-	ui.DrawLightAlt(".", col+2, line, ColorFgLOS)
-	ui.DrawLight(".", col+3, line, ColorFgLOS)
-	ui.DrawDark("│              │", col+4, line, ColorText)
-	ui.DrawDark(".", rcol, line, ColorFgDark)
-	ui.DrawDark("♣", rcol+1, line, ColorFgSimellas)
-	ui.DrawDark(".#", rcol+2, line, ColorFgDark)
+	ui.DrawDark("#.", col, line, ColorFgDark, true)
+	ui.DrawLightAlt(".", col+2, line, ColorFgLOS, true)
+	ui.DrawLight(".", col+3, line, ColorFgLOS, true)
+	ui.DrawDark("│              │", col+4, line, ColorText, false)
+	ui.DrawDark(".", rcol, line, ColorFgDark, true)
+	ui.DrawDark("♣", rcol+1, line, ColorFgSimellas, true)
+	ui.DrawDark(".#", rcol+2, line, ColorFgDark, true)
 	line++
-	ui.DrawDark("##", col, line, ColorFgDark)
-	ui.DrawLight("!", col+2, line, ColorFgCollectable)
-	ui.DrawLightAlt(".", col+3, line, ColorFgLOS)
-	ui.DrawDark("│              │", col+4, line, ColorText)
-	ui.DrawDark("│  BREAK       │", col+4, line, ColorText)
-	ui.DrawDark(".###", rcol, line, ColorFgDark)
+	ui.DrawDark("##", col, line, ColorFgDark, true)
+	ui.DrawLight("!", col+2, line, ColorFgCollectable, true)
+	ui.DrawLightAlt(".", col+3, line, ColorFgLOS, true)
+	ui.DrawDark("│              │", col+4, line, ColorText, false)
+	ui.DrawDark("│  BREAK       │", col+4, line, ColorText, false)
+	ui.DrawDark(".###", rcol, line, ColorFgDark, true)
 	line++
-	ui.DrawDark(" #", col, line, ColorFgDark)
-	ui.DrawLightAlt("g", col+2, line, ColorFgMonster)
-	ui.DrawLight("G", col+3, line, ColorFgMonster)
-	ui.DrawDark("│  OUT OF      │", col+4, line, ColorText)
-	ui.DrawDark("##  ", rcol, line, ColorFgDark)
+	ui.DrawDark(" #", col, line, ColorFgDark, true)
+	ui.DrawLightAlt("g", col+2, line, ColorFgMonster, true)
+	ui.DrawLight("G", col+3, line, ColorFgMonster, true)
+	ui.DrawDark("│  OUT OF      │", col+4, line, ColorText, false)
+	ui.DrawDark("##  ", rcol, line, ColorFgDark, true)
 	line++
-	ui.DrawLight("#", col, line, ColorFgLOS)
-	ui.DrawLightAlt("#", col+1, line, ColorFgLOS)
-	ui.DrawLight("D", col+2, line, ColorFgMonster)
-	ui.DrawLightAlt("g", col+3, line, ColorFgMonster)
-	ui.DrawDark("│  HAREKA'S    │", col+4, line, ColorText)
-	ui.DrawDark(".## ", rcol, line, ColorFgDark)
+	ui.DrawLight("#", col, line, ColorFgLOS, true)
+	ui.DrawLightAlt("#", col+1, line, ColorFgLOS, true)
+	ui.DrawLight("D", col+2, line, ColorFgMonster, true)
+	ui.DrawLightAlt("g", col+3, line, ColorFgMonster, true)
+	ui.DrawDark("│  HAREKA'S    │", col+4, line, ColorText, false)
+	ui.DrawDark(".## ", rcol, line, ColorFgDark, true)
 	line++
-	ui.DrawLightAlt("#", col, line, ColorFgLOS)
-	ui.DrawLight("@", col+1, line, ColorFgPlayer)
-	ui.DrawLightAlt("#", col+2, line, ColorFgLOS)
-	ui.DrawDark("#", col+3, line, ColorFgDark)
-	ui.DrawDark("│  UNDERGROUND │", col+4, line, ColorText)
-	ui.DrawDark("\".##", rcol, line, ColorFgDark)
+	ui.DrawLightAlt("#", col, line, ColorFgLOS, true)
+	ui.DrawLight("@", col+1, line, ColorFgPlayer, true)
+	ui.DrawLightAlt("#", col+2, line, ColorFgLOS, true)
+	ui.DrawDark("#", col+3, line, ColorFgDark, true)
+	ui.DrawDark("│  UNDERGROUND │", col+4, line, ColorText, false)
+	ui.DrawDark("\".##", rcol, line, ColorFgDark, true)
 	line++
-	ui.DrawLight("#", col, line, ColorFgLOS)
-	ui.DrawLightAlt(".", col+1, line, ColorFgLOS)
-	ui.DrawLight("#", col+2, line, ColorFgLOS)
-	ui.DrawDark("#", col+3, line, ColorFgDark)
-	ui.DrawDark("│              │", col+4, line, ColorText)
-	ui.DrawDark("#.", rcol, line, ColorFgDark)
-	ui.DrawDark(">", rcol+2, line, ColorFgPlace)
-	ui.DrawDark("#", rcol+3, line, ColorFgDark)
+	ui.DrawLight("#", col, line, ColorFgLOS, true)
+	ui.DrawLightAlt(".", col+1, line, ColorFgLOS, true)
+	ui.DrawLight("#", col+2, line, ColorFgLOS, true)
+	ui.DrawDark("#", col+3, line, ColorFgDark, true)
+	ui.DrawDark("│              │", col+4, line, ColorText, false)
+	ui.DrawDark("#.", rcol, line, ColorFgDark, true)
+	ui.DrawDark(">", rcol+2, line, ColorFgPlace, true)
+	ui.DrawDark("#", rcol+3, line, ColorFgDark, true)
 	line++
-	ui.DrawLightAlt("#", col, line, ColorFgLOS)
-	ui.DrawLight("[", col+1, line, ColorFgCollectable)
-	ui.DrawLightAlt(".", col+2, line, ColorFgLOS)
-	ui.DrawDark("##", col+3, line, ColorFgDark)
-	ui.DrawDark("│              │", col+4, line, ColorFgHPok)
-	ui.DrawDark("\"\"##", rcol, line, ColorFgDark)
+	ui.DrawLightAlt("#", col, line, ColorFgLOS, true)
+	ui.DrawLight("[", col+1, line, ColorFgCollectable, true)
+	ui.DrawLightAlt(".", col+2, line, ColorFgLOS, true)
+	ui.DrawDark("##", col+3, line, ColorFgDark, true)
+	ui.DrawDark("│              │", col+4, line, ColorFgHPok, false)
+	ui.DrawDark("\"\"##", rcol, line, ColorFgDark, true)
 	line++
-	ui.DrawDark("────│/\\/\\/\\/\\/\\/\\/\\│────", col, line, ColorText)
+	ui.DrawDark("────│/\\/\\/\\/\\/\\/\\/\\│────", col, line, ColorText, false)
 	line++
 	line++
-	ui.DrawDark("───Press any key to continue───", col-3, line, ColorFg)
+	ui.DrawDark("───Press any key to continue───", col-3, line, ColorFg, false)
 	ui.Flush()
 	ui.PressAnyKey()
 }
@@ -287,26 +287,38 @@ func (ui *termui) DrawColored(text string, x, y int, fg, bg uicolor) {
 	}
 }
 
-func (ui *termui) DrawDark(text string, x, y int, fg uicolor) {
+func (ui *termui) DrawDark(text string, x, y int, fg uicolor, inmap bool) {
 	col := 0
 	for _, r := range text {
-		ui.SetCell(x+col, y, r, fg, ColorBgDark)
+		if inmap {
+			ui.SetMapCell(x+col, y, r, fg, ColorBgDark)
+		} else {
+			ui.SetCell(x+col, y, r, fg, ColorBgDark)
+		}
 		col++
 	}
 }
 
-func (ui *termui) DrawLight(text string, x, y int, fg uicolor) {
+func (ui *termui) DrawLight(text string, x, y int, fg uicolor, inmap bool) {
 	col := 0
 	for _, r := range text {
-		ui.SetCell(x+col, y, r, fg, ColorBgLOS)
+		if inmap {
+			ui.SetMapCell(x+col, y, r, fg, ColorBgLOS)
+		} else {
+			ui.SetCell(x+col, y, r, fg, ColorBgLOS)
+		}
 		col++
 	}
 }
 
-func (ui *termui) DrawLightAlt(text string, x, y int, fg uicolor) {
+func (ui *termui) DrawLightAlt(text string, x, y int, fg uicolor, inmap bool) {
 	col := 0
 	for _, r := range text {
-		ui.SetCell(x+col, y, r, fg, ColorBgLOSalt)
+		if inmap {
+			ui.SetMapCell(x+col, y, r, fg, ColorBgLOSalt)
+		} else {
+			ui.SetCell(x+col, y, r, fg, ColorBgLOSalt)
+		}
 		col++
 	}
 }
@@ -1562,15 +1574,19 @@ func (ui *termui) DrawDungeonView(g *game, m uiMode) {
 	}
 	line := 0
 	if !ui.Small() {
-		ui.DrawText(fmt.Sprintf("[ %v", g.Player.Armour), BarCol, line)
+		ui.SetMapCell(BarCol, line, '[', ColorFg, ColorBg)
+		ui.DrawText(fmt.Sprintf(" %v", g.Player.Armour), BarCol+1, line)
 		line++
-		ui.DrawText(fmt.Sprintf(") %v", g.Player.Weapon), BarCol, line)
+		ui.SetMapCell(BarCol, line, ')', ColorFg, ColorBg)
+		ui.DrawText(fmt.Sprintf(" %v", g.Player.Weapon), BarCol+1, line)
 		line++
 		if g.Player.Shield != NoShield {
 			if g.Player.Weapon.TwoHanded() {
-				ui.DrawText("] (unusable)", BarCol, line)
+				ui.SetMapCell(BarCol, line, ']', ColorFg, ColorBg)
+				ui.DrawText(" (unusable)", BarCol+1, line)
 			} else {
-				ui.DrawText(fmt.Sprintf("] %v", g.Player.Shield), BarCol, line)
+				ui.SetMapCell(BarCol, line, ']', ColorFg, ColorBg)
+				ui.DrawText(fmt.Sprintf(" %v", g.Player.Shield), BarCol+1, line)
 			}
 		}
 		line++
