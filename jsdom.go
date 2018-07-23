@@ -1,5 +1,7 @@
 // +build js,dom
 
+// THIS FILE IS NO LONGER UP TO DATE
+
 package main
 
 import (
