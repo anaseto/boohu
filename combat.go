@@ -416,7 +416,7 @@ func (g *game) BlockEffects(m *monster) {
 			if RandInt(3) == 0 && g.Dungeon.Cell(pos).T == WallCell {
 				g.Dungeon.SetCell(pos, FreeCell)
 				g.Stats.Digs++
-				g.MakeNoise(WallNoise+1, pos)
+				g.MakeNoise(WallNoise+2, pos)
 				g.Fog(pos, 1, g.Ev)
 				g.Print("The blocking sound destructs a wall.")
 			}
