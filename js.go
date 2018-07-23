@@ -748,6 +748,14 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (er
 	return ui.CursorKeyAction(g, targ, runeKeyAction{r: ui.ReadKey(in.key)}, data)
 }
 
+func (ui *termui) ColorLine(y int, fg uicolor) {
+	for x := 0; x < DungeonWidth; x++ {
+		i := ui.GetIndex(x, y)
+		c := ui.cells[i]
+		ui.SetCell(x, y, c.r, fg, c.bg)
+	}
+}
+
 func (ui *termui) Select(g *game, l int) (index int, alternate bool, err error) {
 	for {
 		in := ui.PollEvent()
@@ -763,17 +771,41 @@ func (ui *termui) Select(g *game, l int) (index int, alternate bool, err error) 
 			y := in.mouseY
 			x := in.mouseX
 			switch in.button {
+			case -1:
+				oih := ui.itemHover
+				if y <= 0 || y > l || x >= DungeonWidth {
+					ui.itemHover = -1
+					if oih != -1 {
+						ui.ColorLine(oih, ColorFg)
+						ui.Flush()
+					}
+					break
+				}
+				if y == oih {
+					break
+				}
+				ui.itemHover = y
+				ui.ColorLine(y, ColorYellow)
+				if oih != -1 {
+					ui.ColorLine(oih, ColorFg)
+				}
+				ui.Flush()
 			case 0:
 				if y < 0 || y > l || x >= DungeonWidth {
+					ui.itemHover = -1
 					return -1, false, errors.New(DoNothing)
 				}
 				if y == 0 {
+					ui.itemHover = -1
 					return -1, true, nil
 				}
+				ui.itemHover = -1
 				return y - 1, false, nil
 			case 2:
+				ui.itemHover = -1
 				return -1, true, nil
 			case 1:
+				ui.itemHover = -1
 				return -1, false, errors.New(DoNothing)
 			}
 		}
