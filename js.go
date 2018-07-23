@@ -623,9 +623,9 @@ func (ui *termui) KeyMenuAction(n int) (m int, action keyConfigAction) {
 		n -= DungeonHeight / 2
 	case "d":
 		n += DungeonHeight / 2
-	case "j", "2":
+	case "j", "2", "ArrowDown":
 		n++
-	case "k", "8":
+	case "k", "8", "ArrowUp":
 		n--
 	case "R":
 		action = ResetConfig
