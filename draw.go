@@ -2097,18 +2097,28 @@ func (ui *termui) DrawStatusLine(g *game) {
 	}
 	line := DungeonHeight
 	col := 2
-	weapon := fmt.Sprintf(" )%s ", g.Player.Weapon.Short())
+	ui.DrawText(" ", col, line)
+	col++
+	ui.SetMapCell(col, line, ')', ColorFg, ColorBg)
+	col++
+	weapon := fmt.Sprintf("%s ", g.Player.Weapon.Short())
 	ui.DrawText(weapon, col, line)
 	col += utf8.RuneCountInString(weapon)
-	armour := fmt.Sprintf("[%s ", g.Player.Armour.Short())
+	ui.SetMapCell(col, line, '[', ColorFg, ColorBg)
+	col++
+	armour := fmt.Sprintf("%s ", g.Player.Armour.Short())
 	ui.DrawText(armour, col, line)
 	col += utf8.RuneCountInString(armour)
 	if g.Player.Shield != NoShield {
-		shield := fmt.Sprintf("]%s ", g.Player.Shield.Short())
+		ui.SetMapCell(col, line, ']', ColorFg, ColorBg)
+		col++
+		shield := fmt.Sprintf("%s ", g.Player.Shield.Short())
 		ui.DrawText(shield, col, line)
 		col += utf8.RuneCountInString(shield)
 	}
-	simellas := fmt.Sprintf("♣:%d ", g.Player.Simellas)
+	ui.SetMapCell(col, line, '♣', ColorFg, ColorBg)
+	col++
+	simellas := fmt.Sprintf(":%d ", g.Player.Simellas)
 	ui.DrawText(simellas, col, line)
 	col += utf8.RuneCountInString(simellas)
 	var depth string
