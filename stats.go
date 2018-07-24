@@ -7,8 +7,14 @@ type stats struct {
 	Moves         int
 	Hits          int
 	Misses        int
-	Wounds        int
+	ReceivedHits  int
+	Dodges        int
+	Blocks        int
+	Drinks        int
+	Evocations    int
+	Throws        int
 	TimesLucky    int
+	Damage        int
 	DExplPerc     [MaxDepth + 1]int
 	DSleepingPerc [MaxDepth + 1]int
 	DKilledPerc   [MaxDepth + 1]int

@@ -205,10 +205,13 @@ func (g *game) Dump() string {
 func (g *game) DetailedStatistics(w io.Writer) {
 	fmt.Fprintf(w, "\n")
 	fmt.Fprintf(w, "Statistics:\n")
+	fmt.Fprintf(w, "You drank %d potions, throwed %d items, and evoked rods %d times.\n", g.Stats.Drinks, g.Stats.Throws, g.Stats.Evocations)
 	fmt.Fprintf(w, "You had %d hits (%.1f per 100 turns), %d misses (%.1f), and %d moves (%.1f).\n",
 		g.Stats.Hits, float64(g.Stats.Hits)*100/float64(g.Stats.Turns+1),
 		g.Stats.Misses, float64(g.Stats.Misses)*100/float64(g.Stats.Turns+1),
 		g.Stats.Moves, float64(g.Stats.Moves)*100/float64(g.Stats.Turns+1))
+	fmt.Fprintf(w, "You got hit %d times, blocked %d times, and dodged %d times.\n", g.Stats.ReceivedHits, g.Stats.Blocks, g.Stats.Dodges)
+	fmt.Fprintf(w, "You endured %d damage.\n", g.Stats.Damage)
 	fmt.Fprintf(w, "You were lucky %d times.\n", g.Stats.TimesLucky)
 	fmt.Fprintf(w, "There were %d fires.\n", g.Stats.Burns)
 	fmt.Fprintf(w, "There were %d destroyed walls.\n", g.Stats.Digs)

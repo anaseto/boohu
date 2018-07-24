@@ -1779,6 +1779,7 @@ func (m *monster) HitPlayer(g *game, ev event) {
 			g.Smoke(ev)
 		}
 	} else {
+		g.Stats.Dodges++
 		g.Printf("%s misses you.", m.Kind.Definite(true))
 	}
 }
@@ -1979,6 +1980,7 @@ func (m *monster) ThrowRock(g *game, ev event) bool {
 			g.TemporalWallAt(ray[len(ray)-1], ev)
 		}
 	} else {
+		g.Stats.Dodges++
 		g.Printf("You dodge %s's rock.", m.Kind.Indefinite(false))
 		g.ui.MonsterProjectileAnimation(g, g.Ray(m.Pos), '●', ColorMagenta)
 		dir := g.Player.Pos.Dir(m.Pos)
@@ -2033,6 +2035,7 @@ func (m *monster) ThrowJavelin(g *game, ev event) bool {
 			g.ui.MonsterJavelinAnimation(g, g.Ray(m.Pos), false)
 		}
 	} else {
+		g.Stats.Dodges++
 		g.Printf("You dodge %s's %s.", m.Kind.Indefinite(false), "javelin")
 		g.ui.MonsterJavelinAnimation(g, g.Ray(m.Pos), false)
 	}
@@ -2080,6 +2083,7 @@ func (m *monster) ThrowAcid(g *game, ev event) bool {
 			g.Corrosion(ev)
 		}
 	} else {
+		g.Stats.Dodges++
 		g.Printf("You dodge %s's acid projectile.", m.Kind.Indefinite(false))
 		g.ui.MonsterProjectileAnimation(g, g.Ray(m.Pos), '*', ColorGreen)
 	}

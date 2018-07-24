@@ -190,6 +190,7 @@ func (r rod) Use(g *game, ev event) error {
 	g.Player.MP -= r.MPCost()
 	g.StoryPrintf("You evoked your %s.", r)
 	g.Stats.UsedRod[r]++
+	g.Stats.Evocations++
 	g.FunAction()
 	ev.Renew(g, 7)
 	return nil

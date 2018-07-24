@@ -33,6 +33,8 @@ func (g *game) HitDamage(dt dmgType, base int, armor int) (attack int, clang boo
 }
 
 func (m *monster) InflictDamage(g *game, damage, max int) {
+	g.Stats.ReceivedHits++
+	g.Stats.Damage += damage
 	oldHP := g.Player.HP
 	g.Player.HP -= damage
 	g.ui.WoundedAnimation(g)
@@ -405,6 +407,7 @@ func (g *game) ArmourClang() (sclang string) {
 }
 
 func (g *game) BlockEffects(m *monster) {
+	g.Stats.Blocks++
 	switch g.Player.Shield {
 	case EarthShield:
 		dir := m.Pos.Dir(g.Player.Pos)
