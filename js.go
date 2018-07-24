@@ -494,7 +494,7 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 			switch in.button {
 			case -1:
 				if in.mouseY == DungeonHeight {
-					m, ok := ui.WhichButton(in.mouseX)
+					m, ok := ui.WhichButton(g, in.mouseX)
 					omh := ui.menuHover
 					if ok {
 						ui.menuHover = m
@@ -515,12 +515,12 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 				fallthrough
 			case 0:
 				if in.mouseY == DungeonHeight {
-					m, ok := ui.WhichButton(in.mouseX)
+					m, ok := ui.WhichButton(g, in.mouseX)
 					if !ok {
 						again = true
 						break
 					}
-					err, again, quit = ui.HandleKeyAction(g, runeKeyAction{k: m.Key()})
+					err, again, quit = ui.HandleKeyAction(g, runeKeyAction{k: m.Key(g)})
 					if err != nil {
 						again = true
 					}
@@ -648,7 +648,7 @@ func (ui *termui) KeyMenuAction(n int) (m int, action keyConfigAction) {
 
 func (ui *termui) DrawMenus(g *game) {
 	line := DungeonHeight
-	for i, cols := range MenuCols {
+	for i, cols := range MenuCols[0 : len(MenuCols)-1] {
 		if cols[0] >= 0 {
 			if menu(i) == ui.menuHover {
 				ui.DrawColoredText(menu(i).String(), cols[0], line, ColorBlue)
@@ -656,6 +656,17 @@ func (ui *termui) DrawMenus(g *game) {
 				ui.DrawColoredText(menu(i).String(), cols[0], line, ColorViolet)
 			}
 		}
+	}
+	interactMenu := ui.UpdateInteractButton(g)
+	if interactMenu == "" {
+		return
+	}
+	i := len(MenuCols) - 1
+	cols := MenuCols[i]
+	if menu(i) == ui.menuHover {
+		ui.DrawColoredText(interactMenu, cols[0], line, ColorBlue)
+	} else {
+		ui.DrawColoredText(interactMenu, cols[0], line, ColorViolet)
 	}
 }
 
@@ -674,7 +685,7 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (er
 			switch in.button {
 			case -1:
 				if in.mouseY == DungeonHeight {
-					m, ok := ui.WhichButton(in.mouseX)
+					m, ok := ui.WhichButton(g, in.mouseX)
 					omh := ui.menuHover
 					if ok {
 						ui.menuHover = m
@@ -705,14 +716,14 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (er
 				fallthrough
 			case 0:
 				if in.mouseY == DungeonHeight {
-					m, ok := ui.WhichButton(in.mouseX)
+					m, ok := ui.WhichButton(g, in.mouseX)
 					if !ok {
 						g.Targeting = InvalidPos
 						notarg = true
 						err = errors.New(DoNothing)
 						break
 					}
-					err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: m.Key()}, data)
+					err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: m.Key(g)}, data)
 				} else if in.mouseX >= DungeonWidth || in.mouseY >= DungeonHeight {
 					g.Targeting = InvalidPos
 					notarg = true

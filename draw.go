@@ -2158,8 +2158,8 @@ const (
 	MenuThrow
 	MenuDrink
 	MenuEvoke
-	//MenuView
 	MenuOther
+	MenuInteract
 )
 
 func (m menu) String() (text string) {
@@ -2174,15 +2174,15 @@ func (m menu) String() (text string) {
 		text = "drink"
 	case MenuEvoke:
 		text = "evoke"
-	//case MenuView:
-	//text = "view"
 	case MenuOther:
-		text = "other"
+		text = "menu"
+	case MenuInteract:
+		text = "interact"
 	}
 	return "[" + text + "]"
 }
 
-func (m menu) Key() (key keyAction) {
+func (m menu) Key(g *game) (key keyAction) {
 	switch m {
 	case MenuRest:
 		key = KeyRest
@@ -2194,22 +2194,26 @@ func (m menu) Key() (key keyAction) {
 		key = KeyDrink
 	case MenuEvoke:
 		key = KeyEvoke
-	//case MenuView:
-	//key = KeyDescription
 	case MenuOther:
 		key = KeyMenu
+	case MenuInteract:
+		if _, ok := g.Equipables[g.Player.Pos]; ok {
+			key = KeyEquip
+		} else if _, ok := g.Stairs[g.Player.Pos]; ok {
+			key = KeyDescend
+		}
 	}
 	return key
 }
 
 var MenuCols = [][2]int{
-	MenuRest:    {0, 0},
-	MenuExplore: {0, 0},
-	MenuThrow:   {0, 0},
-	MenuDrink:   {0, 0},
-	MenuEvoke:   {0, 0},
-	//MenuView:    {0, 0},
-	MenuOther: {0, 0}}
+	MenuRest:     {0, 0},
+	MenuExplore:  {0, 0},
+	MenuThrow:    {0, 0},
+	MenuDrink:    {0, 0},
+	MenuEvoke:    {0, 0},
+	MenuOther:    {0, 0},
+	MenuInteract: {0, 0}}
 
 func init() {
 	for i := range MenuCols {
@@ -2222,16 +2226,41 @@ func init() {
 	}
 }
 
-func (ui *termui) WhichButton(col int) (menu, bool) {
+func (ui *termui) WhichButton(g *game, col int) (menu, bool) {
 	if ui.Small() {
 		return MenuOther, false
 	}
-	for i, cols := range MenuCols {
+	end := len(MenuCols) - 1
+	if _, ok := g.Equipables[g.Player.Pos]; ok {
+		end++
+	} else if _, ok := g.Stairs[g.Player.Pos]; ok {
+		end++
+	}
+	for i, cols := range MenuCols[0:end] {
 		if cols[0] >= 0 && col >= cols[0] && col < cols[1] {
 			return menu(i), true
 		}
 	}
 	return MenuOther, false
+}
+
+func (ui *termui) UpdateInteractButton(g *game) string {
+	var interactMenu string
+	var show bool
+	if _, ok := g.Equipables[g.Player.Pos]; ok {
+		interactMenu = "[equip]"
+		show = true
+	} else if _, ok := g.Stairs[g.Player.Pos]; ok {
+		interactMenu = "[descend]"
+		show = true
+	}
+	if !show {
+		return ""
+	}
+	i := len(MenuCols) - 1
+	runes := utf8.RuneCountInString(interactMenu)
+	MenuCols[i][1] = MenuCols[i][0] + runes
+	return interactMenu
 }
 
 func (ui *termui) LogColor(e logEntry) uicolor {
@@ -2758,9 +2787,6 @@ func (ui *termui) ActionItem(g *game, i, lnum int, ka keyAction, fg uicolor) {
 }
 
 var menuActions = []keyAction{
-	KeyDescend,
-	KeyEquip,
-	//KeyExclude,
 	KeyCharacterInfo,
 	KeyLogs,
 	KeyHelp,
