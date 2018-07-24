@@ -691,7 +691,7 @@ func (ar armour) Desc() string {
 	case CelmistRobe:
 		text = "The celmist robe improves your magic reserves, rod recharge rate, and rods can gain an extra charge."
 	case HarmonistRobe:
-		text = "The harmonist robe makes you harder to detect."
+		text = "The harmonist robe makes you harder to detect (reduced LOS, stealthy, noise mitigation)."
 	}
 	return text
 }
