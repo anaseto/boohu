@@ -2369,7 +2369,7 @@ func (g *game) MaxDanger() int {
 		adjust -= Min(g.Depth, 6) * 2
 	}
 	if g.Depth < 3 && g.Player.Shield != NoShield && !g.Player.Weapon.TwoHanded() && g.Player.Weapon != Dagger {
-		adjust += 7 - g.Depth*3
+		adjust += 12 - g.Depth*4
 	}
 	if g.Player.Weapon.TwoHanded() && g.Depth < 4 {
 		adjust += (4 - g.Depth) * 2
