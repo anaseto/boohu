@@ -404,6 +404,8 @@ const (
 	KeyConfigure
 	KeyMenu
 	KeyNextStairs
+	KeyMenuCommandHelp
+	KeyMenuTargetingHelp
 )
 
 var configurableKeyActions = [...]keyAction{
@@ -554,6 +556,10 @@ func (k keyAction) NormalModeDescription() (text string) {
 		text = "Quit without saving"
 	case KeyHelp:
 		text = "Help (keys and mouse)"
+	case KeyMenuCommandHelp:
+		text = "Help (commands)"
+	case KeyMenuTargetingHelp:
+		text = "Help (targeting)"
 	case KeyConfigure:
 		text = "Settings and key bindings"
 	case KeyWizard:
@@ -837,8 +843,11 @@ func (ui *termui) HandleKey(g *game, rka runeKeyAction) (err error, again bool, 
 		ui.MenuSelectedAnimation(g, MenuExplore, err == nil)
 	case KeyExamine:
 		err, again, quit = ui.Examine(g, nil)
-	case KeyHelp:
+	case KeyHelp, KeyMenuCommandHelp:
 		ui.KeysHelp(g)
+		again = true
+	case KeyMenuTargetingHelp:
+		ui.ExamineHelp(g)
 		again = true
 	case KeyCharacterInfo:
 		ui.CharacterInfo(g)
@@ -953,7 +962,7 @@ func (ui *termui) DrawKeysDescription(g *game, title string, actions []string) {
 }
 
 func (ui *termui) KeysHelp(g *game) {
-	ui.DrawKeysDescription(g, "Keys", []string{
+	ui.DrawKeysDescription(g, "Commands", []string{
 		"Movement", "h/j/k/l/y/u/b/n or numpad or mouse left",
 		"Wait a turn", "“.” or 5 or mouse left on @",
 		"Rest (until status free or regen)", "r",
@@ -975,7 +984,7 @@ func (ui *termui) KeysHelp(g *game) {
 }
 
 func (ui *termui) ExamineHelp(g *game) {
-	ui.DrawKeysDescription(g, "Examine/Travel/Targeting Keys", []string{
+	ui.DrawKeysDescription(g, "Examine/Travel/Targeting Commands", []string{
 		"Move cursor", "h/j/k/l/y/u/b/n or numpad or mouse left",
 		"Cycle through monsters", "+",
 		"Cycle through stairs", ">",
@@ -1313,9 +1322,13 @@ func (ui *termui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, dat
 		ui.NextMonster(g, rka.r, pos, data)
 	case KeyNextObject:
 		ui.NextObject(g, pos, data)
-	case KeyHelp:
+	case KeyHelp, KeyMenuTargetingHelp:
 		ui.HideCursor()
 		ui.ExamineHelp(g)
+		ui.SetCursor(pos)
+	case KeyMenuCommandHelp:
+		ui.HideCursor()
+		ui.KeysHelp(g)
 		ui.SetCursor(pos)
 	case KeyTarget:
 		err = targ.Action(g, pos)
@@ -2275,7 +2288,6 @@ func (ui *termui) UpdateInteractButton(g *game) string {
 
 func (ui *termui) LogColor(e logEntry) uicolor {
 	fg := ColorFg
-	// TODO: define uicolors?
 	switch e.Style {
 	case logCritic:
 		fg = ColorRed
@@ -2371,10 +2383,10 @@ func (ui *termui) RunesForKeyAction(k keyAction) string {
 type keyConfigAction int
 
 const (
-	NavigateConfig keyConfigAction = iota
-	ChangeConfig
-	ResetConfig
-	QuitConfig
+	NavigateKeys keyConfigAction = iota
+	ChangeKeys
+	ResetKeys
+	QuitKeyConfig
 )
 
 func (ui *termui) ChangeKeys(g *game) {
@@ -2429,7 +2441,7 @@ loop:
 			n += 12
 		}
 		switch action {
-		case ChangeConfig:
+		case ChangeKeys:
 			ui.DrawStyledTextLine(" insert new key ", lines, FooterLine)
 			ui.Flush()
 			r := ui.ReadRuneKey()
@@ -2456,9 +2468,9 @@ loop:
 			if err != nil {
 				g.Print(err.Error())
 			}
-		case QuitConfig:
+		case QuitKeyConfig:
 			break loop
-		case ResetConfig:
+		case ResetKeys:
 			ApplyDefaultKeyBindings()
 			err := g.SaveConfig()
 			//err := g.RemoveDataFile("config.gob")
@@ -2799,7 +2811,8 @@ func (ui *termui) ActionItem(g *game, i, lnum int, ka keyAction, fg uicolor) {
 var menuActions = []keyAction{
 	KeyCharacterInfo,
 	KeyLogs,
-	KeyHelp,
+	KeyMenuCommandHelp,
+	KeyMenuTargetingHelp,
 	KeyConfigure,
 	KeySave,
 	KeyQuit,

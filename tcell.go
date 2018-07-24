@@ -278,7 +278,7 @@ func (ui *termui) KeyMenuAction(n int) (m int, action keyConfigAction) {
 		r := tev.Rune()
 		switch tev.Key() {
 		case tcell.KeyEsc:
-			action = QuitConfig
+			action = QuitKeyConfig
 			return n, action
 		case tcell.KeyDown:
 			r = '2'
@@ -287,7 +287,7 @@ func (ui *termui) KeyMenuAction(n int) (m int, action keyConfigAction) {
 		}
 		switch r {
 		case 'a':
-			action = ChangeConfig
+			action = ChangeKeys
 		case 'u':
 			n -= DungeonHeight / 2
 		case 'd':
@@ -297,23 +297,23 @@ func (ui *termui) KeyMenuAction(n int) (m int, action keyConfigAction) {
 		case 'k', '8':
 			n--
 		case 'R':
-			action = ResetConfig
+			action = ResetKeys
 		case ' ':
-			action = QuitConfig
+			action = QuitKeyConfig
 		}
 	case *tcell.EventMouse:
 		switch tev.Buttons() {
 		case tcell.Button1:
 			x, y := tev.Position()
 			if x > DungeonWidth || y > DungeonHeight {
-				action = QuitConfig
+				action = QuitKeyConfig
 			}
 		case tcell.WheelUp:
 			n -= 2
 		case tcell.WheelDown:
 			n += 2
 		case tcell.Button2:
-			action = QuitConfig
+			action = QuitKeyConfig
 		}
 	}
 	return n, action

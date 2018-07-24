@@ -359,9 +359,9 @@ func (ui *termui) KeyMenuAction(n int) (m int, action keyConfigAction) {
 	in := ui.ReadChar()
 	switch in.r {
 	case 'a':
-		action = ChangeConfig
+		action = ChangeKeys
 	case '\x1b', ' ':
-		action = QuitConfig
+		action = QuitKeyConfig
 	case 'u':
 		n -= DungeonHeight / 2
 	case 'd':
@@ -371,7 +371,7 @@ func (ui *termui) KeyMenuAction(n int) (m int, action keyConfigAction) {
 	case 'k', '8':
 		n--
 	case 'R':
-		action = ResetConfig
+		action = ResetKeys
 	}
 	return n, action
 }

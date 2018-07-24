@@ -271,7 +271,7 @@ func (ui *termui) KeyMenuAction(n int) (m int, action keyConfigAction) {
 		if tev.Ch == 0 {
 			switch tev.Key {
 			case termbox.KeyEsc, termbox.KeySpace:
-				action = QuitConfig
+				action = QuitKeyConfig
 				return n, action
 			case termbox.KeyArrowDown:
 				tev.Ch = '2'
@@ -281,7 +281,7 @@ func (ui *termui) KeyMenuAction(n int) (m int, action keyConfigAction) {
 		}
 		switch tev.Ch {
 		case 'a':
-			action = ChangeConfig
+			action = ChangeKeys
 		case 'u':
 			n -= DungeonHeight / 2
 		case 'd':
@@ -291,9 +291,9 @@ func (ui *termui) KeyMenuAction(n int) (m int, action keyConfigAction) {
 		case 'k', '8':
 			n--
 		case 'R':
-			action = ResetConfig
+			action = ResetKeys
 		case ' ':
-			action = QuitConfig
+			action = QuitKeyConfig
 		}
 	case termbox.EventMouse:
 		if tev.Ch == 0 {
@@ -302,10 +302,10 @@ func (ui *termui) KeyMenuAction(n int) (m int, action keyConfigAction) {
 				y := tev.MouseY
 				x := tev.MouseX
 				if x > DungeonWidth || y > DungeonHeight {
-					action = QuitConfig
+					action = QuitKeyConfig
 				}
 			case termbox.MouseMiddle:
-				action = QuitConfig
+				action = QuitKeyConfig
 			case termbox.MouseWheelUp:
 				n -= 2
 			case termbox.MouseWheelDown:

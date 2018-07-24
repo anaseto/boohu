@@ -616,9 +616,9 @@ func (ui *termui) KeyMenuAction(n int) (m int, action keyConfigAction) {
 	in := ui.PollEvent()
 	switch in.key {
 	case "a":
-		action = ChangeConfig
+		action = ChangeKeys
 	case "\x1b", "Escape", " ":
-		action = QuitConfig
+		action = QuitKeyConfig
 	case "u":
 		n -= DungeonHeight / 2
 	case "d":
@@ -628,7 +628,7 @@ func (ui *termui) KeyMenuAction(n int) (m int, action keyConfigAction) {
 	case "k", "8", "ArrowUp":
 		n--
 	case "R":
-		action = ResetConfig
+		action = ResetKeys
 	case "":
 		if in.mouse {
 			y := in.mouseY
@@ -636,10 +636,10 @@ func (ui *termui) KeyMenuAction(n int) (m int, action keyConfigAction) {
 			switch in.button {
 			case 0:
 				if x > DungeonWidth || y > DungeonHeight {
-					action = QuitConfig
+					action = QuitKeyConfig
 				}
 			case 1:
-				action = QuitConfig
+				action = QuitKeyConfig
 			}
 		}
 	}
