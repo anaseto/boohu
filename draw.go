@@ -559,9 +559,9 @@ func (k keyAction) NormalModeDescription() (text string) {
 	case KeyHelp:
 		text = "Help (keys and mouse)"
 	case KeyMenuCommandHelp:
-		text = "Help (commands)"
+		text = "Help (general commands)"
 	case KeyMenuTargetingHelp:
-		text = "Help (targeting)"
+		text = "Help (targeting commands)"
 	case KeyConfigure:
 		text = "Settings and key bindings"
 	case KeyWizard:
