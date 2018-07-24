@@ -182,24 +182,24 @@ func (g *game) WriteDump() error {
 
 func (ui *termui) Init() error {
 	ui.cells = make([]UICell, UIWidth*UIHeight)
-	js.Global().Get("document").Call("getElementById", "gamecanvas").Call(
+	canvas := js.Global().Get("document").Call("getElementById", "gamecanvas")
+	canvas.Call(
 		"addEventListener", "keypress", js.NewEventCallback(0, func(e js.Value) {
 			s := e.Get("key").String()
 			ch <- jsInput{key: s}
 		}))
 	js.Global().Get("document").Call(
 		"addEventListener", "keypress", js.NewEventCallback(0, func(e js.Value) {
-			s := e.Get("key").String()
-			if s == " " {
+			if !e.Get("ctrlKey").Bool() && !e.Get("metaKey").Bool() && js.Global().Get("document").Get("activeElement") == canvas {
 				e.Call("preventDefault")
 			}
 		}))
-	js.Global().Get("document").Call("getElementById", "gamecanvas").Call(
+	canvas.Call(
 		"addEventListener", "mousedown", js.NewEventCallback(0, func(e js.Value) {
 			x, y := ui.GetMousePos(e)
 			ch <- jsInput{mouse: true, mouseX: x, mouseY: y, button: e.Get("button").Int()}
 		}))
-	js.Global().Get("document").Call("getElementById", "gamecanvas").Call(
+	canvas.Call(
 		"addEventListener", "mousemove", js.NewEventCallback(0, func(e js.Value) {
 			x, y := ui.GetMousePos(e)
 			if x != ui.mousepos.X || y != ui.mousepos.Y {
