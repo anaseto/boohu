@@ -617,7 +617,7 @@ func (ar armour) Equip(g *game) {
 		g.StoryPrintf("You found and put on %s.", Indefinite(ar.String(), false))
 		g.FoundEquipables[ar] = true
 	}
-	g.Printf("You put the %s on and leave your %s on the ground.", ar, oar)
+	g.Printf("You put the %s on and leave your %s.", ar, oar)
 	g.Equipables[g.Player.Pos] = oar
 	if oar == CelmistRobe && g.Player.MP > g.Player.MPMax() {
 		g.Player.MP = g.Player.MPMax()
@@ -729,7 +729,7 @@ func (wp weapon) Equip(g *game) {
 		g.StoryPrintf("You found and took %s.", Indefinite(wp.String(), false))
 		g.FoundEquipables[wp] = true
 	}
-	g.Printf("You take the %s and leave your %s on the ground.", wp, owp)
+	g.Printf("You take the %s and leave your %s.", wp, owp)
 	if wp == Frundis {
 		g.PrintfStyled("♫ ♪ … Oh, you're there, let's fight our way out!", logSpecial)
 	}
@@ -902,7 +902,7 @@ func (sh shield) Equip(g *game) {
 	}
 	if osh != NoShield {
 		g.Equipables[g.Player.Pos] = osh
-		g.Printf("You put the %s on and leave your %s on the ground.", sh, osh)
+		g.Printf("You put the %s on and leave your %s.", sh, osh)
 	} else {
 		delete(g.Equipables, g.Player.Pos)
 		g.Printf("You put the %s on.", sh)
