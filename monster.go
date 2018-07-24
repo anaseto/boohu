@@ -2332,9 +2332,9 @@ func (g *game) Danger() int {
 func (g *game) MaxDanger() int {
 	max := 18 + 9*g.Depth + g.Depth/2 + g.Depth*g.Depth/3
 	if g.Depth == MaxDepth-1 {
-		max += 10
+		max += 20
 	} else if g.Depth == MaxDepth {
-		max += 40
+		max += 50
 	}
 	adjust := -2 * g.Depth
 	for c, q := range g.Player.Consumables {
@@ -2411,8 +2411,10 @@ func (g *game) MaxMonsters() int {
 	} else if max > 36 {
 		max = 36
 	}
-	if g.Depth == MaxDepth {
-		max += 4
+	if g.Depth == MaxDepth-1 {
+		max += 3
+	} else if g.Depth == MaxDepth {
+		max += 6
 	}
 	switch g.Dungeon.Gen {
 	case GenCaveMapTree, GenCaveMap:
