@@ -617,6 +617,9 @@ func (ar armour) Equip(g *game) {
 	}
 	g.Printf("You put the %s on and leave your %s on the ground.", ar, oar)
 	g.Equipables[g.Player.Pos] = oar
+	if oar == CelmistRobe && g.Player.MP > g.Player.MPMax() {
+		g.Player.MP = g.Player.MPMax()
+	}
 }
 
 func (ar armour) String() string {
