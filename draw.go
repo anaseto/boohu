@@ -778,6 +778,19 @@ func (ui *termui) HandleKeyAction(g *game, rka runeKeyAction) (err error, again 
 	return ui.HandleKey(g, rka)
 }
 
+func (ui *termui) OptionalDescendConfirmation(g *game, st stair) (err error) {
+	if g.Depth == WinDepth && st == NormalStair {
+		g.Print("Do you really want to dive in optional depths? [y/N]")
+		ui.DrawDungeonView(g, NormalMode)
+		dive := ui.PromptConfirmation(g)
+		if !dive {
+			err = errors.New("Keep going in current level, then.")
+		}
+	}
+	return err
+
+}
+
 func (ui *termui) HandleKey(g *game, rka runeKeyAction) (err error, again bool, quit bool) {
 	switch rka.k {
 	case KeyW, KeyS, KeyN, KeyE, KeyNW, KeyNE, KeySW, KeySE:
@@ -791,14 +804,10 @@ func (ui *termui) HandleKey(g *game, rka runeKeyAction) (err error, again bool, 
 		ui.MenuSelectedAnimation(g, MenuRest, err == nil)
 	case KeyDescend:
 		if stair, ok := g.Stairs[g.Player.Pos]; ok {
-			if g.Depth == WinDepth && stair == NormalStair {
-				g.Print("Do you really want to dive in optional depths? [y/N]")
-				ui.DrawDungeonView(g, NormalMode)
-				dive := ui.PromptConfirmation(g)
-				if !dive {
-					err = errors.New("Keep going in current level, then.")
-					break
-				}
+			ui.MenuSelectedAnimation(g, MenuInteract, true)
+			err = ui.OptionalDescendConfirmation(g, stair)
+			if err != nil {
+				break
 			}
 			if g.Descend() {
 				ui.Win(g)
@@ -831,6 +840,7 @@ func (ui *termui) HandleKey(g *game, rka runeKeyAction) (err error, again bool, 
 		}
 	case KeyEquip:
 		err = ui.Equip(g, g.Ev)
+		ui.MenuSelectedAnimation(g, MenuInteract, err == nil)
 	case KeyDrink:
 		err = ui.SelectPotion(g, g.Ev)
 		err = ui.CleanError(err)
@@ -1308,7 +1318,12 @@ func (ui *termui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, dat
 	case KeyNextStairs:
 		ui.NextStair(g, data)
 	case KeyDescend:
-		if _, ok := g.Stairs[g.Player.Pos]; ok {
+		if stair, ok := g.Stairs[g.Player.Pos]; ok {
+			ui.MenuSelectedAnimation(g, MenuInteract, true)
+			err = ui.OptionalDescendConfirmation(g, stair)
+			if err != nil {
+				break
+			}
 			again = false
 			g.Targeting = InvalidPos
 			notarg = true
@@ -3035,10 +3050,19 @@ func (ui *termui) MenuSelectedAnimation(g *game, m menu, ok bool) {
 		return
 	}
 	if !ui.Small() {
-		if ok {
-			ui.DrawColoredText(m.String(), MenuCols[m][0], DungeonHeight, ColorCyan)
+		var message string
+		if m == MenuInteract {
+			message = ui.UpdateInteractButton(g)
 		} else {
-			ui.DrawColoredText(m.String(), MenuCols[m][0], DungeonHeight, ColorMagenta)
+			message = m.String()
+		}
+		if message == "" {
+			return
+		}
+		if ok {
+			ui.DrawColoredText(message, MenuCols[m][0], DungeonHeight, ColorCyan)
+		} else {
+			ui.DrawColoredText(message, MenuCols[m][0], DungeonHeight, ColorMagenta)
 		}
 		ui.Flush()
 		time.Sleep(25 * time.Millisecond)
