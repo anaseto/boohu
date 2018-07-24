@@ -1781,7 +1781,7 @@ func (ui *termui) LightningBoltAnimation(g *game, ray []position) {
 			mons := g.MonsterAt(pos)
 			r := '*'
 			if RandInt(2) == 0 {
-				r = '+'
+				r = '×'
 			}
 			if mons.Exists() {
 				r = '√'

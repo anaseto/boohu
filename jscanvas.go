@@ -70,6 +70,7 @@ var MapNames = map[rune]string{
 	'"':  "foliage",
 	'•':  "tick",
 	'●':  "rock",
+	'×':  "times",
 	',':  "comma",
 	'}':  "rbrace",
 	'%':  "percent",
