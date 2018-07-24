@@ -891,7 +891,7 @@ func (ui *termui) HandleKey(g *game, rka runeKeyAction) (err error, again bool, 
 		again = true
 	case KeyWizardInfo:
 		if g.Wizard {
-			ui.WizardInfo(g)
+			err = ui.HandleWizardAction(g)
 			again = true
 		} else {
 			err = errors.New("Unknown key. Type ? for help.")
@@ -1903,6 +1903,8 @@ func (ui *termui) LightningHitAnimation(g *game, targets []position) {
 	}
 }
 
+var WizardMap = false
+
 func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgColor uicolor) {
 	m := g.Dungeon
 	c := m.Cell(pos)
@@ -1926,7 +1928,7 @@ func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgCol
 		return
 	}
 	if g.Wizard {
-		if !c.Explored && g.HasFreeExploredNeighbor(pos) {
+		if !c.Explored && g.HasFreeExploredNeighbor(pos) && !WizardMap {
 			r = '¤'
 			fgColor = ColorFgDark
 			bgColor = ColorBgDark
@@ -1939,7 +1941,7 @@ func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgCol
 			}
 		}
 	}
-	if g.Player.LOS[pos] {
+	if g.Player.LOS[pos] && !WizardMap {
 		fgColor = ColorFgLOS
 		bgColor = ColorBgLOS
 		if pos.X%2 == 1 && pos.Y%2 == 0 {
@@ -1973,7 +1975,7 @@ func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgCol
 			break
 		}
 		switch {
-		case pos == g.Player.Pos:
+		case pos == g.Player.Pos && !WizardMap:
 			r = '@'
 			fgColor = ColorFgPlayer
 		default:
@@ -2012,7 +2014,7 @@ func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgCol
 				r = '+'
 				fgColor = ColorFgPlace
 			}
-			if g.Player.LOS[pos] || g.Wizard {
+			if (g.Player.LOS[pos] || g.Wizard) && !WizardMap {
 				m := g.MonsterAt(pos)
 				if m.Exists() {
 					r = m.Kind.Letter()
@@ -2958,6 +2960,76 @@ func (ui *termui) HandleSettingAction(g *game) error {
 		if err != nil {
 			g.Print(err.Error())
 		}
+	}
+	return nil
+}
+
+type wizardAction int
+
+const (
+	WizardInfoAction wizardAction = iota
+	WizardToggleMap
+)
+
+func (a wizardAction) String() (text string) {
+	switch a {
+	case WizardInfoAction:
+		text = "Info"
+	case WizardToggleMap:
+		text = "toggle see/hide monsters"
+	}
+	return text
+}
+
+var wizardActions = []wizardAction{
+	WizardInfoAction,
+	WizardToggleMap,
+}
+
+func (ui *termui) WizardItem(g *game, i, lnum int, s wizardAction, fg uicolor) {
+	bg := ui.ListItemBG(i)
+	ui.ClearLineWithColor(lnum, bg)
+	ui.DrawColoredTextOnBG(fmt.Sprintf("%c - %s", rune(i+97), s), 0, lnum, fg, bg)
+}
+
+func (ui *termui) SelectWizardMagic(g *game, actions []wizardAction) (wizardAction, error) {
+	for {
+		ui.ClearLine(0)
+		ui.DrawColoredText("Evoke", 0, 0, ColorCyan)
+		col := utf8.RuneCountInString("Evoke")
+		ui.DrawText(" which magic?", col, 0)
+		for i, r := range actions {
+			ui.WizardItem(g, i, i+1, r, ColorFg)
+		}
+		ui.DrawTextLine(" press esc or space to cancel ", len(actions)+1)
+		ui.Flush()
+		index, alt, err := ui.Select(g, len(actions))
+		if alt {
+			continue
+		}
+		if err != nil {
+			ui.DrawDungeonView(g, NoFlushMode)
+			return WizardInfoAction, err
+		}
+		ui.WizardItem(g, index, index+1, actions[index], ColorYellow)
+		ui.Flush()
+		time.Sleep(75 * time.Millisecond)
+		ui.DrawDungeonView(g, NoFlushMode)
+		return actions[index], nil
+	}
+}
+
+func (ui *termui) HandleWizardAction(g *game) error {
+	s, err := ui.SelectWizardMagic(g, wizardActions)
+	if err != nil {
+		return err
+	}
+	switch s {
+	case WizardInfoAction:
+		ui.WizardInfo(g)
+	case WizardToggleMap:
+		WizardMap = !WizardMap
+		ui.DrawDungeonView(g, NoFlushMode)
 	}
 	return nil
 }
