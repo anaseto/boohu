@@ -298,6 +298,7 @@ func (g *game) Equip(ev event) error {
 	if eq, ok := g.Equipables[g.Player.Pos]; ok {
 		eq.Equip(g)
 		ev.Renew(g, 10)
+		g.BoredomAction(ev, 1)
 		return nil
 	}
 	return errors.New("Found nothing to equip here.")
