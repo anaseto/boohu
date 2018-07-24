@@ -3025,7 +3025,7 @@ func (ui *termui) StatusEndAnimation(g *game) {
 	r, fg, bg := ui.PositionDrawing(g, g.Player.Pos)
 	ui.DrawAtPosition(g, g.Player.Pos, false, r, ColorViolet, bg)
 	ui.Flush()
-	time.Sleep(200 * time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
 	ui.DrawAtPosition(g, g.Player.Pos, false, r, fg, bg)
 	ui.Flush()
 }
