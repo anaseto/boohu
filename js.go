@@ -268,7 +268,7 @@ func (c uicolor) Color() color.Color {
 	case 0:
 		cl = color.RGBA{7, 54, 66, opaque}
 	case 1:
-		cl = color.RGBA{211, 1, 2, opaque}
+		cl = color.RGBA{220, 50, 47, opaque}
 	case 2:
 		cl = color.RGBA{133, 153, 0, opaque}
 	case 3:
