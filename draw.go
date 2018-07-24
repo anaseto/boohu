@@ -479,6 +479,8 @@ func (k keyAction) NormalModeKey() bool {
 		KeyLogs,
 		KeyDump,
 		KeyHelp,
+		KeyMenuCommandHelp,
+		KeyMenuTargetingHelp,
 		KeySave,
 		KeyQuit,
 		KeyConfigure,
