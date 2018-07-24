@@ -444,7 +444,7 @@ func (g *game) InitLevel() {
 	}
 	for i := 0; i < nstairs; i++ {
 		var pos position
-		if g.Depth >= WinDepth {
+		if g.Depth >= WinDepth && g.Depth != 14 {
 			pos = g.FreeCellForStair(60)
 			g.Stairs[pos] = WinStair
 		}
