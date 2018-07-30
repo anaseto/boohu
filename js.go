@@ -190,7 +190,7 @@ func (ui *termui) Init() error {
 		}))
 	js.Global().Get("document").Call(
 		"addEventListener", "keypress", js.NewEventCallback(0, func(e js.Value) {
-			if !e.Get("ctrlKey").Bool() && !e.Get("metaKey").Bool() && js.Global().Get("document").Get("activeElement") == canvas {
+			if !e.Get("ctrlKey").Bool() && !e.Get("metaKey").Bool() && js.Global().Get("Object").Call("is", js.Global().Get("document").Get("activeElement"), canvas).Bool() {
 				e.Call("preventDefault")
 			}
 		}))
