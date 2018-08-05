@@ -366,7 +366,7 @@ func (g *game) QuaffWallPotion(ev event) error {
 		}
 		g.PushEvent(&cloudEvent{ERank: ev.Rank() + 200 + RandInt(50), Pos: pos, EAction: ObstructionEnd})
 	}
-	g.Printf("You quaff the %s. You feel surrounded by temporal walls.", WallPotion)
+	g.Printf("You quaff the %s. You feel surrounded by temporary walls.", WallPotion)
 	g.ComputeLOS()
 	return nil
 }

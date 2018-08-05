@@ -489,7 +489,7 @@ func (g *game) EvokeRodObstruction(ev event) error {
 		return err
 	}
 	g.TemporalWallAt(g.Player.Target, ev)
-	g.Printf("You see a wall appear from nothing.")
+	g.Printf("You see a wall appear from thin air.")
 	return nil
 }
 
