@@ -780,11 +780,11 @@ func (ui *termui) HandleKeyAction(g *game, rka runeKeyAction) (err error, again 
 
 func (ui *termui) OptionalDescendConfirmation(g *game, st stair) (err error) {
 	if g.Depth == WinDepth && st == NormalStair {
-		g.Print("Do you really want to dive in optional depths? [y/N]")
+		g.Print("Do you really want to dive into optional depths? [y/N]")
 		ui.DrawDungeonView(g, NormalMode)
 		dive := ui.PromptConfirmation(g)
 		if !dive {
-			err = errors.New("Keep going in current level, then.")
+			err = errors.New("Keep going in the current level, then.")
 		}
 	}
 	return err

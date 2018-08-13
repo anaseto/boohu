@@ -1773,7 +1773,7 @@ func (m *monster) HitPlayer(g *game, ev event) {
 		m.HitSideEffects(g, ev)
 		if g.Player.Aptitudes[AptConfusingGas] && g.Player.HP < g.Player.HPMax()/2 && RandInt(3) == 0 {
 			m.EnterConfusion(g, ev)
-			g.Printf("You release a confusing gas on the %s.", m.Kind)
+			g.Printf("You release some confusing gas on the %s.", m.Kind)
 		}
 		if g.Player.Aptitudes[AptSmoke] && g.Player.HP < g.Player.HPMax()/2 && RandInt(2) == 0 {
 			g.Smoke(ev)
@@ -2194,7 +2194,7 @@ func (m *monster) MakeHuntIfHurt(g *game) {
 	if m.Exists() && m.State != Hunting {
 		m.MakeHunt(g)
 		if m.State == Resting {
-			g.Printf("%s awakes.", m.Kind.Definite(true))
+			g.Printf("%s awakens.", m.Kind.Definite(true))
 		}
 		if m.Kind == MonsHound {
 			g.Printf("%s barks.", m.Kind.Definite(true))
@@ -2271,7 +2271,7 @@ func (m *monster) MakeAware(g *game) {
 		}
 	}
 	if m.State == Resting {
-		g.Printf("%s awakes.", m.Kind.Definite(true))
+		g.Printf("%s awakens.", m.Kind.Definite(true))
 	}
 	if m.State == Wandering {
 		g.Printf("%s notices you.", m.Kind.Definite(true))

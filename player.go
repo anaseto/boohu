@@ -237,7 +237,7 @@ func (g *game) BoredomAction(ev event, grade int) {
 	}
 	if g.Boredom >= 120 && obor < 120 {
 		if g.MonsterCount() > 4 {
-			g.PrintStyled("You feel a little bored, your health could decline.", logCritic)
+			g.PrintStyled("You feel a little bored, your health may decline.", logCritic)
 			g.StopAuto()
 		}
 	}
@@ -476,13 +476,13 @@ func (g *game) Smoke(ev event) {
 	g.Player.Statuses[StatusSwift]++
 	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 20 + RandInt(10), EAction: HasteEnd})
 	g.ComputeLOS()
-	g.Print("You feel an energy burst and smoking coming out from you.")
+	g.Print("You feel an energy burst and smoke comes out from you.")
 }
 
 func (g *game) Corrosion(ev event) {
 	g.Player.Statuses[StatusCorrosion]++
 	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 80 + RandInt(40), EAction: CorrosionEnd})
-	g.Print("Your equipment is corroded.")
+	g.Print("Your equipment gets corroded.")
 }
 
 func (g *game) Confusion(ev event) {

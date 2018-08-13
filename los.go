@@ -156,7 +156,7 @@ func (g *game) SeePosition(pos position) {
 		g.DijkstraMapRebuild = true
 	} else {
 		if g.WrongWall[pos] {
-			g.Printf("There is no more a wall there.")
+			g.Printf("There is no longer a wall there.")
 			g.StopAuto()
 			g.DijkstraMapRebuild = true
 		}
@@ -251,7 +251,7 @@ func (g *game) ComputeNoise() {
 				// no footsteps
 			default:
 				noise[pos] = true
-				g.Print("You heared some footsteps.")
+				g.Print("You heard some footsteps.")
 				count++
 			}
 		}

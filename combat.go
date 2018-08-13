@@ -174,7 +174,7 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 		if HPrate < 50 && RandInt(HPrate/4) == 0 && !g.Player.HasStatus(StatusExhausted) && !g.Player.HasStatus(StatusBerserk) {
 			g.Player.Statuses[StatusBerserk] = 1
 			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 65 + RandInt(20), EAction: BerserkEnd})
-			g.Print("Your sword insurges you to kill things.")
+			g.Print("Your sword enrages you to kill things.")
 			g.Player.HP += 10
 		}
 	case g.Player.Weapon == DefenderFlail:
@@ -359,7 +359,7 @@ func (g *game) HitMonster(dt dmgType, dmg int, mons *monster, ev event) (hit boo
 			mons.Pos.Distance(g.Player.Pos) == 1 {
 			g.Player.Statuses[StatusNausea]++
 			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 30 + RandInt(20), EAction: NauseaEnd})
-			g.Print("The brizzia's corpse releases a nauseous gas. You feel sick.")
+			g.Print("The brizzia's corpse releases some nauseous gas. You feel sick.")
 		}
 		g.Stats.Hits++
 	} else {
@@ -421,7 +421,7 @@ func (g *game) BlockEffects(m *monster) {
 				g.Stats.Digs++
 				g.MakeNoise(WallNoise+2, pos)
 				g.Fog(pos, 1, g.Ev)
-				g.Printf("%s Blocking sound breaks a wall.", g.CrackSound())
+				g.Printf("%s The sound of blocking breaks a wall.", g.CrackSound())
 			}
 		}
 	case BashingShield:

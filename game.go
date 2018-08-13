@@ -829,7 +829,7 @@ func (g *game) ApplyRest() {
 		}
 	}
 	g.Stats.Rest++
-	g.PrintStyled("You feel fresh again. Some monsters might have awaken.", logStatusEnd)
+	g.PrintStyled("You feel fresh again. Some monsters might have awoken.", logStatusEnd)
 }
 
 func (g *game) AutoPlayer(ev event) bool {
