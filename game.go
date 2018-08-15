@@ -480,7 +480,7 @@ func (g *game) InitLevel() {
 	if g.Depth == WinDepth {
 		g.PrintStyled("You feel magic in the air. A first way out is close!", logSpecial)
 	} else if g.Depth == MaxDepth {
-		g.PrintStyled("If rumors are true, you reached the bottom!", logSpecial)
+		g.PrintStyled("If rumors are true, you have reached the bottom!", logSpecial)
 	}
 	g.ComputeLOS()
 	g.MakeMonstersAware()
@@ -877,7 +877,7 @@ func (g *game) AutoPlayer(ev event) bool {
 			if finished && g.AllExplored() {
 				g.Print("You finished exploring.")
 			} else if n == nil {
-				g.Print("You could not reach safely some places.")
+				g.Print("You could not safely reach some places.")
 			}
 			if n != nil {
 				err := g.MovePlayer(*n, ev)

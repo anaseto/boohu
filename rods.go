@@ -255,7 +255,7 @@ func (g *game) EvokeRodSleeping(ev event) error {
 		return err
 	}
 	neighbors := g.Dungeon.FreeNeighbors(g.Player.Target)
-	g.Print("A sleeping ball emerges straight from the rod.")
+	g.Print("A sleeping ball emerges straight out of the rod.")
 	g.ui.ProjectileTrajectoryAnimation(g, g.Ray(g.Player.Target), ColorFgSleepingMonster)
 	for _, pos := range append(neighbors, g.Player.Target) {
 		mons := g.MonsterAt(pos)
@@ -277,7 +277,7 @@ func (g *game) EvokeRodFireBolt(ev event) error {
 	}
 	ray := g.Ray(g.Player.Target)
 	g.MakeNoise(MagicCastNoise, g.Player.Pos)
-	g.Print("Whoosh! A fire bolt emerges straight from the rod.")
+	g.Print("Whoosh! A fire bolt emerges straight out of the rod.")
 	g.ui.LightningBoltAnimation(g, ray)
 	for _, pos := range ray {
 		g.Burn(pos, ev)
@@ -307,7 +307,7 @@ func (g *game) EvokeRodFireball(ev event) error {
 	}
 	neighbors := g.Dungeon.FreeNeighbors(g.Player.Target)
 	g.MakeNoise(MagicExplosionNoise, g.Player.Target)
-	g.Printf("A fireball emerges straight from the rod... %s", g.ExplosionSound())
+	g.Printf("A fireball emerges straight out of the rod... %s", g.ExplosionSound())
 	g.ui.ProjectileTrajectoryAnimation(g, g.Ray(g.Player.Target), ColorFgExplosionStart)
 	g.ui.ExplosionAnimation(g, FireExplosion, g.Player.Target)
 	for _, pos := range append(neighbors, g.Player.Target) {
@@ -341,7 +341,7 @@ func (g *game) EvokeRodLightning(ev event) error {
 	})
 	stack := []position{}
 	g.MakeNoise(MagicCastNoise, g.Player.Pos)
-	g.Print("Whoosh! Lightning emerges straight from the rod.")
+	g.Print("Whoosh! Lightning emerges straight out of the rod.")
 	for _, pos := range nb {
 		mons := g.MonsterAt(pos)
 		if !mons.Exists() {
@@ -489,7 +489,7 @@ func (g *game) EvokeRodObstruction(ev event) error {
 		return err
 	}
 	g.TemporalWallAt(g.Player.Target, ev)
-	g.Printf("You see a wall appear from thin air.")
+	g.Printf("You see a wall appear out of thin air.")
 	return nil
 }
 

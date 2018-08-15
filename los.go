@@ -251,7 +251,7 @@ func (g *game) ComputeNoise() {
 				// no footsteps
 			default:
 				noise[pos] = true
-				g.Print("You heard some footsteps.")
+				g.Print("You hear footsteps.")
 				count++
 			}
 		}

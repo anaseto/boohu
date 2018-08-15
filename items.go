@@ -110,7 +110,7 @@ func (p potion) Desc() (text string) {
 	case LignificationPotion:
 		text = "makes you more resistant to physical blows, but you are attached to the ground while the effect lasts."
 	case WallPotion:
-		text = "replaces free cells around you with temporal walls."
+		text = "replaces free cells around you with temporary walls."
 	case CBlinkPotion:
 		text = "makes you blink to a targeted cell in your line of sight."
 	case DigPotion:
@@ -201,7 +201,7 @@ func (g *game) QuaffTeleportation(ev event) error {
 	delay := 20 + RandInt(30)
 	g.Player.Statuses[StatusTele] = 1
 	g.PushEvent(&simpleEvent{ERank: ev.Rank() + delay, EAction: Teleportation})
-	g.Printf("You quaff a %s. You feel unstable.", TeleportationPotion)
+	g.Printf("You quaff the %s. You feel unstable.", TeleportationPotion)
 	return nil
 }
 
@@ -211,7 +211,7 @@ func (g *game) QuaffBerserk(ev event) error {
 	}
 	g.Player.Statuses[StatusBerserk] = 1
 	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 65 + RandInt(20), EAction: BerserkEnd})
-	g.Printf("You quaff a %s. You feel a sudden urge to kill things.", BerserkPotion)
+	g.Printf("You quaff the %s. You feel a sudden urge to kill things.", BerserkPotion)
 	g.Player.HP += 10
 	return nil
 }
@@ -222,7 +222,7 @@ func (g *game) QuaffHealWounds(ev event) error {
 	if g.Player.HP > g.Player.HPMax() {
 		g.Player.HP = g.Player.HPMax()
 	}
-	g.Printf("You quaff a %s (%d -> %d).", HealWoundsPotion, hp, g.Player.HP)
+	g.Printf("You quaff the %s (%d -> %d).", HealWoundsPotion, hp, g.Player.HP)
 	return nil
 }
 
@@ -242,11 +242,11 @@ func (g *game) QuaffDescent(ev event) error {
 	//return errors.New("You cannot descend while lignified.")
 	//}
 	if g.Depth >= MaxDepth {
-		return errors.New("You cannot descend more!")
+		return errors.New("You cannot descend any deeper!")
 	}
 	g.Printf("You quaff the %s. You fall through the ground.", DescentPotion)
 	g.LevelStats()
-	g.StoryPrint("You descended deeper in the dungeon.")
+	g.StoryPrint("You descended deeper into the dungeon.")
 	g.Depth++
 	g.DepthPlayerTurn = 0
 	g.InitLevel()
@@ -285,7 +285,7 @@ func (g *game) QuaffSwapPotion(ev event) error {
 	}
 	g.Player.Statuses[StatusSwap] = 1
 	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 130 + RandInt(41), EAction: SwapEnd})
-	g.Printf("You quaff the %s. You feel like dancing.", SwapPotion)
+	g.Printf("You quaff the %s. You feel light-footed.", SwapPotion)
 	return nil
 }
 
@@ -338,7 +338,7 @@ func (g *game) QuaffMagicMapping(ev event) error {
 			g.ui.MagicMappingAnimation(g, cdists[d])
 		}
 	}
-	g.Printf("You quaff the %s. You feel wiser.", MagicMappingPotion)
+	g.Printf("You quaff the %s. You feel aware of your surroundings..", MagicMappingPotion)
 	return nil
 }
 
