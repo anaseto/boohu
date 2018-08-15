@@ -196,26 +196,26 @@ var MonsData = []monsterData{
 }
 
 var monsDesc = []string{
-	MonsGoblin:          "Goblins are little humanoid creatures. They often appear in group.",
+	MonsGoblin:          "Goblins are little humanoid creatures. They often appear in a group.",
 	MonsOgre:            "Ogres are big clunky humanoids that can hit really hard.",
 	MonsCyclop:          "Cyclops are very similar to ogres, but they also like to throw rocks at their foes (for up to 15 damage). The rocks can block your way for a while.",
 	MonsWorm:            "Farmer worms are ugly slow moving creatures, but surprisingly hardy at times, and they furrow as they move, helping new foliage to grow.",
 	MonsBrizzia:         "Brizzias are big slow moving biped creatures. They are quite hardy, and when hurt they can cause nausea, impeding the use of potions.",
-	MonsAcidMound:       "Acid mounds are acidic creatures. They can temporally corrode your equipment.",
-	MonsHound:           "Hounds are fast moving carnivore quadrupeds. They can bark. They can smell you.",
-	MonsYack:            "Yacks are quite large herbivorous quadrupeds. They tend to form large groups. They can push you one cell away.",
-	MonsGiantBee:        "Giant bees are fragile, but extremely fast moving creatures. Their bite can sometimes enrage you.",
-	MonsGoblinWarrior:   "Goblin warriors are goblins that learned to fight, and got equipped with a leather armour. They can throw javelins.",
+	MonsAcidMound:       "Acid mounds are acidic creatures. They can temporarily corrode your equipment.",
+	MonsHound:           "Hounds are fast moving carnivore quadrupeds. They can bark, and smell you.",
+	MonsYack:            "Yacks are quite large herbivorous quadrupeds. They tend to form large groups, and can push you one cell away.",
+	MonsGiantBee:        "Giant bees are fragile but extremely fast moving creatures. Their bite can sometimes enrage you.",
+	MonsGoblinWarrior:   "Goblin warriors are goblins that learned to fight, and got equipped with leather armour. They can throw javelins.",
 	MonsHydra:           "Hydras are enormous creatures with four heads that can hit you each at once.",
-	MonsSkeletonWarrior: "Skeleton warriors are good fighters, and are equipped with a chain mail.",
+	MonsSkeletonWarrior: "Skeleton warriors are good fighters, clad in chain mail.",
 	MonsSpider:          "Spiders are fast moving fragile creatures, whose bite can confuse you.",
 	MonsWingedMilfid:    "Winged milfids are fast moving humanoids that can fly over you and make you swap positions.",
-	MonsBlinkingFrog:    "Blinking frogs are big frog-like unstable creatures, whose bite can make you blink away.",
+	MonsBlinkingFrog:    "Blinking frogs are big frog-like creatures, whose bite can make you blink away.",
 	MonsLich:            "Liches are non-living mages wearing a leather armour. They can throw a bolt of torment at you, halving your HP.",
-	MonsEarthDragon:     "Earth dragons are big and hardy creatures that wander in the Underground. It is said they are to credit for many tunnels.",
-	MonsMirrorSpecter:   "Mirror specters are very insubstantial creatures. They can absorb your mana.",
-	MonsExplosiveNadre:  "Explosive nadres are very frail creatures that explode upon dying, halving HP of any adjacent creatures and occasionally destructing walls.",
-	MonsSatowalgaPlant:  "Satowalga Plants are static bushes that throw acidic projectiles at you, sometimes corroding and confusing you.",
+	MonsEarthDragon:     "Earth dragons are big and hardy creatures that wander in the Underground. It is said they can be credited for many of the tunnels.",
+	MonsMirrorSpecter:   "Mirror specters are very insubstantial creatures, which can absorb your mana.",
+	MonsExplosiveNadre:  "Explosive nadres are very frail creatures that explode upon dying, halving HP of any adjacent creatures and occasionally destroying walls.",
+	MonsSatowalgaPlant:  "Satowalga Plants are immobile bushes that throw acidic projectiles at you, sometimes corroding and confusing you.",
 	MonsMadNixe:         "Mad nixes are magical humanoids that can attract you to them.",
 	MonsMarevorHelith:   "Marevor Helith is an ancient undead nakrus very fond of teleporting people away.",
 }
@@ -1642,7 +1642,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 			g.Fog(m.Pos, 1, ev)
 			if g.Player.Pos.Distance(target) < 12 {
 				// XXX use dijkstra distance ?
-				g.Printf("%s You hear an earth-breaking noise.", g.CrackSound())
+				g.Printf("%s You hear an earth-splitting noise.", g.CrackSound())
 				g.StopAuto()
 			}
 			m.MoveTo(g, target)
@@ -1773,7 +1773,7 @@ func (m *monster) HitPlayer(g *game, ev event) {
 		m.HitSideEffects(g, ev)
 		if g.Player.Aptitudes[AptConfusingGas] && g.Player.HP < g.Player.HPMax()/2 && RandInt(3) == 0 {
 			m.EnterConfusion(g, ev)
-			g.Printf("You release some confusing gas on the %s.", m.Kind)
+			g.Printf("You release some confusing gas against the %s.", m.Kind)
 		}
 		if g.Player.Aptitudes[AptSmoke] && g.Player.HP < g.Player.HPMax()/2 && RandInt(2) == 0 {
 			g.Smoke(ev)
@@ -2030,7 +2030,7 @@ func (m *monster) ThrowJavelin(g *game, ev event) bool {
 		} else if !g.Player.HasStatus(StatusDisabledShield) {
 			g.Player.Statuses[StatusDisabledShield] = 1
 			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 100 + RandInt(100), EAction: DisabledShieldEnd})
-			g.Printf("%s's %s gets fixed on your shield.", m.Kind.Indefinite(true), "javelin")
+			g.Printf("%s's %s gets embedded in your shield.", m.Kind.Indefinite(true), "javelin")
 			g.MakeNoise(ShieldBlockNoise, g.Player.Pos)
 			g.ui.MonsterJavelinAnimation(g, g.Ray(m.Pos), false)
 		}
@@ -2097,7 +2097,7 @@ func (m *monster) NixeAttraction(g *game, ev event) bool {
 		return false
 	}
 	g.MakeNoise(9, m.Pos)
-	g.PrintfStyled("%s uses energies to lure you.", logMonsterHit, m.Kind.Definite(true))
+	g.PrintfStyled("%s lures you to her.", logMonsterHit, m.Kind.Definite(true))
 	ray := g.Ray(m.Pos)
 	g.ui.MonsterProjectileAnimation(g, ray, 'θ', ColorCyan) // TODO: improve
 	if len(ray) > 1 {
@@ -2153,7 +2153,7 @@ func (m *monster) AbsorbMana(g *game, ev event) bool {
 func (m *monster) Explode(g *game, ev event) {
 	neighbors := m.Pos.ValidNeighbors()
 	g.MakeNoise(WallNoise, m.Pos)
-	g.Printf("%s %s blows with a noisy pop.", g.ExplosionSound(), m.Kind.Definite(true))
+	g.Printf("%s %s explodes with a loud boom.", g.ExplosionSound(), m.Kind.Definite(true))
 	g.ui.ExplosionAnimation(g, FireExplosion, m.Pos)
 	for _, pos := range append(neighbors, m.Pos) {
 		c := g.Dungeon.Cell(pos)

@@ -41,9 +41,9 @@ func (ap aptitude) String() string {
 	case AptStealthyLOS:
 		text = "The shadows follow you. (reduced LOS)"
 	case AptConfusingGas:
-		text = "You occasionally release a confusing gas when hurt."
+		text = "You occasionally release some confusing gas when hurt."
 	case AptSmoke:
-		text = "You occasionally get energic and smoke clouds when hurt."
+		text = "You occasionally get energetic and emit smoke clouds when hurt."
 	}
 	return text
 }
