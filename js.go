@@ -550,6 +550,14 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 			in.key = "8"
 		case "ArrowDown":
 			in.key = "2"
+		case "Home":
+			in.key = "7"
+		case "End":
+			in.key = "1"
+		case "PageUp":
+			in.key = "9"
+		case "PageDown":
+			in.key = "3"
 		}
 		if utf8.RuneCountInString(in.key) > 1 {
 			err = fmt.Errorf("Invalid key: “%s”.", in.key)
@@ -750,6 +758,14 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (er
 		in.key = "8"
 	case "ArrowDown":
 		in.key = "2"
+	case "Home":
+		in.key = "7"
+	case "End":
+		in.key = "1"
+	case "PageUp":
+		in.key = "9"
+	case "PageDown":
+		in.key = "3"
 	}
 	if utf8.RuneCountInString(in.key) > 1 {
 		g.Printf("Invalid key: “%s”.", in.key)
