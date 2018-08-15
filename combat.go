@@ -359,7 +359,7 @@ func (g *game) HitMonster(dt dmgType, dmg int, mons *monster, ev event) (hit boo
 			mons.Pos.Distance(g.Player.Pos) == 1 {
 			g.Player.Statuses[StatusNausea]++
 			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 30 + RandInt(20), EAction: NauseaEnd})
-			g.Print("The brizzia's corpse releases some nauseous gas. You feel sick.")
+			g.Print("The brizzia's corpse releases some nauseating gas. You feel sick.")
 		}
 		g.Stats.Hits++
 	} else {
@@ -450,7 +450,7 @@ func (g *game) BlockEffects(m *monster) {
 		}
 		if pos != m.Pos {
 			m.MoveTo(g, pos)
-			g.Printf("%s is repelled away.", m.Kind.Definite(true))
+			g.Printf("%s is repelled.", m.Kind.Definite(true))
 		}
 	case ConfusingShield:
 		if m.Pos.Distance(g.Player.Pos) > 1 {

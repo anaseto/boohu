@@ -3046,7 +3046,7 @@ func (ui *termui) Death(g *game) {
 func (ui *termui) Win(g *game) {
 	err := g.RemoveSaveFile()
 	if err != nil {
-		g.PrintfStyled("Error removing saved file: %v", logError, err)
+		g.PrintfStyled("Error removing save file: %v", logError, err)
 	}
 	if g.Wizard {
 		g.Print("You escape by the magic stairs! **WIZARD** --press esc or space to continue--")

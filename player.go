@@ -324,7 +324,7 @@ func (g *game) Teleportation(ev event) {
 	if pos.valid() {
 		// should always happen
 		opos := g.Player.Pos
-		g.Print("You feel yourself teleported away.")
+		g.Print("You teleport away.")
 		g.ui.TeleportAnimation(g, opos, pos, true)
 		g.PlacePlayerAt(pos)
 	} else {
@@ -363,9 +363,9 @@ func (g *game) CollectGround() {
 		g.StoryPrintf("You found and took a %s.", r)
 	}
 	if eq, ok := g.Equipables[pos]; ok {
-		g.Printf("You stand over %s.", Indefinite(eq.String(), false))
+		g.Printf("You are standing over %s.", Indefinite(eq.String(), false))
 	} else if _, ok := g.Stairs[pos]; ok {
-		g.Print("You stand over stairs.")
+		g.Print("You are standing on a staircase.")
 	} else if g.Doors[pos] {
 		g.Print("You stand at the door.")
 	}

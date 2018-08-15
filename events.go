@@ -165,7 +165,7 @@ func (sev *simpleEvent) Action(g *game) {
 		g.Player.Statuses[StatusNausea] = 0
 		g.ui.StatusEndAnimation(g)
 	case DisabledShieldEnd:
-		g.PrintStyled("You manage to free your shield from the projectile.", logStatusEnd)
+		g.PrintStyled("You manage to dislodge the projectile from your shield.", logStatusEnd)
 		g.Player.Statuses[StatusDisabledShield] = 0
 		g.ui.StatusEndAnimation(g)
 	case CorrosionEnd:
@@ -183,13 +183,13 @@ func (sev *simpleEvent) Action(g *game) {
 	case SwapEnd:
 		g.Player.Statuses[StatusSwap] = 0
 		if g.Player.Statuses[StatusSwap] == 0 {
-			g.PrintStyled("You are no longer dancing.", logStatusEnd)
+			g.PrintStyled("You no longer feel light-footed.", logStatusEnd)
 			g.ui.StatusEndAnimation(g)
 		}
 	case ShadowsEnd:
 		g.Player.Statuses[StatusShadows] = 0
 		if g.Player.Statuses[StatusShadows] == 0 {
-			g.PrintStyled("Shadows have left you.", logStatusEnd)
+			g.PrintStyled("The shadows leave you.", logStatusEnd)
 			g.ui.StatusEndAnimation(g)
 			g.ComputeLOS()
 			g.MakeMonstersAware()
@@ -325,7 +325,7 @@ func (g *game) MakeCreatureSleep(pos position, ev event) {
 	if pos == g.Player.Pos {
 		g.Player.Statuses[StatusSlow]++
 		g.PushEvent(&simpleEvent{ERank: ev.Rank() + 30 + RandInt(10), EAction: SlowEnd})
-		g.Print("The night clouds make you sleepy.")
+		g.Print("The clouds of night make you sleepy.")
 		return
 	}
 	mons := g.MonsterAt(pos)
