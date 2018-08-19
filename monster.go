@@ -1925,7 +1925,7 @@ func (m *monster) Blocked(g *game) bool {
 		block := RandInt(g.Player.Block())
 		acc := RandInt(m.Accuracy)
 		if block >= acc {
-			g.MakeNoise(12+g.Player.Block()/2, g.Player.Pos)
+			//g.MakeNoise(12+g.Player.Block()/2, g.Player.Pos)
 			blocked = true
 		}
 	}

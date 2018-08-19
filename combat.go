@@ -394,7 +394,7 @@ const (
 	MagicExplosionNoise = 16
 	MagicCastNoise      = 16
 	BaseHitNoise        = 11
-	ShieldBlockNoise    = 15
+	ShieldBlockNoise    = 17
 )
 
 func (g *game) ArmourClang() (sclang string) {
@@ -419,7 +419,7 @@ func (g *game) BlockEffects(m *monster) {
 			if RandInt(3) == 0 && g.Dungeon.Cell(pos).T == WallCell {
 				g.Dungeon.SetCell(pos, FreeCell)
 				g.Stats.Digs++
-				g.MakeNoise(WallNoise+2, pos)
+				g.MakeNoise(WallNoise+3, pos)
 				g.Fog(pos, 1, g.Ev)
 				g.Printf("%s The sound of blocking breaks a wall.", g.CrackSound())
 			}
