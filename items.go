@@ -891,6 +891,7 @@ const (
 	ConfusingShield
 	EarthShield
 	BashingShield
+	FireShield
 )
 
 func (sh shield) Equip(g *game) {
@@ -919,6 +920,8 @@ func (sh shield) String() (text string) {
 		text = "earth shield"
 	case BashingShield:
 		text = "bashing shield"
+	case FireShield:
+		text = "fire shield"
 	}
 	return text
 }
@@ -933,6 +936,8 @@ func (sh shield) Short() (text string) {
 		text = "Er"
 	case BashingShield:
 		text = "Bs"
+	case FireShield:
+		text = "Fs"
 	}
 	return text
 }
@@ -947,6 +952,8 @@ func (sh shield) Desc() (text string) {
 		text = "An earth shield offers great protection, but impact sound can disintegrate nearby walls."
 	case BashingShield:
 		text = "A bashing shield can block attacks and push ennemies away."
+	case FireShield:
+		text = "A fire shield blocks attacks, sometimes burning foliage."
 	}
 	return text
 }
@@ -959,7 +966,7 @@ func (sh shield) Block() (block int) {
 	switch sh {
 	case Buckler:
 		block += 6
-	case ConfusingShield, BashingShield:
+	case ConfusingShield, BashingShield, FireShield:
 		block += 9
 	case EarthShield:
 		block += 15

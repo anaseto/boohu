@@ -460,5 +460,12 @@ func (g *game) BlockEffects(m *monster) {
 			m.EnterConfusion(g, g.Ev)
 			g.Printf("%s appears confused.", m.Kind.Definite(true))
 		}
+	case FireShield:
+		dir := m.Pos.Dir(g.Player.Pos)
+		burnpos := g.Player.Pos.To(dir)
+		if RandInt(4) == 0 {
+			g.Print("Sparks emerge out of the shield.")
+			g.Burn(burnpos, g.Ev)
+		}
 	}
 }

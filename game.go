@@ -332,6 +332,7 @@ func (g *game) InitPlayer() {
 	//g.Player.Weapon = HarKarGauntlets
 	//g.Player.Weapon = DefenderFlail
 	//g.Player.Shield = EarthShield
+	//g.Player.Shield = FireShield
 	//g.Player.Armour = PonderousnessPlates
 	//g.Player.Armour = HarmonistRobe
 	//g.Player.Armour = CelmistRobe
@@ -593,7 +594,7 @@ func (g *game) SeenGoodShield() (count int) {
 }
 
 func (g *game) GenShield() {
-	ars := [4]shield{Buckler, ConfusingShield, BashingShield, EarthShield}
+	ars := [5]shield{Buckler, ConfusingShield, BashingShield, EarthShield, FireShield}
 	n := 12 + 5*g.SeenGoodShield()
 	if g.SeenGoodShield() == 2 {
 		return
