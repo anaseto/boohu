@@ -940,13 +940,13 @@ func (sh shield) Short() (text string) {
 func (sh shield) Desc() (text string) {
 	switch sh {
 	case Buckler:
-		text = "A buckler is a small shield that can block attacks. (incompatible with two-handed weapon)"
+		text = "A buckler is a small shield that can block attacks."
 	case ConfusingShield:
-		text = "A confusing shield blocks attacks, sometimes confusing monsters. (incompatible with two-handed weapon)"
+		text = "A confusing shield blocks attacks, sometimes confusing monsters."
 	case EarthShield:
-		text = "An earth shield offers great protection, but impact sound can disintegrate nearby walls. (incompatible with two-handed weapon)"
+		text = "An earth shield offers great protection, but impact sound can disintegrate nearby walls."
 	case BashingShield:
-		text = "A bashing shield can block attacks and push ennemies away. (incompatible with two-handed weapon)"
+		text = "A bashing shield can block attacks and push ennemies away."
 	}
 	return text
 }
