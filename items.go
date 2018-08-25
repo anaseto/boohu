@@ -46,6 +46,7 @@ const (
 	DigPotion
 	SwapPotion
 	ShadowsPotion
+	ConfusePotion
 	DreamPotion
 )
 
@@ -80,6 +81,8 @@ func (p potion) String() (text string) {
 		text += " of swapping"
 	case ShadowsPotion:
 		text += " of shadows"
+	case ConfusePotion:
+		text += " of confusion"
 	case DreamPotion:
 		text += " of dreams"
 	}
@@ -119,6 +122,8 @@ func (p potion) Desc() (text string) {
 		text = "makes you swap positions with monsters instead of attacking."
 	case ShadowsPotion:
 		text = "reduces your line of sight range to 1."
+	case ConfusePotion:
+		text = "generates a harmonic light that confuses monsters in your line of sight."
 	case DreamPotion:
 		text = "shows you the position of monsters sleeping at drink time."
 	}
@@ -173,6 +178,8 @@ func (p potion) Use(g *game, ev event) error {
 		err = g.QuaffSwapPotion(ev)
 	case ShadowsPotion:
 		err = g.QuaffShadowsPotion(ev)
+	case ConfusePotion:
+		err = g.QuaffConfusePotion(ev)
 	case DreamPotion:
 		err = g.QuaffDreamPotion(ev)
 	}
@@ -339,6 +346,20 @@ func (g *game) QuaffMagicMapping(ev event) error {
 		}
 	}
 	g.Printf("You quaff the %s. You feel aware of your surroundings..", MagicMappingPotion)
+	return nil
+}
+
+func (g *game) QuaffConfusePotion(ev event) error {
+	g.Printf("You quaff the %s. A harmonic light confuses monsters.", ConfusePotion)
+	for pos, b := range g.Player.LOS {
+		if !b {
+			continue
+		}
+		mons := g.MonsterAt(pos)
+		if mons.Exists() {
+			mons.EnterConfusion(g, ev)
+		}
+	}
 	return nil
 }
 
@@ -584,6 +605,7 @@ var ConsumablesCollectData = map[consumable]collectData{
 	DigPotion:           {rarity: 12, quantity: 1},
 	SwapPotion:          {rarity: 12, quantity: 1},
 	ShadowsPotion:       {rarity: 15, quantity: 1},
+	ConfusePotion:       {rarity: 15, quantity: 1},
 	DescentPotion:       {rarity: 18, quantity: 1},
 	MagicMappingPotion:  {rarity: 18, quantity: 1},
 	DreamPotion:         {rarity: 18, quantity: 1},
