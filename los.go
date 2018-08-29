@@ -150,6 +150,9 @@ func (g *game) SeePosition(pos position) {
 		} else if rod, ok := g.Rods[pos]; ok {
 			g.Printf("You %s %s.", see, Indefinite(rod.String(), false))
 			g.StopAuto()
+		} else if stone, ok := g.MagicalStones[pos]; ok {
+			g.Printf("You %s %s.", see, Indefinite(stone.String(), false))
+			g.StopAuto()
 		}
 		g.FunAction()
 		g.Dungeon.SetExplored(pos)

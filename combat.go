@@ -42,6 +42,21 @@ func (m *monster) InflictDamage(g *game, damage, max int) {
 		g.StoryPrintf("Critical HP: %d (hit by %s)", g.Player.HP, m.Kind.Indefinite(false))
 		g.ui.CriticalHPWarning(g)
 	}
+	if g.Player.HP <= 0 {
+		return
+	}
+	stone, ok := g.MagicalStones[g.Player.Pos]
+	if !ok {
+		return
+	}
+	switch stone {
+	case TeleStone:
+		g.UseStone(g.Player.Pos)
+		g.Teleportation(g.Ev)
+	case FogStone:
+		g.Fog(g.Player.Pos, 3, g.Ev)
+		g.UseStone(g.Player.Pos)
+	}
 }
 
 func (g *game) MakeMonstersAware() {
@@ -361,6 +376,7 @@ func (g *game) HitMonster(dt dmgType, dmg int, mons *monster, ev event) (hit boo
 			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 30 + RandInt(20), EAction: NauseaEnd})
 			g.Print("The brizzia's corpse releases some nauseating gas. You feel sick.")
 		}
+		g.HandleStone(mons)
 		g.Stats.Hits++
 	} else {
 		g.Printf("You miss %s.", mons.Kind.Definite(false))
@@ -370,13 +386,63 @@ func (g *game) HitMonster(dt dmgType, dmg int, mons *monster, ev event) (hit boo
 	return hit
 }
 
+func (g *game) HandleStone(mons *monster) {
+	stone, ok := g.MagicalStones[mons.Pos]
+	if !ok {
+		return
+	}
+	switch stone {
+	case TeleStone:
+		if mons.Exists() {
+			g.UseStone(mons.Pos)
+			mons.TeleportAway(g)
+		}
+	case FogStone:
+		g.Fog(mons.Pos, 3, g.Ev)
+		g.UseStone(mons.Pos)
+	}
+}
+
+func (g *game) HandleKillOnStone(mons *monster, ev event) bool {
+	clos := false
+	if stone, ok := g.MagicalStones[mons.Pos]; ok {
+		switch stone {
+		case ObstructionStone:
+			g.CreateTemporalWallAt(mons.Pos, ev)
+			neighbors := g.Dungeon.FreeNeighbors(mons.Pos)
+			for _, pos := range neighbors {
+				if pos == g.Player.Pos {
+					continue
+				}
+				mons := g.MonsterAt(pos)
+				if mons.Exists() {
+					continue
+				}
+				g.CreateTemporalWallAt(pos, ev)
+			}
+			g.UseStone(mons.Pos)
+			g.Printf("You see walls appear out of thin air around the stone.")
+			g.ComputeLOS()
+			clos = true
+		}
+	}
+	return clos
+}
+
 func (g *game) HandleKill(mons *monster, ev event) {
 	g.Stats.Killed++
 	g.Stats.KilledMons[mons.Kind]++
 	if mons.Kind == MonsExplosiveNadre {
 		mons.Explode(g, ev)
 	}
+	clos := false
+	if g.HandleKillOnStone(mons, ev) {
+		clos = true
+	}
 	if g.Doors[mons.Pos] {
+		clos = true
+	}
+	if clos {
 		g.ComputeLOS()
 	}
 	if mons.Kind.Dangerousness() > 10 {

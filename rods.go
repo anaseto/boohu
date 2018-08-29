@@ -296,6 +296,7 @@ func (g *game) EvokeRodFireBolt(ev event) error {
 			g.HandleKill(mons, ev)
 		}
 		g.MakeNoise(MagicHitNoise, mons.Pos)
+		g.HandleStone(mons)
 		mons.MakeHuntIfHurt(g)
 	}
 	return nil
@@ -327,6 +328,7 @@ func (g *game) EvokeRodFireball(ev event) error {
 			g.HandleKill(mons, ev)
 		}
 		g.MakeNoise(MagicHitNoise, mons.Pos)
+		g.HandleStone(mons)
 		mons.MakeHuntIfHurt(g)
 	}
 	return nil
@@ -375,6 +377,7 @@ func (g *game) EvokeRodLightning(ev event) error {
 			g.HandleKill(mons, ev)
 		}
 		g.MakeNoise(MagicHitNoise, mons.Pos)
+		g.HandleStone(mons)
 		mons.MakeHuntIfHurt(g)
 		nb = pos.Neighbors(nb, func(npos position) bool {
 			return npos.valid() && d.Cell(npos).T != WallCell
@@ -479,6 +482,7 @@ func (g *game) EvokeRodShatter(ev event) error {
 			g.HandleKill(mons, ev)
 		}
 		g.MakeNoise(ExplosionHitNoise, mons.Pos)
+		g.HandleStone(mons)
 		mons.MakeHuntIfHurt(g)
 	}
 	return nil
@@ -497,13 +501,17 @@ func (g *game) TemporalWallAt(pos position, ev event) {
 	if g.Dungeon.Cell(pos).T == WallCell {
 		return
 	}
+	g.CreateTemporalWallAt(pos, ev)
+	g.ComputeLOS()
+}
+
+func (g *game) CreateTemporalWallAt(pos position, ev event) {
 	g.Dungeon.SetCell(pos, WallCell)
 	delete(g.Clouds, pos)
 	if g.TemporalWalls != nil {
 		g.TemporalWalls[pos] = true
 	}
 	g.PushEvent(&cloudEvent{ERank: ev.Rank() + 200 + RandInt(50), Pos: pos, EAction: ObstructionEnd})
-	g.ComputeLOS()
 }
 
 func (g *game) EvokeRodSwapping(ev event) error {

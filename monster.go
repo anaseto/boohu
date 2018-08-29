@@ -2167,6 +2167,7 @@ func (m *monster) Explode(g *game, ev event) {
 				mons.HP = 1
 			}
 			g.MakeNoise(ExplosionHitNoise, mons.Pos)
+			g.HandleStone(mons)
 			mons.MakeHuntIfHurt(g)
 		} else if g.Player.Pos == pos {
 			dmg := g.Player.HP / 2

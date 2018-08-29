@@ -380,12 +380,7 @@ func (g *game) QuaffWallPotion(ev event) error {
 		if mons.Exists() {
 			continue
 		}
-		g.Dungeon.SetCell(pos, WallCell)
-		delete(g.Clouds, g.Player.Target)
-		if g.TemporalWalls != nil {
-			g.TemporalWalls[pos] = true
-		}
-		g.PushEvent(&cloudEvent{ERank: ev.Rank() + 200 + RandInt(50), Pos: pos, EAction: ObstructionEnd})
+		g.CreateTemporalWallAt(pos, ev)
 	}
 	g.Printf("You quaff the %s. You feel surrounded by temporary walls.", WallPotion)
 	g.ComputeLOS()
@@ -511,6 +506,7 @@ func (g *game) ThrowConfusingDart(ev event) error {
 			g.ui.ThrowAnimation(g, g.Ray(mons.Pos), true)
 			g.HandleKill(mons, ev)
 		}
+		g.HandleStone(mons)
 	} else {
 		g.Printf("Your %s missed the %s.", ConfusingDart, mons.Kind)
 		g.ui.ThrowAnimation(g, g.Ray(mons.Pos), false)
@@ -537,6 +533,7 @@ func (g *game) ThrowExplosiveMagara(ev event) error {
 				mons.HP = 1
 			}
 			g.MakeNoise(ExplosionHitNoise, mons.Pos)
+			g.HandleStone(mons)
 			mons.MakeHuntIfHurt(g)
 		} else if g.Dungeon.Cell(pos).T == WallCell && RandInt(2) == 0 {
 			g.Dungeon.SetCell(pos, FreeCell)

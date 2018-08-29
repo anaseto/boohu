@@ -322,6 +322,8 @@ func (g *game) DumpDungeon() string {
 					r = rod.Letter()
 				} else if _, ok := g.Stairs[pos]; ok {
 					r = '>'
+				} else if _, ok := g.MagicalStones[pos]; ok {
+					r = '_'
 				} else if _, ok := g.Simellas[pos]; ok {
 					r = '♣'
 				} else if _, ok := g.Doors[pos]; ok {

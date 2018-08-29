@@ -28,6 +28,7 @@ type game struct {
 	Fungus              map[position]vegetation
 	Doors               map[position]bool
 	TemporalWalls       map[position]bool
+	MagicalStones       map[position]stone
 	GeneratedUniques    map[monsterBand]int
 	SpecialBands        map[int][]monsterBandData
 	GeneratedEquipables map[equipable]bool
@@ -163,6 +164,9 @@ func (g *game) FreeCellForStatic() position {
 			continue
 		}
 		if _, ok := g.Equipables[pos]; ok {
+			continue
+		}
+		if _, ok := g.MagicalStones[pos]; ok {
 			continue
 		}
 		return pos
@@ -460,6 +464,21 @@ func (g *game) InitLevel() {
 			}
 			g.Stairs[pos] = NormalStair
 		}
+	}
+
+	// Magical Stones
+	g.MagicalStones = map[position]stone{}
+	nstones := 1
+	switch RandInt(7) {
+	case 0:
+		nstones = 0
+	case 1, 2:
+		nstones = 2
+	}
+	for i := 0; i < nstones; i++ {
+		pos := g.FreeCellForStatic()
+		stone := stone(1 + RandInt(NumStones-1))
+		g.MagicalStones[pos] = stone
 	}
 
 	// Simellas

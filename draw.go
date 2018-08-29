@@ -1119,6 +1119,7 @@ func (ui *termui) DescribePosition(g *game, pos position, targ Targeter) {
 		desc += fmt.Sprintf("%s (%s)", mons.Kind.Indefinite(false), ui.MonsterInfo(mons))
 	}
 	stair, okStair := g.Stairs[pos]
+	stone, okStone := g.MagicalStones[pos]
 	switch {
 	case g.Simellas[pos] > 0:
 		desc = ui.AddComma(see, desc)
@@ -1145,6 +1146,9 @@ func (ui *termui) DescribePosition(g *game, pos position, targ Targeter) {
 			desc = ui.AddComma(see, desc)
 			desc += fmt.Sprintf("stairs downwards")
 		}
+	case okStone:
+		desc = ui.AddComma(see, desc)
+		desc += fmt.Sprint(Indefinite(stone.String(), false))
 	case g.Doors[pos] || g.WrongDoor[pos]:
 		desc = ui.AddComma(see, desc)
 		desc += fmt.Sprintf("a door")
@@ -1516,6 +1520,8 @@ func (ui *termui) ViewPositionDescription(g *game, pos position) {
 			}
 			ui.DrawDescription(g, desc)
 		}
+	} else if stone, ok := g.MagicalStones[pos]; ok {
+		ui.DrawDescription(g, stone.Description())
 	} else if g.Doors[pos] {
 		ui.DrawDescription(g, "A closed door blocks your line of sight. Doors open automatically when you or a monster stand on them. Doors are flammable.")
 	} else if g.Simellas[pos] > 0 {
@@ -2006,6 +2012,13 @@ func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgCol
 					fgColor = ColorFgMagicPlace
 				} else {
 					fgColor = ColorFgPlace
+				}
+			} else if stone, ok := g.MagicalStones[pos]; ok {
+				r = '_'
+				if stone == InertStone {
+					fgColor = ColorFgPlace
+				} else {
+					fgColor = ColorFgMagicPlace
 				}
 			} else if _, ok := g.Simellas[pos]; ok {
 				r = '♣'
