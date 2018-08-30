@@ -39,7 +39,7 @@ func (s stone) Description() (text string) {
 	case QueenStone:
 		text = "If a creature is hurt while standing on queenstone, a loud boom will resonate, leaving nearby monsters in a 2-range distance confused. You know how to avoid the effect yourself."
 	case ObstructionStone:
-		text = "When a monster dies on the stone, temporal walls appear around the obstruction stone."
+		text = "When a creature is hurt while standing on the obstruction stone, temporal walls appear around it."
 	}
 	return text
 }

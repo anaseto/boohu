@@ -75,6 +75,18 @@ func (m *monster) InflictDamage(g *game, damage, max int) {
 		}
 		//g.Confusion(g.Ev)
 		g.UseStone(g.Player.Pos)
+	case ObstructionStone:
+		neighbors := g.Dungeon.FreeNeighbors(g.Player.Pos)
+		for _, pos := range neighbors {
+			mons := g.MonsterAt(pos)
+			if mons.Exists() {
+				continue
+			}
+			g.CreateTemporalWallAt(pos, g.Ev)
+		}
+		g.Printf("You see walls appear out of thin air around the stone.")
+		g.UseStone(g.Player.Pos)
+		g.ComputeLOS()
 	}
 }
 
@@ -441,33 +453,25 @@ func (g *game) HandleStone(mons *monster) {
 		// 	g.Confusion(g.Ev)
 		// }
 		g.UseStone(mons.Pos)
-	}
-}
-
-func (g *game) HandleKillOnStone(mons *monster, ev event) bool {
-	clos := false
-	if stone, ok := g.MagicalStones[mons.Pos]; ok {
-		switch stone {
-		case ObstructionStone:
-			g.CreateTemporalWallAt(mons.Pos, ev)
-			neighbors := g.Dungeon.FreeNeighbors(mons.Pos)
-			for _, pos := range neighbors {
-				if pos == g.Player.Pos {
-					continue
-				}
-				mons := g.MonsterAt(pos)
-				if mons.Exists() {
-					continue
-				}
-				g.CreateTemporalWallAt(pos, ev)
-			}
-			g.UseStone(mons.Pos)
-			g.Printf("You see walls appear out of thin air around the stone.")
-			g.ComputeLOS()
-			clos = true
+	case ObstructionStone:
+		if !mons.Exists() {
+			g.CreateTemporalWallAt(mons.Pos, g.Ev)
 		}
+		neighbors := g.Dungeon.FreeNeighbors(mons.Pos)
+		for _, pos := range neighbors {
+			if pos == g.Player.Pos {
+				continue
+			}
+			mons := g.MonsterAt(pos)
+			if mons.Exists() {
+				continue
+			}
+			g.CreateTemporalWallAt(pos, g.Ev)
+		}
+		g.Printf("You see walls appear out of thin air around the stone.")
+		g.UseStone(mons.Pos)
+		g.ComputeLOS()
 	}
-	return clos
 }
 
 func (g *game) HandleKill(mons *monster, ev event) {
@@ -476,14 +480,7 @@ func (g *game) HandleKill(mons *monster, ev event) {
 	if mons.Kind == MonsExplosiveNadre {
 		mons.Explode(g, ev)
 	}
-	clos := false
-	if g.HandleKillOnStone(mons, ev) {
-		clos = true
-	}
 	if g.Doors[mons.Pos] {
-		clos = true
-	}
-	if clos {
 		g.ComputeLOS()
 	}
 	if mons.Kind.Dangerousness() > 10 {
