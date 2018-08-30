@@ -1741,7 +1741,7 @@ func (m *monster) DramaticAdjustment(g *game, baseAttack, attack, evasion, acc i
 }
 
 func (m *monster) HitPlayer(g *game, ev event) {
-	if g.Player.HP <= 0 {
+	if g.Player.HP <= 0 || g.Player.Pos.Distance(m.Pos) > 1 {
 		return
 	}
 	evasion := RandInt(g.Player.Evasion())
