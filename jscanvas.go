@@ -91,6 +91,7 @@ var MapNames = map[rune]string{
 	'>':  "stairs",
 	'!':  "potion",
 	';':  "semicolon",
+	'_':  "stone",
 }
 
 var LetterNames = map[rune]string{
