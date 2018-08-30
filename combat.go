@@ -56,6 +56,25 @@ func (m *monster) InflictDamage(g *game, damage, max int) {
 	case FogStone:
 		g.Fog(g.Player.Pos, 3, g.Ev)
 		g.UseStone(g.Player.Pos)
+	case QueenStone:
+		g.MakeNoise(QueenStoneNoise, g.Player.Pos)
+		dij := &normalPath{game: g}
+		nm := Dijkstra(dij, []position{g.Player.Pos}, 2)
+		for _, m := range g.Monsters {
+			if !m.Exists() {
+				continue
+			}
+			if m.State == Resting {
+				continue
+			}
+			_, ok := nm[m.Pos]
+			if !ok {
+				continue
+			}
+			m.EnterConfusion(g, g.Ev)
+		}
+		//g.Confusion(g.Ev)
+		g.UseStone(g.Player.Pos)
 	}
 }
 
@@ -400,6 +419,28 @@ func (g *game) HandleStone(mons *monster) {
 	case FogStone:
 		g.Fog(mons.Pos, 3, g.Ev)
 		g.UseStone(mons.Pos)
+	case QueenStone:
+		g.MakeNoise(QueenStoneNoise, mons.Pos)
+		dij := &normalPath{game: g}
+		nm := Dijkstra(dij, []position{mons.Pos}, 2)
+		for _, m := range g.Monsters {
+			if !m.Exists() {
+				continue
+			}
+			if m.State == Resting {
+				continue
+			}
+			_, ok := nm[m.Pos]
+			if !ok {
+				continue
+			}
+			m.EnterConfusion(g, g.Ev)
+		}
+		// _, ok := nm[g.Player.Pos]
+		// if ok {
+		// 	g.Confusion(g.Ev)
+		// }
+		g.UseStone(mons.Pos)
 	}
 }
 
@@ -461,6 +502,7 @@ const (
 	MagicCastNoise      = 16
 	BaseHitNoise        = 11
 	ShieldBlockNoise    = 17
+	QueenStoneNoise     = 20
 )
 
 func (g *game) ArmourClang() (sclang string) {

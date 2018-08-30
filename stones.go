@@ -6,6 +6,7 @@ const (
 	InertStone stone = iota
 	TeleStone
 	FogStone
+	QueenStone
 	ObstructionStone
 )
 
@@ -19,6 +20,8 @@ func (s stone) String() (text string) {
 		text = "teleport stone"
 	case FogStone:
 		text = "fog stone"
+	case QueenStone:
+		text = "queenstone"
 	case ObstructionStone:
 		text = "obstruction stone"
 	}
@@ -33,6 +36,8 @@ func (s stone) Description() (text string) {
 		text = "Any creature standing on the teleport stone will teleport away when hit in combat."
 	case FogStone:
 		text = "Fog will appear if a creature is hurt while standing on the fog stone."
+	case QueenStone:
+		text = "If a creature is hurt while standing on queenstone, a loud boom will resonate, leaving nearby monsters in a 2-range distance confused. You know how to avoid the effect yourself."
 	case ObstructionStone:
 		text = "When a monster dies on the stone, temporal walls appear around the obstruction stone."
 	}
