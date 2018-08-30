@@ -1,3 +1,18 @@
+v0.10-dev
+
+Gameplay:
+
++ New feature: 4 distinct magical stones, static objects on the ground that
+  have a special effect when a creature is hurt while standing on them.
+  Magical stones have only 1 charge.
++ New fire shield: it can burn nearby foliage after a successful block.
+
+User Interface:
+
++ Many grammar fixes (by kylobite).
++ Avoid clash between browser and Boohu keys when the canvas is focused.
+
+-----------------------------------------------------------------------------
 v0.9.0 2018-07-25
 
 Items and Monsters:

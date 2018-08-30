@@ -972,7 +972,7 @@ func (sh shield) Desc() (text string) {
 	case BashingShield:
 		text = "A bashing shield can block attacks and push ennemies away."
 	case FireShield:
-		text = "A fire shield blocks attacks, sometimes burning foliage."
+		text = "A fire shield blocks attacks, sometimes burning nearby foliage."
 	}
 	return text
 }
