@@ -51,8 +51,6 @@ func (r rod) String() string {
 		text = "rod of teleport other"
 	case RodFog:
 		text = "rod of fog"
-	case RodFear:
-		text = "rod of fear"
 	case RodFireBall:
 		text = "rod of fireball"
 	case RodFireBolt:
@@ -69,6 +67,8 @@ func (r rod) String() string {
 		text = "rod of swapping"
 	case RodFreezingClouds:
 		text = "rod of freezing clouds"
+	case RodFear:
+		text = "rod of fear"
 	case RodConfusingClouds:
 		text = "rod of confusing clouds"
 	}
@@ -179,6 +179,12 @@ func (r rod) Use(g *game, ev event) error {
 		err = g.EvokeRodSleeping(ev)
 	case RodSwapping:
 		err = g.EvokeRodSwapping(ev)
+	case RodConfusingClouds:
+		err = g.EvokeRodConfusingClouds(ev)
+	case RodFear:
+		err = g.EvokeRodFear(ev)
+	case RodFreezingClouds:
+		err = g.EvokeRodFreezingClouds(ev)
 	}
 
 	if err != nil {
@@ -534,6 +540,30 @@ func (g *game) SwapWithMonster(mons *monster) {
 	mons.MoveTo(g, g.Player.Pos)
 	g.PlacePlayerAt(ompos)
 	mons.MakeAware(g)
+}
+
+func (g *game) EvokeRodConfusingClouds(ev event) error {
+	return nil
+}
+
+func (g *game) ConfusingClouds(mons *monster) {
+
+}
+
+func (g *game) EvokeRodFear(ev event) error {
+	return nil
+}
+
+func (g *game) Fear(mons *monster) {
+
+}
+
+func (g *game) EvokeRodFreezingClouds(ev event) error {
+	return nil
+}
+
+func (g *game) FreezingClouds(mons *monster) {
+
 }
 
 func (g *game) GeneratedRodsCount() int {
