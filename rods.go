@@ -19,10 +19,6 @@ const (
 	RodShatter
 	RodSleeping
 	RodSwapping
-	// below unimplemented
-	RodConfusingClouds
-	RodFear
-	RodFreezingClouds
 )
 
 const NumRods = int(RodSwapping) + 1
@@ -51,8 +47,6 @@ func (r rod) String() string {
 		text = "rod of teleport other"
 	case RodFog:
 		text = "rod of fog"
-	case RodFear:
-		text = "rod of fear"
 	case RodFireBall:
 		text = "rod of fireball"
 	case RodFireBolt:
@@ -67,10 +61,6 @@ func (r rod) String() string {
 		text = "rod of sleeping"
 	case RodSwapping:
 		text = "rod of swapping"
-	case RodFreezingClouds:
-		text = "rod of freezing clouds"
-	case RodConfusingClouds:
-		text = "rod of confusing clouds"
 	}
 	return text
 }
@@ -100,12 +90,6 @@ func (r rod) Desc() string {
 		text = "induces sleeping and exhaustion for monsters in the targeted area."
 	case RodSwapping:
 		text = "makes you swap positions with a targeted monster."
-	case RodFear:
-		text = "TODO"
-	case RodFreezingClouds:
-		text = "TODO"
-	case RodConfusingClouds:
-		text = "TODO"
 	}
 	return fmt.Sprintf("The %s %s Rods sometimes regain charges as you go deeper. This rod can have up to %d charges.", r, text, r.MaxCharge())
 }
