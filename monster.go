@@ -741,7 +741,43 @@ func init() {
 				MonsOgre: {1, 1}, MonsSpider: {2, 2},
 			}, Rarity: 75, Band: true},
 		},
-			minDepth: 4,
+			minDepth: 5,
+			maxDepth: 11,
+		},
+		{bands: []monsterBandData{ // spiders
+			{Monster: MonsSpider, Rarity: 30},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsHound: {1, 1}, MonsSpider: {2, 2},
+			}, Rarity: 45, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsYack: {1, 1}, MonsSpider: {2, 2},
+			}, Rarity: 55, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsSpider: {2, 2}, MonsBrizzia: {1, 1},
+			}, Rarity: 55, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsSpider: {2, 2}, MonsWingedMilfid: {2, 2},
+			}, Rarity: 55, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsOgre: {1, 1}, MonsSpider: {2, 2},
+			}, Rarity: 75, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsBlinkingFrog: {1, 1}, MonsSpider: {2, 2},
+			}, Rarity: 75, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsMadNixe: {1, 1}, MonsSpider: {2, 2},
+			}, Rarity: 95, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsMirrorSpecter: {1, 1}, MonsSpider: {2, 2},
+			}, Rarity: 95, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsAcidMound: {1, 1}, MonsSpider: {2, 2},
+			}, Rarity: 95, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsHydra: {1, 1}, MonsSpider: {2, 2},
+			}, Rarity: 250, Band: true},
+		},
+			minDepth: 7,
 			maxDepth: 11,
 		},
 		{bands: []monsterBandData{ // milfids
