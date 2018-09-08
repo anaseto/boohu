@@ -1107,8 +1107,7 @@ func (ui *termui) DescribePosition(g *game, pos position, targ Targeter) {
 	if !g.Player.LOS[pos] {
 		see = "saw"
 	}
-	if g.Dungeon.Cell(pos).T == WallCell || g.WrongWall[pos] {
-		// TODO: revise if a monster ever creates walls outside of LOS
+	if g.Dungeon.Cell(pos).T == WallCell && !g.WrongWall[pos] || g.Dungeon.Cell(pos).T == FreeCell && g.WrongWall[pos] {
 		desc = ui.AddComma(see, "")
 		desc += fmt.Sprintf("a wall")
 		g.InfoEntry = desc + "."
@@ -1962,92 +1961,78 @@ func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgCol
 	if g.ExclusionsMap[pos] && c.T != WallCell {
 		fgColor = ColorFgExcluded
 	}
-	switch c.T {
-	case WallCell:
+	switch {
+	case c.T == WallCell && (!g.WrongWall[pos] || g.Wizard) || c.T == FreeCell && g.WrongWall[pos] && !g.Wizard:
 		r = '#'
 		if g.TemporalWalls[pos] {
 			fgColor = ColorFgMagicPlace
 		}
-		if g.WrongWall[pos] {
-			// TODO: not reached, but could eventually someday
-			r = '.'
+	case pos == g.Player.Pos && !WizardMap:
+		r = '@'
+		fgColor = ColorFgPlayer
+	default:
+		r = '.'
+		if _, ok := g.Fungus[pos]; ok && !g.WrongFoliage[pos] || !ok && g.WrongFoliage[pos] {
+			r = '"'
 		}
-	case FreeCell:
-		if g.WrongWall[pos] {
-			r = '#'
-			if g.TemporalWalls[pos] {
-				fgColor = ColorFgMagicPlace
-			}
-			break
-		}
-		switch {
-		case pos == g.Player.Pos && !WizardMap:
-			r = '@'
-			fgColor = ColorFgPlayer
-		default:
-			r = '.'
-			if _, ok := g.Fungus[pos]; ok && !g.WrongFoliage[pos] || !ok && g.WrongFoliage[pos] {
-				r = '"'
-			}
-			if cld, ok := g.Clouds[pos]; ok && g.Player.LOS[pos] {
-				r = '§'
-				if cld == CloudFire {
-					fgColor = ColorFgWanderingMonster
-				} else if cld == CloudNight {
-					fgColor = ColorFgSleepingMonster
-				}
-			}
-			if c, ok := g.Collectables[pos]; ok {
-				r = c.Consumable.Letter()
-				fgColor = ColorFgCollectable
-			} else if eq, ok := g.Equipables[pos]; ok {
-				r = eq.Letter()
-				fgColor = ColorFgCollectable
-			} else if rod, ok := g.Rods[pos]; ok {
-				r = rod.Letter()
-				fgColor = ColorFgCollectable
-			} else if stair, ok := g.Stairs[pos]; ok {
-				r = '>'
-				if stair == WinStair {
-					fgColor = ColorFgMagicPlace
-				} else {
-					fgColor = ColorFgPlace
-				}
-			} else if stone, ok := g.MagicalStones[pos]; ok {
-				r = '_'
-				if stone == InertStone {
-					fgColor = ColorFgPlace
-				} else {
-					fgColor = ColorFgMagicPlace
-				}
-			} else if _, ok := g.Simellas[pos]; ok {
-				r = '♣'
-				fgColor = ColorFgSimellas
-			} else if _, ok := g.Doors[pos]; ok {
-				r = '+'
-				fgColor = ColorFgPlace
-			}
-			if (g.Player.LOS[pos] || g.Wizard) && !WizardMap {
-				m := g.MonsterAt(pos)
-				if m.Exists() {
-					r = m.Kind.Letter()
-					if m.Status(MonsConfused) {
-						fgColor = ColorFgConfusedMonster
-					} else if m.State == Resting {
-						fgColor = ColorFgSleepingMonster
-					} else if m.State == Wandering {
-						fgColor = ColorFgWanderingMonster
-					} else {
-						fgColor = ColorFgMonster
-					}
-				}
-			} else if !g.Wizard && g.Noise[pos] {
-				r = '♫'
+		if cld, ok := g.Clouds[pos]; ok && g.Player.LOS[pos] {
+			r = '§'
+			if cld == CloudFire {
 				fgColor = ColorFgWanderingMonster
-			} else if !g.Wizard && g.DreamingMonster[pos] {
-				r = '☻'
+			} else if cld == CloudNight {
 				fgColor = ColorFgSleepingMonster
 			}
+		}
+		if c, ok := g.Collectables[pos]; ok {
+			r = c.Consumable.Letter()
+			fgColor = ColorFgCollectable
+		} else if eq, ok := g.Equipables[pos]; ok {
+			r = eq.Letter()
+			fgColor = ColorFgCollectable
+		} else if rod, ok := g.Rods[pos]; ok {
+			r = rod.Letter()
+			fgColor = ColorFgCollectable
+		} else if stair, ok := g.Stairs[pos]; ok {
+			r = '>'
+			if stair == WinStair {
+				fgColor = ColorFgMagicPlace
+			} else {
+				fgColor = ColorFgPlace
+			}
+		} else if stone, ok := g.MagicalStones[pos]; ok {
+			r = '_'
+			if stone == InertStone {
+				fgColor = ColorFgPlace
+			} else {
+				fgColor = ColorFgMagicPlace
+			}
+		} else if _, ok := g.Simellas[pos]; ok {
+			r = '♣'
+			fgColor = ColorFgSimellas
+		} else if _, ok := g.Doors[pos]; ok {
+			r = '+'
+			fgColor = ColorFgPlace
+		}
+		if (g.Player.LOS[pos] || g.Wizard) && !WizardMap {
+			m := g.MonsterAt(pos)
+			if m.Exists() {
+				r = m.Kind.Letter()
+				if m.Status(MonsConfused) {
+					fgColor = ColorFgConfusedMonster
+				} else if m.State == Resting {
+					fgColor = ColorFgSleepingMonster
+				} else if m.State == Wandering {
+					fgColor = ColorFgWanderingMonster
+				} else {
+					fgColor = ColorFgMonster
+				}
+			}
+		} else if !g.Wizard && g.Noise[pos] {
+			r = '♫'
+			fgColor = ColorFgWanderingMonster
+		} else if !g.Wizard && g.DreamingMonster[pos] {
+			r = '☻'
+			fgColor = ColorFgSleepingMonster
 		}
 	}
 	return

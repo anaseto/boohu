@@ -171,7 +171,9 @@ func (g *game) SeePosition(pos position) {
 	}
 	if g.WrongWall[pos] {
 		delete(g.WrongWall, pos)
-		delete(g.TemporalWalls, pos)
+		if g.Dungeon.Cell(pos).T == FreeCell {
+			delete(g.TemporalWalls, pos)
+		}
 	}
 	if _, ok := g.WrongDoor[pos]; ok {
 		delete(g.WrongDoor, pos)

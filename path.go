@@ -39,8 +39,8 @@ func (pp *playerPath) Neighbors(pos position) []position {
 		if cld, ok := pp.game.Clouds[npos]; ok && cld == CloudFire && !(pp.game.WrongDoor[npos] || pp.game.WrongFoliage[npos]) {
 			return false
 		}
-		return npos.valid() && (d.Cell(npos).T != WallCell || pp.game.Player.HasStatus(StatusDig)) &&
-			d.Cell(npos).Explored && !pp.game.WrongWall[npos]
+		return npos.valid() && ((d.Cell(npos).T == FreeCell && !pp.game.WrongWall[pos] || d.Cell(npos).T == WallCell && pp.game.WrongWall[pos]) || pp.game.Player.HasStatus(StatusDig)) &&
+			d.Cell(npos).Explored
 	}
 	if pp.game.Player.HasStatus(StatusConfusion) {
 		nb = pos.CardinalNeighbors(nb, keep)
@@ -116,7 +116,8 @@ func (ap *autoexplorePath) Neighbors(pos position) []position {
 			// XXX little info leak
 			return false
 		}
-		return npos.valid() && d.Cell(npos).T != WallCell && !ap.game.ExclusionsMap[npos]
+		return npos.valid() && (d.Cell(npos).T == FreeCell && !ap.game.WrongWall[pos] || d.Cell(npos).T == WallCell && ap.game.WrongWall[pos]) &&
+			!ap.game.ExclusionsMap[npos]
 	}
 	if ap.game.Player.HasStatus(StatusConfusion) {
 		nb = pos.CardinalNeighbors(nb, keep)

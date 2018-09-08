@@ -485,6 +485,9 @@ func (g *game) TemporalWallAt(pos position, ev event) {
 	if g.Dungeon.Cell(pos).T == WallCell {
 		return
 	}
+	if !g.Player.LOS[pos] {
+		g.WrongWall[pos] = true
+	}
 	g.CreateTemporalWallAt(pos, ev)
 	g.ComputeLOS()
 }
@@ -492,9 +495,7 @@ func (g *game) TemporalWallAt(pos position, ev event) {
 func (g *game) CreateTemporalWallAt(pos position, ev event) {
 	g.Dungeon.SetCell(pos, WallCell)
 	delete(g.Clouds, pos)
-	if g.TemporalWalls != nil {
-		g.TemporalWalls[pos] = true
-	}
+	g.TemporalWalls[pos] = true
 	g.PushEvent(&cloudEvent{ERank: ev.Rank() + 200 + RandInt(50), Pos: pos, EAction: ObstructionEnd})
 }
 

@@ -21,6 +21,7 @@ type game struct {
 	Highlight           map[position]bool // highlighted positions (e.g. targeted ray)
 	Collectables        map[position]collectable
 	CollectableScore    int
+	UnstableLevel       int
 	Equipables          map[position]equipable
 	Rods                map[position]rod
 	Stairs              map[position]stair
@@ -383,6 +384,9 @@ func (g *game) InitLevel() {
 		g.GeneratedUniques = map[monsterBand]int{}
 		g.Stats.KilledMons = map[monsterKind]int{}
 		g.InitSpecialBands()
+		if RandInt(2) == 0 {
+			g.UnstableLevel = 1 + RandInt(15)
+		}
 		g.Version = Version
 	}
 
@@ -531,6 +535,12 @@ func (g *game) InitLevel() {
 	}
 	for i := range g.Monsters {
 		g.PushEvent(&monsterEvent{ERank: g.Turn + RandInt(10), EAction: MonsterTurn, NMons: i})
+	}
+	if g.Depth > 0 && g.Depth == g.UnstableLevel {
+		g.PrintStyled("You sense magic instability on this level.", logSpecial)
+		for i := 0; i < 15; i++ {
+			g.PushEvent(&cloudEvent{ERank: g.Turn + 100 + RandInt(100), EAction: ObstructionProgression})
+		}
 	}
 }
 

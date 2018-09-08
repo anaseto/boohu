@@ -257,6 +257,7 @@ type cloudAction int
 const (
 	CloudEnd cloudAction = iota
 	ObstructionEnd
+	ObstructionProgression
 	FireProgression
 	NightProgression
 )
@@ -278,7 +279,7 @@ func (cev *cloudEvent) Action(g *game) {
 		g.ComputeLOS()
 	case ObstructionEnd:
 		if !g.Player.LOS[cev.Pos] && g.Dungeon.Cell(cev.Pos).T == WallCell {
-			g.WrongWall[cev.Pos] = true
+			g.WrongWall[cev.Pos] = !g.WrongWall[cev.Pos]
 		} else {
 			delete(g.TemporalWalls, cev.Pos)
 		}
@@ -289,6 +290,14 @@ func (cev *cloudEvent) Action(g *game) {
 		g.MakeNoise(TemporalWallNoise, cev.Pos)
 		g.Fog(cev.Pos, 1, &simpleEvent{ERank: cev.Rank()})
 		g.ComputeLOS()
+	case ObstructionProgression:
+		pos := g.FreeCell()
+		g.TemporalWallAt(pos, cev)
+		if g.Player.LOS[pos] {
+			g.Printf("You see a wall appear out of thin air.")
+			g.StopAuto()
+		}
+		g.PushEvent(&cloudEvent{ERank: cev.Rank() + 200 + RandInt(50), EAction: ObstructionProgression})
 	case FireProgression:
 		if _, ok := g.Clouds[cev.Pos]; !ok {
 			break
