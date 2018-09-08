@@ -384,7 +384,7 @@ func (g *game) InitLevel() {
 		g.GeneratedUniques = map[monsterBand]int{}
 		g.Stats.KilledMons = map[monsterKind]int{}
 		g.InitSpecialBands()
-		if RandInt(2) == 0 {
+		if RandInt(3) > 0 {
 			g.UnstableLevel = 1 + RandInt(15)
 		}
 		g.Version = Version
@@ -540,6 +540,9 @@ func (g *game) InitLevel() {
 		g.PrintStyled("You sense magic instability on this level.", logSpecial)
 		for i := 0; i < 15; i++ {
 			g.PushEvent(&cloudEvent{ERank: g.Turn + 100 + RandInt(100), EAction: ObstructionProgression})
+		}
+		if RandInt(4) == 0 {
+			g.UnstableLevel = g.UnstableLevel + RandInt(MaxDepth-g.UnstableLevel) + 1
 		}
 	}
 }
