@@ -742,6 +742,7 @@ func ApplyDefaultKeyBindings() {
 		')':    KeyNextObject,
 		'(':    KeyNextObject,
 		'[':    KeyNextObject,
+		'_':    KeyNextObject,
 		'v':    KeyDescription,
 		'd':    KeyDescription,
 		'.':    KeyTarget,
@@ -1244,6 +1245,9 @@ func (ui *termui) NextObject(g *game, pos position, data *examineData) {
 			data.objects = append(data.objects, p)
 		}
 		for p := range g.Simellas {
+			data.objects = append(data.objects, p)
+		}
+		for p := range g.MagicalStones {
 			data.objects = append(data.objects, p)
 		}
 		data.objects = g.SortedNearestTo(data.objects, g.Player.Pos)
