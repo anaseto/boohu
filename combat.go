@@ -499,7 +499,7 @@ const (
 	MagicCastNoise      = 16
 	BaseHitNoise        = 11
 	ShieldBlockNoise    = 17
-	QueenStoneNoise     = 20
+	QueenStoneNoise     = 19
 )
 
 func (g *game) ArmourClang() (sclang string) {
