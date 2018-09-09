@@ -2,9 +2,9 @@ v0.10-dev
 
 Gameplay:
 
-+ New feature: 4 distinct magical stones, static objects on the ground that
++ New map feature: 4 distinct magical stones, static objects on the ground that
   have a special effect when a creature is hurt while standing on them.
-  Magical stones have only 1 charge.
+  Magical stones have only 1 charge. Some special levels can get more stones. 
 + New instable level: temporal walls can appear inadvertently.
 + New fire shield: it can burn nearby foliage after a successful block.
 + New potion of confusion: it confuses any monster in your line of sight.
