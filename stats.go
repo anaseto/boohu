@@ -12,6 +12,7 @@ type stats struct {
 	Blocks        int
 	Drinks        int
 	Evocations    int
+	UsedStones    int
 	Throws        int
 	TimesLucky    int
 	Damage        int
