@@ -22,6 +22,7 @@ type game struct {
 	Collectables        map[position]collectable
 	CollectableScore    int
 	UnstableLevel       int
+	StoneLevel          int
 	Equipables          map[position]equipable
 	Rods                map[position]rod
 	Stairs              map[position]stair
@@ -387,6 +388,9 @@ func (g *game) InitLevel() {
 		if RandInt(3) > 0 {
 			g.UnstableLevel = 1 + RandInt(15)
 		}
+		if RandInt(2) == 0 || RandInt(2) == 0 && g.UnstableLevel == 0 {
+			g.StoneLevel = 1 + RandInt(15)
+		}
 		g.Version = Version
 	}
 
@@ -479,10 +483,23 @@ func (g *game) InitLevel() {
 	case 1, 2:
 		nstones = 2
 	}
+	ustone := stone(0)
+	if g.Depth > 0 && g.Depth == g.StoneLevel {
+		ustone = stone(1 + RandInt(NumStones-1))
+		nstones = 10 + g.Depth/2
+		if RandInt(4) == 0 {
+			g.StoneLevel = g.StoneLevel + RandInt(MaxDepth-g.StoneLevel) + 1
+		}
+	}
 	for i := 0; i < nstones; i++ {
 		pos := g.FreeCellForStatic()
-		stone := stone(1 + RandInt(NumStones-1))
-		g.MagicalStones[pos] = stone
+		var st stone
+		if ustone != stone(0) {
+			st = ustone
+		} else {
+			st = stone(1 + RandInt(NumStones-1))
+		}
+		g.MagicalStones[pos] = st
 	}
 
 	// Simellas
