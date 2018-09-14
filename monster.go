@@ -745,10 +745,13 @@ func init() {
 			maxDepth: 11,
 		},
 		{bands: []monsterBandData{ // spiders
-			{Monster: MonsSpider, Rarity: 30},
+			{Monster: MonsSpider, Rarity: 40},
 			{Distribution: map[monsterKind]monsInterval{
 				MonsHound: {1, 1}, MonsSpider: {2, 2},
-			}, Rarity: 45, Band: true},
+			}, Rarity: 55, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsSpider: {4, 4},
+			}, Rarity: 85, Band: true},
 			{Distribution: map[monsterKind]monsInterval{
 				MonsYack: {1, 1}, MonsSpider: {2, 2},
 			}, Rarity: 55, Band: true},
