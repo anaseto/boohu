@@ -556,7 +556,7 @@ func (g *game) InitLevel() {
 	if g.Depth > 0 && g.Depth == g.UnstableLevel {
 		g.PrintStyled("You sense magic instability on this level.", logSpecial)
 		for i := 0; i < 15; i++ {
-			g.PushEvent(&cloudEvent{ERank: g.Turn + 100 + RandInt(100), EAction: ObstructionProgression})
+			g.PushEvent(&cloudEvent{ERank: g.Turn + 100 + RandInt(900), EAction: ObstructionProgression})
 		}
 		if RandInt(4) == 0 {
 			g.UnstableLevel = g.UnstableLevel + RandInt(MaxDepth-g.UnstableLevel) + 1
