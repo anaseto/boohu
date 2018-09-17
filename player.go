@@ -71,9 +71,9 @@ func (p *player) Armor() int {
 		ar += 4
 	case ChainMail:
 		ar += 6
-	case ScintillatingPlates:
+	case ShinyPlates:
 		ar += 7
-	case PonderousnessPlates:
+	case TurtlePlates:
 		ar += 10
 	}
 	if p.Aptitudes[AptScales] {
@@ -120,9 +120,9 @@ func (p *player) Evasion() int {
 		ev += 3
 	}
 	switch p.Armour {
-	case ChainMail, ScintillatingPlates:
+	case ChainMail, ShinyPlates:
 		ev -= 1
-	case PonderousnessPlates:
+	case TurtlePlates:
 		ev -= 2
 	}
 	if p.HasStatus(StatusAgile) {
@@ -409,7 +409,7 @@ func (g *game) MovePlayer(pos position, ev event) error {
 			delay -= 2
 		}
 		switch g.Player.Armour {
-		case PonderousnessPlates:
+		case TurtlePlates:
 			delay += 3
 		case SpeedRobe:
 			delay -= 3

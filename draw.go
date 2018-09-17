@@ -1027,7 +1027,7 @@ func (ui *termui) CharacterInfo(g *game) {
 	b.WriteString(formatText(
 		fmt.Sprintf("You are wielding %s. %s", Indefinite(g.Player.Weapon.String(), false), g.Player.Weapon.Desc()), TextWidth))
 	b.WriteString("\n\n")
-	b.WriteString(formatText(fmt.Sprintf("You are wearing a %s. %s", g.Player.Armour, g.Player.Armour.Desc()), TextWidth))
+	b.WriteString(formatText(fmt.Sprintf("You are wearing %s. %s", g.Player.Armour.StringIndefinite(), g.Player.Armour.Desc()), TextWidth))
 	b.WriteString("\n\n")
 	if g.Player.Shield != NoShield {
 		b.WriteString(formatText(fmt.Sprintf("You are wearing a %s. %s", g.Player.Shield, g.Player.Shield.Desc()), TextWidth))

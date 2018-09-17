@@ -703,7 +703,7 @@ loop:
 }
 
 func (g *game) GenArmour() {
-	ars := [9]armour{Robe, LeatherArmour, SmokingScales, ChainMail, ScintillatingPlates, PonderousnessPlates, SpeedRobe, CelmistRobe, HarmonistRobe}
+	ars := [9]armour{Robe, LeatherArmour, SmokingScales, ChainMail, ShinyPlates, TurtlePlates, SpeedRobe, CelmistRobe, HarmonistRobe}
 	n := 11 + 5*g.SeenGoodArmour()
 	if g.SeenGoodArmour() > 2 {
 		return

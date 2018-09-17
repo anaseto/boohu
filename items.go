@@ -622,8 +622,8 @@ const (
 	LeatherArmour
 	ChainMail
 	SmokingScales
-	ScintillatingPlates
-	PonderousnessPlates
+	ShinyPlates
+	TurtlePlates
 	SpeedRobe
 	CelmistRobe
 	HarmonistRobe
@@ -633,7 +633,7 @@ func (ar armour) Equip(g *game) {
 	oar := g.Player.Armour
 	g.Player.Armour = ar
 	if !g.FoundEquipables[ar] {
-		g.StoryPrintf("You found and put on %s.", Indefinite(ar.String(), false))
+		g.StoryPrintf("You found and put on %s.", ar.StringIndefinite())
 		g.FoundEquipables[ar] = true
 	}
 	g.Printf("You put the %s on and leave your %s.", ar, oar)
@@ -653,10 +653,10 @@ func (ar armour) String() string {
 		return "chain mail"
 	case SmokingScales:
 		return "smoking scales"
-	case ScintillatingPlates:
-		return "scintillating plates"
-	case PonderousnessPlates:
-		return "ponderousness plates"
+	case ShinyPlates:
+		return "shiny plates"
+	case TurtlePlates:
+		return "turtle plates"
 	case SpeedRobe:
 		return "robe of speed"
 	case CelmistRobe:
@@ -665,7 +665,16 @@ func (ar armour) String() string {
 		return "harmonist robe"
 	default:
 		// should not happen
-		return "some piece of armour"
+		return "?"
+	}
+}
+
+func (ar armour) StringIndefinite() string {
+	switch ar {
+	case ShinyPlates, TurtlePlates, SmokingScales:
+		return ar.String()
+	default:
+		return "a " + ar.String()
 	}
 }
 
@@ -679,9 +688,9 @@ func (ar armour) Short() string {
 		return "Ch"
 	case SmokingScales:
 		return "Sm"
-	case ScintillatingPlates:
+	case ShinyPlates:
 		return "Sc"
-	case PonderousnessPlates:
+	case TurtlePlates:
 		return "Pl"
 	case SpeedRobe:
 		return "Sp"
@@ -706,10 +715,10 @@ func (ar armour) Desc() string {
 		text = "A chain mail provides good protection against blows, at a minor evasion cost."
 	case SmokingScales:
 		text = "Smoking scales provide protection against blows. They leave short-lived fog as you move."
-	case ScintillatingPlates:
-		text = "Scintillating plates provide very good protection against blows, but increase your line of sight range."
-	case PonderousnessPlates:
-		text = "Ponderousness plates provide great protection against blows, but make you move slower and a little less good at evading blows."
+	case ShinyPlates:
+		text = "Shiny plates provide very good protection against blows, but increase your line of sight range."
+	case TurtlePlates:
+		text = "Turtle plates provide great protection against blows, but make you move slower and a little less good at evading blows."
 	case SpeedRobe:
 		text = "The speed robe makes you move faster, but makes you frail."
 	case CelmistRobe:

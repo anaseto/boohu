@@ -129,7 +129,7 @@ func (g *game) Dump() string {
 	fmt.Fprintf(buf, g.DumpStatuses())
 	fmt.Fprintf(buf, "\n\n")
 	fmt.Fprintf(buf, "Equipment:\n")
-	fmt.Fprintf(buf, "You are wearing %s.\n", Indefinite(g.Player.Armour.String(), false))
+	fmt.Fprintf(buf, "You are wearing %s.\n", g.Player.Armour.StringIndefinite())
 	fmt.Fprintf(buf, "You are wielding %s.\n", Indefinite(g.Player.Weapon.String(), false))
 	if g.Player.Shield != NoShield {
 		if g.Player.Weapon.TwoHanded() {
