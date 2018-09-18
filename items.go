@@ -376,7 +376,7 @@ func (g *game) QuaffTormentPotion(ev event) error {
 	g.Player.HP = g.Player.HP - damage
 	g.Stats.Damage += damage
 	g.ui.WoundedAnimation(g)
-	g.MakeNoise(ExplosionNoise+10, g.Player.Target)
+	g.MakeNoise(ExplosionNoise+10, g.Player.Pos)
 	g.ui.TormentExplosionAnimation(g)
 	for pos, b := range g.Player.LOS {
 		if !b {
