@@ -47,6 +47,7 @@ const (
 	SwapPotion
 	ShadowsPotion
 	ConfusePotion
+	TormentPotion
 	DreamPotion
 )
 
@@ -83,6 +84,8 @@ func (p potion) String() (text string) {
 		text += " of shadows"
 	case ConfusePotion:
 		text += " of confusion"
+	case TormentPotion:
+		text += " of torment explosion"
 	case DreamPotion:
 		text += " of dreams"
 	}
@@ -124,6 +127,8 @@ func (p potion) Desc() (text string) {
 		text = "reduces your line of sight range to 1."
 	case ConfusePotion:
 		text = "generates a harmonic light that confuses monsters in your line of sight."
+	case TormentPotion:
+		text = "halves HP of every creature in sight, including the player, and destroys visible walls. Extremely noisy."
 	case DreamPotion:
 		text = "shows you the position of monsters sleeping at drink time."
 	}
@@ -180,6 +185,8 @@ func (p potion) Use(g *game, ev event) error {
 		err = g.QuaffShadowsPotion(ev)
 	case ConfusePotion:
 		err = g.QuaffConfusePotion(ev)
+	case TormentPotion:
+		err = g.QuaffTormentPotion(ev)
 	case DreamPotion:
 		err = g.QuaffDreamPotion(ev)
 	}
@@ -363,6 +370,23 @@ func (g *game) QuaffConfusePotion(ev event) error {
 	return nil
 }
 
+func (g *game) QuaffTormentPotion(ev event) error {
+	g.Printf("You quaff the %s. %s It hurts!", TormentPotion, g.ExplosionSound())
+	damage := g.Player.HP / 2
+	g.Player.HP = g.Player.HP - damage
+	g.Stats.Damage += damage
+	g.ui.WoundedAnimation(g)
+	g.MakeNoise(ExplosionNoise, g.Player.Target)
+	g.ui.TormentExplosionAnimation(g)
+	for pos, b := range g.Player.LOS {
+		if !b {
+			continue
+		}
+		g.ExplosionAt(ev, pos)
+	}
+	return nil
+}
+
 func (g *game) QuaffDreamPotion(ev event) error {
 	for _, mons := range g.Monsters {
 		if mons.Exists() && mons.State == Resting && !g.Player.LOS[mons.Pos] {
@@ -515,6 +539,30 @@ func (g *game) ThrowConfusingDart(ev event) error {
 	return nil
 }
 
+func (g *game) ExplosionAt(ev event, pos position) {
+	g.Burn(pos, ev)
+	mons := g.MonsterAt(pos)
+	if mons.Exists() {
+		mons.HP /= 2
+		if mons.HP == 0 {
+			mons.HP = 1
+		}
+		g.MakeNoise(ExplosionHitNoise, mons.Pos)
+		g.HandleStone(mons)
+		mons.MakeHuntIfHurt(g)
+	} else if g.Dungeon.Cell(pos).T == WallCell && RandInt(2) == 0 {
+		g.Dungeon.SetCell(pos, FreeCell)
+		g.Stats.Digs++
+		if !g.Player.LOS[pos] {
+			g.WrongWall[pos] = true
+		} else {
+			g.ui.WallExplosionAnimation(g, pos)
+		}
+		g.MakeNoise(WallNoise, pos)
+		g.Fog(pos, 1, ev)
+	}
+}
+
 func (g *game) ThrowExplosiveMagara(ev event) error {
 	if err := g.ui.ChooseTarget(g, &chooser{area: true, minDist: true, flammable: true, wall: true}); err != nil {
 		return err
@@ -525,27 +573,7 @@ func (g *game) ThrowExplosiveMagara(ev event) error {
 	g.ui.ProjectileTrajectoryAnimation(g, g.Ray(g.Player.Target), ColorFgPlayer)
 	g.ui.ExplosionAnimation(g, FireExplosion, g.Player.Target)
 	for _, pos := range append(neighbors, g.Player.Target) {
-		g.Burn(pos, ev)
-		mons := g.MonsterAt(pos)
-		if mons.Exists() {
-			mons.HP /= 2
-			if mons.HP == 0 {
-				mons.HP = 1
-			}
-			g.MakeNoise(ExplosionHitNoise, mons.Pos)
-			g.HandleStone(mons)
-			mons.MakeHuntIfHurt(g)
-		} else if g.Dungeon.Cell(pos).T == WallCell && RandInt(2) == 0 {
-			g.Dungeon.SetCell(pos, FreeCell)
-			g.Stats.Digs++
-			if !g.Player.LOS[pos] {
-				g.WrongWall[pos] = true
-			} else {
-				g.ui.WallExplosionAnimation(g, pos)
-			}
-			g.MakeNoise(WallNoise, pos)
-			g.Fog(pos, 1, ev)
-		}
+		g.ExplosionAt(ev, pos)
 	}
 
 	ev.Renew(g, 10)
@@ -606,6 +634,7 @@ var ConsumablesCollectData = map[consumable]collectData{
 	DescentPotion:       {rarity: 18, quantity: 1},
 	MagicMappingPotion:  {rarity: 18, quantity: 1},
 	DreamPotion:         {rarity: 18, quantity: 1},
+	TormentPotion:       {rarity: 30, quantity: 1},
 }
 
 type equipable interface {

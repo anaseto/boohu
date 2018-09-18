@@ -71,6 +71,7 @@ type Renderer interface {
 	ChooseTarget(*game, Targeter) error
 	CriticalHPWarning(*game)
 	ExplosionAnimation(*game, explosionStyle, position)
+	TormentExplosionAnimation(*game)
 	LightningBoltAnimation(*game, []position)
 	ThrowAnimation(*game, []position, bool)
 	MonsterJavelinAnimation(*game, []position, bool)
@@ -335,6 +336,7 @@ func (g *game) InitPlayer() {
 	//g.Player.Consumables[DreamPotion] = 5
 	//g.Player.Consumables[ShadowsPotion] = 5
 	//g.Player.Consumables[ConfusePotion] = 5
+	//g.Player.Consumables[TormentPotion] = 5
 	//g.Player.Weapon = ElecWhip
 	//g.Player.Weapon = DancingRapier
 	//g.Player.Weapon = Sabre

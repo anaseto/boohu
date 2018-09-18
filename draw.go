@@ -1730,6 +1730,31 @@ func (ui *termui) MonsterProjectileAnimation(g *game, ray []position, r rune, fg
 	}
 }
 
+func (ui *termui) ExplosionAnimationAt(g *game, pos position, fg uicolor) {
+	_, _, bgColor := ui.PositionDrawing(g, pos)
+	mons := g.MonsterAt(pos)
+	r := ';'
+	switch RandInt(9) {
+	case 0, 6:
+		r = ','
+	case 1:
+		r = '}'
+	case 2:
+		r = '%'
+	case 3, 7:
+		r = ':'
+	case 4:
+		r = '\\'
+	case 5:
+		r = '~'
+	}
+	if mons.Exists() || g.Player.Pos == pos {
+		r = '√'
+	}
+	//ui.DrawAtPosition(g, pos, true, r, fg, bgColor)
+	ui.DrawAtPosition(g, pos, true, r, bgColor, fg)
+}
+
 func (ui *termui) ExplosionAnimation(g *game, es explosionStyle, pos position) {
 	if DisableAnimations {
 		return
@@ -1751,28 +1776,28 @@ func (ui *termui) ExplosionAnimation(g *game, es explosionStyle, pos position) {
 			if !g.Player.LOS[npos] {
 				continue
 			}
-			_, _, bgColor := ui.PositionDrawing(g, npos)
-			mons := g.MonsterAt(npos)
-			r := ';'
-			switch RandInt(9) {
-			case 0, 6:
-				r = ','
-			case 1:
-				r = '}'
-			case 2:
-				r = '%'
-			case 3, 7:
-				r = ':'
-			case 4:
-				r = '\\'
-			case 5:
-				r = '~'
+			ui.ExplosionAnimationAt(g, npos, fg)
+		}
+		ui.Flush()
+		time.Sleep(100 * time.Millisecond)
+	}
+	time.Sleep(20 * time.Millisecond)
+}
+
+func (ui *termui) TormentExplosionAnimation(g *game) {
+	if DisableAnimations {
+		return
+	}
+	ui.DrawDungeonView(g, NormalMode)
+	time.Sleep(20 * time.Millisecond)
+	colors := [3]uicolor{ColorFgExplosionStart, ColorFgExplosionEnd, ColorFgMagicPlace}
+	for i := 0; i < 3; i++ {
+		for npos, b := range g.Player.LOS {
+			if !b {
+				continue
 			}
-			if mons.Exists() || g.Player.Pos == npos {
-				r = '√'
-			}
-			//ui.DrawAtPosition(g, npos, true, r, fg, bgColor)
-			ui.DrawAtPosition(g, npos, true, r, bgColor, fg)
+			fg := colors[RandInt(3)]
+			ui.ExplosionAnimationAt(g, npos, fg)
 		}
 		ui.Flush()
 		time.Sleep(100 * time.Millisecond)
