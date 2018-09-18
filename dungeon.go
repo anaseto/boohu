@@ -1332,7 +1332,7 @@ loop:
 	g.Dungeon.SetCell(doorpos, FreeCell)
 }
 
-func (g *game) GenBSPMap(h, w int) {
+func (g *game) GenBSPMap(height, width int) {
 	rooms := []room{}
 	crooms := []room{{pos: position{1, 1}, w: DungeonWidth - 2, h: DungeonHeight - 2}}
 	big := 0
@@ -1408,7 +1408,7 @@ func (g *game) GenBSPMap(h, w int) {
 	}
 
 	d := &dungeon{}
-	d.Cells = make([]cell, h*w)
+	d.Cells = make([]cell, height*width)
 	for i := 0; i < DungeonNCells; i++ {
 		d.SetCell(idxtopos(i), FreeCell)
 	}

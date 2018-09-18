@@ -319,8 +319,8 @@ func (g *game) DumpDungeon() string {
 					r = c.Consumable.Letter()
 				} else if eq, ok := g.Equipables[pos]; ok {
 					r = eq.Letter()
-				} else if rod, ok := g.Rods[pos]; ok {
-					r = rod.Letter()
+				} else if rd, ok := g.Rods[pos]; ok {
+					r = rd.Letter()
 				} else if _, ok := g.Stairs[pos]; ok {
 					r = '>'
 				} else if _, ok := g.MagicalStones[pos]; ok {

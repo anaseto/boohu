@@ -808,9 +808,9 @@ func (ui *termui) HandleKey(g *game, rka runeKeyAction) (err error, again bool, 
 		err = g.Rest(g.Ev)
 		ui.MenuSelectedAnimation(g, MenuRest, err == nil)
 	case KeyDescend:
-		if stair, ok := g.Stairs[g.Player.Pos]; ok {
+		if st, ok := g.Stairs[g.Player.Pos]; ok {
 			ui.MenuSelectedAnimation(g, MenuInteract, true)
-			err = ui.OptionalDescendConfirmation(g, stair)
+			err = ui.OptionalDescendConfirmation(g, st)
 			if err != nil {
 				break
 			}
@@ -874,17 +874,18 @@ func (ui *termui) HandleKey(g *game, rka runeKeyAction) (err error, again bool, 
 		again = true
 	case KeySave:
 		g.Ev.Renew(g, 0)
-		err := g.Save()
-		if err != nil {
-			g.PrintfStyled("Error: %v", logError, err)
+		errsave := g.Save()
+		if errsave != nil {
+			g.PrintfStyled("Error: %v", logError, errsave)
 			g.PrintStyled("Could not save game.", logError)
 		} else {
 			quit = true
 		}
 	case KeyDump:
-		err := g.WriteDump()
-		if err != nil {
-			g.PrintStyled("Error writing dump to file.", logError)
+		errdump := g.WriteDump()
+		if errdump != nil {
+			g.PrintfStyled("Error: %v", logError, errdump)
+			g.PrintStyled("Could not write character dump.", logError)
 		} else {
 			dataDir, _ := g.DataDir()
 			if dataDir != "" {
@@ -1122,8 +1123,8 @@ func (ui *termui) DescribePosition(g *game, pos position, targ Targeter) {
 		desc = ui.AddComma(see, desc)
 		desc += fmt.Sprintf("%s (%s)", mons.Kind.Indefinite(false), ui.MonsterInfo(mons))
 	}
-	stair, okStair := g.Stairs[pos]
-	stone, okStone := g.MagicalStones[pos]
+	strt, okStair := g.Stairs[pos]
+	stn, okStone := g.MagicalStones[pos]
 	switch {
 	case g.Simellas[pos] > 0:
 		desc = ui.AddComma(see, desc)
@@ -1143,7 +1144,7 @@ func (ui *termui) DescribePosition(g *game, pos position, targ Targeter) {
 		desc = ui.AddComma(see, desc)
 		desc += fmt.Sprintf("a %v", rod)
 	case okStair:
-		if stair == WinStair {
+		if strt == WinStair {
 			desc = ui.AddComma(see, desc)
 			desc += fmt.Sprintf("glowing stairs")
 		} else {
@@ -1152,7 +1153,7 @@ func (ui *termui) DescribePosition(g *game, pos position, targ Targeter) {
 		}
 	case okStone:
 		desc = ui.AddComma(see, desc)
-		desc += fmt.Sprint(Indefinite(stone.String(), false))
+		desc += fmt.Sprint(Indefinite(stn.String(), false))
 	case g.Doors[pos] || g.WrongDoor[pos]:
 		desc = ui.AddComma(see, desc)
 		desc += fmt.Sprintf("a door")
@@ -1308,7 +1309,6 @@ func (ui *termui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, dat
 		}
 	}
 	if rka.k == KeyMenu {
-		var err error
 		rka.k, err = ui.SelectAction(g, menuActions, g.Ev)
 		if err != nil {
 			err = ui.CleanError(err)
@@ -1329,9 +1329,9 @@ func (ui *termui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, dat
 	case KeyNextStairs:
 		ui.NextStair(g, data)
 	case KeyDescend:
-		if stair, ok := g.Stairs[g.Player.Pos]; ok {
+		if strt, ok := g.Stairs[g.Player.Pos]; ok {
 			ui.MenuSelectedAnimation(g, MenuInteract, true)
-			err = ui.OptionalDescendConfirmation(g, stair)
+			err = ui.OptionalDescendConfirmation(g, strt)
 			if err != nil {
 				break
 			}
@@ -1395,9 +1395,9 @@ func (ui *termui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, dat
 		g.Ev.Renew(g, 0)
 		g.Highlight = nil
 		g.Targeting = InvalidPos
-		err := g.Save()
-		if err != nil {
-			g.PrintfStyled("Error: %v", logError, err)
+		errsave := g.Save()
+		if errsave != nil {
+			g.PrintfStyled("Error: %v", logError, errsave)
 			g.PrintStyled("Could not save game.", logError)
 		} else {
 			notarg = true
@@ -1513,8 +1513,8 @@ func (ui *termui) ViewPositionDescription(g *game, pos position) {
 		ui.DrawDescription(g, r.Desc())
 	} else if eq, ok := g.Equipables[pos]; ok {
 		ui.DrawDescription(g, eq.Desc())
-	} else if stair, ok := g.Stairs[pos]; ok {
-		if stair == WinStair {
+	} else if strt, ok := g.Stairs[pos]; ok {
+		if strt == WinStair {
 			desc := "These shiny-looking stairs are in fact a magical monolith. It is said they were made some centuries ago by Marevor Helith. They will lead you back to your village."
 			if g.Depth < MaxDepth {
 				desc += " Note that this is not the last floor, so you may want to find a normal stair and continue collecting simellas, if you're courageous enough."
@@ -1527,8 +1527,8 @@ func (ui *termui) ViewPositionDescription(g *game, pos position) {
 			}
 			ui.DrawDescription(g, desc)
 		}
-	} else if stone, ok := g.MagicalStones[pos]; ok {
-		ui.DrawDescription(g, stone.Description())
+	} else if stn, ok := g.MagicalStones[pos]; ok {
+		ui.DrawDescription(g, stn.Description())
 	} else if g.Doors[pos] {
 		ui.DrawDescription(g, "A closed door blocks your line of sight. Doors open automatically when you or a monster stand on them. Doors are flammable.")
 	} else if g.Simellas[pos] > 0 {
@@ -2025,16 +2025,16 @@ func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgCol
 		} else if rod, ok := g.Rods[pos]; ok {
 			r = rod.Letter()
 			fgColor = ColorFgCollectable
-		} else if stair, ok := g.Stairs[pos]; ok {
+		} else if strt, ok := g.Stairs[pos]; ok {
 			r = '>'
-			if stair == WinStair {
+			if strt == WinStair {
 				fgColor = ColorFgMagicPlace
 			} else {
 				fgColor = ColorFgPlace
 			}
-		} else if stone, ok := g.MagicalStones[pos]; ok {
+		} else if stn, ok := g.MagicalStones[pos]; ok {
 			r = '_'
-			if stone == InertStone {
+			if stn == InertStone {
 				fgColor = ColorFgPlace
 			} else {
 				fgColor = ColorFgMagicPlace

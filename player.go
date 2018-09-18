@@ -366,8 +366,8 @@ func (g *game) CollectGround() {
 		g.Printf("You are standing over %s.", Indefinite(eq.String(), false))
 	} else if _, ok := g.Stairs[pos]; ok {
 		g.Print("You are standing on a staircase.")
-	} else if stone, ok := g.MagicalStones[pos]; ok {
-		g.Printf("You are standing on %s.", Indefinite(stone.String(), false))
+	} else if stn, ok := g.MagicalStones[pos]; ok {
+		g.Printf("You are standing on %s.", Indefinite(stn.String(), false))
 	} else if g.Doors[pos] {
 		g.Print("You stand at the door.")
 	}

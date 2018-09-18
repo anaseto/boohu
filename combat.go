@@ -45,11 +45,11 @@ func (m *monster) InflictDamage(g *game, damage, max int) {
 	if g.Player.HP <= 0 {
 		return
 	}
-	stone, ok := g.MagicalStones[g.Player.Pos]
+	stn, ok := g.MagicalStones[g.Player.Pos]
 	if !ok {
 		return
 	}
-	switch stone {
+	switch stn {
 	case TeleStone:
 		g.UseStone(g.Player.Pos)
 		g.Teleportation(g.Ev)
@@ -178,9 +178,9 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 			neighbors = g.Dungeon.FreeNeighbors(g.Player.Pos)
 		}
 		for _, pos := range neighbors {
-			mons := g.MonsterAt(pos)
-			if mons.Exists() {
-				g.HitMonster(DmgPhysical, g.Player.Attack(), mons, ev)
+			m := g.MonsterAt(pos)
+			if m.Exists() {
+				g.HitMonster(DmgPhysical, g.Player.Attack(), m, ev)
 			}
 		}
 	case g.Player.Weapon.Pierce():
@@ -188,9 +188,9 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 		dir := mons.Pos.Dir(g.Player.Pos)
 		behind := g.Player.Pos.To(dir).To(dir)
 		if behind.valid() {
-			mons := g.MonsterAt(behind)
-			if mons.Exists() {
-				g.HitMonster(DmgPhysical, g.Player.Attack(), mons, ev)
+			m := g.MonsterAt(behind)
+			if m.Exists() {
+				g.HitMonster(DmgPhysical, g.Player.Attack(), m, ev)
 			}
 		}
 	case g.Player.Weapon == ElecWhip:
@@ -202,9 +202,9 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 			dir := ompos.Dir(g.Player.Pos)
 			behind := g.Player.Pos.To(dir).To(dir)
 			if behind.valid() {
-				mons := g.MonsterAt(behind)
-				if mons.Exists() {
-					g.HitMonster(DmgPhysical, g.Player.Attack()+3, mons, ev)
+				m := g.MonsterAt(behind)
+				if m.Exists() {
+					g.HitMonster(DmgPhysical, g.Player.Attack()+3, m, ev)
 				}
 			}
 			if mons.Exists() {
@@ -418,11 +418,11 @@ func (g *game) HitMonster(dt dmgType, dmg int, mons *monster, ev event) (hit boo
 }
 
 func (g *game) HandleStone(mons *monster) {
-	stone, ok := g.MagicalStones[mons.Pos]
+	stn, ok := g.MagicalStones[mons.Pos]
 	if !ok {
 		return
 	}
-	switch stone {
+	switch stn {
 	case TeleStone:
 		if mons.Exists() {
 			g.UseStone(mons.Pos)
@@ -462,8 +462,8 @@ func (g *game) HandleStone(mons *monster) {
 			if pos == g.Player.Pos {
 				continue
 			}
-			mons := g.MonsterAt(pos)
-			if mons.Exists() {
+			m := g.MonsterAt(pos)
+			if m.Exists() {
 				continue
 			}
 			g.CreateTemporalWallAt(pos, g.Ev)

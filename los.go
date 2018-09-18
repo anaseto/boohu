@@ -147,11 +147,11 @@ func (g *game) SeePosition(pos position) {
 		} else if eq, ok := g.Equipables[pos]; ok {
 			g.Printf("You %s %s.", see, Indefinite(eq.String(), false))
 			g.StopAuto()
-		} else if rod, ok := g.Rods[pos]; ok {
-			g.Printf("You %s %s.", see, Indefinite(rod.String(), false))
+		} else if rd, ok := g.Rods[pos]; ok {
+			g.Printf("You %s %s.", see, Indefinite(rd.String(), false))
 			g.StopAuto()
-		} else if stone, ok := g.MagicalStones[pos]; ok {
-			g.Printf("You %s %s.", see, Indefinite(stone.String(), false))
+		} else if stn, ok := g.MagicalStones[pos]; ok {
+			g.Printf("You %s %s.", see, Indefinite(stn.String(), false))
 			g.StopAuto()
 		}
 		g.FunAction()
