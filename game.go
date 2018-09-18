@@ -344,10 +344,10 @@ func (g *game) InitPlayer() {
 	//g.Player.Weapon = DefenderFlail
 	//g.Player.Shield = EarthShield
 	//g.Player.Shield = FireShield
-	//g.Player.Armour = PonderousnessPlates
+	//g.Player.Armour = TurtlePlates
 	//g.Player.Armour = HarmonistRobe
 	//g.Player.Armour = CelmistRobe
-	//g.Player.Armour = ScintillatingPlates
+	//g.Player.Armour = ShinyPlates
 	//g.Player.Armour = SmokingScales
 }
 
