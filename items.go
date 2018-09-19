@@ -994,7 +994,7 @@ func (sh shield) Short() (text string) {
 	case BashingShield:
 		text = "Bs"
 	case FireShield:
-		text = "Fs"
+		text = "Fr"
 	}
 	return text
 }
