@@ -25,3 +25,6 @@ passively).
 -----------------------------------------------------------------------
 Automatic doors are inspired from Cogmind, but are open only if there is
 someone right on the door.
+-----------------------------------------------------------------------
+Magical stones are inspired from TGGW's pillars, even though the mechanics and
+effects are very different.
