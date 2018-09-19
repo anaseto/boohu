@@ -718,9 +718,9 @@ func (ar armour) Short() string {
 	case SmokingScales:
 		return "Sm"
 	case ShinyPlates:
-		return "Sc"
+		return "Sh"
 	case TurtlePlates:
-		return "Pl"
+		return "Tr"
 	case SpeedRobe:
 		return "Sp"
 	case CelmistRobe:
