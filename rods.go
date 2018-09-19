@@ -77,11 +77,11 @@ func (r rod) Desc() string {
 	case RodFog:
 		text = "creates a dense fog that reduces your (and monster's) line of sight."
 	case RodFireBall:
-		text = "throws a 1-radius fireball at your foes. You cannot use it at melee range."
+		text = "throws a 1-radius fireball at your foes. You cannot use it at melee range. It can burn foliage and doors."
 	case RodFireBolt:
-		text = "throws a fire bolt through one or more enemies."
+		text = "throws a fire bolt through one or more enemies. It can burn foliage and doors."
 	case RodLightning:
-		text = "deals electrical damage to foes connected to you."
+		text = "deals electrical damage to foes connected to you. It can burn foliage and doors."
 	case RodObstruction:
 		text = "creates a temporary wall at targeted location."
 	case RodShatter:

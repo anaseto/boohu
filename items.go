@@ -128,7 +128,7 @@ func (p potion) Desc() (text string) {
 	case ConfusePotion:
 		text = "generates a harmonic light that confuses monsters in your line of sight."
 	case TormentPotion:
-		text = "halves HP of every creature in sight, including the player, and destroys visible walls. Extremely noisy."
+		text = "halves HP of every creature in sight, including the player, and destroys visible walls. Extremely noisy. It can burn foliage and doors."
 	case DreamPotion:
 		text = "shows you the position of monsters sleeping at drink time."
 	}
@@ -462,9 +462,9 @@ func (p projectile) Desc() (text string) {
 	case ConfusingDart:
 		text = "can be silently thrown to confuse foes, dealing up to 7 damage. Confused monsters cannot move diagonally."
 	case ExplosiveMagara:
-		text = "can be thrown to cause a fire explosion halving HP of monsters in a square area. It can occasionally destruct walls."
+		text = "can be thrown to cause a fire explosion halving HP of monsters in a square area. It can occasionally destruct walls. It can burn doors and foliage."
 	case NightMagara:
-		text = "can be thrown at a monster to produce sleep inducing clouds in a 2-radius area. You are affected too by the clouds, but they will slow your actions instead."
+		text = "can be thrown at a monster to produce sleep inducing clouds in a 2-radius area. You are affected too by the clouds, but they will slow your actions instead. Can burn doors and foliage."
 	}
 	return fmt.Sprintf("The %s %s", p, text)
 }
