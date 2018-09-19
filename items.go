@@ -224,7 +224,9 @@ func (g *game) QuaffBerserk(ev event) error {
 		return errors.New("You are too exhausted to berserk.")
 	}
 	g.Player.Statuses[StatusBerserk] = 1
-	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 65 + RandInt(20), EAction: BerserkEnd})
+	end := ev.Rank() + 65 + RandInt(20)
+	g.PushEvent(&simpleEvent{ERank: end, EAction: BerserkEnd})
+	g.Player.Expire[StatusBerserk] = end
 	g.Printf("You quaff the %s. You feel a sudden urge to kill things.", BerserkPotion)
 	g.Player.HP += 10
 	return nil
@@ -273,9 +275,12 @@ func (g *game) QuaffSwiftness(ev event) error {
 		return fmt.Errorf("You already quaffed a %s potion.", SwiftnessPotion)
 	}
 	g.Player.Statuses[StatusSwift]++
-	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 85 + RandInt(20), EAction: HasteEnd})
+	end := ev.Rank() + 85 + RandInt(20)
+	g.PushEvent(&simpleEvent{ERank: end, EAction: HasteEnd})
+	g.Player.Expire[StatusSwift] = end
 	g.Player.Statuses[StatusAgile]++
-	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 85 + RandInt(20), EAction: EvasionEnd})
+	g.PushEvent(&simpleEvent{ERank: end, EAction: EvasionEnd})
+	g.Player.Expire[StatusAgile] = end
 	g.Printf("You quaff the %s. You feel speedy and agile.", SwiftnessPotion)
 	return nil
 }
@@ -285,7 +290,9 @@ func (g *game) QuaffDigPotion(ev event) error {
 		return errors.New("You are already digging.")
 	}
 	g.Player.Statuses[StatusDig] = 1
-	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 75 + RandInt(20), EAction: DigEnd})
+	end := ev.Rank() + 75 + RandInt(20)
+	g.PushEvent(&simpleEvent{ERank: end, EAction: DigEnd})
+	g.Player.Expire[StatusDig] = end
 	g.Printf("You quaff the %s. You feel like an earth dragon.", DigPotion)
 	return nil
 }
@@ -298,7 +305,9 @@ func (g *game) QuaffSwapPotion(ev event) error {
 		return errors.New("You are already swapping.")
 	}
 	g.Player.Statuses[StatusSwap] = 1
-	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 130 + RandInt(41), EAction: SwapEnd})
+	end := ev.Rank() + 130 + RandInt(41)
+	g.PushEvent(&simpleEvent{ERank: end, EAction: SwapEnd})
+	g.Player.Expire[StatusSwap] = end
 	g.Printf("You quaff the %s. You feel light-footed.", SwapPotion)
 	return nil
 }
@@ -308,7 +317,9 @@ func (g *game) QuaffShadowsPotion(ev event) error {
 		return errors.New("You are already surrounded by shadows.")
 	}
 	g.Player.Statuses[StatusShadows] = 1
-	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 130 + RandInt(41), EAction: ShadowsEnd})
+	end := ev.Rank() + 130 + RandInt(41)
+	g.PushEvent(&simpleEvent{ERank: end, EAction: ShadowsEnd})
+	g.Player.Expire[StatusShadows] = end
 	g.Printf("You quaff the %s. You feel surrounded by shadows.", ShadowsPotion)
 	g.ComputeLOS()
 	return nil

@@ -72,6 +72,7 @@ var (
 	ColorFgSleepingMonster,
 	ColorFgStatusBad,
 	ColorFgStatusGood,
+	ColorFgStatusExpire,
 	ColorFgStatusOther,
 	ColorFgTargetMode,
 	ColorFgWanderingMonster uicolor
@@ -109,6 +110,7 @@ func LinkColors() {
 	ColorFgSleepingMonster = ColorViolet
 	ColorFgStatusBad = ColorRed
 	ColorFgStatusGood = ColorBlue
+	ColorFgStatusExpire = ColorViolet
 	ColorFgStatusOther = ColorYellow
 	ColorFgTargetMode = ColorCyan
 	ColorFgWanderingMonster = ColorOrange
@@ -2118,6 +2120,16 @@ func (ui *termui) DrawStatusBar(g *game, line int) {
 		fg := ColorFgStatusOther
 		if st.Good() {
 			fg = ColorFgStatusGood
+			t := 13
+			if g.Player.Statuses[StatusBerserk] > 0 {
+				t -= 3
+			}
+			if g.Player.Statuses[StatusSlow] > 0 {
+				t += 3
+			}
+			if g.Player.Expire[st] >= g.Ev.Rank() && g.Player.Expire[st]-g.Ev.Rank() <= t {
+				fg = ColorFgStatusExpire
+			}
 		} else if st.Bad() {
 			fg = ColorFgStatusBad
 		}

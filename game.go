@@ -317,6 +317,7 @@ func (g *game) InitPlayer() {
 	r := g.RandomRod()
 	g.Player.Rods = map[rod]rodProps{r: rodProps{r.MaxCharge() - 1}}
 	g.Player.Statuses = map[status]int{}
+	g.Player.Expire = map[status]int{}
 
 	// Testing
 	//g.Player.Aptitudes[AptStealthyLOS] = true
@@ -328,6 +329,7 @@ func (g *game) InitPlayer() {
 	//g.Player.Rods[RodShatter] = rodProps{Charge: 3}
 	//g.Player.Rods[RodFog] = rodProps{Charge: 3}
 	//g.Player.Rods[RodSleeping] = rodProps{Charge: 3}
+	//g.Player.Consumables[BerserkPotion] = 5
 	//g.Player.Consumables[MagicMappingPotion] = 1
 	//g.Player.Consumables[ExplosiveMagara] = 5
 	//g.Player.Consumables[NightMagara] = 5

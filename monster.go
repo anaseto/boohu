@@ -1842,7 +1842,9 @@ func (m *monster) HitSideEffects(g *game, ev event) {
 		if RandInt(5) == 0 && !g.Player.HasStatus(StatusBerserk) && !g.Player.HasStatus(StatusExhausted) {
 			g.Player.Statuses[StatusBerserk] = 1
 			g.Player.HP += 10
-			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 25 + RandInt(30), EAction: BerserkEnd})
+			end := ev.Rank() + 25 + RandInt(30)
+			g.PushEvent(&simpleEvent{ERank: end, EAction: BerserkEnd})
+			g.Player.Expire[StatusBerserk] = end
 			g.Print("You feel a sudden urge to kill things.")
 		}
 	case MonsBlinkingFrog:

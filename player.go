@@ -16,6 +16,7 @@ type player struct {
 	Rods        map[rod]rodProps
 	Aptitudes   map[aptitude]bool
 	Statuses    map[status]int
+	Expire      map[status]int
 	Pos         position
 	Target      position
 	LOS         map[position]bool
@@ -476,7 +477,9 @@ func (g *game) Smoke(ev event) {
 		}
 	}
 	g.Player.Statuses[StatusSwift]++
-	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 20 + RandInt(10), EAction: HasteEnd})
+	end := ev.Rank() + 20 + RandInt(10)
+	g.PushEvent(&simpleEvent{ERank: end, EAction: HasteEnd})
+	g.Player.Expire[StatusSwift] = end
 	g.ComputeLOS()
 	g.Print("You feel an energy burst and smoke comes out from you.")
 }

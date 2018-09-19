@@ -219,7 +219,9 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 		HPrate := g.Player.HP * 100 / g.Player.HPMax()
 		if HPrate < 50 && RandInt(HPrate/4) == 0 && !g.Player.HasStatus(StatusExhausted) && !g.Player.HasStatus(StatusBerserk) {
 			g.Player.Statuses[StatusBerserk] = 1
-			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 65 + RandInt(20), EAction: BerserkEnd})
+			end := ev.Rank() + 65 + RandInt(20)
+			g.PushEvent(&simpleEvent{ERank: end, EAction: BerserkEnd})
+			g.Player.Expire[StatusBerserk] = end
 			g.Print("Your sword enrages you to kill things.")
 			g.Player.HP += 10
 		}
