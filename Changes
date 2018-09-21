@@ -14,6 +14,8 @@ Gameplay:
 User Interface:
 
 + Many grammar fixes (by kilobyte).
++ No more need to refresh the page to play again in the browser version.
++ Change the color of some statuses when they are about to expire.
 + Avoid clash between browser and Boohu keys when the canvas is focused.
 
 -----------------------------------------------------------------------------
