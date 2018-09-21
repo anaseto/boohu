@@ -23,14 +23,18 @@ func main() {
 		log.Fatalf("boohu: %v\n", err)
 	}
 	defer tui.Close()
-
 	ApplyDefaultKeyBindings()
 	gameConfig.Tiles = true
 	tui.PostInit()
 	LinkColors()
 	gameConfig.DarkLOS = true
 	ApplyDarkLOS()
+	for {
+		newGame(tui)
+	}
+}
 
+func newGame(tui *termui) {
 	tui.DrawWelcome()
 	g := &game{}
 	load, err := g.Load()
@@ -53,8 +57,8 @@ func main() {
 	g.ui = tui
 	g.EventLoop()
 	tui.Clear()
-	tui.DrawText("Refresh the page to start again.\nYou can find last game statistics below.", 0, 0)
-	tui.DrawText(SaveError, 0, 1)
+	tui.DrawColoredText("Do you want to collect some more simellas today?\n\n───Click or press any key to play again───", 7, 5, ColorFg)
+	tui.DrawText(SaveError, 0, 10)
 	tui.Flush()
 	tui.PressAnyKey()
 }
@@ -83,7 +87,7 @@ func (g *game) Save() error {
 	}
 	s := base64.StdEncoding.EncodeToString(save)
 	storage.Call("setItem", "boohusave", s)
-	SaveError = "no errors"
+	SaveError = ""
 	return nil
 }
 
@@ -103,7 +107,7 @@ func (g *game) SaveConfig() error {
 	}
 	s := base64.StdEncoding.EncodeToString(conf)
 	storage.Call("setItem", "boohuconfig", s)
-	SaveError = "no errors"
+	SaveError = ""
 	return nil
 }
 

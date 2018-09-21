@@ -1943,8 +1943,6 @@ func (ui *termui) LightningHitAnimation(g *game, targets []position) {
 	}
 }
 
-var WizardMap = false
-
 func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgColor uicolor) {
 	m := g.Dungeon
 	c := m.Cell(pos)
@@ -1968,7 +1966,7 @@ func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgCol
 		return
 	}
 	if g.Wizard {
-		if !c.Explored && g.HasFreeExploredNeighbor(pos) && !WizardMap {
+		if !c.Explored && g.HasFreeExploredNeighbor(pos) && !g.WizardMap {
 			r = '¤'
 			fgColor = ColorFgDark
 			bgColor = ColorBgDark
@@ -1981,7 +1979,7 @@ func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgCol
 			}
 		}
 	}
-	if g.Player.LOS[pos] && !WizardMap {
+	if g.Player.LOS[pos] && !g.WizardMap {
 		fgColor = ColorFgLOS
 		bgColor = ColorBgLOS
 		if pos.X%2 == 1 && pos.Y%2 == 0 {
@@ -2002,7 +2000,7 @@ func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgCol
 		if g.TemporalWalls[pos] {
 			fgColor = ColorFgMagicPlace
 		}
-	case pos == g.Player.Pos && !WizardMap:
+	case pos == g.Player.Pos && !g.WizardMap:
 		r = '@'
 		fgColor = ColorFgPlayer
 	default:
@@ -2048,7 +2046,7 @@ func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgCol
 			r = '+'
 			fgColor = ColorFgPlace
 		}
-		if (g.Player.LOS[pos] || g.Wizard) && !WizardMap {
+		if (g.Player.LOS[pos] || g.Wizard) && !g.WizardMap {
 			m := g.MonsterAt(pos)
 			if m.Exists() {
 				r = m.Kind.Letter()
@@ -3071,7 +3069,7 @@ func (ui *termui) HandleWizardAction(g *game) error {
 	case WizardInfoAction:
 		ui.WizardInfo(g)
 	case WizardToggleMap:
-		WizardMap = !WizardMap
+		g.WizardMap = !g.WizardMap
 		ui.DrawDungeonView(g, NoFlushMode)
 	}
 	return nil

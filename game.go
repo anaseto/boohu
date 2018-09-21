@@ -60,6 +60,7 @@ type game struct {
 	Boredom             int
 	Quit                bool
 	Wizard              bool
+	WizardMap           bool
 	Version             string
 	ui                  Renderer
 }
