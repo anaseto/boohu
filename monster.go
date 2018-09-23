@@ -1622,6 +1622,10 @@ func (m *monster) HandleTurn(g *game, ev event) {
 		}
 		m.Path = nil
 		for _, npos := range g.Dungeon.CardinalFreeNeighbors(mpos) {
+			mons := g.MonsterAt(npos)
+			if mons.Exists() {
+				continue
+			}
 			m.Target = npos
 			if npos.Distance(g.Player.Pos) == 1 {
 				break
