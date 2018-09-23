@@ -1620,6 +1620,13 @@ func (m *monster) HandleTurn(g *game, ev event) {
 			m.AttackAction(g, ev)
 			return
 		}
+		m.Path = nil
+		for _, npos := range g.Dungeon.CardinalFreeNeighbors(mpos) {
+			m.Target = npos
+			if npos.Distance(g.Player.Pos) == 1 {
+				break
+			}
+		}
 	}
 	if m.Kind == MonsMarevorHelith {
 		if m.TeleportMonsterAway(g) {
@@ -1630,7 +1637,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	m.Obstructing = false
 	if !(len(m.Path) > 0 && m.Path[0] == m.Target && m.Path[len(m.Path)-1] == mpos) {
 		m.Path = m.APath(g, mpos, m.Target)
-		if len(m.Path) == 0 {
+		if len(m.Path) == 0 && !m.Status(MonsConfused) {
 			// if target is not accessible, try free neighbor cells
 			for _, npos := range g.Dungeon.FreeNeighbors(m.Target) {
 				m.Path = m.APath(g, mpos, npos)
