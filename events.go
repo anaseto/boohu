@@ -238,6 +238,7 @@ func (mev *monsterEvent) Action(g *game) {
 		if mons.Exists() {
 			mons.Statuses[MonsConfused] = 0
 			g.Printf("The %s is no longer confused.", mons.Kind)
+			mons.Path = mons.APath(g, mons.Pos, mons.Target)
 		}
 	case MonsExhaustionEnd:
 		mons := g.Monsters[mev.NMons]
