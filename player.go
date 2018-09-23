@@ -70,12 +70,10 @@ func (p *player) Armor() int {
 		ar += 3
 	case SmokingScales:
 		ar += 4
-	case ChainMail:
-		ar += 6
 	case ShinyPlates:
-		ar += 7
+		ar += 6
 	case TurtlePlates:
-		ar += 10
+		ar += 9
 	}
 	if p.Aptitudes[AptScales] {
 		ar += 2
@@ -121,7 +119,7 @@ func (p *player) Evasion() int {
 		ev += 3
 	}
 	switch p.Armour {
-	case ChainMail, ShinyPlates:
+	case ShinyPlates:
 		ev -= 1
 	case TurtlePlates:
 		ev -= 2
