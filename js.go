@@ -565,7 +565,7 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 			in.key = "9"
 		case "PageDown":
 			in.key = "3"
-		case "Numpad5":
+		case "Numpad5", "Delete":
 			in.key = "5"
 		}
 		if utf8.RuneCountInString(in.key) > 1 {
@@ -775,7 +775,7 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (er
 		in.key = "9"
 	case "PageDown":
 		in.key = "3"
-	case "Numpad5":
+	case "Numpad5", "Delete":
 		in.key = "5"
 	}
 	if utf8.RuneCountInString(in.key) > 1 {
