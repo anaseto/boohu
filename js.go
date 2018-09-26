@@ -190,6 +190,9 @@ func (ui *termui) Init() error {
 	canvas.Call(
 		"addEventListener", "keypress", js.NewEventCallback(0, func(e js.Value) {
 			s := e.Get("key").String()
+			if s == "Unidentified" {
+				s = e.Get("code").String()
+			}
 			ch <- jsInput{key: s}
 		}))
 	js.Global().Get("document").Call(
@@ -562,6 +565,8 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 			in.key = "9"
 		case "PageDown":
 			in.key = "3"
+		case "Numpad5":
+			in.key = "5"
 		}
 		if utf8.RuneCountInString(in.key) > 1 {
 			err = fmt.Errorf("Invalid key: “%s”.", in.key)
@@ -770,6 +775,8 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (er
 		in.key = "9"
 	case "PageDown":
 		in.key = "3"
+	case "Numpad5":
+		in.key = "5"
 	}
 	if utf8.RuneCountInString(in.key) > 1 {
 		g.Printf("Invalid key: “%s”.", in.key)
