@@ -2219,6 +2219,16 @@ func (ui *termui) DrawStatusLine(g *game) {
 		fg := ColorFgStatusOther
 		if st.Good() {
 			fg = ColorFgStatusGood
+			t := 13
+			if g.Player.Statuses[StatusBerserk] > 0 {
+				t -= 3
+			}
+			if g.Player.Statuses[StatusSlow] > 0 {
+				t += 3
+			}
+			if g.Player.Expire[st] >= g.Ev.Rank() && g.Player.Expire[st]-g.Ev.Rank() <= t {
+				fg = ColorFgStatusExpire
+			}
 		} else if st.Bad() {
 			fg = ColorFgStatusBad
 		}
