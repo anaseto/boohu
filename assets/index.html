@@ -8,13 +8,19 @@
 </head>
 <body>
 <canvas id="gamecanvas">
-	Game Screen
+Game Screen
 </canvas>
 <details>
 <summary>Game Summary and Statistics</summary>
 <pre id="dump">
 </pre>
 </details>
+<script>
+var canvas = document.getElementById("gamecanvas");
+var ctx = canvas.getContext("2d");
+ctx.font = "30px Sans";
+ctx.fillText("Loading...", canvas.width/3, canvas.height/2);
+</script>
 <script src="../boohu.js"></script> 
 </body>
 </html>
