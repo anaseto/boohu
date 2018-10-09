@@ -176,7 +176,7 @@ var MonsData = []monsterData{
 	MonsCyclop:          {10, 12, 12, 28, 13, 0, 8, 'C', "cyclop", 9},
 	MonsWorm:            {12, 9, 10, 25, 13, 0, 10, 'w', "farmer worm", 3},
 	MonsBrizzia:         {12, 10, 10, 30, 13, 0, 10, 'z', "brizzia", 7},
-	MonsAcidMound:       {10, 9, 10, 19, 15, 0, 8, 'a', "acid mound", 7},
+	MonsAcidMound:       {10, 9, 10, 19, 16, 0, 8, 'a', "acid mound", 7},
 	MonsHound:           {8, 9, 10, 15, 14, 0, 12, 'h', "hound", 4},
 	MonsYack:            {10, 11, 10, 21, 14, 0, 10, 'y', "yack", 6},
 	MonsGiantBee:        {6, 10, 10, 11, 15, 0, 15, 'B', "giant bee", 6},
@@ -188,10 +188,10 @@ var MonsData = []monsterData{
 	MonsBlinkingFrog:    {10, 10, 10, 20, 15, 0, 12, 'F', "blinking frog", 7},
 	MonsLich:            {10, 10, 10, 23, 15, 3, 12, 'L', "lich", 17},
 	MonsEarthDragon:     {10, 14, 10, 40, 14, 6, 8, 'D', "earth dragon", 20},
-	MonsMirrorSpecter:   {10, 9, 10, 18, 15, 0, 17, 'm', "mirror specter", 11},
-	MonsExplosiveNadre:  {10, 4, 10, 1, 14, 0, 10, 'n', "explosive nadre", 5},
+	MonsMirrorSpecter:   {10, 10, 10, 18, 15, 0, 17, 'm', "mirror specter", 11},
+	MonsExplosiveNadre:  {10, 6, 10, 4, 14, 0, 10, 'n', "explosive nadre", 6},
 	MonsSatowalgaPlant:  {10, 12, 12, 30, 15, 0, 4, 'P', "satowalga plant", 7},
-	MonsMadNixe:         {10, 10, 10, 20, 15, 0, 15, 'N', "mad nixe", 12},
+	MonsMadNixe:         {10, 11, 10, 20, 15, 0, 15, 'N', "mad nixe", 12},
 	MonsMarevorHelith:   {10, 0, 10, 97, 18, 10, 15, 'M', "Marevor Helith", 18},
 }
 
