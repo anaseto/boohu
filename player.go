@@ -36,7 +36,7 @@ func (p *player) HPMax() int {
 }
 
 func (p *player) MPMax() int {
-	mpmax := 3
+	mpmax := 4
 	if p.Aptitudes[AptMagic] {
 		mpmax += 2
 	}
