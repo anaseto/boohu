@@ -447,7 +447,7 @@ func (p projectile) Plural() (text string) {
 func (p projectile) Desc() (text string) {
 	switch p {
 	case ConfusingDart:
-		text = "can be silently thrown to confuse foes, dealing up to 7 damage. Confused monsters cannot move diagonally."
+		text = "can be silently thrown to confuse foes. Confused monsters cannot move diagonally."
 	case ExplosiveMagara:
 		text = "can be thrown to cause a fire explosion halving HP of monsters in a square area. It can occasionally destruct walls. It can burn doors and foliage."
 	case NightMagara:
