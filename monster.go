@@ -189,7 +189,7 @@ var MonsData = []monsterData{
 	MonsLich:            {10, 10, 10, 23, 15, 3, 12, 'L', "lich", 17},
 	MonsEarthDragon:     {10, 14, 10, 40, 14, 6, 8, 'D', "earth dragon", 20},
 	MonsMirrorSpecter:   {10, 10, 10, 18, 15, 0, 17, 'm', "mirror specter", 11},
-	MonsExplosiveNadre:  {10, 6, 10, 3, 14, 0, 10, 'n', "explosive nadre", 6},
+	MonsExplosiveNadre:  {10, 6, 10, 3, 14, 0, 10, 'n', "explosive nadre", 9},
 	MonsSatowalgaPlant:  {10, 12, 12, 30, 15, 0, 4, 'P', "satowalga plant", 7},
 	MonsMadNixe:         {10, 11, 10, 20, 15, 0, 15, 'N', "mad nixe", 12},
 	MonsMarevorHelith:   {10, 0, 10, 97, 18, 10, 15, 'M', "Marevor Helith", 18},
@@ -200,7 +200,7 @@ var monsDesc = []string{
 	MonsOgre:            "Ogres are big clunky humanoids that can hit really hard.",
 	MonsCyclop:          "Cyclops are very similar to ogres, but they also like to throw rocks at their foes (for up to 15 damage). The rocks can block your way for a while.",
 	MonsWorm:            "Farmer worms are ugly slow moving creatures, but surprisingly hardy at times, and they furrow as they move, helping new foliage to grow.",
-	MonsBrizzia:         "Brizzias are big slow moving biped creatures. They are quite hardy, and when hurt they can cause nausea, impeding the use of potions.",
+	MonsBrizzia:         "Brizzias are big slow moving biped creatures. They are quite hardy, and can cause nausea, impeding the use of potions.",
 	MonsAcidMound:       "Acid mounds are acidic creatures. They can temporarily corrode your equipment.",
 	MonsHound:           "Hounds are fast moving carnivore quadrupeds. They can bark, and smell you.",
 	MonsYack:            "Yacks are quite large herbivorous quadrupeds. They tend to form large groups, and can push you one cell away.",
@@ -214,7 +214,7 @@ var monsDesc = []string{
 	MonsLich:            "Liches are non-living mages wearing a leather armour. They can throw a bolt of torment at you, halving your HP.",
 	MonsEarthDragon:     "Earth dragons are big and hardy creatures that wander in the Underground. It is said they can be credited for many of the tunnels.",
 	MonsMirrorSpecter:   "Mirror specters are very insubstantial creatures, which can absorb your mana.",
-	MonsExplosiveNadre:  "Explosive nadres are very frail creatures that explode upon dying, halving HP of any adjacent creatures and occasionally destroying walls.",
+	MonsExplosiveNadre:  "Explosive nadres are very frail creatures that explode upon dying or attacking, halving HP of any adjacent creatures and occasionally destroying walls.",
 	MonsSatowalgaPlant:  "Satowalga Plants are immobile bushes that throw acidic projectiles at you, sometimes corroding and confusing you.",
 	MonsMadNixe:         "Mad nixes are magical humanoids that can attract you to them.",
 	MonsMarevorHelith:   "Marevor Helith is an ancient undead nakrus very fond of teleporting people away.",
@@ -1846,26 +1846,34 @@ func (m *monster) EnterConfusion(g *game, ev event) {
 func (m *monster) HitSideEffects(g *game, ev event) {
 	switch m.Kind {
 	case MonsSpider:
-		if RandInt(2) == 0 {
+		if RandInt(3) > 0 {
 			g.Confusion(ev)
 		}
+	case MonsBrizzia:
+		if RandInt(2) == 0 && !g.Player.HasStatus(StatusNausea) {
+			g.Player.Statuses[StatusNausea]++
+			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 30 + RandInt(20), EAction: NauseaEnd})
+		}
+	case MonsExplosiveNadre:
+		m.HP = 0
+		g.HandleKill(m, ev)
 	case MonsGiantBee:
-		if RandInt(5) == 0 && !g.Player.HasStatus(StatusBerserk) && !g.Player.HasStatus(StatusExhausted) {
+		if RandInt(4) == 0 && !g.Player.HasStatus(StatusBerserk) && !g.Player.HasStatus(StatusExhausted) {
 			g.Player.Statuses[StatusBerserk] = 1
 			g.Player.HP += 10
 			end := ev.Rank() + 25 + RandInt(30)
 			g.PushEvent(&simpleEvent{ERank: end, EAction: BerserkEnd})
 			g.Player.Expire[StatusBerserk] = end
-			g.Print("You feel a sudden urge to kill things.")
+			g.Print("You feel wild.")
 		}
 	case MonsBlinkingFrog:
-		if RandInt(2) == 0 {
+		if RandInt(3) > 0 {
 			g.Blink(ev)
 		}
 	case MonsAcidMound:
 		g.Corrosion(ev)
 	case MonsYack:
-		if RandInt(2) == 0 && m.PushPlayer(g) {
+		if RandInt(3) > 0 && m.PushPlayer(g) {
 			g.Print("The yack pushes you.")
 		}
 	case MonsWingedMilfid:
@@ -1877,7 +1885,7 @@ func (m *monster) HitSideEffects(g *game, ev event) {
 		g.PlacePlayerAt(ompos)
 		g.Print("The flying milfid makes you swap positions.")
 		m.Statuses[MonsExhausted] = 1
-		g.PushEvent(&monsterEvent{ERank: ev.Rank() + 50 + RandInt(50), NMons: m.Index, EAction: MonsExhaustionEnd})
+		g.PushEvent(&monsterEvent{ERank: ev.Rank() + 50 + RandInt(20), NMons: m.Index, EAction: MonsExhaustionEnd})
 	}
 }
 
