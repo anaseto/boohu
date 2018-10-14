@@ -296,17 +296,13 @@ func (g *game) InitPlayer() {
 	switch RandInt(12) {
 	case 0, 1:
 		g.Player.Consumables[TeleportationPotion] = 1
-	case 2, 3:
-		g.Player.Consumables[BerserkPotion] = 1
-	case 4:
+	case 2, 3, 4:
 		g.Player.Consumables[SwiftnessPotion] = 1
-	case 5:
-		g.Player.Consumables[LignificationPotion] = 1
 	case 6:
 		g.Player.Consumables[WallPotion] = 1
 	case 7:
 		g.Player.Consumables[CBlinkPotion] = 1
-	case 8:
+	case 5, 8:
 		g.Player.Consumables[DigPotion] = 1
 	case 9:
 		g.Player.Consumables[SwapPotion] = 1
@@ -340,11 +336,6 @@ func (g *game) InitPlayer() {
 	//g.Player.Consumables[ShadowsPotion] = 5
 	//g.Player.Consumables[ConfusePotion] = 5
 	//g.Player.Consumables[TormentPotion] = 5
-	//g.Player.Weapon = ElecWhip
-	//g.Player.Weapon = DancingRapier
-	//g.Player.Weapon = Sabre
-	//g.Player.Weapon = HarKarGauntlets
-	//g.Player.Weapon = DefenderFlail
 	//g.Player.Shield = EarthShield
 	//g.Player.Shield = FireShield
 	//g.Player.Armour = TurtlePlates
@@ -386,7 +377,7 @@ func (g *game) InitLevel() {
 		g.Targeting = InvalidPos
 		g.GeneratedRods = map[rod]bool{}
 		g.GeneratedEquipables = map[equipable]bool{}
-		g.FoundEquipables = map[equipable]bool{Robe: true, Dagger: true}
+		g.FoundEquipables = map[equipable]bool{Robe: true}
 		g.GeneratedUniques = map[monsterBand]int{}
 		g.Stats.KilledMons = map[monsterKind]int{}
 		g.InitSpecialBands()
@@ -422,17 +413,17 @@ func (g *game) InitLevel() {
 
 	// Equipment
 	g.Equipables = make(map[position]equipable)
-	g.GenWeapon()
 	g.GenArmour()
 	g.GenShield()
 
 	// Rods
 	g.Rods = map[position]rod{}
-	r := g.Depth - 4*g.GeneratedRodsCount()
-	if r > 0 && RandInt((6-r)*3) == 0 && g.GeneratedRodsCount() < 3 ||
-		g.GeneratedRodsCount() == 0 && g.Depth > 4 ||
-		g.GeneratedRodsCount() == 1 && g.Depth > 8 ||
-		g.GeneratedRodsCount() == 2 && g.Depth > 11 {
+	r := g.Depth - 3*g.GeneratedRodsCount()
+	if r > 0 && RandInt((6-r)*3) == 0 && g.GeneratedRodsCount() < 4 ||
+		g.GeneratedRodsCount() == 0 && g.Depth > 0 ||
+		g.GeneratedRodsCount() == 1 && g.Depth > 4 ||
+		g.GeneratedRodsCount() == 2 && g.Depth > 8 ||
+		g.GeneratedRodsCount() == 3 && g.Depth > 11 {
 		g.GenerateRod()
 	}
 
@@ -534,11 +525,6 @@ func (g *game) InitLevel() {
 	g.ComputeLOS()
 	g.MakeMonstersAware()
 
-	// Frundis is somewhere in the level
-	if g.FrundisInLevel() {
-		g.PrintStyled("You hear some faint music… ♫ larilon, larila ♫ ♪", logSpecial)
-	}
-
 	// recharge rods
 	if g.Depth > 0 {
 		g.RechargeRods()
@@ -618,16 +604,6 @@ func (g *game) GenCollectables() {
 			}
 		}
 	}
-}
-
-func (g *game) SeenGoodWeapons() (count int) {
-	for eq, b := range g.GeneratedEquipables {
-		w, ok := eq.(weapon)
-		if ok && b && w != Dagger {
-			count++
-		}
-	}
-	return count
 }
 
 func (g *game) SeenGoodArmour() (count int) {
@@ -765,74 +741,6 @@ loop:
 			}
 		}
 	}
-}
-
-func (g *game) GenWeapon() {
-	wps := [12]weapon{Dagger, Axe, BattleAxe, Spear, Halberd, Sabre, DancingRapier, BerserkSword, Frundis, ElecWhip, HarKarGauntlets, DefenderFlail}
-	n := 11 + 5*g.SeenGoodWeapons()
-	if g.SeenGoodWeapons() > 2 {
-		return
-	}
-	if g.SeenGoodWeapons() == 0 {
-		n -= 4 * g.Depth
-		if n < 2 {
-			if g.Depth < 4 {
-				n = 2
-			} else {
-				n = 1
-			}
-		}
-	} else if g.SeenGoodWeapons() == 1 {
-		n -= 4 * (g.Depth - 6)
-		if n < 2 {
-			if g.Depth < 11 {
-				n = 2
-			} else {
-				n = 1
-			}
-		}
-	} else if g.Player.Weapon != Dagger {
-		n += 10
-	} else if g.Depth >= WinDepth {
-		n = 2
-	}
-	r := RandInt(n)
-	if r != 0 {
-		return
-	}
-loop:
-	for {
-		for i := 0; i < len(wps); i++ {
-			if g.GeneratedEquipables[wps[i]] {
-				// do not generate duplicates
-				continue
-			}
-			n := 50
-			if wps[i].TwoHanded() && g.Depth < 3 {
-				n *= (3 - g.Depth)
-			}
-			if wps[i] == Dagger {
-				n *= 2
-			}
-			r := RandInt(n)
-			if r == 0 {
-				pos := g.FreeCellForStatic()
-				g.Equipables[pos] = wps[i]
-				g.GeneratedEquipables[wps[i]] = true
-				break loop
-			}
-		}
-
-	}
-}
-
-func (g *game) FrundisInLevel() bool {
-	for _, eq := range g.Equipables {
-		if wp, ok := eq.(weapon); ok && wp == Frundis {
-			return true
-		}
-	}
-	return false
 }
 
 func (g *game) Descend() bool {

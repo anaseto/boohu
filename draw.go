@@ -214,7 +214,7 @@ func (ui *termui) DrawWelcome() {
 	line := 5
 	rcol := col + 20
 	ColorText := ColorFgHPok
-	ui.DrawDark(fmt.Sprintf("       Boohu %s", Version), col, line-2, ColorText, false)
+	ui.DrawDark(fmt.Sprintf("       Boohu (pacifist) %s", Version), col, line-2, ColorText, false)
 	ui.DrawDark("────│\\/\\/\\/\\/\\/\\/\\/│────", col, line, ColorText, false)
 	line++
 	ui.DrawDark("##", col, line, ColorFgDark, true)
@@ -1027,9 +1027,6 @@ func (ui *termui) CharacterInfo(g *game) {
 	b := bytes.Buffer{}
 	b.WriteString(formatText("Every year, the elders send someone to collect medicinal simella plants in the Underground.  This year, the honor fell upon you, and so here you are.  According to the elders, deep in the Underground, magical stairs will lead you back to your village.  Along the way, you will collect simellas, as well as various items that will help you deal with monsters, which you may fight or flee...", TextWidth))
 	b.WriteString("\n\n")
-	b.WriteString(formatText(
-		fmt.Sprintf("You are wielding %s. %s", Indefinite(g.Player.Weapon.String(), false), g.Player.Weapon.Desc()), TextWidth))
-	b.WriteString("\n\n")
 	b.WriteString(formatText(fmt.Sprintf("You are wearing %s. %s", g.Player.Armour.StringIndefinite(), g.Player.Armour.Desc()), TextWidth))
 	b.WriteString("\n\n")
 	if g.Player.Shield != NoShield {
@@ -1628,17 +1625,9 @@ func (ui *termui) DrawDungeonView(g *game, m uiMode) {
 		ui.SetMapCell(BarCol, line, '[', ColorFg, ColorBg)
 		ui.DrawText(fmt.Sprintf(" %v", g.Player.Armour), BarCol+1, line)
 		line++
-		ui.SetMapCell(BarCol, line, ')', ColorFg, ColorBg)
-		ui.DrawText(fmt.Sprintf(" %v", g.Player.Weapon), BarCol+1, line)
-		line++
 		if g.Player.Shield != NoShield {
-			if g.Player.Weapon.TwoHanded() {
-				ui.SetMapCell(BarCol, line, ']', ColorFg, ColorBg)
-				ui.DrawText(" (unusable)", BarCol+1, line)
-			} else {
-				ui.SetMapCell(BarCol, line, ']', ColorFg, ColorBg)
-				ui.DrawText(fmt.Sprintf(" %v", g.Player.Shield), BarCol+1, line)
-			}
+			ui.SetMapCell(BarCol, line, ']', ColorFg, ColorBg)
+			ui.DrawText(fmt.Sprintf(" %v", g.Player.Shield), BarCol+1, line)
 		}
 		line++
 		line++
@@ -2172,11 +2161,6 @@ func (ui *termui) DrawStatusLine(g *game) {
 	col := 2
 	ui.DrawText(" ", col, line)
 	col++
-	ui.SetMapCell(col, line, ')', ColorFg, ColorBg)
-	col++
-	weapon := fmt.Sprintf("%s ", g.Player.Weapon.Short())
-	ui.DrawText(weapon, col, line)
-	col += utf8.RuneCountInString(weapon)
 	ui.SetMapCell(col, line, '[', ColorFg, ColorBg)
 	col++
 	armour := fmt.Sprintf("%s ", g.Player.Armour.Short())

@@ -110,7 +110,7 @@ func (g *game) SortedProjectiles() consumableSlice {
 
 func (g *game) Dump() string {
 	buf := &bytes.Buffer{}
-	fmt.Fprintf(buf, " -- Boohu version %s character file --\n\n", Version)
+	fmt.Fprintf(buf, " -- Boohu (pacifist) version %s character file --\n\n", Version)
 	if g.Wizard {
 		fmt.Fprintf(buf, "**WIZARD MODE**\n")
 	}
@@ -130,13 +130,8 @@ func (g *game) Dump() string {
 	fmt.Fprintf(buf, "\n\n")
 	fmt.Fprintf(buf, "Equipment:\n")
 	fmt.Fprintf(buf, "You are wearing %s.\n", g.Player.Armour.StringIndefinite())
-	fmt.Fprintf(buf, "You are wielding %s.\n", Indefinite(g.Player.Weapon.String(), false))
 	if g.Player.Shield != NoShield {
-		if g.Player.Weapon.TwoHanded() {
-			fmt.Fprintf(buf, "You have %s (unused).\n", Indefinite(g.Player.Shield.String(), false))
-		} else {
-			fmt.Fprintf(buf, "You are wearing %s.\n", Indefinite(g.Player.Shield.String(), false))
-		}
+		fmt.Fprintf(buf, "You are wearing %s.\n", Indefinite(g.Player.Shield.String(), false))
 	}
 	fmt.Fprintf(buf, "\n")
 	rs := g.SortedRods()
@@ -356,7 +351,7 @@ func (g *game) DumpedKilledMonsters() string {
 
 func (g *game) SimplifedDump(err error) string {
 	buf := &bytes.Buffer{}
-	fmt.Fprintf(buf, " ♣ Boohu version %s play summary ♣\n\n", Version)
+	fmt.Fprintf(buf, " ♣ Boohu (pacifist) version %s play summary ♣\n\n", Version)
 	if g.Wizard {
 		fmt.Fprintf(buf, "**WIZARD MODE**\n")
 	}

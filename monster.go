@@ -1973,7 +1973,7 @@ func (m *monster) TormentBolt(g *game, ev event) bool {
 
 func (m *monster) Blocked(g *game) bool {
 	blocked := false
-	if g.Player.Shield != NoShield && !g.Player.Weapon.TwoHanded() {
+	if g.Player.Shield != NoShield {
 		block := RandInt(g.Player.Block())
 		acc := RandInt(m.Accuracy)
 		if block >= acc {
@@ -2400,7 +2400,7 @@ func (g *game) MaxDanger() int {
 			adjust += Min(5, g.Depth) * Min(q, Min(5, g.Depth))
 		case TeleportationPotion, DigPotion, WallPotion:
 			adjust += Min(3, g.Depth) * Min(q, 3)
-		case SwiftnessPotion, LignificationPotion, MagicPotion, BerserkPotion, ExplosiveMagara, ShadowsPotion:
+		case SwiftnessPotion, MagicPotion, ExplosiveMagara, ShadowsPotion:
 			adjust += Min(2, g.Depth) * Min(q, 3)
 		case ConfusingDart:
 			adjust += Min(1, g.Depth) * Min(q, 7)
@@ -2412,26 +2412,17 @@ func (g *game) MaxDanger() int {
 	if g.Depth < MaxDepth && g.Player.Consumables[DescentPotion] > 0 {
 		adjust += g.Depth
 	}
-	if g.Player.Weapon == Dagger {
-		adjust -= Min(3, g.Depth) * Max(1, g.Depth-2)
-	}
 	if g.Player.Armour != Robe && g.Player.Armour != LeatherArmour {
 		adjust += WinDepth - Min(g.Depth, WinDepth)
 	}
-	if g.Depth > 3 && g.Player.Shield == NoShield && !g.Player.Weapon.TwoHanded() {
+	if g.Depth > 3 && g.Player.Shield == NoShield {
 		adjust -= Min(g.Depth, 6) * 2
 	}
-	if g.Depth < 3 && g.Player.Shield != NoShield && !g.Player.Weapon.TwoHanded() && g.Player.Weapon != Dagger {
+	if g.Depth < 3 && g.Player.Shield != NoShield {
 		adjust += 12 - g.Depth*4
-	}
-	if g.Player.Weapon.TwoHanded() && g.Depth < 4 {
-		adjust += (4 - g.Depth) * 2
 	}
 	if g.Player.Armour == LeatherArmour {
 		adjust += WinDepth/2 - g.Depth
-	}
-	if g.Player.Weapon != Dagger && g.Depth < 3 {
-		adjust += 4 + (3-g.Depth)*3
 	}
 	if g.Player.Armour == Robe {
 		adjust -= 3 * g.Depth / 2

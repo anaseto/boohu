@@ -27,15 +27,6 @@ func (r rod) Letter() rune {
 	return '/'
 }
 
-func (r rod) Rare() bool {
-	switch r {
-	case RodDigging, RodTeleportOther, RodShatter, RodSwapping:
-		return true
-	default:
-		return false
-	}
-}
-
 func (r rod) String() string {
 	var text string
 	switch r {
@@ -533,9 +524,6 @@ func (g *game) GeneratedRodsCount() int {
 
 func (g *game) RandomRod() rod {
 	r := rod(RandInt(NumRods))
-	if r.Rare() && RandInt(3) == 0 {
-		r = rod(RandInt(NumRods))
-	}
 	return r
 }
 

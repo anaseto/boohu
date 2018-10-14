@@ -10,7 +10,6 @@ type player struct {
 	MP          int
 	Simellas    int
 	Armour      armour
-	Weapon      weapon
 	Shield      shield
 	Consumables map[consumable]int
 	Rods        map[rod]rodProps
@@ -47,22 +46,6 @@ func (p *player) MPMax() int {
 	return mpmax
 }
 
-func (p *player) Accuracy() int {
-	acc := 15
-	if p.Aptitudes[AptAccurate] {
-		acc += 2
-	}
-	return acc
-}
-
-func (p *player) RangedAccuracy() int {
-	acc := 15
-	if p.Aptitudes[AptAccurate] {
-		acc += 10
-	}
-	return acc
-}
-
 func (p *player) Armor() int {
 	ar := 0
 	switch p.Armour {
@@ -88,21 +71,6 @@ func (p *player) Armor() int {
 		}
 	}
 	return ar
-}
-
-func (p *player) Attack() int {
-	attack := p.Weapon.Attack()
-	if p.Aptitudes[AptStrong] {
-		attack += attack / 5
-	}
-	if p.HasStatus(StatusCorrosion) {
-		penalty := p.Statuses[StatusCorrosion]
-		if penalty > 5 {
-			penalty = 5
-		}
-		attack -= penalty
-	}
-	return attack
 }
 
 func (p *player) Block() int {
@@ -389,13 +357,10 @@ func (g *game) MovePlayer(pos position, ev event) error {
 	}
 	delay := 10
 	mons := g.MonsterAt(pos)
-	if g.Player.Weapon == DefenderFlail && !mons.Exists() {
-		mons = g.AttractMonster(pos)
+	if g.Player.HasStatus(StatusLignification) {
+		return errors.New("You cannot move while lignified")
 	}
 	if !mons.Exists() {
-		if g.Player.HasStatus(StatusLignification) {
-			return errors.New("You cannot move while lignified")
-		}
 		if c.T == WallCell {
 			g.Dungeon.SetCell(pos, FreeCell)
 			g.MakeNoise(WallNoise, pos)

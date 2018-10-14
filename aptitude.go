@@ -3,8 +3,7 @@ package main
 type aptitude int
 
 const (
-	AptAccurate aptitude = iota
-	AptAgile
+	AptAgile aptitude = iota
 	AptFast
 	AptHealthy
 	AptStealthyMovement
@@ -14,14 +13,11 @@ const (
 	AptConfusingGas
 	AptSmoke
 	AptHear
-	AptStrong
 )
 
 func (ap aptitude) String() string {
 	var text string
 	switch ap {
-	case AptAccurate:
-		text = "You are unusually accurate, specially for ranged attacks."
 	case AptAgile:
 		text = "You are agile."
 	case AptFast:
@@ -34,8 +30,6 @@ func (ap aptitude) String() string {
 		text = "You are covered by scales."
 	case AptHear:
 		text = "You have good ears."
-	case AptStrong:
-		text = "You are strong."
 	case AptMagic:
 		text = "You have big magic reserves."
 	case AptStealthyLOS:
@@ -50,7 +44,7 @@ func (ap aptitude) String() string {
 
 func (g *game) RandomApt() (aptitude, bool) {
 	// XXX use less uniform probability ?
-	max := int(AptStrong)
+	max := int(AptHear)
 	count := 0
 	var apt aptitude
 	for {

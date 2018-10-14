@@ -35,10 +35,10 @@ type potion int
 const (
 	HealWoundsPotion potion = iota
 	TeleportationPotion
-	BerserkPotion
+	//BerserkPotion
 	DescentPotion
 	SwiftnessPotion
-	LignificationPotion
+	//LignificationPotion
 	MagicMappingPotion
 	MagicPotion
 	WallPotion
@@ -66,12 +66,12 @@ func (p potion) String() (text string) {
 		text += " of magic mapping"
 	case MagicPotion:
 		text += " of refill magic"
-	case BerserkPotion:
-		text += " of berserk"
+	//case BerserkPotion:
+	//text += " of berserk"
 	case SwiftnessPotion:
 		text += " of swiftness"
-	case LignificationPotion:
-		text += " of lignification"
+	//case LignificationPotion:
+	//text += " of lignification"
 	case WallPotion:
 		text += " of walls"
 	case CBlinkPotion:
@@ -109,12 +109,12 @@ func (p potion) Desc() (text string) {
 		text = "shows you the map."
 	case MagicPotion:
 		text = "replenishes your magical reserves."
-	case BerserkPotion:
-		text = "makes you enter a crazy rage, temporarily making you faster, stronger and healthier. You cannot drink potions while berserk, and afterwards it leaves you slow and exhausted."
+	//case BerserkPotion:
+	//text = "makes you enter a crazy rage, temporarily making you faster, stronger and healthier. You cannot drink potions while berserk, and afterwards it leaves you slow and exhausted."
 	case SwiftnessPotion:
 		text = "makes you move faster and better at avoiding blows for a short time."
-	case LignificationPotion:
-		text = "makes you more resistant to physical blows, but you are attached to the ground while the effect lasts."
+	//case LignificationPotion:
+	//text = "makes you more resistant to physical blows, but you are attached to the ground while the effect lasts."
 	case WallPotion:
 		text = "replaces free cells around you with temporary walls."
 	case CBlinkPotion:
@@ -161,14 +161,14 @@ func (p potion) Use(g *game, ev event) error {
 		err = g.QuaffHealWounds(ev)
 	case TeleportationPotion:
 		err = g.QuaffTeleportation(ev)
-	case BerserkPotion:
-		err = g.QuaffBerserk(ev)
+	//case BerserkPotion:
+	//err = g.QuaffBerserk(ev)
 	case DescentPotion:
 		err = g.QuaffDescent(ev)
 	case SwiftnessPotion:
 		err = g.QuaffSwiftness(ev)
-	case LignificationPotion:
-		err = g.QuaffLignification(ev)
+	//case LignificationPotion:
+	//err = g.QuaffLignification(ev)
 	case MagicMappingPotion:
 		err = g.QuaffMagicMapping(ev)
 	case MagicPotion:
@@ -216,19 +216,6 @@ func (g *game) QuaffTeleportation(ev event) error {
 	g.Player.Statuses[StatusTele] = 1
 	g.PushEvent(&simpleEvent{ERank: ev.Rank() + delay, EAction: Teleportation})
 	g.Printf("You quaff the %s. You feel unstable.", TeleportationPotion)
-	return nil
-}
-
-func (g *game) QuaffBerserk(ev event) error {
-	if g.Player.HasStatus(StatusExhausted) {
-		return errors.New("You are too exhausted to berserk.")
-	}
-	g.Player.Statuses[StatusBerserk] = 1
-	end := ev.Rank() + 65 + RandInt(20)
-	g.PushEvent(&simpleEvent{ERank: end, EAction: BerserkEnd})
-	g.Player.Expire[StatusBerserk] = end
-	g.Printf("You quaff the %s. You feel a sudden urge to kill things.", BerserkPotion)
-	g.Player.HP += 10
 	return nil
 }
 
@@ -322,17 +309,6 @@ func (g *game) QuaffShadowsPotion(ev event) error {
 	g.Player.Expire[StatusShadows] = end
 	g.Printf("You quaff the %s. You feel surrounded by shadows.", ShadowsPotion)
 	g.ComputeLOS()
-	return nil
-}
-
-func (g *game) QuaffLignification(ev event) error {
-	if g.Player.HasStatus(StatusLignification) {
-		return errors.New("You are already lignified.")
-	}
-	g.Player.Statuses[StatusLignification]++
-	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 150 + RandInt(100), EAction: LignificationEnd})
-	g.Printf("You quaff the %s. You feel rooted to the ground.", LignificationPotion)
-	g.Player.HP += 10
 	return nil
 }
 
@@ -516,36 +492,11 @@ func (g *game) ThrowConfusingDart(ev event) error {
 		return err
 	}
 	mons := g.MonsterAt(g.Player.Target)
-	acc := RandInt(g.Player.RangedAccuracy())
-	evasion := RandInt(mons.Evasion)
-	if mons.State == Resting {
-		evasion /= 2 + 1
-	}
-	if acc > evasion {
-		bonus := 0
-		if g.Player.HasStatus(StatusBerserk) {
-			bonus += RandInt(5)
-		}
-		if g.Player.Aptitudes[AptStrong] {
-			bonus += 2
-		}
-		attack, _ := g.HitDamage(DmgPhysical, 7+bonus, mons.Armor) // no clang with darts
-		mons.HP -= attack
-		if mons.HP > 0 {
-			mons.EnterConfusion(g, ev)
-			g.PrintfStyled("Your %s hits the %s (%d dmg), who appears confused.", logPlayerHit, ConfusingDart, mons.Kind, attack)
-			g.ui.ThrowAnimation(g, g.Ray(mons.Pos), true)
-			mons.MakeHuntIfHurt(g)
-		} else {
-			g.PrintfStyled("Your %s kills the %s.", logPlayerHit, ConfusingDart, mons.Kind)
-			g.ui.ThrowAnimation(g, g.Ray(mons.Pos), true)
-			g.HandleKill(mons, ev)
-		}
-		g.HandleStone(mons)
-	} else {
-		g.Printf("Your %s missed the %s.", ConfusingDart, mons.Kind)
-		g.ui.ThrowAnimation(g, g.Ray(mons.Pos), false)
-	}
+	mons.EnterConfusion(g, ev)
+	g.PrintfStyled("Your %s hits the %s, who appears confused.", logPlayerHit, ConfusingDart, mons.Kind)
+	g.ui.ThrowAnimation(g, g.Ray(mons.Pos), true)
+	mons.MakeHuntIfHurt(g)
+	g.HandleStone(mons)
 	ev.Renew(g, 10)
 	return nil
 }
@@ -561,7 +512,7 @@ func (g *game) ExplosionAt(ev event, pos position) {
 		g.MakeNoise(ExplosionHitNoise, mons.Pos)
 		g.HandleStone(mons)
 		mons.MakeHuntIfHurt(g)
-	} else if g.Dungeon.Cell(pos).T == WallCell && RandInt(2) == 0 {
+	} else if g.Dungeon.Cell(pos).T == WallCell {
 		g.Dungeon.SetCell(pos, FreeCell)
 		g.Stats.Digs++
 		if !g.Player.LOS[pos] {
@@ -631,21 +582,21 @@ var ConsumablesCollectData = map[consumable]collectData{
 	ExplosiveMagara:     {rarity: 8, quantity: 1},
 	NightMagara:         {rarity: 10, quantity: 1},
 	TeleportationPotion: {rarity: 6, quantity: 1},
-	BerserkPotion:       {rarity: 6, quantity: 1},
-	HealWoundsPotion:    {rarity: 6, quantity: 1},
-	SwiftnessPotion:     {rarity: 6, quantity: 1},
-	LignificationPotion: {rarity: 9, quantity: 1},
-	MagicPotion:         {rarity: 9, quantity: 1},
-	WallPotion:          {rarity: 12, quantity: 1},
-	CBlinkPotion:        {rarity: 12, quantity: 1},
-	DigPotion:           {rarity: 12, quantity: 1},
-	SwapPotion:          {rarity: 12, quantity: 1},
-	ShadowsPotion:       {rarity: 15, quantity: 1},
-	ConfusePotion:       {rarity: 15, quantity: 1},
-	DescentPotion:       {rarity: 18, quantity: 1},
-	MagicMappingPotion:  {rarity: 18, quantity: 1},
-	DreamPotion:         {rarity: 18, quantity: 1},
-	TormentPotion:       {rarity: 30, quantity: 1},
+	//BerserkPotion:       {rarity: 6, quantity: 1},
+	HealWoundsPotion: {rarity: 6, quantity: 1},
+	SwiftnessPotion:  {rarity: 6, quantity: 1},
+	//LignificationPotion: {rarity: 9, quantity: 1},
+	MagicPotion:        {rarity: 9, quantity: 1},
+	WallPotion:         {rarity: 12, quantity: 1},
+	CBlinkPotion:       {rarity: 12, quantity: 1},
+	DigPotion:          {rarity: 12, quantity: 1},
+	SwapPotion:         {rarity: 12, quantity: 1},
+	ShadowsPotion:      {rarity: 15, quantity: 1},
+	ConfusePotion:      {rarity: 15, quantity: 1},
+	DescentPotion:      {rarity: 18, quantity: 1},
+	MagicMappingPotion: {rarity: 18, quantity: 1},
+	DreamPotion:        {rarity: 18, quantity: 1},
+	TormentPotion:      {rarity: 30, quantity: 1},
 }
 
 type equipable interface {
@@ -771,184 +722,6 @@ func (ar armour) Desc() string {
 
 func (ar armour) Letter() rune {
 	return '['
-}
-
-type weapon int
-
-const (
-	Dagger weapon = iota
-	Axe
-	BattleAxe
-	Spear
-	Halberd
-	Sabre
-	DancingRapier
-	BerserkSword
-	Frundis
-	ElecWhip
-	HarKarGauntlets
-	DefenderFlail
-)
-
-func (wp weapon) Equip(g *game) {
-	owp := g.Player.Weapon
-	g.Player.Weapon = wp
-	if !g.FoundEquipables[wp] {
-		g.StoryPrintf("You found and took %s.", Indefinite(wp.String(), false))
-		g.FoundEquipables[wp] = true
-	}
-	g.Printf("You take the %s and leave your %s.", wp, owp)
-	if wp == Frundis {
-		g.PrintfStyled("♫ ♪ … Oh, you're there, let's fight our way out!", logSpecial)
-	}
-	g.Equipables[g.Player.Pos] = owp
-}
-
-func (wp weapon) String() string {
-	switch wp {
-	case Dagger:
-		return "dagger"
-	case Axe:
-		return "axe"
-	case BattleAxe:
-		return "battle axe"
-	case Spear:
-		return "spear"
-	case Halberd:
-		return "halberd"
-	case Sabre:
-		return "sabre"
-	case DancingRapier:
-		return "dancing rapier"
-	case BerserkSword:
-		return "berserk sword"
-	case Frundis:
-		return "staff Frundis"
-	case ElecWhip:
-		return "lightning whip"
-	case HarKarGauntlets:
-		return "har-kar gauntlets"
-	case DefenderFlail:
-		return "defender flail"
-	default:
-		// should not happen
-		return "some weapon"
-	}
-}
-
-func (wp weapon) Short() string {
-	switch wp {
-	case Dagger:
-		return "Dg"
-	case Axe:
-		return "Ax"
-	case BattleAxe:
-		return "Bt"
-	case Spear:
-		return "Sp"
-	case Halberd:
-		return "Hl"
-	case Sabre:
-		return "Sb"
-	case DancingRapier:
-		return "Dn"
-	case BerserkSword:
-		return "Br"
-	case Frundis:
-		return "Fr"
-	case ElecWhip:
-		return "Wh"
-	case HarKarGauntlets:
-		return "Hk"
-	case DefenderFlail:
-		return "Fl"
-	default:
-		// should not happen
-		return "?"
-	}
-}
-
-func (wp weapon) Desc() string {
-	var text string
-	switch wp {
-	case Dagger:
-		text = "A dagger is the most basic weapon. Great against sleeping monsters, but that's all."
-	case Axe:
-		text = "An axe is a one-handed weapon that can hit at once any foes adjacent to you, dealing extra damage in the open."
-	case BattleAxe:
-		text = "A battle axe is a big two-handed weapon that can hit at once any foes adjacent to you, dealing extra damage in the open."
-	case Spear:
-		text = "A spear is a one-handed weapon that can hit two opponents in a row at once. Useful in corridors."
-	case Halberd:
-		text = "An halberd is a big two-handed weapon that can hit two opponents in a row at once. Useful in corridors."
-	case Sabre:
-		text = "A sabre is a one-handed weapon. It is more accurate against injured opponents."
-	case DancingRapier:
-		text = "A dancing rapier is a one-handed weapon. It makes you swap with your foe and can hit another monster behind with extra damage."
-	case BerserkSword:
-		text = "A berserk sword is a big two-handed weapon that can make you berserk when attacking while injured."
-	case Frundis:
-		text = "Frundis is a musician and harmonist, which happens to be a two-handed staff too. It may occasionally confuse monsters on hit. It magically helps reducing noise in combat too."
-	case ElecWhip:
-		text = "The lightning whip is a one-handed weapon that inflicts electrical damage to a monster and any foes connected to it."
-	case HarKarGauntlets:
-		text = "Har-kar gauntlets are an unarmed combat weapon. They allow you to make a wind attack, passing over foes in a direction."
-	case DefenderFlail:
-		text = "The defender flail is a one-handed weapon that moves foes toward you, and hits harder as you keep attacking without moving."
-	}
-	return fmt.Sprintf("%s It can hit for up to %d damage.", text, wp.Attack())
-}
-
-func (wp weapon) Attack() int {
-	switch wp {
-	case Axe, Spear, Sabre, DancingRapier:
-		return 11
-	case BerserkSword:
-		return 17
-	case BattleAxe, Halberd:
-		return 15
-	case Frundis, HarKarGauntlets:
-		return 13
-	case DefenderFlail:
-		return 10
-	case Dagger:
-		return 9
-	case ElecWhip:
-		return 8
-	default:
-		return 0
-	}
-}
-
-func (wp weapon) TwoHanded() bool {
-	switch wp {
-	case BattleAxe, Halberd, BerserkSword, Frundis, HarKarGauntlets:
-		return true
-	default:
-		return false
-	}
-}
-
-func (wp weapon) Letter() rune {
-	return ')'
-}
-
-func (wp weapon) Cleave() bool {
-	switch wp {
-	case Axe, BattleAxe:
-		return true
-	default:
-		return false
-	}
-}
-
-func (wp weapon) Pierce() bool {
-	switch wp {
-	case Spear, Halberd:
-		return true
-	default:
-		return false
-	}
 }
 
 type shield int

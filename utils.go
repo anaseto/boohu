@@ -5,7 +5,6 @@ import (
 	"crypto/rand"
 	"log"
 	"math/big"
-	"strings"
 )
 
 func Abs(x int) int {
@@ -43,12 +42,6 @@ func Max(x, y int) int {
 
 func Indefinite(s string, upper bool) (text string) {
 	if len(s) > 0 {
-		if s == HarKarGauntlets.String() {
-			if upper {
-				return strings.ToUpper(s[0:1]) + s[1:]
-			}
-			return s
-		}
 		switch s[0] {
 		case 'a', 'e', 'i', 'o', 'u':
 			if upper {
