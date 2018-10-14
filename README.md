@@ -1,3 +1,5 @@
+*This is an experimental pacifist branch, just for fun.*
+
 Break Out Of Hareka's Underground (Boohu) is a roguelike game mainly inspired from DCSS and its tavern, with some ideas from Brogue, but aiming for very short games, almost no character building, and a simplified inventory.
 
 *Every year, the elders send someone to collect medicinal simella plants in the
