@@ -285,11 +285,13 @@ func (g *game) InitPlayer() {
 	g.Player.Consumables = map[consumable]int{
 		HealWoundsPotion: 1,
 	}
-	switch RandInt(4) {
+	switch RandInt(5) {
 	case 0:
 		g.Player.Consumables[ExplosiveMagara] = 1
 	case 1:
 		g.Player.Consumables[NightMagara] = 1
+	case 2:
+		g.Player.Consumables[TeleportMagara] = 1
 	default:
 		g.Player.Consumables[ConfusingDart] = 3
 	}

@@ -439,10 +439,11 @@ type projectile int
 const (
 	ConfusingDart projectile = iota
 	ExplosiveMagara
+	TeleportMagara
 	NightMagara
 )
 
-const NumProjectiles = int(ExplosiveMagara) + 1
+const NumProjectiles = int(NightMagara) + 1
 
 func (p projectile) String() (text string) {
 	switch p {
@@ -450,6 +451,8 @@ func (p projectile) String() (text string) {
 		text = "dart of confusion"
 	case ExplosiveMagara:
 		text = "explosive magara"
+	case TeleportMagara:
+		text = "teleport magara"
 	case NightMagara:
 		text = "night magara"
 	}
@@ -462,6 +465,8 @@ func (p projectile) Plural() (text string) {
 		text = "darts of confusion"
 	case ExplosiveMagara:
 		text = "explosive magaras"
+	case TeleportMagara:
+		text = "teleport magaras"
 	case NightMagara:
 		text = "night magaras"
 	}
@@ -474,6 +479,8 @@ func (p projectile) Desc() (text string) {
 		text = "can be silently thrown to confuse foes, dealing up to 7 damage. Confused monsters cannot move diagonally."
 	case ExplosiveMagara:
 		text = "can be thrown to cause a fire explosion halving HP of monsters in a square area. It can occasionally destruct walls. It can burn doors and foliage."
+	case TeleportMagara:
+		text = "can be thrown to make monsters in a square area teleport."
 	case NightMagara:
 		text = "can be thrown at a monster to produce sleep inducing clouds in a 2-radius area. You are affected too by the clouds, but they will slow your actions instead. Can burn doors and foliage."
 	}
@@ -500,6 +507,8 @@ func (p projectile) Use(g *game, ev event) error {
 		err = g.ThrowConfusingDart(ev)
 	case ExplosiveMagara:
 		err = g.ThrowExplosiveMagara(ev)
+	case TeleportMagara:
+		err = g.ThrowTeleportMagara(ev)
 	case NightMagara:
 		err = g.ThrowNightMagara(ev)
 	}
@@ -591,6 +600,24 @@ func (g *game) ThrowExplosiveMagara(ev event) error {
 	return nil
 }
 
+func (g *game) ThrowTeleportMagara(ev event) error {
+	if err := g.ui.ChooseTarget(g, &chooser{area: true, minDist: true}); err != nil {
+		return err
+	}
+	neighbors := g.Player.Target.ValidNeighbors()
+	g.Print("You throw the teleport magara.")
+	g.ui.ProjectileTrajectoryAnimation(g, g.Ray(g.Player.Target), ColorFgPlayer)
+	for _, pos := range append(neighbors, g.Player.Target) {
+		mons := g.MonsterAt(pos)
+		if mons.Exists() {
+			mons.TeleportAway(g)
+		}
+	}
+
+	ev.Renew(g, 10)
+	return nil
+}
+
 func (g *game) NightFog(at position, radius int, ev event) {
 	dij := &normalPath{game: g}
 	nm := Dijkstra(dij, []position{at}, radius)
@@ -630,6 +657,7 @@ var ConsumablesCollectData = map[consumable]collectData{
 	ConfusingDart:       {rarity: 4, quantity: 3},
 	ExplosiveMagara:     {rarity: 8, quantity: 1},
 	NightMagara:         {rarity: 10, quantity: 1},
+	TeleportMagara:      {rarity: 8, quantity: 1},
 	TeleportationPotion: {rarity: 6, quantity: 1},
 	BerserkPotion:       {rarity: 6, quantity: 1},
 	HealWoundsPotion:    {rarity: 6, quantity: 1},
