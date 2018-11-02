@@ -160,6 +160,8 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 				tev.Ch = '9'
 			case termbox.KeyPgdn:
 				tev.Ch = '3'
+			case termbox.KeyDelete:
+				tev.Ch = '5'
 			case termbox.KeyCtrlW:
 				ui.EnterWizard(g)
 				return nil, true, false
@@ -346,6 +348,8 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (er
 				tev.Ch = '9'
 			case termbox.KeyPgdn:
 				tev.Ch = '3'
+			case termbox.KeyDelete:
+				tev.Ch = '5'
 			case termbox.KeyEsc, termbox.KeySpace:
 				g.Targeting = InvalidPos
 				notarg = true
