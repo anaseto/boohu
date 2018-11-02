@@ -2,8 +2,12 @@ v0.11-dev
 
 Gameplay:
 
-+ Made confused monsters smarter
-+ Removed plain chain mail
++ Made confused monsters smarter.
++ Removed plain chain mail.
++ New teleport magara that teleports monsters in a square area.
+
+User Interface:
++ Some minor fixes.
 
 -----------------------------------------------------------------------------
 v0.10.0 2018-09-21
@@ -16,6 +20,8 @@ Gameplay:
 + New instable level: temporal walls can appear inadvertently.
 + New fire shield: it can burn nearby foliage after a successful block.
 + New potion of confusion: it confuses any monster in your line of sight.
++ New potion of torment that acts similarly to an explosive magara, but in the
+  whole LOS area, including the player.
 + Rename ponderousness plates into turtle plates, and scintillating plates into
   shiny plates (shorter).
 
