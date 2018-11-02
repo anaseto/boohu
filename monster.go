@@ -70,6 +70,7 @@ const (
 	MonsExplosiveNadre
 	MonsSatowalgaPlant
 	MonsMadNixe
+	MonsMindCelmist
 	MonsMarevorHelith
 )
 
@@ -112,7 +113,7 @@ func (mk monsterKind) Ranged() bool {
 
 func (mk monsterKind) Smiting() bool {
 	switch mk {
-	case MonsMirrorSpecter:
+	case MonsMirrorSpecter, MonsMindCelmist:
 		return true
 	default:
 		return false
@@ -192,6 +193,7 @@ var MonsData = []monsterData{
 	MonsExplosiveNadre:  {10, 6, 10, 3, 14, 0, 10, 'n', "explosive nadre", 6},
 	MonsSatowalgaPlant:  {10, 12, 12, 30, 15, 0, 4, 'P', "satowalga plant", 7},
 	MonsMadNixe:         {10, 11, 10, 20, 15, 0, 15, 'N', "mad nixe", 12},
+	MonsMindCelmist:     {10, 6, 12, 18, 99, 0, 14, 'C', "mind celmist", 16},
 	MonsMarevorHelith:   {10, 0, 10, 97, 18, 10, 15, 'M', "Marevor Helith", 18},
 }
 
@@ -217,6 +219,7 @@ var monsDesc = []string{
 	MonsExplosiveNadre:  "Explosive nadres are very frail creatures that explode upon dying, halving HP of any adjacent creatures and occasionally destroying walls.",
 	MonsSatowalgaPlant:  "Satowalga Plants are immobile bushes that throw acidic projectiles at you, sometimes corroding and confusing you.",
 	MonsMadNixe:         "Mad nixes are magical humanoids that can attract you to them.",
+	MonsMindCelmist:     "Mind celmists are mages that use magical mind attacks that bypass armour. They can occasionally confuse or slow you.",
 	MonsMarevorHelith:   "Marevor Helith is an ancient undead nakrus very fond of teleporting people away.",
 }
 
@@ -240,6 +243,7 @@ const (
 	LoneAcidMound
 	LoneExplosiveNadre
 	LoneSatowalgaPlant
+	LoneMindCelmist
 	LoneEarlyNixe
 	LoneEarlyAcidMound
 	LoneEarlyBrizzia
@@ -248,6 +252,7 @@ const (
 	LoneEarlyEarthDragon
 	LoneEarlyHydra
 	LoneEarlyLich
+	LoneEarlyMindCelmist
 	BandGoblins
 	BandGoblinsMany
 	BandGoblinsHound
@@ -272,6 +277,9 @@ const (
 	BandGiantBees
 	BandGiantBeesMany
 	BandSkeletonWarrior
+	BandMindCelmists
+	BandMindCelmistsLich
+	BandMindCelmistsMadNixe
 	BandMadNixes
 	BandMadNixesDragon
 	BandMadNixesHydra
@@ -283,6 +291,7 @@ const (
 	UBandGoblins
 	UBandBeeYacks
 	UBandMadNixes
+	UBandMindCelmist
 	UHydras
 	UExplosiveNadres
 	ULich
@@ -303,6 +312,7 @@ const (
 	UXMadNixeCyclop
 	UXMadNixeHydra
 	UXMadNixes
+	UXMindCelmists
 	UXMilfidYack
 	UXVariedWarriors
 )
@@ -362,6 +372,7 @@ var MonsBands = []monsterBandData{
 	LoneAcidMound:           {Rarity: 70, MinDepth: 6, MaxDepth: 13, Monster: MonsAcidMound},
 	LoneExplosiveNadre:      {Rarity: 55, MinDepth: 3, MaxDepth: 7, Monster: MonsExplosiveNadre},
 	LoneSatowalgaPlant:      {Rarity: 80, MinDepth: 5, MaxDepth: 13, Monster: MonsSatowalgaPlant},
+	LoneMindCelmist:         {Rarity: 110, MinDepth: 9, MaxDepth: 13, Monster: MonsMindCelmist},
 	LoneEarlyNixe:           {Rarity: 200, MinDepth: 1, MaxDepth: 7, Monster: MonsMadNixe, Unique: true},
 	LoneEarlyAcidMound:      {Rarity: 150, MinDepth: 1, MaxDepth: 5, Monster: MonsAcidMound, Unique: true},
 	LoneEarlyBrizzia:        {Rarity: 200, MinDepth: 1, MaxDepth: 6, Monster: MonsBrizzia, Unique: true},
@@ -370,6 +381,7 @@ var MonsBands = []monsterBandData{
 	LoneEarlyEarthDragon:    {Rarity: 350, MinDepth: 6, MaxDepth: 7, Monster: MonsEarthDragon, Unique: true},
 	LoneEarlyHydra:          {Rarity: 350, MinDepth: 4, MaxDepth: 5, Monster: MonsHydra, Unique: true},
 	LoneEarlyLich:           {Rarity: 350, MinDepth: 5, MaxDepth: 6, Monster: MonsLich, Unique: true},
+	LoneEarlyMindCelmist:    {Rarity: 350, MinDepth: 5, MaxDepth: 6, Monster: MonsMindCelmist, Unique: true},
 	BandGoblins: {
 		Distribution: map[monsterKind]monsInterval{MonsGoblin: {2, 3}},
 		Rarity:       17, MinDepth: 1, MaxDepth: 5, Band: true,
@@ -489,6 +501,26 @@ var MonsBands = []monsterBandData{
 		Distribution: map[monsterKind]monsInterval{MonsSkeletonWarrior: {2, 3}},
 		Rarity:       60, MinDepth: 8, MaxDepth: 13, Band: true,
 	},
+	BandMindCelmists: {
+		Distribution: map[monsterKind]monsInterval{
+			MonsMindCelmist:   {1, 1},
+			MonsGoblinWarrior: {1, 1},
+		},
+		Rarity: 200, MinDepth: 13, MaxDepth: 15, Band: true,
+	},
+	BandMindCelmistsLich: {
+		Distribution: map[monsterKind]monsInterval{
+			MonsMindCelmist: {2, 2},
+		},
+		Rarity: 200, MinDepth: 13, MaxDepth: 15, Band: true,
+	},
+	BandMindCelmistsMadNixe: {
+		Distribution: map[monsterKind]monsInterval{
+			MonsMindCelmist: {1, 1},
+			MonsMadNixe:     {1, 1},
+		},
+		Rarity: 200, MinDepth: 13, MaxDepth: 15, Band: true,
+	},
 	BandMadNixes: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsMadNixe: {1, 1},
@@ -593,6 +625,13 @@ var MonsBands = []monsterBandData{
 		},
 		Rarity: 80, MinDepth: 12, MaxDepth: 12, Band: true, Unique: true,
 	},
+	UBandMindCelmist: {
+		Distribution: map[monsterKind]monsInterval{
+			MonsMindCelmist: {2, 2},
+			MonsHound:       {1, 1},
+		},
+		Rarity: 100, MinDepth: 11, MaxDepth: 11, Band: true, Unique: true,
+	},
 	USatowalga: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsSatowalgaPlant: {3, 3},
@@ -694,6 +733,13 @@ var MonsBands = []monsterBandData{
 			MonsMadNixe: {3, 3},
 		},
 		Rarity: 200, MinDepth: 14, MaxDepth: 15, Band: true, Unique: true,
+	},
+	UXMindCelmists: {
+		Distribution: map[monsterKind]monsInterval{
+			MonsMindCelmist: {2, 2},
+			MonsCyclop:      {1, 1},
+		},
+		Rarity: 150, MinDepth: 14, MaxDepth: 15, Band: true, Unique: true,
 	},
 	UXMilfidYack: {
 		Distribution: map[monsterKind]monsInterval{
@@ -1202,6 +1248,33 @@ func init() {
 			{Distribution: map[monsterKind]monsInterval{
 				MonsMirrorSpecter: {1, 1}, MonsCyclop: {1, 1},
 			}, Rarity: 75, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsMindCelmist: {1, 1}, MonsCyclop: {1, 1},
+			}, Rarity: 85, Band: true},
+		}},
+		{bands: []monsterBandData{ // mind celmists
+			{Monster: MonsMindCelmist, Rarity: 100},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsMindCelmist: {2, 2}, MonsHound: {1, 1},
+			}, Rarity: 50, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsMindCelmist: {1, 1}, MonsMadNixe: {2, 2},
+			}, Rarity: 50, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsMindCelmist: {1, 1}, MonsLich: {1, 1},
+			}, Rarity: 50, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsMindCelmist: {1, 1}, MonsOgre: {1, 1},
+			}, Rarity: 50, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsMindCelmist: {1, 1}, MonsCyclop: {1, 1},
+			}, Rarity: 50, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsMindCelmist: {1, 1}, MonsYack: {2, 2},
+			}, Rarity: 50, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsMindCelmist: {1, 1}, MonsBlinkingFrog: {2, 2},
+			}, Rarity: 50, Band: true},
 		}},
 		{bands: []monsterBandData{ // nixe trap
 			{Distribution: map[monsterKind]monsInterval{
@@ -1234,6 +1307,9 @@ func init() {
 			{Distribution: map[monsterKind]monsInterval{
 				MonsMadNixe: {2, 2}, MonsWingedMilfid: {2, 2},
 			}, Rarity: 75, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsMadNixe: {2, 2}, MonsMindCelmist: {1, 1},
+			}, Rarity: 150, Band: true},
 		}},
 		{bands: []monsterBandData{ // blinking frogs terrible
 			{Distribution: map[monsterKind]monsInterval{
@@ -1263,6 +1339,9 @@ func init() {
 			{Distribution: map[monsterKind]monsInterval{
 				MonsGiantBee: {2, 2}, MonsBlinkingFrog: {3, 3},
 			}, Rarity: 75, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsMindCelmist: {1, 1}, MonsBlinkingFrog: {2, 2},
+			}, Rarity: 150, Band: true},
 		}},
 		{bands: []monsterBandData{ // yacks and brizzias terrible
 			{Distribution: map[monsterKind]monsInterval{
@@ -1350,6 +1429,9 @@ func init() {
 			{Distribution: map[monsterKind]monsInterval{
 				MonsEarthDragon: {1, 1}, MonsMirrorSpecter: {1, 1},
 			}, Rarity: 50, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsEarthDragon: {1, 1}, MonsMindCelmist: {1, 1},
+			}, Rarity: 200, Band: true},
 		}},
 		{bands: []monsterBandData{ // terrible goblin warriors
 			{Distribution: map[monsterKind]monsInterval{
@@ -1462,6 +1544,64 @@ func (m *monster) AlternatePlacement(g *game) *position {
 			continue
 		}
 		return &pos
+	}
+	return nil
+}
+
+func (m *monster) AlternateConfusedPlacement(g *game) *position {
+	var neighbors []position
+	neighbors = g.Dungeon.CardinalFreeNeighbors(m.Pos)
+	npos := InvalidPos
+	for _, pos := range neighbors {
+		mons := g.MonsterAt(pos)
+		if mons.Exists() || g.Player.Pos == pos {
+			continue
+		}
+		npos = pos
+		if npos.Distance(g.Player.Pos) == 1 {
+			return &npos
+		}
+	}
+	if npos.valid() {
+		return &npos
+	}
+	return nil
+}
+
+func (m *monster) SafePlacement(g *game) *position {
+	var neighbors []position
+	if m.Status(MonsConfused) {
+		neighbors = g.Dungeon.CardinalFreeNeighbors(m.Pos)
+	} else {
+		neighbors = g.Dungeon.FreeNeighbors(m.Pos)
+	}
+	spos := InvalidPos
+	sbest := 9
+	area := make([]position, 9)
+	for _, pos := range neighbors {
+		if pos.Distance(g.Player.Pos) <= 1 {
+			continue
+		}
+		mons := g.MonsterAt(pos)
+		if mons.Exists() {
+			continue
+		}
+		// simple heuristic
+		nsbest := g.Dungeon.WallAreaCount(area, pos, 1)
+		if nsbest < sbest {
+			sbest = nsbest
+			spos = pos
+		} else if nsbest == sbest {
+			switch pos.Dir(g.Player.Pos) {
+			case N, W, E, S:
+			default:
+				sbest = nsbest
+				spos = pos
+			}
+		}
+	}
+	if spos.valid() {
+		return &spos
 	}
 	return nil
 }
@@ -1602,10 +1742,17 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	if m.State == Hunting && m.SmitingAttack(g, ev) {
 		return
 	}
-	if m.Kind == MonsSatowalgaPlant {
+	switch m.Kind {
+	case MonsSatowalgaPlant:
 		ev.Renew(g, m.Kind.MovementDelay())
 		// oklob plants are static ranged-only
 		return
+	case MonsMindCelmist:
+		if m.State == Hunting && !g.Player.LOS[m.Pos] && m.Pos.Distance(g.Player.Pos) <= g.LosRange() {
+			// “smart” wait
+			ev.Renew(g, m.Kind.MovementDelay())
+			return
+		}
 	}
 	if mpos.Distance(ppos) == 1 {
 		attack := true
@@ -1614,22 +1761,24 @@ func (m *monster) HandleTurn(g *game, ev event) {
 			case E, N, W, S:
 			default:
 				attack = false
+				m.Path = nil
+				safepos := m.AlternateConfusedPlacement(g)
+				if safepos != nil {
+					m.Target = *safepos
+				}
+			}
+		} else if m.Kind == MonsMindCelmist {
+			// we can avoid melee
+			safepos := m.SafePlacement(g)
+			m.Path = nil
+			attack = false
+			if safepos != nil {
+				m.Target = *safepos
 			}
 		}
 		if attack {
 			m.AttackAction(g, ev)
 			return
-		}
-		m.Path = nil
-		for _, npos := range g.Dungeon.CardinalFreeNeighbors(mpos) {
-			mons := g.MonsterAt(npos)
-			if mons.Exists() {
-				continue
-			}
-			m.Target = npos
-			if npos.Distance(g.Player.Pos) == 1 {
-				break
-			}
 		}
 	}
 	if m.Kind == MonsMarevorHelith {
@@ -1702,7 +1851,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 		} else {
 			m.InvertFoliage(g)
 			m.MoveTo(g, target)
-			if m.Kind.Ranged() && !m.FireReady && g.Player.LOS[m.Pos] {
+			if (m.Kind.Ranged() || m.Kind.Smiting()) && !m.FireReady && g.Player.LOS[m.Pos] {
 				m.FireReady = true
 			}
 			m.Path = m.Path[:len(m.Path)-1]
@@ -2186,6 +2335,8 @@ func (m *monster) SmitingAttack(g *game, ev event) bool {
 	switch m.Kind {
 	case MonsMirrorSpecter:
 		return m.AbsorbMana(g, ev)
+	case MonsMindCelmist:
+		return m.MindAttack(g, ev)
 	}
 	return false
 }
@@ -2198,6 +2349,29 @@ func (m *monster) AbsorbMana(g *game, ev event) bool {
 	g.Printf("%s absorbs your mana.", m.Kind.Definite(true))
 	m.Statuses[MonsExhausted] = 1
 	g.PushEvent(&monsterEvent{ERank: ev.Rank() + 10 + RandInt(10), NMons: m.Index, EAction: MonsExhaustionEnd})
+	ev.Renew(g, m.Kind.AttackDelay())
+	return true
+}
+
+func (m *monster) MindAttack(g *game, ev event) bool {
+	if g.Player.Pos.Distance(m.Pos) == 1 && (m.HP < m.HPmax || RandInt(2) == 0) {
+		// try to avoid melee
+		safepos := m.SafePlacement(g)
+		if safepos != nil {
+			return false
+		}
+	}
+	dmg := 1 + m.Attack
+	m.InflictDamage(g, dmg, m.Attack)
+	g.Printf("The celmist mage hurts your mind (%d dmg).", dmg)
+	if RandInt(3) == 0 {
+		if RandInt(2) == 0 {
+			g.Player.Statuses[StatusSlow]++
+			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 30 + RandInt(10), EAction: SlowEnd})
+		} else {
+			g.Confusion(ev)
+		}
+	}
 	ev.Renew(g, m.Kind.AttackDelay())
 	return true
 }
