@@ -39,8 +39,13 @@ func (ui *termui) PostInit() {
 }
 
 func (ui *termui) Clear() {
-	ui.Screen.Clear()
 	w, h := ui.Screen.Size()
+	if w > UIWidth {
+		w = UIWidth
+	}
+	if h > UIHeight {
+		h = UIHeight
+	}
 	st := tcell.StyleDefault
 	st = st.Foreground(tcell.Color(ColorFg)).Background(tcell.Color(ColorBg))
 	for row := 0; row < h; row++ {
