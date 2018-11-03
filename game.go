@@ -21,6 +21,7 @@ type game struct {
 	Highlight           map[position]bool // highlighted positions (e.g. targeted ray)
 	Collectables        map[position]collectable
 	CollectableScore    int
+	LastConsumables     []consumable
 	UnstableLevel       int
 	StoneLevel          int
 	Equipables          map[position]equipable
@@ -597,7 +598,11 @@ func (g *game) StairsSlice() []position {
 
 func (g *game) GenCollectables() {
 	rounds := 100
+	if len(g.LastConsumables) > 3 {
+		g.LastConsumables = g.LastConsumables[1:]
+	}
 	for i := 0; i < rounds; i++ {
+	loopcons:
 		for c, data := range ConsumablesCollectData {
 			var r int
 			dfactor := g.Depth + 1
@@ -614,6 +619,13 @@ func (g *game) GenCollectables() {
 			}
 
 			if r == 0 {
+				// avoid too many of the same
+				for _, co := range g.LastConsumables {
+					if co == c && RandInt(4) > 0 {
+						continue loopcons
+					}
+				}
+				g.LastConsumables = append(g.LastConsumables, c)
 				g.CollectableScore++
 				pos := g.FreeCellForStatic()
 				g.Collectables[pos] = collectable{Consumable: c, Quantity: data.quantity}
