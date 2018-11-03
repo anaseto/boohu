@@ -193,7 +193,7 @@ var MonsData = []monsterData{
 	MonsExplosiveNadre:  {10, 6, 10, 3, 14, 0, 10, 'n', "explosive nadre", 6},
 	MonsSatowalgaPlant:  {10, 12, 12, 30, 15, 0, 4, 'P', "satowalga plant", 7},
 	MonsMadNixe:         {10, 11, 10, 20, 15, 0, 15, 'N', "mad nixe", 12},
-	MonsMindCelmist:     {10, 6, 12, 18, 99, 0, 14, 'c', "mind celmist", 16},
+	MonsMindCelmist:     {10, 9, 12, 18, 99, 0, 14, 'c', "mind celmist", 16},
 	MonsMarevorHelith:   {10, 0, 10, 97, 18, 10, 15, 'M', "Marevor Helith", 18},
 }
 
@@ -2361,10 +2361,11 @@ func (m *monster) MindAttack(g *game, ev event) bool {
 			return false
 		}
 	}
-	dmg := 1 + m.Attack
+	dmg := 3 + RandInt(m.Attack) + RandInt(m.Attack) + RandInt(m.Attack)
+	dmg /= 3
 	m.InflictDamage(g, dmg, m.Attack)
 	g.Printf("The celmist mage hurts your mind (%d dmg).", dmg)
-	if RandInt(3) == 0 {
+	if RandInt(2) == 0 {
 		if RandInt(2) == 0 {
 			g.Player.Statuses[StatusSlow]++
 			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 30 + RandInt(10), EAction: SlowEnd})
@@ -2372,7 +2373,7 @@ func (m *monster) MindAttack(g *game, ev event) bool {
 			g.Confusion(ev)
 		}
 	}
-	ev.Renew(g, m.Kind.AttackDelay())
+	ev.Renew(g, 2*m.Kind.AttackDelay())
 	return true
 }
 
