@@ -219,7 +219,7 @@ var monsDesc = []string{
 	MonsExplosiveNadre:  "Explosive nadres are very frail creatures that explode upon dying, halving HP of any adjacent creatures and occasionally destroying walls.",
 	MonsSatowalgaPlant:  "Satowalga Plants are immobile bushes that throw acidic projectiles at you, sometimes corroding and confusing you.",
 	MonsMadNixe:         "Mad nixes are magical humanoids that can attract you to them.",
-	MonsMindCelmist:     "Mind celmists are mages that use magical mind attacks that bypass armour. They can occasionally confuse or slow you.",
+	MonsMindCelmist:     "Mind celmists are mages that use magical smitting mind attacks that bypass armour. They can occasionally confuse or slow you. They try to avoid melee.",
 	MonsMarevorHelith:   "Marevor Helith is an ancient undead nakrus very fond of teleporting people away.",
 }
 
