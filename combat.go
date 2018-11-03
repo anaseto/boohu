@@ -535,7 +535,7 @@ func (g *game) BlockEffects(m *monster) {
 		if m.Kind == MonsSatowalgaPlant || m.Pos.Distance(g.Player.Pos) > 1 {
 			break
 		}
-		if RandInt(3) == 0 {
+		if RandInt(5) == 0 {
 			break
 		}
 		dir := m.Pos.Dir(g.Player.Pos)
