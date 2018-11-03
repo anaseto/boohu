@@ -1748,8 +1748,8 @@ func (m *monster) HandleTurn(g *game, ev event) {
 		// oklob plants are static ranged-only
 		return
 	case MonsMindCelmist:
-		if m.State == Hunting && !g.Player.LOS[m.Pos] && m.Pos.Distance(g.Player.Pos) <= g.LosRange() {
-			// “smart” wait
+		if m.State == Hunting && !g.Player.LOS[m.Pos] && m.Pos.Distance(g.Player.Pos) <= 2 {
+			// “smart” wait at short distance
 			ev.Renew(g, m.Kind.MovementDelay())
 			return
 		}
