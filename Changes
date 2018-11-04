@@ -5,6 +5,8 @@ Gameplay:
 + Made confused monsters smarter.
 + Removed plain chain mail.
 + New teleport magara that teleports monsters in a square area.
++ New monster: mind celmist - uses a smitting attack and avoids melee.
++ Make shields a little less useful when surrounded.
 
 User Interface:
 + Some minor fixes.
