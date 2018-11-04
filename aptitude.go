@@ -14,8 +14,11 @@ const (
 	AptConfusingGas
 	AptSmoke
 	AptHear
+	AptTeleport
 	AptStrong
 )
+
+const NumApts = int(AptStrong) + 1
 
 func (ap aptitude) String() string {
 	var text string
@@ -44,13 +47,14 @@ func (ap aptitude) String() string {
 		text = "You occasionally release some confusing gas when hurt."
 	case AptSmoke:
 		text = "You occasionally get energetic and emit smoke clouds when hurt."
+	case AptTeleport:
+		text = "You occasionally teleport your foes when hurt."
 	}
 	return text
 }
 
 func (g *game) RandomApt() (aptitude, bool) {
 	// XXX use less uniform probability ?
-	max := int(AptStrong)
 	count := 0
 	var apt aptitude
 	for {
@@ -58,7 +62,7 @@ func (g *game) RandomApt() (aptitude, bool) {
 		if count > 1000 {
 			break
 		}
-		r := RandInt(max + 1)
+		r := RandInt(NumApts)
 		apt = aptitude(r)
 		if g.Player.Aptitudes[apt] {
 			continue
