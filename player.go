@@ -49,17 +49,11 @@ func (p *player) MPMax() int {
 
 func (p *player) Accuracy() int {
 	acc := 15
-	if p.Aptitudes[AptAccurate] {
-		acc += 2
-	}
 	return acc
 }
 
 func (p *player) RangedAccuracy() int {
 	acc := 15
-	if p.Aptitudes[AptAccurate] {
-		acc += 10
-	}
 	return acc
 }
 

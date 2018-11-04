@@ -525,36 +525,26 @@ func (g *game) ThrowConfusingDart(ev event) error {
 		return err
 	}
 	mons := g.MonsterAt(g.Player.Target)
-	acc := RandInt(g.Player.RangedAccuracy())
-	evasion := RandInt(mons.Evasion)
-	if mons.State == Resting {
-		evasion /= 2 + 1
+	bonus := 0
+	if g.Player.HasStatus(StatusBerserk) {
+		bonus += RandInt(5)
 	}
-	if acc > evasion {
-		bonus := 0
-		if g.Player.HasStatus(StatusBerserk) {
-			bonus += RandInt(5)
-		}
-		if g.Player.Aptitudes[AptStrong] {
-			bonus += 2
-		}
-		attack, _ := g.HitDamage(DmgPhysical, 7+bonus, mons.Armor) // no clang with darts
-		mons.HP -= attack
-		if mons.HP > 0 {
-			mons.EnterConfusion(g, ev)
-			g.PrintfStyled("Your %s hits the %s (%d dmg), who appears confused.", logPlayerHit, ConfusingDart, mons.Kind, attack)
-			g.ui.ThrowAnimation(g, g.Ray(mons.Pos), true)
-			mons.MakeHuntIfHurt(g)
-		} else {
-			g.PrintfStyled("Your %s kills the %s.", logPlayerHit, ConfusingDart, mons.Kind)
-			g.ui.ThrowAnimation(g, g.Ray(mons.Pos), true)
-			g.HandleKill(mons, ev)
-		}
-		g.HandleStone(mons)
+	if g.Player.Aptitudes[AptStrong] {
+		bonus += 2
+	}
+	attack, _ := g.HitDamage(DmgPhysical, 7+bonus, mons.Armor) // no clang with darts
+	mons.HP -= attack
+	if mons.HP > 0 {
+		mons.EnterConfusion(g, ev)
+		g.PrintfStyled("Your %s hits the %s (%d dmg), who appears confused.", logPlayerHit, ConfusingDart, mons.Kind, attack)
+		g.ui.ThrowAnimation(g, g.Ray(mons.Pos), true)
+		mons.MakeHuntIfHurt(g)
 	} else {
-		g.Printf("Your %s missed the %s.", ConfusingDart, mons.Kind)
-		g.ui.ThrowAnimation(g, g.Ray(mons.Pos), false)
+		g.PrintfStyled("Your %s kills the %s.", logPlayerHit, ConfusingDart, mons.Kind)
+		g.ui.ThrowAnimation(g, g.Ray(mons.Pos), true)
+		g.HandleKill(mons, ev)
 	}
+	g.HandleStone(mons)
 	ev.Renew(g, 10)
 	return nil
 }
@@ -654,7 +644,7 @@ type collectData struct {
 }
 
 var ConsumablesCollectData = map[consumable]collectData{
-	ConfusingDart:       {rarity: 4, quantity: 3},
+	ConfusingDart:       {rarity: 4, quantity: 2},
 	ExplosiveMagara:     {rarity: 8, quantity: 1},
 	NightMagara:         {rarity: 10, quantity: 1},
 	TeleportMagara:      {rarity: 12, quantity: 1},

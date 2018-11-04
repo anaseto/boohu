@@ -1977,6 +1977,14 @@ func (m *monster) HitPlayer(g *game, ev event) {
 		if g.Player.Aptitudes[AptSmoke] && g.Player.HP < g.Player.HPMax()/2 && RandInt(2) == 0 {
 			g.Smoke(ev)
 		}
+		if g.Player.Aptitudes[AptSwap] && g.Player.HP < 2*g.Player.HPMax()/5 && RandInt(2) == 0 &&
+			!g.Player.HasStatus(StatusSwap) && !g.Player.HasStatus(StatusLignification) {
+			g.Player.Statuses[StatusSwap] = 1
+			end := ev.Rank() + 40 + RandInt(10)
+			g.PushEvent(&simpleEvent{ERank: end, EAction: SwapEnd})
+			g.Player.Expire[StatusSwap] = end
+			g.Print("You feel light-footed.")
+		}
 	} else {
 		g.Stats.Dodges++
 		g.Printf("%s misses you.", m.Kind.Definite(true))
