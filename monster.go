@@ -1970,7 +1970,7 @@ func (m *monster) HitPlayer(g *game, ev event) {
 			return
 		}
 		m.HitSideEffects(g, ev)
-		if g.Player.Aptitudes[AptConfusingGas] && g.Player.HP < g.Player.HPMax()/2 && RandInt(3) == 0 {
+		if g.Player.Aptitudes[AptConfusingGas] && g.Player.HP < g.Player.HPMax()/2 && RandInt(2) == 0 {
 			m.EnterConfusion(g, ev)
 			g.Printf("You release some confusing gas against the %s.", m.Kind)
 		}
