@@ -214,17 +214,15 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 		}
 	case g.Player.Weapon == HarKarGauntlets:
 		g.HarKarAttack(mons, ev)
-	case g.Player.Weapon == BerserkSword:
-		g.HitMonster(DmgPhysical, g.Player.Attack(), mons, ev)
-		HPrate := g.Player.HP * 100 / g.Player.HPMax()
-		if HPrate < 50 && RandInt(HPrate/4) == 0 && !g.Player.HasStatus(StatusExhausted) && !g.Player.HasStatus(StatusBerserk) {
-			g.Player.Statuses[StatusBerserk] = 1
-			end := ev.Rank() + 65 + RandInt(20)
-			g.PushEvent(&simpleEvent{ERank: end, EAction: BerserkEnd})
-			g.Player.Expire[StatusBerserk] = end
-			g.Print("Your sword enrages you to kill things.")
-			g.Player.HP += 10
+	case g.Player.Weapon == HopeSword:
+		attack := g.Player.Attack()
+		fact := 100 * g.Player.HPMax() / g.Player.HP
+		if fact > 300 {
+			fact = 300
 		}
+		attack *= fact
+		attack /= 100
+		g.HitMonster(DmgPhysical, attack, mons, ev)
 	case g.Player.Weapon == DefenderFlail:
 		bonus := g.Player.Statuses[StatusSlay]
 		g.HitMonster(DmgPhysical, g.Player.Attack()+bonus, mons, ev)
@@ -342,7 +340,11 @@ const (
 func (g *game) HitMonster(dt dmgType, dmg int, mons *monster, ev event) (hit bool) {
 	maxacc := g.Player.Accuracy()
 	if g.Player.Weapon == Sabre && mons.HP > 0 {
-		maxacc += int(6 * (-1 + float64(mons.HPmax)/float64(mons.HP)))
+		adjust := 6 * (-100 + 100*mons.HPmax/mons.HP) / 100
+		if adjust > 20 {
+			adjust = 20
+		}
+		maxacc += adjust
 	}
 	acc := RandInt(maxacc)
 	evasion := RandInt(mons.Evasion)

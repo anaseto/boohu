@@ -801,7 +801,7 @@ const (
 	Halberd
 	Sabre
 	DancingRapier
-	BerserkSword
+	HopeSword
 	Frundis
 	ElecWhip
 	HarKarGauntlets
@@ -838,8 +838,8 @@ func (wp weapon) String() string {
 		return "sabre"
 	case DancingRapier:
 		return "dancing rapier"
-	case BerserkSword:
-		return "berserk sword"
+	case HopeSword:
+		return "hopeful sword"
 	case Frundis:
 		return "staff Frundis"
 	case ElecWhip:
@@ -870,8 +870,8 @@ func (wp weapon) Short() string {
 		return "Sb"
 	case DancingRapier:
 		return "Dn"
-	case BerserkSword:
-		return "Br"
+	case HopeSword:
+		return "Ds"
 	case Frundis:
 		return "Fr"
 	case ElecWhip:
@@ -903,8 +903,8 @@ func (wp weapon) Desc() string {
 		text = "A sabre is a one-handed weapon. It is more accurate against injured opponents."
 	case DancingRapier:
 		text = "A dancing rapier is a one-handed weapon. It makes you swap with your foe and can hit another monster behind with extra damage."
-	case BerserkSword:
-		text = "A berserk sword is a big two-handed weapon that can make you berserk when attacking while injured."
+	case HopeSword:
+		text = "The hopeful sword is a big two-handed weapon that hits stronger when you are injured."
 	case Frundis:
 		text = "Frundis is a musician and harmonist, which happens to be a two-handed staff too. It may occasionally confuse monsters on hit. It magically helps reducing noise in combat too."
 	case ElecWhip:
@@ -921,9 +921,7 @@ func (wp weapon) Attack() int {
 	switch wp {
 	case Axe, Spear, Sabre, DancingRapier:
 		return 11
-	case BerserkSword:
-		return 17
-	case BattleAxe, Halberd:
+	case BattleAxe, Halberd, HopeSword:
 		return 15
 	case Frundis, HarKarGauntlets:
 		return 13
@@ -940,7 +938,7 @@ func (wp weapon) Attack() int {
 
 func (wp weapon) TwoHanded() bool {
 	switch wp {
-	case BattleAxe, Halberd, BerserkSword, Frundis, HarKarGauntlets:
+	case BattleAxe, Halberd, HopeSword, Frundis, HarKarGauntlets:
 		return true
 	default:
 		return false
