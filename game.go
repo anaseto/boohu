@@ -782,7 +782,7 @@ loop:
 }
 
 func (g *game) GenWeapon() {
-	wps := [12]weapon{Dagger, Axe, BattleAxe, Spear, Halberd, Sabre, DancingRapier, HopeSword, Frundis, ElecWhip, HarKarGauntlets, DefenderFlail}
+	wps := [WeaponNum]weapon{Dagger, Axe, BattleAxe, Spear, Halberd, Sabre, DancingRapier, HopeSword, Frundis, ElecWhip, HarKarGauntlets, VampDagger, DefenderFlail}
 	n := 11 + 5*g.SeenGoodWeapons()
 	if g.SeenGoodWeapons() > 2 {
 		return

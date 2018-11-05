@@ -381,7 +381,7 @@ func (g *game) HitMonster(dt dmgType, dmg int, mons *monster, ev event) (hit boo
 		}
 		g.MakeNoise(noise, mons.Pos)
 		if mons.State == Resting {
-			if g.Player.Weapon == Dagger {
+			if g.Player.Weapon == Dagger || g.Player.Weapon == VampDagger {
 				attack *= 4
 			} else {
 				attack *= 2
@@ -397,6 +397,14 @@ func (g *game) HitMonster(dt dmgType, dmg int, mons *monster, ev event) (hit boo
 		}
 		oldHP := mons.HP
 		mons.HP -= attack
+		if g.Player.Weapon == VampDagger {
+			healing := 3 * attack / 5
+			if g.Player.HP+healing > g.Player.HPMax() {
+				g.Player.HP = g.Player.HPMax()
+			} else {
+				g.Player.HP += healing
+			}
+		}
 		g.ui.HitAnimation(g, mons.Pos, false)
 		if mons.HP > 0 {
 			g.PrintfStyled("You hit %s (%d dmg).%s", logPlayerHit, mons.Kind.Definite(false), attack, sclang)
