@@ -806,6 +806,7 @@ const (
 	ElecWhip
 	HarKarGauntlets
 	VampDagger
+	DragonSword
 	DefenderFlail
 )
 
@@ -851,6 +852,8 @@ func (wp weapon) String() string {
 		return "har-kar gauntlets"
 	case VampDagger:
 		return "vampiric dagger"
+	case DragonSword:
+		return "dragon sword"
 	case DefenderFlail:
 		return "defender flail"
 	default:
@@ -885,6 +888,8 @@ func (wp weapon) Short() string {
 		return "Hk"
 	case VampDagger:
 		return "Vm"
+	case DragonSword:
+		return "Dr"
 	case DefenderFlail:
 		return "Fl"
 	default:
@@ -920,6 +925,8 @@ func (wp weapon) Desc() string {
 		text = "Har-kar gauntlets are an unarmed combat weapon. They allow you to make a wind attack, passing over foes in a direction."
 	case VampDagger:
 		text = "The vampiric dagger is a one-handed weapon that gives you some healing when you hit living monsters."
+	case DragonSword:
+		text = "The dragon sword is a one-handed weapon that inflicts extra damage on healthy big monsters."
 	case DefenderFlail:
 		text = "The defender flail is a one-handed weapon that moves foes toward you, and hits harder as you keep attacking without moving."
 	}
@@ -928,7 +935,7 @@ func (wp weapon) Desc() string {
 
 func (wp weapon) Attack() int {
 	switch wp {
-	case Axe, Spear, Sabre, DancingRapier:
+	case Axe, Spear, Sabre, DancingRapier, DragonSword:
 		return 11
 	case BattleAxe, Halberd, HopeSword:
 		return 15
