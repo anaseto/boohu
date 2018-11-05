@@ -223,7 +223,7 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 		attack *= fact
 		attack /= 100
 		g.HitMonster(DmgPhysical, attack, mons, ev)
-	case g.Player.Weapon == DragonSword:
+	case g.Player.Weapon == DragonSabre:
 		fact := 100 * mons.HP / mons.HPmax
 		mfact := 100 * (mons.HPmax * mons.HPmax) / (45 * 45)
 		bonus := (12 * fact / 100) * mfact / 100
@@ -344,7 +344,7 @@ const (
 
 func (g *game) HitMonster(dt dmgType, dmg int, mons *monster, ev event) (hit bool) {
 	maxacc := g.Player.Accuracy()
-	if g.Player.Weapon == Sabre && mons.HP > 0 {
+	if g.Player.Weapon == AssassinSabre && mons.HP > 0 {
 		adjust := 6 * (-100 + 100*mons.HPmax/mons.HP) / 100
 		if adjust > 20 {
 			adjust = 20

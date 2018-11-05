@@ -799,14 +799,14 @@ const (
 	BattleAxe
 	Spear
 	Halberd
-	Sabre
+	AssassinSabre
 	DancingRapier
 	HopeSword
 	Frundis
 	ElecWhip
 	HarKarGauntlets
 	VampDagger
-	DragonSword
+	DragonSabre
 	DefenderFlail
 )
 
@@ -838,8 +838,8 @@ func (wp weapon) String() string {
 		return "spear"
 	case Halberd:
 		return "halberd"
-	case Sabre:
-		return "sabre"
+	case AssassinSabre:
+		return "assassin sabre"
 	case DancingRapier:
 		return "dancing rapier"
 	case HopeSword:
@@ -852,8 +852,8 @@ func (wp weapon) String() string {
 		return "har-kar gauntlets"
 	case VampDagger:
 		return "vampiric dagger"
-	case DragonSword:
-		return "dragon sword"
+	case DragonSabre:
+		return "dragon sabre"
 	case DefenderFlail:
 		return "defender flail"
 	default:
@@ -874,7 +874,7 @@ func (wp weapon) Short() string {
 		return "Sp"
 	case Halberd:
 		return "Hl"
-	case Sabre:
+	case AssassinSabre:
 		return "Sb"
 	case DancingRapier:
 		return "Dn"
@@ -888,7 +888,7 @@ func (wp weapon) Short() string {
 		return "Hk"
 	case VampDagger:
 		return "Vm"
-	case DragonSword:
+	case DragonSabre:
 		return "Dr"
 	case DefenderFlail:
 		return "Fl"
@@ -911,10 +911,10 @@ func (wp weapon) Desc() string {
 		text = "A spear is a one-handed weapon that can hit two opponents in a row at once. Useful in corridors."
 	case Halberd:
 		text = "An halberd is a big two-handed weapon that can hit two opponents in a row at once. Useful in corridors."
-	case Sabre:
-		text = "A sabre is a one-handed weapon. It is more accurate against injured opponents."
+	case AssassinSabre:
+		text = "The assassin sabre is a one-handed weapon. It is more accurate against injured opponents."
 	case DancingRapier:
-		text = "A dancing rapier is a one-handed weapon. It makes you swap with your foe and can hit another monster behind with extra damage."
+		text = "The dancing rapier is a one-handed weapon. It makes you swap with your foe and can hit another monster behind with extra damage."
 	case HopeSword:
 		text = "The hopeful sword is a big two-handed weapon that hits stronger when you are injured."
 	case Frundis:
@@ -925,8 +925,8 @@ func (wp weapon) Desc() string {
 		text = "Har-kar gauntlets are an unarmed combat weapon. They allow you to make a wind attack, passing over foes in a direction."
 	case VampDagger:
 		text = "The vampiric dagger is a one-handed weapon that gives you some healing when you hit living monsters."
-	case DragonSword:
-		text = "The dragon sword is a one-handed weapon that inflicts extra damage on healthy big monsters."
+	case DragonSabre:
+		text = "The dragon sabre is a one-handed weapon that inflicts extra damage on healthy big monsters."
 	case DefenderFlail:
 		text = "The defender flail is a one-handed weapon that moves foes toward you, and hits harder as you keep attacking without moving."
 	}
@@ -935,7 +935,7 @@ func (wp weapon) Desc() string {
 
 func (wp weapon) Attack() int {
 	switch wp {
-	case Axe, Spear, Sabre, DancingRapier, DragonSword:
+	case Axe, Spear, AssassinSabre, DancingRapier, DragonSabre:
 		return 11
 	case BattleAxe, Halberd, HopeSword:
 		return 15
