@@ -346,8 +346,8 @@ func (g *game) HitMonster(dt dmgType, dmg int, mons *monster, ev event) (hit boo
 	maxacc := g.Player.Accuracy()
 	if g.Player.Weapon == AssassinSabre && mons.HP > 0 {
 		adjust := 6 * (-100 + 100*mons.HPmax/mons.HP) / 100
-		if adjust > 20 {
-			adjust = 20
+		if adjust > 25 {
+			adjust = 25
 		}
 		maxacc += adjust
 	}
