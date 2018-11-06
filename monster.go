@@ -2281,6 +2281,7 @@ func (m *monster) VampireSpit(g *game, ev event) bool {
 	g.Print("The vampire spits at you. You feel sick.")
 	m.Statuses[MonsExhausted] = 1
 	g.PushEvent(&monsterEvent{ERank: ev.Rank() + 100 + RandInt(50), NMons: m.Index, EAction: MonsExhaustionEnd})
+	ev.Renew(g, m.Kind.AttackDelay())
 	return true
 }
 
