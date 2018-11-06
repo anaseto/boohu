@@ -228,7 +228,7 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 		g.HitMonster(DmgPhysical, attack, mons, ev)
 	case g.Player.Weapon == DragonSabre:
 		mfact := 100 * (mons.HPmax * mons.HPmax) / (45 * 45)
-		bonus := -1 + 14*mfact/100
+		bonus := -1 + 13*mfact/100
 		g.HitMonster(DmgPhysical, g.Player.Attack()+bonus, mons, ev)
 	case g.Player.Weapon == DefenderFlail:
 		bonus := g.Player.Statuses[StatusSlay]

@@ -969,7 +969,7 @@ func (wp weapon) Attack() int {
 
 func (wp weapon) TwoHanded() bool {
 	switch wp {
-	case BattleAxe, Halberd, HopeSword, Frundis, HarKarGauntlets:
+	case BattleAxe, Halberd, HopeSword, Frundis, HarKarGauntlets, FinalBlade:
 		return true
 	default:
 		return false
