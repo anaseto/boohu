@@ -72,6 +72,7 @@ const (
 	MonsSatowalgaPlant
 	MonsMadNixe
 	MonsMindCelmist
+	MonsVampire
 	MonsMarevorHelith
 )
 
@@ -105,7 +106,7 @@ func (mk monsterKind) Dangerousness() int {
 
 func (mk monsterKind) Ranged() bool {
 	switch mk {
-	case MonsLich, MonsCyclop, MonsGoblinWarrior, MonsSatowalgaPlant, MonsMadNixe:
+	case MonsLich, MonsCyclop, MonsGoblinWarrior, MonsSatowalgaPlant, MonsMadNixe, MonsVampire:
 		return true
 	default:
 		return false
@@ -205,6 +206,7 @@ var MonsData = []monsterData{
 	MonsSatowalgaPlant:  {10, 12, 12, 30, 15, 0, 4, 'P', "satowalga plant", 7},
 	MonsMadNixe:         {10, 11, 10, 20, 15, 0, 15, 'N', "mad nixe", 12},
 	MonsMindCelmist:     {10, 9, 20, 18, 99, 0, 14, 'c', "mind celmist", 16},
+	MonsVampire:         {10, 9, 10, 21, 15, 0, 14, 'V', "vampire", 13},
 	MonsMarevorHelith:   {10, 0, 10, 97, 18, 10, 15, 'M', "Marevor Helith", 18},
 }
 
@@ -232,6 +234,7 @@ var monsDesc = []string{
 	MonsSatowalgaPlant:  "Satowalga Plants are immobile bushes that throw acidic projectiles at you, sometimes corroding and confusing you.",
 	MonsMadNixe:         "Mad nixes are magical humanoids that can attract you to them.",
 	MonsMindCelmist:     "Mind celmists are mages that use magical smitting mind attacks that bypass armour. They can occasionally confuse or slow you. They try to avoid melee.",
+	MonsVampire:         "Vampires are humanoids that drink blood to survive. Their spitting can cause nausea.",
 	MonsMarevorHelith:   "Marevor Helith is an ancient undead nakrus very fond of teleporting people away.",
 }
 
@@ -256,6 +259,7 @@ const (
 	LoneExplosiveNadre
 	LoneSatowalgaPlant
 	LoneMindCelmist
+	LoneVampire
 	LoneEarlyNixe
 	LoneEarlyAcidMound
 	LoneEarlyBrizzia
@@ -265,6 +269,7 @@ const (
 	LoneEarlyHydra
 	LoneEarlyLich
 	LoneEarlyMindCelmist
+	LoneEarlyVampire
 	BandGoblins
 	BandGoblinsMany
 	BandGoblinsHound
@@ -296,6 +301,7 @@ const (
 	BandMadNixesDragon
 	BandMadNixesHydra
 	BandMadNixesFrogs
+	BandVampire
 	UBandWorms
 	UBandGoblinsEasy
 	UBandFrogs
@@ -307,6 +313,7 @@ const (
 	UHydras
 	UExplosiveNadres
 	ULich
+	UVampires
 	UBrizzias
 	UAcidMounds
 	USatowalga
@@ -324,6 +331,7 @@ const (
 	UXMadNixeCyclop
 	UXMadNixeHydra
 	UXMadNixes
+	UXVampires
 	UXMindCelmists
 	UXMilfidYack
 	UXVariedWarriors
@@ -385,7 +393,9 @@ var MonsBands = []monsterBandData{
 	LoneExplosiveNadre:      {Rarity: 55, MinDepth: 3, MaxDepth: 7, Monster: MonsExplosiveNadre},
 	LoneSatowalgaPlant:      {Rarity: 80, MinDepth: 5, MaxDepth: 13, Monster: MonsSatowalgaPlant},
 	LoneMindCelmist:         {Rarity: 110, MinDepth: 9, MaxDepth: 13, Monster: MonsMindCelmist},
+	LoneVampire:             {Rarity: 110, MinDepth: 9, MaxDepth: 13, Monster: MonsVampire},
 	LoneEarlyNixe:           {Rarity: 200, MinDepth: 1, MaxDepth: 7, Monster: MonsMadNixe, Unique: true},
+	LoneEarlyVampire:        {Rarity: 350, MinDepth: 3, MaxDepth: 7, Monster: MonsVampire, Unique: true},
 	LoneEarlyAcidMound:      {Rarity: 150, MinDepth: 1, MaxDepth: 5, Monster: MonsAcidMound, Unique: true},
 	LoneEarlyBrizzia:        {Rarity: 200, MinDepth: 1, MaxDepth: 6, Monster: MonsBrizzia, Unique: true},
 	LoneEarlySpecter:        {Rarity: 150, MinDepth: 1, MaxDepth: 5, Monster: MonsMirrorSpecter, Unique: true},
@@ -513,6 +523,14 @@ var MonsBands = []monsterBandData{
 		Distribution: map[monsterKind]monsInterval{MonsSkeletonWarrior: {2, 3}},
 		Rarity:       60, MinDepth: 8, MaxDepth: 13, Band: true,
 	},
+	BandVampire: {
+		Distribution: map[monsterKind]monsInterval{
+			MonsVampire:     {1, 1},
+			MonsMindCelmist: {0, 1},
+			MonsMadNixe:     {0, 1},
+		},
+		Rarity: 250, MinDepth: 13, MaxDepth: 15, Band: true,
+	},
 	BandMindCelmists: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsMindCelmist:   {1, 1},
@@ -603,6 +621,13 @@ var MonsBands = []monsterBandData{
 		},
 		Rarity: 40, MinDepth: 9, MaxDepth: 9, Band: true, Unique: true,
 	},
+	UVampires: {
+		Distribution: map[monsterKind]monsInterval{
+			MonsVampire:      {2, 2},
+			MonsWingedMilfid: {1, 1},
+		},
+		Rarity: 100, MinDepth: 9, MaxDepth: 9, Band: true, Unique: true,
+	},
 	UHydras: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsHydra:  {2, 3},
@@ -660,6 +685,7 @@ var MonsBands = []monsterBandData{
 		Distribution: map[monsterKind]monsInterval{
 			MonsMarevorHelith: {1, 1},
 			MonsLich:          {0, 1},
+			MonsVampire:       {0, 1},
 		},
 		Rarity: 100, MinDepth: 7, MaxDepth: 15, Band: true, Unique: true,
 	},
@@ -739,6 +765,12 @@ var MonsBands = []monsterBandData{
 			MonsMadNixe: {1, 1},
 		},
 		Rarity: 110, MinDepth: 15, MaxDepth: 15, Band: true, Unique: true,
+	},
+	UXVampires: {
+		Distribution: map[monsterKind]monsInterval{
+			MonsVampire: {3, 3},
+		},
+		Rarity: 250, MinDepth: 14, MaxDepth: 15, Band: true, Unique: true,
 	},
 	UXMadNixes: {
 		Distribution: map[monsterKind]monsInterval{
@@ -1322,6 +1354,9 @@ func init() {
 			{Distribution: map[monsterKind]monsInterval{
 				MonsMadNixe: {2, 2}, MonsMindCelmist: {1, 1},
 			}, Rarity: 150, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsMadNixe: {2, 2}, MonsVampire: {1, 1},
+			}, Rarity: 150, Band: true},
 		}},
 		{bands: []monsterBandData{ // blinking frogs terrible
 			{Distribution: map[monsterKind]monsInterval{
@@ -1409,6 +1444,9 @@ func init() {
 			{Distribution: map[monsterKind]monsInterval{
 				MonsMirrorSpecter: {1, 1}, MonsSkeletonWarrior: {2, 2},
 			}, Rarity: 50, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsLich: {1, 1}, MonsVampire: {2, 2},
+			}, Rarity: 150, Band: true},
 		}},
 		{bands: []monsterBandData{ // terrible dragon and hydras
 			{Distribution: map[monsterKind]monsInterval{
@@ -1978,6 +2016,12 @@ func (m *monster) HitPlayer(g *game, ev event) {
 		}
 		g.PrintfStyled("%s hits you (%d dmg).%s", logMonsterHit, m.Kind.Definite(true), attack, sclang)
 		m.InflictDamage(g, attack, m.Attack)
+		if m.Kind == MonsVampire {
+			m.HP += 2 * attack / 3
+			if m.HP > m.HPmax {
+				m.HP = m.HPmax
+			}
+		}
 		if g.Player.HP <= 0 {
 			return
 		}
@@ -2101,6 +2145,8 @@ func (m *monster) RangedAttack(g *game, ev event) bool {
 		return m.ThrowAcid(g, ev)
 	case MonsMadNixe:
 		return m.NixeAttraction(g, ev)
+	case MonsVampire:
+		return m.VampireSpit(g, ev)
 	}
 	return false
 }
@@ -2222,6 +2268,19 @@ func (m *monster) ThrowRock(g *game, ev event) bool {
 		}
 	}
 	ev.Renew(g, 2*m.Kind.AttackDelay())
+	return true
+}
+
+func (m *monster) VampireSpit(g *game, ev event) bool {
+	blocked := m.RangeBlocked(g)
+	if blocked || g.Player.HasStatus(StatusNausea) {
+		return false
+	}
+	g.Player.Statuses[StatusNausea]++
+	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 30 + RandInt(20), EAction: NauseaEnd})
+	g.Print("The vampire spits at you. You feel sick.")
+	m.Statuses[MonsExhausted] = 1
+	g.PushEvent(&monsterEvent{ERank: ev.Rank() + 100 + RandInt(50), NMons: m.Index, EAction: MonsExhaustionEnd})
 	return true
 }
 
