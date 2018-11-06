@@ -433,6 +433,9 @@ func (g *game) HitMonster(dt dmgType, dmg int, mons *monster, ev event) (hit boo
 			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 30 + RandInt(20), EAction: NauseaEnd})
 			g.Print("The brizzia's corpse releases some nauseating gas. You feel sick.")
 		}
+		if mons.Kind == MonsTinyHarpy && mons.HP > 0 {
+			mons.Blink(g)
+		}
 		g.HandleStone(mons)
 		g.Stats.Hits++
 	} else {

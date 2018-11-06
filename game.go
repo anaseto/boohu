@@ -22,8 +22,6 @@ type game struct {
 	Collectables        map[position]collectable
 	CollectableScore    int
 	LastConsumables     []consumable
-	UnstableLevel       int
-	StoneLevel          int
 	Equipables          map[position]equipable
 	Rods                map[position]rod
 	Stairs              map[position]stair
@@ -33,7 +31,6 @@ type game struct {
 	TemporalWalls       map[position]bool
 	MagicalStones       map[position]stone
 	GeneratedUniques    map[monsterBand]int
-	SpecialBands        map[int][]monsterBandData
 	GeneratedEquipables map[equipable]bool
 	GeneratedRods       map[rod]bool
 	FoundEquipables     map[equipable]bool
@@ -63,7 +60,15 @@ type game struct {
 	Wizard              bool
 	WizardMap           bool
 	Version             string
+	Opts                startOpts
 	ui                  Renderer
+}
+
+type startOpts struct {
+	Alternate     monsterKind
+	StoneLevel    int
+	SpecialBands  map[int][]monsterBandData
+	UnstableLevel int
 }
 
 type Renderer interface {
@@ -363,22 +368,22 @@ func (g *game) InitPlayer() {
 }
 
 func (g *game) InitSpecialBands() {
-	g.SpecialBands = map[int][]monsterBandData{}
+	g.Opts.SpecialBands = map[int][]monsterBandData{}
 	sb := MonsSpecialBands[RandInt(len(MonsSpecialBands))]
 	depth := sb.minDepth + RandInt(sb.maxDepth-sb.minDepth+1)
-	g.SpecialBands[depth] = sb.bands
+	g.Opts.SpecialBands[depth] = sb.bands
 	seb := MonsSpecialEndBands[RandInt(len(MonsSpecialEndBands))]
 	if RandInt(4) == 0 {
 		if RandInt(5) > 1 {
-			g.SpecialBands[13] = seb.bands
+			g.Opts.SpecialBands[13] = seb.bands
 		} else {
-			g.SpecialBands[12] = seb.bands
+			g.Opts.SpecialBands[12] = seb.bands
 		}
 	} else if RandInt(5) > 0 {
 		if RandInt(3) > 0 {
-			g.SpecialBands[15] = seb.bands
+			g.Opts.SpecialBands[15] = seb.bands
 		} else {
-			g.SpecialBands[14] = seb.bands
+			g.Opts.SpecialBands[14] = seb.bands
 		}
 	}
 }
@@ -399,10 +404,26 @@ func (g *game) InitLevel() {
 		g.Stats.KilledMons = map[monsterKind]int{}
 		g.InitSpecialBands()
 		if RandInt(3) > 0 {
-			g.UnstableLevel = 1 + RandInt(15)
+			g.Opts.UnstableLevel = 1 + RandInt(15)
 		}
-		if RandInt(2) == 0 || RandInt(2) == 0 && g.UnstableLevel == 0 {
-			g.StoneLevel = 1 + RandInt(15)
+		if RandInt(2) == 0 || RandInt(2) == 0 && g.Opts.UnstableLevel == 0 {
+			g.Opts.StoneLevel = 1 + RandInt(15)
+		}
+		if RandInt(3) == 0 {
+			g.Opts.Alternate = MonsTinyHarpy
+			if RandInt(4) == 0 {
+				g.Opts.Alternate = MonsWorm
+			}
+			if RandInt(10) == 0 {
+				switch RandInt(3) {
+				case 0:
+					g.Opts.Alternate = MonsExplosiveNadre
+				case 1:
+					g.Opts.Alternate = MonsSpider
+				case 2:
+					g.Opts.Alternate = MonsHound
+				}
+			}
 		}
 		g.Version = Version
 	}
@@ -419,7 +440,7 @@ func (g *game) InitLevel() {
 
 	// Monsters
 	g.BandData = MonsBands
-	if bd, ok := g.SpecialBands[g.Depth]; ok {
+	if bd, ok := g.Opts.SpecialBands[g.Depth]; ok {
 		g.BandData = bd
 	}
 	g.GenMonsters()
@@ -497,11 +518,11 @@ func (g *game) InitLevel() {
 		nstones = 2
 	}
 	ustone := stone(0)
-	if g.Depth > 0 && g.Depth == g.StoneLevel {
+	if g.Depth > 0 && g.Depth == g.Opts.StoneLevel {
 		ustone = stone(1 + RandInt(NumStones-1))
 		nstones = 10 + g.Depth/2
 		if RandInt(4) == 0 {
-			g.StoneLevel = g.StoneLevel + RandInt(MaxDepth-g.StoneLevel) + 1
+			g.Opts.StoneLevel = g.Opts.StoneLevel + RandInt(MaxDepth-g.Opts.StoneLevel) + 1
 		}
 	}
 	for i := 0; i < nstones; i++ {
@@ -566,13 +587,13 @@ func (g *game) InitLevel() {
 	for i := range g.Monsters {
 		g.PushEvent(&monsterEvent{ERank: g.Turn + RandInt(10), EAction: MonsterTurn, NMons: i})
 	}
-	if g.Depth > 0 && g.Depth == g.UnstableLevel {
+	if g.Depth > 0 && g.Depth == g.Opts.UnstableLevel {
 		g.PrintStyled("You sense magic instability on this level.", logSpecial)
 		for i := 0; i < 15; i++ {
 			g.PushEvent(&cloudEvent{ERank: g.Turn + 100 + RandInt(900), EAction: ObstructionProgression})
 		}
 		if RandInt(4) == 0 {
-			g.UnstableLevel = g.UnstableLevel + RandInt(MaxDepth-g.UnstableLevel) + 1
+			g.Opts.UnstableLevel = g.Opts.UnstableLevel + RandInt(MaxDepth-g.Opts.UnstableLevel) + 1
 		}
 	}
 }

@@ -50,6 +50,7 @@ type monsterKind int
 
 const (
 	MonsGoblin monsterKind = iota
+	MonsTinyHarpy
 	MonsOgre
 	MonsCyclop
 	MonsWorm
@@ -182,6 +183,7 @@ type monsterData struct {
 
 var MonsData = []monsterData{
 	MonsGoblin:          {10, 7, 10, 15, 14, 0, 12, 'g', "goblin", 2},
+	MonsTinyHarpy:       {10, 8, 10, 14, 14, 0, 14, 't', "tiny harpy", 3},
 	MonsOgre:            {10, 15, 12, 28, 13, 0, 8, 'O', "ogre", 6},
 	MonsCyclop:          {10, 12, 12, 28, 13, 0, 8, 'C', "cyclop", 9},
 	MonsWorm:            {12, 9, 10, 25, 13, 0, 10, 'w', "farmer worm", 3},
@@ -208,6 +210,7 @@ var MonsData = []monsterData{
 
 var monsDesc = []string{
 	MonsGoblin:          "Goblins are little humanoid creatures. They often appear in a group.",
+	MonsTinyHarpy:       "Tiny harpies are little humanoid flying creatures. They blink away when hurt. They often appear in a group.",
 	MonsOgre:            "Ogres are big clunky humanoids that can hit really hard.",
 	MonsCyclop:          "Cyclops are very similar to ogres, but they also like to throw rocks at their foes (for up to 15 damage). The rocks can block your way for a while.",
 	MonsWorm:            "Farmer worms are ugly slow moving creatures, but surprisingly hardy at times, and they furrow as they move, helping new foliage to grow.",
@@ -2441,6 +2444,17 @@ func (m *monster) Explode(g *game, ev event) {
 	}
 }
 
+func (m *monster) Blink(g *game) {
+	npos := g.BlinkPos()
+	if npos == InvalidPos || npos == g.Player.Pos {
+		return
+	}
+	opos := m.Pos
+	g.Printf("The %s blinks away.", m.Kind)
+	g.ui.TeleportAnimation(g, opos, npos, true)
+	m.MoveTo(g, npos)
+}
+
 func (m *monster) MakeHunt(g *game) {
 	m.State = Hunting
 	m.Target = g.Player.Pos
@@ -2712,6 +2726,9 @@ loop:
 			g.Bands = append(g.Bands, monsterBand(band))
 			pos := g.FreeCellForMonster()
 			for _, mk := range monsters {
+				if mk == MonsGoblin {
+					mk = g.Opts.Alternate
+				}
 				if nmons-1 <= 0 {
 					return
 				}

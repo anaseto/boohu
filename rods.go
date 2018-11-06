@@ -188,10 +188,7 @@ func (g *game) EvokeRodBlink(ev event) error {
 	return nil
 }
 
-func (g *game) Blink(ev event) {
-	if g.Player.HasStatus(StatusLignification) {
-		return
-	}
+func (g *game) BlinkPos() position {
 	losPos := []position{}
 	for pos, b := range g.Player.LOS {
 		if !b {
@@ -207,9 +204,7 @@ func (g *game) Blink(ev event) {
 		losPos = append(losPos, pos)
 	}
 	if len(losPos) == 0 {
-		// should not happen
-		g.Print("You could not blink.")
-		return
+		return InvalidPos
 	}
 	npos := losPos[RandInt(len(losPos))]
 	for i := 0; i < 4; i++ {
@@ -217,6 +212,19 @@ func (g *game) Blink(ev event) {
 		if npos.Distance(g.Player.Pos) < pos.Distance(g.Player.Pos) {
 			npos = pos
 		}
+	}
+	return npos
+}
+
+func (g *game) Blink(ev event) {
+	if g.Player.HasStatus(StatusLignification) {
+		return
+	}
+	npos := g.BlinkPos()
+	if npos == InvalidPos {
+		// should not happen
+		g.Print("You could not blink.")
+		return
 	}
 	opos := g.Player.Pos
 	g.Print("You blink away.")
