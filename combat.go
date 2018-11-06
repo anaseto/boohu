@@ -352,6 +352,8 @@ func (g *game) HitMonster(dt dmgType, dmg int, mons *monster, ev event) (hit boo
 			adjust = 25
 		}
 		maxacc += adjust
+	} else if g.Player.Weapon == FinalBlade {
+		maxacc += 5
 	}
 	acc := RandInt(maxacc)
 	evasion := RandInt(mons.Evasion)
@@ -403,6 +405,11 @@ func (g *game) HitMonster(dt dmgType, dmg int, mons *monster, ev event) (hit boo
 			}
 		}
 		oldHP := mons.HP
+		if g.Player.Weapon == FinalBlade {
+			if mons.HP <= mons.HPmax/2 {
+				attack = mons.HP
+			}
+		}
 		mons.HP -= attack
 		if g.Player.Weapon == VampDagger {
 			healing := 3 * attack / 5

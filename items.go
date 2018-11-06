@@ -807,6 +807,7 @@ const (
 	HarKarGauntlets
 	VampDagger
 	DragonSabre
+	FinalBlade
 	DefenderFlail
 )
 
@@ -854,6 +855,8 @@ func (wp weapon) String() string {
 		return "vampiric dagger"
 	case DragonSabre:
 		return "dragon sabre"
+	case FinalBlade:
+		return "final blade"
 	case DefenderFlail:
 		return "defender flail"
 	default:
@@ -890,6 +893,8 @@ func (wp weapon) Short() string {
 		return "Vm"
 	case DragonSabre:
 		return "Dr"
+	case FinalBlade:
+		return "Fn"
 	case DefenderFlail:
 		return "Fl"
 	default:
@@ -927,6 +932,8 @@ func (wp weapon) Desc() string {
 		text = "The vampiric dagger is a one-handed weapon that gives you some healing when you hit living monsters."
 	case DragonSabre:
 		text = "The dragon sabre is a one-handed weapon that inflicts extra damage on healthy big monsters."
+	case FinalBlade:
+		text = "The final blade is an accurate two-handed weapon that instantly kills monsters at less than half full health. Wielding this weapon hurts your maximum health."
 	case DefenderFlail:
 		text = "The defender flail is a one-handed weapon that moves foes toward you, and hits harder as you keep attacking without moving."
 	}
@@ -937,7 +944,7 @@ func (wp weapon) Attack() int {
 	switch wp {
 	case Axe, Spear, AssassinSabre, DancingRapier, DragonSabre:
 		return 11
-	case BattleAxe, Halberd, HopeSword:
+	case BattleAxe, Halberd, HopeSword, FinalBlade:
 		return 15
 	case Frundis, HarKarGauntlets:
 		return 13

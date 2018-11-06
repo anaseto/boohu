@@ -30,6 +30,9 @@ func (p *player) HPMax() int {
 		hpmax += 10
 	}
 	hpmax -= 3 * p.Bored
+	if p.Weapon == FinalBlade {
+		hpmax = 2 * hpmax / 3
+	}
 	if hpmax < 21 {
 		hpmax = 21
 	}

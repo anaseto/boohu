@@ -350,6 +350,7 @@ func (g *game) InitPlayer() {
 	//g.Player.Weapon = DefenderFlail
 	//g.Player.Weapon = HopeSword
 	//g.Player.Weapon = DragonSabre
+	//g.Player.Weapon = FinalBlade
 	//g.Player.Shield = EarthShield
 	//g.Player.Shield = FireShield
 	//g.Player.Armour = TurtlePlates
@@ -784,7 +785,7 @@ loop:
 }
 
 func (g *game) GenWeapon() {
-	wps := [WeaponNum]weapon{Dagger, Axe, BattleAxe, Spear, Halberd, AssassinSabre, DancingRapier, HopeSword, Frundis, ElecWhip, HarKarGauntlets, VampDagger, DragonSabre, DefenderFlail}
+	wps := [WeaponNum]weapon{Dagger, Axe, BattleAxe, Spear, Halberd, AssassinSabre, DancingRapier, HopeSword, Frundis, ElecWhip, HarKarGauntlets, VampDagger, DragonSabre, FinalBlade, DefenderFlail}
 	n := 11 + 5*g.SeenGoodWeapons()
 	if g.SeenGoodWeapons() > 2 {
 		return
