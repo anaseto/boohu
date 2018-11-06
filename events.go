@@ -60,6 +60,7 @@ const (
 	SwapEnd
 	ShadowsEnd
 	SlayEnd
+	AccurateEnd
 )
 
 func (g *game) PushEvent(ev event) {
@@ -175,19 +176,19 @@ func (sev *simpleEvent) Action(g *game) {
 			g.ui.StatusEndAnimation(g)
 		}
 	case DigEnd:
-		g.Player.Statuses[StatusDig] = 0
+		g.Player.Statuses[StatusDig]--
 		if g.Player.Statuses[StatusDig] == 0 {
 			g.PrintStyled("You no longer feel like an earth dragon.", logStatusEnd)
 			g.ui.StatusEndAnimation(g)
 		}
 	case SwapEnd:
-		g.Player.Statuses[StatusSwap] = 0
+		g.Player.Statuses[StatusSwap]--
 		if g.Player.Statuses[StatusSwap] == 0 {
 			g.PrintStyled("You no longer feel light-footed.", logStatusEnd)
 			g.ui.StatusEndAnimation(g)
 		}
 	case ShadowsEnd:
-		g.Player.Statuses[StatusShadows] = 0
+		g.Player.Statuses[StatusShadows]--
 		if g.Player.Statuses[StatusShadows] == 0 {
 			g.PrintStyled("The shadows leave you.", logStatusEnd)
 			g.ui.StatusEndAnimation(g)
@@ -204,6 +205,12 @@ func (sev *simpleEvent) Action(g *game) {
 			g.ui.StatusEndAnimation(g)
 			g.ComputeLOS()
 			g.MakeMonstersAware()
+		}
+	case AccurateEnd:
+		g.Player.Statuses[StatusAccurate]--
+		if g.Player.Statuses[StatusAccurate] == 0 {
+			g.PrintStyled("You no longer feel accurate.", logStatusEnd)
+			g.ui.StatusEndAnimation(g)
 		}
 	}
 }

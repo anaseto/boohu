@@ -360,7 +360,7 @@ func (g *game) HitMonster(dt dmgType, dmg int, mons *monster, ev event) (hit boo
 	if mons.State == Resting {
 		evasion /= 2 + 1
 	}
-	if acc > evasion {
+	if acc > evasion || g.Player.HasStatus(StatusAccurate) {
 		hit = true
 		noise := BaseHitNoise
 		if g.Player.Weapon == Dagger || g.Player.Weapon == VampDagger {

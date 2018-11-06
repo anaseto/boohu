@@ -19,11 +19,12 @@ const (
 	StatusSwap
 	StatusShadows
 	StatusSlay
+	StatusAccurate
 )
 
 func (st status) Good() bool {
 	switch st {
-	case StatusBerserk, StatusSwift, StatusAgile, StatusDig, StatusSwap, StatusShadows, StatusSlay:
+	case StatusBerserk, StatusSwift, StatusAgile, StatusDig, StatusSwap, StatusShadows, StatusSlay, StatusAccurate:
 		return true
 	default:
 		return false
@@ -73,6 +74,8 @@ func (st status) String() string {
 		return "Shadows"
 	case StatusSlay:
 		return "Slay"
+	case StatusAccurate:
+		return "Accurate"
 	default:
 		// should not happen
 		return "unknown"
@@ -113,6 +116,8 @@ func (st status) Short() string {
 		return "Sh"
 	case StatusSlay:
 		return "Sl"
+	case StatusAccurate:
+		return "Ac"
 	default:
 		// should not happen
 		return "?"

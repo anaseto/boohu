@@ -48,6 +48,7 @@ const (
 	ShadowsPotion
 	ConfusePotion
 	TormentPotion
+	AccuracyPotion
 	DreamPotion
 )
 
@@ -86,6 +87,8 @@ func (p potion) String() (text string) {
 		text += " of confusion"
 	case TormentPotion:
 		text += " of torment explosion"
+	case AccuracyPotion:
+		text += " of accuracy"
 	case DreamPotion:
 		text += " of dreams"
 	}
@@ -129,6 +132,8 @@ func (p potion) Desc() (text string) {
 		text = "generates a harmonic light that confuses monsters in your line of sight."
 	case TormentPotion:
 		text = "halves HP of every creature in sight, including the player, and destroys visible walls. Extremely noisy. It can burn foliage and doors."
+	case AccuracyPotion:
+		text = "makes you never miss for a few turns."
 	case DreamPotion:
 		text = "shows you the position of monsters sleeping at drink time."
 	}
@@ -187,6 +192,8 @@ func (p potion) Use(g *game, ev event) error {
 		err = g.QuaffConfusePotion(ev)
 	case TormentPotion:
 		err = g.QuaffTormentPotion(ev)
+	case AccuracyPotion:
+		err = g.QuaffAccuracyPotion(ev)
 	case DreamPotion:
 		err = g.QuaffDreamPotion(ev)
 	}
@@ -271,9 +278,6 @@ func (g *game) QuaffDescent(ev event) error {
 }
 
 func (g *game) QuaffSwiftness(ev event) error {
-	if g.Player.HasStatus(StatusSwift) && g.Player.HasStatus(StatusAgile) {
-		return fmt.Errorf("You already quaffed a %s potion.", SwiftnessPotion)
-	}
 	g.Player.Statuses[StatusSwift]++
 	end := ev.Rank() + 85 + RandInt(20)
 	g.PushEvent(&simpleEvent{ERank: end, EAction: HasteEnd})
@@ -286,9 +290,6 @@ func (g *game) QuaffSwiftness(ev event) error {
 }
 
 func (g *game) QuaffDigPotion(ev event) error {
-	if g.Player.HasStatus(StatusDig) {
-		return errors.New("You are already digging.")
-	}
 	g.Player.Statuses[StatusDig] = 1
 	end := ev.Rank() + 75 + RandInt(20)
 	g.PushEvent(&simpleEvent{ERank: end, EAction: DigEnd})
@@ -300,9 +301,6 @@ func (g *game) QuaffDigPotion(ev event) error {
 func (g *game) QuaffSwapPotion(ev event) error {
 	if g.Player.HasStatus(StatusLignification) {
 		return errors.New("You cannot drink this potion while lignified.")
-	}
-	if g.Player.HasStatus(StatusSwap) {
-		return errors.New("You are already swapping.")
 	}
 	g.Player.Statuses[StatusSwap] = 1
 	end := ev.Rank() + 130 + RandInt(41)
@@ -395,6 +393,15 @@ func (g *game) QuaffTormentPotion(ev event) error {
 		}
 		g.ExplosionAt(ev, pos)
 	}
+	return nil
+}
+
+func (g *game) QuaffAccuracyPotion(ev event) error {
+	g.Player.Statuses[StatusAccurate]++
+	end := ev.Rank() + 85 + RandInt(20)
+	g.PushEvent(&simpleEvent{ERank: end, EAction: AccurateEnd})
+	g.Player.Expire[StatusAccurate] = end
+	g.Printf("You quaff the %s. You feel accurate.", SwiftnessPotion)
 	return nil
 }
 
@@ -664,6 +671,7 @@ var ConsumablesCollectData = map[consumable]collectData{
 	MagicMappingPotion:  {rarity: 18, quantity: 1},
 	DreamPotion:         {rarity: 18, quantity: 1},
 	TormentPotion:       {rarity: 30, quantity: 1},
+	AccuracyPotion:      {rarity: 18, quantity: 1},
 }
 
 type equipable interface {
