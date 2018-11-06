@@ -349,6 +349,7 @@ func (g *game) InitPlayer() {
 	//g.Player.Weapon = HarKarGauntlets
 	//g.Player.Weapon = DefenderFlail
 	//g.Player.Weapon = HopeSword
+	//g.Player.Weapon = DragonSabre
 	//g.Player.Shield = EarthShield
 	//g.Player.Shield = FireShield
 	//g.Player.Armour = TurtlePlates
