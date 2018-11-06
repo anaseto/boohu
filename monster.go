@@ -158,6 +158,15 @@ func (mk monsterKind) Definite(capital bool) (text string) {
 	return text
 }
 
+func (mk monsterKind) Living() bool {
+	switch mk {
+	case MonsLich, MonsSkeletonWarrior, MonsMarevorHelith:
+		return false
+	default:
+		return true
+	}
+}
+
 type monsterData struct {
 	movementDelay int
 	baseAttack    int

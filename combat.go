@@ -411,7 +411,7 @@ func (g *game) HitMonster(dt dmgType, dmg int, mons *monster, ev event) (hit boo
 			}
 		}
 		mons.HP -= attack
-		if g.Player.Weapon == VampDagger {
+		if g.Player.Weapon == VampDagger && mons.Kind.Living() {
 			healing := 3 * attack / 5
 			if g.Player.HP+healing > g.Player.HPMax() {
 				g.Player.HP = g.Player.HPMax()
