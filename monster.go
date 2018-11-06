@@ -1153,6 +1153,9 @@ func init() {
 				MonsLich: {1, 1}, MonsSkeletonWarrior: {1, 1},
 			}, Rarity: 45, Band: true},
 			{Distribution: map[monsterKind]monsInterval{
+				MonsLich: {1, 1}, MonsVampire: {1, 1},
+			}, Rarity: 45, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
 				MonsLich: {1, 1}, MonsBlinkingFrog: {1, 1}, MonsWingedMilfid: {1, 1},
 			}, Rarity: 100, Band: true},
 			{Distribution: map[monsterKind]monsInterval{
@@ -1308,10 +1311,10 @@ func init() {
 				MonsMindCelmist: {1, 1}, MonsLich: {1, 1},
 			}, Rarity: 50, Band: true},
 			{Distribution: map[monsterKind]monsInterval{
-				MonsMindCelmist: {1, 1}, MonsOgre: {1, 1},
+				MonsMindCelmist: {1, 1}, MonsOgre: {2, 2},
 			}, Rarity: 50, Band: true},
 			{Distribution: map[monsterKind]monsInterval{
-				MonsMindCelmist: {1, 1}, MonsCyclop: {1, 1},
+				MonsMindCelmist: {1, 1}, MonsCyclop: {1, 2},
 			}, Rarity: 50, Band: true},
 			{Distribution: map[monsterKind]monsInterval{
 				MonsMindCelmist: {1, 1}, MonsYack: {2, 2},
@@ -1319,6 +1322,12 @@ func init() {
 			{Distribution: map[monsterKind]monsInterval{
 				MonsMindCelmist: {1, 1}, MonsBlinkingFrog: {2, 2},
 			}, Rarity: 50, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsMindCelmist: {1, 1}, MonsVampire: {1, 2},
+			}, Rarity: 50, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsMindCelmist: {3, 3},
+			}, Rarity: 300, Band: true},
 		}},
 		{bands: []monsterBandData{ // nixe trap
 			{Distribution: map[monsterKind]monsInterval{
@@ -1447,6 +1456,29 @@ func init() {
 			{Distribution: map[monsterKind]monsInterval{
 				MonsLich: {1, 1}, MonsVampire: {2, 2},
 			}, Rarity: 150, Band: true},
+		}},
+		{bands: []monsterBandData{ // terrible vampires
+			{Distribution: map[monsterKind]monsInterval{
+				MonsLich: {1, 1}, MonsVampire: {2, 2},
+			}, Rarity: 40, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsLich: {1, 1}, MonsMadNixe: {1, 1}, MonsVampire: {1, 1},
+			}, Rarity: 50, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsVampire: {1, 1}, MonsBlinkingFrog: {2, 2},
+			}, Rarity: 50, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsVampire: {2, 2}, MonsMadNixe: {1, 1},
+			}, Rarity: 50, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsVampire: {2, 2}, MonsMindCelmist: {1, 1},
+			}, Rarity: 50, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsVampire: {4, 4},
+			}, Rarity: 400, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsMirrorSpecter: {1, 1}, MonsVampire: {1, 1},
+			}, Rarity: 50, Band: true},
 		}},
 		{bands: []monsterBandData{ // terrible dragon and hydras
 			{Distribution: map[monsterKind]monsInterval{
