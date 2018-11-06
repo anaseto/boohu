@@ -216,9 +216,12 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 		g.HarKarAttack(mons, ev)
 	case g.Player.Weapon == HopeSword:
 		attack := g.Player.Attack()
-		fact := 100 * g.Player.HPMax() / g.Player.HP
-		if fact > 300 {
-			fact = 300
+		fact := -50 + 100*g.Player.HPMax()/g.Player.HP
+		if fact < 100 {
+			fact = 100
+		}
+		if fact > 250 {
+			fact = 250
 		}
 		attack *= fact
 		attack /= 100
