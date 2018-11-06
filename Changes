@@ -3,10 +3,25 @@ v0.11-dev
 Gameplay:
 
 + Made confused monsters smarter.
-+ Removed plain chain mail.
-+ New teleport magara that teleports monsters in a square area.
++ New aptitude: you occasionally teleport your foes when hurt.
++ New projectile: teleport magara - it teleports monsters in a square area.
++ New potion of accuracy that makes you never miss for a few turns.
 + New monster: mind celmist - uses a smitting attack and avoids melee.
++ New monster: tiny harpy - can blink when hurt, appears sometimes in place of goblins.
++ New monster: vampire that has a nauseous spit and can regenerate by drinking your blood.
++ New weapon: vampiric dagger, that heals you a little when hitting living monsters.
++ New weapon: hopeful sword - it hurts harder the more you're injured; two-handed.
++ New weapon: final blade - it can kill in one shot ennemies with less than
+  half HP; two-handed; your maximum HP is reduced.
++ New weapon: dragon sabre - it hits harder against big monsters with lots of
+  HP such as dragons or hydras.
++ Renamed sabre into assassin sabre.
++ Removed berserk sword.
++ Removed plain chain mail.
 + Make shields a little less useful when surrounded.
++ Darts of confusion always hit. Less of them generated as a result, and
+  removed “unusually accurate” aptitude.
++ New “light-footed when hurt” aptitude.
 
 User Interface:
 + Some minor fixes.
