@@ -363,7 +363,7 @@ func (g *game) HitMonster(dt dmgType, dmg int, mons *monster, ev event) (hit boo
 	if acc > evasion {
 		hit = true
 		noise := BaseHitNoise
-		if g.Player.Weapon == Dagger {
+		if g.Player.Weapon == Dagger || g.Player.Weapon == VampDagger {
 			noise -= 2
 		}
 		if g.Player.Armour == HarmonistRobe {

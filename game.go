@@ -351,6 +351,7 @@ func (g *game) InitPlayer() {
 	//g.Player.Weapon = HopeSword
 	//g.Player.Weapon = DragonSabre
 	//g.Player.Weapon = FinalBlade
+	//g.Player.Weapon = VampDagger
 	//g.Player.Shield = EarthShield
 	//g.Player.Shield = FireShield
 	//g.Player.Armour = TurtlePlates
