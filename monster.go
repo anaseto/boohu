@@ -305,6 +305,7 @@ const (
 	BandMadNixesHydra
 	BandMadNixesFrogs
 	BandVampire
+	UBandTinyHarpy
 	UBandWorms
 	UBandGoblinsEasy
 	UBandFrogs
@@ -582,6 +583,13 @@ var MonsBands = []monsterBandData{
 			MonsBlinkingFrog: {2, 2},
 		},
 		Rarity: 110, MinDepth: 13, MaxDepth: 15, Band: true,
+	},
+	UBandTinyHarpy: {
+		Distribution: map[monsterKind]monsInterval{
+			MonsTinyHarpy:    {3, 3},
+			MonsWingedMilfid: {1, 1},
+		},
+		Rarity: 50, MinDepth: 4, MaxDepth: 4, Band: true, Unique: true,
 	},
 	UBandWorms: {
 		Distribution: map[monsterKind]monsInterval{MonsWorm: {3, 4}, MonsSpider: {1, 1}},
