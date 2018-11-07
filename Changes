@@ -6,6 +6,8 @@ Gameplay:
 + New aptitude: you occasionally teleport your foes when hurt.
 + New rod of lignification - it works on monsters in a similar way to the
   player potion.
++ New rod of last hope - the damage it does is inversely proportional to your
+  health.
 + New projectile: teleport magara - it teleports monsters in a square area.
 + New potion of accuracy that makes you never miss for a few turns.
 + New monster: mind celmist - uses a smitting attack and avoids melee.
