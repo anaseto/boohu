@@ -299,7 +299,7 @@ func (g *game) InitPlayer() {
 	case 2:
 		g.Player.Consumables[TeleportMagara] = 1
 	default:
-		g.Player.Consumables[ConfusingDart] = 3
+		g.Player.Consumables[ConfusingDart] = 2
 	}
 	switch RandInt(13) {
 	case 0, 1:
