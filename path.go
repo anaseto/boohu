@@ -159,6 +159,9 @@ func (mp *monPath) Cost(from, to position) int {
 		}
 		return 1
 	}
+	if mons.Status(MonsLignified) {
+		return 8
+	}
 	return 4
 }
 
