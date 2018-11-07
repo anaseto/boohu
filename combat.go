@@ -384,9 +384,11 @@ func (g *game) HitMonster(dt dmgType, dmg int, mons *monster, ev event) (hit boo
 				pa += 1 + RandInt(2)
 			}
 		}
-		attack, clang := g.HitDamage(dt, pa, mons.Armor)
+		marmor := mons.Armor
+		marmor = 6 + marmor/2
+		attack, clang := g.HitDamage(dt, pa, marmor)
 		if clang {
-			noise += mons.Armor
+			noise += marmor
 		}
 		g.MakeNoise(noise, mons.Pos)
 		if mons.State == Resting {
@@ -398,7 +400,7 @@ func (g *game) HitMonster(dt dmgType, dmg int, mons *monster, ev event) (hit boo
 		}
 		var sclang string
 		if clang {
-			if mons.Armor > 3 {
+			if marmor > 3 {
 				sclang = " ♫ Clang!"
 			} else {
 				sclang = " ♪ Clang!"
