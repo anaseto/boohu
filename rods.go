@@ -18,6 +18,7 @@ const (
 	RodObstruction
 	RodShatter
 	RodSleeping
+	RodLignification
 	RodSwapping
 )
 
@@ -29,8 +30,8 @@ func (r rod) Letter() rune {
 
 func (r rod) Rare() bool {
 	switch r {
-	case RodDigging, RodTeleportOther, RodShatter, RodSwapping:
-		return true
+	//case RodDigging, RodTeleportOther, RodShatter, RodSwapping:
+	//return true
 	default:
 		return false
 	}
@@ -59,6 +60,8 @@ func (r rod) String() string {
 		text = "rod of shatter"
 	case RodSleeping:
 		text = "rod of sleeping"
+	case RodLignification:
+		text = "rod of lignification"
 	case RodSwapping:
 		text = "rod of swapping"
 	}
@@ -88,6 +91,8 @@ func (r rod) Desc() string {
 		text = "induces an explosion around a wall, hurting adjacent monsters. The wall can disintegrate. You cannot use it at melee range."
 	case RodSleeping:
 		text = "induces sleeping and exhaustion for monsters in the targeted area."
+	case RodLignification:
+		text = "lignifies a monster, so that it cannot move, but can still fight with improved resistance."
 	case RodSwapping:
 		text = "makes you swap positions with a targeted monster."
 	}
@@ -161,6 +166,8 @@ func (r rod) Use(g *game, ev event) error {
 		err = g.EvokeRodShatter(ev)
 	case RodSleeping:
 		err = g.EvokeRodSleeping(ev)
+	case RodLignification:
+		err = g.EvokeRodLignification(ev)
 	case RodSwapping:
 		err = g.EvokeRodSwapping(ev)
 	}
@@ -486,6 +493,17 @@ func (g *game) EvokeRodObstruction(ev event) error {
 	}
 	g.TemporalWallAt(g.Player.Target, ev)
 	g.Printf("You see a wall appear out of thin air.")
+	return nil
+}
+
+func (g *game) EvokeRodLignification(ev event) error {
+	if err := g.ui.ChooseTarget(g, &chooser{needsFreeWay: true}); err != nil {
+		return err
+	}
+	mons := g.MonsterAt(g.Player.Target)
+	// mons not nil (check done in targeter)
+	mons.EnterLignification(g, ev)
+	g.Printf("%s is rooted to the ground.", mons.Kind.Definite(true))
 	return nil
 }
 

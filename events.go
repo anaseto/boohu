@@ -221,6 +221,7 @@ const (
 	MonsterTurn monsterAction = iota
 	MonsConfusionEnd
 	MonsExhaustionEnd
+	MonsLignificationEnd
 )
 
 type monsterEvent struct {
@@ -244,7 +245,18 @@ func (mev *monsterEvent) Action(g *game) {
 		mons := g.Monsters[mev.NMons]
 		if mons.Exists() {
 			mons.Statuses[MonsConfused] = 0
-			g.Printf("The %s is no longer confused.", mons.Kind)
+			if g.Player.LOS[mons.Pos] {
+				g.Printf("The %s is no longer confused.", mons.Kind)
+			}
+			mons.Path = mons.APath(g, mons.Pos, mons.Target)
+		}
+	case MonsLignificationEnd:
+		mons := g.Monsters[mev.NMons]
+		if mons.Exists() {
+			mons.Statuses[MonsLignified] = 0
+			if g.Player.LOS[mons.Pos] {
+				g.Printf("%s is no longer lignified.", mons.Kind.Definite(true))
+			}
 			mons.Path = mons.APath(g, mons.Pos, mons.Target)
 		}
 	case MonsExhaustionEnd:

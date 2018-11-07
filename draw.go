@@ -50,6 +50,7 @@ var (
 	ColorFgAnimationHit,
 	ColorFgCollectable,
 	ColorFgConfusedMonster,
+	ColorFgLignifiedMonster,
 	ColorFgDark,
 	ColorFgExcluded,
 	ColorFgExplosionEnd,
@@ -88,6 +89,7 @@ func LinkColors() {
 	ColorFgAnimationHit = ColorMagenta
 	ColorFgCollectable = ColorYellow
 	ColorFgConfusedMonster = ColorGreen
+	ColorFgLignifiedMonster = ColorYellow
 	ColorFgDark = ColorBase01
 	ColorFgExcluded = ColorRed
 	ColorFgExplosionEnd = ColorOrange
@@ -2050,7 +2052,9 @@ func (ui *termui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgCol
 			m := g.MonsterAt(pos)
 			if m.Exists() {
 				r = m.Kind.Letter()
-				if m.Status(MonsConfused) {
+				if m.Status(MonsLignified) {
+					fgColor = ColorFgLignifiedMonster
+				} else if m.Status(MonsConfused) {
 					fgColor = ColorFgConfusedMonster
 				} else if m.State == Resting {
 					fgColor = ColorFgSleepingMonster

@@ -28,11 +28,12 @@ type monsterStatus int
 const (
 	MonsConfused monsterStatus = iota
 	MonsExhausted
+	MonsLignified
 	// unimplemented
 	MonsAfraid
 )
 
-const NMonsStatus = 2
+const NMonsStatus = int(MonsLignified) + 1
 
 func (st monsterStatus) String() (text string) {
 	switch st {
@@ -40,6 +41,8 @@ func (st monsterStatus) String() (text string) {
 		text = "confused"
 	case MonsExhausted:
 		text = "exhausted"
+	case MonsLignified:
+		text = "lignified"
 	case MonsAfraid:
 		text = "afraid"
 	}
@@ -1863,6 +1866,10 @@ func (m *monster) HandleTurn(g *game, ev event) {
 			return
 		}
 	}
+	if m.Status(MonsLignified) {
+		ev.Renew(g, 10) // wait
+		return
+	}
 	if m.Kind == MonsMarevorHelith {
 		if m.TeleportMonsterAway(g) {
 			ev.Renew(g, m.Kind.MovementDelay())
@@ -2088,6 +2095,15 @@ func (m *monster) EnterConfusion(g *game, ev event) {
 		m.Path = m.Path[:0]
 		g.PushEvent(&monsterEvent{
 			ERank: ev.Rank() + 50 + RandInt(100), NMons: m.Index, EAction: MonsConfusionEnd})
+	}
+}
+
+func (m *monster) EnterLignification(g *game, ev event) {
+	if !m.Status(MonsLignified) {
+		m.Statuses[MonsLignified] = 1
+		m.Path = m.Path[:0]
+		g.PushEvent(&monsterEvent{
+			ERank: ev.Rank() + 150 + RandInt(100), NMons: m.Index, EAction: MonsLignificationEnd})
 	}
 }
 
