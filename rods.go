@@ -488,7 +488,7 @@ func (g *game) EvokeRodShatter(ev event) error {
 }
 
 func (g *game) EvokeRodObstruction(ev event) error {
-	if err := g.ui.ChooseTarget(g, &chooser{needsFreeWay: true, free: true}); err != nil {
+	if err := g.ui.ChooseTarget(g, &chooser{free: true}); err != nil {
 		return err
 	}
 	g.TemporalWallAt(g.Player.Target, ev)
@@ -497,7 +497,7 @@ func (g *game) EvokeRodObstruction(ev event) error {
 }
 
 func (g *game) EvokeRodLignification(ev event) error {
-	if err := g.ui.ChooseTarget(g, &chooser{needsFreeWay: true}); err != nil {
+	if err := g.ui.ChooseTarget(g, &chooser{}); err != nil {
 		return err
 	}
 	mons := g.MonsterAt(g.Player.Target)
