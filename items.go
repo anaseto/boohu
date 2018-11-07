@@ -552,7 +552,7 @@ func (g *game) ThrowConfusingDart(ev event) error {
 		g.HandleKill(mons, ev)
 	}
 	g.HandleStone(mons)
-	ev.Renew(g, 10)
+	ev.Renew(g, 7)
 	return nil
 }
 
@@ -593,7 +593,7 @@ func (g *game) ThrowExplosiveMagara(ev event) error {
 		g.ExplosionAt(ev, pos)
 	}
 
-	ev.Renew(g, 10)
+	ev.Renew(g, 7)
 	return nil
 }
 
@@ -611,7 +611,7 @@ func (g *game) ThrowTeleportMagara(ev event) error {
 		}
 	}
 
-	ev.Renew(g, 10)
+	ev.Renew(g, 7)
 	return nil
 }
 
@@ -636,7 +636,7 @@ func (g *game) ThrowNightMagara(ev event) error {
 	g.ui.ProjectileTrajectoryAnimation(g, g.Ray(g.Player.Target), ColorFgSleepingMonster)
 	g.NightFog(g.Player.Target, 2, ev)
 
-	ev.Renew(g, 10)
+	ev.Renew(g, 7)
 	return nil
 }
 
