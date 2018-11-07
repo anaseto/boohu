@@ -24,8 +24,10 @@ type player struct {
 	Bored       int
 }
 
+const DefaultHealth = 42
+
 func (p *player) HPMax() int {
-	hpmax := 42
+	hpmax := DefaultHealth
 	if p.Aptitudes[AptHealthy] {
 		hpmax += 10
 	}

@@ -19,6 +19,7 @@ const (
 	RodShatter
 	RodSleeping
 	RodLignification
+	RodHope
 	RodSwapping
 )
 
@@ -62,6 +63,8 @@ func (r rod) String() string {
 		text = "rod of sleeping"
 	case RodLignification:
 		text = "rod of lignification"
+	case RodHope:
+		text = "rod of last hope"
 	case RodSwapping:
 		text = "rod of swapping"
 	}
@@ -93,6 +96,8 @@ func (r rod) Desc() string {
 		text = "induces sleeping and exhaustion for monsters in the targeted area."
 	case RodLignification:
 		text = "lignifies a monster, so that it cannot move, but can still fight with improved resistance."
+	case RodHope:
+		text = "creates an energy channel against a targeted monster. The damage done is inversely proportional to your health. It can burn foliage and doors."
 	case RodSwapping:
 		text = "makes you swap positions with a targeted monster."
 	}
@@ -168,6 +173,8 @@ func (r rod) Use(g *game, ev event) error {
 		err = g.EvokeRodSleeping(ev)
 	case RodLignification:
 		err = g.EvokeRodLignification(ev)
+	case RodHope:
+		err = g.EvokeRodHope(ev)
 	case RodSwapping:
 		err = g.EvokeRodSwapping(ev)
 	}
@@ -523,6 +530,34 @@ func (g *game) CreateTemporalWallAt(pos position, ev event) {
 	delete(g.Clouds, pos)
 	g.TemporalWalls[pos] = true
 	g.PushEvent(&cloudEvent{ERank: ev.Rank() + 200 + RandInt(50), Pos: pos, EAction: ObstructionEnd})
+}
+
+func (g *game) EvokeRodHope(ev event) error {
+	if err := g.ui.ChooseTarget(g, &chooser{needsFreeWay: true}); err != nil {
+		return err
+	}
+	g.MakeNoise(MagicCastNoise, g.Player.Pos)
+	g.ui.ProjectileTrajectoryAnimation(g, g.Ray(g.Player.Target), ColorFgExplosionStart)
+	mons := g.MonsterAt(g.Player.Target)
+	// mons not nil (check done in the targeter)
+	attack := -20 + 30*DefaultHealth/g.Player.HP
+	if attack > 130 {
+		attack = 130
+	}
+	dmg := 0
+	for i := 0; i < 5; i++ {
+		dmg += RandInt(attack)
+	}
+	dmg /= 5
+	if dmg < 0 {
+		// should not happen
+		dmg = 0
+	}
+	mons.HP -= dmg
+	g.ui.HitAnimation(g, g.Player.Target, true)
+	g.Printf("An energy channel hits %s (%d dmg).", mons.Kind.Definite(false), dmg)
+	g.Burn(g.Player.Target, ev)
+	return nil
 }
 
 func (g *game) EvokeRodSwapping(ev event) error {

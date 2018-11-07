@@ -241,7 +241,7 @@ func (g *game) QuaffBerserk(ev event) error {
 
 func (g *game) QuaffHealWounds(ev event) error {
 	hp := g.Player.HP
-	g.Player.HP += 2 * g.Player.HPMax() / 3
+	g.Player.HP += 2 * DefaultHealth / 3
 	if g.Player.HP > g.Player.HPMax() {
 		g.Player.HP = g.Player.HPMax()
 	}
