@@ -301,7 +301,7 @@ func (g *game) InitPlayer() {
 	default:
 		g.Player.Consumables[ConfusingDart] = 3
 	}
-	switch RandInt(12) {
+	switch RandInt(13) {
 	case 0, 1:
 		g.Player.Consumables[TeleportationPotion] = 1
 	case 2, 3:
@@ -322,6 +322,8 @@ func (g *game) InitPlayer() {
 		g.Player.Consumables[ShadowsPotion] = 1
 	case 11:
 		g.Player.Consumables[ConfusePotion] = 1
+	case 12:
+		g.Player.Consumables[AccuracyPotion] = 1
 	}
 	r := g.RandomRod()
 	g.Player.Rods = map[rod]rodProps{r: rodProps{r.MaxCharge() - 1}}
