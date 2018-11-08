@@ -569,6 +569,9 @@ func (g *game) EvokeRodSwapping(ev event) error {
 	}
 	mons := g.MonsterAt(g.Player.Target)
 	// mons not nil (check done in the targeter)
+	if mons.Status(MonsLignified) {
+		return errors.New("You cannot target a lignified monster.")
+	}
 	g.SwapWithMonster(mons)
 	return nil
 }

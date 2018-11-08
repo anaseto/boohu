@@ -2051,7 +2051,7 @@ func (m *monster) HitPlayer(g *game, ev event) {
 			g.BlockEffects(m)
 			return
 		}
-		if g.Player.HasStatus(StatusSwap) && !g.Player.HasStatus(StatusLignification) {
+		if g.Player.HasStatus(StatusSwap) && !g.Player.HasStatus(StatusLignification) && !m.Status(MonsLignified) {
 			g.SwapWithMonster(m)
 			return
 		}

@@ -160,7 +160,7 @@ func (g *game) InOpenMons(mons *monster) bool {
 
 func (g *game) AttackMonster(mons *monster, ev event) {
 	switch {
-	case g.Player.HasStatus(StatusSwap) && !g.Player.HasStatus(StatusLignification):
+	case g.Player.HasStatus(StatusSwap) && !g.Player.HasStatus(StatusLignification) && !mons.Status(MonsLignified):
 		g.SwapWithMonster(mons)
 	case g.Player.Weapon == Frundis:
 		if !g.HitMonster(DmgPhysical, g.Player.Attack(), mons, ev) {
