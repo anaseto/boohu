@@ -2087,6 +2087,10 @@ func (m *monster) HitPlayer(g *game, ev event) {
 			if opos != m.Pos {
 				g.TemporalWallAt(opos, ev)
 				g.Print("A temporal wall emerges.")
+				if !m.Status(MonsExhausted) {
+					m.Statuses[MonsExhausted] = 1
+					g.PushEvent(&monsterEvent{ERank: g.Ev.Rank() + 100 + RandInt(50), NMons: m.Index, EAction: MonsExhaustionEnd})
+				}
 			}
 		}
 		if g.Player.Aptitudes[AptTeleport] && g.Player.HP < HeavyWoundHP && RandInt(2) == 0 {
