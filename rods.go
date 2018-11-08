@@ -29,15 +29,6 @@ func (r rod) Letter() rune {
 	return '/'
 }
 
-func (r rod) Rare() bool {
-	switch r {
-	//case RodDigging, RodTeleportOther, RodShatter, RodSwapping:
-	//return true
-	default:
-		return false
-	}
-}
-
 func (r rod) String() string {
 	var text string
 	switch r {
@@ -456,7 +447,6 @@ func (g *game) EvokeRodShatter(ev event) error {
 		return err
 	}
 	neighbors := g.Dungeon.FreeNeighbors(g.Player.Target)
-	//if RandInt(2) == 0 {
 	g.Dungeon.SetCell(g.Player.Target, FreeCell)
 	g.Stats.Digs++
 	g.ComputeLOS()
@@ -466,12 +456,6 @@ func (g *game) EvokeRodShatter(ev event) error {
 	g.ui.ProjectileTrajectoryAnimation(g, g.Ray(g.Player.Target), ColorFgExplosionWallStart)
 	g.ui.ExplosionAnimation(g, WallExplosion, g.Player.Target)
 	g.Fog(g.Player.Target, 2, ev)
-	//} else {
-	//g.MakeNoise(15, g.Player.Target)
-	//g.Print("You see an explosion around the wall.")
-	//g.ui.ProjectileTrajectoryAnimation(g, g.Ray(g.Player.Target), ColorFgExplosionWallStart)
-	//g.ui.ExplosionAnimation(g, AroundWallExplosion, g.Player.Target)
-	//}
 	for _, pos := range neighbors {
 		mons := g.MonsterAt(pos)
 		if !mons.Exists() {
@@ -597,9 +581,6 @@ func (g *game) GeneratedRodsCount() int {
 
 func (g *game) RandomRod() rod {
 	r := rod(RandInt(NumRods))
-	if r.Rare() && RandInt(3) == 0 {
-		r = rod(RandInt(NumRods))
-	}
 	return r
 }
 
