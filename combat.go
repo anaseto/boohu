@@ -75,6 +75,12 @@ func (m *monster) InflictDamage(g *game, damage, max int) {
 		}
 		//g.Confusion(g.Ev)
 		g.UseStone(g.Player.Pos)
+	case TreeStone:
+		if !g.Player.HasStatus(StatusLignification) {
+			g.UseStone(g.Player.Pos)
+			g.EnterLignification(g.Ev)
+			g.Print("You feel rooted to the ground.")
+		}
 	case ObstructionStone:
 		neighbors := g.Dungeon.FreeNeighbors(g.Player.Pos)
 		for _, pos := range neighbors {
@@ -484,6 +490,11 @@ func (g *game) HandleStone(mons *monster) {
 		// 	g.Confusion(g.Ev)
 		// }
 		g.UseStone(mons.Pos)
+	case TreeStone:
+		if mons.Exists() {
+			g.UseStone(mons.Pos)
+			mons.EnterLignification(g, g.Ev)
+		}
 	case ObstructionStone:
 		if !mons.Exists() {
 			g.CreateTemporalWallAt(mons.Pos, g.Ev)

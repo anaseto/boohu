@@ -503,3 +503,9 @@ func (g *game) PlacePlayerAt(pos position) {
 	g.ComputeLOS()
 	g.MakeMonstersAware()
 }
+
+func (g *game) EnterLignification(ev event) {
+	g.Player.Statuses[StatusLignification]++
+	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 150 + RandInt(100), EAction: LignificationEnd})
+	g.Player.HP += 10
+}

@@ -2117,6 +2117,9 @@ func (m *monster) EnterLignification(g *game, ev event) {
 		m.Path = m.Path[:0]
 		g.PushEvent(&monsterEvent{
 			ERank: ev.Rank() + 150 + RandInt(100), NMons: m.Index, EAction: MonsLignificationEnd})
+		if g.Player.LOS[m.Pos] {
+			g.Printf("%s is rooted to the ground.", m.Kind.Definite(true))
+		}
 	}
 }
 

@@ -7,6 +7,7 @@ const (
 	TeleStone
 	FogStone
 	QueenStone
+	TreeStone
 	ObstructionStone
 )
 
@@ -22,6 +23,8 @@ func (s stone) String() (text string) {
 		text = "fog stone"
 	case QueenStone:
 		text = "queenstone"
+	case TreeStone:
+		text = "tree stone"
 	case ObstructionStone:
 		text = "obstruction stone"
 	}
@@ -38,6 +41,8 @@ func (s stone) Description() (text string) {
 		text = "Fog will appear if a creature is hurt while standing on the fog stone."
 	case QueenStone:
 		text = "If a creature is hurt while standing on queenstone, a loud boom will resonate, leaving nearby monsters in a 2-range distance confused. You know how to avoid the effect yourself."
+	case TreeStone:
+		text = "Any creature hurt while standing on a tree stone will be lignified."
 	case ObstructionStone:
 		text = "When a creature is hurt while standing on the obstruction stone, temporal walls appear around it."
 	}

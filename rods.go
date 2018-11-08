@@ -493,8 +493,10 @@ func (g *game) EvokeRodLignification(ev event) error {
 	}
 	mons := g.MonsterAt(g.Player.Target)
 	// mons not nil (check done in targeter)
+	if mons.Status(MonsLignified) {
+		return errors.New("You cannot target a lignified monster.")
+	}
 	mons.EnterLignification(g, ev)
-	g.Printf("%s is rooted to the ground.", mons.Kind.Definite(true))
 	return nil
 }
 
