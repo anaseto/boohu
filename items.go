@@ -652,8 +652,8 @@ type collectData struct {
 
 var ConsumablesCollectData = map[consumable]collectData{
 	ConfusingDart:       {rarity: 4, quantity: 2},
-	ExplosiveMagara:     {rarity: 8, quantity: 1},
-	NightMagara:         {rarity: 10, quantity: 1},
+	ExplosiveMagara:     {rarity: 6, quantity: 1},
+	NightMagara:         {rarity: 9, quantity: 1},
 	TeleportMagara:      {rarity: 12, quantity: 1},
 	TeleportationPotion: {rarity: 6, quantity: 1},
 	BerserkPotion:       {rarity: 6, quantity: 1},
