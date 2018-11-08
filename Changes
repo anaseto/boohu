@@ -3,12 +3,17 @@ v0.11-dev
 Gameplay:
 
 + Made confused monsters smarter.
++ New tree stone: any creature hurt while standing on the stone is lignified.
 + New aptitude: you occasionally teleport your foes when hurt.
++ New aptitude: you occasionally lignify your foes when hurt.
++ New aptitude: light-footed when hurt.
 + New rod of lignification - it works on monsters in a similar way to the
   player potion.
 + New rod of last hope - the damage it does is inversely proportional to your
   health.
 + New projectile: teleport magara - it teleports monsters in a square area.
++ Darts of confusion always hit. Less of them generated as a result, and
+  removed “unusually accurate” aptitude.
 + New potion of accuracy that makes you never miss for a few turns.
 + New monster: mind celmist - uses a smitting attack and avoids melee.
 + New monster: tiny harpy - can blink when hurt, appears sometimes in place of
@@ -27,9 +32,6 @@ Gameplay:
 + Removed berserk sword.
 + Removed plain chain mail.
 + Make shields a little less useful when surrounded.
-+ Darts of confusion always hit. Less of them generated as a result, and
-  removed “unusually accurate” aptitude.
-+ New “light-footed when hurt” aptitude.
 
 User Interface:
 + Some minor fixes.
