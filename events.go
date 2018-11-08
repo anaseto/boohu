@@ -262,7 +262,7 @@ func (mev *monsterEvent) Action(g *game) {
 	case MonsExhaustionEnd:
 		mons := g.Monsters[mev.NMons]
 		if mons.Exists() {
-			mons.Statuses[MonsExhausted] = 0
+			mons.Statuses[MonsExhausted]--
 		}
 	}
 }
@@ -363,10 +363,7 @@ func (g *game) MakeCreatureSleep(pos position, ev event) {
 		return
 	}
 	mons.State = Resting
-	if !mons.Status(MonsExhausted) {
-		mons.Statuses[MonsExhausted] = 1
-		g.PushEvent(&monsterEvent{ERank: ev.Rank() + 30 + RandInt(10), NMons: mons.Index, EAction: MonsExhaustionEnd})
-	}
+	mons.ExhaustTime(g, 30+RandInt(10))
 }
 
 func (g *game) BurnCreature(pos position, ev event) {

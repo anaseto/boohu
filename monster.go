@@ -2036,6 +2036,17 @@ func (m *monster) DramaticAdjustment(g *game, baseAttack, attack, evasion, acc i
 	return attack, evasion, clang
 }
 
+func (m *monster) Exhaust(g *game) {
+	m.ExhaustTime(g, 100+RandInt(50))
+}
+
+func (m *monster) ExhaustTime(g *game, t int) {
+	if !m.Status(MonsExhausted) {
+		m.Statuses[MonsExhausted]++
+		g.PushEvent(&monsterEvent{ERank: g.Ev.Rank() + t, NMons: m.Index, EAction: MonsExhaustionEnd})
+	}
+}
+
 func (m *monster) HitPlayer(g *game, ev event) {
 	if g.Player.HP <= 0 || g.Player.Pos.Distance(m.Pos) > 1 {
 		return
@@ -2087,10 +2098,7 @@ func (m *monster) HitPlayer(g *game, ev event) {
 			if opos != m.Pos {
 				g.TemporalWallAt(opos, ev)
 				g.Print("A temporal wall emerges.")
-				if !m.Status(MonsExhausted) {
-					m.Statuses[MonsExhausted] = 1
-					g.PushEvent(&monsterEvent{ERank: g.Ev.Rank() + 100 + RandInt(50), NMons: m.Index, EAction: MonsExhaustionEnd})
-				}
+				m.Exhaust(g)
 			}
 		}
 		if g.Player.Aptitudes[AptTeleport] && g.Player.HP < HeavyWoundHP && RandInt(2) == 0 {
@@ -2159,8 +2167,7 @@ func (m *monster) HitSideEffects(g *game, ev event) {
 		m.MoveTo(g, g.Player.Pos)
 		g.PlacePlayerAt(ompos)
 		g.Print("The flying milfid makes you swap positions.")
-		m.Statuses[MonsExhausted] = 1
-		g.PushEvent(&monsterEvent{ERank: ev.Rank() + 50 + RandInt(50), NMons: m.Index, EAction: MonsExhaustionEnd})
+		m.ExhaustTime(g, 50+RandInt(50))
 	}
 }
 
@@ -2250,8 +2257,7 @@ func (m *monster) TormentBolt(g *game, ev event) bool {
 		g.BlockEffects(m)
 		g.ui.MonsterProjectileAnimation(g, g.Ray(m.Pos), '*', ColorCyan)
 	}
-	m.Statuses[MonsExhausted] = 1
-	g.PushEvent(&monsterEvent{ERank: ev.Rank() + 100 + RandInt(50), NMons: m.Index, EAction: MonsExhaustionEnd})
+	m.Exhaust(g)
 	ev.Renew(g, m.Kind.AttackDelay())
 	return true
 }
@@ -2346,8 +2352,7 @@ func (m *monster) VampireSpit(g *game, ev event) bool {
 	g.Player.Statuses[StatusNausea]++
 	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 30 + RandInt(20), EAction: NauseaEnd})
 	g.Print("The vampire spits at you. You feel sick.")
-	m.Statuses[MonsExhausted] = 1
-	g.PushEvent(&monsterEvent{ERank: ev.Rank() + 100 + RandInt(50), NMons: m.Index, EAction: MonsExhaustionEnd})
+	m.Exhaust(g)
 	ev.Renew(g, m.Kind.AttackDelay())
 	return true
 }
@@ -2398,8 +2403,7 @@ func (m *monster) ThrowJavelin(g *game, ev event) bool {
 		g.Printf("You dodge %s's %s.", m.Kind.Indefinite(false), "javelin")
 		g.ui.MonsterJavelinAnimation(g, g.Ray(m.Pos), false)
 	}
-	m.Statuses[MonsExhausted] = 1
-	g.PushEvent(&monsterEvent{ERank: ev.Rank() + 50 + RandInt(50), NMons: m.Index, EAction: MonsExhaustionEnd})
+	m.ExhaustTime(g, 50+RandInt(50))
 	ev.Renew(g, m.Kind.AttackDelay())
 	return true
 }
@@ -2464,8 +2468,7 @@ func (m *monster) NixeAttraction(g *game, ev event) bool {
 		g.ui.TeleportAnimation(g, g.Player.Pos, ray[1], true)
 		g.PlacePlayerAt(ray[1])
 	}
-	m.Statuses[MonsExhausted] = 1
-	g.PushEvent(&monsterEvent{ERank: ev.Rank() + 100 + RandInt(50), NMons: m.Index, EAction: MonsExhaustionEnd})
+	m.Exhaust(g)
 	ev.Renew(g, m.Kind.AttackDelay())
 	return true
 }
@@ -2505,8 +2508,7 @@ func (m *monster) AbsorbMana(g *game, ev event) bool {
 	}
 	g.Player.MP -= 1
 	g.Printf("%s absorbs your mana.", m.Kind.Definite(true))
-	m.Statuses[MonsExhausted] = 1
-	g.PushEvent(&monsterEvent{ERank: ev.Rank() + 10 + RandInt(10), NMons: m.Index, EAction: MonsExhaustionEnd})
+	m.ExhaustTime(g, 10+RandInt(10))
 	ev.Renew(g, m.Kind.AttackDelay())
 	return true
 }

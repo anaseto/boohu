@@ -260,10 +260,7 @@ func (g *game) EvokeRodSleeping(ev event) error {
 			continue
 		}
 		mons.State = Resting
-		if !mons.Status(MonsExhausted) {
-			mons.Statuses[MonsExhausted] = 1
-			g.PushEvent(&monsterEvent{ERank: ev.Rank() + 30 + RandInt(20), NMons: mons.Index, EAction: MonsExhaustionEnd})
-		}
+		mons.ExhaustTime(g, 30+RandInt(20))
 	}
 	return nil
 }

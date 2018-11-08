@@ -591,10 +591,7 @@ func (g *game) BlockEffects(m *monster) {
 			}
 			pos = npos
 		}
-		if !m.Status(MonsExhausted) {
-			m.Statuses[MonsExhausted] = 1
-			g.PushEvent(&monsterEvent{ERank: g.Ev.Rank() + 100 + RandInt(50), NMons: m.Index, EAction: MonsExhaustionEnd})
-		}
+		m.Exhaust(g)
 		if pos != m.Pos {
 			m.MoveTo(g, pos)
 			g.Printf("%s is repelled.", m.Kind.Definite(true))
