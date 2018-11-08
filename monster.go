@@ -2074,7 +2074,6 @@ func (m *monster) HitPlayer(g *game, ev event) {
 		}
 		m.HitSideEffects(g, ev)
 		const HeavyWoundHP = 18
-		const CriticalHP = 18
 		if g.Player.Aptitudes[AptConfusingGas] && g.Player.HP < HeavyWoundHP && RandInt(2) == 0 {
 			m.EnterConfusion(g, ev)
 			g.Printf("You release some confusing gas against the %s.", m.Kind)
@@ -2082,13 +2081,13 @@ func (m *monster) HitPlayer(g *game, ev event) {
 		if g.Player.Aptitudes[AptSmoke] && g.Player.HP < HeavyWoundHP && RandInt(2) == 0 {
 			g.Smoke(ev)
 		}
-		if g.Player.Aptitudes[AptSwap] && g.Player.HP <= CriticalHP && RandInt(2) == 0 &&
-			!g.Player.HasStatus(StatusSwap) && !g.Player.HasStatus(StatusLignification) {
-			g.Player.Statuses[StatusSwap] = 1
-			end := ev.Rank() + 70 + RandInt(10)
-			g.PushEvent(&simpleEvent{ERank: end, EAction: SwapEnd})
-			g.Player.Expire[StatusSwap] = end
-			g.Print("You feel light-footed.")
+		if g.Player.Aptitudes[AptObstruction] && g.Player.HP <= HeavyWoundHP && RandInt(2) == 0 {
+			opos := m.Pos
+			m.Blink(g)
+			if opos != m.Pos {
+				g.TemporalWallAt(opos, ev)
+				g.Print("A temporal wall emerges.")
+			}
 		}
 		if g.Player.Aptitudes[AptTeleport] && g.Player.HP < HeavyWoundHP && RandInt(2) == 0 {
 			m.TeleportAway(g)
@@ -2570,7 +2569,7 @@ func (m *monster) Explode(g *game, ev event) {
 
 func (m *monster) Blink(g *game) {
 	npos := g.BlinkPos()
-	if npos == InvalidPos || npos == g.Player.Pos {
+	if !npos.valid() || npos == g.Player.Pos || npos == m.Pos {
 		return
 	}
 	opos := m.Pos

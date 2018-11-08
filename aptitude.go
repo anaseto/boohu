@@ -3,7 +3,7 @@ package main
 type aptitude int
 
 const (
-	AptSwap aptitude = iota
+	AptObstruction aptitude = iota
 	AptAgile
 	AptFast
 	AptHealthy
@@ -24,8 +24,8 @@ const NumApts = int(AptStrong) + 1
 func (ap aptitude) String() string {
 	var text string
 	switch ap {
-	case AptSwap:
-		text = "You occasionally get light-footed when hurt."
+	case AptObstruction:
+		text = "The earth occasionally blows monsters away when hurt."
 	case AptAgile:
 		text = "You are agile."
 	case AptFast:

@@ -226,7 +226,7 @@ func (g *game) Blink(ev event) {
 		return
 	}
 	npos := g.BlinkPos()
-	if npos == InvalidPos {
+	if !npos.valid() {
 		// should not happen
 		g.Print("You could not blink.")
 		return
