@@ -417,14 +417,7 @@ func (g *game) InitLevel() {
 				g.Opts.Alternate = MonsWorm
 			}
 			if RandInt(10) == 0 {
-				switch RandInt(3) {
-				case 0:
-					g.Opts.Alternate = MonsExplosiveNadre
-				case 1:
-					g.Opts.Alternate = MonsSpider
-				case 2:
-					g.Opts.Alternate = MonsHound
-				}
+				g.Opts.Alternate = MonsExplosiveNadre
 			}
 		}
 		g.Version = Version
