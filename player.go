@@ -22,6 +22,7 @@ type player struct {
 	LOS         map[position]bool
 	Rays        rayMap
 	Bored       int
+	AccScore    int
 }
 
 const DefaultHealth = 42
