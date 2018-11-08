@@ -2073,14 +2073,16 @@ func (m *monster) HitPlayer(g *game, ev event) {
 			return
 		}
 		m.HitSideEffects(g, ev)
-		if g.Player.Aptitudes[AptConfusingGas] && g.Player.HP < g.Player.HPMax()/2 && RandInt(2) == 0 {
+		const HeavyWoundHP = 18
+		const CriticalHP = 18
+		if g.Player.Aptitudes[AptConfusingGas] && g.Player.HP < HeavyWoundHP && RandInt(2) == 0 {
 			m.EnterConfusion(g, ev)
 			g.Printf("You release some confusing gas against the %s.", m.Kind)
 		}
-		if g.Player.Aptitudes[AptSmoke] && g.Player.HP < g.Player.HPMax()/2 && RandInt(2) == 0 {
+		if g.Player.Aptitudes[AptSmoke] && g.Player.HP < HeavyWoundHP && RandInt(2) == 0 {
 			g.Smoke(ev)
 		}
-		if g.Player.Aptitudes[AptSwap] && g.Player.HP <= 15 && RandInt(2) == 0 &&
+		if g.Player.Aptitudes[AptSwap] && g.Player.HP <= CriticalHP && RandInt(2) == 0 &&
 			!g.Player.HasStatus(StatusSwap) && !g.Player.HasStatus(StatusLignification) {
 			g.Player.Statuses[StatusSwap] = 1
 			end := ev.Rank() + 70 + RandInt(10)
@@ -2088,8 +2090,11 @@ func (m *monster) HitPlayer(g *game, ev event) {
 			g.Player.Expire[StatusSwap] = end
 			g.Print("You feel light-footed.")
 		}
-		if g.Player.Aptitudes[AptTeleport] && g.Player.HP <= g.Player.HPMax()/2 && RandInt(2) == 0 {
+		if g.Player.Aptitudes[AptTeleport] && g.Player.HP < HeavyWoundHP && RandInt(2) == 0 {
 			m.TeleportAway(g)
+		}
+		if g.Player.Aptitudes[AptLignification] && g.Player.HP < HeavyWoundHP && RandInt(2) == 0 {
+			m.EnterLignification(g, ev)
 		}
 	} else {
 		g.Stats.Dodges++

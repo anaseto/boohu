@@ -15,6 +15,7 @@ const (
 	AptSmoke
 	AptHear
 	AptTeleport
+	AptLignification
 	AptStrong
 )
 
@@ -47,6 +48,8 @@ func (ap aptitude) String() string {
 		text = "You occasionally release some confusing gas when hurt."
 	case AptSmoke:
 		text = "You occasionally get energetic and emit smoke clouds when hurt."
+	case AptLignification:
+		text = "Nature occasionally lignifies your foes when hurt."
 	case AptTeleport:
 		text = "You occasionally teleport your foes when hurt."
 	}
