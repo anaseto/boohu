@@ -631,9 +631,9 @@ func (g *game) GenCollectables() {
 				// more items in last levels
 				dfactor += g.Depth - WinDepth + 1
 			}
-			if g.CollectableScore >= 5*dfactor/3 {
+			if g.CollectableScore >= 7*dfactor/4 {
 				r = RandInt(data.rarity * rounds * 4)
-			} else if g.CollectableScore < 4*dfactor/3 {
+			} else if g.CollectableScore < 5*dfactor/3 {
 				r = RandInt(data.rarity * rounds / 4)
 			} else {
 				r = RandInt(data.rarity * rounds)
