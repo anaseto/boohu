@@ -684,7 +684,6 @@ type armour int
 const (
 	Robe armour = iota
 	LeatherArmour
-	//ChainMail
 	SmokingScales
 	ShinyPlates
 	TurtlePlates
@@ -713,8 +712,6 @@ func (ar armour) String() string {
 		return "robe"
 	case LeatherArmour:
 		return "leather armour"
-	//case ChainMail:
-	//return "chain mail"
 	case SmokingScales:
 		return "smoking scales"
 	case ShinyPlates:
@@ -748,8 +745,6 @@ func (ar armour) Short() string {
 		return "Rb"
 	case LeatherArmour:
 		return "Lt"
-	//case ChainMail:
-	//return "Ch"
 	case SmokingScales:
 		return "Sm"
 	case ShinyPlates:
@@ -775,18 +770,16 @@ func (ar armour) Desc() string {
 		text = "A robe provides no special protection, and will not help you much in your journey."
 	case LeatherArmour:
 		text = "A leather armour provides some protection against blows."
-	//case ChainMail:
-	//text = "A chain mail provides good protection against blows, at a minor evasion cost."
 	case SmokingScales:
 		text = "Smoking scales provide protection against blows. They leave short-lived fog as you move."
 	case ShinyPlates:
-		text = "Shiny plates provide very good protection against blows, but increase your line of sight range."
+		text = "Shiny plates provide good protection against blows, but increase your line of sight range."
 	case TurtlePlates:
 		text = "Turtle plates provide great protection against blows, but make you move slower and a little less good at evading blows."
 	case SpeedRobe:
-		text = "The speed robe makes you move faster, but makes you frail."
+		text = "The speed robe makes you move faster, with a minor evasion bonus."
 	case CelmistRobe:
-		text = "The celmist robe improves your magic reserves, rod recharge rate, and rods can gain an extra charge."
+		text = "The celmist robe improves your magic reserves, rod recharge rate, and rods can gain two extra charges."
 	case HarmonistRobe:
 		text = "The harmonist robe makes you harder to detect (reduced LOS, stealthy, noise mitigation)."
 	}

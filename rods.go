@@ -604,7 +604,7 @@ func (g *game) RechargeRods() {
 	for r, props := range g.Player.Rods {
 		max := r.MaxCharge()
 		if g.Player.Armour == CelmistRobe {
-			max++
+			max += 2
 		}
 		if props.Charge < max {
 			rchg := RandInt(1 + r.Rate())
@@ -612,7 +612,7 @@ func (g *game) RechargeRods() {
 				rchg++
 			}
 			if g.Player.Armour == CelmistRobe {
-				if RandInt(5) > 0 {
+				if RandInt(10) > 0 {
 					rchg++
 				}
 				if RandInt(3) == 0 {
