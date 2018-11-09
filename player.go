@@ -121,8 +121,10 @@ func (p *player) Evasion() int {
 	switch p.Armour {
 	case TurtlePlates:
 		ev -= 2
+	case HarmonistRobe, CelmistRobe, Robe:
+		ev += 1
 	case SpeedRobe:
-		ev += 2
+		ev += 3
 	}
 	if p.HasStatus(StatusAgile) {
 		ev += 7
