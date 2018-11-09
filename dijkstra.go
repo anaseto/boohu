@@ -1,41 +1,12 @@
 package main
 
 import (
-	"bytes"
 	"container/heap"
-	"fmt"
 )
 
 type Dijkstrer interface {
 	Neighbors(position) []position
 	Cost(position, position) int
-}
-
-func (g *game) drawDijkstra(nm nodeMap) string {
-	// TODO: this function could be removed
-	b := &bytes.Buffer{}
-	for y := 0; y < DungeonHeight; y++ {
-		for x := 0; x < DungeonWidth; x++ {
-			pos := position{x, y}
-			n, ok := nm[pos]
-			if ok {
-				if pos == g.Player.Pos {
-					fmt.Fprintf(b, "%d@", n.Cost)
-				} else {
-					c := g.Dungeon.Cell(pos)
-					if c.T == WallCell {
-						fmt.Fprintf(b, "%d#", n.Cost)
-					} else {
-						fmt.Fprintf(b, "%d ", n.Cost)
-					}
-				}
-			} else {
-				fmt.Fprintf(b, "# ")
-			}
-		}
-		fmt.Fprintf(b, "\n")
-	}
-	return b.String()
 }
 
 func Dijkstra(dij Dijkstrer, sources []position, maxCost int) nodeMap {
