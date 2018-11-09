@@ -32,6 +32,10 @@ Gameplay:
 + Removed berserk sword.
 + Removed plain chain mail.
 + Make shields a little less useful when surrounded.
++ Reworked stealth: now hunting monsters may return to wandering mode when not
+  seing you. The effect is much increased by wearing the harmonist robe. This
+  gives more depth to stealth (the wandering/hunting difference matters now
+  more).
 
 User Interface:
 + Some minor fixes.
