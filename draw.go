@@ -2827,8 +2827,12 @@ func (ui *termui) SelectPotion(g *game, ev event) error {
 func (ui *termui) RodItem(g *game, i, lnum int, r rod, fg uicolor) {
 	bg := ui.ListItemBG(i)
 	ui.ClearLineWithColor(lnum, bg)
+	mc := r.MaxCharge()
+	if g.Player.Armour == CelmistRobe {
+		mc += 2
+	}
 	ui.DrawColoredTextOnBG(fmt.Sprintf("%c - %s (%d/%d charges, %d mana cost)",
-		rune(i+97), r, g.Player.Rods[r].Charge, r.MaxCharge(), r.MPCost()), 0, lnum, fg, bg)
+		rune(i+97), r, g.Player.Rods[r].Charge, mc, r.MPCost()), 0, lnum, fg, bg)
 }
 
 func (ui *termui) SelectRod(g *game, ev event) error {
