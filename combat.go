@@ -362,17 +362,15 @@ func (g *game) HitMonster(dt dmgType, dmg int, mons *monster, ev event) (hit boo
 		maxacc += 7
 	}
 	acc := RandInt(maxacc)
-	for i := 0; i < Abs(g.Player.AccScore)/2; i++ {
-		if g.Player.AccScore >= 2 && acc >= maxacc/2 || g.Player.AccScore <= -2 && acc < maxacc/2 {
-			acc = RandInt(maxacc)
-		} else {
-			break
-		}
+	if g.Player.AccScore == 1 && acc >= maxacc/2 {
+		acc -= RandInt(1 + maxacc/2)
+	} else if g.Player.AccScore == -1 && acc < maxacc/2 {
+		acc += RandInt(1 + maxacc/2)
 	}
 	if acc >= maxacc/2 {
-		g.Player.AccScore++
-	} else if acc < maxacc/2 {
-		g.Player.AccScore--
+		g.Player.AccScore = 1
+	} else {
+		g.Player.AccScore = -1
 	}
 	evasion := RandInt(mons.Evasion)
 	if mons.State == Resting {
