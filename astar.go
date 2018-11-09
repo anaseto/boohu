@@ -63,7 +63,6 @@ type Astar interface {
 }
 
 func AstarPath(ast Astar, from, to position) (path []position, length int, found bool) {
-	// XXX: length and found are not used
 	nodeCache = nodeCache[:0]
 	nm := nodeMap{}
 	nq := &priorityQueue{}
