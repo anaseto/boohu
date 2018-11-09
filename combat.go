@@ -590,16 +590,22 @@ func (g *game) BlockEffects(m *monster) {
 		}
 		dir := m.Pos.Dir(g.Player.Pos)
 		pos := m.Pos
-		for i := 0; i < 3; i++ {
-			npos := pos.To(dir)
+		npos := pos
+		i := 0
+		for {
+			i++
+			npos = npos.To(dir)
 			if !npos.valid() || g.Dungeon.Cell(npos).T == WallCell {
 				break
 			}
 			mons := g.MonsterAt(npos)
 			if mons.Exists() {
-				break
+				continue
 			}
 			pos = npos
+			if i >= 3 {
+				break
+			}
 		}
 		m.Exhaust(g)
 		if pos != m.Pos {

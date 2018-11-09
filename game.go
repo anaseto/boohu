@@ -362,6 +362,7 @@ func (g *game) InitPlayer() {
 	//g.Player.Weapon = VampDagger
 	//g.Player.Shield = EarthShield
 	//g.Player.Shield = FireShield
+	//g.Player.Shield = BashingShield
 	//g.Player.Armour = TurtlePlates
 	//g.Player.Armour = HarmonistRobe
 	//g.Player.Armour = CelmistRobe
