@@ -1821,6 +1821,13 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	ppos := g.Player.Pos
 	mpos := m.Pos
 	m.MakeAware(g)
+	if !g.Player.LOS[m.Pos] && m.State == Hunting {
+		if g.Player.Armour == HarmonistRobe && RandInt(3) == 0 {
+			m.State = Wandering
+		} else if RandInt(20) == 0 {
+			m.State = Wandering
+		}
+	}
 	if m.State == Resting {
 		wander := RandInt(100 + 6*Max(800-(g.DepthPlayerTurn+1), 0))
 		if wander == 0 {
@@ -2707,7 +2714,9 @@ func (m *monster) GatherBand(g *game) {
 			r := RandInt(100)
 			if r > 50 || mons.State == Wandering && r > 10 {
 				mons.Target = m.Target
-				mons.State = m.State
+				if mons.State == Resting {
+					mons.State = Wandering
+				}
 			}
 		}
 	}
