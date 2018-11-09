@@ -119,12 +119,8 @@ func (p *player) Evasion() int {
 		ev += 3
 	}
 	switch p.Armour {
-	case ShinyPlates:
-		ev -= 1
 	case TurtlePlates:
 		ev -= 2
-	case HarmonistRobe:
-		ev += 1
 	case SpeedRobe:
 		ev += 2
 	}
