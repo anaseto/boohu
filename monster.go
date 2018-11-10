@@ -76,6 +76,7 @@ const (
 	MonsMadNixe
 	MonsMindCelmist
 	MonsVampire
+	MonsTreeMushroom
 	MonsMarevorHelith
 )
 
@@ -109,7 +110,7 @@ func (mk monsterKind) Dangerousness() int {
 
 func (mk monsterKind) Ranged() bool {
 	switch mk {
-	case MonsLich, MonsCyclop, MonsGoblinWarrior, MonsSatowalgaPlant, MonsMadNixe, MonsVampire:
+	case MonsLich, MonsCyclop, MonsGoblinWarrior, MonsSatowalgaPlant, MonsMadNixe, MonsVampire, MonsTreeMushroom:
 		return true
 	default:
 		return false
@@ -210,6 +211,7 @@ var MonsData = []monsterData{
 	MonsMadNixe:         {10, 11, 10, 20, 15, 0, 15, 'N', "mad nixe", 12},
 	MonsMindCelmist:     {10, 9, 20, 18, 99, 0, 14, 'c', "mind celmist", 16},
 	MonsVampire:         {10, 9, 10, 21, 15, 0, 14, 'V', "vampire", 13},
+	MonsTreeMushroom:    {12, 14, 12, 38, 14, 4, 6, 'T', "tree mushroom", 14},
 	MonsMarevorHelith:   {10, 0, 10, 97, 18, 10, 15, 'M', "Marevor Helith", 18},
 }
 
@@ -238,6 +240,7 @@ var monsDesc = []string{
 	MonsMadNixe:         "Mad nixes are magical humanoids that can attract you to them.",
 	MonsMindCelmist:     "Mind celmists are mages that use magical smitting mind attacks that bypass armour. They can occasionally confuse or slow you. They try to avoid melee.",
 	MonsVampire:         "Vampires are humanoids that drink blood to survive. Their spitting can cause nausea.",
+	MonsTreeMushroom:    "Tree mushrooms are big clunky slow-moving creatures. They can throw lignifying spores at you.",
 	MonsMarevorHelith:   "Marevor Helith is an ancient undead nakrus very fond of teleporting people away.",
 }
 
@@ -263,6 +266,7 @@ const (
 	LoneSatowalgaPlant
 	LoneMindCelmist
 	LoneVampire
+	LoneTreeMushroom
 	LoneEarlyNixe
 	LoneEarlyAcidMound
 	LoneEarlyBrizzia
@@ -273,6 +277,7 @@ const (
 	LoneEarlyLich
 	LoneEarlyMindCelmist
 	LoneEarlyVampire
+	LoneEarlyTreeMushroom
 	BandGoblins
 	BandGoblinsMany
 	BandGoblinsHound
@@ -297,6 +302,8 @@ const (
 	BandGiantBees
 	BandGiantBeesMany
 	BandSkeletonWarrior
+	BandTreeMushroomWorms
+	BandTreeMushrooms
 	BandMindCelmists
 	BandMindCelmistsLich
 	BandMindCelmistsMadNixe
@@ -304,7 +311,9 @@ const (
 	BandMadNixesDragon
 	BandMadNixesHydra
 	BandMadNixesFrogs
-	BandVampire
+	BandVampires
+	BandVampireNixe
+	BandVampireCelmist
 	UBandTinyHarpy
 	UBandWorms
 	UBandGoblinsEasy
@@ -336,6 +345,7 @@ const (
 	UXMadNixeHydra
 	UXMadNixes
 	UXVampires
+	UXTreeMushrooms
 	UXMindCelmists
 	UXMilfidYack
 	UXVariedWarriors
@@ -398,6 +408,7 @@ var MonsBands = []monsterBandData{
 	LoneSatowalgaPlant:      {Rarity: 80, MinDepth: 5, MaxDepth: 13, Monster: MonsSatowalgaPlant},
 	LoneMindCelmist:         {Rarity: 110, MinDepth: 9, MaxDepth: 13, Monster: MonsMindCelmist},
 	LoneVampire:             {Rarity: 110, MinDepth: 9, MaxDepth: 13, Monster: MonsVampire},
+	LoneTreeMushroom:        {Rarity: 150, MinDepth: 10, MaxDepth: 13, Monster: MonsTreeMushroom},
 	LoneEarlyNixe:           {Rarity: 200, MinDepth: 1, MaxDepth: 7, Monster: MonsMadNixe, Unique: true},
 	LoneEarlyVampire:        {Rarity: 350, MinDepth: 3, MaxDepth: 7, Monster: MonsVampire, Unique: true},
 	LoneEarlyAcidMound:      {Rarity: 150, MinDepth: 1, MaxDepth: 5, Monster: MonsAcidMound, Unique: true},
@@ -408,6 +419,7 @@ var MonsBands = []monsterBandData{
 	LoneEarlyHydra:          {Rarity: 350, MinDepth: 4, MaxDepth: 5, Monster: MonsHydra, Unique: true},
 	LoneEarlyLich:           {Rarity: 350, MinDepth: 5, MaxDepth: 6, Monster: MonsLich, Unique: true},
 	LoneEarlyMindCelmist:    {Rarity: 350, MinDepth: 5, MaxDepth: 6, Monster: MonsMindCelmist, Unique: true},
+	LoneEarlyTreeMushroom:   {Rarity: 400, MinDepth: 6, MaxDepth: 7, Monster: MonsTreeMushroom, Unique: true},
 	BandGoblins: {
 		Distribution: map[monsterKind]monsInterval{MonsGoblin: {2, 3}},
 		Rarity:       17, MinDepth: 1, MaxDepth: 5, Band: true,
@@ -527,11 +539,36 @@ var MonsBands = []monsterBandData{
 		Distribution: map[monsterKind]monsInterval{MonsSkeletonWarrior: {2, 3}},
 		Rarity:       60, MinDepth: 8, MaxDepth: 13, Band: true,
 	},
-	BandVampire: {
+	BandVampires: {
+		Distribution: map[monsterKind]monsInterval{
+			MonsVampire: {2, 2},
+		},
+		Rarity: 250, MinDepth: 13, MaxDepth: 15, Band: true,
+	},
+	BandVampireNixe: {
+		Distribution: map[monsterKind]monsInterval{
+			MonsVampire: {1, 1},
+			MonsMadNixe: {1, 1},
+		},
+		Rarity: 250, MinDepth: 13, MaxDepth: 15, Band: true,
+	},
+	BandVampireCelmist: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsVampire:     {1, 1},
-			MonsMindCelmist: {0, 1},
-			MonsMadNixe:     {0, 1},
+			MonsMindCelmist: {1, 1},
+		},
+		Rarity: 250, MinDepth: 13, MaxDepth: 15, Band: true,
+	},
+	BandTreeMushroomWorms: {
+		Distribution: map[monsterKind]monsInterval{
+			MonsTreeMushroom: {1, 1},
+			MonsWorm:         {2, 2},
+		},
+		Rarity: 250, MinDepth: 10, MaxDepth: 12, Band: true,
+	},
+	BandTreeMushrooms: {
+		Distribution: map[monsterKind]monsInterval{
+			MonsTreeMushroom: {2, 2},
 		},
 		Rarity: 250, MinDepth: 13, MaxDepth: 15, Band: true,
 	},
@@ -781,7 +818,7 @@ var MonsBands = []monsterBandData{
 		Distribution: map[monsterKind]monsInterval{
 			MonsVampire: {3, 3},
 		},
-		Rarity: 250, MinDepth: 14, MaxDepth: 15, Band: true, Unique: true,
+		Rarity: 200, MinDepth: 14, MaxDepth: 15, Band: true, Unique: true,
 	},
 	UXMadNixes: {
 		Distribution: map[monsterKind]monsInterval{
@@ -795,6 +832,12 @@ var MonsBands = []monsterBandData{
 			MonsCyclop:      {1, 1},
 		},
 		Rarity: 150, MinDepth: 14, MaxDepth: 15, Band: true, Unique: true,
+	},
+	UXTreeMushrooms: {
+		Distribution: map[monsterKind]monsInterval{
+			MonsTreeMushroom: {3, 3},
+		},
+		Rarity: 200, MinDepth: 14, MaxDepth: 15, Band: true, Unique: true,
 	},
 	UXMilfidYack: {
 		Distribution: map[monsterKind]monsInterval{
@@ -1043,6 +1086,9 @@ func init() {
 			{Distribution: map[monsterKind]monsInterval{
 				MonsSatowalgaPlant: {2, 2}, MonsBlinkingFrog: {1, 1},
 			}, Rarity: 200, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsSatowalgaPlant: {1, 1}, MonsTreeMushroom: {1, 1},
+			}, Rarity: 400, Band: true},
 		},
 			minDepth: 7,
 			maxDepth: 11,
@@ -1135,6 +1181,9 @@ func init() {
 			}, Rarity: 100, Band: true},
 			{Distribution: map[monsterKind]monsInterval{
 				MonsHydra: {2, 2}, MonsMirrorSpecter: {1, 1},
+			}, Rarity: 250, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsHydra: {1, 1}, MonsTreeMushroom: {1, 1},
 			}, Rarity: 250, Band: true},
 		},
 			minDepth: 9,
@@ -1298,6 +1347,9 @@ func init() {
 				MonsSatowalgaPlant: {2, 2}, MonsMadNixe: {1, 1},
 			}, Rarity: 75, Band: true},
 			{Distribution: map[monsterKind]monsInterval{
+				MonsSatowalgaPlant: {2, 2}, MonsTreeMushroom: {1, 1},
+			}, Rarity: 125, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
 				MonsCyclop: {2, 2}, MonsLich: {1, 1},
 			}, Rarity: 75, Band: true},
 			{Distribution: map[monsterKind]monsInterval{
@@ -1408,6 +1460,9 @@ func init() {
 			}, Rarity: 75, Band: true},
 			{Distribution: map[monsterKind]monsInterval{
 				MonsMindCelmist: {1, 1}, MonsBlinkingFrog: {2, 2},
+			}, Rarity: 150, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsTreeMushroom: {1, 1}, MonsBlinkingFrog: {2, 2},
 			}, Rarity: 150, Band: true},
 		}},
 		{bands: []monsterBandData{ // yacks and brizzias terrible
@@ -1524,6 +1579,9 @@ func init() {
 			}, Rarity: 50, Band: true},
 			{Distribution: map[monsterKind]monsInterval{
 				MonsEarthDragon: {1, 1}, MonsMindCelmist: {1, 1},
+			}, Rarity: 200, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsHydra: {1, 1}, MonsTreeMushroom: {1, 1},
 			}, Rarity: 200, Band: true},
 		}},
 		{bands: []monsterBandData{ // terrible goblin warriors
@@ -2228,6 +2286,8 @@ func (m *monster) RangedAttack(g *game, ev event) bool {
 		return m.NixeAttraction(g, ev)
 	case MonsVampire:
 		return m.VampireSpit(g, ev)
+	case MonsTreeMushroom:
+		return m.ThrowSpores(g, ev)
 	}
 	return false
 }
@@ -2359,6 +2419,18 @@ func (m *monster) VampireSpit(g *game, ev event) bool {
 	g.Player.Statuses[StatusNausea]++
 	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 30 + RandInt(20), EAction: NauseaEnd})
 	g.Print("The vampire spits at you. You feel sick.")
+	m.Exhaust(g)
+	ev.Renew(g, m.Kind.AttackDelay())
+	return true
+}
+
+func (m *monster) ThrowSpores(g *game, ev event) bool {
+	blocked := m.RangeBlocked(g)
+	if blocked || g.Player.HasStatus(StatusLignification) {
+		return false
+	}
+	g.EnterLignification(ev)
+	g.Print("The tree mushroom releases spores. You feel rooted to the ground.")
 	m.Exhaust(g)
 	ev.Renew(g, m.Kind.AttackDelay())
 	return true
