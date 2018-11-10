@@ -2404,7 +2404,18 @@ func (m *monster) ThrowRock(g *game, ev event) bool {
 		dir := g.Player.Pos.Dir(m.Pos)
 		pos := g.Player.Pos.To(dir)
 		if pos.valid() {
-			g.TemporalWallAt(pos, ev)
+			mons := g.MonsterAt(pos)
+			if mons.Exists() {
+				mons.HP -= RandInt(15)
+				if mons.HP <= 0 {
+					g.HandleKill(mons, ev)
+				} else {
+					mons.Blink(g)
+					if mons.Pos != pos {
+						g.TemporalWallAt(pos, ev)
+					}
+				}
+			}
 		}
 	}
 	ev.Renew(g, 2*m.Kind.AttackDelay())
