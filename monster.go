@@ -2415,6 +2415,8 @@ func (m *monster) ThrowRock(g *game, ev event) bool {
 						g.TemporalWallAt(pos, ev)
 					}
 				}
+			} else {
+				g.TemporalWallAt(pos, ev)
 			}
 		}
 	}
