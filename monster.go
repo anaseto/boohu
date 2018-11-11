@@ -210,7 +210,7 @@ var MonsData = []monsterData{
 	MonsSatowalgaPlant:  {10, 12, 12, 30, 15, 0, 4, 'P', "satowalga plant", 7},
 	MonsMadNixe:         {10, 11, 10, 20, 15, 0, 15, 'N', "mad nixe", 12},
 	MonsMindCelmist:     {10, 9, 20, 18, 99, 0, 14, 'c', "mind celmist", 16},
-	MonsVampire:         {10, 9, 10, 21, 15, 0, 14, 'V', "vampire", 13},
+	MonsVampire:         {10, 9, 10, 21, 15, 0, 15, 'V', "vampire", 13},
 	MonsTreeMushroom:    {12, 14, 12, 38, 14, 4, 6, 'T', "tree mushroom", 14},
 	MonsMarevorHelith:   {10, 0, 10, 97, 18, 10, 15, 'M', "Marevor Helith", 18},
 }
@@ -2140,7 +2140,11 @@ func (m *monster) HitPlayer(g *game, ev event) {
 		g.PrintfStyled("%s hits you (%d dmg).%s", logMonsterHit, m.Kind.Definite(true), attack, sclang)
 		m.InflictDamage(g, attack, m.Attack)
 		if m.Kind == MonsVampire {
-			m.HP += 2 * attack / 3
+			healing := attack
+			if healing > 2*m.Attack/3 {
+				healing = 2 * m.Attack / 3
+			}
+			m.HP += healing
 			if m.HP > m.HPmax {
 				m.HP = m.HPmax
 			}
