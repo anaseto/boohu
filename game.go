@@ -507,11 +507,13 @@ func (g *game) InitLevel() {
 	// Magical Stones
 	g.MagicalStones = map[position]stone{}
 	nstones := 1
-	switch RandInt(7) {
+	switch RandInt(8) {
 	case 0:
 		nstones = 0
-	case 1, 2:
+	case 1, 2, 3:
 		nstones = 2
+	case 4, 5, 6:
+		nstones = 3
 	}
 	ustone := stone(0)
 	if g.Depth > 0 && g.Depth == g.Opts.StoneLevel {
