@@ -1680,6 +1680,9 @@ func (m *monster) Exists() bool {
 }
 
 func (m *monster) AlternatePlacement(g *game) *position {
+	if m.Status(MonsLignified) {
+		return nil
+	}
 	var neighbors []position
 	if m.Status(MonsConfused) {
 		neighbors = g.Dungeon.CardinalFreeNeighbors(m.Pos)
