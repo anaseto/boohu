@@ -29,8 +29,6 @@ const (
 	MonsConfused monsterStatus = iota
 	MonsExhausted
 	MonsLignified
-	// unimplemented
-	MonsAfraid
 )
 
 const NMonsStatus = int(MonsLignified) + 1
@@ -43,8 +41,6 @@ func (st monsterStatus) String() (text string) {
 		text = "exhausted"
 	case MonsLignified:
 		text = "lignified"
-	case MonsAfraid:
-		text = "afraid"
 	}
 	return text
 }
