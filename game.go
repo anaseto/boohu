@@ -33,6 +33,7 @@ type game struct {
 	GeneratedUniques    map[monsterBand]int
 	GeneratedEquipables map[equipable]bool
 	GeneratedRods       map[rod]bool
+	GenPlan             [MaxDepth + 1]genFlavour
 	FoundEquipables     map[equipable]bool
 	Simellas            map[position]int
 	WrongWall           map[position]bool
@@ -253,8 +254,8 @@ func (g *game) FreeForStairs() position {
 	}
 }
 
-const MaxDepth = 15
-const WinDepth = 12
+const MaxDepth = 11
+const WinDepth = 8
 
 const (
 	DungeonHeight = 21
@@ -378,18 +379,28 @@ func (g *game) InitSpecialBands() {
 	seb := MonsSpecialEndBands[RandInt(len(MonsSpecialEndBands))]
 	if RandInt(4) == 0 {
 		if RandInt(5) > 1 {
-			g.Opts.SpecialBands[13] = seb.bands
+			g.Opts.SpecialBands[WinDepth+1] = seb.bands
 		} else {
-			g.Opts.SpecialBands[12] = seb.bands
+			g.Opts.SpecialBands[WinDepth] = seb.bands
 		}
 	} else if RandInt(5) > 0 {
 		if RandInt(3) > 0 {
-			g.Opts.SpecialBands[15] = seb.bands
+			g.Opts.SpecialBands[MaxDepth] = seb.bands
 		} else {
-			g.Opts.SpecialBands[14] = seb.bands
+			g.Opts.SpecialBands[MaxDepth-1] = seb.bands
 		}
 	}
 }
+
+type genFlavour int
+
+const (
+	GenRod genFlavour = iota
+	GenWeapon
+	GenArmour
+	GenWpArm
+	GenExtraCollectables
+)
 
 func (g *game) InitLevel() {
 	// Dungeon terrain
@@ -397,6 +408,7 @@ func (g *game) InitLevel() {
 
 	// Starting data
 	if g.Depth == 0 {
+		g.Depth++ // start at 1
 		g.InitPlayer()
 		g.AutoTarget = InvalidPos
 		g.Targeting = InvalidPos
@@ -407,10 +419,10 @@ func (g *game) InitLevel() {
 		g.Stats.KilledMons = map[monsterKind]int{}
 		g.InitSpecialBands()
 		if RandInt(3) > 0 {
-			g.Opts.UnstableLevel = 1 + RandInt(15)
+			g.Opts.UnstableLevel = 1 + RandInt(MaxDepth)
 		}
 		if RandInt(2) == 0 || RandInt(2) == 0 && g.Opts.UnstableLevel == 0 {
-			g.Opts.StoneLevel = 1 + RandInt(15)
+			g.Opts.StoneLevel = 1 + RandInt(MaxDepth)
 		}
 		if RandInt(3) == 0 {
 			g.Opts.Alternate = MonsTinyHarpy
@@ -422,6 +434,27 @@ func (g *game) InitLevel() {
 			}
 		}
 		g.Version = Version
+		g.GenPlan = [MaxDepth + 1]genFlavour{
+			1:  GenRod,
+			2:  GenWeapon,
+			3:  GenArmour,
+			4:  GenRod,
+			5:  GenExtraCollectables,
+			6:  GenWpArm,
+			7:  GenRod,
+			8:  GenExtraCollectables,
+			9:  GenWeapon,
+			10: GenExtraCollectables,
+			11: GenExtraCollectables,
+		}
+		permi := RandInt(7)
+		switch permi {
+		case 0, 1, 2, 3:
+			g.GenPlan[permi+1], g.GenPlan[permi+2] = g.GenPlan[permi+2], g.GenPlan[permi+1]
+		}
+		if RandInt(4) == 0 {
+			g.GenPlan[6], g.GenPlan[7] = g.GenPlan[7], g.GenPlan[6]
+		}
 	}
 
 	g.MonstersPosCache = make([]int, DungeonNCells)
@@ -447,26 +480,26 @@ func (g *game) InitLevel() {
 
 	// Equipment
 	g.Equipables = make(map[position]equipable)
-	g.GenWeapon()
-	g.GenArmour()
-	g.GenShield()
-
-	// Rods
 	g.Rods = map[position]rod{}
-	r := g.Depth - 4*g.GeneratedRodsCount()
-	if r > 0 && RandInt((6-r)*3) == 0 && g.GeneratedRodsCount() < 3 ||
-		g.GeneratedRodsCount() == 0 && g.Depth > 4 ||
-		g.GeneratedRodsCount() == 1 && g.Depth > 8 ||
-		g.GeneratedRodsCount() == 2 && g.Depth > 11 {
+	switch g.GenPlan[g.Depth] {
+	case GenWeapon:
+		g.GenWeapon()
+	case GenArmour:
+		g.GenArmour()
+	case GenWpArm:
+		g.GenWeapon()
+		g.GenArmour()
+	case GenRod:
 		g.GenerateRod()
+	case GenExtraCollectables:
+		for i := 0; i < 2; i++ {
+			g.GenCollectable()
+			g.CollectableScore-- // these are extra
+		}
 	}
 
 	// Aptitudes/Mutations
-	r = 15 + 3*g.Player.AptitudeCount() - g.Depth
-	if RandInt(r) == 0 && g.Depth > 0 && g.Player.AptitudeCount() < 2 ||
-		g.Player.AptitudeCount() == 0 && g.Depth > 1 ||
-		g.Player.AptitudeCount() == 1 && g.Depth > 5 {
-		//g.Player.AptitudeCount() == 2 && g.Depth > 8 {
+	if g.Depth == 2 || g.Depth == 5 {
 		apt, ok := g.RandomApt()
 		if ok {
 			g.ApplyAptitude(apt)
@@ -490,13 +523,13 @@ func (g *game) InitLevel() {
 	}
 	for i := 0; i < nstairs; i++ {
 		var pos position
-		if g.Depth >= WinDepth && g.Depth != 14 {
+		if g.Depth >= WinDepth && g.Depth != MaxDepth-1 {
 			pos = g.FreeCellForStair(60)
 			g.Stairs[pos] = WinStair
 		}
 		if g.Depth < MaxDepth {
-			if g.Depth > 9 {
-				pos = g.FreeCellForStair(40)
+			if g.Depth > 5 {
+				pos = g.FreeCellForStair(50)
 			} else {
 				pos = g.FreeCellForStair(0)
 			}
@@ -518,7 +551,7 @@ func (g *game) InitLevel() {
 	ustone := stone(0)
 	if g.Depth > 0 && g.Depth == g.Opts.StoneLevel {
 		ustone = stone(1 + RandInt(NumStones-1))
-		nstones = 10 + g.Depth/2
+		nstones = 10 + RandInt(3)
 		if RandInt(4) == 0 {
 			g.Opts.StoneLevel = g.Opts.StoneLevel + RandInt(MaxDepth-g.Opts.StoneLevel) + 1
 		}
@@ -540,7 +573,7 @@ func (g *game) InitLevel() {
 		pos := g.FreeCellForStatic()
 		const rounds = 5
 		for j := 0; j < rounds; j++ {
-			g.Simellas[pos] += 1 + RandInt(g.Depth+g.Depth*g.Depth/10)
+			g.Simellas[pos] += 1 + RandInt(g.Depth+g.Depth*g.Depth/6)
 		}
 		g.Simellas[pos] /= rounds
 		if g.Simellas[pos] == 0 {
@@ -575,7 +608,7 @@ func (g *game) InitLevel() {
 	g.Clouds = map[position]cloud{}
 
 	// Events
-	if g.Depth == 0 {
+	if g.Depth == 1 {
 		g.Events = &eventQueue{}
 		heap.Init(g.Events)
 		g.PushEvent(&simpleEvent{ERank: 0, EAction: PlayerTurn})
@@ -620,247 +653,104 @@ func (g *game) StairsSlice() []position {
 	return stairs
 }
 
-func (g *game) GenCollectables() {
+func (g *game) GenCollectable() {
 	rounds := 100
 	if len(g.LastConsumables) > 3 {
 		g.LastConsumables = g.LastConsumables[1:]
 	}
-	for i := 0; i < rounds; i++ {
+	for {
 	loopcons:
 		for c, data := range ConsumablesCollectData {
-			var r int
-			dfactor := g.Depth + 1
-			if g.Depth >= WinDepth {
-				// more items in last levels
-				dfactor += g.Depth - WinDepth + 1
-			}
-			if g.CollectableScore >= 7*dfactor/4 {
-				r = RandInt(data.rarity * rounds * 4)
-			} else if g.CollectableScore < 5*dfactor/3 {
-				r = RandInt(data.rarity * rounds / 4)
-			} else {
-				r = RandInt(data.rarity * rounds)
+			r := RandInt(data.rarity * rounds)
+			if r != 0 {
+				continue
 			}
 
-			if r == 0 {
-				// avoid too many of the same
-				for _, co := range g.LastConsumables {
-					if co == c && RandInt(4) > 0 {
-						continue loopcons
-					}
+			// avoid too many of the same
+			for _, co := range g.LastConsumables {
+				if co == c && RandInt(4) > 0 {
+					continue loopcons
 				}
-				g.LastConsumables = append(g.LastConsumables, c)
-				g.CollectableScore++
-				pos := g.FreeCellForStatic()
-				g.Collectables[pos] = collectable{Consumable: c, Quantity: data.quantity}
 			}
+			g.LastConsumables = append(g.LastConsumables, c)
+			g.CollectableScore++
+			pos := g.FreeCellForStatic()
+			g.Collectables[pos] = collectable{Consumable: c, Quantity: data.quantity}
+			return
 		}
 	}
+
 }
 
-func (g *game) SeenGoodWeapons() (count int) {
-	for eq, b := range g.GeneratedEquipables {
-		w, ok := eq.(weapon)
-		if ok && b && w != Dagger {
-			count++
-		}
+func (g *game) GenCollectables() {
+	score := g.CollectableScore - 2*(g.Depth-1)
+	n := 2
+	if score >= 0 && RandInt(4) == 0 {
+		n--
 	}
-	return count
-}
-
-func (g *game) SeenGoodArmour() (count int) {
-	for eq, b := range g.GeneratedEquipables {
-		ar, ok := eq.(armour)
-		if ok && b && ar != Robe && ar != LeatherArmour {
-			count++
-		}
+	if score <= 0 && RandInt(4) == 0 {
+		n++
 	}
-	return count
-}
-
-func (g *game) SeenGoodShield() (count int) {
-	for eq, b := range g.GeneratedEquipables {
-		sh, ok := eq.(shield)
-		if ok && b && sh != Buckler {
-			count++
-		}
+	if score > 0 && n >= 2 {
+		n--
 	}
-	return count
+	if score < 0 && n <= -2 {
+		n++
+	}
+	for i := 0; i < n; i++ {
+		g.GenCollectable()
+	}
 }
 
 func (g *game) GenShield() {
-	ars := [5]shield{Buckler, ConfusingShield, BashingShield, EarthShield, FireShield}
-	n := 12 + 5*g.SeenGoodShield()
-	if g.SeenGoodShield() == 2 {
-		return
-	}
-	if g.SeenGoodShield() == 0 {
-		n -= 2 * g.Depth
-		if n < 2 {
-			if g.Depth < 8 {
-				n = 2
-			} else {
-				n = 1
-			}
-		}
-	} else if g.SeenGoodShield() == 1 {
-		n -= 4 * (g.Depth - 7)
-		if n < 2 {
-			if g.Depth < 12 {
-				n = 2
-			} else {
-				n = 1
-			}
-		}
-	} else if g.Player.Shield != NoShield && g.Player.Shield != Buckler {
-		n += 10
-	} else if g.Depth > WinDepth {
-		n = 2
-	}
-	r := RandInt(n)
-	if r != 0 {
-		if !g.GeneratedEquipables[Buckler] && (g.Depth > 0 && RandInt(2) == 0 || g.Depth > 3) {
-			pos := g.FreeCellForStatic()
-			g.Equipables[pos] = Buckler
-			g.GeneratedEquipables[Buckler] = true
-		}
-		return
-	}
-loop:
+	ars := [4]shield{ConfusingShield, BashingShield, EarthShield, FireShield}
 	for {
-		for i := 0; i < len(ars); i++ {
-			if g.GeneratedEquipables[ars[i]] {
-				// do not generate duplicates
-				continue
-			}
-			n := 50
-			r := RandInt(n)
-			if r == 0 {
-				pos := g.FreeCellForStatic()
-				g.Equipables[pos] = ars[i]
-				g.GeneratedEquipables[ars[i]] = true
-				break loop
-			}
+		i := RandInt(len(ars))
+		if g.GeneratedEquipables[ars[i]] {
+			// do not generate duplicates
+			continue
 		}
+		pos := g.FreeCellForStatic()
+		g.Equipables[pos] = ars[i]
+		g.GeneratedEquipables[ars[i]] = true
+		break
 	}
 }
 
 func (g *game) GenArmour() {
-	ars := [8]armour{Robe, LeatherArmour, SmokingScales, ShinyPlates, TurtlePlates, SpeedRobe, CelmistRobe, HarmonistRobe}
-	n := 11 + 5*g.SeenGoodArmour()
-	if g.SeenGoodArmour() > 2 {
-		return
-	}
-	if g.SeenGoodArmour() == 0 {
-		n -= 2 * g.Depth
-		if n < 2 {
-			if g.Depth < 7 {
-				n = 2
-			} else {
-				n = 1
-			}
-		}
-	} else if g.SeenGoodArmour() == 1 {
-		n -= 4 * (g.Depth - 7)
-		if n < 2 {
-			if g.Depth < 12 {
-				n = 2
-			} else {
-				n = 1
-			}
-		}
-	} else if g.Player.Armour != Robe && g.Player.Armour != LeatherArmour {
-		n += 10
-	} else if g.Depth > WinDepth {
-		n = 2
-	}
-	r := RandInt(n)
-	if r != 0 {
-		if !g.GeneratedEquipables[LeatherArmour] && (RandInt(2) == 0 || g.Depth >= 3) {
-			pos := g.FreeCellForStatic()
-			g.Equipables[pos] = LeatherArmour
-			g.GeneratedEquipables[LeatherArmour] = true
-		}
-		return
-	}
-loop:
+	ars := [6]armour{SmokingScales, ShinyPlates, TurtlePlates, SpeedRobe, CelmistRobe, HarmonistRobe}
 	for {
-		for i := 0; i < len(ars); i++ {
-			if g.GeneratedEquipables[ars[i]] {
-				// do not generate duplicates
-				continue
-			}
-			n := 50
-			if ars[i] == Robe {
-				n *= 2
-			}
-			r := RandInt(n)
-			if r == 0 {
-				pos := g.FreeCellForStatic()
-				g.Equipables[pos] = ars[i]
-				g.GeneratedEquipables[ars[i]] = true
-				break loop
-			}
+		i := RandInt(len(ars))
+		if g.GeneratedEquipables[ars[i]] {
+			// do not generate duplicates
+			continue
 		}
+		pos := g.FreeCellForStatic()
+		g.Equipables[pos] = ars[i]
+		g.GeneratedEquipables[ars[i]] = true
+		break
 	}
 }
 
 func (g *game) GenWeapon() {
-	wps := [WeaponNum]weapon{Dagger, Axe, BattleAxe, Spear, Halberd, AssassinSabre, DancingRapier, HopeSword, Frundis, ElecWhip, HarKarGauntlets, VampDagger, DragonSabre, FinalBlade, DefenderFlail}
-	n := 11 + 5*g.SeenGoodWeapons()
-	if g.SeenGoodWeapons() > 2 {
-		return
-	}
-	if g.SeenGoodWeapons() == 0 {
-		n -= 4 * g.Depth
-		if n < 2 {
-			if g.Depth < 4 {
-				n = 2
-			} else {
-				n = 1
-			}
-		}
-	} else if g.SeenGoodWeapons() == 1 {
-		n -= 4 * (g.Depth - 6)
-		if n < 2 {
-			if g.Depth < 11 {
-				n = 2
-			} else {
-				n = 1
-			}
-		}
-	} else if g.Player.Weapon != Dagger {
-		n += 10
-	} else if g.Depth >= WinDepth {
-		n = 2
-	}
-	r := RandInt(n)
-	if r != 0 {
-		return
-	}
-loop:
+	wps := [WeaponNum - 1]weapon{Axe, BattleAxe, Spear, Halberd, AssassinSabre, DancingRapier, HopeSword, Frundis, ElecWhip, HarKarGauntlets, VampDagger, DragonSabre, FinalBlade, DefenderFlail}
+	onehanded := false
 	for {
-		for i := 0; i < len(wps); i++ {
-			if g.GeneratedEquipables[wps[i]] {
-				// do not generate duplicates
-				continue
-			}
-			n := 50
-			if wps[i].TwoHanded() && g.Depth < 3 {
-				n *= (3 - g.Depth)
-			}
-			if wps[i] == Dagger {
-				n *= 2
-			}
-			r := RandInt(n)
-			if r == 0 {
-				pos := g.FreeCellForStatic()
-				g.Equipables[pos] = wps[i]
-				g.GeneratedEquipables[wps[i]] = true
-				break loop
-			}
+		i := RandInt(len(wps))
+		if g.GeneratedEquipables[wps[i]] {
+			// do not generate duplicates
+			continue
 		}
-
+		pos := g.FreeCellForStatic()
+		g.Equipables[pos] = wps[i]
+		if !wps[i].TwoHanded() {
+			onehanded = true
+		}
+		g.GeneratedEquipables[wps[i]] = true
+		break
+	}
+	if onehanded {
+		g.GenShield()
 	}
 }
 

@@ -57,7 +57,6 @@ func (ap aptitude) String() string {
 }
 
 func (g *game) RandomApt() (aptitude, bool) {
-	// XXX use less uniform probability ?
 	count := 0
 	var apt aptitude
 	for {

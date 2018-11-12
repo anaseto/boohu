@@ -174,12 +174,12 @@ func (g *game) Dump() string {
 	fmt.Fprintf(buf, "You collected %d simellas.\n", g.Player.Simellas)
 	fmt.Fprintf(buf, "You killed %d monsters.\n", g.Stats.Killed)
 	fmt.Fprintf(buf, "You spent %.1f turns in the Underground.\n", float64(g.Turn)/10)
-	maxDepth := Max(g.Depth+1, g.ExploredLevels)
+	maxDepth := Max(g.Depth, g.ExploredLevels)
 	s := "s"
 	if maxDepth == 1 {
 		s = ""
 	}
-	fmt.Fprintf(buf, "You explored %d level%s out of %d.\n", maxDepth, s, MaxDepth+1)
+	fmt.Fprintf(buf, "You explored %d level%s out of %d.\n", maxDepth, s, MaxDepth)
 	fmt.Fprintf(buf, "\n")
 	fmt.Fprintf(buf, "Last messages:\n")
 	for i := len(g.Log) - 10; i < len(g.Log); i++ {
@@ -231,12 +231,15 @@ func (g *game) DetailedStatistics(w io.Writer) {
 	fmt.Fprintf(w, "\n")
 	hfmt := "%-23s"
 	fmt.Fprintf(w, hfmt, "Quantity/Depth")
-	for i := 0; i < maxDepth; i++ {
+	for i := 1; i < maxDepth; i++ {
 		fmt.Fprintf(w, " %3d", i)
 	}
 	fmt.Fprintf(w, "\n")
 	fmt.Fprintf(w, hfmt, "Explored (%)")
 	for i, n := range g.Stats.DExplPerc {
+		if i == 0 {
+			continue
+		}
 		if i >= maxDepth {
 			break
 		}
@@ -245,6 +248,9 @@ func (g *game) DetailedStatistics(w io.Writer) {
 	fmt.Fprintf(w, "\n")
 	fmt.Fprintf(w, hfmt, "Sleeping monsters (%)")
 	for i, n := range g.Stats.DSleepingPerc {
+		if i == 0 {
+			continue
+		}
 		if i >= maxDepth {
 			break
 		}
@@ -253,6 +259,9 @@ func (g *game) DetailedStatistics(w io.Writer) {
 	fmt.Fprintf(w, "\n")
 	fmt.Fprintf(w, hfmt, "Dead monsters (%)")
 	for i, n := range g.Stats.DKilledPerc {
+		if i == 0 {
+			continue
+		}
 		if i >= maxDepth {
 			break
 		}
@@ -261,6 +270,9 @@ func (g *game) DetailedStatistics(w io.Writer) {
 	fmt.Fprintf(w, "\n")
 	fmt.Fprintf(w, hfmt, "Dungeon Layout")
 	for i, s := range g.Stats.DLayout {
+		if i == 0 {
+			continue
+		}
 		if i >= maxDepth {
 			break
 		}

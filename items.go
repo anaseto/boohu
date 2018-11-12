@@ -683,7 +683,6 @@ type armour int
 
 const (
 	Robe armour = iota
-	LeatherArmour
 	SmokingScales
 	ShinyPlates
 	TurtlePlates
@@ -710,8 +709,6 @@ func (ar armour) String() string {
 	switch ar {
 	case Robe:
 		return "robe"
-	case LeatherArmour:
-		return "leather armour"
 	case SmokingScales:
 		return "smoking scales"
 	case ShinyPlates:
@@ -743,8 +740,6 @@ func (ar armour) Short() string {
 	switch ar {
 	case Robe:
 		return "Rb"
-	case LeatherArmour:
-		return "Lt"
 	case SmokingScales:
 		return "Sm"
 	case ShinyPlates:
@@ -768,8 +763,6 @@ func (ar armour) Desc() string {
 	switch ar {
 	case Robe:
 		text = "A robe provides no special protection, and will not help you much in your journey."
-	case LeatherArmour:
-		text = "A leather armour provides some protection against blows."
 	case SmokingScales:
 		text = "Smoking scales provide protection against blows. They leave short-lived fog as you move."
 	case ShinyPlates:
@@ -993,7 +986,6 @@ type shield int
 
 const (
 	NoShield shield = iota
-	Buckler
 	ConfusingShield
 	EarthShield
 	BashingShield
@@ -1018,8 +1010,6 @@ func (sh shield) Equip(g *game) {
 
 func (sh shield) String() (text string) {
 	switch sh {
-	case Buckler:
-		text = "buckler"
 	case ConfusingShield:
 		text = "confusing shield"
 	case EarthShield:
@@ -1034,8 +1024,6 @@ func (sh shield) String() (text string) {
 
 func (sh shield) Short() (text string) {
 	switch sh {
-	case Buckler:
-		text = "Bk"
 	case ConfusingShield:
 		text = "Cn"
 	case EarthShield:
@@ -1050,8 +1038,6 @@ func (sh shield) Short() (text string) {
 
 func (sh shield) Desc() (text string) {
 	switch sh {
-	case Buckler:
-		text = "A buckler is a small shield that can block attacks."
 	case ConfusingShield:
 		text = "A confusing shield blocks attacks, sometimes confusing monsters."
 	case EarthShield:
@@ -1070,8 +1056,6 @@ func (sh shield) Letter() rune {
 
 func (sh shield) Block() (block int) {
 	switch sh {
-	case Buckler:
-		block += 6
 	case ConfusingShield, BashingShield, FireShield:
 		block += 9
 	case EarthShield:

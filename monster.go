@@ -385,208 +385,208 @@ func (g *game) GenBand(mbd monsterBandData, band monsterBand) []monsterKind {
 }
 
 var MonsBands = []monsterBandData{
-	LoneGoblin:              {Rarity: 10, MinDepth: 0, MaxDepth: 5, Monster: MonsGoblin},
-	LoneOgre:                {Rarity: 15, MinDepth: 2, MaxDepth: 11, Monster: MonsOgre},
-	LoneWorm:                {Rarity: 10, MinDepth: 0, MaxDepth: 6, Monster: MonsWorm},
-	LoneRareWorm:            {Rarity: 90, MinDepth: 7, MaxDepth: 13, Monster: MonsWorm},
-	LoneBrizzia:             {Rarity: 90, MinDepth: 7, MaxDepth: 13, Monster: MonsBrizzia},
-	LoneHound:               {Rarity: 25, MinDepth: 1, MaxDepth: 8, Monster: MonsHound},
-	LoneHydra:               {Rarity: 45, MinDepth: 8, MaxDepth: 13, Monster: MonsHydra},
-	LoneSpider:              {Rarity: 20, MinDepth: 3, MaxDepth: 13, Monster: MonsSpider},
-	LoneMilfid:              {Rarity: 100, MinDepth: 3, MaxDepth: 13, Monster: MonsWingedMilfid},
-	LoneBlinkingFrog:        {Rarity: 50, MinDepth: 4, MaxDepth: 13, Monster: MonsBlinkingFrog},
-	LoneCyclop:              {Rarity: 35, MinDepth: 4, MaxDepth: 13, Monster: MonsCyclop},
-	LoneLich:                {Rarity: 70, MinDepth: 9, MaxDepth: 13, Monster: MonsLich},
-	LoneEarthDragon:         {Rarity: 80, MinDepth: 10, MaxDepth: 13, Monster: MonsEarthDragon},
-	LoneSpecter:             {Rarity: 70, MinDepth: 6, MaxDepth: 13, Monster: MonsMirrorSpecter},
-	LoneAcidMound:           {Rarity: 70, MinDepth: 6, MaxDepth: 13, Monster: MonsAcidMound},
-	LoneExplosiveNadre:      {Rarity: 55, MinDepth: 3, MaxDepth: 7, Monster: MonsExplosiveNadre},
-	LoneSatowalgaPlant:      {Rarity: 80, MinDepth: 5, MaxDepth: 13, Monster: MonsSatowalgaPlant},
-	LoneMindCelmist:         {Rarity: 110, MinDepth: 9, MaxDepth: 13, Monster: MonsMindCelmist},
-	LoneVampire:             {Rarity: 110, MinDepth: 9, MaxDepth: 13, Monster: MonsVampire},
-	LoneTreeMushroom:        {Rarity: 150, MinDepth: 10, MaxDepth: 13, Monster: MonsTreeMushroom},
-	LoneEarlyNixe:           {Rarity: 200, MinDepth: 1, MaxDepth: 7, Monster: MonsMadNixe, Unique: true},
-	LoneEarlyVampire:        {Rarity: 350, MinDepth: 3, MaxDepth: 7, Monster: MonsVampire, Unique: true},
-	LoneEarlyAcidMound:      {Rarity: 150, MinDepth: 1, MaxDepth: 5, Monster: MonsAcidMound, Unique: true},
-	LoneEarlyBrizzia:        {Rarity: 200, MinDepth: 1, MaxDepth: 6, Monster: MonsBrizzia, Unique: true},
-	LoneEarlySpecter:        {Rarity: 150, MinDepth: 1, MaxDepth: 5, Monster: MonsMirrorSpecter, Unique: true},
-	LoneEarlySatowalgaPlant: {Rarity: 150, MinDepth: 1, MaxDepth: 4, Monster: MonsSatowalgaPlant, Unique: true},
-	LoneEarlyEarthDragon:    {Rarity: 350, MinDepth: 6, MaxDepth: 7, Monster: MonsEarthDragon, Unique: true},
-	LoneEarlyHydra:          {Rarity: 350, MinDepth: 4, MaxDepth: 5, Monster: MonsHydra, Unique: true},
-	LoneEarlyLich:           {Rarity: 350, MinDepth: 5, MaxDepth: 6, Monster: MonsLich, Unique: true},
-	LoneEarlyMindCelmist:    {Rarity: 350, MinDepth: 5, MaxDepth: 6, Monster: MonsMindCelmist, Unique: true},
-	LoneEarlyTreeMushroom:   {Rarity: 400, MinDepth: 6, MaxDepth: 7, Monster: MonsTreeMushroom, Unique: true},
+	LoneGoblin:              {Rarity: 10, MinDepth: 1, MaxDepth: 3, Monster: MonsGoblin},
+	LoneOgre:                {Rarity: 15, MinDepth: 2, MaxDepth: 7, Monster: MonsOgre},
+	LoneWorm:                {Rarity: 10, MinDepth: 1, MaxDepth: 3, Monster: MonsWorm},
+	LoneRareWorm:            {Rarity: 90, MinDepth: 4, MaxDepth: WinDepth + 1, Monster: MonsWorm},
+	LoneBrizzia:             {Rarity: 90, MinDepth: 4, MaxDepth: WinDepth + 1, Monster: MonsBrizzia},
+	LoneHound:               {Rarity: 25, MinDepth: 1, MaxDepth: 5, Monster: MonsHound},
+	LoneHydra:               {Rarity: 45, MinDepth: 5, MaxDepth: WinDepth + 1, Monster: MonsHydra},
+	LoneSpider:              {Rarity: 20, MinDepth: 3, MaxDepth: WinDepth + 1, Monster: MonsSpider},
+	LoneMilfid:              {Rarity: 100, MinDepth: 3, MaxDepth: WinDepth + 1, Monster: MonsWingedMilfid},
+	LoneBlinkingFrog:        {Rarity: 50, MinDepth: 3, MaxDepth: WinDepth + 1, Monster: MonsBlinkingFrog},
+	LoneCyclop:              {Rarity: 35, MinDepth: 3, MaxDepth: WinDepth + 1, Monster: MonsCyclop},
+	LoneLich:                {Rarity: 70, MinDepth: 5, MaxDepth: WinDepth + 1, Monster: MonsLich},
+	LoneEarthDragon:         {Rarity: 80, MinDepth: 6, MaxDepth: WinDepth + 1, Monster: MonsEarthDragon},
+	LoneSpecter:             {Rarity: 70, MinDepth: 4, MaxDepth: WinDepth + 1, Monster: MonsMirrorSpecter},
+	LoneAcidMound:           {Rarity: 70, MinDepth: 4, MaxDepth: WinDepth + 1, Monster: MonsAcidMound},
+	LoneExplosiveNadre:      {Rarity: 55, MinDepth: 2, MaxDepth: 4, Monster: MonsExplosiveNadre},
+	LoneSatowalgaPlant:      {Rarity: 80, MinDepth: 4, MaxDepth: WinDepth + 1, Monster: MonsSatowalgaPlant},
+	LoneMindCelmist:         {Rarity: 110, MinDepth: 5, MaxDepth: WinDepth + 1, Monster: MonsMindCelmist},
+	LoneVampire:             {Rarity: 110, MinDepth: 5, MaxDepth: WinDepth + 1, Monster: MonsVampire},
+	LoneTreeMushroom:        {Rarity: 150, MinDepth: 6, MaxDepth: WinDepth + 1, Monster: MonsTreeMushroom},
+	LoneEarlyNixe:           {Rarity: 200, MinDepth: 1, MaxDepth: 4, Monster: MonsMadNixe, Unique: true},
+	LoneEarlyVampire:        {Rarity: 350, MinDepth: 2, MaxDepth: 4, Monster: MonsVampire, Unique: true},
+	LoneEarlyAcidMound:      {Rarity: 150, MinDepth: 1, MaxDepth: 3, Monster: MonsAcidMound, Unique: true},
+	LoneEarlyBrizzia:        {Rarity: 200, MinDepth: 1, MaxDepth: 3, Monster: MonsBrizzia, Unique: true},
+	LoneEarlySpecter:        {Rarity: 150, MinDepth: 1, MaxDepth: 3, Monster: MonsMirrorSpecter, Unique: true},
+	LoneEarlySatowalgaPlant: {Rarity: 150, MinDepth: 1, MaxDepth: 3, Monster: MonsSatowalgaPlant, Unique: true},
+	LoneEarlyEarthDragon:    {Rarity: 350, MinDepth: 4, MaxDepth: 5, Monster: MonsEarthDragon, Unique: true},
+	LoneEarlyHydra:          {Rarity: 350, MinDepth: 3, MaxDepth: 4, Monster: MonsHydra, Unique: true},
+	LoneEarlyLich:           {Rarity: 350, MinDepth: 3, MaxDepth: 4, Monster: MonsLich, Unique: true},
+	LoneEarlyMindCelmist:    {Rarity: 350, MinDepth: 3, MaxDepth: 4, Monster: MonsMindCelmist, Unique: true},
+	LoneEarlyTreeMushroom:   {Rarity: 400, MinDepth: 4, MaxDepth: 5, Monster: MonsTreeMushroom, Unique: true},
 	BandGoblins: {
 		Distribution: map[monsterKind]monsInterval{MonsGoblin: {2, 3}},
-		Rarity:       17, MinDepth: 1, MaxDepth: 5, Band: true,
+		Rarity:       17, MinDepth: 1, MaxDepth: 3, Band: true,
 	},
 	BandGoblinsMany: {
 		Distribution: map[monsterKind]monsInterval{MonsGoblin: {4, 4}},
-		Rarity:       75, MinDepth: 2, MaxDepth: 5, Band: true,
+		Rarity:       75, MinDepth: 2, MaxDepth: 3, Band: true,
 	},
 	BandGoblinsHound: {
 		Distribution: map[monsterKind]monsInterval{MonsGoblin: {2, 2}, MonsHound: {1, 1}},
-		Rarity:       25, MinDepth: 1, MaxDepth: 5, Band: true,
+		Rarity:       25, MinDepth: 1, MaxDepth: 3, Band: true,
 	},
 	BandGoblinsOgre: {
 		Distribution: map[monsterKind]monsInterval{MonsGoblin: {1, 1}, MonsOgre: {1, 1}},
-		Rarity:       75, MinDepth: 3, MaxDepth: 5, Band: true,
+		Rarity:       75, MinDepth: 2, MaxDepth: 3, Band: true,
 	},
 	BandGoblinsWithWarriors: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsGoblin:        {3, 3},
 			MonsGoblinWarrior: {2, 2}},
-		Rarity: 50, MinDepth: 5, MaxDepth: 9, Band: true,
+		Rarity: 50, MinDepth: 4, MaxDepth: 5, Band: true,
 	},
 	BandGoblinsWithWarriorsMilfid: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsGoblin:        {3, 3},
 			MonsGoblinWarrior: {1, 1},
 			MonsWingedMilfid:  {1, 1}},
-		Rarity: 70, MinDepth: 5, MaxDepth: 9, Band: true,
+		Rarity: 70, MinDepth: 4, MaxDepth: 5, Band: true,
 	},
 	BandGoblinsWithWarriorsHound: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsGoblin:        {3, 3},
 			MonsGoblinWarrior: {1, 1},
 			MonsHound:         {1, 1}},
-		Rarity: 50, MinDepth: 5, MaxDepth: 9, Band: true,
+		Rarity: 50, MinDepth: 4, MaxDepth: 5, Band: true,
 	},
 	BandGoblinsWithWarriorsOgre: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsGoblin:        {3, 3},
 			MonsGoblinWarrior: {1, 1},
 			MonsOgre:          {1, 1}},
-		Rarity: 50, MinDepth: 5, MaxDepth: 9, Band: true,
+		Rarity: 50, MinDepth: 4, MaxDepth: 5, Band: true,
 	},
 	BandGoblinWarriors: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsGoblin:        {1, 1},
 			MonsGoblinWarrior: {3, 3}},
-		Rarity: 80, MinDepth: 10, MaxDepth: 13, Band: true,
+		Rarity: 80, MinDepth: 6, MaxDepth: WinDepth + 1, Band: true,
 	},
 	BandGoblinWarriorsMilfid: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsGoblin:        {1, 1},
 			MonsGoblinWarrior: {2, 2},
 			MonsWingedMilfid:  {1, 1}},
-		Rarity: 100, MinDepth: 10, MaxDepth: 13, Band: true,
+		Rarity: 100, MinDepth: 6, MaxDepth: WinDepth + 1, Band: true,
 	},
 	BandHounds: {
 		Distribution: map[monsterKind]monsInterval{MonsHound: {2, 2}, MonsGoblin: {1, 1}},
-		Rarity:       55, MinDepth: 2, MaxDepth: 10, Band: true,
+		Rarity:       55, MinDepth: 2, MaxDepth: 6, Band: true,
 	},
 	BandHoundsMany: {
 		Distribution: map[monsterKind]monsInterval{MonsHound: {3, 3}},
-		Rarity:       100, MinDepth: 2, MaxDepth: 10, Band: true,
+		Rarity:       100, MinDepth: 2, MaxDepth: 6, Band: true,
 	},
 	BandSpiders: {
 		Distribution: map[monsterKind]monsInterval{MonsSpider: {2, 3}},
-		Rarity:       35, MinDepth: 5, MaxDepth: 13, Band: true,
+		Rarity:       35, MinDepth: 4, MaxDepth: WinDepth + 1, Band: true,
 	},
 	BandSpidersMilfid: {
 		Distribution: map[monsterKind]monsInterval{MonsSpider: {2, 2}, MonsWingedMilfid: {1, 1}},
-		Rarity:       75, MinDepth: 5, MaxDepth: 13, Band: true,
+		Rarity:       75, MinDepth: 4, MaxDepth: WinDepth + 1, Band: true,
 	},
 	BandWingedMilfids: {
 		Distribution: map[monsterKind]monsInterval{MonsWingedMilfid: {2, 3}},
-		Rarity:       85, MinDepth: 7, MaxDepth: 13, Band: true,
+		Rarity:       85, MinDepth: 4, MaxDepth: WinDepth + 1, Band: true,
 	},
 	BandBlinkingFrogs: {
 		Distribution: map[monsterKind]monsInterval{MonsBlinkingFrog: {2, 4}},
-		Rarity:       65, MinDepth: 9, MaxDepth: 13, Band: true,
+		Rarity:       65, MinDepth: 5, MaxDepth: WinDepth + 1, Band: true,
 	},
 	BandSatowalga: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsSatowalgaPlant: {2, 2},
 		},
-		Rarity: 100, MinDepth: 7, MaxDepth: 13, Band: true,
+		Rarity: 100, MinDepth: 4, MaxDepth: WinDepth + 1, Band: true,
 	},
-	BandExplosive: {
+	BandExplosive: { // XXX too random
 		Distribution: map[monsterKind]monsInterval{
 			MonsBlinkingFrog:   {0, 1},
 			MonsExplosiveNadre: {1, 2},
 			MonsGiantBee:       {1, 1},
 			MonsBrizzia:        {0, 1},
 		},
-		Rarity: 60, MinDepth: 8, MaxDepth: 13, Band: true,
+		Rarity: 60, MinDepth: 5, MaxDepth: WinDepth + 1, Band: true,
 	},
 	BandYacksGoblin: {
 		Distribution: map[monsterKind]monsInterval{MonsYack: {2, 2}, MonsGoblin: {1, 1}},
-		Rarity:       50, MinDepth: 5, MaxDepth: 11, Band: true,
+		Rarity:       50, MinDepth: 3, MaxDepth: WinDepth - 1, Band: true,
 	},
 	BandYacksMilfid: {
 		Distribution: map[monsterKind]monsInterval{MonsYack: {2, 2}, MonsWingedMilfid: {1, 1}},
-		Rarity:       80, MinDepth: 5, MaxDepth: 11, Band: true,
+		Rarity:       80, MinDepth: 3, MaxDepth: WinDepth - 1, Band: true,
 	},
 	BandYacksMany: {
 		Distribution: map[monsterKind]monsInterval{MonsYack: {4, 5}},
-		Rarity:       50, MinDepth: 5, MaxDepth: 11, Band: true,
+		Rarity:       50, MinDepth: 3, MaxDepth: WinDepth - 1, Band: true,
 	},
 	BandGiantBees: {
 		Distribution: map[monsterKind]monsInterval{MonsGiantBee: {2, 3}},
-		Rarity:       55, MinDepth: 6, MaxDepth: 13, Band: true,
+		Rarity:       55, MinDepth: 4, MaxDepth: WinDepth + 1, Band: true,
 	},
 	BandGiantBeesMany: {
 		Distribution: map[monsterKind]monsInterval{MonsGiantBee: {4, 5}},
-		Rarity:       90, MinDepth: 6, MaxDepth: 13, Band: true,
+		Rarity:       90, MinDepth: 4, MaxDepth: WinDepth + 1, Band: true,
 	},
 	BandSkeletonWarrior: {
 		Distribution: map[monsterKind]monsInterval{MonsSkeletonWarrior: {2, 3}},
-		Rarity:       60, MinDepth: 8, MaxDepth: 13, Band: true,
+		Rarity:       60, MinDepth: 5, MaxDepth: WinDepth + 1, Band: true,
 	},
 	BandVampires: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsVampire: {2, 2},
 		},
-		Rarity: 250, MinDepth: 13, MaxDepth: 15, Band: true,
+		Rarity: 250, MinDepth: WinDepth + 1, MaxDepth: MaxDepth, Band: true,
 	},
 	BandVampireNixe: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsVampire: {1, 1},
 			MonsMadNixe: {1, 1},
 		},
-		Rarity: 250, MinDepth: 13, MaxDepth: 15, Band: true,
+		Rarity: 250, MinDepth: WinDepth + 1, MaxDepth: MaxDepth, Band: true,
 	},
 	BandVampireCelmist: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsVampire:     {1, 1},
 			MonsMindCelmist: {1, 1},
 		},
-		Rarity: 250, MinDepth: 13, MaxDepth: 15, Band: true,
+		Rarity: 250, MinDepth: WinDepth + 1, MaxDepth: MaxDepth, Band: true,
 	},
 	BandTreeMushroomWorms: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsTreeMushroom: {1, 1},
 			MonsWorm:         {2, 2},
 		},
-		Rarity: 250, MinDepth: 10, MaxDepth: 12, Band: true,
+		Rarity: 250, MinDepth: 6, MaxDepth: WinDepth, Band: true,
 	},
 	BandTreeMushrooms: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsTreeMushroom: {2, 2},
 		},
-		Rarity: 250, MinDepth: 13, MaxDepth: 15, Band: true,
+		Rarity: 250, MinDepth: WinDepth + 1, MaxDepth: MaxDepth, Band: true,
 	},
 	BandMindCelmists: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsMindCelmist:   {1, 1},
 			MonsGoblinWarrior: {1, 1},
 		},
-		Rarity: 200, MinDepth: 13, MaxDepth: 15, Band: true,
+		Rarity: 200, MinDepth: WinDepth + 1, MaxDepth: MaxDepth, Band: true,
 	},
 	BandMindCelmistsLich: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsMindCelmist: {2, 2},
 		},
-		Rarity: 200, MinDepth: 13, MaxDepth: 15, Band: true,
+		Rarity: 200, MinDepth: WinDepth + 1, MaxDepth: MaxDepth, Band: true,
 	},
 	BandMindCelmistsMadNixe: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsMindCelmist: {1, 1},
 			MonsMadNixe:     {1, 1},
 		},
-		Rarity: 200, MinDepth: 13, MaxDepth: 15, Band: true,
+		Rarity: 200, MinDepth: WinDepth + 1, MaxDepth: MaxDepth, Band: true,
 	},
 	BandMadNixes: {
 		Distribution: map[monsterKind]monsInterval{
@@ -594,54 +594,54 @@ var MonsBands = []monsterBandData{
 			MonsSpider:  {1, 1},
 			MonsHound:   {1, 1},
 		},
-		Rarity: 110, MinDepth: 13, MaxDepth: 15, Band: true,
+		Rarity: 110, MinDepth: WinDepth + 1, MaxDepth: MaxDepth, Band: true,
 	},
 	BandMadNixesDragon: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsMadNixe:     {1, 1},
 			MonsEarthDragon: {1, 1},
 		},
-		Rarity: 110, MinDepth: 13, MaxDepth: 15, Band: true,
+		Rarity: 110, MinDepth: WinDepth + 1, MaxDepth: MaxDepth, Band: true,
 	},
 	BandMadNixesHydra: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsMadNixe: {1, 1},
 			MonsHydra:   {1, 1},
 		},
-		Rarity: 110, MinDepth: 13, MaxDepth: 15, Band: true,
+		Rarity: 110, MinDepth: WinDepth + 1, MaxDepth: MaxDepth, Band: true,
 	},
 	BandMadNixesFrogs: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsMadNixe:      {1, 1},
 			MonsBlinkingFrog: {2, 2},
 		},
-		Rarity: 110, MinDepth: 13, MaxDepth: 15, Band: true,
+		Rarity: 110, MinDepth: WinDepth + 1, MaxDepth: MaxDepth, Band: true,
 	},
 	UBandTinyHarpy: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsTinyHarpy:    {3, 3},
 			MonsWingedMilfid: {1, 1},
 		},
-		Rarity: 50, MinDepth: 4, MaxDepth: 4, Band: true, Unique: true,
+		Rarity: 50, MinDepth: 2, MaxDepth: 2, Band: true, Unique: true,
 	},
 	UBandWorms: {
 		Distribution: map[monsterKind]monsInterval{MonsWorm: {3, 4}, MonsSpider: {1, 1}},
-		Rarity:       50, MinDepth: 4, MaxDepth: 4, Band: true, Unique: true,
+		Rarity:       50, MinDepth: 2, MaxDepth: 2, Band: true, Unique: true,
 	},
 	UBandGoblinsEasy: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsGoblin: {3, 3},
 			MonsHound:  {2, 2},
 		},
-		Rarity: 30, MinDepth: 5, MaxDepth: 5, Band: true, Unique: true,
+		Rarity: 30, MinDepth: 3, MaxDepth: 3, Band: true, Unique: true,
 	},
 	UBandFrogs: {
 		Distribution: map[monsterKind]monsInterval{MonsBlinkingFrog: {2, 3}},
-		Rarity:       60, MinDepth: 6, MaxDepth: 6, Band: true, Unique: true,
+		Rarity:       60, MinDepth: 4, MaxDepth: 4, Band: true, Unique: true,
 	},
 	UBandOgres: {
 		Distribution: map[monsterKind]monsInterval{MonsOgre: {2, 3}, MonsCyclop: {1, 1}},
-		Rarity:       35, MinDepth: 7, MaxDepth: 7, Band: true, Unique: true,
+		Rarity:       35, MinDepth: 4, MaxDepth: 4, Band: true, Unique: true,
 	},
 	UBandGoblins: {
 		Distribution: map[monsterKind]monsInterval{
@@ -649,42 +649,42 @@ var MonsBands = []monsterBandData{
 			MonsGoblinWarrior: {2, 2},
 			MonsHound:         {1, 1},
 		},
-		Rarity: 30, MinDepth: 8, MaxDepth: 8, Band: true, Unique: true,
+		Rarity: 30, MinDepth: 5, MaxDepth: 5, Band: true, Unique: true,
 	},
 	UBandBeeYacks: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsYack:     {3, 4},
 			MonsGiantBee: {2, 2},
 		},
-		Rarity: 45, MinDepth: 9, MaxDepth: 9, Band: true, Unique: true,
+		Rarity: 45, MinDepth: 5, MaxDepth: 5, Band: true, Unique: true,
 	},
 	UBandMadNixes: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsMadNixe: {2, 2},
 			MonsSpider:  {1, 1},
 		},
-		Rarity: 40, MinDepth: 9, MaxDepth: 9, Band: true, Unique: true,
+		Rarity: 40, MinDepth: 5, MaxDepth: 5, Band: true, Unique: true,
 	},
 	UVampires: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsVampire:      {2, 2},
 			MonsWingedMilfid: {1, 1},
 		},
-		Rarity: 100, MinDepth: 9, MaxDepth: 9, Band: true, Unique: true,
+		Rarity: 100, MinDepth: 5, MaxDepth: 5, Band: true, Unique: true,
 	},
 	UHydras: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsHydra:  {2, 3},
 			MonsSpider: {1, 2},
 		},
-		Rarity: 40, MinDepth: 10, MaxDepth: 10, Band: true, Unique: true,
+		Rarity: 40, MinDepth: 6, MaxDepth: 6, Band: true, Unique: true,
 	},
 	UExplosiveNadres: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsExplosiveNadre: {2, 3},
 			MonsBrizzia:        {1, 2},
 		},
-		Rarity: 55, MinDepth: 10, MaxDepth: 10, Band: true, Unique: true,
+		Rarity: 55, MinDepth: 6, MaxDepth: 6, Band: true, Unique: true,
 	},
 	ULich: {
 		Distribution: map[monsterKind]monsInterval{
@@ -692,38 +692,38 @@ var MonsBands = []monsterBandData{
 			MonsLich:            {1, 1},
 			MonsMirrorSpecter:   {0, 1},
 		},
-		Rarity: 50, MinDepth: 11, MaxDepth: 11, Band: true, Unique: true,
+		Rarity: 50, MinDepth: WinDepth - 1, MaxDepth: WinDepth - 1, Band: true, Unique: true,
 	},
 	UBrizzias: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsBrizzia: {3, 4},
 		},
-		Rarity: 80, MinDepth: 11, MaxDepth: 11, Band: true, Unique: true,
+		Rarity: 80, MinDepth: WinDepth - 1, MaxDepth: WinDepth - 1, Band: true, Unique: true,
 	},
 	UAcidMounds: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsAcidMound: {3, 4},
 		},
-		Rarity: 80, MinDepth: 12, MaxDepth: 12, Band: true, Unique: true,
+		Rarity: 80, MinDepth: WinDepth, MaxDepth: WinDepth, Band: true, Unique: true,
 	},
 	UBandMindCelmist: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsMindCelmist: {2, 2},
 			MonsHound:       {1, 1},
 		},
-		Rarity: 100, MinDepth: 11, MaxDepth: 11, Band: true, Unique: true,
+		Rarity: 100, MinDepth: WinDepth - 1, MaxDepth: WinDepth - 1, Band: true, Unique: true,
 	},
 	USatowalga: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsSatowalgaPlant: {3, 3},
 		},
-		Rarity: 80, MinDepth: 12, MaxDepth: 12, Band: true, Unique: true,
+		Rarity: 80, MinDepth: WinDepth, MaxDepth: WinDepth, Band: true, Unique: true,
 	},
 	UDragon: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsEarthDragon: {2, 2},
 		},
-		Rarity: 60, MinDepth: 12, MaxDepth: 12, Band: true, Unique: true,
+		Rarity: 60, MinDepth: WinDepth, MaxDepth: WinDepth, Band: true, Unique: true,
 	},
 	UMarevorHelith: {
 		Distribution: map[monsterKind]monsInterval{
@@ -731,19 +731,19 @@ var MonsBands = []monsterBandData{
 			MonsLich:          {0, 1},
 			MonsVampire:       {0, 1},
 		},
-		Rarity: 100, MinDepth: 7, MaxDepth: 15, Band: true, Unique: true,
+		Rarity: 100, MinDepth: 3, MaxDepth: MaxDepth, Band: true, Unique: true,
 	},
 	UXCyclops: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsCyclop: {3, 3},
 		},
-		Rarity: 100, MinDepth: 13, MaxDepth: 15, Band: true, Unique: true,
+		Rarity: 100, MinDepth: WinDepth + 1, MaxDepth: MaxDepth, Band: true, Unique: true,
 	},
 	UXLiches: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsLich: {2, 2},
 		},
-		Rarity: 100, MinDepth: 14, MaxDepth: 15, Band: true, Unique: true,
+		Rarity: 100, MinDepth: MaxDepth - 1, MaxDepth: MaxDepth, Band: true, Unique: true,
 	},
 	UXFrogRanged: {
 		Distribution: map[monsterKind]monsInterval{
@@ -751,33 +751,33 @@ var MonsBands = []monsterBandData{
 			MonsCyclop:       {1, 1},
 			MonsLich:         {1, 1},
 		},
-		Rarity: 100, MinDepth: 14, MaxDepth: 15, Band: true, Unique: true,
+		Rarity: 100, MinDepth: MaxDepth - 1, MaxDepth: MaxDepth, Band: true, Unique: true,
 	},
 	UXExplosive: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsExplosiveNadre: {5, 5},
 		},
-		Rarity: 100, MinDepth: 13, MaxDepth: 15, Band: true, Unique: true,
+		Rarity: 100, MinDepth: WinDepth + 1, MaxDepth: MaxDepth, Band: true, Unique: true,
 	},
 	UXWarriors: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsHound:         {2, 2},
 			MonsGoblinWarrior: {3, 3},
 		},
-		Rarity: 100, MinDepth: 14, MaxDepth: 15, Band: true, Unique: true,
+		Rarity: 100, MinDepth: MaxDepth - 1, MaxDepth: MaxDepth, Band: true, Unique: true,
 	},
 	UXSatowalgaNixe: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsSatowalgaPlant: {2, 2},
 			MonsMadNixe:        {1, 1},
 		},
-		Rarity: 110, MinDepth: 15, MaxDepth: 15, Band: true, Unique: true,
+		Rarity: 110, MinDepth: MaxDepth, MaxDepth: MaxDepth, Band: true, Unique: true,
 	},
 	UXSpecters: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsMirrorSpecter: {3, 3},
 		},
-		Rarity: 100, MinDepth: 14, MaxDepth: 15, Band: true, Unique: true,
+		Rarity: 100, MinDepth: MaxDepth - 1, MaxDepth: MaxDepth, Band: true, Unique: true,
 	},
 	UXDisabling: {
 		Distribution: map[monsterKind]monsInterval{
@@ -787,60 +787,60 @@ var MonsBands = []monsterBandData{
 			MonsGiantBee:       {1, 1},
 			MonsMirrorSpecter:  {1, 1},
 		},
-		Rarity: 100, MinDepth: 15, MaxDepth: 15, Band: true, Unique: true,
+		Rarity: 100, MinDepth: MaxDepth, MaxDepth: MaxDepth, Band: true, Unique: true,
 	},
 	UXMadNixeSpecter: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsMirrorSpecter: {1, 1},
 			MonsMadNixe:       {1, 1},
 		},
-		Rarity: 110, MinDepth: 14, MaxDepth: 15, Band: true, Unique: true,
+		Rarity: 110, MinDepth: MaxDepth - 1, MaxDepth: MaxDepth, Band: true, Unique: true,
 	},
 	UXMadNixeCyclop: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsCyclop:  {1, 1},
 			MonsMadNixe: {1, 1},
 		},
-		Rarity: 110, MinDepth: 14, MaxDepth: 15, Band: true, Unique: true,
+		Rarity: 110, MinDepth: MaxDepth - 1, MaxDepth: MaxDepth, Band: true, Unique: true,
 	},
 	UXMadNixeHydra: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsHydra:   {1, 1},
 			MonsMadNixe: {1, 1},
 		},
-		Rarity: 110, MinDepth: 15, MaxDepth: 15, Band: true, Unique: true,
+		Rarity: 110, MinDepth: MaxDepth, MaxDepth: MaxDepth, Band: true, Unique: true,
 	},
 	UXVampires: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsVampire: {3, 3},
 		},
-		Rarity: 200, MinDepth: 14, MaxDepth: 15, Band: true, Unique: true,
+		Rarity: 200, MinDepth: MaxDepth - 1, MaxDepth: MaxDepth, Band: true, Unique: true,
 	},
 	UXMadNixes: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsMadNixe: {3, 3},
 		},
-		Rarity: 200, MinDepth: 14, MaxDepth: 15, Band: true, Unique: true,
+		Rarity: 200, MinDepth: MaxDepth - 1, MaxDepth: MaxDepth, Band: true, Unique: true,
 	},
 	UXMindCelmists: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsMindCelmist: {2, 2},
 			MonsCyclop:      {1, 1},
 		},
-		Rarity: 150, MinDepth: 14, MaxDepth: 15, Band: true, Unique: true,
+		Rarity: 150, MinDepth: MaxDepth - 1, MaxDepth: MaxDepth, Band: true, Unique: true,
 	},
 	UXTreeMushrooms: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsTreeMushroom: {3, 3},
 		},
-		Rarity: 200, MinDepth: 14, MaxDepth: 15, Band: true, Unique: true,
+		Rarity: 200, MinDepth: MaxDepth - 1, MaxDepth: MaxDepth, Band: true, Unique: true,
 	},
 	UXMilfidYack: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsWingedMilfid: {2, 2},
 			MonsYack:         {3, 3},
 		},
-		Rarity: 110, MinDepth: 14, MaxDepth: 15, Band: true, Unique: true,
+		Rarity: 110, MinDepth: MaxDepth - 1, MaxDepth: MaxDepth, Band: true, Unique: true,
 	},
 	UXVariedWarriors: {
 		Distribution: map[monsterKind]monsInterval{
@@ -848,7 +848,7 @@ var MonsBands = []monsterBandData{
 			MonsWingedMilfid:    {1, 1},
 			MonsSkeletonWarrior: {1, 1},
 		},
-		Rarity: 100, MinDepth: 13, MaxDepth: 15, Band: true, Unique: true,
+		Rarity: 100, MinDepth: WinDepth + 1, MaxDepth: MaxDepth, Band: true, Unique: true,
 	},
 }
 
@@ -881,8 +881,8 @@ func init() {
 				MonsOgre: {1, 1}, MonsSpider: {2, 2},
 			}, Rarity: 75, Band: true},
 		},
-			minDepth: 5,
-			maxDepth: 11,
+			minDepth: 3,
+			maxDepth: 7,
 		},
 		{bands: []monsterBandData{ // spiders
 			{Monster: MonsSpider, Rarity: 40},
@@ -920,8 +920,8 @@ func init() {
 				MonsHydra: {1, 1}, MonsSpider: {2, 2},
 			}, Rarity: 250, Band: true},
 		},
-			minDepth: 7,
-			maxDepth: 11,
+			minDepth: 4,
+			maxDepth: 7,
 		},
 		{bands: []monsterBandData{ // milfids
 			{Monster: MonsWingedMilfid, Rarity: 50},
@@ -944,8 +944,8 @@ func init() {
 				MonsWingedMilfid: {1, 1}, MonsYack: {3, 3},
 			}, Rarity: 75, Band: true},
 		},
-			minDepth: 4,
-			maxDepth: 11,
+			minDepth: 3,
+			maxDepth: 7,
 		},
 		{bands: []monsterBandData{ // Bees
 			{Monster: MonsGiantBee, Rarity: 50},
@@ -980,8 +980,8 @@ func init() {
 				MonsGiantBee: {2, 2}, MonsMadNixe: {1, 1},
 			}, Rarity: 200, Band: true},
 		},
-			minDepth: 5,
-			maxDepth: 11,
+			minDepth: 4,
+			maxDepth: 7,
 		},
 		{bands: []monsterBandData{ // goblins
 			{Monster: MonsGoblin, Rarity: 50},
@@ -1011,8 +1011,8 @@ func init() {
 				MonsGoblinWarrior: {2, 2}, MonsMadNixe: {1, 1},
 			}, Rarity: 200, Band: true},
 		},
-			minDepth: 5,
-			maxDepth: 11,
+			minDepth: 4,
+			maxDepth: 7,
 		},
 		{bands: []monsterBandData{ // explosive nadres
 			{Monster: MonsExplosiveNadre, Rarity: 100},
@@ -1044,8 +1044,8 @@ func init() {
 				MonsExplosiveNadre: {2, 2}, MonsEarthDragon: {1, 1},
 			}, Rarity: 500, Band: true},
 		},
-			minDepth: 5,
-			maxDepth: 11,
+			minDepth: 3,
+			maxDepth: 7,
 		},
 		{bands: []monsterBandData{ // plants
 			{Monster: MonsSatowalgaPlant, Rarity: 100},
@@ -1086,8 +1086,8 @@ func init() {
 				MonsSatowalgaPlant: {1, 1}, MonsTreeMushroom: {1, 1},
 			}, Rarity: 400, Band: true},
 		},
-			minDepth: 7,
-			maxDepth: 11,
+			minDepth: 4,
+			maxDepth: 7,
 		},
 		{bands: []monsterBandData{ // acid mounds
 			{Monster: MonsAcidMound, Rarity: 50},
@@ -1116,8 +1116,8 @@ func init() {
 				MonsAcidMound: {2, 2}, MonsMadNixe: {1, 1},
 			}, Rarity: 200, Band: true},
 		},
-			minDepth: 7,
-			maxDepth: 12,
+			minDepth: 4,
+			maxDepth: WinDepth,
 		},
 		{bands: []monsterBandData{ // blinking frogs
 			{Monster: MonsBlinkingFrog, Rarity: 50},
@@ -1146,8 +1146,8 @@ func init() {
 				MonsBlinkingFrog: {2, 2}, MonsMadNixe: {1, 1},
 			}, Rarity: 200, Band: true},
 		},
-			minDepth: 7,
-			maxDepth: 12,
+			minDepth: 4,
+			maxDepth: WinDepth,
 		},
 		{bands: []monsterBandData{ // hydras
 			{Monster: MonsHydra, Rarity: 30},
@@ -1182,8 +1182,8 @@ func init() {
 				MonsHydra: {1, 1}, MonsTreeMushroom: {1, 1},
 			}, Rarity: 250, Band: true},
 		},
-			minDepth: 9,
-			maxDepth: 13,
+			minDepth: 5,
+			maxDepth: WinDepth + 1,
 		},
 		{bands: []monsterBandData{ // liches
 			{Monster: MonsLich, Rarity: 30},
@@ -1224,8 +1224,8 @@ func init() {
 				MonsLich: {2, 2}, MonsSkeletonWarrior: {2, 2},
 			}, Rarity: 200, Band: true},
 		},
-			minDepth: 10,
-			maxDepth: 13,
+			minDepth: 6,
+			maxDepth: WinDepth + 1,
 		},
 		{bands: []monsterBandData{ // dragons
 			{Monster: MonsEarthDragon, Rarity: 30},
@@ -1269,8 +1269,8 @@ func init() {
 				MonsEarthDragon: {2, 2}, MonsExplosiveNadre: {1, 1},
 			}, Rarity: 250, Band: true},
 		},
-			minDepth: 10,
-			maxDepth: 13,
+			minDepth: 6,
+			maxDepth: WinDepth + 1,
 		},
 	}
 	for _, sb := range MonsSpecialBands {
@@ -2830,12 +2830,20 @@ func (g *game) Danger() int {
 }
 
 func (g *game) MaxDanger() int {
-	max := 18 + 9*g.Depth + g.Depth/2 + g.Depth*g.Depth/3
-	if g.Depth == MaxDepth-1 {
-		max += 20
-	} else if g.Depth == MaxDepth {
-		max += 50
+	danger := [MaxDepth + 1]int{
+		1:  25,
+		2:  43,
+		3:  65,
+		4:  90,
+		5:  115,
+		6:  140,
+		7:  165,
+		8:  190,
+		9:  215,
+		10: 245,
+		11: 285,
 	}
+	max := danger[g.Depth]
 	adjust := -2 * g.Depth
 	for c, q := range g.Player.Consumables {
 		switch c {
@@ -2854,30 +2862,6 @@ func (g *game) MaxDanger() int {
 	}
 	if g.Depth < MaxDepth && g.Player.Consumables[DescentPotion] > 0 {
 		adjust += g.Depth
-	}
-	if g.Player.Weapon == Dagger {
-		adjust -= Min(3, g.Depth) * Max(1, g.Depth-2)
-	}
-	if g.Player.Armour != Robe && g.Player.Armour != LeatherArmour {
-		adjust += WinDepth - Min(g.Depth, WinDepth)
-	}
-	if g.Depth > 3 && g.Player.Shield == NoShield && !g.Player.Weapon.TwoHanded() {
-		adjust -= Min(g.Depth, 6) * 2
-	}
-	if g.Depth < 3 && g.Player.Shield != NoShield && !g.Player.Weapon.TwoHanded() && g.Player.Weapon != Dagger {
-		adjust += 12 - g.Depth*4
-	}
-	if g.Player.Weapon.TwoHanded() && g.Depth < 4 {
-		adjust += (4 - g.Depth) * 2
-	}
-	if g.Player.Armour == LeatherArmour {
-		adjust += WinDepth/2 - g.Depth
-	}
-	if g.Player.Weapon != Dagger && g.Depth < 3 {
-		adjust += 4 + (3-g.Depth)*3
-	}
-	if g.Player.Armour == Robe {
-		adjust -= 3 * g.Depth / 2
 	}
 	if max+adjust < max-max/3 {
 		max = max - max/3
@@ -2908,17 +2892,20 @@ func (g *game) MaxDanger() int {
 }
 
 func (g *game) MaxMonsters() int {
-	max := 13 + 3*g.Depth
-	if max > 33 && g.Depth <= WinDepth {
-		max = 33
-	} else if max > 36 {
-		max = 36
+	nmons := [MaxDepth + 1]int{
+		1:  13,
+		2:  17,
+		3:  22,
+		4:  28,
+		5:  33,
+		6:  33,
+		7:  33,
+		8:  36,
+		9:  36,
+		10: 39,
+		11: 42,
 	}
-	if g.Depth == MaxDepth-1 {
-		max += 3
-	} else if g.Depth == MaxDepth {
-		max += 6
-	}
+	max := nmons[g.Depth]
 	switch g.Dungeon.Gen {
 	case GenCaveMapTree, GenCaveMap:
 		max = max * 90 / 100
