@@ -140,6 +140,9 @@ func (r rod) Use(g *game, ev event) error {
 	if r.MPCost() > g.Player.MP {
 		return errors.New("Not enough magic points for using this rod.")
 	}
+	if g.Player.HasStatus(StatusBerserk) {
+		return errors.New("You cannot use rods while berserk.")
+	}
 	var err error
 	switch r {
 	case RodBlink:

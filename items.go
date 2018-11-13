@@ -113,11 +113,11 @@ func (p potion) Desc() (text string) {
 	case MagicPotion:
 		text = "replenishes your magical reserves."
 	case BerserkPotion:
-		text = "makes you enter a crazy rage, temporarily making you faster, stronger and healthier. You cannot drink potions while berserk, and afterwards it leaves you slow and exhausted."
+		text = "makes you enter a crazy rage, temporarily making you faster, stronger and healthier. You cannot use rods while berserk, and afterwards it leaves you slow and exhausted."
 	case SwiftnessPotion:
 		text = "makes you move faster and better at avoiding blows for a short time."
 	case LignificationPotion:
-		text = "makes you more resistant to physical blows, but you are attached to the ground while the effect lasts."
+		text = "makes you more resistant to physical blows, but you are attached to the ground while the effect lasts (you can still descend)."
 	case WallPotion:
 		text = "replaces free cells around you with temporary walls."
 	case CBlinkPotion:
@@ -125,7 +125,7 @@ func (p potion) Desc() (text string) {
 	case DigPotion:
 		text = "makes you dig walls like an earth dragon."
 	case SwapPotion:
-		text = "makes you swap positions with monsters instead of attacking."
+		text = "makes you swap positions with monsters instead of attacking. Ranged monsters can still damage you."
 	case ShadowsPotion:
 		text = "reduces your line of sight range to 1."
 	case ConfusePotion:
@@ -156,9 +156,6 @@ func (p potion) Use(g *game, ev event) error {
 	}
 	if g.Player.HasStatus(StatusNausea) {
 		return errors.New("You cannot drink potions while sick.")
-	}
-	if g.Player.HasStatus(StatusBerserk) {
-		return errors.New("You cannot drink potions while berserk.")
 	}
 	var err error
 	switch p {
