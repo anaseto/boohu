@@ -2732,7 +2732,7 @@ func (m *monster) MakeAware(g *game) {
 		return
 	}
 	if m.State == Resting {
-		if m.Status(MonsExhausted) && (m.Pos.Distance(g.Player.Pos) > 1 || RandInt(2) == 0) {
+		if m.Status(MonsExhausted) && (m.Pos.Distance(g.Player.Pos) > 1 || RandInt(3) > 0) {
 			return
 		}
 		adjust := g.LosRange() - m.Pos.Distance(g.Player.Pos)

@@ -84,7 +84,7 @@ func (r rod) Desc() string {
 	case RodShatter:
 		text = "induces an explosion around a wall, hurting adjacent monsters. The wall can disintegrate. You cannot use it at melee range."
 	case RodSleeping:
-		text = "induces sleeping and exhaustion for monsters in the targeted area."
+		text = "induces deep sleeping and exhaustion for monsters in the targeted area."
 	case RodLignification:
 		text = "lignifies a monster, so that it cannot move, but can still fight with improved resistance."
 	case RodHope:
@@ -260,7 +260,7 @@ func (g *game) EvokeRodSleeping(ev event) error {
 			continue
 		}
 		mons.State = Resting
-		mons.ExhaustTime(g, 30+RandInt(20))
+		mons.ExhaustTime(g, 40+RandInt(20))
 	}
 	return nil
 }
