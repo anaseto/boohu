@@ -294,7 +294,8 @@ const (
 	BandWingedMilfids
 	BandSatowalga
 	BandBlinkingFrogs
-	BandExplosive
+	BandExplosiveFrog
+	BandExplosiveBrizzia
 	BandGiantBees
 	BandGiantBeesMany
 	BandSkeletonWarrior
@@ -344,6 +345,7 @@ const (
 	UXTreeMushrooms
 	UXMindCelmists
 	UXMilfidYack
+	UXYacks
 	UXVariedWarriors
 )
 
@@ -502,14 +504,21 @@ var MonsBands = []monsterBandData{
 		},
 		Rarity: 10, MinDepth: 4, MaxDepth: WinDepth + 1, Band: true,
 	},
-	BandExplosive: { // XXX too random
+	BandExplosiveFrog: {
 		Distribution: map[monsterKind]monsInterval{
-			MonsBlinkingFrog:   {0, 1},
-			MonsExplosiveNadre: {1, 2},
+			MonsBlinkingFrog:   {1, 1},
+			MonsExplosiveNadre: {2, 2},
 			MonsGiantBee:       {1, 1},
-			MonsBrizzia:        {0, 1},
 		},
-		Rarity: 7, MinDepth: 5, MaxDepth: WinDepth + 1, Band: true,
+		Rarity: 10, MinDepth: 5, MaxDepth: WinDepth + 1, Band: true,
+	},
+	BandExplosiveBrizzia: {
+		Distribution: map[monsterKind]monsInterval{
+			MonsExplosiveNadre: {2, 2},
+			MonsGiantBee:       {1, 1},
+			MonsBrizzia:        {1, 1},
+		},
+		Rarity: 10, MinDepth: 5, MaxDepth: WinDepth + 1, Band: true,
 	},
 	BandYacksGoblin: {
 		Distribution: map[monsterKind]monsInterval{MonsYack: {2, 2}, MonsGoblin: {1, 1}},
@@ -820,7 +829,7 @@ var MonsBands = []monsterBandData{
 		Distribution: map[monsterKind]monsInterval{
 			MonsMadNixe: {3, 3},
 		},
-		Rarity: 10, MinDepth: MaxDepth - 1, MaxDepth: MaxDepth, Band: true, Unique: true,
+		Rarity: 10, MinDepth: MaxDepth - 2, MaxDepth: MaxDepth, Band: true, Unique: true,
 	},
 	UXMindCelmists: {
 		Distribution: map[monsterKind]monsInterval{
@@ -841,6 +850,12 @@ var MonsBands = []monsterBandData{
 			MonsYack:         {3, 3},
 		},
 		Rarity: 6, MinDepth: MaxDepth - 1, MaxDepth: MaxDepth, Band: true, Unique: true,
+	},
+	UXYacks: {
+		Distribution: map[monsterKind]monsInterval{
+			MonsYack: {7, 7},
+		},
+		Rarity: 8, MinDepth: MaxDepth - 2, MaxDepth: MaxDepth, Band: true, Unique: true,
 	},
 	UXVariedWarriors: {
 		Distribution: map[monsterKind]monsInterval{
