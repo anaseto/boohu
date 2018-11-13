@@ -2944,7 +2944,7 @@ func (g *game) GenMonsters() {
 loop:
 	for danger > 0 && nmons > 0 {
 		for band, data := range g.BandData {
-			if RandInt(data.Rarity*100) != 0 {
+			if RandInt(data.Rarity*50) != 0 {
 				continue
 			}
 			monsters := g.GenBand(data, monsterBand(band))
