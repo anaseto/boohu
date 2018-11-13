@@ -1027,7 +1027,7 @@ func (ui *termui) CharacterInfo(g *game) {
 	ui.DrawDungeonView(g, NoFlushMode)
 
 	b := bytes.Buffer{}
-	b.WriteString(formatText("Every year, the elders send someone to collect medicinal simella plants in the Underground.  This year, the honor fell upon you, and so here you are.  According to the elders, deep in the Underground, magical stairs will lead you back to your village.  Along the way, you will collect simellas, as well as various items that will help you deal with monsters, which you may fight or flee...", TextWidth))
+	b.WriteString(formatText("Every year, the elders send someone to collect medicinal simella plants in the Underground.  This year, the honor fell upon you, and so here you are.  According to the elders, deep in the Underground, magical stairs will lead you back to your village.", TextWidth))
 	b.WriteString("\n\n")
 	b.WriteString(formatText(
 		fmt.Sprintf("You are wielding %s. %s", Indefinite(g.Player.Weapon.String(), false), g.Player.Weapon.Desc()), TextWidth))
