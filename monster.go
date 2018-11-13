@@ -1597,7 +1597,7 @@ func init() {
 		}},
 		{bands: []monsterBandData{ // terrible goblin warriors
 			{Distribution: map[monsterKind]monsInterval{
-				MonsGoblinWarrior: {2, 2}, MonsHound: {5, 5},
+				MonsGoblinWarrior: {2, 2}, MonsHound: {4, 4},
 			}, Rarity: 2, Band: true},
 			{Distribution: map[monsterKind]monsInterval{
 				MonsGoblinWarrior: {2, 2}, MonsHydra: {1, 1},
@@ -1610,6 +1610,9 @@ func init() {
 			}, Rarity: 3, Band: true},
 			{Distribution: map[monsterKind]monsInterval{
 				MonsGoblinWarrior: {2, 2}, MonsMadNixe: {1, 1},
+			}, Rarity: 3, Band: true},
+			{Distribution: map[monsterKind]monsInterval{
+				MonsGoblinWarrior: {2, 2}, MonsWingedMilfid: {2, 2},
 			}, Rarity: 3, Band: true},
 			{Distribution: map[monsterKind]monsInterval{
 				MonsGoblinWarrior: {2, 2}, MonsYack: {3, 3},
