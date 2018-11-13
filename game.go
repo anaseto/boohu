@@ -378,7 +378,7 @@ func (g *game) InitSpecialBands() {
 	g.Opts.SpecialBands[depth] = sb.bands
 	seb := MonsSpecialEndBands[RandInt(len(MonsSpecialEndBands))]
 	if RandInt(4) == 0 {
-		if RandInt(5) > 1 {
+		if RandInt(5) > 1 || depth == WinDepth {
 			g.Opts.SpecialBands[WinDepth+1] = seb.bands
 		} else {
 			g.Opts.SpecialBands[WinDepth] = seb.bands

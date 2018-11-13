@@ -1183,7 +1183,7 @@ func init() {
 			}, Rarity: 250, Band: true},
 		},
 			minDepth: 5,
-			maxDepth: WinDepth + 1,
+			maxDepth: WinDepth,
 		},
 		{bands: []monsterBandData{ // liches
 			{Monster: MonsLich, Rarity: 30},
@@ -1225,7 +1225,7 @@ func init() {
 			}, Rarity: 200, Band: true},
 		},
 			minDepth: 6,
-			maxDepth: WinDepth + 1,
+			maxDepth: WinDepth,
 		},
 		{bands: []monsterBandData{ // dragons
 			{Monster: MonsEarthDragon, Rarity: 30},
@@ -1270,7 +1270,7 @@ func init() {
 			}, Rarity: 250, Band: true},
 		},
 			minDepth: 6,
-			maxDepth: WinDepth + 1,
+			maxDepth: WinDepth,
 		},
 	}
 	for _, sb := range MonsSpecialBands {
