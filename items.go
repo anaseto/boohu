@@ -227,6 +227,9 @@ func (g *game) QuaffBerserk(ev event) error {
 	if g.Player.HasStatus(StatusExhausted) {
 		return errors.New("You are too exhausted to berserk.")
 	}
+	if g.Player.HasStatus(StatusBerserk) {
+		return errors.New("You are already berserk.")
+	}
 	g.Player.Statuses[StatusBerserk] = 1
 	end := ev.Rank() + 65 + RandInt(20)
 	g.PushEvent(&simpleEvent{ERank: end, EAction: BerserkEnd})
