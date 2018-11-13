@@ -207,7 +207,7 @@ var MonsData = []monsterData{
 	MonsMadNixe:         {10, 11, 10, 20, 15, 0, 15, 'N', "mad nixe", 12},
 	MonsMindCelmist:     {10, 9, 20, 18, 99, 0, 14, 'c', "mind celmist", 16},
 	MonsVampire:         {10, 9, 10, 21, 15, 0, 15, 'V', "vampire", 13},
-	MonsTreeMushroom:    {12, 14, 12, 38, 14, 4, 6, 'T', "tree mushroom", 14},
+	MonsTreeMushroom:    {12, 15, 12, 38, 14, 4, 6, 'T', "tree mushroom", 14},
 	MonsMarevorHelith:   {10, 0, 10, 97, 18, 10, 15, 'M', "Marevor Helith", 18},
 }
 
