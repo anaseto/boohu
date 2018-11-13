@@ -410,9 +410,6 @@ const (
 )
 
 func (g *game) InitLevel() {
-	// Dungeon terrain
-	g.GenDungeon()
-
 	// Starting data
 	if g.Depth == 0 {
 		g.Depth++ // start at 1
@@ -463,6 +460,9 @@ func (g *game) InitLevel() {
 			g.GenPlan[6], g.GenPlan[7] = g.GenPlan[7], g.GenPlan[6]
 		}
 	}
+
+	// Dungeon terrain
+	g.GenDungeon()
 
 	g.MonstersPosCache = make([]int, DungeonNCells)
 	g.Player.Pos = g.FreeCell()
