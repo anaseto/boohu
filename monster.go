@@ -199,15 +199,15 @@ var MonsData = []monsterData{
 	MonsSpider:          {8, 7, 10, 13, 17, 0, 15, 's', "spider", 6},
 	MonsWingedMilfid:    {8, 9, 10, 17, 15, 0, 13, 'W', "winged milfid", 7},
 	MonsBlinkingFrog:    {10, 10, 10, 20, 15, 0, 12, 'F', "blinking frog", 7},
-	MonsLich:            {10, 10, 10, 23, 15, 3, 12, 'L', "lich", 17},
+	MonsLich:            {10, 10, 10, 23, 15, 3, 12, 'L', "lich", 16},
 	MonsEarthDragon:     {10, 14, 10, 40, 14, 6, 8, 'D', "earth dragon", 20},
 	MonsMirrorSpecter:   {10, 10, 10, 18, 15, 0, 17, 'm', "mirror specter", 11},
 	MonsExplosiveNadre:  {10, 6, 10, 3, 14, 0, 10, 'n', "explosive nadre", 6},
 	MonsSatowalgaPlant:  {10, 12, 12, 30, 15, 0, 4, 'P', "satowalga plant", 7},
 	MonsMadNixe:         {10, 11, 10, 20, 15, 0, 15, 'N', "mad nixe", 12},
-	MonsMindCelmist:     {10, 9, 20, 18, 99, 0, 14, 'c', "mind celmist", 16},
+	MonsMindCelmist:     {10, 9, 20, 18, 99, 0, 14, 'c', "mind celmist", 14},
 	MonsVampire:         {10, 9, 10, 21, 15, 0, 15, 'V', "vampire", 13},
-	MonsTreeMushroom:    {12, 15, 12, 38, 14, 4, 6, 'T', "tree mushroom", 14},
+	MonsTreeMushroom:    {12, 15, 12, 38, 14, 4, 6, 'T', "tree mushroom", 17},
 	MonsMarevorHelith:   {10, 0, 10, 97, 18, 10, 15, 'M', "Marevor Helith", 18},
 }
 
