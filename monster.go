@@ -366,10 +366,10 @@ func (g *game) GenBand(mbd monsterBandData, band monsterBand) []monsterKind {
 	if g.GeneratedUniques[band] > 0 && mbd.Unique {
 		return nil
 	}
-	if g.Depth > mbd.MaxDepth+RandInt(3) || RandInt(10) == 0 {
+	if g.Depth > mbd.MaxDepth+RandInt(2) || RandInt(15) == 0 {
 		return nil
 	}
-	if g.Depth < mbd.MinDepth-RandInt(3) {
+	if g.Depth < mbd.MinDepth-RandInt(2) {
 		return nil
 	}
 	if !mbd.Band {
@@ -2926,7 +2926,7 @@ func (g *game) GenMonsters() {
 loop:
 	for danger > 0 && nmons > 0 {
 		for band, data := range g.BandData {
-			if RandInt(data.Rarity*2) != 0 {
+			if RandInt(data.Rarity*3) != 0 {
 				continue
 			}
 			monsters := g.GenBand(data, monsterBand(band))
