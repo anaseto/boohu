@@ -25,6 +25,7 @@ Gameplay:
 + Darts of confusion always hit. Less of them generated as a result, and
   removed “unusually accurate” aptitude.
 + New potion of accuracy that makes you never miss for a few turns.
++ Berserk status now forbids rod usage instead of potion usage. 
 + New monster: mind celmist - uses a smitting attack and avoids melee.
 + New monster: tiny harpy - can blink when hurt, appears sometimes in place of
   goblins.
