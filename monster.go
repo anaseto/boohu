@@ -2849,8 +2849,8 @@ func (g *game) Danger() int {
 
 func (g *game) MaxDanger() int {
 	danger := [MaxDepth + 1]int{
-		1:  25,
-		2:  43,
+		1:  20,
+		2:  42,
 		3:  65,
 		4:  90,
 		5:  115,
