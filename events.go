@@ -363,7 +363,7 @@ func (g *game) MakeCreatureSleep(pos position, ev event) {
 		return
 	}
 	mons.State = Resting
-	mons.ExhaustTime(g, 30+RandInt(10))
+	mons.ExhaustTime(g, 40+RandInt(10))
 }
 
 func (g *game) BurnCreature(pos position, ev event) {

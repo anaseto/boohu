@@ -263,7 +263,7 @@ func (g *game) EvokeRodSleeping(ev event) error {
 			continue
 		}
 		mons.State = Resting
-		mons.ExhaustTime(g, 40+RandInt(20))
+		mons.ExhaustTime(g, 40+RandInt(10))
 	}
 	return nil
 }

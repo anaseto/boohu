@@ -621,6 +621,7 @@ func (g *game) NightFog(at position, radius int, ev event) {
 		if !ok {
 			g.Clouds[pos] = CloudNight
 			g.PushEvent(&cloudEvent{ERank: ev.Rank() + 10, EAction: NightProgression, Pos: pos})
+			g.MakeCreatureSleep(pos, ev)
 		}
 	}
 	g.ComputeLOS()
