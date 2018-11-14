@@ -409,60 +409,64 @@ const (
 	GenExtraCollectables
 )
 
+func (g *game) InitFirstLevel() {
+	g.Depth++ // start at 1
+	g.InitPlayer()
+	g.AutoTarget = InvalidPos
+	g.Targeting = InvalidPos
+	g.GeneratedRods = map[rod]bool{}
+	g.GeneratedEquipables = map[equipable]bool{}
+	g.FoundEquipables = map[equipable]bool{Robe: true, Dagger: true}
+	g.GeneratedUniques = map[monsterBand]int{}
+	g.Stats.KilledMons = map[monsterKind]int{}
+	g.InitSpecialBands()
+	if RandInt(4) > 0 {
+		g.Opts.UnstableLevel = 1 + RandInt(MaxDepth)
+	}
+	if g.Opts.UnstableLevel >= 1 && g.Opts.UnstableLevel <= 3 {
+		// it should happen less often in the first levels
+		g.Opts.UnstableLevel += RandInt(MaxDepth - 2)
+	}
+	if RandInt(3) > 0 || RandInt(2) == 0 && g.Opts.UnstableLevel == 0 {
+		g.Opts.StoneLevel = 1 + RandInt(MaxDepth)
+	}
+	if g.Opts.StoneLevel >= 1 && g.Opts.StoneLevel <= 3 {
+		g.Opts.StoneLevel += RandInt(MaxDepth - 2)
+	}
+	if RandInt(3) == 0 {
+		g.Opts.Alternate = MonsTinyHarpy
+		if RandInt(10) == 0 {
+			g.Opts.Alternate = MonsWorm
+		}
+	}
+	g.Version = Version
+	g.GenPlan = [MaxDepth + 1]genFlavour{
+		1:  GenRod,
+		2:  GenWeapon,
+		3:  GenArmour,
+		4:  GenRod,
+		5:  GenExtraCollectables,
+		6:  GenWpArm,
+		7:  GenRod,
+		8:  GenExtraCollectables,
+		9:  GenWeapon,
+		10: GenExtraCollectables,
+		11: GenExtraCollectables,
+	}
+	permi := RandInt(7)
+	switch permi {
+	case 0, 1, 2, 3:
+		g.GenPlan[permi+1], g.GenPlan[permi+2] = g.GenPlan[permi+2], g.GenPlan[permi+1]
+	}
+	if RandInt(4) == 0 {
+		g.GenPlan[6], g.GenPlan[7] = g.GenPlan[7], g.GenPlan[6]
+	}
+}
+
 func (g *game) InitLevel() {
 	// Starting data
 	if g.Depth == 0 {
-		g.Depth++ // start at 1
-		g.InitPlayer()
-		g.AutoTarget = InvalidPos
-		g.Targeting = InvalidPos
-		g.GeneratedRods = map[rod]bool{}
-		g.GeneratedEquipables = map[equipable]bool{}
-		g.FoundEquipables = map[equipable]bool{Robe: true, Dagger: true}
-		g.GeneratedUniques = map[monsterBand]int{}
-		g.Stats.KilledMons = map[monsterKind]int{}
-		g.InitSpecialBands()
-		if RandInt(4) > 0 {
-			g.Opts.UnstableLevel = 1 + RandInt(MaxDepth)
-		}
-		if g.Opts.UnstableLevel >= 1 && g.Opts.UnstableLevel <= 3 {
-			// it should happen less often in the first levels
-			g.Opts.UnstableLevel += RandInt(MaxDepth - 2)
-		}
-		if RandInt(3) > 0 || RandInt(2) == 0 && g.Opts.UnstableLevel == 0 {
-			g.Opts.StoneLevel = 1 + RandInt(MaxDepth)
-		}
-		if g.Opts.StoneLevel >= 1 && g.Opts.StoneLevel <= 3 {
-			g.Opts.StoneLevel += RandInt(MaxDepth - 2)
-		}
-		if RandInt(3) == 0 {
-			g.Opts.Alternate = MonsTinyHarpy
-			if RandInt(10) == 0 {
-				g.Opts.Alternate = MonsWorm
-			}
-		}
-		g.Version = Version
-		g.GenPlan = [MaxDepth + 1]genFlavour{
-			1:  GenRod,
-			2:  GenWeapon,
-			3:  GenArmour,
-			4:  GenRod,
-			5:  GenExtraCollectables,
-			6:  GenWpArm,
-			7:  GenRod,
-			8:  GenExtraCollectables,
-			9:  GenWeapon,
-			10: GenExtraCollectables,
-			11: GenExtraCollectables,
-		}
-		permi := RandInt(7)
-		switch permi {
-		case 0, 1, 2, 3:
-			g.GenPlan[permi+1], g.GenPlan[permi+2] = g.GenPlan[permi+2], g.GenPlan[permi+1]
-		}
-		if RandInt(4) == 0 {
-			g.GenPlan[6], g.GenPlan[7] = g.GenPlan[7], g.GenPlan[6]
-		}
+		g.InitFirstLevel()
 	}
 
 	// Dungeon terrain
