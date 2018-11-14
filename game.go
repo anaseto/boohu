@@ -422,15 +422,18 @@ func (g *game) InitLevel() {
 		g.GeneratedUniques = map[monsterBand]int{}
 		g.Stats.KilledMons = map[monsterKind]int{}
 		g.InitSpecialBands()
-		if RandInt(3) > 0 {
+		if RandInt(4) > 0 {
 			g.Opts.UnstableLevel = 1 + RandInt(MaxDepth)
 		}
 		if g.Opts.UnstableLevel >= 1 && g.Opts.UnstableLevel <= 3 {
 			// it should happen less often in the first levels
 			g.Opts.UnstableLevel += RandInt(MaxDepth - 2)
 		}
-		if RandInt(2) == 0 || RandInt(2) == 0 && g.Opts.UnstableLevel == 0 {
+		if RandInt(3) > 0 || RandInt(2) == 0 && g.Opts.UnstableLevel == 0 {
 			g.Opts.StoneLevel = 1 + RandInt(MaxDepth)
+		}
+		if g.Opts.StoneLevel >= 1 && g.Opts.StoneLevel <= 3 {
+			g.Opts.StoneLevel += RandInt(MaxDepth - 2)
 		}
 		if RandInt(3) == 0 {
 			g.Opts.Alternate = MonsTinyHarpy
