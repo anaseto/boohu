@@ -388,7 +388,7 @@ func (g *game) GenBand(mbd monsterBandData, band monsterBand) []monsterKind {
 
 var MonsBands = []monsterBandData{
 	LoneGoblin:              {Rarity: 2, MinDepth: 1, MaxDepth: 2, Monster: MonsGoblin},
-	LoneOgre:                {Rarity: 3, MinDepth: 2, MaxDepth: 7, Monster: MonsOgre},
+	LoneOgre:                {Rarity: 4, MinDepth: 2, MaxDepth: 7, Monster: MonsOgre},
 	LoneWorm:                {Rarity: 2, MinDepth: 1, MaxDepth: 3, Monster: MonsWorm},
 	LoneRareWorm:            {Rarity: 13, MinDepth: 4, MaxDepth: WinDepth + 1, Monster: MonsWorm},
 	LoneBrizzia:             {Rarity: 13, MinDepth: 4, MaxDepth: WinDepth + 1, Monster: MonsBrizzia},
@@ -530,7 +530,7 @@ var MonsBands = []monsterBandData{
 	},
 	BandYacksMany: {
 		Distribution: map[monsterKind]monsInterval{MonsYack: {4, 5}},
-		Rarity:       5, MinDepth: 3, MaxDepth: WinDepth - 1, Band: true,
+		Rarity:       5, MinDepth: 4, MaxDepth: WinDepth - 1, Band: true,
 	},
 	BandGiantBees: {
 		Distribution: map[monsterKind]monsInterval{MonsGiantBee: {2, 3}},
@@ -543,6 +543,13 @@ var MonsBands = []monsterBandData{
 	BandSkeletonWarrior: {
 		Distribution: map[monsterKind]monsInterval{MonsSkeletonWarrior: {2, 3}},
 		Rarity:       7, MinDepth: 5, MaxDepth: WinDepth + 1, Band: true,
+	},
+	BandTreeMushroomWorms: {
+		Distribution: map[monsterKind]monsInterval{
+			MonsTreeMushroom: {1, 1},
+			MonsWorm:         {2, 2},
+		},
+		Rarity: 10, MinDepth: 6, MaxDepth: WinDepth, Band: true,
 	},
 	BandVampires: {
 		Distribution: map[monsterKind]monsInterval{
@@ -564,16 +571,10 @@ var MonsBands = []monsterBandData{
 		},
 		Rarity: 10, MinDepth: WinDepth + 1, MaxDepth: MaxDepth, Band: true,
 	},
-	BandTreeMushroomWorms: {
-		Distribution: map[monsterKind]monsInterval{
-			MonsTreeMushroom: {1, 1},
-			MonsWorm:         {2, 2},
-		},
-		Rarity: 10, MinDepth: 6, MaxDepth: WinDepth, Band: true,
-	},
 	BandTreeMushrooms: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsTreeMushroom: {2, 2},
+			MonsWorm:         {1, 1},
 		},
 		Rarity: 10, MinDepth: WinDepth + 1, MaxDepth: MaxDepth, Band: true,
 	},
@@ -635,7 +636,7 @@ var MonsBands = []monsterBandData{
 	},
 	UBandWorms: {
 		Distribution: map[monsterKind]monsInterval{MonsWorm: {3, 4}, MonsSpider: {1, 1}},
-		Rarity:       6, MinDepth: 2, MaxDepth: 2, Band: true, Unique: true,
+		Rarity:       8, MinDepth: 2, MaxDepth: 3, Band: true, Unique: true,
 	},
 	UBandGoblinsEasy: {
 		Distribution: map[monsterKind]monsInterval{
@@ -683,8 +684,8 @@ var MonsBands = []monsterBandData{
 	},
 	UHydras: {
 		Distribution: map[monsterKind]monsInterval{
-			MonsHydra:  {2, 3},
-			MonsSpider: {1, 2},
+			MonsHydra:  {2, 2},
+			MonsSpider: {2, 2},
 		},
 		Rarity: 5, MinDepth: 6, MaxDepth: 6, Band: true, Unique: true,
 	},
@@ -709,18 +710,18 @@ var MonsBands = []monsterBandData{
 		},
 		Rarity: 8, MinDepth: WinDepth - 1, MaxDepth: WinDepth - 1, Band: true, Unique: true,
 	},
-	UAcidMounds: {
-		Distribution: map[monsterKind]monsInterval{
-			MonsAcidMound: {3, 4},
-		},
-		Rarity: 8, MinDepth: WinDepth, MaxDepth: WinDepth, Band: true, Unique: true,
-	},
 	UBandMindCelmist: {
 		Distribution: map[monsterKind]monsInterval{
 			MonsMindCelmist: {2, 2},
 			MonsHound:       {1, 1},
 		},
 		Rarity: 10, MinDepth: WinDepth - 1, MaxDepth: WinDepth - 1, Band: true, Unique: true,
+	},
+	UAcidMounds: {
+		Distribution: map[monsterKind]monsInterval{
+			MonsAcidMound: {3, 4},
+		},
+		Rarity: 8, MinDepth: WinDepth, MaxDepth: WinDepth, Band: true, Unique: true,
 	},
 	USatowalga: {
 		Distribution: map[monsterKind]monsInterval{
@@ -896,7 +897,7 @@ func init() {
 				MonsOgre: {1, 1}, MonsSpider: {2, 2},
 			}, Rarity: 4, Band: true},
 		},
-			minDepth: 3,
+			minDepth: 4,
 			maxDepth: 7,
 		},
 		{bands: []monsterBandData{ // spiders
@@ -959,7 +960,7 @@ func init() {
 				MonsWingedMilfid: {1, 1}, MonsYack: {3, 3},
 			}, Rarity: 4, Band: true},
 		},
-			minDepth: 3,
+			minDepth: 4,
 			maxDepth: 7,
 		},
 		{bands: []monsterBandData{ // Bees
@@ -1059,7 +1060,7 @@ func init() {
 				MonsExplosiveNadre: {2, 2}, MonsEarthDragon: {1, 1},
 			}, Rarity: 10, Band: true},
 		},
-			minDepth: 3,
+			minDepth: 4,
 			maxDepth: 7,
 		},
 		{bands: []monsterBandData{ // plants
