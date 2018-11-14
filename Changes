@@ -2,6 +2,16 @@ v0.11-dev
 
 Gameplay:
 
++ Overhaul of dungeon structure. The main dungeon is shortened to 8 levels,
+  from Depth 1 to 8, and there are 3 optional levels as before, now from 9 to
+  11. This is to make the game more coffee-break (as intended), and also more
+  dense: each level now should feel more special. In particular,
+  weapon/rod/armour distribution is a little less random than before, and
+  excluding some occasional permutations because of some sane randomisation,
+  one will in particular find a rod in Depth 1, a weapon/shield in Depth 2, and
+  an armour in Depth 3. Levels that do not get a weapon/rod/armour will get
+  extra consumables. Monster band distribution and special levels have had
+  various adjustments too.
 + Made confused monsters smarter.
 + New tree stone: any creature hurt while standing on the stone is lignified.
 + New aptitude: you occasionally teleport your foes when hurt.
