@@ -2888,6 +2888,12 @@ func (g *game) MaxDanger() int {
 	} else {
 		max = max + adjust
 	}
+	if g.Depth > 3 && g.Player.Weapon == Dagger {
+		max -= 3 * g.Depth
+	}
+	if g.Depth > 4 && g.Player.Armour == Robe {
+		max -= 2 * g.Depth
+	}
 	if g.Player.Consumables[MagicMappingPotion] > 0 && WinDepth-g.Depth < g.Player.Consumables[MagicMappingPotion] {
 		max = max * 110 / 100
 	}
