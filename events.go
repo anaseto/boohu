@@ -417,6 +417,8 @@ func (g *game) Burn(pos position, ev event) {
 		} else {
 			g.WrongDoor[pos] = true
 		}
+	} else {
+		g.ComputeLOS()
 	}
 	g.PushEvent(&cloudEvent{ERank: ev.Rank() + 10, EAction: FireProgression, Pos: pos})
 	g.BurnCreature(pos, ev)
