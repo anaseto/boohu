@@ -6,12 +6,6 @@ import (
 	"sort"
 )
 
-// + consumables (potion-like or throwing dart, strategic + tactical)
-// + equipables
-// + recharging with depth (rod-like, strategic & a little tactical + mana)
-//   - digging, fog, slowing clouds or something, fear,
-//     fireball, lightning bolt, shatter, blink, teleport other
-
 type consumable interface {
 	Use(*game, event) error
 	String() string
