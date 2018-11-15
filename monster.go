@@ -2124,10 +2124,8 @@ func (m *monster) Exhaust(g *game) {
 }
 
 func (m *monster) ExhaustTime(g *game, t int) {
-	if !m.Status(MonsExhausted) {
-		m.Statuses[MonsExhausted]++
-		g.PushEvent(&monsterEvent{ERank: g.Ev.Rank() + t, NMons: m.Index, EAction: MonsExhaustionEnd})
-	}
+	m.Statuses[MonsExhausted]++
+	g.PushEvent(&monsterEvent{ERank: g.Ev.Rank() + t, NMons: m.Index, EAction: MonsExhaustionEnd})
 }
 
 func (m *monster) HitPlayer(g *game, ev event) {
