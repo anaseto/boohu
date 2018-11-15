@@ -786,7 +786,7 @@ func (g *game) Descend() bool {
 	g.LevelStats()
 	if strt, ok := g.Stairs[g.Player.Pos]; ok && strt == WinStair {
 		g.StoryPrint("You escaped!")
-		g.ExploredLevels = g.Depth + 1
+		g.ExploredLevels = g.Depth
 		g.Depth = -1
 		return true
 	}
