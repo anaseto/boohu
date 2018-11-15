@@ -22,6 +22,7 @@ Gameplay:
 + New rod of last hope - the damage it does is inversely proportional to your
   health.
 + New projectile: teleport magara - it teleports monsters in a square area.
++ New projectile: slowing magara - it releases a bolt slowing monsters.
 + Darts of confusion always hit. Less of them generated as a result, and
   removed “unusually accurate” aptitude.
 + New potion of accuracy that makes you never miss for a few turns.
