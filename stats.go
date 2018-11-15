@@ -29,8 +29,6 @@ type stats struct {
 	TMWounded     int
 	TMonsLOS      int
 	UsedRod       [NumRods]int
-	//UsedPotion    [MaxDepth + 1]int
-	//UsedProj      [MaxDepth + 1]int
 }
 
 func (g *game) TurnStats() {

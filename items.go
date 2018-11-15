@@ -191,11 +191,6 @@ func (p potion) Use(g *game, ev event) error {
 	if err != nil {
 		return err
 	}
-	//if p == DescentPotion {
-	//g.Stats.UsedPotion[g.Depth-1]++
-	//} else {
-	//g.Stats.UsedPotion[g.Depth]++
-	//}
 	ev.Renew(g, 5)
 	g.UseConsumable(p)
 	g.Stats.Drinks++
