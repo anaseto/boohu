@@ -204,7 +204,6 @@ func (g *game) MoveToTarget(ev event) bool {
 }
 
 func (g *game) WaitTurn(ev event) {
-	// XXX Really wait for 10 ?
 	grade := 1
 	if len(g.Noise) > 0 || g.StatusRest() {
 		grade = 1

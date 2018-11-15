@@ -74,8 +74,6 @@ func formatText(text string, width int) string {
 	wantspace := false
 	wlen := 0
 	for _, c := range text {
-		// it's enough to test with just spaces for now
-		//if unicode.IsSpace(c) && c != 0xa0 {
 		if c == ' ' {
 			if wlen == 0 {
 				continue

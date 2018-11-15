@@ -175,8 +175,6 @@ func (g *game) LoadConfig() (bool, error) {
 }
 
 func (g *game) WriteDump() error {
-	//storage := js.Global.Get("localStorage")
-	//storage.Call("setItem", "boohudump", g.Dump())
 	pre := js.Global().Get("document").Call("getElementById", "dump")
 	pre.Set("innerHTML", g.Dump())
 	return nil
@@ -342,8 +340,6 @@ func (ui *termui) Close() {
 func (ui *termui) PostInit() {
 	SolarizedPalette()
 	ui.HideCursor()
-	//MenuCols[MenuOther] = MenuCols[MenuView]
-	//MenuCols[MenuView] = [2]int{-1, -1}
 	settingsActions = append(settingsActions, toggleTiles)
 }
 
@@ -385,9 +381,6 @@ func (ui *termui) FlushCallback(obj js.Value) {
 			continue
 		}
 		cell := ui.cells[i]
-		//if cell.r == ' ' {
-		//cell.r = ' '
-		//}
 		x, y := ui.GetPos(i)
 		ui.Draw(cell, x, y)
 		ui.backBuffer[i] = cell
@@ -401,11 +394,6 @@ func (ui *termui) HideCursor() {
 func (ui *termui) SetCursor(pos position) {
 	ui.cursor = pos
 }
-
-//func (ui *termui) IsMapCell(x, y int) bool {
-//	i := ui.GetIndex(x, y)
-//	return i < len(ui.cells) && ui.cells[i].inMap
-//}
 
 func (ui *termui) SetCell(x, y int, r rune, fg, bg uicolor) {
 	i := ui.GetIndex(x, y)

@@ -198,7 +198,6 @@ func (ui *termui) Draw(cell UICell, x, y int) {
 		canvas = cv
 	} else {
 		canvas = js.Global().Get("document").Call("createElement", "canvas")
-		//if gameConfig.Tiles {
 		canvas.Set("width", 16)
 		canvas.Set("height", 24)
 		ctx := canvas.Call("getContext", "2d")
