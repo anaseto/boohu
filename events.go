@@ -221,6 +221,7 @@ const (
 	MonsterTurn monsterAction = iota
 	MonsConfusionEnd
 	MonsExhaustionEnd
+	MonsSlowEnd
 	MonsLignificationEnd
 )
 
@@ -258,6 +259,11 @@ func (mev *monsterEvent) Action(g *game) {
 				g.Printf("%s is no longer lignified.", mons.Kind.Definite(true))
 			}
 			mons.Path = mons.APath(g, mons.Pos, mons.Target)
+		}
+	case MonsSlowEnd:
+		mons := g.Monsters[mev.NMons]
+		if mons.Exists() {
+			mons.Statuses[MonsSlow]--
 		}
 	case MonsExhaustionEnd:
 		mons := g.Monsters[mev.NMons]

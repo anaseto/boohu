@@ -164,7 +164,7 @@ func (ui *termui) WallExplosionAnimation(g *game, pos position) {
 	}
 }
 
-func (ui *termui) LightningBoltAnimation(g *game, ray []position) {
+func (ui *termui) FireBoltAnimation(g *game, ray []position) {
 	if DisableAnimations {
 		return
 	}
@@ -185,6 +185,30 @@ func (ui *termui) LightningBoltAnimation(g *game, ray []position) {
 				r = '√'
 			}
 			//ui.DrawAtPosition(g, pos, true, r, fg, bgColor)
+			ui.DrawAtPosition(g, pos, true, r, bgColor, fg)
+		}
+		ui.Flush()
+		time.Sleep(100 * time.Millisecond)
+	}
+	time.Sleep(25 * time.Millisecond)
+}
+
+func (ui *termui) SlowingMagaraAnimation(g *game, ray []position) {
+	if DisableAnimations {
+		return
+	}
+	ui.DrawDungeonView(g, NormalMode)
+	time.Sleep(25 * time.Millisecond)
+	colors := [2]uicolor{ColorFgConfusedMonster, ColorFgMagicPlace}
+	for j := 0; j < 3; j++ {
+		for i := len(ray) - 1; i >= 0; i-- {
+			fg := colors[RandInt(2)]
+			pos := ray[i]
+			_, _, bgColor := ui.PositionDrawing(g, pos)
+			r := '*'
+			if RandInt(2) == 0 {
+				r = '×'
+			}
 			ui.DrawAtPosition(g, pos, true, r, bgColor, fg)
 		}
 		ui.Flush()

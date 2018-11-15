@@ -434,6 +434,7 @@ const (
 	ConfusingDart projectile = iota
 	ExplosiveMagara
 	TeleportMagara
+	SlowingMagara
 	NightMagara
 )
 
@@ -447,6 +448,8 @@ func (p projectile) String() (text string) {
 		text = "explosive magara"
 	case TeleportMagara:
 		text = "teleport magara"
+	case SlowingMagara:
+		text = "slowing magara"
 	case NightMagara:
 		text = "night magara"
 	}
@@ -461,6 +464,8 @@ func (p projectile) Plural() (text string) {
 		text = "explosive magaras"
 	case TeleportMagara:
 		text = "teleport magaras"
+	case SlowingMagara:
+		text = "slowing magaras"
 	case NightMagara:
 		text = "night magaras"
 	}
@@ -475,6 +480,8 @@ func (p projectile) Desc() (text string) {
 		text = "can be thrown to cause a fire explosion halving HP of monsters in a square area. It can occasionally destruct walls. It can burn doors and foliage."
 	case TeleportMagara:
 		text = "can be thrown to make monsters in a square area teleport."
+	case SlowingMagara:
+		text = "can be activated to release a slowing bolt inducing slow movement and attack in one or more foes."
 	case NightMagara:
 		text = "can be thrown at a monster to produce sleep inducing clouds in a 2-radius area. You are affected too by the clouds, but they will slow your actions instead. Can burn doors and foliage."
 	}
@@ -503,6 +510,8 @@ func (p projectile) Use(g *game, ev event) error {
 		err = g.ThrowExplosiveMagara(ev)
 	case TeleportMagara:
 		err = g.ThrowTeleportMagara(ev)
+	case SlowingMagara:
+		err = g.ThrowSlowingMagara(ev)
 	case NightMagara:
 		err = g.ThrowNightMagara(ev)
 	}
@@ -602,6 +611,27 @@ func (g *game) ThrowTeleportMagara(ev event) error {
 	return nil
 }
 
+func (g *game) ThrowSlowingMagara(ev event) error {
+	if err := g.ui.ChooseTarget(g, &chooser{}); err != nil {
+		return err
+	}
+	ray := g.Ray(g.Player.Target)
+	g.MakeNoise(MagicCastNoise, g.Player.Pos)
+	g.Print("Whoosh! A bolt of slowing emerges out of the magara.")
+	g.ui.SlowingMagaraAnimation(g, ray)
+	for _, pos := range ray {
+		mons := g.MonsterAt(pos)
+		if !mons.Exists() {
+			continue
+		}
+		mons.Statuses[MonsSlow]++
+		g.PushEvent(&monsterEvent{ERank: g.Ev.Rank() + 130 + RandInt(40), NMons: mons.Index, EAction: MonsSlowEnd})
+	}
+
+	ev.Renew(g, 7)
+	return nil
+}
+
 func (g *game) NightFog(at position, radius int, ev event) {
 	dij := &normalPath{game: g}
 	nm := Dijkstra(dij, []position{at}, radius)
@@ -643,6 +673,7 @@ var ConsumablesCollectData = map[consumable]collectData{
 	ExplosiveMagara:     {rarity: 6, quantity: 1},
 	NightMagara:         {rarity: 9, quantity: 1},
 	TeleportMagara:      {rarity: 12, quantity: 1},
+	SlowingMagara:       {rarity: 12, quantity: 1},
 	TeleportationPotion: {rarity: 6, quantity: 1},
 	BerserkPotion:       {rarity: 6, quantity: 1},
 	HealWoundsPotion:    {rarity: 6, quantity: 1},

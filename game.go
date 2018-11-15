@@ -80,7 +80,8 @@ type Renderer interface {
 	CriticalHPWarning(*game)
 	ExplosionAnimation(*game, explosionStyle, position)
 	TormentExplosionAnimation(*game)
-	LightningBoltAnimation(*game, []position)
+	FireBoltAnimation(*game, []position)
+	SlowingMagaraAnimation(*game, []position)
 	ThrowAnimation(*game, []position, bool)
 	MonsterJavelinAnimation(*game, []position, bool)
 	MonsterProjectileAnimation(*game, []position, rune, uicolor)
@@ -299,13 +300,15 @@ func (g *game) InitPlayer() {
 	g.Player.Consumables = map[consumable]int{
 		HealWoundsPotion: 1,
 	}
-	switch RandInt(5) {
+	switch RandInt(6) {
 	case 0:
 		g.Player.Consumables[ExplosiveMagara] = 1
 	case 1:
 		g.Player.Consumables[NightMagara] = 1
 	case 2:
 		g.Player.Consumables[TeleportMagara] = 1
+	case 3:
+		g.Player.Consumables[SlowingMagara] = 1
 	default:
 		g.Player.Consumables[ConfusingDart] = 2
 	}
@@ -352,6 +355,7 @@ func (g *game) InitPlayer() {
 	//g.Player.Consumables[MagicMappingPotion] = 1
 	//g.Player.Consumables[ExplosiveMagara] = 5
 	//g.Player.Consumables[NightMagara] = 5
+	//g.Player.Consumables[SlowingMagara] = 5
 	//g.Player.Consumables[DigPotion] = 5
 	//g.Player.Consumables[SwapPotion] = 5
 	//g.Player.Consumables[DreamPotion] = 5

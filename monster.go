@@ -28,6 +28,7 @@ type monsterStatus int
 const (
 	MonsConfused monsterStatus = iota
 	MonsExhausted
+	MonsSlow
 	MonsLignified
 )
 
@@ -39,6 +40,8 @@ func (st monsterStatus) String() (text string) {
 		text = "confused"
 	case MonsExhausted:
 		text = "exhausted"
+	case MonsSlow:
+		text = "slowed"
 	case MonsLignified:
 		text = "lignified"
 	}
@@ -1883,7 +1886,11 @@ func (m *monster) AttackAction(g *game, ev event) {
 		} else {
 			m.HitPlayer(g, ev)
 		}
-		ev.Renew(g, m.Kind.AttackDelay())
+		adelay := m.Kind.AttackDelay()
+		if m.Status(MonsSlow) {
+			adelay += 3
+		}
+		ev.Renew(g, adelay)
 	}
 }
 
@@ -1904,6 +1911,10 @@ func (m *monster) HandleTurn(g *game, ev event) {
 			m.State = Wandering
 		}
 	}
+	movedelay := m.Kind.MovementDelay()
+	if m.Status(MonsSlow) {
+		movedelay += 3
+	}
 	if m.State == Resting {
 		wander := RandInt(100 + 6*Max(800-(g.DepthPlayerTurn+1), 0))
 		if wander == 0 {
@@ -1920,13 +1931,13 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	}
 	switch m.Kind {
 	case MonsSatowalgaPlant:
-		ev.Renew(g, m.Kind.MovementDelay())
+		ev.Renew(g, movedelay)
 		// oklob plants are static ranged-only
 		return
 	case MonsMindCelmist:
 		if m.State == Hunting && !g.Player.LOS[m.Pos] && m.Pos.Distance(g.Player.Pos) <= 2 {
 			// “smart” wait at short distance
-			ev.Renew(g, m.Kind.MovementDelay())
+			ev.Renew(g, movedelay)
 			return
 		}
 	}
@@ -1963,7 +1974,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	}
 	if m.Kind == MonsMarevorHelith {
 		if m.TeleportMonsterAway(g) {
-			ev.Renew(g, m.Kind.MovementDelay())
+			ev.Renew(g, movedelay)
 			return
 		}
 	}
@@ -2004,7 +2015,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 			m.State = Wandering
 			m.GatherBand(g)
 		}
-		ev.Renew(g, m.Kind.MovementDelay())
+		ev.Renew(g, movedelay)
 		return
 	}
 	target := m.Path[len(m.Path)-2]
@@ -2076,7 +2087,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	default:
 		m.Path = m.APath(g, mpos, m.Target)
 	}
-	ev.Renew(g, m.Kind.MovementDelay())
+	ev.Renew(g, movedelay)
 }
 
 func (m *monster) InvertFoliage(g *game) {

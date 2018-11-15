@@ -275,11 +275,11 @@ func (g *game) EvokeRodFireBolt(ev event) error {
 	ray := g.Ray(g.Player.Target)
 	g.MakeNoise(MagicCastNoise, g.Player.Pos)
 	g.Print("Whoosh! A fire bolt emerges straight out of the rod.")
-	g.ui.LightningBoltAnimation(g, ray)
+	g.ui.FireBoltAnimation(g, ray)
 	for _, pos := range ray {
 		g.Burn(pos, ev)
 		mons := g.MonsterAt(pos)
-		if mons == nil {
+		if !mons.Exists() {
 			continue
 		}
 		dmg := 0
