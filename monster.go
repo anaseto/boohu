@@ -240,7 +240,7 @@ var monsDesc = []string{
 	MonsMindCelmist:     "Mind celmists are mages that use magical smitting mind attacks that bypass armour. They can occasionally confuse or slow you. They try to avoid melee.",
 	MonsVampire:         "Vampires are humanoids that drink blood to survive. Their spitting can cause nausea, impeding the use of potions.",
 	MonsTreeMushroom:    "Tree mushrooms are big clunky slow-moving creatures. They can throw lignifying spores at you.",
-	MonsMarevorHelith:   "Marevor Helith is an ancient undead nakrus very fond of teleporting people away. He is a well-known expert in the field of magaras - items that many people simply call magical objects. His current research focus is monolith creation.",
+	MonsMarevorHelith:   "Marevor Helith is an ancient undead nakrus very fond of teleporting people away. He is a well-known expert in the field of magaras - items that many people simply call magical objects. His current research focus is monolith creation. Marevor, a repentant necromancer, is now searching for his old disciple Jaixel in the Underground to help him overcome the past.",
 }
 
 type monsterBand int
