@@ -549,7 +549,7 @@ func (k keyAction) NormalModeDescription() (text string) {
 	case KeyDrink:
 		text = "Quaff potion"
 	case KeyThrow:
-		text = "Throw item"
+		text = "Throw/Fire item"
 	case KeyEvoke:
 		text = "Evoke rod"
 	case KeyCharacterInfo:

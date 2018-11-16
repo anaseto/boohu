@@ -40,7 +40,6 @@ const (
 	DigPotion
 	SwapPotion
 	ShadowsPotion
-	ConfusePotion
 	TormentPotion
 	AccuracyPotion
 	DreamPotion
@@ -77,8 +76,6 @@ func (p potion) String() (text string) {
 		text += " of swapping"
 	case ShadowsPotion:
 		text += " of shadows"
-	case ConfusePotion:
-		text += " of confusion"
 	case TormentPotion:
 		text += " of torment explosion"
 	case AccuracyPotion:
@@ -122,8 +119,6 @@ func (p potion) Desc() (text string) {
 		text = "makes you swap positions with monsters instead of attacking. Ranged monsters can still damage you."
 	case ShadowsPotion:
 		text = "reduces your line of sight range to 1."
-	case ConfusePotion:
-		text = "generates a harmonic light that confuses monsters in your line of sight."
 	case TormentPotion:
 		text = "halves HP of every creature in sight, including the player, and destroys visible walls. Extremely noisy. It can burn foliage and doors."
 	case AccuracyPotion:
@@ -179,8 +174,6 @@ func (p potion) Use(g *game, ev event) error {
 		err = g.QuaffSwapPotion(ev)
 	case ShadowsPotion:
 		err = g.QuaffShadowsPotion(ev)
-	case ConfusePotion:
-		err = g.QuaffConfusePotion(ev)
 	case TormentPotion:
 		err = g.QuaffTormentPotion(ev)
 	case AccuracyPotion:
@@ -352,20 +345,6 @@ func (g *game) QuaffMagicMapping(ev event) error {
 	return nil
 }
 
-func (g *game) QuaffConfusePotion(ev event) error {
-	g.Printf("You quaff the %s. A harmonic light confuses monsters.", ConfusePotion)
-	for pos, b := range g.Player.LOS {
-		if !b {
-			continue
-		}
-		mons := g.MonsterAt(pos)
-		if mons.Exists() {
-			mons.EnterConfusion(g, ev)
-		}
-	}
-	return nil
-}
-
 func (g *game) QuaffTormentPotion(ev event) error {
 	g.Printf("You quaff the %s. %s It hurts!", TormentPotion, g.ExplosionSound())
 	damage := g.Player.HP / 2
@@ -435,6 +414,7 @@ const (
 	ExplosiveMagara
 	TeleportMagara
 	SlowingMagara
+	ConfuseMagara
 	NightMagara
 )
 
@@ -450,6 +430,8 @@ func (p projectile) String() (text string) {
 		text = "teleport magara"
 	case SlowingMagara:
 		text = "slowing magara"
+	case ConfuseMagara:
+		text = "confusion magara"
 	case NightMagara:
 		text = "night magara"
 	}
@@ -466,6 +448,8 @@ func (p projectile) Plural() (text string) {
 		text = "teleport magaras"
 	case SlowingMagara:
 		text = "slowing magaras"
+	case ConfuseMagara:
+		text = "confusion magaras"
 	case NightMagara:
 		text = "night magaras"
 	}
@@ -482,6 +466,8 @@ func (p projectile) Desc() (text string) {
 		text = "can be thrown to make monsters in a square area teleport."
 	case SlowingMagara:
 		text = "can be activated to release a slowing bolt inducing slow movement and attack in one or more foes."
+	case ConfuseMagara:
+		text = "generates a harmonic light that confuses monsters in your line of sight."
 	case NightMagara:
 		text = "can be thrown at a monster to produce sleep inducing clouds in a 2-radius area. You are affected too by the clouds, but they will slow your actions instead. Can burn doors and foliage."
 	}
@@ -512,6 +498,8 @@ func (p projectile) Use(g *game, ev event) error {
 		err = g.ThrowTeleportMagara(ev)
 	case SlowingMagara:
 		err = g.ThrowSlowingMagara(ev)
+	case ConfuseMagara:
+		err = g.ThrowConfuseMagara(ev)
 	case NightMagara:
 		err = g.ThrowNightMagara(ev)
 	}
@@ -632,6 +620,22 @@ func (g *game) ThrowSlowingMagara(ev event) error {
 	return nil
 }
 
+func (g *game) ThrowConfuseMagara(ev event) error {
+	g.Printf("You activate the %s. A harmonic light confuses monsters.", ConfuseMagara)
+	for pos, b := range g.Player.LOS {
+		if !b {
+			continue
+		}
+		mons := g.MonsterAt(pos)
+		if mons.Exists() {
+			mons.EnterConfusion(g, ev)
+		}
+	}
+
+	ev.Renew(g, 7)
+	return nil
+}
+
 func (g *game) NightFog(at position, radius int, ev event) {
 	dij := &normalPath{game: g}
 	nm := Dijkstra(dij, []position{at}, radius)
@@ -674,6 +678,7 @@ var ConsumablesCollectData = map[consumable]collectData{
 	NightMagara:         {rarity: 9, quantity: 1},
 	TeleportMagara:      {rarity: 12, quantity: 1},
 	SlowingMagara:       {rarity: 12, quantity: 1},
+	ConfuseMagara:       {rarity: 15, quantity: 1},
 	TeleportationPotion: {rarity: 6, quantity: 1},
 	BerserkPotion:       {rarity: 6, quantity: 1},
 	HealWoundsPotion:    {rarity: 6, quantity: 1},
@@ -685,7 +690,6 @@ var ConsumablesCollectData = map[consumable]collectData{
 	DigPotion:           {rarity: 12, quantity: 1},
 	SwapPotion:          {rarity: 12, quantity: 1},
 	ShadowsPotion:       {rarity: 15, quantity: 1},
-	ConfusePotion:       {rarity: 15, quantity: 1},
 	DescentPotion:       {rarity: 18, quantity: 1},
 	MagicMappingPotion:  {rarity: 18, quantity: 1},
 	DreamPotion:         {rarity: 18, quantity: 1},

@@ -300,7 +300,7 @@ func (g *game) InitPlayer() {
 	g.Player.Consumables = map[consumable]int{
 		HealWoundsPotion: 1,
 	}
-	switch RandInt(6) {
+	switch RandInt(7) {
 	case 0:
 		g.Player.Consumables[ExplosiveMagara] = 1
 	case 1:
@@ -309,10 +309,12 @@ func (g *game) InitPlayer() {
 		g.Player.Consumables[TeleportMagara] = 1
 	case 3:
 		g.Player.Consumables[SlowingMagara] = 1
+	case 4:
+		g.Player.Consumables[ConfuseMagara] = 1
 	default:
 		g.Player.Consumables[ConfusingDart] = 2
 	}
-	switch RandInt(13) {
+	switch RandInt(12) {
 	case 0, 1:
 		g.Player.Consumables[TeleportationPotion] = 1
 	case 2, 3:
@@ -332,8 +334,6 @@ func (g *game) InitPlayer() {
 	case 10:
 		g.Player.Consumables[ShadowsPotion] = 1
 	case 11:
-		g.Player.Consumables[ConfusePotion] = 1
-	case 12:
 		g.Player.Consumables[AccuracyPotion] = 1
 	}
 	r := g.RandomRod()
@@ -356,11 +356,11 @@ func (g *game) InitPlayer() {
 	//g.Player.Consumables[ExplosiveMagara] = 5
 	//g.Player.Consumables[NightMagara] = 5
 	//g.Player.Consumables[SlowingMagara] = 5
+	//g.Player.Consumables[ConfuseMagara] = 5
 	//g.Player.Consumables[DigPotion] = 5
 	//g.Player.Consumables[SwapPotion] = 5
 	//g.Player.Consumables[DreamPotion] = 5
 	//g.Player.Consumables[ShadowsPotion] = 5
-	//g.Player.Consumables[ConfusePotion] = 5
 	//g.Player.Consumables[TormentPotion] = 5
 	//g.Player.Consumables[AccuracyPotion] = 5
 	//g.Player.Weapon = ElecWhip
