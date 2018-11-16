@@ -204,20 +204,21 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 	case g.Player.Weapon == DancingRapier:
 		ompos := mons.Pos
 		g.HitMonster(DmgPhysical, g.Player.Attack(), mons, ev)
-		if !g.Player.HasStatus(StatusLignification) {
-			dir := ompos.Dir(g.Player.Pos)
-			behind := g.Player.Pos.To(dir).To(dir)
-			if behind.valid() {
-				m := g.MonsterAt(behind)
-				if m.Exists() {
-					g.HitMonster(DmgPhysical, g.Player.Attack()+3, m, ev)
-				}
-			}
-			if mons.Exists() {
-				mons.MoveTo(g, g.Player.Pos)
-			}
-			g.PlacePlayerAt(ompos)
+		if g.Player.HasStatus(StatusLignification) {
+			break
 		}
+		dir := ompos.Dir(g.Player.Pos)
+		behind := g.Player.Pos.To(dir).To(dir)
+		if behind.valid() {
+			m := g.MonsterAt(behind)
+			if m.Exists() {
+				g.HitMonster(DmgPhysical, g.Player.Attack()+3, m, ev)
+			}
+		}
+		if mons.Exists() {
+			mons.MoveTo(g, g.Player.Pos)
+		}
+		g.PlacePlayerAt(ompos)
 	case g.Player.Weapon == HarKarGauntlets:
 		g.HarKarAttack(mons, ev)
 	case g.Player.Weapon == HopeSword:
