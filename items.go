@@ -797,9 +797,9 @@ func (ar armour) Desc() string {
 	case SpeedRobe:
 		text = "The speed robe makes you move faster, with a minor evasion bonus."
 	case CelmistRobe:
-		text = "The celmist robe improves your magic reserves, rod recharge rate, and rods can gain two extra charges."
+		text = "The celmist robe improves your magic reserves, rod recharge rate, and rods can gain two extra charges. In Hareka, celmists are what most people would call mages."
 	case HarmonistRobe:
-		text = "The harmonist robe makes you harder to detect (reduced LOS, stealthy, noise mitigation)."
+		text = "The harmonist robe makes you harder to detect (reduced LOS, stealthy, noise mitigation). Harmonists are mages specialized in manipulation of light and noise."
 	}
 	return text
 }

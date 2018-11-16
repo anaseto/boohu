@@ -229,7 +229,7 @@ var monsDesc = []string{
 	MonsHydra:           "Hydras are enormous creatures with four heads that can hit you each at once.",
 	MonsSkeletonWarrior: "Skeleton warriors are good fighters, clad in chain mail.",
 	MonsSpider:          "Spiders are fast moving fragile creatures, whose bite can confuse you.",
-	MonsWingedMilfid:    "Winged milfids are fast moving humanoids that can fly over you and make you swap positions.",
+	MonsWingedMilfid:    "Winged milfids are fast moving humanoids that can fly over you and make you swap positions. They tend to be very agressive creatures.",
 	MonsBlinkingFrog:    "Blinking frogs are big frog-like creatures, whose bite can make you blink away.",
 	MonsLich:            "Liches are non-living mages wearing a leather armour. They can throw a bolt of torment at you, halving your HP.",
 	MonsEarthDragon:     "Earth dragons are big and hardy creatures that wander in the Underground. It is said they can be credited for many of the tunnels.",
@@ -238,9 +238,9 @@ var monsDesc = []string{
 	MonsSatowalgaPlant:  "Satowalga Plants are immobile bushes that throw acidic projectiles at you, sometimes corroding and confusing you.",
 	MonsMadNixe:         "Mad nixes are magical humanoids that can attract you to them.",
 	MonsMindCelmist:     "Mind celmists are mages that use magical smitting mind attacks that bypass armour. They can occasionally confuse or slow you. They try to avoid melee.",
-	MonsVampire:         "Vampires are humanoids that drink blood to survive. Their spitting can cause nausea.",
+	MonsVampire:         "Vampires are humanoids that drink blood to survive. Their spitting can cause nausea, impeding the use of potions.",
 	MonsTreeMushroom:    "Tree mushrooms are big clunky slow-moving creatures. They can throw lignifying spores at you.",
-	MonsMarevorHelith:   "Marevor Helith is an ancient undead nakrus very fond of teleporting people away.",
+	MonsMarevorHelith:   "Marevor Helith is an ancient undead nakrus very fond of teleporting people away. He is a well-known expert in the field of magaras - items that many people simply call magical objects. His current research focus is monolith creation.",
 }
 
 type monsterBand int
