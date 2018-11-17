@@ -1905,9 +1905,9 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	mpos := m.Pos
 	m.MakeAware(g)
 	if !g.Player.LOS[m.Pos] && m.State == Hunting {
-		if g.Player.Armour == HarmonistRobe && RandInt(3) == 0 {
+		if g.Player.Armour == HarmonistRobe && RandInt(3) > 0 {
 			m.State = Wandering
-		} else if RandInt(20) == 0 {
+		} else if RandInt(10) == 0 {
 			m.State = Wandering
 		}
 	}
@@ -2787,6 +2787,7 @@ func (m *monster) MakeAware(g *game) {
 		}
 		if g.Player.Armour == HarmonistRobe {
 			r *= 2
+			r += 5
 		}
 		if r >= 25 && m.Pos.Distance(g.Player.Pos) > 1 {
 			return
