@@ -7,7 +7,7 @@ back to your village.  Along the way, you will collect simellas, as well as
 various items that will help you deal with monsters, which you may
 fight or flee...*
 
-![Boohu introduction screen](https://download.tuxfamily.org/boohu/intro-screen.png)
+![Boohu introduction screen](https://download.tuxfamily.org/boohu/intro-screen-tiles.png)
 
 Screenshot and Website
 ----------------------
@@ -21,6 +21,8 @@ to play in the browser and download pre-built binaries for the latest release.
 
 Install from Sources
 --------------------
+
+## ASCII
 
 You can build from source by following these steps:
 
@@ -41,6 +43,16 @@ option `--tags tcell` or `--tags ansi` to the `go get` command. The first will u
 [tcell](https://github.com/gdamore/tcell) instead of termbox-go, and requires
 cgo on some platforms, but is more portable. The second will work on POSIX
 systems with a `stty` command.
+
+## Tiles
+
+With Go 1.11 or later, you can also build the WebAssembly version with:
+
+    GOOS=js GOARCH=wasm go build --tags js -o boohu.wasm
+
+You can then play by serving a directory containing the wasm file via http. The
+directory should contain some other files that you can find in the main
+website instance.
 
 Colors
 ------
