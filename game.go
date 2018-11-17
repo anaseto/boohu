@@ -125,6 +125,8 @@ func (g *game) FreeCell() position {
 }
 
 func (g *game) FreeCellForStair(dist int) position {
+	iters := 0
+	bestpos := g.Player.Pos
 	for {
 		pos := g.FreeCellForStatic()
 		adjust := 0
@@ -132,8 +134,15 @@ func (g *game) FreeCellForStair(dist int) position {
 			adjust += RandInt(dist)
 		}
 		adjust /= 4
-		if pos.Distance(g.Player.Pos) > 6+adjust {
-			return pos
+		if pos.Distance(g.Player.Pos) <= 6+adjust {
+			continue
+		}
+		iters++
+		if pos.Distance(g.Player.Pos) > bestpos.Distance(g.Player.Pos) {
+			bestpos = pos
+		}
+		if iters == 2 {
+			return bestpos
 		}
 	}
 }
