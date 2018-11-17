@@ -124,6 +124,18 @@ func (g *game) FreeCell() position {
 	}
 }
 
+func (g *game) FreeCellForPlayer() position {
+	center := position{DungeonWidth / 2, DungeonHeight / 2}
+	bestpos := g.FreeCell()
+	for i := 0; i < 2; i++ {
+		pos := g.FreeCell()
+		if pos.Distance(center) > bestpos.Distance(center) {
+			bestpos = pos
+		}
+	}
+	return bestpos
+}
+
 func (g *game) FreeCellForStair(dist int) position {
 	iters := 0
 	bestpos := g.Player.Pos
@@ -486,7 +498,7 @@ func (g *game) InitLevel() {
 	g.GenDungeon()
 
 	g.MonstersPosCache = make([]int, DungeonNCells)
-	g.Player.Pos = g.FreeCell()
+	g.Player.Pos = g.FreeCellForPlayer()
 
 	g.WrongWall = map[position]bool{}
 	g.WrongFoliage = map[position]bool{}
