@@ -22,7 +22,7 @@ to play in the browser and download pre-built binaries for the latest release.
 Install from Sources
 --------------------
 
-## ASCII
+### ASCII
 
 You can build from source by following these steps:
 
@@ -44,7 +44,7 @@ option `--tags tcell` or `--tags ansi` to the `go get` command. The first will u
 cgo on some platforms, but is more portable. The second will work on POSIX
 systems with a `stty` command.
 
-## Tiles
+### Tiles
 
 With Go 1.11 or later, you can also build the WebAssembly version with:
 
