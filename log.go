@@ -64,7 +64,7 @@ func (g *game) PrintEntry(e logEntry) {
 	g.Log = append(g.Log, e)
 	g.LogIndex++
 	if len(g.Log) > 100000 {
-		g.Log = g.Log[90000:]
+		g.Log = g.Log[10000:]
 	}
 }
 
