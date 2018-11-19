@@ -231,7 +231,7 @@ func (g *game) DetailedStatistics(w io.Writer) {
 	fmt.Fprintf(w, "\n")
 	hfmt := "%-23s"
 	fmt.Fprintf(w, hfmt, "Quantity/Depth")
-	for i := 1; i < maxDepth; i++ {
+	for i := 1; i <= maxDepth; i++ {
 		fmt.Fprintf(w, " %3d", i)
 	}
 	fmt.Fprintf(w, "\n")
@@ -240,7 +240,7 @@ func (g *game) DetailedStatistics(w io.Writer) {
 		if i == 0 {
 			continue
 		}
-		if i >= maxDepth {
+		if i > maxDepth {
 			break
 		}
 		fmt.Fprintf(w, " %3d", n)
@@ -251,7 +251,7 @@ func (g *game) DetailedStatistics(w io.Writer) {
 		if i == 0 {
 			continue
 		}
-		if i >= maxDepth {
+		if i > maxDepth {
 			break
 		}
 		fmt.Fprintf(w, " %3d", n)
@@ -262,7 +262,7 @@ func (g *game) DetailedStatistics(w io.Writer) {
 		if i == 0 {
 			continue
 		}
-		if i >= maxDepth {
+		if i > maxDepth {
 			break
 		}
 		fmt.Fprintf(w, " %3d", n)
@@ -273,7 +273,7 @@ func (g *game) DetailedStatistics(w io.Writer) {
 		if i == 0 {
 			continue
 		}
-		if i >= maxDepth {
+		if i > maxDepth {
 			break
 		}
 		fmt.Fprintf(w, " %3s", s)
