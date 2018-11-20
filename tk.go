@@ -198,6 +198,7 @@ func (ui *termui) ApplyToggleLayout() {
 		UIHeight = 26
 		UIWidth = 100
 	}
+	ui.cache = make(map[UICell]string)
 	ui.cells = make([]UICell, UIWidth*UIHeight)
 	ui.ResetCells()
 	ui.backBuffer = make([]UICell, UIWidth*UIHeight)
