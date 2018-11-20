@@ -1,4 +1,4 @@
-// +build js
+// +build js tk
 
 // font used for letters: source code pro
 

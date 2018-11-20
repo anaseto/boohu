@@ -1,4 +1,4 @@
-// +build !tcell,!ansi,!js
+// +build !tcell,!ansi,!js,!tk
 
 package main
 
