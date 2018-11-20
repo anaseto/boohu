@@ -569,6 +569,9 @@ func (g *game) ArmourClang() (sclang string) {
 
 func (g *game) BlockEffects(m *monster) {
 	g.Stats.Blocks++
+	// only one shield block per turn
+	g.Player.Blocked = true
+	g.PushEvent(&simpleEvent{ERank: g.Ev.Rank() + 10, EAction: BlockEnd})
 	switch g.Player.Shield {
 	case EarthShield:
 		dir := m.Pos.Dir(g.Player.Pos)

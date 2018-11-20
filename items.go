@@ -1064,13 +1064,13 @@ func (sh shield) Short() (text string) {
 func (sh shield) Desc() (text string) {
 	switch sh {
 	case ConfusingShield:
-		text = "A confusing shield blocks attacks, sometimes confusing monsters."
+		text = "A confusing shield can block an attack, sometimes confusing monsters."
 	case EarthShield:
 		text = "An earth shield offers great protection, but impact sound can disintegrate nearby walls."
 	case BashingShield:
-		text = "A bashing shield can block attacks and push ennemies away."
+		text = "A bashing shield can block an attack and push the ennemy away."
 	case FireShield:
-		text = "A fire shield blocks attacks, sometimes burning nearby foliage."
+		text = "A fire shield can block an attack, sometimes burning nearby foliage."
 	}
 	return text
 }
@@ -1082,7 +1082,7 @@ func (sh shield) Letter() rune {
 func (sh shield) Block() (block int) {
 	switch sh {
 	case ConfusingShield, BashingShield, FireShield:
-		block += 9
+		block += 10
 	case EarthShield:
 		block += 15
 	}

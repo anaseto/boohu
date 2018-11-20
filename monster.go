@@ -2362,19 +2362,10 @@ func (m *monster) TormentBolt(g *game, ev event) bool {
 
 func (m *monster) Blocked(g *game) bool {
 	blocked := false
-	if g.Player.Shield != NoShield && !g.Player.Weapon.TwoHanded() {
-		nmons := 0
-		for _, pos := range g.Dungeon.FreeNeighbors(g.Player.Pos) {
-			mons := g.MonsterAt(pos)
-			if mons.Exists() {
-				nmons++
-			}
-		}
-		// less chance to block the more ennemies are surrounding you
-		block := RandInt(g.Player.Block() - 2*nmons + 2)
+	if g.Player.Shield != NoShield && !g.Player.Weapon.TwoHanded() && !g.Player.Blocked {
+		block := RandInt(g.Player.Block())
 		acc := RandInt(m.Accuracy)
 		if block >= acc {
-			//g.MakeNoise(12+g.Player.Block()/2, g.Player.Pos)
 			blocked = true
 		}
 	}

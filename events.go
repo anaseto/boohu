@@ -61,6 +61,7 @@ const (
 	ShadowsEnd
 	SlayEnd
 	AccurateEnd
+	BlockEnd
 )
 
 func (g *game) PushEvent(ev event) {
@@ -212,6 +213,8 @@ func (sev *simpleEvent) Action(g *game) {
 			g.PrintStyled("You no longer feel accurate.", logStatusEnd)
 			g.ui.StatusEndAnimation(g)
 		}
+	case BlockEnd:
+		g.Player.Blocked = false
 	}
 }
 

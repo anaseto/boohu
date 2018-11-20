@@ -23,6 +23,7 @@ type player struct {
 	Rays        rayMap
 	Bored       int
 	AccScore    int
+	Blocked     bool
 }
 
 const DefaultHealth = 42
