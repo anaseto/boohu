@@ -106,6 +106,12 @@ $can create image 0 0 -anchor nw -image gamescreen
 bind $can <Key> {
 	GetKey %A %K
 }
+bind $can <Motion> {
+	MouseMotion %x %y
+}
+bind $can <ButtonPress> {
+	MouseDown %x %y %b
+}
 `)
 	ui.ir.RegisterCommand("GetKey", func(c, keysym string) {
 		var s string
@@ -115,6 +121,18 @@ bind $can <Key> {
 			s = keysym
 		}
 		ch <- uiInput{key: s}
+	})
+	ui.ir.RegisterCommand("MouseDown", func(x, y, b int) {
+		ch <- uiInput{mouse: true, mouseX: (x - 1) / ui.width, mouseY: (y - 1) / ui.height, button: b - 1}
+	})
+	ui.ir.RegisterCommand("MouseMotion", func(x, y int) {
+		nx := (x - 1) / ui.width
+		ny := (y - 1) / ui.height
+		if nx != ui.mousepos.X || ny != ui.mousepos.Y {
+			ui.mousepos.X = nx
+			ui.mousepos.Y = ny
+			ch <- uiInput{mouse: true, mouseX: nx, mouseY: ny, button: -1}
+		}
 	})
 	ui.menuHover = -1
 	ui.ResetCells()
