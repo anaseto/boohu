@@ -1064,7 +1064,7 @@ func (sh shield) Short() (text string) {
 func (sh shield) Desc() (text string) {
 	switch sh {
 	case ConfusingShield:
-		text = "A confusing shield can block an attack, sometimes confusing monsters."
+		text = "A confusing shield can block an attack, sometimes confusing the monster."
 	case EarthShield:
 		text = "An earth shield offers great protection, but impact sound can disintegrate nearby walls."
 	case BashingShield:
