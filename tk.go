@@ -5,6 +5,8 @@ package main
 import (
 	"bytes"
 	"encoding/base64"
+	"image"
+	"image/draw"
 	"image/png"
 	"unicode/utf8"
 
@@ -17,18 +19,20 @@ type termui struct {
 	backBuffer []UICell
 	cursor     position
 	stty       string
-	cache      map[UICell]string
+	cache      map[UICell]*image.RGBA
 	width      int
 	height     int
 	mousepos   position
 	menuHover  menu
 	itemHover  int
+	canvas     *image.RGBA
 }
 
 func (ui *termui) Init() error {
 	ui.cells = make([]UICell, UIWidth*UIHeight)
 	ui.ResetCells()
 	ui.backBuffer = make([]UICell, UIWidth*UIHeight)
+	ui.canvas = image.NewRGBA(image.Rect(0, 0, UIWidth*16, UIHeight*24))
 	ui.ir = gothic.NewInterpreter(`
 set width [expr {16 * 100}]
 set height [expr {24 * 26}]
@@ -55,7 +59,6 @@ bind $can <ButtonPress> {
 		} else {
 			s = keysym
 		}
-		//fmt.Printf("“%s” “%s”\n", c, keysym)
 		ch <- uiInput{key: s}
 	})
 	ui.ir.RegisterCommand("MouseDown", func(x, y, b int) {
@@ -80,7 +83,7 @@ bind $can <ButtonPress> {
 func (ui *termui) InitElements() error {
 	ui.width = 16
 	ui.height = 24
-	ui.cache = make(map[UICell]string)
+	ui.cache = make(map[UICell]*image.RGBA)
 	return nil
 }
 
@@ -128,7 +131,11 @@ func (ui *termui) Flush() {
 			ymax = y
 		}
 	}
-	ui.ir.Eval("gamescreen copy bufscreen -from %{0%d} %{1%d} %{2%d} %{3%d} -to %{0%d} %{1%d} %{2%d} %{3%d}",
+	pngbuf := &bytes.Buffer{}
+	subimg := ui.canvas.SubImage(image.Rect(xmin*16, ymin*24, (xmax+1)*16, (ymax+1)*24))
+	png.Encode(pngbuf, subimg)
+	png := base64.StdEncoding.EncodeToString(pngbuf.Bytes())
+	ui.ir.Eval("gamescreen put %{0%s} -format png -to %{1%d} %{2%d} %{3%d} %{4%d}", png,
 		xmin*16, ymin*24, (xmax+1)*16, (ymax+1)*24) // TODO: optimize this more
 }
 
@@ -143,23 +150,21 @@ func (ui *termui) ApplyToggleLayout() {
 		UIHeight = 26
 		UIWidth = 100
 	}
-	ui.cache = make(map[UICell]string)
+	ui.cache = make(map[UICell]*image.RGBA)
 	ui.cells = make([]UICell, UIWidth*UIHeight)
 	ui.ResetCells()
 	ui.backBuffer = make([]UICell, UIWidth*UIHeight)
 }
 
 func (ui *termui) Draw(cell UICell, x, y int) {
-	var img string
+	var img *image.RGBA
 	if im, ok := ui.cache[cell]; ok {
 		img = im
 	} else {
-		pngbuf := &bytes.Buffer{}
-		png.Encode(pngbuf, getImage(cell))
-		img = base64.StdEncoding.EncodeToString(pngbuf.Bytes())
+		img = getImage(cell)
 		ui.cache[cell] = img
 	}
-	ui.ir.Eval("::bufscreen put %{%s} -format png -to %{%d} %{%d}", img, x*ui.width, ui.height*y)
+	draw.Draw(ui.canvas, image.Rect(x*ui.width, ui.height*y, (x+1)*ui.width, (y+1)*ui.height), img, image.Point{0, 0}, draw.Over)
 }
 
 func (ui *termui) KeyToRuneKeyAction(in uiInput) rune {
