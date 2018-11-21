@@ -360,7 +360,7 @@ func (g *game) HitMonster(dt dmgType, dmg int, mons *monster, ev event) (hit boo
 		}
 		maxacc += adjust
 	} else if g.Player.Weapon == FinalBlade {
-		maxacc += 7
+		maxacc += 10
 	}
 	acc := RandInt(maxacc)
 	if g.Player.AccScore == 1 && acc >= maxacc/2 {
