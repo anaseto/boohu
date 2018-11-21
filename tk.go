@@ -175,6 +175,10 @@ func (ui *termui) PostInit() {
 }
 
 func (ui *termui) Flush() {
+	xmin := UIWidth - 1
+	xmax := 0
+	ymin := UIHeight - 1
+	ymax := 0
 	for i := 0; i < len(ui.cells); i++ {
 		if ui.cells[i] == ui.backBuffer[i] {
 			continue
@@ -183,8 +187,21 @@ func (ui *termui) Flush() {
 		x, y := ui.GetPos(i)
 		ui.Draw(cell, x, y)
 		ui.backBuffer[i] = cell
+		if x < xmin {
+			xmin = x
+		}
+		if x > xmax {
+			xmax = x
+		}
+		if y < ymin {
+			ymin = y
+		}
+		if y > ymax {
+			ymax = y
+		}
 	}
-	ui.ir.Eval("gamescreen copy bufscreen") // TODO: optimize this
+	ui.ir.Eval("gamescreen copy bufscreen -from %{0%d} %{1%d} %{2%d} %{3%d} -to %{0%d} %{1%d} %{2%d} %{3%d}",
+		xmin*16, ymin*24, (xmax+1)*16, (ymax+1)*24) // TODO: optimize this more
 }
 
 func (ui *termui) ApplyToggleLayout() {
