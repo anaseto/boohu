@@ -12,6 +12,7 @@ import (
 	"image/png"
 	"log"
 	"os"
+	"unicode/utf8"
 
 	"github.com/nsf/gothic"
 )
@@ -120,6 +121,7 @@ bind $can <ButtonPress> {
 		} else {
 			s = keysym
 		}
+		//fmt.Printf("“%s” “%s”\n", c, keysym)
 		ch <- uiInput{key: s}
 	})
 	ui.ir.RegisterCommand("MouseDown", func(x, y, b int) {
@@ -276,4 +278,33 @@ func (ui *termui) Draw(cell UICell, x, y int) {
 		ui.cache[cell] = img
 	}
 	ui.ir.Eval("::bufscreen put %{%s} -format png -to %{%d} %{%d}", img, x*ui.width, ui.height*y)
+}
+
+func (ui *termui) KeyToRuneKeyAction(in uiInput) rune {
+	switch in.key {
+	case "Enter":
+		in.key = "."
+	case "Left", "KP_Left":
+		in.key = "4"
+	case "Right", "KP_Right":
+		in.key = "6"
+	case "Up", "KP_Up":
+		in.key = "8"
+	case "Down", "KP_Down":
+		in.key = "2"
+	case "KP_Home":
+		in.key = "7"
+	case "KP_End":
+		in.key = "1"
+	case "KP_Prior":
+		in.key = "9"
+	case "KP_Next":
+		in.key = "3"
+	case "KP_Begin", "KP_Delete":
+		in.key = "5"
+	}
+	if utf8.RuneCountInString(in.key) > 1 {
+		return 0
+	}
+	return ui.ReadKey(in.key)
 }

@@ -7,6 +7,7 @@ import (
 	"errors"
 	"log"
 	"runtime"
+	"unicode/utf8"
 
 	"github.com/gopherjs/gopherwasm/js"
 )
@@ -276,4 +277,33 @@ type uiInput struct {
 	mouseY    int
 	button    int
 	interrupt bool
+}
+
+func (ui *termui) KeyToRuneKeyAction(in uiInput) rune {
+	switch in.key {
+	case "Enter":
+		in.key = "."
+	case "ArrowLeft":
+		in.key = "4"
+	case "ArrowRight":
+		in.key = "6"
+	case "ArrowUp":
+		in.key = "8"
+	case "ArrowDown":
+		in.key = "2"
+	case "Home":
+		in.key = "7"
+	case "End":
+		in.key = "1"
+	case "PageUp":
+		in.key = "9"
+	case "PageDown":
+		in.key = "3"
+	case "Numpad5", "Delete":
+		in.key = "5"
+	}
+	if utf8.RuneCountInString(in.key) > 1 {
+		return 0
+	}
+	return ui.ReadKey(in.key)
 }

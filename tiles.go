@@ -4,11 +4,9 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"image/color"
 	"strings"
 	"unicode"
-	"unicode/utf8"
 )
 
 type UICell struct {
@@ -393,32 +391,11 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 			}
 		}
 	default:
-		switch in.key {
-		case "Enter":
-			in.key = "."
-		case "ArrowLeft":
-			in.key = "4"
-		case "ArrowRight":
-			in.key = "6"
-		case "ArrowUp":
-			in.key = "8"
-		case "ArrowDown":
-			in.key = "2"
-		case "Home":
-			in.key = "7"
-		case "End":
-			in.key = "1"
-		case "PageUp":
-			in.key = "9"
-		case "PageDown":
-			in.key = "3"
-		case "Numpad5", "Delete":
-			in.key = "5"
-		}
-		if utf8.RuneCountInString(in.key) > 1 {
-			err = fmt.Errorf("Invalid key: “%s”.", in.key)
+		r := ui.KeyToRuneKeyAction(in)
+		if r == 0 {
+			again = true
 		} else {
-			err, again, quit = ui.HandleKeyAction(g, runeKeyAction{r: ui.ReadKey(in.key)})
+			err, again, quit = ui.HandleKeyAction(g, runeKeyAction{r: r})
 		}
 	}
 	if err != nil {
@@ -517,96 +494,77 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (er
 	case "\x1b", "Escape", " ":
 		g.Targeting = InvalidPos
 		notarg = true
-		return
-	case "Enter":
-		in.key = "."
 	case "":
-		if in.mouse {
-			switch in.button {
-			case -1:
-				if in.mouseY == DungeonHeight {
-					m, ok := ui.WhichButton(g, in.mouseX)
-					omh := ui.menuHover
-					if ok {
-						ui.menuHover = m
-					} else {
-						ui.menuHover = -1
-					}
-					if ui.menuHover != omh {
-						ui.DrawMenus(g)
-						ui.Flush()
-					}
-					g.Targeting = InvalidPos
-					notarg = true
-					err = errors.New(DoNothing)
-					break
+		if !in.mouse {
+			return
+		}
+		switch in.button {
+		case -1:
+			if in.mouseY == DungeonHeight {
+				m, ok := ui.WhichButton(g, in.mouseX)
+				omh := ui.menuHover
+				if ok {
+					ui.menuHover = m
+				} else {
+					ui.menuHover = -1
 				}
-				ui.menuHover = -1
-				if in.mouseY >= DungeonHeight || in.mouseX >= DungeonWidth {
-					g.Targeting = InvalidPos
-					notarg = true
-					err = errors.New(DoNothing)
-					break
-				}
-				mpos := position{in.mouseX, in.mouseY}
-				if g.Targeting == mpos {
-					break
+				if ui.menuHover != omh {
+					ui.DrawMenus(g)
+					ui.Flush()
 				}
 				g.Targeting = InvalidPos
-				fallthrough
-			case 0:
-				if in.mouseY == DungeonHeight {
-					m, ok := ui.WhichButton(g, in.mouseX)
-					if !ok {
-						g.Targeting = InvalidPos
-						notarg = true
-						err = errors.New(DoNothing)
-						break
-					}
-					err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: m.Key(g)}, data)
-				} else if in.mouseX >= DungeonWidth || in.mouseY >= DungeonHeight {
+				notarg = true
+				err = errors.New(DoNothing)
+				break
+			}
+			ui.menuHover = -1
+			if in.mouseY >= DungeonHeight || in.mouseX >= DungeonWidth {
+				g.Targeting = InvalidPos
+				notarg = true
+				err = errors.New(DoNothing)
+				break
+			}
+			mpos := position{in.mouseX, in.mouseY}
+			if g.Targeting == mpos {
+				break
+			}
+			g.Targeting = InvalidPos
+			fallthrough
+		case 0:
+			if in.mouseY == DungeonHeight {
+				m, ok := ui.WhichButton(g, in.mouseX)
+				if !ok {
 					g.Targeting = InvalidPos
 					notarg = true
 					err = errors.New(DoNothing)
-				} else {
-					again, notarg = ui.CursorMouseLeft(g, targ, position{X: in.mouseX, Y: in.mouseY}, data)
+					break
 				}
-			case 2:
-				if in.mouseY >= DungeonHeight || in.mouseX >= DungeonWidth {
-					err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: KeyMenu}, data)
-				} else {
-					err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: KeyDescription}, data)
-				}
-			case 1:
-				err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: KeyExclude}, data)
+				err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: m.Key(g)}, data)
+			} else if in.mouseX >= DungeonWidth || in.mouseY >= DungeonHeight {
+				g.Targeting = InvalidPos
+				notarg = true
+				err = errors.New(DoNothing)
+			} else {
+				again, notarg = ui.CursorMouseLeft(g, targ, position{X: in.mouseX, Y: in.mouseY}, data)
 			}
+		case 2:
+			if in.mouseY >= DungeonHeight || in.mouseX >= DungeonWidth {
+				err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: KeyMenu}, data)
+			} else {
+				err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: KeyDescription}, data)
+			}
+		case 1:
+			err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: KeyExclude}, data)
 		}
-		return err, again, quit, notarg
-	case "ArrowLeft":
-		in.key = "4"
-	case "ArrowRight":
-		in.key = "6"
-	case "ArrowUp":
-		in.key = "8"
-	case "ArrowDown":
-		in.key = "2"
-	case "Home":
-		in.key = "7"
-	case "End":
-		in.key = "1"
-	case "PageUp":
-		in.key = "9"
-	case "PageDown":
-		in.key = "3"
-	case "Numpad5", "Delete":
-		in.key = "5"
-	}
-	if utf8.RuneCountInString(in.key) > 1 {
-		g.Printf("Invalid key: “%s”.", in.key)
+	default:
+		r := ui.KeyToRuneKeyAction(in)
+		if r != 0 {
+			return ui.CursorKeyAction(g, targ, runeKeyAction{r: r}, data)
+		}
+		again = true
 		notarg = true
-		return
 	}
-	return ui.CursorKeyAction(g, targ, runeKeyAction{r: ui.ReadKey(in.key)}, data)
+	return
 }
 
 func (ui *termui) ColorLine(y int, fg uicolor) {
