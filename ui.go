@@ -343,7 +343,6 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (er
 			return ui.CursorKeyAction(g, targ, runeKeyAction{r: r}, data)
 		}
 		again = true
-		notarg = true
 	}
 	return
 }
