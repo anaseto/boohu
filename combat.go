@@ -20,7 +20,7 @@ func (g *game) HitDamage(dt dmgType, base int, armor int) (attack int, clang boo
 	attack = min + RandInt(base-min+1)
 	absorb := g.Absorb(armor)
 	if dt == DmgMagical {
-		absorb /= 2
+		absorb = 2 * absorb / 3
 	}
 	attack -= absorb
 	if absorb > 0 && absorb >= 2*armor/3 && RandInt(2) == 0 {
