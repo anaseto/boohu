@@ -3,8 +3,6 @@
 package main
 
 import (
-	"unicode/utf8"
-
 	termbox "github.com/nsf/termbox-go"
 )
 
@@ -30,6 +28,7 @@ func (ui *termui) PostInit() {
 	termbox.SetInputMode(termbox.InputEsc | termbox.InputMouse)
 	termbox.HideCursor()
 	ui.HideCursor()
+	ui.menuHover = -1
 }
 
 func (ui *termui) Clear() {
@@ -60,20 +59,8 @@ func (ui *termui) Interrupt() {
 	termbox.Interrupt()
 }
 
-func (ui *termui) HideCursor() {
-	ui.cursor = InvalidPos
-}
-
-func (ui *termui) SetCursor(pos position) {
-	ui.cursor = pos
-}
-
 func (ui *termui) SetCell(x, y int, r rune, fg, bg uicolor) {
 	termbox.SetCell(x, y, r, termbox.Attribute(fg), termbox.Attribute(bg))
-}
-
-func (ui *termui) SetMapCell(x, y int, r rune, fg, bg uicolor) {
-	ui.SetCell(x, y, r, fg, bg)
 }
 
 func (ui *termui) PollEvent() (in uiInput) {
@@ -127,11 +114,4 @@ func (ui *termui) PollEvent() (in uiInput) {
 		in.interrupt = true
 	}
 	return in
-}
-
-func (ui *termui) KeyToRuneKeyAction(in uiInput) rune {
-	if utf8.RuneCountInString(in.key) != 1 {
-		return 0
-	}
-	return ui.ReadKey(in.key)
 }

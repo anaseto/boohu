@@ -4,7 +4,6 @@ package main
 
 import (
 	"runtime"
-	"unicode/utf8"
 
 	"github.com/gdamore/tcell"
 )
@@ -38,6 +37,7 @@ func (ui *termui) PostInit() {
 	}
 	ui.Screen.HideCursor()
 	ui.HideCursor()
+	ui.menuHover = -1
 }
 
 func (ui *termui) Clear() {
@@ -81,22 +81,10 @@ func (ui *termui) Interrupt() {
 	ui.Screen.PostEvent(tcell.NewEventInterrupt(nil))
 }
 
-func (ui *termui) HideCursor() {
-	ui.cursor = InvalidPos
-}
-
-func (ui *termui) SetCursor(pos position) {
-	ui.cursor = pos
-}
-
 func (ui *termui) SetCell(x, y int, r rune, fg, bg uicolor) {
 	st := tcell.StyleDefault
 	st = st.Foreground(tcell.Color(fg)).Background(tcell.Color(bg))
 	ui.Screen.SetContent(x, y, r, nil, st)
-}
-
-func (ui *termui) SetMapCell(x, y int, r rune, fg, bg uicolor) {
-	ui.SetCell(x, y, r, fg, bg)
 }
 
 func (ui *termui) PollEvent() (in uiInput) {
@@ -151,11 +139,4 @@ func (ui *termui) PollEvent() (in uiInput) {
 		in.interrupt = true
 	}
 	return in
-}
-
-func (ui *termui) KeyToRuneKeyAction(in uiInput) rune {
-	if utf8.RuneCountInString(in.key) != 1 {
-		return 0
-	}
-	return ui.ReadKey(in.key)
 }

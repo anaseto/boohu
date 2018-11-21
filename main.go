@@ -1,4 +1,4 @@
-// +build !js,!ansi,!tk
+// +build !js,!ansi
 
 package main
 
@@ -49,9 +49,15 @@ func main() {
 	tui.PostInit()
 	LinkColors()
 
-	tui.DrawWelcome()
 	g := &game{}
-	load, err := g.Load()
+	load, err := g.LoadConfig()
+	if load && err != nil {
+		g.Print("Error loading config file.")
+	} else if load {
+		CustomKeys = true
+	}
+	tui.DrawWelcome()
+	load, err = g.Load()
 	if !load {
 		g.InitLevel()
 	} else if err != nil {
@@ -59,13 +65,6 @@ func main() {
 		g.PrintfStyled("Error: %v", logError, err)
 		g.PrintStyled("Could not load saved game… starting new game.", logError)
 	}
-	load, err = g.LoadConfig()
-	if load && err != nil {
-		g.Print("Error loading config file.")
-	} else if load {
-		CustomKeys = true
-	}
-
 	g.ui = tui
 	g.EventLoop()
 }

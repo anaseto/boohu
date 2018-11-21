@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"unicode/utf8"
 )
 
 var ch chan uiInput
@@ -66,22 +65,21 @@ func main() {
 		}
 	}()
 
-	tui.DrawWelcome()
 	g := &game{}
-	load, err := g.Load()
+	load, err := g.LoadConfig()
+	if load && err != nil {
+		g.Print("Error loading config file.")
+	} else if load {
+		CustomKeys = true
+	}
+	tui.DrawWelcome()
+	load, err = g.Load()
 	if !load {
 		g.InitLevel()
 	} else if err != nil {
 		g.InitLevel()
 		g.Print("Error loading saved game… starting new game.")
 	}
-	load, err = g.LoadConfig()
-	if load && err != nil {
-		g.Print("Error loading config file.")
-	} else if load {
-		CustomKeys = true
-	}
-
 	g.ui = tui
 	g.EventLoop()
 }
@@ -152,6 +150,7 @@ func (ui *termui) PostInit() {
 	cmd = exec.Command("stty", "raw", "-echo")
 	cmd.Stdin = os.Stdin
 	cmd.Run()
+	ui.menuHover = -1
 }
 
 func (ui *termui) MoveTo(x, y int) {
@@ -233,14 +232,6 @@ func (ui *termui) Small() bool {
 	return gameConfig.Small
 }
 
-func (ui *termui) HideCursor() {
-	ui.cursor = InvalidPos
-}
-
-func (ui *termui) SetCursor(pos position) {
-	ui.cursor = pos
-}
-
 func (ui *termui) SetCell(x, y int, r rune, fg, bg uicolor) {
 	i := ui.GetIndex(x, y)
 	if i >= len(ui.cells) {
@@ -248,10 +239,6 @@ func (ui *termui) SetCell(x, y int, r rune, fg, bg uicolor) {
 	}
 	ui.cells[ui.GetIndex(x, y)] = AnsiCell{fg: fg, bg: bg, r: r}
 
-}
-
-func (ui *termui) SetMapCell(x, y int, r rune, fg, bg uicolor) {
-	ui.SetCell(x, y, r, fg, bg)
 }
 
 func (ui *termui) Interrupt() {
@@ -264,11 +251,4 @@ func (ui *termui) PollEvent() (in uiInput) {
 	case in.interrupt = <-interrupt:
 	}
 	return in
-}
-
-func (ui *termui) KeyToRuneKeyAction(in uiInput) rune {
-	if utf8.RuneCountInString(in.key) != 1 {
-		return 0
-	}
-	return ui.ReadKey(in.key)
 }

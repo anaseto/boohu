@@ -3,12 +3,8 @@
 package main
 
 import (
-	"bytes"
 	"encoding/base64"
 	"errors"
-	"image"
-	"image/draw"
-	"image/png"
 	"log"
 	"runtime"
 	"unicode/utf8"
@@ -94,50 +90,6 @@ func (ui *termui) InitElements() error {
 	return nil
 }
 
-func getImage(cell UICell) []byte {
-	var pngImg []byte
-	if cell.inMap && gameConfig.Tiles {
-		pngImg = TileImgs["map-notile"]
-		if im, ok := TileImgs["map-"+string(cell.r)]; ok {
-			pngImg = im
-		} else if im, ok := TileImgs["map-"+MapNames[cell.r]]; ok {
-			pngImg = im
-		}
-	} else {
-		pngImg = TileImgs["map-notile"]
-		if im, ok := TileImgs["letter-"+string(cell.r)]; ok {
-			pngImg = im
-		} else if im, ok := TileImgs["letter-"+LetterNames[cell.r]]; ok {
-			pngImg = im
-		}
-	}
-	buf := make([]byte, len(pngImg))
-	base64.StdEncoding.Decode(buf, pngImg) // TODO: check error
-	br := bytes.NewReader(buf)
-	img, err := png.Decode(br)
-	if err != nil {
-		js.Global().Get("console").Call("log", "could not decode png")
-	}
-	rect := img.Bounds()
-	rgbaimg := image.NewRGBA(rect)
-	draw.Draw(rgbaimg, rect, img, rect.Min, draw.Src)
-	bgc := cell.bg.Color()
-	fgc := cell.fg.Color()
-	for y := 0; y < rect.Max.Y; y++ {
-		for x := 0; x < rect.Max.X; x++ {
-			c := rgbaimg.At(x, y)
-			r, _, _, _ := c.RGBA()
-			if r == 0 {
-				rgbaimg.Set(x, y, bgc)
-			} else {
-				rgbaimg.Set(x, y, fgc)
-			}
-		}
-	}
-	buf = rgbaimg.Pix
-	return buf
-}
-
 func (ui *termui) Draw(cell UICell, x, y int) {
 	var canvas js.Value
 	if cv, ok := ui.cache[cell]; ok {
@@ -148,7 +100,7 @@ func (ui *termui) Draw(cell UICell, x, y int) {
 		canvas.Set("height", 24)
 		ctx := canvas.Call("getContext", "2d")
 		ctx.Set("imageSmoothingEnabled", false)
-		buf := getImage(cell)
+		buf := getImage(cell).Pix
 		ta := js.TypedArrayOf(buf)
 		ca := js.Global().Get("Uint8ClampedArray").New(ta)
 		imgdata := js.Global().Get("ImageData").New(ca, 16, 24)
@@ -378,6 +330,8 @@ func (ui *termui) FlushCallback(obj js.Value) {
 
 func (ui *termui) KeyToRuneKeyAction(in uiInput) rune {
 	switch in.key {
+	case "Escape":
+		in.key = "\x1b"
 	case "Enter":
 		in.key = "."
 	case "ArrowLeft":

@@ -3,7 +3,13 @@
 package main
 
 import (
+	"bytes"
+	"encoding/base64"
+	"image"
 	"image/color"
+	"image/draw"
+	"image/png"
+	"log"
 )
 
 type UICell struct {
@@ -115,30 +121,6 @@ func (c uicolor) Color() color.Color {
 	return cl
 }
 
-func (ui *termui) DrawMenus(g *game) {
-	line := DungeonHeight
-	for i, cols := range MenuCols[0 : len(MenuCols)-1] {
-		if cols[0] >= 0 {
-			if menu(i) == ui.menuHover {
-				ui.DrawColoredText(menu(i).String(), cols[0], line, ColorBlue)
-			} else {
-				ui.DrawColoredText(menu(i).String(), cols[0], line, ColorViolet)
-			}
-		}
-	}
-	interactMenu := ui.UpdateInteractButton(g)
-	if interactMenu == "" {
-		return
-	}
-	i := len(MenuCols) - 1
-	cols := MenuCols[i]
-	if menu(i) == ui.menuHover {
-		ui.DrawColoredText(interactMenu, cols[0], line, ColorBlue)
-	} else {
-		ui.DrawColoredText(interactMenu, cols[0], line, ColorViolet)
-	}
-}
-
 var TileImgs map[string][]byte
 
 var MapNames = map[rune]string{
@@ -246,14 +228,6 @@ func (ui *termui) Small() bool {
 	return gameConfig.Small
 }
 
-func (ui *termui) HideCursor() {
-	ui.cursor = InvalidPos
-}
-
-func (ui *termui) SetCursor(pos position) {
-	ui.cursor = pos
-}
-
 func (ui *termui) SetCell(x, y int, r rune, fg, bg uicolor) {
 	i := ui.GetIndex(x, y)
 	if i >= len(ui.cells) {
@@ -284,4 +258,47 @@ func (ui *termui) ColorLine(y int, fg uicolor) {
 		c := ui.cells[i]
 		ui.SetCell(x, y, c.r, fg, c.bg)
 	}
+}
+
+func getImage(cell UICell) *image.RGBA {
+	var pngImg []byte
+	if cell.inMap && gameConfig.Tiles {
+		pngImg = TileImgs["map-notile"]
+		if im, ok := TileImgs["map-"+string(cell.r)]; ok {
+			pngImg = im
+		} else if im, ok := TileImgs["map-"+MapNames[cell.r]]; ok {
+			pngImg = im
+		}
+	} else {
+		pngImg = TileImgs["map-notile"]
+		if im, ok := TileImgs["letter-"+string(cell.r)]; ok {
+			pngImg = im
+		} else if im, ok := TileImgs["letter-"+LetterNames[cell.r]]; ok {
+			pngImg = im
+		}
+	}
+	buf := make([]byte, len(pngImg))
+	base64.StdEncoding.Decode(buf, pngImg) // TODO: check error
+	br := bytes.NewReader(buf)
+	img, err := png.Decode(br)
+	if err != nil {
+		log.Printf("Could not decode png: %v", err)
+	}
+	rect := img.Bounds()
+	rgbaimg := image.NewRGBA(rect)
+	draw.Draw(rgbaimg, rect, img, rect.Min, draw.Src)
+	bgc := cell.bg.Color()
+	fgc := cell.fg.Color()
+	for y := 0; y < rect.Max.Y; y++ {
+		for x := 0; x < rect.Max.X; x++ {
+			c := rgbaimg.At(x, y)
+			r, _, _, _ := c.RGBA()
+			if r == 0 {
+				rgbaimg.Set(x, y, bgc)
+			} else {
+				rgbaimg.Set(x, y, fgc)
+			}
+		}
+	}
+	return rgbaimg
 }
