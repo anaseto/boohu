@@ -3,9 +3,8 @@
 package main
 
 import (
-	"errors"
 	"runtime"
-	"unicode"
+	"unicode/utf8"
 
 	"github.com/gdamore/tcell"
 )
@@ -14,6 +13,9 @@ type termui struct {
 	tcell.Screen
 	cursor position
 	small  bool
+	// below unused for this backend
+	menuHover menu
+	itemHover int
 }
 
 func (ui *termui) Init() error {
@@ -97,342 +99,63 @@ func (ui *termui) SetMapCell(x, y int, r rune, fg, bg uicolor) {
 	ui.SetCell(x, y, r, fg, bg)
 }
 
-func (ui *termui) WaitForContinue(g *game, line int) {
-loop:
-	for {
-		switch tev := ui.Screen.PollEvent().(type) {
-		case *tcell.EventKey:
-			if tev.Key() == tcell.KeyEsc {
-				break loop
-			}
-			if tev.Rune() == ' ' {
-				break loop
-			}
-		case *tcell.EventMouse:
-			switch tev.Buttons() {
-			case tcell.Button1:
-				x, y := tev.Position()
-				if line >= 0 {
-					if y > line || x > DungeonWidth {
-						break loop
-					}
-				} else {
-					break loop
-				}
-			case tcell.Button2:
-				break loop
-			}
-		}
-	}
-}
-
-func (ui *termui) PromptConfirmation(g *game) bool {
-	for {
-		switch tev := ui.Screen.PollEvent().(type) {
-		case *tcell.EventKey:
-			if tev.Rune() == 'Y' || tev.Rune() == 'y' {
-				return true
-			}
-		}
-		return false
-	}
-}
-
-func (ui *termui) PressAnyKey() error {
-	for {
-		switch tev := ui.Screen.PollEvent().(type) {
-		case *tcell.EventKey:
-			return nil
-		case *tcell.EventInterrupt:
-			return errors.New("interrupted")
-		case *tcell.EventMouse:
-			switch tev.Buttons() {
-			case tcell.Button1, tcell.Button2, tcell.Button3:
-				return nil
-			}
-		}
-	}
-}
-
-func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit bool) {
-	again = true
+func (ui *termui) PollEvent() (in uiInput) {
 	switch tev := ui.Screen.PollEvent().(type) {
 	case *tcell.EventKey:
-		again = false
-		r := tev.Rune()
 		switch tev.Key() {
+		case tcell.KeyEsc:
+			in.key = " "
 		case tcell.KeyLeft:
 			// TODO: will not work if user changes keybindings
-			r = '4'
+			in.key = "4"
 		case tcell.KeyDown:
-			r = '2'
+			in.key = "2"
 		case tcell.KeyUp:
-			r = '8'
+			in.key = "8"
 		case tcell.KeyRight:
-			r = '6'
+			in.key = "6"
 		case tcell.KeyHome:
-			r = '7'
+			in.key = "7"
 		case tcell.KeyEnd:
-			r = '1'
+			in.key = "1"
 		case tcell.KeyPgUp:
-			r = '9'
+			in.key = "9"
 		case tcell.KeyPgDn:
-			r = '3'
+			in.key = "3"
 		case tcell.KeyDelete:
-			r = '5'
+			in.key = "5"
 		case tcell.KeyCtrlW:
-			ui.EnterWizard(g)
-			return nil, true, false
+			in.key = "W"
 		case tcell.KeyCtrlQ:
-			if ui.Quit(g) {
-				return nil, false, true
-			}
-			return nil, true, false
+			in.key = "Q"
 		case tcell.KeyCtrlP:
-			r = 'm'
+			in.key = "m"
 		}
-		err, again, quit = ui.HandleKeyAction(g, runeKeyAction{r: r})
+		if tev.Rune() != 0 && in.key == "" {
+			in.key = string(tev.Rune())
+		}
 	case *tcell.EventMouse:
+		in.mouseX, in.mouseY = tev.Position()
 		switch tev.Buttons() {
-		case tcell.ButtonNone:
 		case tcell.Button1:
-			x, y := tev.Position()
-			pos := position{X: x, Y: y}
-			if y == DungeonHeight {
-				m, ok := ui.WhichButton(g, x)
-				if !ok {
-					again = true
-					break
-				}
-				err, again, quit = ui.HandleKeyAction(g, runeKeyAction{k: m.Key(g)})
-			} else if x >= DungeonWidth || y >= DungeonHeight {
-				again = true
-			} else {
-				err, again, quit = ui.ExaminePos(g, ev, pos)
-			}
+			in.mouse = true
+			in.button = 0
+		case tcell.Button2:
+			in.mouse = true
+			in.button = 1
 		case tcell.Button3:
-			err, again, quit = ui.HandleKeyAction(g, runeKeyAction{k: KeyMenu})
+			in.mouse = true
+			in.button = 2
 		}
+	case *tcell.EventInterrupt:
+		in.interrupt = true
 	}
-	if err != nil {
-		again = true
-	}
-	return err, again, quit
+	return in
 }
 
-func (ui *termui) Scroll(n int) (m int, quit bool) {
-	switch tev := ui.Screen.PollEvent().(type) {
-	case *tcell.EventKey:
-		r := tev.Rune()
-		switch tev.Key() {
-		case tcell.KeyEsc:
-			quit = true
-			return n, quit
-		case tcell.KeyDown:
-			r = '2'
-		case tcell.KeyUp:
-			r = '8'
-		}
-		switch r {
-		case 'u':
-			n -= 12
-		case 'd':
-			n += 12
-		case 'j', '2':
-			n++
-		case 'k', '8':
-			n--
-		case ' ':
-			quit = true
-		}
-	case *tcell.EventMouse:
-		switch tev.Buttons() {
-		case tcell.WheelUp:
-			n -= 2
-		case tcell.WheelDown:
-			n += 2
-		case tcell.Button2:
-			quit = true
-		case tcell.Button1:
-			x, y := tev.Position()
-			if x >= DungeonWidth {
-				quit = true
-				break
-			}
-			if y > UIHeight {
-				break
-			}
-			n += y - (DungeonHeight+3)/2
-		}
+func (ui *termui) KeyToRuneKeyAction(in uiInput) rune {
+	if utf8.RuneCountInString(in.key) != 1 {
+		return 0
 	}
-	return n, quit
-}
-
-func (ui *termui) ReadRuneKey() rune {
-	for {
-		switch tev := ui.Screen.PollEvent().(type) {
-		case *tcell.EventKey:
-			r := tev.Rune()
-			if r == ' ' {
-				return 0
-			}
-			if unicode.IsPrint(r) {
-				return r
-			}
-			switch tev.Key() {
-			case tcell.KeyEsc:
-				return 0
-			}
-		}
-	}
-}
-
-func (ui *termui) KeyMenuAction(n int) (m int, action keyConfigAction) {
-	switch tev := ui.Screen.PollEvent().(type) {
-	case *tcell.EventKey:
-		r := tev.Rune()
-		switch tev.Key() {
-		case tcell.KeyEsc:
-			action = QuitKeyConfig
-			return n, action
-		case tcell.KeyDown:
-			r = '2'
-		case tcell.KeyUp:
-			r = '8'
-		}
-		switch r {
-		case 'a':
-			action = ChangeKeys
-		case 'u':
-			n -= DungeonHeight / 2
-		case 'd':
-			n += DungeonHeight / 2
-		case 'j', '2':
-			n++
-		case 'k', '8':
-			n--
-		case 'R':
-			action = ResetKeys
-		case ' ':
-			action = QuitKeyConfig
-		}
-	case *tcell.EventMouse:
-		switch tev.Buttons() {
-		case tcell.Button1:
-			x, y := tev.Position()
-			if x > DungeonWidth || y > DungeonHeight {
-				action = QuitKeyConfig
-			}
-		case tcell.WheelUp:
-			n -= 2
-		case tcell.WheelDown:
-			n += 2
-		case tcell.Button2:
-			action = QuitKeyConfig
-		}
-	}
-	return n, action
-}
-
-func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (err error, again, quit, notarg bool) {
-	again = true
-	switch tev := ui.Screen.PollEvent().(type) {
-	case *tcell.EventKey:
-		r := tev.Rune()
-		switch tev.Key() {
-		case tcell.KeyLeft:
-			r = '4'
-		case tcell.KeyDown:
-			r = '2'
-		case tcell.KeyUp:
-			r = '8'
-		case tcell.KeyRight:
-			r = '6'
-		case tcell.KeyHome:
-			r = '7'
-		case tcell.KeyEnd:
-			r = '1'
-		case tcell.KeyPgUp:
-			r = '9'
-		case tcell.KeyPgDn:
-			r = '3'
-		case tcell.KeyDelete:
-			r = '5'
-		case tcell.KeyEsc:
-			g.Targeting = InvalidPos
-			notarg = true
-			return
-		case tcell.KeyEnter:
-			r = '.'
-		}
-		err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{r: r}, data)
-	case *tcell.EventMouse:
-		switch tev.Buttons() {
-		case tcell.Button1:
-			x, y := tev.Position()
-			if y == DungeonHeight {
-				m, ok := ui.WhichButton(g, x)
-				if !ok {
-					g.Targeting = InvalidPos
-					notarg = true
-					err = errors.New(DoNothing)
-					break
-				}
-				err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: m.Key(g)}, data)
-			} else if x >= DungeonWidth || y >= DungeonHeight {
-				g.Targeting = InvalidPos
-				notarg = true
-				err = errors.New(DoNothing)
-			} else {
-				again, notarg = ui.CursorMouseLeft(g, targ, position{X: x, Y: y}, data)
-			}
-		case tcell.Button3:
-			x, y := tev.Position()
-			if y >= DungeonHeight || x >= DungeonWidth {
-				err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: KeyMenu}, data)
-			} else {
-				err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: KeyDescription}, data)
-			}
-		case tcell.Button2:
-			err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: KeyExclude}, data)
-		}
-	}
-	return err, again, quit, notarg
-}
-
-func (ui *termui) Select(g *game, l int) (index int, alternate bool, err error) {
-	for {
-		switch tev := ui.Screen.PollEvent().(type) {
-		case *tcell.EventKey:
-			if tev.Key() == tcell.KeyEsc {
-				return -1, false, errors.New(DoNothing)
-			}
-			r := tev.Rune()
-			if 97 <= r && int(r) < 97+l {
-				return int(r - 97), false, nil
-			}
-			if r == '?' {
-				return -1, true, nil
-			}
-			if r == ' ' {
-				return -1, false, errors.New(DoNothing)
-			}
-		case *tcell.EventMouse:
-			switch tev.Buttons() {
-			case tcell.Button1:
-				x, y := tev.Position()
-				if y < 0 || y > l || x >= DungeonWidth {
-					return -1, false, errors.New(DoNothing)
-				}
-				if y == 0 {
-					return -1, true, nil
-				}
-				return y - 1, false, nil
-			case tcell.Button3:
-				return -1, true, nil
-			case tcell.Button2:
-				return -1, false, errors.New(DoNothing)
-			}
-		}
-	}
+	return ui.ReadKey(in.key)
 }

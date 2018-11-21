@@ -158,15 +158,6 @@ func init() {
 	interrupt = make(chan bool)
 }
 
-type uiInput struct {
-	key       string
-	mouse     bool
-	mouseX    int
-	mouseY    int
-	button    int
-	interrupt bool
-}
-
 func (ui *termui) Close() {
 }
 

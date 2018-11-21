@@ -4,24 +4,18 @@ package main
 
 import (
 	"bufio"
-	"errors"
 	"flag"
 	"fmt"
 	"os"
 	"os/exec"
-	"unicode"
+	"unicode/utf8"
 )
 
-type ansiInput struct {
-	r         rune
-	interrupt bool
-}
-
-var ch chan ansiInput
+var ch chan uiInput
 var interrupt chan bool
 
 func init() {
-	ch = make(chan ansiInput, 100)
+	ch = make(chan uiInput, 100)
 	interrupt = make(chan bool)
 }
 
@@ -67,7 +61,7 @@ func main() {
 		for {
 			r, _, err := tui.bStdin.ReadRune()
 			if err == nil {
-				ch <- ansiInput{r: r}
+				ch <- uiInput{key: string(r)}
 			}
 		}
 	}()
@@ -105,10 +99,9 @@ type termui struct {
 	backBuffer []AnsiCell
 	cursor     position
 	stty       string
-}
-
-func (ui *termui) GetIndex(x, y int) int {
-	return y*UIWidth + x
+	// below unused for this backend
+	menuHover menu
+	itemHover int
 }
 
 func (ui *termui) GetPos(i int) (int, int) {
@@ -265,7 +258,7 @@ func (ui *termui) Interrupt() {
 	interrupt <- true
 }
 
-func (ui *termui) ReadChar() (in ansiInput) {
+func (ui *termui) PollEvent() (in uiInput) {
 	select {
 	case in = <-ch:
 	case in.interrupt = <-interrupt:
@@ -273,126 +266,9 @@ func (ui *termui) ReadChar() (in ansiInput) {
 	return in
 }
 
-func (ui *termui) WaitForContinue(g *game, line int) {
-loop:
-	for {
-		in := ui.ReadChar()
-		switch in.r {
-		case '\x1b', ' ':
-			break loop
-		}
+func (ui *termui) KeyToRuneKeyAction(in uiInput) rune {
+	if utf8.RuneCountInString(in.key) != 1 {
+		return 0
 	}
-}
-
-func (ui *termui) PromptConfirmation(g *game) bool {
-	for {
-		in := ui.ReadChar()
-		switch in.r {
-		case 'Y', 'y':
-			return true
-		default:
-			return false
-		}
-	}
-}
-
-func (ui *termui) PressAnyKey() error {
-	for {
-		in := ui.ReadChar()
-		if in.interrupt {
-			return errors.New("interrupted")
-		}
-		return nil
-	}
-}
-
-func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit bool) {
-	again = true
-	in := ui.ReadChar()
-	switch in.r {
-	case 'W':
-		ui.EnterWizard(g)
-		return nil, true, false
-	case 'Q':
-		if ui.Quit(g) {
-			return nil, false, true
-		}
-		return nil, true, false
-	}
-	err, again, quit = ui.HandleKeyAction(g, runeKeyAction{r: in.r})
-	if err != nil {
-		again = true
-	}
-	return err, again, quit
-}
-
-func (ui *termui) Scroll(n int) (m int, quit bool) {
-	in := ui.ReadChar()
-	switch in.r {
-	case '\x1b', ' ':
-		quit = true
-	case 'u':
-		n -= 12
-	case 'd':
-		n += 12
-	case 'j', '2':
-		n++
-	case 'k', '8':
-		n--
-	}
-	return n, quit
-}
-
-func (ui *termui) ReadRuneKey() rune {
-	for {
-		in := ui.ReadChar()
-		if in.r == ' ' || in.r == '\x1b' {
-			return 0
-		}
-		if unicode.IsPrint(in.r) {
-			return in.r
-		}
-	}
-}
-
-func (ui *termui) KeyMenuAction(n int) (m int, action keyConfigAction) {
-	in := ui.ReadChar()
-	switch in.r {
-	case 'a':
-		action = ChangeKeys
-	case '\x1b', ' ':
-		action = QuitKeyConfig
-	case 'u':
-		n -= DungeonHeight / 2
-	case 'd':
-		n += DungeonHeight / 2
-	case 'j', '2':
-		n++
-	case 'k', '8':
-		n--
-	case 'R':
-		action = ResetKeys
-	}
-	return n, action
-}
-
-func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (err error, again, quit, notarg bool) {
-	in := ui.ReadChar()
-	return ui.CursorKeyAction(g, targ, runeKeyAction{r: in.r}, data)
-}
-
-func (ui *termui) Select(g *game, l int) (index int, alternate bool, err error) {
-	for {
-		in := ui.ReadChar()
-		switch {
-		case in.r == '\x1b' || in.r == ' ':
-			return -1, false, errors.New(DoNothing)
-		case 97 <= in.r && int(in.r) < 97+l:
-			return int(in.r - 97), false, nil
-		case in.r == '?':
-			return -1, true, nil
-		case in.r == ' ':
-			return -1, false, errors.New(DoNothing)
-		}
-	}
+	return ui.ReadKey(in.key)
 }
