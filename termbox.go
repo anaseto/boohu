@@ -36,15 +36,12 @@ var SmallScreen = false
 
 func (ui *termui) Flush() {
 	ui.DrawLogFrame()
-	for j := ui.g.DrawFrameStart; j < len(ui.g.DrawLog); j++ {
-		cdraw := ui.g.DrawLog[j]
+	for _, cdraw := range ui.g.DrawLog[len(ui.g.DrawLog)-1].Draws {
 		cell := cdraw.Cell
 		i := cdraw.I
 		x, y := ui.GetPos(i)
 		termbox.SetCell(x, y, cell.R, termbox.Attribute(cell.Fg), termbox.Attribute(cell.Bg))
 	}
-	ui.g.DrawFrameStart = len(ui.g.DrawLog)
-	ui.g.DrawFrame++
 	termbox.Flush()
 	w, h := termbox.Size()
 	if w <= UIWidth-8 || h <= UIHeight-2 {

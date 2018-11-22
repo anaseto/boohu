@@ -210,10 +210,14 @@ func Simple8ColorPalette() {
 	ColorGreen = Green
 }
 
+type drawFrame struct {
+	Draws []cellDraw
+	Time  time.Time
+}
+
 type cellDraw struct {
-	Cell  UICell
-	I     int
-	Frame int
+	Cell UICell
+	I    int
 }
 
 func (ui *termui) SetCell(x, y int, r rune, fg, bg uicolor) {
@@ -241,13 +245,15 @@ func (ui *termui) DrawLogFrame() {
 	if len(ui.g.drawBackBuffer) != len(ui.g.DrawBuffer) {
 		ui.g.drawBackBuffer = make([]UICell, len(ui.g.DrawBuffer))
 	}
+	ui.g.DrawLog = append(ui.g.DrawLog, drawFrame{Time: time.Now()})
 	for i := 0; i < len(ui.g.DrawBuffer); i++ {
 		if ui.g.DrawBuffer[i] == ui.g.drawBackBuffer[i] {
 			continue
 		}
 		c := ui.g.DrawBuffer[i]
-		cdraw := cellDraw{Cell: c, I: i, Frame: ui.g.DrawFrame}
-		ui.g.DrawLog = append(ui.g.DrawLog, cdraw)
+		cdraw := cellDraw{Cell: c, I: i}
+		last := len(ui.g.DrawLog) - 1
+		ui.g.DrawLog[last].Draws = append(ui.g.DrawLog[last].Draws, cdraw)
 		ui.g.drawBackBuffer[i] = c
 	}
 }

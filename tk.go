@@ -108,8 +108,7 @@ func (ui *termui) Flush() {
 	xmax := 0
 	ymin := UIHeight - 1
 	ymax := 0
-	for j := ui.g.DrawFrameStart; j < len(ui.g.DrawLog); j++ {
-		cdraw := ui.g.DrawLog[j]
+	for _, cdraw := range ui.g.DrawLog[len(ui.g.DrawLog)-1].Draws {
 		cell := cdraw.Cell
 		i := cdraw.I
 		x, y := ui.GetPos(i)
@@ -133,9 +132,6 @@ func (ui *termui) Flush() {
 	png := base64.StdEncoding.EncodeToString(pngbuf.Bytes())
 	ui.ir.Eval("gamescreen put %{0%s} -format png -to %{1%d} %{2%d} %{3%d} %{4%d}", png,
 		xmin*16, ymin*24, (xmax+1)*16, (ymax+1)*24) // TODO: optimize this more
-
-	ui.g.DrawFrameStart = len(ui.g.DrawLog)
-	ui.g.DrawFrame++
 }
 
 func (ui *termui) ApplyToggleLayout() {

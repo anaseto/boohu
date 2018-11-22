@@ -318,15 +318,12 @@ func (ui *termui) ApplyToggleLayout() {
 
 func (ui *termui) FlushCallback(obj js.Value) {
 	ui.DrawLogFrame()
-	for j := ui.g.DrawFrameStart; j < len(ui.g.DrawLog); j++ {
-		cdraw := ui.g.DrawLog[j]
+	for _, cdraw := range ui.g.DrawLog[len(ui.g.DrawLog)-1].Draws {
 		cell := cdraw.Cell
 		i := cdraw.I
 		x, y := ui.GetPos(i)
 		ui.Draw(cell, x, y)
 	}
-	ui.g.DrawFrameStart = len(ui.g.DrawLog)
-	ui.g.DrawFrame++
 }
 
 func (ui *termui) KeyToRuneKeyAction(in uiInput) rune {

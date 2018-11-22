@@ -45,8 +45,7 @@ var SmallScreen = false
 
 func (ui *termui) Flush() {
 	ui.DrawLogFrame()
-	for j := ui.g.DrawFrameStart; j < len(ui.g.DrawLog); j++ {
-		cdraw := ui.g.DrawLog[j]
+	for _, cdraw := range ui.g.DrawLog[len(ui.g.DrawLog)-1].Draws {
 		cell := cdraw.Cell
 		i := cdraw.I
 		x, y := ui.GetPos(i)
@@ -54,8 +53,6 @@ func (ui *termui) Flush() {
 		st = st.Foreground(tcell.Color(cell.Fg)).Background(tcell.Color(cell.Bg))
 		ui.Screen.SetContent(x, y, cell.R, nil, st)
 	}
-	ui.g.DrawFrameStart = len(ui.g.DrawLog)
-	ui.g.DrawFrame++
 	//ui.g.Printf("%d %d %d", ui.g.DrawFrame, ui.g.DrawFrameStart, len(ui.g.DrawLog))
 	ui.Screen.Show()
 	w, h := ui.Screen.Size()

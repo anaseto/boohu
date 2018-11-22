@@ -53,9 +53,7 @@ type game struct {
 	AutoNext            bool
 	DrawBuffer          []UICell
 	drawBackBuffer      []UICell
-	DrawLog             []cellDraw
-	DrawFrame           int
-	DrawFrameStart      int
+	DrawLog             []drawFrame
 	Log                 []logEntry
 	LogIndex            int
 	LogNextTick         int

@@ -143,8 +143,7 @@ func (ui *termui) Flush() {
 	var prevfg, prevbg uicolor
 	first := true
 	var prevx, prevy int
-	for j := ui.g.DrawFrameStart; j < len(ui.g.DrawLog); j++ {
-		cdraw := ui.g.DrawLog[j]
+	for _, cdraw := range ui.g.DrawLog[len(ui.g.DrawLog)-1].Draws {
 		cell := cdraw.Cell
 		i := cdraw.I
 		x, y := ui.GetPos(i)
@@ -186,9 +185,6 @@ func (ui *termui) Flush() {
 	ui.MoveTo(ui.cursor.X, ui.cursor.Y)
 	fmt.Fprintf(ui.bStdout, "\x1b[0m")
 	ui.bStdout.Flush()
-
-	ui.g.DrawFrameStart = len(ui.g.DrawLog)
-	ui.g.DrawFrame++
 }
 
 func (ui *termui) ApplyToggleLayout() {
