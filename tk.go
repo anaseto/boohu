@@ -123,6 +123,9 @@ func (ui *termui) Flush() {
 			ymax = y
 		}
 	}
+	if xmin > xmax || ymin > ymax {
+		return
+	}
 	pngbuf := &bytes.Buffer{}
 	subimg := ui.canvas.SubImage(image.Rect(xmin*16, ymin*24, (xmax+1)*16, (ymax+1)*24))
 	png.Encode(pngbuf, subimg)
