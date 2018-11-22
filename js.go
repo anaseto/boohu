@@ -65,7 +65,6 @@ var SaveError string
 
 type termui struct {
 	g         *game
-	cells     []UICell
 	cursor    position
 	display   js.Value
 	cache     map[UICell]js.Value
@@ -239,7 +238,6 @@ func (g *game) WriteDump() error {
 // End of io compatibility functions
 
 func (ui *termui) Init() error {
-	ui.cells = make([]UICell, UIWidth*UIHeight)
 	canvas := js.Global().Get("document").Call("getElementById", "gamecanvas")
 	canvas.Call(
 		"addEventListener", "keypress", js.NewEventCallback(0, func(e js.Value) {
@@ -270,7 +268,6 @@ func (ui *termui) Init() error {
 			}
 		}))
 	ui.menuHover = -1
-	ui.Clear()
 	ui.InitElements()
 	return nil
 }
@@ -311,8 +308,8 @@ func (ui *termui) ApplyToggleLayout() {
 	canvas := js.Global().Get("document").Call("getElementById", "gamecanvas")
 	canvas.Set("height", 24*UIHeight)
 	canvas.Set("width", 16*UIWidth)
+	ui.g.DrawBuffer = make([]UICell, UIWidth*UIHeight)
 	ui.cache = make(map[UICell]js.Value)
-	ui.cells = make([]UICell, UIWidth*UIHeight)
 	ui.Clear()
 }
 

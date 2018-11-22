@@ -198,8 +198,8 @@ func (ui *termui) ApplyToggleLayout() {
 		UIHeight = 26
 		UIWidth = 100
 	}
-	ui.Clear()
 	ui.g.DrawBuffer = make([]UICell, UIWidth*UIHeight)
+	ui.Clear()
 }
 
 func (ui *termui) Small() bool {

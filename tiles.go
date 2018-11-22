@@ -217,7 +217,7 @@ func (ui *termui) PollEvent() (in uiInput) {
 func (ui *termui) ColorLine(y int, fg uicolor) {
 	for x := 0; x < DungeonWidth; x++ {
 		i := ui.GetIndex(x, y)
-		c := ui.cells[i]
+		c := ui.g.DrawBuffer[i]
 		ui.SetCell(x, y, c.R, fg, c.Bg)
 	}
 }

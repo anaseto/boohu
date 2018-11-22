@@ -230,10 +230,6 @@ func (ui *termui) SetGenCell(x, y int, r rune, fg, bg uicolor, inmap bool) {
 		return
 	}
 	c := UICell{R: r, Fg: fg, Bg: bg, InMap: inmap}
-	if len(ui.g.DrawBuffer) == 0 {
-		// XXX: perhaps initialize at a better place
-		ui.g.DrawBuffer = make([]UICell, UIHeight*UIWidth)
-	}
 	ui.g.DrawBuffer[i] = c
 }
 
@@ -259,6 +255,7 @@ func (ui *termui) DrawLogFrame() {
 }
 
 func (ui *termui) DrawWelcome() {
+	ui.DrawBufferInit()
 	ui.Clear()
 	col := 10
 	line := 5

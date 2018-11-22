@@ -1568,3 +1568,11 @@ func (ui *termui) Clear() {
 		ui.SetCell(x, y, ' ', ColorFg, ColorBg)
 	}
 }
+
+func (ui *termui) DrawBufferInit() {
+	if len(ui.g.DrawBuffer) == 0 {
+		ui.g.DrawBuffer = make([]UICell, UIHeight*UIWidth)
+	} else if len(ui.g.DrawBuffer) != UIHeight*UIWidth {
+		ui.g.DrawBuffer = make([]UICell, UIHeight*UIWidth)
+	}
+}

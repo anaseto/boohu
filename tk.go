@@ -16,7 +16,6 @@ import (
 type termui struct {
 	g         *game
 	ir        *gothic.Interpreter
-	cells     []UICell
 	cursor    position
 	stty      string
 	cache     map[UICell]*image.RGBA
@@ -29,7 +28,6 @@ type termui struct {
 }
 
 func (ui *termui) Init() error {
-	ui.cells = make([]UICell, UIWidth*UIHeight)
 	ui.canvas = image.NewRGBA(image.Rect(0, 0, UIWidth*16, UIHeight*24))
 	ui.ir = gothic.NewInterpreter(`
 set width [expr {16 * 100}]
@@ -72,7 +70,6 @@ bind $can <ButtonPress> {
 		}
 	})
 	ui.menuHover = -1
-	ui.Clear()
 	ui.InitElements()
 	return nil
 }
@@ -146,9 +143,8 @@ func (ui *termui) ApplyToggleLayout() {
 		UIWidth = 100
 	}
 	ui.cache = make(map[UICell]*image.RGBA)
-	ui.cells = make([]UICell, UIWidth*UIHeight)
-	ui.Clear()
 	ui.g.DrawBuffer = make([]UICell, UIWidth*UIHeight)
+	ui.Clear()
 }
 
 func (ui *termui) Draw(cell UICell, x, y int) {

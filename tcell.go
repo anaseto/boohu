@@ -65,6 +65,17 @@ func (ui *termui) Flush() {
 
 func (ui *termui) ApplyToggleLayout() {
 	gameConfig.Small = !gameConfig.Small
+	if gameConfig.Small {
+		ui.Clear()
+		ui.Flush()
+		UIHeight = 24
+		UIWidth = 80
+	} else {
+		UIHeight = 26
+		UIWidth = 100
+	}
+	ui.g.DrawBuffer = make([]UICell, UIWidth*UIHeight)
+	ui.Clear()
 }
 
 func (ui *termui) Small() bool {

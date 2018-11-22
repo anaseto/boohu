@@ -126,6 +126,10 @@ func (g *game) LoadConfig() (bool, error) {
 	if gameConfig.DarkLOS {
 		ApplyDarkLOS()
 	}
+	if gameConfig.Small {
+		UIHeight = 24
+		UIWidth = 80
+	}
 	return true, nil
 }
 
