@@ -210,6 +210,48 @@ func Simple8ColorPalette() {
 	ColorGreen = Green
 }
 
+type cellDraw struct {
+	Cell  UICell
+	I     int
+	Frame int
+}
+
+func (ui *termui) SetCell(x, y int, r rune, fg, bg uicolor) {
+	ui.SetGenCell(x, y, r, fg, bg, false)
+}
+
+func (ui *termui) SetGenCell(x, y int, r rune, fg, bg uicolor, inmap bool) {
+	i := ui.GetIndex(x, y)
+	if i >= UIHeight*UIWidth {
+		return
+	}
+	c := UICell{R: r, Fg: fg, Bg: bg, InMap: inmap}
+	if len(ui.g.DrawBuffer) == 0 {
+		// XXX: perhaps initialize at a better place
+		ui.g.DrawBuffer = make([]UICell, UIHeight*UIWidth)
+	}
+	ui.g.DrawBuffer[i] = c
+}
+
+func (ui *termui) SetMapCell(x, y int, r rune, fg, bg uicolor) {
+	ui.SetGenCell(x, y, r, fg, bg, true)
+}
+
+func (ui *termui) DrawLogFrame() {
+	if len(ui.g.drawBackBuffer) != len(ui.g.DrawBuffer) {
+		ui.g.drawBackBuffer = make([]UICell, len(ui.g.DrawBuffer))
+	}
+	for i := 0; i < len(ui.g.DrawBuffer); i++ {
+		if ui.g.DrawBuffer[i] == ui.g.drawBackBuffer[i] {
+			continue
+		}
+		c := ui.g.DrawBuffer[i]
+		cdraw := cellDraw{Cell: c, I: i, Frame: ui.g.DrawFrame}
+		ui.g.DrawLog = append(ui.g.DrawLog, cdraw)
+		ui.g.drawBackBuffer[i] = c
+	}
+}
+
 func (ui *termui) DrawWelcome() {
 	ui.Clear()
 	col := 10

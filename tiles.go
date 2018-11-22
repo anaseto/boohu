@@ -12,33 +12,15 @@ import (
 	"log"
 )
 
-type UICell struct {
-	fg    uicolor
-	bg    uicolor
-	r     rune
-	inMap bool
-}
-
-func (ui *termui) GetPos(i int) (int, int) {
-	return i - (i/UIWidth)*UIWidth, i / UIWidth
-}
-
-func (ui *termui) ResetCells() {
-	for i := 0; i < len(ui.cells); i++ {
-		ui.cells[i].r = ' '
-		ui.cells[i].bg = ColorBg
-	}
-}
-
 func (ui *termui) ApplyToggleTiles() {
 	gameConfig.Tiles = !gameConfig.Tiles
 	for c, _ := range ui.cache {
-		if c.inMap {
+		if c.InMap {
 			delete(ui.cache, c)
 		}
 	}
-	for i := 0; i < len(ui.backBuffer); i++ {
-		ui.backBuffer[i] = UICell{}
+	for i := 0; i < len(ui.g.DrawBuffer); i++ {
+		ui.g.DrawBuffer[i] = UICell{}
 	}
 }
 
@@ -220,28 +202,8 @@ func (ui *termui) Interrupt() {
 	interrupt <- true
 }
 
-func (ui *termui) Clear() {
-	ui.ResetCells()
-}
-
 func (ui *termui) Small() bool {
 	return gameConfig.Small
-}
-
-func (ui *termui) SetCell(x, y int, r rune, fg, bg uicolor) {
-	i := ui.GetIndex(x, y)
-	if i >= len(ui.cells) {
-		return
-	}
-	ui.cells[i] = UICell{fg: fg, bg: bg, r: r}
-}
-
-func (ui *termui) SetMapCell(x, y int, r rune, fg, bg uicolor) {
-	i := ui.GetIndex(x, y)
-	if i >= len(ui.cells) {
-		return
-	}
-	ui.cells[i] = UICell{fg: fg, bg: bg, r: r, inMap: true}
 }
 
 func (ui *termui) PollEvent() (in uiInput) {
@@ -256,24 +218,24 @@ func (ui *termui) ColorLine(y int, fg uicolor) {
 	for x := 0; x < DungeonWidth; x++ {
 		i := ui.GetIndex(x, y)
 		c := ui.cells[i]
-		ui.SetCell(x, y, c.r, fg, c.bg)
+		ui.SetCell(x, y, c.R, fg, c.Bg)
 	}
 }
 
 func getImage(cell UICell) *image.RGBA {
 	var pngImg []byte
-	if cell.inMap && gameConfig.Tiles {
+	if cell.InMap && gameConfig.Tiles {
 		pngImg = TileImgs["map-notile"]
-		if im, ok := TileImgs["map-"+string(cell.r)]; ok {
+		if im, ok := TileImgs["map-"+string(cell.R)]; ok {
 			pngImg = im
-		} else if im, ok := TileImgs["map-"+MapNames[cell.r]]; ok {
+		} else if im, ok := TileImgs["map-"+MapNames[cell.R]]; ok {
 			pngImg = im
 		}
 	} else {
 		pngImg = TileImgs["map-notile"]
-		if im, ok := TileImgs["letter-"+string(cell.r)]; ok {
+		if im, ok := TileImgs["letter-"+string(cell.R)]; ok {
 			pngImg = im
-		} else if im, ok := TileImgs["letter-"+LetterNames[cell.r]]; ok {
+		} else if im, ok := TileImgs["letter-"+LetterNames[cell.R]]; ok {
 			pngImg = im
 		}
 	}
@@ -287,8 +249,8 @@ func getImage(cell UICell) *image.RGBA {
 	rect := img.Bounds()
 	rgbaimg := image.NewRGBA(rect)
 	draw.Draw(rgbaimg, rect, img, rect.Min, draw.Src)
-	bgc := cell.bg.Color()
-	fgc := cell.fg.Color()
+	bgc := cell.Bg.Color()
+	fgc := cell.Fg.Color()
 	for y := 0; y < rect.Max.Y; y++ {
 		for x := 0; x < rect.Max.X; x++ {
 			c := rgbaimg.At(x, y)

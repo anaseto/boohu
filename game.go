@@ -51,6 +51,11 @@ type game struct {
 	AutoDir             direction
 	AutoHalt            bool
 	AutoNext            bool
+	DrawBuffer          []UICell
+	drawBackBuffer      []UICell
+	DrawLog             []cellDraw
+	DrawFrame           int
+	DrawFrameStart      int
 	Log                 []logEntry
 	LogIndex            int
 	LogNextTick         int
@@ -62,7 +67,7 @@ type game struct {
 	WizardMap           bool
 	Version             string
 	Opts                startOpts
-	ui                  Renderer
+	ui                  UI
 }
 
 type startOpts struct {
@@ -72,7 +77,7 @@ type startOpts struct {
 	UnstableLevel int
 }
 
-type Renderer interface {
+type UI interface {
 	ExploreStep(*game) bool
 	HandlePlayerTurn(*game, event) bool
 	Death(*game)

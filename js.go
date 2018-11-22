@@ -14,6 +14,8 @@ import (
 
 func main() {
 	tui := &termui{}
+	g := &game{}
+	tui.g = g
 	err := tui.Init()
 	if err != nil {
 		log.Fatalf("boohu: %v\n", err)
@@ -31,7 +33,7 @@ func main() {
 }
 
 func newGame(tui *termui) {
-	g := &game{}
+	g := tui.g
 	load, err := g.LoadConfig()
 	if load && err != nil {
 		g.Print("Error loading config file.")
@@ -62,17 +64,17 @@ func newGame(tui *termui) {
 var SaveError string
 
 type termui struct {
-	cells      []UICell
-	backBuffer []UICell
-	cursor     position
-	display    js.Value
-	cache      map[UICell]js.Value
-	ctx        js.Value
-	width      int
-	height     int
-	mousepos   position
-	menuHover  menu
-	itemHover  int
+	g         *game
+	cells     []UICell
+	cursor    position
+	display   js.Value
+	cache     map[UICell]js.Value
+	ctx       js.Value
+	width     int
+	height    int
+	mousepos  position
+	menuHover menu
+	itemHover int
 }
 
 func (ui *termui) InitElements() error {
@@ -268,8 +270,7 @@ func (ui *termui) Init() error {
 			}
 		}))
 	ui.menuHover = -1
-	ui.ResetCells()
-	ui.backBuffer = make([]UICell, UIWidth*UIHeight)
+	ui.Clear()
 	ui.InitElements()
 	return nil
 }
@@ -299,7 +300,7 @@ func (ui *termui) Flush() {
 func (ui *termui) ApplyToggleLayout() {
 	gameConfig.Small = !gameConfig.Small
 	if gameConfig.Small {
-		ui.ResetCells()
+		ui.Clear()
 		ui.Flush()
 		UIHeight = 24
 		UIWidth = 80
@@ -312,20 +313,20 @@ func (ui *termui) ApplyToggleLayout() {
 	canvas.Set("width", 16*UIWidth)
 	ui.cache = make(map[UICell]js.Value)
 	ui.cells = make([]UICell, UIWidth*UIHeight)
-	ui.ResetCells()
-	ui.backBuffer = make([]UICell, UIWidth*UIHeight)
+	ui.Clear()
 }
 
 func (ui *termui) FlushCallback(obj js.Value) {
-	for i := 0; i < len(ui.cells); i++ {
-		if ui.cells[i] == ui.backBuffer[i] {
-			continue
-		}
-		cell := ui.cells[i]
+	ui.DrawLogFrame()
+	for j := ui.g.DrawFrameStart; j < len(ui.g.DrawLog); j++ {
+		cdraw := ui.g.DrawLog[j]
+		cell := cdraw.Cell
+		i := cdraw.I
 		x, y := ui.GetPos(i)
 		ui.Draw(cell, x, y)
-		ui.backBuffer[i] = cell
 	}
+	ui.g.DrawFrameStart = len(ui.g.DrawLog)
+	ui.g.DrawFrame++
 }
 
 func (ui *termui) KeyToRuneKeyAction(in uiInput) rune {

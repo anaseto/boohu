@@ -9,6 +9,7 @@ import (
 )
 
 type termui struct {
+	g *game
 	tcell.Screen
 	cursor position
 	small  bool
@@ -40,26 +41,22 @@ func (ui *termui) PostInit() {
 	ui.menuHover = -1
 }
 
-func (ui *termui) Clear() {
-	w, h := ui.Screen.Size()
-	if w > UIWidth {
-		w = UIWidth
-	}
-	if h > UIHeight {
-		h = UIHeight
-	}
-	st := tcell.StyleDefault
-	st = st.Foreground(tcell.Color(ColorFg)).Background(tcell.Color(ColorBg))
-	for row := 0; row < h; row++ {
-		for col := 0; col < w; col++ {
-			ui.Screen.SetContent(col, row, ' ', nil, st)
-		}
-	}
-}
-
 var SmallScreen = false
 
 func (ui *termui) Flush() {
+	ui.DrawLogFrame()
+	for j := ui.g.DrawFrameStart; j < len(ui.g.DrawLog); j++ {
+		cdraw := ui.g.DrawLog[j]
+		cell := cdraw.Cell
+		i := cdraw.I
+		x, y := ui.GetPos(i)
+		st := tcell.StyleDefault
+		st = st.Foreground(tcell.Color(cell.Fg)).Background(tcell.Color(cell.Bg))
+		ui.Screen.SetContent(x, y, cell.R, nil, st)
+	}
+	ui.g.DrawFrameStart = len(ui.g.DrawLog)
+	ui.g.DrawFrame++
+	//ui.g.Printf("%d %d %d", ui.g.DrawFrame, ui.g.DrawFrameStart, len(ui.g.DrawLog))
 	ui.Screen.Show()
 	w, h := ui.Screen.Size()
 	if w <= UIWidth-8 || h <= UIHeight-2 {
@@ -79,12 +76,6 @@ func (ui *termui) Small() bool {
 
 func (ui *termui) Interrupt() {
 	ui.Screen.PostEvent(tcell.NewEventInterrupt(nil))
-}
-
-func (ui *termui) SetCell(x, y int, r rune, fg, bg uicolor) {
-	st := tcell.StyleDefault
-	st = st.Foreground(tcell.Color(fg)).Background(tcell.Color(bg))
-	ui.Screen.SetContent(x, y, r, nil, st)
 }
 
 func (ui *termui) PollEvent() (in uiInput) {

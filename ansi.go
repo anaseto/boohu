@@ -40,6 +40,8 @@ func main() {
 	}
 
 	tui := &termui{}
+	g := &game{}
+	tui.g = g
 	if *optMinimalUI {
 		gameConfig.Small = true
 		UIHeight = 24
@@ -65,7 +67,6 @@ func main() {
 		}
 	}()
 
-	g := &game{}
 	load, err := g.LoadConfig()
 	if load && err != nil {
 		g.Print("Error loading config file.")
@@ -84,41 +85,21 @@ func main() {
 	g.EventLoop()
 }
 
-type AnsiCell struct {
-	fg uicolor
-	bg uicolor
-	r  rune
-}
-
 type termui struct {
-	bStdin     *bufio.Reader
-	bStdout    *bufio.Writer
-	cells      []AnsiCell
-	backBuffer []AnsiCell
-	cursor     position
-	stty       string
+	g       *game
+	bStdin  *bufio.Reader
+	bStdout *bufio.Writer
+	cursor  position
+	stty    string
 	// below unused for this backend
 	menuHover menu
 	itemHover int
 }
 
-func (ui *termui) GetPos(i int) (int, int) {
-	return i - (i/UIWidth)*UIWidth, i / UIWidth
-}
-
-func (ui *termui) ResetCells() {
-	for i := 0; i < len(ui.cells); i++ {
-		ui.cells[i].r = ' '
-		ui.cells[i].bg = ColorBg
-	}
-}
-
 func (ui *termui) Init() error {
 	ui.bStdin = bufio.NewReader(os.Stdin)
 	ui.bStdout = bufio.NewWriter(os.Stdout)
-	ui.cells = make([]AnsiCell, UIWidth*UIHeight)
-	ui.ResetCells()
-	ui.backBuffer = make([]AnsiCell, UIWidth*UIHeight)
+	ui.Clear()
 	fmt.Fprint(ui.bStdout, "\x1b[2J")
 	return nil
 }
@@ -157,39 +138,35 @@ func (ui *termui) MoveTo(x, y int) {
 	fmt.Fprintf(ui.bStdout, "\x1b[%d;%dH", y+1, x+1)
 }
 
-func (ui *termui) Clear() {
-	ui.ResetCells()
-}
-
 func (ui *termui) Flush() {
+	ui.DrawLogFrame()
 	var prevfg, prevbg uicolor
 	first := true
 	var prevx, prevy int
-	for i := 0; i < len(ui.cells); i++ {
-		if ui.cells[i] == ui.backBuffer[i] {
-			continue
-		}
-		cell := ui.cells[i]
+	for j := ui.g.DrawFrameStart; j < len(ui.g.DrawLog); j++ {
+		cdraw := ui.g.DrawLog[j]
+		cell := cdraw.Cell
+		i := cdraw.I
 		x, y := ui.GetPos(i)
 		pfg := true
 		pbg := true
 		pxy := true
 		if first {
-			prevfg = cell.fg
-			prevbg = cell.bg
+			prevfg = cell.Fg
+			prevbg = cell.Bg
 			prevx = x
 			prevy = y
 			first = false
 		} else {
-			if prevfg == cell.fg {
+			if prevfg == cell.Fg {
 				pfg = false
 			} else {
-				prevfg = cell.fg
+				prevfg = cell.Fg
 			}
-			if prevbg == cell.bg {
+			if prevbg == cell.Bg {
 				pbg = false
 			} else {
-				prevbg = cell.bg
+				prevbg = cell.Bg
 			}
 			if x == prevx+1 && y == prevy {
 				pxy = false
@@ -199,23 +176,25 @@ func (ui *termui) Flush() {
 			ui.MoveTo(x, y)
 		}
 		if pfg {
-			fmt.Fprintf(ui.bStdout, "\x1b[38;5;%dm", cell.fg)
+			fmt.Fprintf(ui.bStdout, "\x1b[38;5;%dm", cell.Fg)
 		}
 		if pbg {
-			fmt.Fprintf(ui.bStdout, "\x1b[48;5;%dm", cell.bg)
+			fmt.Fprintf(ui.bStdout, "\x1b[48;5;%dm", cell.Bg)
 		}
-		ui.bStdout.WriteRune(cell.r)
-		ui.backBuffer[i] = cell
+		ui.bStdout.WriteRune(cell.R)
 	}
 	ui.MoveTo(ui.cursor.X, ui.cursor.Y)
 	fmt.Fprintf(ui.bStdout, "\x1b[0m")
 	ui.bStdout.Flush()
+
+	ui.g.DrawFrameStart = len(ui.g.DrawLog)
+	ui.g.DrawFrame++
 }
 
 func (ui *termui) ApplyToggleLayout() {
 	gameConfig.Small = !gameConfig.Small
 	if gameConfig.Small {
-		ui.ResetCells()
+		ui.Clear()
 		ui.Flush()
 		UIHeight = 24
 		UIWidth = 80
@@ -223,22 +202,12 @@ func (ui *termui) ApplyToggleLayout() {
 		UIHeight = 26
 		UIWidth = 100
 	}
-	ui.cells = make([]AnsiCell, UIWidth*UIHeight)
-	ui.ResetCells()
-	ui.backBuffer = make([]AnsiCell, UIWidth*UIHeight)
+	ui.Clear()
+	ui.g.DrawBuffer = make([]UICell, UIWidth*UIHeight)
 }
 
 func (ui *termui) Small() bool {
 	return gameConfig.Small
-}
-
-func (ui *termui) SetCell(x, y int, r rune, fg, bg uicolor) {
-	i := ui.GetIndex(x, y)
-	if i >= len(ui.cells) {
-		return
-	}
-	ui.cells[ui.GetIndex(x, y)] = AnsiCell{fg: fg, bg: bg, r: r}
-
 }
 
 func (ui *termui) Interrupt() {

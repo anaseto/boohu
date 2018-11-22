@@ -9,6 +9,13 @@ import (
 	"unicode/utf8"
 )
 
+type UICell struct {
+	Fg    uicolor
+	Bg    uicolor
+	R     rune
+	InMap bool
+}
+
 type uiInput struct {
 	key       string
 	mouse     bool
@@ -175,6 +182,10 @@ func (ui *termui) Scroll(n int) (m int, quit bool) {
 
 func (ui *termui) GetIndex(x, y int) int {
 	return y*UIWidth + x
+}
+
+func (ui *termui) GetPos(i int) (int, int) {
+	return i - (i/UIWidth)*UIWidth, i / UIWidth
 }
 
 func (ui *termui) Select(g *game, l int) (index int, alternate bool, err error) {
@@ -1548,5 +1559,12 @@ getKey:
 			continue getKey
 		}
 		return quit
+	}
+}
+
+func (ui *termui) Clear() {
+	for i := 0; i < UIHeight*UIWidth; i++ {
+		x, y := ui.GetPos(i)
+		ui.SetCell(x, y, ' ', ColorFg, ColorBg)
 	}
 }

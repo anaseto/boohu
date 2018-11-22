@@ -14,24 +14,22 @@ import (
 )
 
 type termui struct {
-	ir         *gothic.Interpreter
-	cells      []UICell
-	backBuffer []UICell
-	cursor     position
-	stty       string
-	cache      map[UICell]*image.RGBA
-	width      int
-	height     int
-	mousepos   position
-	menuHover  menu
-	itemHover  int
-	canvas     *image.RGBA
+	g         *game
+	ir        *gothic.Interpreter
+	cells     []UICell
+	cursor    position
+	stty      string
+	cache     map[UICell]*image.RGBA
+	width     int
+	height    int
+	mousepos  position
+	menuHover menu
+	itemHover int
+	canvas    *image.RGBA
 }
 
 func (ui *termui) Init() error {
 	ui.cells = make([]UICell, UIWidth*UIHeight)
-	ui.ResetCells()
-	ui.backBuffer = make([]UICell, UIWidth*UIHeight)
 	ui.canvas = image.NewRGBA(image.Rect(0, 0, UIWidth*16, UIHeight*24))
 	ui.ir = gothic.NewInterpreter(`
 set width [expr {16 * 100}]
@@ -74,8 +72,7 @@ bind $can <ButtonPress> {
 		}
 	})
 	ui.menuHover = -1
-	ui.ResetCells()
-	ui.backBuffer = make([]UICell, UIWidth*UIHeight)
+	ui.Clear()
 	ui.InitElements()
 	return nil
 }
@@ -106,18 +103,17 @@ func (ui *termui) PostInit() {
 }
 
 func (ui *termui) Flush() {
+	ui.DrawLogFrame()
 	xmin := UIWidth - 1
 	xmax := 0
 	ymin := UIHeight - 1
 	ymax := 0
-	for i := 0; i < len(ui.cells); i++ {
-		if ui.cells[i] == ui.backBuffer[i] {
-			continue
-		}
-		cell := ui.cells[i]
+	for j := ui.g.DrawFrameStart; j < len(ui.g.DrawLog); j++ {
+		cdraw := ui.g.DrawLog[j]
+		cell := cdraw.Cell
+		i := cdraw.I
 		x, y := ui.GetPos(i)
 		ui.Draw(cell, x, y)
-		ui.backBuffer[i] = cell
 		if x < xmin {
 			xmin = x
 		}
@@ -137,12 +133,15 @@ func (ui *termui) Flush() {
 	png := base64.StdEncoding.EncodeToString(pngbuf.Bytes())
 	ui.ir.Eval("gamescreen put %{0%s} -format png -to %{1%d} %{2%d} %{3%d} %{4%d}", png,
 		xmin*16, ymin*24, (xmax+1)*16, (ymax+1)*24) // TODO: optimize this more
+
+	ui.g.DrawFrameStart = len(ui.g.DrawLog)
+	ui.g.DrawFrame++
 }
 
 func (ui *termui) ApplyToggleLayout() {
 	gameConfig.Small = !gameConfig.Small
 	if gameConfig.Small {
-		ui.ResetCells()
+		ui.Clear()
 		ui.Flush()
 		UIHeight = 24
 		UIWidth = 80
@@ -152,8 +151,8 @@ func (ui *termui) ApplyToggleLayout() {
 	}
 	ui.cache = make(map[UICell]*image.RGBA)
 	ui.cells = make([]UICell, UIWidth*UIHeight)
-	ui.ResetCells()
-	ui.backBuffer = make([]UICell, UIWidth*UIHeight)
+	ui.Clear()
+	ui.g.DrawBuffer = make([]UICell, UIWidth*UIHeight)
 }
 
 func (ui *termui) Draw(cell UICell, x, y int) {

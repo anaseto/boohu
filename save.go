@@ -36,7 +36,7 @@ func (g *game) Save() error {
 		g.Print(err.Error())
 		return err
 	}
-	saveFile := filepath.Join(dataDir, "save.gob")
+	saveFile := filepath.Join(dataDir, "save")
 	data, err := g.GameSave()
 	if err != nil {
 		g.Print(err.Error())
@@ -51,7 +51,7 @@ func (g *game) Save() error {
 }
 
 func (g *game) RemoveSaveFile() error {
-	return g.RemoveDataFile("save.gob")
+	return g.RemoveDataFile("save")
 }
 
 func (g *game) Load() (bool, error) {
@@ -59,7 +59,7 @@ func (g *game) Load() (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	saveFile := filepath.Join(dataDir, "save.gob")
+	saveFile := filepath.Join(dataDir, "save")
 	_, err = os.Stat(saveFile)
 	if err != nil {
 		// no save file, new game

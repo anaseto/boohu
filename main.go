@@ -38,6 +38,8 @@ func main() {
 	}
 
 	tui := &termui{}
+	g := &game{}
+	tui.g = g
 	err := tui.Init()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "boohu: %v\n", err)
@@ -49,7 +51,6 @@ func main() {
 	tui.PostInit()
 	LinkColors()
 
-	g := &game{}
 	load, err := g.LoadConfig()
 	if load && err != nil {
 		g.Print("Error loading config file.")

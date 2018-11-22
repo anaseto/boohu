@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"compress/zlib"
 	"encoding/gob"
 )
 
@@ -23,7 +24,11 @@ func (g *game) GameSave() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return data.Bytes(), nil
+	var buf bytes.Buffer
+	w := zlib.NewWriter(&buf)
+	w.Write(data.Bytes())
+	w.Close()
+	return buf.Bytes(), nil
 }
 
 type config struct {
@@ -46,13 +51,18 @@ func (c *config) ConfigSave() ([]byte, error) {
 }
 
 func (g *game) DecodeGameSave(data []byte) (*game, error) {
-	buf := bytes.NewBuffer(data)
-	dec := gob.NewDecoder(buf)
-	lg := &game{}
-	err := dec.Decode(lg)
+	buf := bytes.NewReader(data)
+	r, err := zlib.NewReader(buf)
 	if err != nil {
 		return nil, err
 	}
+	dec := gob.NewDecoder(r)
+	lg := &game{}
+	err = dec.Decode(lg)
+	if err != nil {
+		return nil, err
+	}
+	r.Close()
 	return lg, nil
 }
 

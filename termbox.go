@@ -7,6 +7,7 @@ import (
 )
 
 type termui struct {
+	g      *game
 	cursor position
 	small  bool
 	// below unused for this backend
@@ -31,13 +32,19 @@ func (ui *termui) PostInit() {
 	ui.menuHover = -1
 }
 
-func (ui *termui) Clear() {
-	termbox.Clear(termbox.Attribute(ColorFg), termbox.Attribute(ColorBg))
-}
-
 var SmallScreen = false
 
 func (ui *termui) Flush() {
+	ui.DrawLogFrame()
+	for j := ui.g.DrawFrameStart; j < len(ui.g.DrawLog); j++ {
+		cdraw := ui.g.DrawLog[j]
+		cell := cdraw.Cell
+		i := cdraw.I
+		x, y := ui.GetPos(i)
+		termbox.SetCell(x, y, cell.R, termbox.Attribute(cell.Fg), termbox.Attribute(cell.Bg))
+	}
+	ui.g.DrawFrameStart = len(ui.g.DrawLog)
+	ui.g.DrawFrame++
 	termbox.Flush()
 	w, h := termbox.Size()
 	if w <= UIWidth-8 || h <= UIHeight-2 {
@@ -57,10 +64,6 @@ func (ui *termui) Small() bool {
 
 func (ui *termui) Interrupt() {
 	termbox.Interrupt()
-}
-
-func (ui *termui) SetCell(x, y int, r rune, fg, bg uicolor) {
-	termbox.SetCell(x, y, r, termbox.Attribute(fg), termbox.Attribute(bg))
 }
 
 func (ui *termui) PollEvent() (in uiInput) {
