@@ -540,9 +540,13 @@ func (g *game) EvokeRodHope(ev event) error {
 		dmg = 0
 	}
 	mons.HP -= dmg
+	g.Burn(g.Player.Target, ev)
 	g.ui.HitAnimation(g, g.Player.Target, true)
 	g.Printf("An energy channel hits %s (%d dmg).", mons.Kind.Definite(false), dmg)
-	g.Burn(g.Player.Target, ev)
+	if mons.HP <= 0 {
+		g.Printf("%s dies.", mons.Kind.Indefinite(true))
+		g.HandleKill(mons, ev)
+	}
 	return nil
 }
 
