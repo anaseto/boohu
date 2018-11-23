@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"strings"
+	"time"
 	"unicode"
 	"unicode/utf8"
 )
@@ -1559,6 +1560,23 @@ getKey:
 		}
 		return quit
 	}
+}
+
+func (ui *termui) ExploreStep(g *game) bool {
+	next := make(chan bool)
+	var stop bool
+	go func() {
+		time.Sleep(10 * time.Millisecond)
+		ui.Interrupt()
+	}()
+	go func() {
+		err := ui.PressAnyKey()
+		interrupted := err != nil
+		next <- !interrupted
+	}()
+	stop = <-next
+	ui.DrawDungeonView(g, NormalMode)
+	return stop
 }
 
 func (ui *termui) Clear() {
