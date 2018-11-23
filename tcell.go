@@ -8,7 +8,7 @@ import (
 	"github.com/gdamore/tcell"
 )
 
-type termui struct {
+type gameui struct {
 	g *game
 	tcell.Screen
 	cursor position
@@ -18,7 +18,7 @@ type termui struct {
 	itemHover int
 }
 
-func (ui *termui) Init() error {
+func (ui *gameui) Init() error {
 	screen, err := tcell.NewScreen()
 	ui.Screen = screen
 	if err != nil {
@@ -27,11 +27,11 @@ func (ui *termui) Init() error {
 	return ui.Screen.Init()
 }
 
-func (ui *termui) Close() {
+func (ui *gameui) Close() {
 	ui.Screen.Fini()
 }
 
-func (ui *termui) PostInit() {
+func (ui *gameui) PostInit() {
 	ui.Screen.SetStyle(tcell.StyleDefault)
 	if runtime.GOOS != "openbsd" {
 		ui.Screen.EnableMouse()
@@ -43,7 +43,7 @@ func (ui *termui) PostInit() {
 
 var SmallScreen = false
 
-func (ui *termui) Flush() {
+func (ui *gameui) Flush() {
 	ui.DrawLogFrame()
 	for _, cdraw := range ui.g.DrawLog[len(ui.g.DrawLog)-1].Draws {
 		cell := cdraw.Cell
@@ -63,7 +63,7 @@ func (ui *termui) Flush() {
 	}
 }
 
-func (ui *termui) ApplyToggleLayout() {
+func (ui *gameui) ApplyToggleLayout() {
 	gameConfig.Small = !gameConfig.Small
 	if gameConfig.Small {
 		ui.Clear()
@@ -78,15 +78,15 @@ func (ui *termui) ApplyToggleLayout() {
 	ui.Clear()
 }
 
-func (ui *termui) Small() bool {
+func (ui *gameui) Small() bool {
 	return gameConfig.Small || SmallScreen
 }
 
-func (ui *termui) Interrupt() {
+func (ui *gameui) Interrupt() {
 	ui.Screen.PostEvent(tcell.NewEventInterrupt(nil))
 }
 
-func (ui *termui) PollEvent() (in uiInput) {
+func (ui *gameui) PollEvent() (in uiInput) {
 	switch tev := ui.Screen.PollEvent().(type) {
 	case *tcell.EventKey:
 		switch tev.Key() {

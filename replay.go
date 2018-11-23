@@ -7,7 +7,7 @@ import (
 )
 
 func Replay(file string) error {
-	tui := &termui{}
+	tui := &gameui{}
 	g := &game{}
 	tui.g = g
 	g.ui = tui
@@ -28,7 +28,7 @@ func Replay(file string) error {
 	return nil
 }
 
-func (ui *termui) Replay() {
+func (ui *gameui) Replay() {
 	g := ui.g
 	dl := g.DrawLog
 	if len(dl) == 0 {
@@ -86,7 +86,7 @@ func (rep *replay) DrawFrame(i int) {
 }
 
 type replay struct {
-	ui     *termui
+	ui     *gameui
 	frames []drawFrame
 	undo   [][]cellDraw
 	frame  int

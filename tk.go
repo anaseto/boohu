@@ -13,7 +13,7 @@ import (
 	"github.com/nsf/gothic"
 )
 
-type termui struct {
+type gameui struct {
 	g         *game
 	ir        *gothic.Interpreter
 	cursor    position
@@ -27,7 +27,7 @@ type termui struct {
 	canvas    *image.RGBA
 }
 
-func (ui *termui) Init() error {
+func (ui *gameui) Init() error {
 	ui.canvas = image.NewRGBA(image.Rect(0, 0, UIWidth*16, UIHeight*24))
 	ui.ir = gothic.NewInterpreter(`
 set width [expr {16 * 100}]
@@ -74,7 +74,7 @@ bind $can <ButtonPress> {
 	return nil
 }
 
-func (ui *termui) InitElements() error {
+func (ui *gameui) InitElements() error {
 	ui.width = 16
 	ui.height = 24
 	ui.cache = make(map[UICell]*image.RGBA)
@@ -89,17 +89,17 @@ func init() {
 	interrupt = make(chan bool)
 }
 
-func (ui *termui) Close() {
+func (ui *gameui) Close() {
 }
 
-func (ui *termui) PostInit() {
+func (ui *gameui) PostInit() {
 	SolarizedPalette()
 	ui.HideCursor()
 	settingsActions = append(settingsActions, toggleTiles)
 	gameConfig.Tiles = true
 }
 
-func (ui *termui) Flush() {
+func (ui *gameui) Flush() {
 	ui.DrawLogFrame()
 	xmin := UIWidth - 1
 	xmax := 0
@@ -134,7 +134,7 @@ func (ui *termui) Flush() {
 		xmin*16, ymin*24, (xmax+1)*16, (ymax+1)*24) // TODO: optimize this more
 }
 
-func (ui *termui) ApplyToggleLayout() {
+func (ui *gameui) ApplyToggleLayout() {
 	gameConfig.Small = !gameConfig.Small
 	if gameConfig.Small {
 		ui.Clear()
@@ -150,7 +150,7 @@ func (ui *termui) ApplyToggleLayout() {
 	ui.Clear()
 }
 
-func (ui *termui) Draw(cell UICell, x, y int) {
+func (ui *gameui) Draw(cell UICell, x, y int) {
 	var img *image.RGBA
 	if im, ok := ui.cache[cell]; ok {
 		img = im
@@ -161,7 +161,7 @@ func (ui *termui) Draw(cell UICell, x, y int) {
 	draw.Draw(ui.canvas, image.Rect(x*ui.width, ui.height*y, (x+1)*ui.width, (y+1)*ui.height), img, image.Point{0, 0}, draw.Over)
 }
 
-func (ui *termui) KeyToRuneKeyAction(in uiInput) rune {
+func (ui *gameui) KeyToRuneKeyAction(in uiInput) rune {
 	switch in.key {
 	case "Enter":
 		in.key = "."

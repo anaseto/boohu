@@ -12,7 +12,7 @@ import (
 	"log"
 )
 
-func (ui *termui) ApplyToggleTiles() {
+func (ui *gameui) ApplyToggleTiles() {
 	gameConfig.Tiles = !gameConfig.Tiles
 	for c, _ := range ui.cache {
 		if c.InMap {
@@ -198,15 +198,15 @@ var LetterNames = map[rune]string{
 	'_':  "stone",
 }
 
-func (ui *termui) Interrupt() {
+func (ui *gameui) Interrupt() {
 	interrupt <- true
 }
 
-func (ui *termui) Small() bool {
+func (ui *gameui) Small() bool {
 	return gameConfig.Small
 }
 
-func (ui *termui) PollEvent() (in uiInput) {
+func (ui *gameui) PollEvent() (in uiInput) {
 	select {
 	case in = <-ch:
 	case in.interrupt = <-interrupt:
@@ -214,7 +214,7 @@ func (ui *termui) PollEvent() (in uiInput) {
 	return in
 }
 
-func (ui *termui) ColorLine(y int, fg uicolor) {
+func (ui *gameui) ColorLine(y int, fg uicolor) {
 	for x := 0; x < DungeonWidth; x++ {
 		i := ui.GetIndex(x, y)
 		c := ui.g.DrawBuffer[i]

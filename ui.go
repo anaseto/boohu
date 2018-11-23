@@ -26,15 +26,15 @@ type uiInput struct {
 	interrupt bool
 }
 
-func (ui *termui) HideCursor() {
+func (ui *gameui) HideCursor() {
 	ui.cursor = InvalidPos
 }
 
-func (ui *termui) SetCursor(pos position) {
+func (ui *gameui) SetCursor(pos position) {
 	ui.cursor = pos
 }
 
-func (ui *termui) WaitForContinue(g *game, line int) {
+func (ui *gameui) WaitForContinue(g *game, line int) {
 loop:
 	for {
 		in := ui.PollEvent()
@@ -56,7 +56,7 @@ loop:
 	}
 }
 
-func (ui *termui) PromptConfirmation(g *game) bool {
+func (ui *gameui) PromptConfirmation(g *game) bool {
 	for {
 		in := ui.PollEvent()
 		switch in.key {
@@ -68,7 +68,7 @@ func (ui *termui) PromptConfirmation(g *game) bool {
 	}
 }
 
-func (ui *termui) PressAnyKey() error {
+func (ui *gameui) PressAnyKey() error {
 	for {
 		e := ui.PollEvent()
 		if e.interrupt {
@@ -80,7 +80,7 @@ func (ui *termui) PressAnyKey() error {
 	}
 }
 
-func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit bool) {
+func (ui *gameui) PlayerTurnEvent(g *game, ev event) (err error, again, quit bool) {
 	again = true
 	in := ui.PollEvent()
 	switch in.key {
@@ -148,7 +148,7 @@ func (ui *termui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 	return err, again, quit
 }
 
-func (ui *termui) Scroll(n int) (m int, quit bool) {
+func (ui *gameui) Scroll(n int) (m int, quit bool) {
 	in := ui.PollEvent()
 	switch in.key {
 	case "Escape", "\x1b", " ":
@@ -181,15 +181,15 @@ func (ui *termui) Scroll(n int) (m int, quit bool) {
 	return n, quit
 }
 
-func (ui *termui) GetIndex(x, y int) int {
+func (ui *gameui) GetIndex(x, y int) int {
 	return y*UIWidth + x
 }
 
-func (ui *termui) GetPos(i int) (int, int) {
+func (ui *gameui) GetPos(i int) (int, int) {
 	return i - (i/UIWidth)*UIWidth, i / UIWidth
 }
 
-func (ui *termui) Select(g *game, l int) (index int, alternate bool, err error) {
+func (ui *gameui) Select(g *game, l int) (index int, alternate bool, err error) {
 	for {
 		in := ui.PollEvent()
 		r := ui.ReadKey(in.key)
@@ -245,7 +245,7 @@ func (ui *termui) Select(g *game, l int) (index int, alternate bool, err error) 
 	}
 }
 
-func (ui *termui) KeyMenuAction(n int) (m int, action keyConfigAction) {
+func (ui *gameui) KeyMenuAction(n int) (m int, action keyConfigAction) {
 	in := ui.PollEvent()
 	r := ui.KeyToRuneKeyAction(in)
 	switch string(r) {
@@ -280,7 +280,7 @@ func (ui *termui) KeyMenuAction(n int) (m int, action keyConfigAction) {
 	return n, action
 }
 
-func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (err error, again, quit, notarg bool) {
+func (ui *gameui) TargetModeEvent(g *game, targ Targeter, data *examineData) (err error, again, quit, notarg bool) {
 	again = true
 	in := ui.PollEvent()
 	switch in.key {
@@ -359,7 +359,7 @@ func (ui *termui) TargetModeEvent(g *game, targ Targeter, data *examineData) (er
 	return
 }
 
-func (ui *termui) ReadRuneKey() rune {
+func (ui *gameui) ReadRuneKey() rune {
 	for {
 		in := ui.PollEvent()
 		switch in.key {
@@ -375,7 +375,7 @@ func (ui *termui) ReadRuneKey() rune {
 	}
 }
 
-func (ui *termui) ReadKey(s string) (r rune) {
+func (ui *gameui) ReadKey(s string) (r rune) {
 	bs := strings.NewReader(s)
 	r, _, _ = bs.ReadRune()
 	return r
@@ -391,7 +391,7 @@ const (
 
 const DoNothing = "Do nothing, then."
 
-func (ui *termui) EnterWizard(g *game) {
+func (ui *gameui) EnterWizard(g *game) {
 	if ui.Wizard(g) {
 		g.WizardMode()
 		ui.DrawDungeonView(g, NoFlushMode)
@@ -400,7 +400,7 @@ func (ui *termui) EnterWizard(g *game) {
 	}
 }
 
-func (ui *termui) CleanError(err error) error {
+func (ui *gameui) CleanError(err error) error {
 	if err != nil && err.Error() == DoNothing {
 		err = errors.New("")
 	}
@@ -812,7 +812,7 @@ type runeKeyAction struct {
 	k keyAction
 }
 
-func (ui *termui) HandleKeyAction(g *game, rka runeKeyAction) (err error, again bool, quit bool) {
+func (ui *gameui) HandleKeyAction(g *game, rka runeKeyAction) (err error, again bool, quit bool) {
 	if rka.r != 0 {
 		var ok bool
 		rka.k, ok = gameConfig.RuneNormalModeKeys[rka.r]
@@ -836,7 +836,7 @@ func (ui *termui) HandleKeyAction(g *game, rka runeKeyAction) (err error, again 
 	return ui.HandleKey(g, rka)
 }
 
-func (ui *termui) OptionalDescendConfirmation(g *game, st stair) (err error) {
+func (ui *gameui) OptionalDescendConfirmation(g *game, st stair) (err error) {
 	if g.Depth == WinDepth && st == NormalStair {
 		g.Print("Do you really want to dive into optional depths? [y/N]")
 		ui.DrawDungeonView(g, NormalMode)
@@ -849,7 +849,7 @@ func (ui *termui) OptionalDescendConfirmation(g *game, st stair) (err error) {
 
 }
 
-func (ui *termui) HandleKey(g *game, rka runeKeyAction) (err error, again bool, quit bool) {
+func (ui *gameui) HandleKey(g *game, rka runeKeyAction) (err error, again bool, quit bool) {
 	switch rka.k {
 	case KeyW, KeyS, KeyN, KeyE, KeyNW, KeyNE, KeySW, KeySE:
 		err = g.MovePlayer(g.Player.Pos.To(KeyToDir(rka.k)), g.Ev)
@@ -979,7 +979,7 @@ func (ui *termui) HandleKey(g *game, rka runeKeyAction) (err error, again bool, 
 	return err, again, quit
 }
 
-func (ui *termui) GoToPos(g *game, ev event, pos position) (err error, again bool) {
+func (ui *gameui) GoToPos(g *game, ev event, pos position) (err error, again bool) {
 	if !pos.valid() {
 		return errors.New("Invalid location."), true
 	}
@@ -1002,7 +1002,7 @@ func (ui *termui) GoToPos(g *game, ev event, pos position) (err error, again boo
 	return err, again
 }
 
-func (ui *termui) ExaminePos(g *game, ev event, pos position) (err error, again, quit bool) {
+func (ui *gameui) ExaminePos(g *game, ev event, pos position) (err error, again, quit bool) {
 	var start *position
 	if pos.valid() {
 		start = &pos
@@ -1011,13 +1011,13 @@ func (ui *termui) ExaminePos(g *game, ev event, pos position) (err error, again,
 	return err, again, quit
 }
 
-func (ui *termui) Examine(g *game, start *position) (err error, again, quit bool) {
+func (ui *gameui) Examine(g *game, start *position) (err error, again, quit bool) {
 	ex := &examiner{}
 	err, again, quit = ui.CursorAction(g, ex, start)
 	return err, again, quit
 }
 
-func (ui *termui) ChooseTarget(g *game, targ Targeter) error {
+func (ui *gameui) ChooseTarget(g *game, targ Targeter) error {
 	err, _, _ := ui.CursorAction(g, targ, nil)
 	if err != nil {
 		return err
@@ -1028,7 +1028,7 @@ func (ui *termui) ChooseTarget(g *game, targ Targeter) error {
 	return nil
 }
 
-func (ui *termui) NextMonster(g *game, r rune, pos position, data *examineData) {
+func (ui *gameui) NextMonster(g *game, r rune, pos position, data *examineData) {
 	nmonster := data.nmonster
 	for i := 0; i < len(g.Monsters); i++ {
 		if r == '+' {
@@ -1051,7 +1051,7 @@ func (ui *termui) NextMonster(g *game, r rune, pos position, data *examineData) 
 	data.nmonster = nmonster
 }
 
-func (ui *termui) NextStair(g *game, data *examineData) {
+func (ui *gameui) NextStair(g *game, data *examineData) {
 	if data.sortedStairs == nil {
 		stairs := g.StairsSlice()
 		data.sortedStairs = g.SortedNearestTo(stairs, g.Player.Pos)
@@ -1065,7 +1065,7 @@ func (ui *termui) NextStair(g *game, data *examineData) {
 	}
 }
 
-func (ui *termui) NextObject(g *game, pos position, data *examineData) {
+func (ui *gameui) NextObject(g *game, pos position, data *examineData) {
 	nobject := data.nobject
 	if len(data.objects) == 0 {
 		for p := range g.Collectables {
@@ -1100,7 +1100,7 @@ func (ui *termui) NextObject(g *game, pos position, data *examineData) {
 	data.nobject = nobject
 }
 
-func (ui *termui) ExcludeZone(g *game, pos position) {
+func (ui *gameui) ExcludeZone(g *game, pos position) {
 	if !g.Dungeon.Cell(pos).Explored {
 		g.Print("You cannot choose an unexplored cell for exclusion.")
 	} else {
@@ -1109,7 +1109,7 @@ func (ui *termui) ExcludeZone(g *game, pos position) {
 	}
 }
 
-func (ui *termui) CursorMouseLeft(g *game, targ Targeter, pos position, data *examineData) (again, notarg bool) {
+func (ui *gameui) CursorMouseLeft(g *game, targ Targeter, pos position, data *examineData) (again, notarg bool) {
 	again = true
 	if data.npos == pos {
 		err := targ.Action(g, pos)
@@ -1129,7 +1129,7 @@ func (ui *termui) CursorMouseLeft(g *game, targ Targeter, pos position, data *ex
 	return again, notarg
 }
 
-func (ui *termui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, data *examineData) (err error, again, quit, notarg bool) {
+func (ui *gameui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, data *examineData) (err error, again, quit, notarg bool) {
 	pos := data.npos
 	again = true
 	if rka.r != 0 {
@@ -1258,7 +1258,7 @@ type examineData struct {
 
 var InvalidPos = position{-1, -1}
 
-func (ui *termui) CursorAction(g *game, targ Targeter, start *position) (err error, again, quit bool) {
+func (ui *gameui) CursorAction(g *game, targ Targeter, start *position) (err error, again, quit bool) {
 	pos := g.Player.Pos
 	if start != nil {
 		pos = *start
@@ -1405,7 +1405,7 @@ func init() {
 	}
 }
 
-func (ui *termui) WhichButton(g *game, col int) (menu, bool) {
+func (ui *gameui) WhichButton(g *game, col int) (menu, bool) {
 	if ui.Small() {
 		return MenuOther, false
 	}
@@ -1423,7 +1423,7 @@ func (ui *termui) WhichButton(g *game, col int) (menu, bool) {
 	return MenuOther, false
 }
 
-func (ui *termui) UpdateInteractButton(g *game) string {
+func (ui *gameui) UpdateInteractButton(g *game) string {
 	var interactMenu string
 	var show bool
 	if _, ok := g.Equipables[g.Player.Pos]; ok {
@@ -1464,7 +1464,7 @@ var wizardActions = []wizardAction{
 	WizardToggleMap,
 }
 
-func (ui *termui) HandleWizardAction(g *game) error {
+func (ui *gameui) HandleWizardAction(g *game) error {
 	s, err := ui.SelectWizardMagic(g, wizardActions)
 	if err != nil {
 		return err
@@ -1479,7 +1479,7 @@ func (ui *termui) HandleWizardAction(g *game) error {
 	return nil
 }
 
-func (ui *termui) Death(g *game) {
+func (ui *gameui) Death(g *game) {
 	g.Print("You die... --press esc or space to continue--")
 	ui.DrawDungeonView(g, NormalMode)
 	ui.WaitForContinue(g, -1)
@@ -1488,7 +1488,7 @@ func (ui *termui) Death(g *game) {
 	ui.WaitForContinue(g, -1)
 }
 
-func (ui *termui) Win(g *game) {
+func (ui *gameui) Win(g *game) {
 	err := g.RemoveSaveFile()
 	if err != nil {
 		g.PrintfStyled("Error removing save file: %v", logError, err)
@@ -1505,20 +1505,20 @@ func (ui *termui) Win(g *game) {
 	ui.WaitForContinue(g, -1)
 }
 
-func (ui *termui) Dump(g *game, err error) {
+func (ui *gameui) Dump(g *game, err error) {
 	ui.Clear()
 	ui.DrawText(g.SimplifedDump(err), 0, 0)
 	ui.Flush()
 }
 
-func (ui *termui) CriticalHPWarning(g *game) {
+func (ui *gameui) CriticalHPWarning(g *game) {
 	g.PrintStyled("*** CRITICAL HP WARNING *** --press esc or space to continue--", logCritic)
 	ui.DrawDungeonView(g, NormalMode)
 	ui.WaitForContinue(g, DungeonHeight)
 	g.Print("Ok. Be careful, then.")
 }
 
-func (ui *termui) Quit(g *game) bool {
+func (ui *gameui) Quit(g *game) bool {
 	g.Print("Do you really want to quit without saving? [y/N]")
 	ui.DrawDungeonView(g, NormalMode)
 	quit := ui.PromptConfirmation(g)
@@ -1535,13 +1535,13 @@ func (ui *termui) Quit(g *game) bool {
 	return quit
 }
 
-func (ui *termui) Wizard(g *game) bool {
+func (ui *gameui) Wizard(g *game) bool {
 	g.Print("Do you really want to enter wizard mode (no return)? [y/N]")
 	ui.DrawDungeonView(g, NormalMode)
 	return ui.PromptConfirmation(g)
 }
 
-func (ui *termui) HandlePlayerTurn(g *game, ev event) bool {
+func (ui *gameui) HandlePlayerTurn(g *game, ev event) bool {
 getKey:
 	for {
 		var err error
@@ -1562,7 +1562,7 @@ getKey:
 	}
 }
 
-func (ui *termui) ExploreStep(g *game) bool {
+func (ui *gameui) ExploreStep(g *game) bool {
 	next := make(chan bool)
 	var stop bool
 	go func() {
@@ -1579,14 +1579,14 @@ func (ui *termui) ExploreStep(g *game) bool {
 	return stop
 }
 
-func (ui *termui) Clear() {
+func (ui *gameui) Clear() {
 	for i := 0; i < UIHeight*UIWidth; i++ {
 		x, y := ui.GetPos(i)
 		ui.SetCell(x, y, ' ', ColorFg, ColorBg)
 	}
 }
 
-func (ui *termui) DrawBufferInit() {
+func (ui *gameui) DrawBufferInit() {
 	if len(ui.g.DrawBuffer) == 0 {
 		ui.g.DrawBuffer = make([]UICell, UIHeight*UIWidth)
 	} else if len(ui.g.DrawBuffer) != UIHeight*UIWidth {

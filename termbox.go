@@ -6,7 +6,7 @@ import (
 	termbox "github.com/nsf/termbox-go"
 )
 
-type termui struct {
+type gameui struct {
 	g      *game
 	cursor position
 	small  bool
@@ -15,15 +15,15 @@ type termui struct {
 	itemHover int
 }
 
-func (ui *termui) Init() error {
+func (ui *gameui) Init() error {
 	return termbox.Init()
 }
 
-func (ui *termui) Close() {
+func (ui *gameui) Close() {
 	termbox.Close()
 }
 
-func (ui *termui) PostInit() {
+func (ui *gameui) PostInit() {
 	FixColor()
 	termbox.SetOutputMode(termbox.Output256)
 	termbox.SetInputMode(termbox.InputEsc | termbox.InputMouse)
@@ -34,7 +34,7 @@ func (ui *termui) PostInit() {
 
 var SmallScreen = false
 
-func (ui *termui) Flush() {
+func (ui *gameui) Flush() {
 	ui.DrawLogFrame()
 	for _, cdraw := range ui.g.DrawLog[len(ui.g.DrawLog)-1].Draws {
 		cell := cdraw.Cell
@@ -51,7 +51,7 @@ func (ui *termui) Flush() {
 	}
 }
 
-func (ui *termui) ApplyToggleLayout() {
+func (ui *gameui) ApplyToggleLayout() {
 	gameConfig.Small = !gameConfig.Small
 	if gameConfig.Small {
 		ui.Clear()
@@ -66,15 +66,15 @@ func (ui *termui) ApplyToggleLayout() {
 	ui.Clear()
 }
 
-func (ui *termui) Small() bool {
+func (ui *gameui) Small() bool {
 	return gameConfig.Small || SmallScreen
 }
 
-func (ui *termui) Interrupt() {
+func (ui *gameui) Interrupt() {
 	termbox.Interrupt()
 }
 
-func (ui *termui) PollEvent() (in uiInput) {
+func (ui *gameui) PollEvent() (in uiInput) {
 	switch tev := termbox.PollEvent(); tev.Type {
 	case termbox.EventKey:
 		if tev.Ch == 0 {

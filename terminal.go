@@ -4,13 +4,13 @@ package main
 
 import "unicode/utf8"
 
-func (ui *termui) ApplyToggleTiles() {
+func (ui *gameui) ApplyToggleTiles() {
 }
 
-func (ui *termui) ColorLine(y int, fg uicolor) {
+func (ui *gameui) ColorLine(y int, fg uicolor) {
 }
 
-func (ui *termui) KeyToRuneKeyAction(in uiInput) rune {
+func (ui *gameui) KeyToRuneKeyAction(in uiInput) rune {
 	if utf8.RuneCountInString(in.key) != 1 {
 		return 0
 	}

@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	tui := &termui{}
+	tui := &gameui{}
 	g := &game{}
 	tui.g = g
 	err := tui.Init()
@@ -32,7 +32,7 @@ func main() {
 	}
 }
 
-func newGame(tui *termui) {
+func newGame(tui *gameui) {
 	g := tui.g
 	load, err := g.LoadConfig()
 	if load && err != nil {
@@ -63,7 +63,7 @@ func newGame(tui *termui) {
 
 var SaveError string
 
-type termui struct {
+type gameui struct {
 	g         *game
 	cursor    position
 	display   js.Value
@@ -76,7 +76,7 @@ type termui struct {
 	itemHover int
 }
 
-func (ui *termui) InitElements() error {
+func (ui *gameui) InitElements() error {
 	canvas := js.Global().Get("document").Call("getElementById", "gamecanvas")
 	canvas.Call("addEventListener", "contextmenu", js.NewEventCallback(js.PreventDefault, func(e js.Value) {
 	}), false)
@@ -91,7 +91,7 @@ func (ui *termui) InitElements() error {
 	return nil
 }
 
-func (ui *termui) Draw(cell UICell, x, y int) {
+func (ui *gameui) Draw(cell UICell, x, y int) {
 	var canvas js.Value
 	if cv, ok := ui.cache[cell]; ok {
 		canvas = cv
@@ -112,7 +112,7 @@ func (ui *termui) Draw(cell UICell, x, y int) {
 	ui.ctx.Call("drawImage", canvas, x*ui.width, ui.height*y)
 }
 
-func (ui *termui) GetMousePos(evt js.Value) (x, y int) {
+func (ui *gameui) GetMousePos(evt js.Value) (x, y int) {
 	canvas := js.Global().Get("document").Call("getElementById", "gamecanvas")
 	rect := canvas.Call("getBoundingClientRect")
 	x = evt.Get("clientX").Int() - rect.Get("left").Int()
@@ -245,7 +245,7 @@ func (g *game) LoadReplay() error {
 
 // End of io compatibility functions
 
-func (ui *termui) Init() error {
+func (ui *gameui) Init() error {
 	canvas := js.Global().Get("document").Call("getElementById", "gamecanvas")
 	canvas.Call(
 		"addEventListener", "keypress", js.NewEventCallback(0, func(e js.Value) {
@@ -288,21 +288,21 @@ func init() {
 	interrupt = make(chan bool)
 }
 
-func (ui *termui) Close() {
+func (ui *gameui) Close() {
 	// TODO
 }
 
-func (ui *termui) PostInit() {
+func (ui *gameui) PostInit() {
 	SolarizedPalette()
 	ui.HideCursor()
 	settingsActions = append(settingsActions, toggleTiles)
 }
 
-func (ui *termui) Flush() {
+func (ui *gameui) Flush() {
 	js.Global().Get("window").Call("requestAnimationFrame", js.NewEventCallback(0, ui.FlushCallback))
 }
 
-func (ui *termui) ApplyToggleLayout() {
+func (ui *gameui) ApplyToggleLayout() {
 	gameConfig.Small = !gameConfig.Small
 	if gameConfig.Small {
 		ui.Clear()
@@ -321,7 +321,7 @@ func (ui *termui) ApplyToggleLayout() {
 	ui.Clear()
 }
 
-func (ui *termui) FlushCallback(obj js.Value) {
+func (ui *gameui) FlushCallback(obj js.Value) {
 	ui.DrawLogFrame()
 	for _, cdraw := range ui.g.DrawLog[len(ui.g.DrawLog)-1].Draws {
 		cell := cdraw.Cell
@@ -331,7 +331,7 @@ func (ui *termui) FlushCallback(obj js.Value) {
 	}
 }
 
-func (ui *termui) KeyToRuneKeyAction(in uiInput) rune {
+func (ui *gameui) KeyToRuneKeyAction(in uiInput) rune {
 	switch in.key {
 	case "Escape":
 		in.key = "\x1b"

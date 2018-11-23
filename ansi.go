@@ -39,7 +39,7 @@ func main() {
 		DisableAnimations = true
 	}
 
-	tui := &termui{}
+	tui := &gameui{}
 	g := &game{}
 	tui.g = g
 	if *optMinimalUI {
@@ -85,7 +85,7 @@ func main() {
 	g.EventLoop()
 }
 
-type termui struct {
+type gameui struct {
 	g       *game
 	bStdin  *bufio.Reader
 	bStdout *bufio.Writer
@@ -96,7 +96,7 @@ type termui struct {
 	itemHover int
 }
 
-func (ui *termui) Init() error {
+func (ui *gameui) Init() error {
 	ui.bStdin = bufio.NewReader(os.Stdin)
 	ui.bStdout = bufio.NewWriter(os.Stdout)
 	ui.Clear()
@@ -104,7 +104,7 @@ func (ui *termui) Init() error {
 	return nil
 }
 
-func (ui *termui) Close() {
+func (ui *gameui) Close() {
 	fmt.Fprint(ui.bStdout, "\x1b[2J")
 	fmt.Fprintf(ui.bStdout, "\x1b[?25h")
 	ui.bStdout.Flush()
@@ -118,7 +118,7 @@ func (ui *termui) Close() {
 	}
 }
 
-func (ui *termui) PostInit() {
+func (ui *gameui) PostInit() {
 	ui.HideCursor()
 	fmt.Fprintf(ui.bStdout, "\x1b[?25l")
 	cmd := exec.Command("stty", "-g")
@@ -134,11 +134,11 @@ func (ui *termui) PostInit() {
 	ui.menuHover = -1
 }
 
-func (ui *termui) MoveTo(x, y int) {
+func (ui *gameui) MoveTo(x, y int) {
 	fmt.Fprintf(ui.bStdout, "\x1b[%d;%dH", y+1, x+1)
 }
 
-func (ui *termui) Flush() {
+func (ui *gameui) Flush() {
 	ui.DrawLogFrame()
 	var prevfg, prevbg uicolor
 	first := true
@@ -187,7 +187,7 @@ func (ui *termui) Flush() {
 	ui.bStdout.Flush()
 }
 
-func (ui *termui) ApplyToggleLayout() {
+func (ui *gameui) ApplyToggleLayout() {
 	gameConfig.Small = !gameConfig.Small
 	if gameConfig.Small {
 		ui.Clear()
@@ -202,15 +202,15 @@ func (ui *termui) ApplyToggleLayout() {
 	ui.Clear()
 }
 
-func (ui *termui) Small() bool {
+func (ui *gameui) Small() bool {
 	return gameConfig.Small
 }
 
-func (ui *termui) Interrupt() {
+func (ui *gameui) Interrupt() {
 	interrupt <- true
 }
 
-func (ui *termui) PollEvent() (in uiInput) {
+func (ui *gameui) PollEvent() (in uiInput) {
 	select {
 	case in = <-ch:
 	case in.interrupt = <-interrupt:

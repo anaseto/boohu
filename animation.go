@@ -2,7 +2,7 @@ package main
 
 import "time"
 
-func (ui *termui) SwappingAnimation(g *game, mpos, ppos position) {
+func (ui *gameui) SwappingAnimation(g *game, mpos, ppos position) {
 	if DisableAnimations {
 		return
 	}
@@ -20,7 +20,7 @@ func (ui *termui) SwappingAnimation(g *game, mpos, ppos position) {
 	time.Sleep(75 * time.Millisecond)
 }
 
-func (ui *termui) TeleportAnimation(g *game, from, to position, showto bool) {
+func (ui *gameui) TeleportAnimation(g *game, from, to position, showto bool) {
 	if DisableAnimations {
 		return
 	}
@@ -45,7 +45,7 @@ const (
 	AroundWallExplosion
 )
 
-func (ui *termui) ProjectileTrajectoryAnimation(g *game, ray []position, fg uicolor) {
+func (ui *gameui) ProjectileTrajectoryAnimation(g *game, ray []position, fg uicolor) {
 	if DisableAnimations {
 		return
 	}
@@ -59,7 +59,7 @@ func (ui *termui) ProjectileTrajectoryAnimation(g *game, ray []position, fg uico
 	}
 }
 
-func (ui *termui) MonsterProjectileAnimation(g *game, ray []position, r rune, fg uicolor) {
+func (ui *gameui) MonsterProjectileAnimation(g *game, ray []position, r rune, fg uicolor) {
 	if DisableAnimations {
 		return
 	}
@@ -75,7 +75,7 @@ func (ui *termui) MonsterProjectileAnimation(g *game, ray []position, r rune, fg
 	}
 }
 
-func (ui *termui) ExplosionAnimationAt(g *game, pos position, fg uicolor) {
+func (ui *gameui) ExplosionAnimationAt(g *game, pos position, fg uicolor) {
 	_, _, bgColor := ui.PositionDrawing(g, pos)
 	mons := g.MonsterAt(pos)
 	r := ';'
@@ -100,7 +100,7 @@ func (ui *termui) ExplosionAnimationAt(g *game, pos position, fg uicolor) {
 	ui.DrawAtPosition(g, pos, true, r, bgColor, fg)
 }
 
-func (ui *termui) ExplosionAnimation(g *game, es explosionStyle, pos position) {
+func (ui *gameui) ExplosionAnimation(g *game, es explosionStyle, pos position) {
 	if DisableAnimations {
 		return
 	}
@@ -129,7 +129,7 @@ func (ui *termui) ExplosionAnimation(g *game, es explosionStyle, pos position) {
 	time.Sleep(20 * time.Millisecond)
 }
 
-func (ui *termui) TormentExplosionAnimation(g *game) {
+func (ui *gameui) TormentExplosionAnimation(g *game) {
 	if DisableAnimations {
 		return
 	}
@@ -150,7 +150,7 @@ func (ui *termui) TormentExplosionAnimation(g *game) {
 	time.Sleep(20 * time.Millisecond)
 }
 
-func (ui *termui) WallExplosionAnimation(g *game, pos position) {
+func (ui *gameui) WallExplosionAnimation(g *game, pos position) {
 	if DisableAnimations {
 		return
 	}
@@ -164,7 +164,7 @@ func (ui *termui) WallExplosionAnimation(g *game, pos position) {
 	}
 }
 
-func (ui *termui) FireBoltAnimation(g *game, ray []position) {
+func (ui *gameui) FireBoltAnimation(g *game, ray []position) {
 	if DisableAnimations {
 		return
 	}
@@ -193,7 +193,7 @@ func (ui *termui) FireBoltAnimation(g *game, ray []position) {
 	time.Sleep(25 * time.Millisecond)
 }
 
-func (ui *termui) SlowingMagaraAnimation(g *game, ray []position) {
+func (ui *gameui) SlowingMagaraAnimation(g *game, ray []position) {
 	if DisableAnimations {
 		return
 	}
@@ -217,7 +217,7 @@ func (ui *termui) SlowingMagaraAnimation(g *game, ray []position) {
 	time.Sleep(25 * time.Millisecond)
 }
 
-func (ui *termui) ProjectileSymbol(dir direction) (r rune) {
+func (ui *gameui) ProjectileSymbol(dir direction) (r rune) {
 	switch dir {
 	case E, ENE, ESE, WNW, W, WSW:
 		r = '—'
@@ -231,7 +231,7 @@ func (ui *termui) ProjectileSymbol(dir direction) (r rune) {
 	return r
 }
 
-func (ui *termui) ThrowAnimation(g *game, ray []position, hit bool) {
+func (ui *gameui) ThrowAnimation(g *game, ray []position, hit bool) {
 	if DisableAnimations {
 		return
 	}
@@ -252,7 +252,7 @@ func (ui *termui) ThrowAnimation(g *game, ray []position, hit bool) {
 	time.Sleep(30 * time.Millisecond)
 }
 
-func (ui *termui) MonsterJavelinAnimation(g *game, ray []position, hit bool) {
+func (ui *gameui) MonsterJavelinAnimation(g *game, ray []position, hit bool) {
 	if DisableAnimations {
 		return
 	}
@@ -269,7 +269,7 @@ func (ui *termui) MonsterJavelinAnimation(g *game, ray []position, hit bool) {
 	time.Sleep(30 * time.Millisecond)
 }
 
-func (ui *termui) HitAnimation(g *game, pos position, targeting bool) {
+func (ui *gameui) HitAnimation(g *game, pos position, targeting bool) {
 	if DisableAnimations {
 		return
 	}
@@ -288,7 +288,7 @@ func (ui *termui) HitAnimation(g *game, pos position, targeting bool) {
 	time.Sleep(50 * time.Millisecond)
 }
 
-func (ui *termui) LightningHitAnimation(g *game, targets []position) {
+func (ui *gameui) LightningHitAnimation(g *game, targets []position) {
 	if DisableAnimations {
 		return
 	}
@@ -310,7 +310,7 @@ func (ui *termui) LightningHitAnimation(g *game, targets []position) {
 	}
 }
 
-func (ui *termui) WoundedAnimation(g *game) {
+func (ui *gameui) WoundedAnimation(g *game) {
 	if DisableAnimations {
 		return
 	}
@@ -325,7 +325,7 @@ func (ui *termui) WoundedAnimation(g *game) {
 	}
 }
 
-func (ui *termui) DrinkingPotionAnimation(g *game) {
+func (ui *gameui) DrinkingPotionAnimation(g *game) {
 	if DisableAnimations {
 		return
 	}
@@ -342,7 +342,7 @@ func (ui *termui) DrinkingPotionAnimation(g *game) {
 	ui.Flush()
 }
 
-func (ui *termui) StatusEndAnimation(g *game) {
+func (ui *gameui) StatusEndAnimation(g *game) {
 	if DisableAnimations {
 		return
 	}
@@ -354,7 +354,7 @@ func (ui *termui) StatusEndAnimation(g *game) {
 	ui.Flush()
 }
 
-func (ui *termui) MenuSelectedAnimation(g *game, m menu, ok bool) {
+func (ui *gameui) MenuSelectedAnimation(g *game, m menu, ok bool) {
 	if DisableAnimations {
 		return
 	}
@@ -379,7 +379,7 @@ func (ui *termui) MenuSelectedAnimation(g *game, m menu, ok bool) {
 	}
 }
 
-func (ui *termui) MagicMappingAnimation(g *game, border []int) {
+func (ui *gameui) MagicMappingAnimation(g *game, border []int) {
 	if DisableAnimations {
 		return
 	}

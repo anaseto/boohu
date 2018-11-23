@@ -47,7 +47,7 @@ func main() {
 		DisableAnimations = true
 	}
 
-	tui := &termui{}
+	tui := &gameui{}
 	g := &game{}
 	tui.g = g
 	err := tui.Init()
