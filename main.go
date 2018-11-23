@@ -5,6 +5,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
 	"runtime"
 )
@@ -20,6 +21,7 @@ func main() {
 	opt8colors := flag.Bool("o", color8, "use only 8-color palette")
 	opt256colors := flag.Bool("x", !color8, "use xterm 256-color palette (solarized approximation)")
 	optNoAnim := flag.Bool("n", false, "no animations")
+	optReplay := flag.String("r", "", "path to replay file")
 	flag.Parse()
 	if *optSolarized {
 		SolarizedPalette()
@@ -28,6 +30,14 @@ func main() {
 	}
 	if *optVersion {
 		fmt.Println(Version)
+		os.Exit(0)
+	}
+	if *optReplay != "" {
+		err := Replay(*optReplay)
+		if err != nil {
+			log.Printf("boohu: replay: %v\n", err)
+			os.Exit(1)
+		}
 		os.Exit(0)
 	}
 	if *optCenteredCamera {
