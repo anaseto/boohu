@@ -32,13 +32,14 @@ func (ui *termui) Replay() {
 	g := ui.g
 	dl := g.DrawLog
 	g.DrawLog = nil
-	for _, df := range dl {
+	for i := 0; i < len(dl); i++ {
+		df := dl[i]
 		for _, dr := range df.Draws {
-			x, y := tui.GetPos(dr.I)
-			tui.SetGenCell(x, y, dr.Cell.R, dr.Cell.Fg, dr.Cell.Bg, dr.Cell.InMap)
+			x, y := ui.GetPos(dr.I)
+			ui.SetGenCell(x, y, dr.Cell.R, dr.Cell.Fg, dr.Cell.Bg, dr.Cell.InMap)
 		}
-		tui.Flush()
-		err := tui.HandleReplayKey()
+		ui.Flush()
+		err := ui.HandleReplayKey()
 		if err != nil {
 			break
 		}
