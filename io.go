@@ -148,3 +148,62 @@ func (g *game) RemoveDataFile(file string) error {
 	}
 	return nil
 }
+
+func (g *game) SaveReplay() error {
+	dataDir, err := g.DataDir()
+	if err != nil {
+		g.Print(err.Error())
+		return err
+	}
+	saveFile := filepath.Join(dataDir, "replay")
+	data, err := g.EncodeDrawLog()
+	if err != nil {
+		g.Print(err.Error())
+		return err
+	}
+	err = ioutil.WriteFile(saveFile, data, 0644)
+	if err != nil {
+		g.Print(err.Error())
+		return err
+	}
+	return nil
+}
+
+func (g *game) LoadReplay() error {
+	dataDir, err := g.DataDir()
+	if err != nil {
+		return err
+	}
+	saveFile := filepath.Join(dataDir, "replay")
+	_, err = os.Stat(saveFile)
+	if err != nil {
+		// no save file, new game
+		return err
+	}
+	data, err := ioutil.ReadFile(saveFile)
+	if err != nil {
+		return err
+	}
+	dl, err := g.DecodeDrawLog(data)
+	if err != nil {
+		return err
+	}
+	g.DrawLog = dl
+	return nil
+}
+
+func (g *game) WriteDump() error {
+	dataDir, err := g.DataDir()
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile(filepath.Join(dataDir, "dump"), []byte(g.Dump()), 0644)
+	if err != nil {
+		return fmt.Errorf("writing game statistics: %v", err)
+	}
+	err = g.SaveReplay()
+	if err != nil {
+		return fmt.Errorf("writing replay: %v", err)
+	}
+	return nil
+}

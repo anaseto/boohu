@@ -937,13 +937,12 @@ func (ui *termui) HandleKey(g *game, rka runeKeyAction) (err error, again bool, 
 		errdump := g.WriteDump()
 		if errdump != nil {
 			g.PrintfStyled("Error: %v", logError, errdump)
-			g.PrintStyled("Could not write character dump.", logError)
 		} else {
 			dataDir, _ := g.DataDir()
 			if dataDir != "" {
-				g.Printf("Dump written to %s.", filepath.Join(dataDir, "dump"))
+				g.Printf("Game statistics written to %s.", filepath.Join(dataDir, "dump"))
 			} else {
-				g.Print("Dump written.")
+				g.Print("Game statistics written.")
 			}
 		}
 		again = true

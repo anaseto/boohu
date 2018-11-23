@@ -76,3 +76,33 @@ func (g *game) DecodeConfigSave(data []byte) (*config, error) {
 	}
 	return c, nil
 }
+
+func (g *game) EncodeDrawLog() ([]byte, error) {
+	data := bytes.Buffer{}
+	enc := gob.NewEncoder(&data)
+	err := enc.Encode(&g.DrawLog)
+	if err != nil {
+		return nil, err
+	}
+	var buf bytes.Buffer
+	w := zlib.NewWriter(&buf)
+	w.Write(data.Bytes())
+	w.Close()
+	return buf.Bytes(), nil
+}
+
+func (g *game) DecodeDrawLog(data []byte) ([]drawFrame, error) {
+	buf := bytes.NewReader(data)
+	r, err := zlib.NewReader(buf)
+	if err != nil {
+		return nil, err
+	}
+	dec := gob.NewDecoder(r)
+	dl := []drawFrame{}
+	err = dec.Decode(&dl)
+	if err != nil {
+		return nil, err
+	}
+	r.Close()
+	return dl, nil
+}

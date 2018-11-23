@@ -235,6 +235,14 @@ func (g *game) WriteDump() error {
 	return nil
 }
 
+func (g *game) SaveReplay() error {
+	// TODO
+}
+
+func (g *game) LoadReplay() error {
+	// TODO
+}
+
 // End of io compatibility functions
 
 func (ui *termui) Init() error {
