@@ -275,10 +275,10 @@ func (mev *monsterEvent) Action(g *game) {
 		mons := g.Monsters[mev.NMons]
 		if mons.Exists() {
 			mons.Statuses[MonsExhausted]--
-			if mons.State != Resting && g.Player.LOS[mons.Pos] &&
-				(mons.Kind.Ranged() || mons.Kind.Smiting()) && mons.Pos.Distance(g.Player.Pos) > 1 {
-				g.Printf("%s is ready to fire again.", mons.Kind.Definite(true))
-			}
+			//if mons.State != Resting && g.Player.LOS[mons.Pos] &&
+			//(mons.Kind.Ranged() || mons.Kind.Smiting()) && mons.Pos.Distance(g.Player.Pos) > 1 {
+			//g.Printf("%s is ready to fire again.", mons.Kind.Definite(true))
+			//}
 		}
 	}
 }
