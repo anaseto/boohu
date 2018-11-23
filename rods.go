@@ -236,12 +236,12 @@ func (g *game) Blink(ev event) {
 	}
 	opos := g.Player.Pos
 	g.Print("You blink away.")
-	g.ui.TeleportAnimation(g, opos, npos, true)
+	g.ui.TeleportAnimation(opos, npos, true)
 	g.PlacePlayerAt(npos)
 }
 
 func (g *game) EvokeRodTeleportOther(ev event) error {
-	if err := g.ui.ChooseTarget(g, &chooser{}); err != nil {
+	if err := g.ui.ChooseTarget(&chooser{}); err != nil {
 		return err
 	}
 	mons := g.MonsterAt(g.Player.Target)
@@ -251,12 +251,12 @@ func (g *game) EvokeRodTeleportOther(ev event) error {
 }
 
 func (g *game) EvokeRodSleeping(ev event) error {
-	if err := g.ui.ChooseTarget(g, &chooser{area: true, minDist: true}); err != nil {
+	if err := g.ui.ChooseTarget(&chooser{area: true, minDist: true}); err != nil {
 		return err
 	}
 	neighbors := g.Dungeon.FreeNeighbors(g.Player.Target)
 	g.Print("A sleeping ball emerges straight out of the rod.")
-	g.ui.ProjectileTrajectoryAnimation(g, g.Ray(g.Player.Target), ColorFgSleepingMonster)
+	g.ui.ProjectileTrajectoryAnimation(g.Ray(g.Player.Target), ColorFgSleepingMonster)
 	for _, pos := range append(neighbors, g.Player.Target) {
 		mons := g.MonsterAt(pos)
 		if !mons.Exists() {
@@ -269,13 +269,13 @@ func (g *game) EvokeRodSleeping(ev event) error {
 }
 
 func (g *game) EvokeRodFireBolt(ev event) error {
-	if err := g.ui.ChooseTarget(g, &chooser{flammable: true}); err != nil {
+	if err := g.ui.ChooseTarget(&chooser{flammable: true}); err != nil {
 		return err
 	}
 	ray := g.Ray(g.Player.Target)
 	g.MakeNoise(MagicCastNoise, g.Player.Pos)
 	g.Print("Whoosh! A fire bolt emerges straight out of the rod.")
-	g.ui.FireBoltAnimation(g, ray)
+	g.ui.FireBoltAnimation(ray)
 	for _, pos := range ray {
 		g.Burn(pos, ev)
 		mons := g.MonsterAt(pos)
@@ -300,14 +300,14 @@ func (g *game) EvokeRodFireBolt(ev event) error {
 }
 
 func (g *game) EvokeRodFireball(ev event) error {
-	if err := g.ui.ChooseTarget(g, &chooser{area: true, minDist: true, flammable: true}); err != nil {
+	if err := g.ui.ChooseTarget(&chooser{area: true, minDist: true, flammable: true}); err != nil {
 		return err
 	}
 	neighbors := g.Dungeon.FreeNeighbors(g.Player.Target)
 	g.MakeNoise(MagicExplosionNoise, g.Player.Target)
 	g.Printf("A fireball emerges straight out of the rod... %s", g.ExplosionSound())
-	g.ui.ProjectileTrajectoryAnimation(g, g.Ray(g.Player.Target), ColorFgExplosionStart)
-	g.ui.ExplosionAnimation(g, FireExplosion, g.Player.Target)
+	g.ui.ProjectileTrajectoryAnimation(g.Ray(g.Player.Target), ColorFgExplosionStart)
+	g.ui.ExplosionAnimation(FireExplosion, g.Player.Target)
 	for _, pos := range append(neighbors, g.Player.Target) {
 		g.Burn(pos, ev)
 		mons := g.MonsterAt(pos)
@@ -386,7 +386,7 @@ func (g *game) EvokeRodLightning(ev event) error {
 			}
 		}
 	}
-	g.ui.LightningHitAnimation(g, targets)
+	g.ui.LightningHitAnimation(targets)
 
 	return nil
 }
@@ -419,7 +419,7 @@ func (g *game) Fog(at position, radius int, ev event) {
 }
 
 func (g *game) EvokeRodDigging(ev event) error {
-	if err := g.ui.ChooseTarget(g, &wallChooser{}); err != nil {
+	if err := g.ui.ChooseTarget(&wallChooser{}); err != nil {
 		return err
 	}
 	pos := g.Player.Target
@@ -443,7 +443,7 @@ func (g *game) EvokeRodDigging(ev event) error {
 }
 
 func (g *game) EvokeRodShatter(ev event) error {
-	if err := g.ui.ChooseTarget(g, &wallChooser{minDist: true}); err != nil {
+	if err := g.ui.ChooseTarget(&wallChooser{minDist: true}); err != nil {
 		return err
 	}
 	neighbors := g.Dungeon.FreeNeighbors(g.Player.Target)
@@ -453,8 +453,8 @@ func (g *game) EvokeRodShatter(ev event) error {
 	g.MakeMonstersAware()
 	g.MakeNoise(WallNoise, g.Player.Target)
 	g.Printf("%s The wall disappeared.", g.CrackSound())
-	g.ui.ProjectileTrajectoryAnimation(g, g.Ray(g.Player.Target), ColorFgExplosionWallStart)
-	g.ui.ExplosionAnimation(g, WallExplosion, g.Player.Target)
+	g.ui.ProjectileTrajectoryAnimation(g.Ray(g.Player.Target), ColorFgExplosionWallStart)
+	g.ui.ExplosionAnimation(WallExplosion, g.Player.Target)
 	g.Fog(g.Player.Target, 2, ev)
 	for _, pos := range neighbors {
 		mons := g.MonsterAt(pos)
@@ -479,7 +479,7 @@ func (g *game) EvokeRodShatter(ev event) error {
 }
 
 func (g *game) EvokeRodObstruction(ev event) error {
-	if err := g.ui.ChooseTarget(g, &chooser{free: true}); err != nil {
+	if err := g.ui.ChooseTarget(&chooser{free: true}); err != nil {
 		return err
 	}
 	g.TemporalWallAt(g.Player.Target, ev)
@@ -488,7 +488,7 @@ func (g *game) EvokeRodObstruction(ev event) error {
 }
 
 func (g *game) EvokeRodLignification(ev event) error {
-	if err := g.ui.ChooseTarget(g, &chooser{}); err != nil {
+	if err := g.ui.ChooseTarget(&chooser{}); err != nil {
 		return err
 	}
 	mons := g.MonsterAt(g.Player.Target)
@@ -519,11 +519,11 @@ func (g *game) CreateTemporalWallAt(pos position, ev event) {
 }
 
 func (g *game) EvokeRodHope(ev event) error {
-	if err := g.ui.ChooseTarget(g, &chooser{needsFreeWay: true}); err != nil {
+	if err := g.ui.ChooseTarget(&chooser{needsFreeWay: true}); err != nil {
 		return err
 	}
 	g.MakeNoise(MagicCastNoise, g.Player.Pos)
-	g.ui.ProjectileTrajectoryAnimation(g, g.Ray(g.Player.Target), ColorFgExplosionStart)
+	g.ui.ProjectileTrajectoryAnimation(g.Ray(g.Player.Target), ColorFgExplosionStart)
 	mons := g.MonsterAt(g.Player.Target)
 	// mons not nil (check done in the targeter)
 	attack := -20 + 30*DefaultHealth/g.Player.HP
@@ -541,7 +541,7 @@ func (g *game) EvokeRodHope(ev event) error {
 	}
 	mons.HP -= dmg
 	g.Burn(g.Player.Target, ev)
-	g.ui.HitAnimation(g, g.Player.Target, true)
+	g.ui.HitAnimation(g.Player.Target, true)
 	g.Printf("An energy channel hits %s (%d dmg).", mons.Kind.Definite(false), dmg)
 	if mons.HP <= 0 {
 		g.Printf("%s dies.", mons.Kind.Indefinite(true))
@@ -554,7 +554,7 @@ func (g *game) EvokeRodSwapping(ev event) error {
 	if g.Player.HasStatus(StatusLignification) {
 		return errors.New("You cannot use this rod while lignified.")
 	}
-	if err := g.ui.ChooseTarget(g, &chooser{}); err != nil {
+	if err := g.ui.ChooseTarget(&chooser{}); err != nil {
 		return err
 	}
 	mons := g.MonsterAt(g.Player.Target)
@@ -569,7 +569,7 @@ func (g *game) EvokeRodSwapping(ev event) error {
 func (g *game) SwapWithMonster(mons *monster) {
 	ompos := mons.Pos
 	g.Printf("You swap positions with the %s.", mons.Kind)
-	g.ui.SwappingAnimation(g, mons.Pos, g.Player.Pos)
+	g.ui.SwappingAnimation(mons.Pos, g.Player.Pos)
 	mons.MoveTo(g, g.Player.Pos)
 	g.PlacePlayerAt(ompos)
 	mons.MakeAware(g)

@@ -377,8 +377,8 @@ func (ui *gameui) DrawLightAlt(text string, x, y int, fg uicolor, inmap bool) {
 	}
 }
 
-func (ui *gameui) DrawKeysDescription(g *game, title string, actions []string) {
-	ui.DrawDungeonView(g, NoFlushMode)
+func (ui *gameui) DrawKeysDescription(title string, actions []string) {
+	ui.DrawDungeonView(NoFlushMode)
 
 	if CustomKeys {
 		ui.DrawStyledTextLine(fmt.Sprintf(" Default %s ", title), 0, HeaderLine)
@@ -394,11 +394,11 @@ func (ui *gameui) DrawKeysDescription(g *game, title string, actions []string) {
 	ui.DrawTextLine(" press esc or space to continue ", lines)
 	ui.Flush()
 
-	ui.WaitForContinue(g, lines)
+	ui.WaitForContinue(lines)
 }
 
-func (ui *gameui) KeysHelp(g *game) {
-	ui.DrawKeysDescription(g, "Commands", []string{
+func (ui *gameui) KeysHelp() {
+	ui.DrawKeysDescription("Commands", []string{
 		"Movement", "h/j/k/l/y/u/b/n or numpad or mouse left",
 		"Wait a turn", "“.” or 5 or mouse left on @",
 		"Rest (until status free or regen)", "r",
@@ -419,8 +419,8 @@ func (ui *gameui) KeysHelp(g *game) {
 	})
 }
 
-func (ui *gameui) ExamineHelp(g *game) {
-	ui.DrawKeysDescription(g, "Examine/Travel/Targeting Commands", []string{
+func (ui *gameui) ExamineHelp() {
+	ui.DrawKeysDescription("Examine/Travel/Targeting Commands", []string{
 		"Move cursor", "h/j/k/l/y/u/b/n or numpad or mouse left",
 		"Cycle through monsters", "+",
 		"Cycle through stairs", ">",
@@ -433,8 +433,9 @@ func (ui *gameui) ExamineHelp(g *game) {
 
 const TextWidth = DungeonWidth - 2
 
-func (ui *gameui) CharacterInfo(g *game) {
-	ui.DrawDungeonView(g, NoFlushMode)
+func (ui *gameui) CharacterInfo() {
+	g := ui.g
+	ui.DrawDungeonView(NoFlushMode)
 
 	b := bytes.Buffer{}
 	b.WriteString(formatText("Every year, the elders send someone to collect medicinal simella plants in the Underground.  This year, the honor fell upon you, and so here you are.  According to the elders, deep in the Underground, magical stairs will lead you back to your village.", TextWidth))
@@ -448,7 +449,7 @@ func (ui *gameui) CharacterInfo(g *game) {
 		b.WriteString(formatText(fmt.Sprintf("You are wearing a %s. %s", g.Player.Shield, g.Player.Shield.Desc()), TextWidth))
 		b.WriteString("\n\n")
 	}
-	b.WriteString(ui.AptitudesText(g))
+	b.WriteString(ui.AptitudesText())
 
 	desc := b.String()
 	lines := strings.Count(desc, "\n")
@@ -468,20 +469,22 @@ func (ui *gameui) CharacterInfo(g *game) {
 	}
 
 	ui.Flush()
-	ui.WaitForContinue(g, lines+2)
+	ui.WaitForContinue(lines + 2)
 }
 
-func (ui *gameui) WizardInfo(g *game) {
+func (ui *gameui) WizardInfo() {
+	g := ui.g
 	ui.Clear()
 	b := &bytes.Buffer{}
 	fmt.Fprintf(b, "Monsters: %d (%d)\n", len(g.Monsters), g.MaxMonsters())
 	fmt.Fprintf(b, "Danger: %d (%d)\n", g.Danger(), g.MaxDanger())
 	ui.DrawText(b.String(), 0, 0)
 	ui.Flush()
-	ui.WaitForContinue(g, -1)
+	ui.WaitForContinue(-1)
 }
 
-func (ui *gameui) AptitudesText(g *game) string {
+func (ui *gameui) AptitudesText() string {
+	g := ui.g
 	apts := []string{}
 	for apt, b := range g.Player.Aptitudes {
 		if b {
@@ -504,7 +507,8 @@ func (ui *gameui) AddComma(see, s string) string {
 	}
 	return fmt.Sprintf("You %s %s", see, s)
 }
-func (ui *gameui) DescribePosition(g *game, pos position, targ Targeter) {
+func (ui *gameui) DescribePosition(pos position, targ Targeter) {
+	g := ui.g
 	var desc string
 	switch {
 	case !g.Dungeon.Cell(pos).Explored:
@@ -593,48 +597,49 @@ func (ui *gameui) DescribePosition(g *game, pos position, targ Targeter) {
 	g.InfoEntry = desc + "."
 }
 
-func (ui *gameui) ViewPositionDescription(g *game, pos position) {
+func (ui *gameui) ViewPositionDescription(pos position) {
+	g := ui.g
 	if !g.Dungeon.Cell(pos).Explored {
-		ui.DrawDescription(g, "This place is unknown to you.")
+		ui.DrawDescription("This place is unknown to you.")
 		return
 	}
 	mons := g.MonsterAt(pos)
 	if mons.Exists() && g.Player.LOS[mons.Pos] {
 		ui.HideCursor()
-		ui.DrawMonsterDescription(g, mons)
+		ui.DrawMonsterDescription(mons)
 		ui.SetCursor(pos)
 	} else if c, ok := g.Collectables[pos]; ok {
-		ui.DrawDescription(g, c.Consumable.Desc())
+		ui.DrawDescription(c.Consumable.Desc())
 	} else if r, ok := g.Rods[pos]; ok {
-		ui.DrawDescription(g, r.Desc())
+		ui.DrawDescription(r.Desc())
 	} else if eq, ok := g.Equipables[pos]; ok {
-		ui.DrawDescription(g, eq.Desc())
+		ui.DrawDescription(eq.Desc())
 	} else if strt, ok := g.Stairs[pos]; ok {
 		if strt == WinStair {
 			desc := "These shiny-looking stairs are in fact a magical monolith. It is said they were made some centuries ago by Marevor Helith. They will lead you back to your village."
 			if g.Depth < MaxDepth {
 				desc += " Note that this is not the last floor, so you may want to find a normal stair and continue collecting simellas, if you're courageous enough."
 			}
-			ui.DrawDescription(g, desc)
+			ui.DrawDescription(desc)
 		} else {
 			desc := "Stairs lead to the next level of the Underground. There's no way back. Monsters do not follow you."
 			if g.Depth == WinDepth {
 				desc += " If you're afraid, you could instead just win by taking the magical stairs somewhere in the same map."
 			}
-			ui.DrawDescription(g, desc)
+			ui.DrawDescription(desc)
 		}
 	} else if stn, ok := g.MagicalStones[pos]; ok {
-		ui.DrawDescription(g, stn.Description())
+		ui.DrawDescription(stn.Description())
 	} else if g.Doors[pos] {
-		ui.DrawDescription(g, "A closed door blocks your line of sight. Doors open automatically when you or a monster stand on them. Doors are flammable.")
+		ui.DrawDescription("A closed door blocks your line of sight. Doors open automatically when you or a monster stand on them. Doors are flammable.")
 	} else if g.Simellas[pos] > 0 {
-		ui.DrawDescription(g, "A simella is a plant with big white flowers which are used in the Underground for their medicinal properties. They can also make tasty infusions. You were actually sent here by your village to collect as many as possible of those plants.")
+		ui.DrawDescription("A simella is a plant with big white flowers which are used in the Underground for their medicinal properties. They can also make tasty infusions. You were actually sent here by your village to collect as many as possible of those plants.")
 	} else if _, ok := g.Fungus[pos]; ok && g.Dungeon.Cell(pos).T == FreeCell {
-		ui.DrawDescription(g, "Blue dense foliage grows in the Underground. It is difficult to see through, and is flammable.")
+		ui.DrawDescription("Blue dense foliage grows in the Underground. It is difficult to see through, and is flammable.")
 	} else if g.Dungeon.Cell(pos).T == WallCell {
-		ui.DrawDescription(g, "A wall is an impassable pile of rocks. It can be destructed by using some items.")
+		ui.DrawDescription("A wall is an impassable pile of rocks. It can be destructed by using some items.")
 	} else {
-		ui.DrawDescription(g, "This is just plain ground.")
+		ui.DrawDescription("This is just plain ground.")
 	}
 }
 
@@ -658,40 +663,44 @@ func (ui *gameui) MonsterInfo(m *monster) string {
 
 var CenteredCamera bool
 
-func (ui *gameui) InView(g *game, pos position, targeting bool) bool {
+func (ui *gameui) InView(pos position, targeting bool) bool {
+	g := ui.g
 	if targeting {
 		return pos.DistanceY(ui.cursor) <= 10 && pos.DistanceX(ui.cursor) <= 39
 	}
 	return pos.DistanceY(g.Player.Pos) <= 10 && pos.DistanceX(g.Player.Pos) <= 39
 }
 
-func (ui *gameui) CameraOffset(g *game, pos position, targeting bool) (int, int) {
+func (ui *gameui) CameraOffset(pos position, targeting bool) (int, int) {
+	g := ui.g
 	if targeting {
 		return pos.X + 39 - ui.cursor.X, pos.Y + 10 - ui.cursor.Y
 	}
 	return pos.X + 39 - g.Player.Pos.X, pos.Y + 10 - g.Player.Pos.Y
 }
 
-func (ui *gameui) InViewBorder(g *game, pos position, targeting bool) bool {
+func (ui *gameui) InViewBorder(pos position, targeting bool) bool {
+	g := ui.g
 	if targeting {
 		return pos.DistanceY(ui.cursor) != 10 && pos.DistanceX(ui.cursor) != 39
 	}
 	return pos.DistanceY(g.Player.Pos) != 10 && pos.DistanceX(g.Player.Pos) != 39
 }
 
-func (ui *gameui) DrawAtPosition(g *game, pos position, targeting bool, r rune, fg, bg uicolor) {
+func (ui *gameui) DrawAtPosition(pos position, targeting bool, r rune, fg, bg uicolor) {
+	g := ui.g
 	if g.Highlight[pos] || pos == ui.cursor {
 		bg, fg = fg, bg
 	}
 	if CenteredCamera {
-		if !ui.InView(g, pos, targeting) {
+		if !ui.InView(pos, targeting) {
 			return
 		}
-		x, y := ui.CameraOffset(g, pos, targeting)
+		x, y := ui.CameraOffset(pos, targeting)
 		ui.SetMapCell(x, y, r, fg, bg)
-		if ui.InViewBorder(g, pos, targeting) && g.Dungeon.Border(pos) {
+		if ui.InViewBorder(pos, targeting) && g.Dungeon.Border(pos) {
 			for _, opos := range pos.OutsideNeighbors() {
-				xo, yo := ui.CameraOffset(g, opos, targeting)
+				xo, yo := ui.CameraOffset(opos, targeting)
 				ui.SetMapCell(xo, yo, '#', ColorFg, ColorBgBorder)
 			}
 		}
@@ -702,7 +711,8 @@ func (ui *gameui) DrawAtPosition(g *game, pos position, targeting bool, r rune, 
 
 const BarCol = DungeonWidth + 2
 
-func (ui *gameui) DrawDungeonView(g *game, m uiMode) {
+func (ui *gameui) DrawDungeonView(m uiMode) {
+	g := ui.g
 	ui.Clear()
 	d := g.Dungeon
 	for i := 0; i < DungeonWidth; i++ {
@@ -714,8 +724,8 @@ func (ui *gameui) DrawDungeonView(g *game, m uiMode) {
 	ui.SetCell(DungeonWidth, DungeonHeight, '┘', ColorFg, ColorBg)
 	for i := range d.Cells {
 		pos := idxtopos(i)
-		r, fgColor, bgColor := ui.PositionDrawing(g, pos)
-		ui.DrawAtPosition(g, pos, m == TargetingMode, r, fgColor, bgColor)
+		r, fgColor, bgColor := ui.PositionDrawing(pos)
+		ui.DrawAtPosition(pos, m == TargetingMode, r, fgColor, bgColor)
 	}
 	line := 0
 	if !ui.Small() {
@@ -738,22 +748,23 @@ func (ui *gameui) DrawDungeonView(g *game, m uiMode) {
 		line++
 	}
 	if ui.Small() {
-		ui.DrawStatusLine(g)
+		ui.DrawStatusLine()
 	} else {
-		ui.DrawStatusBar(g, line)
-		ui.DrawMenus(g)
+		ui.DrawStatusBar(line)
+		ui.DrawMenus()
 	}
 	if ui.Small() {
-		ui.DrawLog(g, 2)
+		ui.DrawLog(2)
 	} else {
-		ui.DrawLog(g, 4)
+		ui.DrawLog(4)
 	}
 	if m != TargetingMode && m != NoFlushMode {
 		ui.Flush()
 	}
 }
 
-func (ui *gameui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgColor uicolor) {
+func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolor) {
+	g := ui.g
 	m := g.Dungeon
 	c := m.Cell(pos)
 	fgColor = ColorFg
@@ -885,7 +896,8 @@ func (ui *gameui) PositionDrawing(g *game, pos position) (r rune, fgColor, bgCol
 	return
 }
 
-func (ui *gameui) DrawStatusBar(g *game, line int) {
+func (ui *gameui) DrawStatusBar(line int) {
+	g := ui.g
 	sts := statusSlice{}
 	if cld, ok := g.Clouds[g.Player.Pos]; ok && cld == CloudFire {
 		g.Player.Statuses[StatusFlames] = 1
@@ -954,7 +966,8 @@ func (ui *gameui) DrawStatusBar(g *game, line int) {
 	}
 }
 
-func (ui *gameui) DrawStatusLine(g *game) {
+func (ui *gameui) DrawStatusLine() {
+	g := ui.g
 	sts := statusSlice{}
 	if cld, ok := g.Clouds[g.Player.Pos]; ok && cld == CloudFire {
 		g.Player.Statuses[StatusFlames] = 1
@@ -1076,7 +1089,8 @@ func (ui *gameui) LogColor(e logEntry) uicolor {
 	return fg
 }
 
-func (ui *gameui) DrawLog(g *game, lines int) {
+func (ui *gameui) DrawLog(lines int) {
+	g := ui.g
 	min := len(g.Log) - lines
 	if min < 0 {
 		min = 0
@@ -1160,14 +1174,15 @@ const (
 	QuitKeyConfig
 )
 
-func (ui *gameui) ChangeKeys(g *game) {
+func (ui *gameui) ChangeKeys() {
+	g := ui.g
 	lines := DungeonHeight
 	nmax := len(configurableKeyActions) - lines
 	n := 0
 	s := 0
 loop:
 	for {
-		ui.DrawDungeonView(g, NoFlushMode)
+		ui.DrawDungeonView(NoFlushMode)
 		if n >= nmax {
 			n = nmax
 		}
@@ -1252,7 +1267,8 @@ loop:
 	}
 }
 
-func (ui *gameui) DrawPreviousLogs(g *game) {
+func (ui *gameui) DrawPreviousLogs() {
+	g := ui.g
 	bottom := 4
 	if ui.Small() {
 		bottom = 2
@@ -1262,7 +1278,7 @@ func (ui *gameui) DrawPreviousLogs(g *game) {
 	n := nmax
 loop:
 	for {
-		ui.DrawDungeonView(g, NoFlushMode)
+		ui.DrawDungeonView(NoFlushMode)
 		if n >= nmax {
 			n = nmax
 		}
@@ -1311,19 +1327,19 @@ loop:
 	}
 }
 
-func (ui *gameui) DrawMonsterDescription(g *game, mons *monster) {
+func (ui *gameui) DrawMonsterDescription(mons *monster) {
 	s := mons.Kind.Desc()
 	s += " " + fmt.Sprintf("They can hit for up to %d damage.", mons.Kind.BaseAttack())
 	s += " " + fmt.Sprintf("They have around %d HP.", mons.Kind.MaxHP())
-	ui.DrawDescription(g, s)
+	ui.DrawDescription(s)
 }
 
-func (ui *gameui) DrawConsumableDescription(g *game, c consumable) {
-	ui.DrawDescription(g, c.Desc())
+func (ui *gameui) DrawConsumableDescription(c consumable) {
+	ui.DrawDescription(c.Desc())
 }
 
-func (ui *gameui) DrawDescription(g *game, desc string) {
-	ui.DrawDungeonView(g, NoFlushMode)
+func (ui *gameui) DrawDescription(desc string) {
+	ui.DrawDungeonView(NoFlushMode)
 	desc = formatText(desc, TextWidth)
 	lines := strings.Count(desc, "\n")
 	for i := 0; i <= lines+2; i++ {
@@ -1332,8 +1348,8 @@ func (ui *gameui) DrawDescription(g *game, desc string) {
 	ui.DrawText(desc, 0, 0)
 	ui.DrawTextLine(" press esc or space to continue ", lines+2)
 	ui.Flush()
-	ui.WaitForContinue(g, lines+2)
-	ui.DrawDungeonView(g, NoFlushMode)
+	ui.WaitForContinue(lines + 2)
+	ui.DrawDungeonView(NoFlushMode)
 }
 
 func (ui *gameui) DrawText(text string, x, y int) {
@@ -1433,13 +1449,15 @@ func (ui *gameui) ListItemBG(i int) uicolor {
 	return bg
 }
 
-func (ui *gameui) ConsumableItem(g *game, i, lnum int, c consumable, fg uicolor) {
+func (ui *gameui) ConsumableItem(i, lnum int, c consumable, fg uicolor) {
+	g := ui.g
 	bg := ui.ListItemBG(i)
 	ui.ClearLineWithColor(lnum, bg)
 	ui.DrawColoredTextOnBG(fmt.Sprintf("%c - %s (%d available)", rune(i+97), c, g.Player.Consumables[c]), 0, lnum, fg, bg)
 }
 
-func (ui *gameui) SelectProjectile(g *game, ev event) error {
+func (ui *gameui) SelectProjectile(ev event) error {
+	g := ui.g
 	desc := false
 	for {
 		cs := g.SortedProjectiles()
@@ -1457,21 +1475,21 @@ func (ui *gameui) SelectProjectile(g *game, ev event) error {
 			ui.DrawText(" which projectile? (press ? or click here for describe menu)", col, 0)
 		}
 		for i, c := range cs {
-			ui.ConsumableItem(g, i, i+1, c, ColorFg)
+			ui.ConsumableItem(i, i+1, c, ColorFg)
 		}
 		ui.DrawTextLine(" press esc or space to cancel ", len(cs)+1)
 		ui.Flush()
-		index, alt, err := ui.Select(g, len(cs))
+		index, alt, err := ui.Select(len(cs))
 		if alt {
 			desc = !desc
 			continue
 		}
 		if err == nil {
-			ui.ConsumableItem(g, index, index+1, cs[index], ColorYellow)
+			ui.ConsumableItem(index, index+1, cs[index], ColorYellow)
 			ui.Flush()
 			time.Sleep(75 * time.Millisecond)
 			if desc {
-				ui.DrawDescription(g, cs[index].Desc())
+				ui.DrawDescription(cs[index].Desc())
 				continue
 			}
 			err = cs[index].Use(g, ev)
@@ -1480,7 +1498,8 @@ func (ui *gameui) SelectProjectile(g *game, ev event) error {
 	}
 }
 
-func (ui *gameui) SelectPotion(g *game, ev event) error {
+func (ui *gameui) SelectPotion(ev event) error {
+	g := ui.g
 	desc := false
 	for {
 		cs := g.SortedPotions()
@@ -1498,21 +1517,21 @@ func (ui *gameui) SelectPotion(g *game, ev event) error {
 			ui.DrawText(" which potion? (press ? or click here for description menu)", col, 0)
 		}
 		for i, c := range cs {
-			ui.ConsumableItem(g, i, i+1, c, ColorFg)
+			ui.ConsumableItem(i, i+1, c, ColorFg)
 		}
 		ui.DrawTextLine(" press esc or space to cancel ", len(cs)+1)
 		ui.Flush()
-		index, alt, err := ui.Select(g, len(cs))
+		index, alt, err := ui.Select(len(cs))
 		if alt {
 			desc = !desc
 			continue
 		}
 		if err == nil {
-			ui.ConsumableItem(g, index, index+1, cs[index], ColorYellow)
+			ui.ConsumableItem(index, index+1, cs[index], ColorYellow)
 			ui.Flush()
 			time.Sleep(75 * time.Millisecond)
 			if desc {
-				ui.DrawDescription(g, cs[index].Desc())
+				ui.DrawDescription(cs[index].Desc())
 				continue
 			}
 			err = cs[index].Use(g, ev)
@@ -1521,7 +1540,8 @@ func (ui *gameui) SelectPotion(g *game, ev event) error {
 	}
 }
 
-func (ui *gameui) RodItem(g *game, i, lnum int, r rod, fg uicolor) {
+func (ui *gameui) RodItem(i, lnum int, r rod, fg uicolor) {
+	g := ui.g
 	bg := ui.ListItemBG(i)
 	ui.ClearLineWithColor(lnum, bg)
 	mc := r.MaxCharge()
@@ -1532,7 +1552,8 @@ func (ui *gameui) RodItem(g *game, i, lnum int, r rod, fg uicolor) {
 		rune(i+97), r, g.Player.Rods[r].Charge, mc, r.MPCost()), 0, lnum, fg, bg)
 }
 
-func (ui *gameui) SelectRod(g *game, ev event) error {
+func (ui *gameui) SelectRod(ev event) error {
+	g := ui.g
 	desc := false
 	for {
 		rs := g.SortedRods()
@@ -1550,21 +1571,21 @@ func (ui *gameui) SelectRod(g *game, ev event) error {
 			ui.DrawText(" which rod? (press ? or click here for description menu)", col, 0)
 		}
 		for i, r := range rs {
-			ui.RodItem(g, i, i+1, r, ColorFg)
+			ui.RodItem(i, i+1, r, ColorFg)
 		}
 		ui.DrawTextLine(" press esc or space to cancel ", len(rs)+1)
 		ui.Flush()
-		index, alt, err := ui.Select(g, len(rs))
+		index, alt, err := ui.Select(len(rs))
 		if alt {
 			desc = !desc
 			continue
 		}
 		if err == nil {
-			ui.RodItem(g, index, index+1, rs[index], ColorYellow)
+			ui.RodItem(index, index+1, rs[index], ColorYellow)
 			ui.Flush()
 			time.Sleep(75 * time.Millisecond)
 			if desc {
-				ui.DrawDescription(g, rs[index].Desc())
+				ui.DrawDescription(rs[index].Desc())
 				continue
 			}
 			err = rs[index].Use(g, ev)
@@ -1573,7 +1594,7 @@ func (ui *gameui) SelectRod(g *game, ev event) error {
 	}
 }
 
-func (ui *gameui) ActionItem(g *game, i, lnum int, ka keyAction, fg uicolor) {
+func (ui *gameui) ActionItem(i, lnum int, ka keyAction, fg uicolor) {
 	bg := ui.ListItemBG(i)
 	ui.ClearLineWithColor(lnum, bg)
 	desc := ka.NormalModeDescription()
@@ -1593,7 +1614,7 @@ var menuActions = []keyAction{
 	KeyQuit,
 }
 
-func (ui *gameui) SelectAction(g *game, actions []keyAction, ev event) (keyAction, error) {
+func (ui *gameui) SelectAction(actions []keyAction, ev event) (keyAction, error) {
 	for {
 		ui.ClearLine(0)
 		if !ui.Small() {
@@ -1603,22 +1624,22 @@ func (ui *gameui) SelectAction(g *game, actions []keyAction, ev event) (keyActio
 		col := utf8.RuneCountInString("Choose")
 		ui.DrawText(" which action?", col, 0)
 		for i, r := range actions {
-			ui.ActionItem(g, i, i+1, r, ColorFg)
+			ui.ActionItem(i, i+1, r, ColorFg)
 		}
 		ui.DrawTextLine(" press esc or space to cancel ", len(actions)+1)
 		ui.Flush()
-		index, alt, err := ui.Select(g, len(actions))
+		index, alt, err := ui.Select(len(actions))
 		if alt {
 			continue
 		}
 		if err != nil {
-			ui.DrawDungeonView(g, NoFlushMode)
+			ui.DrawDungeonView(NoFlushMode)
 			return KeyExamine, err
 		}
-		ui.ActionItem(g, index, index+1, actions[index], ColorYellow)
+		ui.ActionItem(index, index+1, actions[index], ColorYellow)
 		ui.Flush()
 		time.Sleep(75 * time.Millisecond)
-		ui.DrawDungeonView(g, NoFlushMode)
+		ui.DrawDungeonView(NoFlushMode)
 		return actions[index], nil
 	}
 }
@@ -1652,47 +1673,48 @@ var settingsActions = []setting{
 	toggleLayout,
 }
 
-func (ui *gameui) ConfItem(g *game, i, lnum int, s setting, fg uicolor) {
+func (ui *gameui) ConfItem(i, lnum int, s setting, fg uicolor) {
 	bg := ui.ListItemBG(i)
 	ui.ClearLineWithColor(lnum, bg)
 	ui.DrawColoredTextOnBG(fmt.Sprintf("%c - %s", rune(i+97), s), 0, lnum, fg, bg)
 }
 
-func (ui *gameui) SelectConfigure(g *game, actions []setting) (setting, error) {
+func (ui *gameui) SelectConfigure(actions []setting) (setting, error) {
 	for {
 		ui.ClearLine(0)
 		ui.DrawColoredText("Perform", 0, 0, ColorCyan)
 		col := utf8.RuneCountInString("Perform")
 		ui.DrawText(" which change?", col, 0)
 		for i, r := range actions {
-			ui.ConfItem(g, i, i+1, r, ColorFg)
+			ui.ConfItem(i, i+1, r, ColorFg)
 		}
 		ui.DrawTextLine(" press esc or space to cancel ", len(actions)+1)
 		ui.Flush()
-		index, alt, err := ui.Select(g, len(actions))
+		index, alt, err := ui.Select(len(actions))
 		if alt {
 			continue
 		}
 		if err != nil {
-			ui.DrawDungeonView(g, NoFlushMode)
+			ui.DrawDungeonView(NoFlushMode)
 			return setKeys, err
 		}
-		ui.ConfItem(g, index, index+1, actions[index], ColorYellow)
+		ui.ConfItem(index, index+1, actions[index], ColorYellow)
 		ui.Flush()
 		time.Sleep(75 * time.Millisecond)
-		ui.DrawDungeonView(g, NoFlushMode)
+		ui.DrawDungeonView(NoFlushMode)
 		return actions[index], nil
 	}
 }
 
-func (ui *gameui) HandleSettingAction(g *game) error {
-	s, err := ui.SelectConfigure(g, settingsActions)
+func (ui *gameui) HandleSettingAction() error {
+	g := ui.g
+	s, err := ui.SelectConfigure(settingsActions)
 	if err != nil {
 		return err
 	}
 	switch s {
 	case setKeys:
-		ui.ChangeKeys(g)
+		ui.ChangeKeys()
 	case invertLOS:
 		gameConfig.DarkLOS = !gameConfig.DarkLOS
 		err := g.SaveConfig()
@@ -1720,40 +1742,40 @@ func (ui *gameui) HandleSettingAction(g *game) error {
 	return nil
 }
 
-func (ui *gameui) WizardItem(g *game, i, lnum int, s wizardAction, fg uicolor) {
+func (ui *gameui) WizardItem(i, lnum int, s wizardAction, fg uicolor) {
 	bg := ui.ListItemBG(i)
 	ui.ClearLineWithColor(lnum, bg)
 	ui.DrawColoredTextOnBG(fmt.Sprintf("%c - %s", rune(i+97), s), 0, lnum, fg, bg)
 }
 
-func (ui *gameui) SelectWizardMagic(g *game, actions []wizardAction) (wizardAction, error) {
+func (ui *gameui) SelectWizardMagic(actions []wizardAction) (wizardAction, error) {
 	for {
 		ui.ClearLine(0)
 		ui.DrawColoredText("Evoke", 0, 0, ColorCyan)
 		col := utf8.RuneCountInString("Evoke")
 		ui.DrawText(" which magic?", col, 0)
 		for i, r := range actions {
-			ui.WizardItem(g, i, i+1, r, ColorFg)
+			ui.WizardItem(i, i+1, r, ColorFg)
 		}
 		ui.DrawTextLine(" press esc or space to cancel ", len(actions)+1)
 		ui.Flush()
-		index, alt, err := ui.Select(g, len(actions))
+		index, alt, err := ui.Select(len(actions))
 		if alt {
 			continue
 		}
 		if err != nil {
-			ui.DrawDungeonView(g, NoFlushMode)
+			ui.DrawDungeonView(NoFlushMode)
 			return WizardInfoAction, err
 		}
-		ui.WizardItem(g, index, index+1, actions[index], ColorYellow)
+		ui.WizardItem(index, index+1, actions[index], ColorYellow)
 		ui.Flush()
 		time.Sleep(75 * time.Millisecond)
-		ui.DrawDungeonView(g, NoFlushMode)
+		ui.DrawDungeonView(NoFlushMode)
 		return actions[index], nil
 	}
 }
 
-func (ui *gameui) DrawMenus(g *game) {
+func (ui *gameui) DrawMenus() {
 	line := DungeonHeight
 	for i, cols := range MenuCols[0 : len(MenuCols)-1] {
 		if cols[0] >= 0 {
@@ -1764,7 +1786,7 @@ func (ui *gameui) DrawMenus(g *game) {
 			}
 		}
 	}
-	interactMenu := ui.UpdateInteractButton(g)
+	interactMenu := ui.UpdateInteractButton()
 	if interactMenu == "" {
 		return
 	}

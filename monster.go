@@ -1822,7 +1822,7 @@ func (m *monster) TeleportAway(g *game) {
 	opos := m.Pos
 	m.MoveTo(g, pos)
 	if g.Player.LOS[opos] {
-		g.ui.TeleportAnimation(g, opos, pos, false)
+		g.ui.TeleportAnimation(opos, pos, false)
 	}
 }
 
@@ -2348,12 +2348,12 @@ func (m *monster) TormentBolt(g *game, ev event) bool {
 		g.MakeNoise(MagicHitNoise, g.Player.Pos)
 		damage := g.Player.HP - g.Player.HP/2
 		g.PrintfStyled("%s throws a bolt of torment at you.", logMonsterHit, m.Kind.Definite(true))
-		g.ui.MonsterProjectileAnimation(g, g.Ray(m.Pos), '*', ColorCyan)
+		g.ui.MonsterProjectileAnimation(g.Ray(m.Pos), '*', ColorCyan)
 		m.InflictDamage(g, damage, 15)
 	} else {
 		g.Printf("You block the %s's bolt of torment.", m.Kind)
 		g.BlockEffects(m)
-		g.ui.MonsterProjectileAnimation(g, g.Ray(m.Pos), '*', ColorCyan)
+		g.ui.MonsterProjectileAnimation(g.Ray(m.Pos), '*', ColorCyan)
 	}
 	m.Exhaust(g)
 	ev.Renew(g, m.Kind.AttackDelay())
@@ -2399,7 +2399,7 @@ func (m *monster) ThrowRock(g *game, ev event) bool {
 			sclang = g.ArmourClang()
 		}
 		g.PrintfStyled("%s throws a rock at you (%d dmg).%s", logMonsterHit, m.Kind.Definite(true), attack, sclang)
-		g.ui.MonsterProjectileAnimation(g, g.Ray(m.Pos), '●', ColorMagenta)
+		g.ui.MonsterProjectileAnimation(g.Ray(m.Pos), '●', ColorMagenta)
 		oppos := g.Player.Pos
 		if m.PushPlayer(g) {
 			g.TemporalWallAt(oppos, ev)
@@ -2414,7 +2414,7 @@ func (m *monster) ThrowRock(g *game, ev event) bool {
 		g.Printf("You block %s's rock. Clang!", m.Kind.Indefinite(false))
 		g.MakeNoise(ShieldBlockNoise, g.Player.Pos)
 		g.BlockEffects(m)
-		g.ui.MonsterProjectileAnimation(g, g.Ray(m.Pos), '●', ColorMagenta)
+		g.ui.MonsterProjectileAnimation(g.Ray(m.Pos), '●', ColorMagenta)
 		ray := g.Ray(m.Pos)
 		if len(ray) > 0 {
 			g.TemporalWallAt(ray[len(ray)-1], ev)
@@ -2422,7 +2422,7 @@ func (m *monster) ThrowRock(g *game, ev event) bool {
 	} else {
 		g.Stats.Dodges++
 		g.Printf("You dodge %s's rock.", m.Kind.Indefinite(false))
-		g.ui.MonsterProjectileAnimation(g, g.Ray(m.Pos), '●', ColorMagenta)
+		g.ui.MonsterProjectileAnimation(g.Ray(m.Pos), '●', ColorMagenta)
 		dir := g.Player.Pos.Dir(m.Pos)
 		pos := g.Player.Pos.To(dir)
 		if pos.valid() {
@@ -2497,25 +2497,25 @@ func (m *monster) ThrowJavelin(g *game, ev event) bool {
 			sclang = g.ArmourClang()
 		}
 		g.Printf("%s throws %s at you (%d dmg).%s", m.Kind.Definite(true), Indefinite("javelin", false), attack, sclang)
-		g.ui.MonsterJavelinAnimation(g, g.Ray(m.Pos), true)
+		g.ui.MonsterJavelinAnimation(g.Ray(m.Pos), true)
 		m.InflictDamage(g, attack, jdmg)
 	} else if block {
 		if RandInt(3) == 0 {
 			g.Printf("You block %s's %s. Clang!", m.Kind.Indefinite(false), "javelin")
 			g.MakeNoise(ShieldBlockNoise, g.Player.Pos)
 			g.BlockEffects(m)
-			g.ui.MonsterJavelinAnimation(g, g.Ray(m.Pos), false)
+			g.ui.MonsterJavelinAnimation(g.Ray(m.Pos), false)
 		} else if !g.Player.HasStatus(StatusDisabledShield) {
 			g.Player.Statuses[StatusDisabledShield] = 1
 			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 100 + RandInt(100), EAction: DisabledShieldEnd})
 			g.Printf("%s's %s gets embedded in your shield.", m.Kind.Indefinite(true), "javelin")
 			g.MakeNoise(ShieldBlockNoise, g.Player.Pos)
-			g.ui.MonsterJavelinAnimation(g, g.Ray(m.Pos), false)
+			g.ui.MonsterJavelinAnimation(g.Ray(m.Pos), false)
 		}
 	} else {
 		g.Stats.Dodges++
 		g.Printf("You dodge %s's %s.", m.Kind.Indefinite(false), "javelin")
-		g.ui.MonsterJavelinAnimation(g, g.Ray(m.Pos), false)
+		g.ui.MonsterJavelinAnimation(g.Ray(m.Pos), false)
 	}
 	m.ExhaustTime(g, 50+RandInt(50))
 	ev.Renew(g, m.Kind.AttackDelay())
@@ -2544,7 +2544,7 @@ func (m *monster) ThrowAcid(g *game, ev event) bool {
 		noise := g.HitNoise(false) // no clang with acid projectiles
 		g.MakeNoise(noise, g.Player.Pos)
 		g.Printf("%s throws acid at you (%d dmg).", m.Kind.Definite(true), attack)
-		g.ui.MonsterProjectileAnimation(g, g.Ray(m.Pos), '*', ColorGreen)
+		g.ui.MonsterProjectileAnimation(g.Ray(m.Pos), '*', ColorGreen)
 		m.InflictDamage(g, attack, acdmg)
 		if RandInt(2) == 0 {
 			g.Corrosion(ev)
@@ -2555,14 +2555,14 @@ func (m *monster) ThrowAcid(g *game, ev event) bool {
 	} else if block {
 		g.Printf("You block %s's acid projectile.", m.Kind.Indefinite(false))
 		g.MakeNoise(BaseHitNoise, g.Player.Pos) // no real clang
-		g.ui.MonsterProjectileAnimation(g, g.Ray(m.Pos), '*', ColorGreen)
+		g.ui.MonsterProjectileAnimation(g.Ray(m.Pos), '*', ColorGreen)
 		if RandInt(2) == 0 {
 			g.Corrosion(ev)
 		}
 	} else {
 		g.Stats.Dodges++
 		g.Printf("You dodge %s's acid projectile.", m.Kind.Indefinite(false))
-		g.ui.MonsterProjectileAnimation(g, g.Ray(m.Pos), '*', ColorGreen)
+		g.ui.MonsterProjectileAnimation(g.Ray(m.Pos), '*', ColorGreen)
 	}
 	ev.Renew(g, m.Kind.AttackDelay())
 	return true
@@ -2576,10 +2576,10 @@ func (m *monster) NixeAttraction(g *game, ev event) bool {
 	g.MakeNoise(9, m.Pos)
 	g.PrintfStyled("%s lures you to her.", logMonsterHit, m.Kind.Definite(true))
 	ray := g.Ray(m.Pos)
-	g.ui.MonsterProjectileAnimation(g, ray, 'θ', ColorCyan) // TODO: improve
+	g.ui.MonsterProjectileAnimation(ray, 'θ', ColorCyan) // TODO: improve
 	if len(ray) > 1 {
 		// should always be the case
-		g.ui.TeleportAnimation(g, g.Player.Pos, ray[1], true)
+		g.ui.TeleportAnimation(g.Player.Pos, ray[1], true)
 		g.PlacePlayerAt(ray[1])
 	}
 	m.Exhaust(g)
@@ -2655,7 +2655,7 @@ func (m *monster) Explode(g *game, ev event) {
 	neighbors := m.Pos.ValidNeighbors()
 	g.MakeNoise(WallNoise, m.Pos)
 	g.Printf("%s %s explodes with a loud boom.", g.ExplosionSound(), m.Kind.Definite(true))
-	g.ui.ExplosionAnimation(g, FireExplosion, m.Pos)
+	g.ui.ExplosionAnimation(FireExplosion, m.Pos)
 	for _, pos := range append(neighbors, m.Pos) {
 		c := g.Dungeon.Cell(pos)
 		if c.T == FreeCell {
@@ -2679,7 +2679,7 @@ func (m *monster) Explode(g *game, ev event) {
 			if !g.Player.LOS[pos] {
 				g.WrongWall[pos] = true
 			} else {
-				g.ui.WallExplosionAnimation(g, pos)
+				g.ui.WallExplosionAnimation(pos)
 			}
 			g.MakeNoise(WallNoise, pos)
 			g.Fog(pos, 1, ev)
@@ -2694,7 +2694,7 @@ func (m *monster) Blink(g *game) {
 	}
 	opos := m.Pos
 	g.Printf("The %s blinks away.", m.Kind)
-	g.ui.TeleportAnimation(g, opos, npos, true)
+	g.ui.TeleportAnimation(opos, npos, true)
 	m.MoveTo(g, npos)
 }
 

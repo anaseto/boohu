@@ -108,7 +108,7 @@ func (sev *simpleEvent) Action(g *game) {
 			g.TurnStats()
 			return
 		}
-		g.Quit = g.ui.HandlePlayerTurn(g, sev)
+		g.Quit = g.ui.HandlePlayerTurn(sev)
 		if g.Quit {
 			return
 		}
@@ -128,71 +128,71 @@ func (sev *simpleEvent) Action(g *game) {
 		g.PrintStyled("You are no longer berserk.", logStatusEnd)
 		g.PushEvent(&simpleEvent{ERank: sev.Rank() + 90 + RandInt(30), EAction: SlowEnd})
 		g.PushEvent(&simpleEvent{ERank: sev.Rank() + 270 + RandInt(60), EAction: ExhaustionEnd})
-		g.ui.StatusEndAnimation(g)
+		g.ui.StatusEndAnimation()
 	case SlowEnd:
 		g.Player.Statuses[StatusSlow]--
 		if g.Player.Statuses[StatusSlow] <= 0 {
 			g.PrintStyled("You no longer feel slow.", logStatusEnd)
-			g.ui.StatusEndAnimation(g)
+			g.ui.StatusEndAnimation()
 		}
 	case ExhaustionEnd:
 		g.PrintStyled("You no longer feel exhausted.", logStatusEnd)
 		g.Player.Statuses[StatusExhausted] = 0
-		g.ui.StatusEndAnimation(g)
+		g.ui.StatusEndAnimation()
 	case HasteEnd:
 		g.Player.Statuses[StatusSwift]--
 		if g.Player.Statuses[StatusSwift] == 0 {
 			g.PrintStyled("You no longer feel speedy.", logStatusEnd)
-			g.ui.StatusEndAnimation(g)
+			g.ui.StatusEndAnimation()
 		}
 	case EvasionEnd:
 		g.Player.Statuses[StatusAgile]--
 		if g.Player.Statuses[StatusAgile] == 0 {
 			g.PrintStyled("You no longer feel agile.", logStatusEnd)
-			g.ui.StatusEndAnimation(g)
+			g.ui.StatusEndAnimation()
 		}
 	case LignificationEnd:
 		g.Player.Statuses[StatusLignification]--
 		g.Player.HP -= int(10 * g.Player.HP / Max(g.Player.HPMax(), g.Player.HP))
 		if g.Player.Statuses[StatusLignification] == 0 {
 			g.PrintStyled("You no longer feel attached to the ground.", logStatusEnd)
-			g.ui.StatusEndAnimation(g)
+			g.ui.StatusEndAnimation()
 		}
 	case ConfusionEnd:
 		g.PrintStyled("You no longer feel confused.", logStatusEnd)
 		g.Player.Statuses[StatusConfusion] = 0
-		g.ui.StatusEndAnimation(g)
+		g.ui.StatusEndAnimation()
 	case NauseaEnd:
 		g.PrintStyled("You no longer feel sick.", logStatusEnd)
 		g.Player.Statuses[StatusNausea] = 0
-		g.ui.StatusEndAnimation(g)
+		g.ui.StatusEndAnimation()
 	case DisabledShieldEnd:
 		g.PrintStyled("You manage to dislodge the projectile from your shield.", logStatusEnd)
 		g.Player.Statuses[StatusDisabledShield] = 0
-		g.ui.StatusEndAnimation(g)
+		g.ui.StatusEndAnimation()
 	case CorrosionEnd:
 		g.Player.Statuses[StatusCorrosion]--
 		if g.Player.Statuses[StatusCorrosion] == 0 {
 			g.PrintStyled("Your equipment is now free from acid.", logStatusEnd)
-			g.ui.StatusEndAnimation(g)
+			g.ui.StatusEndAnimation()
 		}
 	case DigEnd:
 		g.Player.Statuses[StatusDig]--
 		if g.Player.Statuses[StatusDig] == 0 {
 			g.PrintStyled("You no longer feel like an earth dragon.", logStatusEnd)
-			g.ui.StatusEndAnimation(g)
+			g.ui.StatusEndAnimation()
 		}
 	case SwapEnd:
 		g.Player.Statuses[StatusSwap]--
 		if g.Player.Statuses[StatusSwap] == 0 {
 			g.PrintStyled("You no longer feel light-footed.", logStatusEnd)
-			g.ui.StatusEndAnimation(g)
+			g.ui.StatusEndAnimation()
 		}
 	case ShadowsEnd:
 		g.Player.Statuses[StatusShadows]--
 		if g.Player.Statuses[StatusShadows] == 0 {
 			g.PrintStyled("The shadows leave you.", logStatusEnd)
-			g.ui.StatusEndAnimation(g)
+			g.ui.StatusEndAnimation()
 			g.ComputeLOS()
 			g.MakeMonstersAware()
 		}
@@ -203,7 +203,7 @@ func (sev *simpleEvent) Action(g *game) {
 		g.Player.Statuses[StatusSlay]--
 		if g.Player.Statuses[StatusSlay] == 0 {
 			g.PrintStyled("You no longer feel extra slaying power.", logStatusEnd)
-			g.ui.StatusEndAnimation(g)
+			g.ui.StatusEndAnimation()
 			g.ComputeLOS()
 			g.MakeMonstersAware()
 		}
@@ -211,7 +211,7 @@ func (sev *simpleEvent) Action(g *game) {
 		g.Player.Statuses[StatusAccurate]--
 		if g.Player.Statuses[StatusAccurate] == 0 {
 			g.PrintStyled("You no longer feel accurate.", logStatusEnd)
-			g.ui.StatusEndAnimation(g)
+			g.ui.StatusEndAnimation()
 		}
 	case BlockEnd:
 		g.Player.Blocked = false

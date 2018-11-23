@@ -34,7 +34,7 @@ func (ui *gameui) SetCursor(pos position) {
 	ui.cursor = pos
 }
 
-func (ui *gameui) WaitForContinue(g *game, line int) {
+func (ui *gameui) WaitForContinue(line int) {
 loop:
 	for {
 		in := ui.PollEvent()
@@ -56,7 +56,7 @@ loop:
 	}
 }
 
-func (ui *gameui) PromptConfirmation(g *game) bool {
+func (ui *gameui) PromptConfirmation() bool {
 	for {
 		in := ui.PollEvent()
 		switch in.key {
@@ -80,7 +80,8 @@ func (ui *gameui) PressAnyKey() error {
 	}
 }
 
-func (ui *gameui) PlayerTurnEvent(g *game, ev event) (err error, again, quit bool) {
+func (ui *gameui) PlayerTurnEvent(ev event) (err error, again, quit bool) {
+	g := ui.g
 	again = true
 	in := ui.PollEvent()
 	switch in.key {
@@ -90,7 +91,7 @@ func (ui *gameui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 			switch in.button {
 			case -1:
 				if in.mouseY == DungeonHeight {
-					m, ok := ui.WhichButton(g, in.mouseX)
+					m, ok := ui.WhichButton(in.mouseX)
 					omh := ui.menuHover
 					if ok {
 						ui.menuHover = m
@@ -98,7 +99,7 @@ func (ui *gameui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 						ui.menuHover = -1
 					}
 					if ui.menuHover != omh {
-						ui.DrawMenus(g)
+						ui.DrawMenus()
 						ui.Flush()
 					}
 					break
@@ -111,12 +112,12 @@ func (ui *gameui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 				fallthrough
 			case 0:
 				if in.mouseY == DungeonHeight {
-					m, ok := ui.WhichButton(g, in.mouseX)
+					m, ok := ui.WhichButton(in.mouseX)
 					if !ok {
 						again = true
 						break
 					}
-					err, again, quit = ui.HandleKeyAction(g, runeKeyAction{k: m.Key(g)})
+					err, again, quit = ui.HandleKeyAction(runeKeyAction{k: m.Key(g)})
 					if err != nil {
 						again = true
 					}
@@ -124,10 +125,10 @@ func (ui *gameui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 				} else if in.mouseX >= DungeonWidth || in.mouseY >= DungeonHeight {
 					again = true
 				} else {
-					err, again, quit = ui.ExaminePos(g, ev, pos)
+					err, again, quit = ui.ExaminePos(ev, pos)
 				}
 			case 2:
-				err, again, quit = ui.HandleKeyAction(g, runeKeyAction{k: KeyMenu})
+				err, again, quit = ui.HandleKeyAction(runeKeyAction{k: KeyMenu})
 				if err != nil {
 					again = true
 				}
@@ -139,7 +140,7 @@ func (ui *gameui) PlayerTurnEvent(g *game, ev event) (err error, again, quit boo
 		if r == 0 {
 			again = true
 		} else {
-			err, again, quit = ui.HandleKeyAction(g, runeKeyAction{r: r})
+			err, again, quit = ui.HandleKeyAction(runeKeyAction{r: r})
 		}
 	}
 	if err != nil {
@@ -189,7 +190,7 @@ func (ui *gameui) GetPos(i int) (int, int) {
 	return i - (i/UIWidth)*UIWidth, i / UIWidth
 }
 
-func (ui *gameui) Select(g *game, l int) (index int, alternate bool, err error) {
+func (ui *gameui) Select(l int) (index int, alternate bool, err error) {
 	for {
 		in := ui.PollEvent()
 		r := ui.ReadKey(in.key)
@@ -280,7 +281,8 @@ func (ui *gameui) KeyMenuAction(n int) (m int, action keyConfigAction) {
 	return n, action
 }
 
-func (ui *gameui) TargetModeEvent(g *game, targ Targeter, data *examineData) (err error, again, quit, notarg bool) {
+func (ui *gameui) TargetModeEvent(targ Targeter, data *examineData) (err error, again, quit, notarg bool) {
+	g := ui.g
 	again = true
 	in := ui.PollEvent()
 	switch in.key {
@@ -294,7 +296,7 @@ func (ui *gameui) TargetModeEvent(g *game, targ Targeter, data *examineData) (er
 		switch in.button {
 		case -1:
 			if in.mouseY == DungeonHeight {
-				m, ok := ui.WhichButton(g, in.mouseX)
+				m, ok := ui.WhichButton(in.mouseX)
 				omh := ui.menuHover
 				if ok {
 					ui.menuHover = m
@@ -302,7 +304,7 @@ func (ui *gameui) TargetModeEvent(g *game, targ Targeter, data *examineData) (er
 					ui.menuHover = -1
 				}
 				if ui.menuHover != omh {
-					ui.DrawMenus(g)
+					ui.DrawMenus()
 					ui.Flush()
 				}
 				g.Targeting = InvalidPos
@@ -325,34 +327,34 @@ func (ui *gameui) TargetModeEvent(g *game, targ Targeter, data *examineData) (er
 			fallthrough
 		case 0:
 			if in.mouseY == DungeonHeight {
-				m, ok := ui.WhichButton(g, in.mouseX)
+				m, ok := ui.WhichButton(in.mouseX)
 				if !ok {
 					g.Targeting = InvalidPos
 					notarg = true
 					err = errors.New(DoNothing)
 					break
 				}
-				err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: m.Key(g)}, data)
+				err, again, quit, notarg = ui.CursorKeyAction(targ, runeKeyAction{k: m.Key(g)}, data)
 			} else if in.mouseX >= DungeonWidth || in.mouseY >= DungeonHeight {
 				g.Targeting = InvalidPos
 				notarg = true
 				err = errors.New(DoNothing)
 			} else {
-				again, notarg = ui.CursorMouseLeft(g, targ, position{X: in.mouseX, Y: in.mouseY}, data)
+				again, notarg = ui.CursorMouseLeft(targ, position{X: in.mouseX, Y: in.mouseY}, data)
 			}
 		case 2:
 			if in.mouseY >= DungeonHeight || in.mouseX >= DungeonWidth {
-				err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: KeyMenu}, data)
+				err, again, quit, notarg = ui.CursorKeyAction(targ, runeKeyAction{k: KeyMenu}, data)
 			} else {
-				err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: KeyDescription}, data)
+				err, again, quit, notarg = ui.CursorKeyAction(targ, runeKeyAction{k: KeyDescription}, data)
 			}
 		case 1:
-			err, again, quit, notarg = ui.CursorKeyAction(g, targ, runeKeyAction{k: KeyExclude}, data)
+			err, again, quit, notarg = ui.CursorKeyAction(targ, runeKeyAction{k: KeyExclude}, data)
 		}
 	default:
 		r := ui.KeyToRuneKeyAction(in)
 		if r != 0 {
-			return ui.CursorKeyAction(g, targ, runeKeyAction{r: r}, data)
+			return ui.CursorKeyAction(targ, runeKeyAction{r: r}, data)
 		}
 		again = true
 	}
@@ -391,10 +393,11 @@ const (
 
 const DoNothing = "Do nothing, then."
 
-func (ui *gameui) EnterWizard(g *game) {
-	if ui.Wizard(g) {
+func (ui *gameui) EnterWizard() {
+	g := ui.g
+	if ui.Wizard() {
 		g.WizardMode()
-		ui.DrawDungeonView(g, NoFlushMode)
+		ui.DrawDungeonView(NoFlushMode)
 	} else {
 		g.Print(DoNothing)
 	}
@@ -812,7 +815,8 @@ type runeKeyAction struct {
 	k keyAction
 }
 
-func (ui *gameui) HandleKeyAction(g *game, rka runeKeyAction) (err error, again bool, quit bool) {
+func (ui *gameui) HandleKeyAction(rka runeKeyAction) (err error, again bool, quit bool) {
+	g := ui.g
 	if rka.r != 0 {
 		var ok bool
 		rka.k, ok = gameConfig.RuneNormalModeKeys[rka.r]
@@ -827,20 +831,21 @@ func (ui *gameui) HandleKeyAction(g *game, rka runeKeyAction) (err error, again 
 		}
 	}
 	if rka.k == KeyMenu {
-		rka.k, err = ui.SelectAction(g, menuActions, g.Ev)
+		rka.k, err = ui.SelectAction(menuActions, g.Ev)
 		if err != nil {
 			err = ui.CleanError(err)
 			return err, again, quit
 		}
 	}
-	return ui.HandleKey(g, rka)
+	return ui.HandleKey(rka)
 }
 
-func (ui *gameui) OptionalDescendConfirmation(g *game, st stair) (err error) {
+func (ui *gameui) OptionalDescendConfirmation(st stair) (err error) {
+	g := ui.g
 	if g.Depth == WinDepth && st == NormalStair {
 		g.Print("Do you really want to dive into optional depths? [y/N]")
-		ui.DrawDungeonView(g, NormalMode)
-		dive := ui.PromptConfirmation(g)
+		ui.DrawDungeonView(NormalMode)
+		dive := ui.PromptConfirmation()
 		if !dive {
 			err = errors.New("Keep going in the current level, then.")
 		}
@@ -849,7 +854,8 @@ func (ui *gameui) OptionalDescendConfirmation(g *game, st stair) (err error) {
 
 }
 
-func (ui *gameui) HandleKey(g *game, rka runeKeyAction) (err error, again bool, quit bool) {
+func (ui *gameui) HandleKey(rka runeKeyAction) (err error, again bool, quit bool) {
+	g := ui.g
 	switch rka.k {
 	case KeyW, KeyS, KeyN, KeyE, KeyNW, KeyNE, KeySW, KeySE:
 		err = g.MovePlayer(g.Player.Pos.To(KeyToDir(rka.k)), g.Ev)
@@ -859,20 +865,20 @@ func (ui *gameui) HandleKey(g *game, rka runeKeyAction) (err error, again bool, 
 		g.WaitTurn(g.Ev)
 	case KeyRest:
 		err = g.Rest(g.Ev)
-		ui.MenuSelectedAnimation(g, MenuRest, err == nil)
+		ui.MenuSelectedAnimation(MenuRest, err == nil)
 	case KeyDescend:
 		if st, ok := g.Stairs[g.Player.Pos]; ok {
-			ui.MenuSelectedAnimation(g, MenuInteract, true)
-			err = ui.OptionalDescendConfirmation(g, st)
+			ui.MenuSelectedAnimation(MenuInteract, true)
+			err = ui.OptionalDescendConfirmation(st)
 			if err != nil {
 				break
 			}
 			if g.Descend() {
-				ui.Win(g)
+				ui.Win()
 				quit = true
 				return err, again, quit
 			}
-			ui.DrawDungeonView(g, NormalMode)
+			ui.DrawDungeonView(NormalMode)
 		} else {
 			err = errors.New("No stairs here.")
 		}
@@ -898,32 +904,32 @@ func (ui *gameui) HandleKey(g *game, rka runeKeyAction) (err error, again bool, 
 		}
 	case KeyEquip:
 		err = g.Equip(g.Ev)
-		ui.MenuSelectedAnimation(g, MenuInteract, err == nil)
+		ui.MenuSelectedAnimation(MenuInteract, err == nil)
 	case KeyDrink:
-		err = ui.SelectPotion(g, g.Ev)
+		err = ui.SelectPotion(g.Ev)
 		err = ui.CleanError(err)
 	case KeyThrow:
-		err = ui.SelectProjectile(g, g.Ev)
+		err = ui.SelectProjectile(g.Ev)
 		err = ui.CleanError(err)
 	case KeyEvoke:
-		err = ui.SelectRod(g, g.Ev)
+		err = ui.SelectRod(g.Ev)
 		err = ui.CleanError(err)
 	case KeyExplore:
 		err = g.Autoexplore(g.Ev)
-		ui.MenuSelectedAnimation(g, MenuExplore, err == nil)
+		ui.MenuSelectedAnimation(MenuExplore, err == nil)
 	case KeyExamine:
-		err, again, quit = ui.Examine(g, nil)
+		err, again, quit = ui.Examine(nil)
 	case KeyHelp, KeyMenuCommandHelp:
-		ui.KeysHelp(g)
+		ui.KeysHelp()
 		again = true
 	case KeyMenuTargetingHelp:
-		ui.ExamineHelp(g)
+		ui.ExamineHelp()
 		again = true
 	case KeyCharacterInfo:
-		ui.CharacterInfo(g)
+		ui.CharacterInfo()
 		again = true
 	case KeyLogs:
-		ui.DrawPreviousLogs(g)
+		ui.DrawPreviousLogs()
 		again = true
 	case KeySave:
 		g.Ev.Renew(g, 0)
@@ -949,24 +955,24 @@ func (ui *gameui) HandleKey(g *game, rka runeKeyAction) (err error, again bool, 
 		again = true
 	case KeyWizardInfo:
 		if g.Wizard {
-			err = ui.HandleWizardAction(g)
+			err = ui.HandleWizardAction()
 			again = true
 		} else {
 			err = errors.New("Unknown key. Type ? for help.")
 		}
 	case KeyWizard:
-		ui.EnterWizard(g)
+		ui.EnterWizard()
 		return nil, true, false
 	case KeyQuit:
-		if ui.Quit(g) {
+		if ui.Quit() {
 			return nil, false, true
 		}
 		return nil, true, false
 	case KeyConfigure:
-		err = ui.HandleSettingAction(g)
+		err = ui.HandleSettingAction()
 		again = true
 	case KeyDescription:
-		//ui.MenuSelectedAnimation(g, MenuView, false)
+		//ui.MenuSelectedAnimation(MenuView, false)
 		err = fmt.Errorf("You must choose a target to describe.")
 	case KeyExclude:
 		err = fmt.Errorf("You must choose a target for exclusion.")
@@ -979,10 +985,12 @@ func (ui *gameui) HandleKey(g *game, rka runeKeyAction) (err error, again bool, 
 	return err, again, quit
 }
 
-func (ui *gameui) GoToPos(g *game, ev event, pos position) (err error, again bool) {
+func (ui *gameui) GoToPos(ev event, pos position) (err error, again bool) {
+	// XXX this function is obsolete
 	if !pos.valid() {
 		return errors.New("Invalid location."), true
 	}
+	g := ui.g
 	switch pos.Distance(g.Player.Pos) {
 	case 0:
 		g.WaitTurn(ev)
@@ -1002,23 +1010,23 @@ func (ui *gameui) GoToPos(g *game, ev event, pos position) (err error, again boo
 	return err, again
 }
 
-func (ui *gameui) ExaminePos(g *game, ev event, pos position) (err error, again, quit bool) {
+func (ui *gameui) ExaminePos(ev event, pos position) (err error, again, quit bool) {
 	var start *position
 	if pos.valid() {
 		start = &pos
 	}
-	err, again, quit = ui.Examine(g, start)
+	err, again, quit = ui.Examine(start)
 	return err, again, quit
 }
 
-func (ui *gameui) Examine(g *game, start *position) (err error, again, quit bool) {
+func (ui *gameui) Examine(start *position) (err error, again, quit bool) {
 	ex := &examiner{}
-	err, again, quit = ui.CursorAction(g, ex, start)
+	err, again, quit = ui.CursorAction(ex, start)
 	return err, again, quit
 }
 
-func (ui *gameui) ChooseTarget(g *game, targ Targeter) error {
-	err, _, _ := ui.CursorAction(g, targ, nil)
+func (ui *gameui) ChooseTarget(targ Targeter) error {
+	err, _, _ := ui.CursorAction(targ, nil)
 	if err != nil {
 		return err
 	}
@@ -1028,7 +1036,8 @@ func (ui *gameui) ChooseTarget(g *game, targ Targeter) error {
 	return nil
 }
 
-func (ui *gameui) NextMonster(g *game, r rune, pos position, data *examineData) {
+func (ui *gameui) NextMonster(r rune, pos position, data *examineData) {
+	g := ui.g
 	nmonster := data.nmonster
 	for i := 0; i < len(g.Monsters); i++ {
 		if r == '+' {
@@ -1051,7 +1060,8 @@ func (ui *gameui) NextMonster(g *game, r rune, pos position, data *examineData) 
 	data.nmonster = nmonster
 }
 
-func (ui *gameui) NextStair(g *game, data *examineData) {
+func (ui *gameui) NextStair(data *examineData) {
+	g := ui.g
 	if data.sortedStairs == nil {
 		stairs := g.StairsSlice()
 		data.sortedStairs = g.SortedNearestTo(stairs, g.Player.Pos)
@@ -1065,7 +1075,8 @@ func (ui *gameui) NextStair(g *game, data *examineData) {
 	}
 }
 
-func (ui *gameui) NextObject(g *game, pos position, data *examineData) {
+func (ui *gameui) NextObject(pos position, data *examineData) {
+	g := ui.g
 	nobject := data.nobject
 	if len(data.objects) == 0 {
 		for p := range g.Collectables {
@@ -1100,7 +1111,8 @@ func (ui *gameui) NextObject(g *game, pos position, data *examineData) {
 	data.nobject = nobject
 }
 
-func (ui *gameui) ExcludeZone(g *game, pos position) {
+func (ui *gameui) ExcludeZone(pos position) {
+	g := ui.g
 	if !g.Dungeon.Cell(pos).Explored {
 		g.Print("You cannot choose an unexplored cell for exclusion.")
 	} else {
@@ -1109,7 +1121,8 @@ func (ui *gameui) ExcludeZone(g *game, pos position) {
 	}
 }
 
-func (ui *gameui) CursorMouseLeft(g *game, targ Targeter, pos position, data *examineData) (again, notarg bool) {
+func (ui *gameui) CursorMouseLeft(targ Targeter, pos position, data *examineData) (again, notarg bool) {
+	g := ui.g
 	again = true
 	if data.npos == pos {
 		err := targ.Action(g, pos)
@@ -1129,7 +1142,8 @@ func (ui *gameui) CursorMouseLeft(g *game, targ Targeter, pos position, data *ex
 	return again, notarg
 }
 
-func (ui *gameui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, data *examineData) (err error, again, quit, notarg bool) {
+func (ui *gameui) CursorKeyAction(targ Targeter, rka runeKeyAction, data *examineData) (err error, again, quit, notarg bool) {
+	g := ui.g
 	pos := data.npos
 	again = true
 	if rka.r != 0 {
@@ -1141,7 +1155,7 @@ func (ui *gameui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, dat
 		}
 	}
 	if rka.k == KeyMenu {
-		rka.k, err = ui.SelectAction(g, menuActions, g.Ev)
+		rka.k, err = ui.SelectAction(menuActions, g.Ev)
 		if err != nil {
 			err = ui.CleanError(err)
 			return err, again, quit, notarg
@@ -1159,11 +1173,11 @@ func (ui *gameui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, dat
 			data.npos = p
 		}
 	case KeyNextStairs:
-		ui.NextStair(g, data)
+		ui.NextStair(data)
 	case KeyDescend:
 		if strt, ok := g.Stairs[g.Player.Pos]; ok {
-			ui.MenuSelectedAnimation(g, MenuInteract, true)
-			err = ui.OptionalDescendConfirmation(g, strt)
+			ui.MenuSelectedAnimation(MenuInteract, true)
+			err = ui.OptionalDescendConfirmation(strt)
 			if err != nil {
 				break
 			}
@@ -1171,7 +1185,7 @@ func (ui *gameui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, dat
 			g.Targeting = InvalidPos
 			notarg = true
 			if g.Descend() {
-				ui.Win(g)
+				ui.Win()
 				quit = true
 				return err, again, quit, notarg
 			}
@@ -1179,16 +1193,16 @@ func (ui *gameui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, dat
 			err = errors.New("No stairs here.")
 		}
 	case KeyPreviousMonster, KeyNextMonster:
-		ui.NextMonster(g, rka.r, pos, data)
+		ui.NextMonster(rka.r, pos, data)
 	case KeyNextObject:
-		ui.NextObject(g, pos, data)
+		ui.NextObject(pos, data)
 	case KeyHelp, KeyMenuTargetingHelp:
 		ui.HideCursor()
-		ui.ExamineHelp(g)
+		ui.ExamineHelp()
 		ui.SetCursor(pos)
 	case KeyMenuCommandHelp:
 		ui.HideCursor()
-		ui.KeysHelp(g)
+		ui.KeysHelp()
 		ui.SetCursor(pos)
 	case KeyTarget:
 		err = targ.Action(g, pos)
@@ -1204,10 +1218,10 @@ func (ui *gameui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, dat
 		}
 	case KeyDescription:
 		ui.HideCursor()
-		ui.ViewPositionDescription(g, pos)
+		ui.ViewPositionDescription(pos)
 		ui.SetCursor(pos)
 	case KeyExclude:
-		ui.ExcludeZone(g, pos)
+		ui.ExcludeZone(pos)
 	case KeyEscape:
 		g.Targeting = InvalidPos
 		notarg = true
@@ -1216,13 +1230,13 @@ func (ui *gameui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, dat
 		if _, ok := targ.(*examiner); !ok {
 			break
 		}
-		err, again, quit = ui.HandleKey(g, rka)
+		err, again, quit = ui.HandleKey(rka)
 		if err != nil {
 			notarg = true
 		}
 		g.Targeting = InvalidPos
 	case KeyConfigure:
-		err = ui.HandleSettingAction(g)
+		err = ui.HandleSettingAction()
 	case KeySave:
 		g.Ev.Renew(g, 0)
 		g.Highlight = nil
@@ -1237,7 +1251,7 @@ func (ui *gameui) CursorKeyAction(g *game, targ Targeter, rka runeKeyAction, dat
 			quit = true
 		}
 	case KeyQuit:
-		if ui.Quit(g) {
+		if ui.Quit() {
 			quit = true
 			again = false
 		}
@@ -1258,7 +1272,8 @@ type examineData struct {
 
 var InvalidPos = position{-1, -1}
 
-func (ui *gameui) CursorAction(g *game, targ Targeter, start *position) (err error, again, quit bool) {
+func (ui *gameui) CursorAction(targ Targeter, start *position) (err error, again, quit bool) {
+	g := ui.g
 	pos := g.Player.Pos
 	if start != nil {
 		pos = *start
@@ -1279,9 +1294,9 @@ func (ui *gameui) CursorAction(g *game, targ Targeter, start *position) (err err
 		objects: []position{},
 	}
 	if _, ok := targ.(*examiner); ok && pos == g.Player.Pos && start == nil {
-		ui.NextObject(g, InvalidPos, data)
+		ui.NextObject(InvalidPos, data)
 		if !data.npos.valid() {
-			ui.NextStair(g, data)
+			ui.NextStair(data)
 		}
 		if data.npos.valid() {
 			pos = data.npos
@@ -1292,12 +1307,12 @@ loop:
 	for {
 		err = nil
 		if pos != opos {
-			ui.DescribePosition(g, pos, targ)
+			ui.DescribePosition(pos, targ)
 		}
 		opos = pos
 		targ.ComputeHighlight(g, pos)
 		ui.SetCursor(pos)
-		ui.DrawDungeonView(g, TargetingMode)
+		ui.DrawDungeonView(TargetingMode)
 		ui.DrawInfoLine(g.InfoEntry)
 		if !ui.Small() {
 			st := " Examine/Travel (? for help) "
@@ -1310,7 +1325,7 @@ loop:
 		ui.Flush()
 		data.npos = pos
 		var notarg bool
-		err, again, quit, notarg = ui.TargetModeEvent(g, targ, data)
+		err, again, quit, notarg = ui.TargetModeEvent(targ, data)
 		if err != nil {
 			err = ui.CleanError(err)
 		}
@@ -1405,7 +1420,8 @@ func init() {
 	}
 }
 
-func (ui *gameui) WhichButton(g *game, col int) (menu, bool) {
+func (ui *gameui) WhichButton(col int) (menu, bool) {
+	g := ui.g
 	if ui.Small() {
 		return MenuOther, false
 	}
@@ -1423,7 +1439,8 @@ func (ui *gameui) WhichButton(g *game, col int) (menu, bool) {
 	return MenuOther, false
 }
 
-func (ui *gameui) UpdateInteractButton(g *game) string {
+func (ui *gameui) UpdateInteractButton() string {
+	g := ui.g
 	var interactMenu string
 	var show bool
 	if _, ok := g.Equipables[g.Player.Pos]; ok {
@@ -1464,31 +1481,34 @@ var wizardActions = []wizardAction{
 	WizardToggleMap,
 }
 
-func (ui *gameui) HandleWizardAction(g *game) error {
-	s, err := ui.SelectWizardMagic(g, wizardActions)
+func (ui *gameui) HandleWizardAction() error {
+	g := ui.g
+	s, err := ui.SelectWizardMagic(wizardActions)
 	if err != nil {
 		return err
 	}
 	switch s {
 	case WizardInfoAction:
-		ui.WizardInfo(g)
+		ui.WizardInfo()
 	case WizardToggleMap:
 		g.WizardMap = !g.WizardMap
-		ui.DrawDungeonView(g, NoFlushMode)
+		ui.DrawDungeonView(NoFlushMode)
 	}
 	return nil
 }
 
-func (ui *gameui) Death(g *game) {
+func (ui *gameui) Death() {
+	g := ui.g
 	g.Print("You die... --press esc or space to continue--")
-	ui.DrawDungeonView(g, NormalMode)
-	ui.WaitForContinue(g, -1)
+	ui.DrawDungeonView(NormalMode)
+	ui.WaitForContinue(-1)
 	err := g.WriteDump()
-	ui.Dump(g, err)
-	ui.WaitForContinue(g, -1)
+	ui.Dump(err)
+	ui.WaitForContinue(-1)
 }
 
-func (ui *gameui) Win(g *game) {
+func (ui *gameui) Win() {
+	g := ui.g
 	err := g.RemoveSaveFile()
 	if err != nil {
 		g.PrintfStyled("Error removing save file: %v", logError, err)
@@ -1498,35 +1518,38 @@ func (ui *gameui) Win(g *game) {
 	} else {
 		g.Print("You escape by the magic stairs! You win. --press esc or space to continue--")
 	}
-	ui.DrawDungeonView(g, NormalMode)
-	ui.WaitForContinue(g, -1)
+	ui.DrawDungeonView(NormalMode)
+	ui.WaitForContinue(-1)
 	err = g.WriteDump()
-	ui.Dump(g, err)
-	ui.WaitForContinue(g, -1)
+	ui.Dump(err)
+	ui.WaitForContinue(-1)
 }
 
-func (ui *gameui) Dump(g *game, err error) {
+func (ui *gameui) Dump(err error) {
+	g := ui.g
 	ui.Clear()
 	ui.DrawText(g.SimplifedDump(err), 0, 0)
 	ui.Flush()
 }
 
-func (ui *gameui) CriticalHPWarning(g *game) {
+func (ui *gameui) CriticalHPWarning() {
+	g := ui.g
 	g.PrintStyled("*** CRITICAL HP WARNING *** --press esc or space to continue--", logCritic)
-	ui.DrawDungeonView(g, NormalMode)
-	ui.WaitForContinue(g, DungeonHeight)
+	ui.DrawDungeonView(NormalMode)
+	ui.WaitForContinue(DungeonHeight)
 	g.Print("Ok. Be careful, then.")
 }
 
-func (ui *gameui) Quit(g *game) bool {
+func (ui *gameui) Quit() bool {
+	g := ui.g
 	g.Print("Do you really want to quit without saving? [y/N]")
-	ui.DrawDungeonView(g, NormalMode)
-	quit := ui.PromptConfirmation(g)
+	ui.DrawDungeonView(NormalMode)
+	quit := ui.PromptConfirmation()
 	if quit {
 		err := g.RemoveSaveFile()
 		if err != nil {
 			g.PrintfStyled("Error removing save file: %v ——press any key to quit——", logError, err)
-			ui.DrawDungeonView(g, NormalMode)
+			ui.DrawDungeonView(NormalMode)
 			ui.PressAnyKey()
 		}
 	} else {
@@ -1535,22 +1558,24 @@ func (ui *gameui) Quit(g *game) bool {
 	return quit
 }
 
-func (ui *gameui) Wizard(g *game) bool {
+func (ui *gameui) Wizard() bool {
+	g := ui.g
 	g.Print("Do you really want to enter wizard mode (no return)? [y/N]")
-	ui.DrawDungeonView(g, NormalMode)
-	return ui.PromptConfirmation(g)
+	ui.DrawDungeonView(NormalMode)
+	return ui.PromptConfirmation()
 }
 
-func (ui *gameui) HandlePlayerTurn(g *game, ev event) bool {
+func (ui *gameui) HandlePlayerTurn(ev event) bool {
+	g := ui.g
 getKey:
 	for {
 		var err error
 		var again, quit bool
 		if g.Targeting.valid() {
-			err, again, quit = ui.ExaminePos(g, ev, g.Targeting)
+			err, again, quit = ui.ExaminePos(ev, g.Targeting)
 		} else {
-			ui.DrawDungeonView(g, NormalMode)
-			err, again, quit = ui.PlayerTurnEvent(g, ev)
+			ui.DrawDungeonView(NormalMode)
+			err, again, quit = ui.PlayerTurnEvent(ev)
 		}
 		if err != nil && err.Error() != "" {
 			g.Print(err.Error())
@@ -1562,7 +1587,7 @@ getKey:
 	}
 }
 
-func (ui *gameui) ExploreStep(g *game) bool {
+func (ui *gameui) ExploreStep() bool {
 	next := make(chan bool)
 	var stop bool
 	go func() {
@@ -1575,7 +1600,7 @@ func (ui *gameui) ExploreStep(g *game) bool {
 		next <- !interrupted
 	}()
 	stop = <-next
-	ui.DrawDungeonView(g, NormalMode)
+	ui.DrawDungeonView(NormalMode)
 	return stop
 }
 

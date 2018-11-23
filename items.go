@@ -187,7 +187,7 @@ func (p potion) Use(g *game, ev event) error {
 	ev.Renew(g, 5)
 	g.UseConsumable(p)
 	g.Stats.Drinks++
-	g.ui.DrinkingPotionAnimation(g)
+	g.ui.DrinkingPotionAnimation()
 	return nil
 }
 
@@ -326,7 +326,7 @@ func (g *game) QuaffMagicMapping(ev event) error {
 		dists = append(dists, dist)
 	}
 	sort.Ints(dists)
-	g.ui.DrawDungeonView(g, NormalMode)
+	g.ui.DrawDungeonView(NormalMode)
 	for _, d := range dists {
 		draw := false
 		for _, i := range cdists[d] {
@@ -338,7 +338,7 @@ func (g *game) QuaffMagicMapping(ev event) error {
 			}
 		}
 		if draw {
-			g.ui.MagicMappingAnimation(g, cdists[d])
+			g.ui.MagicMappingAnimation(cdists[d])
 		}
 	}
 	g.Printf("You quaff the %s. You feel aware of your surroundings..", MagicMappingPotion)
@@ -350,9 +350,9 @@ func (g *game) QuaffTormentPotion(ev event) error {
 	damage := g.Player.HP / 2
 	g.Player.HP = g.Player.HP - damage
 	g.Stats.Damage += damage
-	g.ui.WoundedAnimation(g)
+	g.ui.WoundedAnimation()
 	g.MakeNoise(ExplosionNoise+10, g.Player.Pos)
-	g.ui.TormentExplosionAnimation(g)
+	g.ui.TormentExplosionAnimation()
 	for pos, b := range g.Player.LOS {
 		if !b {
 			continue
@@ -399,7 +399,7 @@ func (g *game) QuaffCBlinkPotion(ev event) error {
 	if g.Player.HasStatus(StatusLignification) {
 		return errors.New("You cannot blink while lignified.")
 	}
-	if err := g.ui.ChooseTarget(g, &chooser{free: true}); err != nil {
+	if err := g.ui.ChooseTarget(&chooser{free: true}); err != nil {
 		return err
 	}
 	g.Printf("You quaff the %s. You blink.", CBlinkPotion)
@@ -512,7 +512,7 @@ func (p projectile) Use(g *game, ev event) error {
 }
 
 func (g *game) ThrowConfusingDart(ev event) error {
-	if err := g.ui.ChooseTarget(g, &chooser{needsFreeWay: true}); err != nil {
+	if err := g.ui.ChooseTarget(&chooser{needsFreeWay: true}); err != nil {
 		return err
 	}
 	mons := g.MonsterAt(g.Player.Target)
@@ -528,11 +528,11 @@ func (g *game) ThrowConfusingDart(ev event) error {
 	if mons.HP > 0 {
 		mons.EnterConfusion(g, ev)
 		g.PrintfStyled("Your %s hits the %s (%d dmg), who appears confused.", logPlayerHit, ConfusingDart, mons.Kind, attack)
-		g.ui.ThrowAnimation(g, g.Ray(mons.Pos), true)
+		g.ui.ThrowAnimation(g.Ray(mons.Pos), true)
 		mons.MakeHuntIfHurt(g)
 	} else {
 		g.PrintfStyled("Your %s kills the %s.", logPlayerHit, ConfusingDart, mons.Kind)
-		g.ui.ThrowAnimation(g, g.Ray(mons.Pos), true)
+		g.ui.ThrowAnimation(g.Ray(mons.Pos), true)
 		g.HandleKill(mons, ev)
 	}
 	g.HandleStone(mons)
@@ -557,7 +557,7 @@ func (g *game) ExplosionAt(ev event, pos position) {
 		if !g.Player.LOS[pos] {
 			g.WrongWall[pos] = true
 		} else {
-			g.ui.WallExplosionAnimation(g, pos)
+			g.ui.WallExplosionAnimation(pos)
 		}
 		g.MakeNoise(WallNoise, pos)
 		g.Fog(pos, 1, ev)
@@ -565,14 +565,14 @@ func (g *game) ExplosionAt(ev event, pos position) {
 }
 
 func (g *game) ThrowExplosiveMagara(ev event) error {
-	if err := g.ui.ChooseTarget(g, &chooser{area: true, minDist: true, flammable: true, wall: true}); err != nil {
+	if err := g.ui.ChooseTarget(&chooser{area: true, minDist: true, flammable: true, wall: true}); err != nil {
 		return err
 	}
 	neighbors := g.Player.Target.ValidNeighbors()
 	g.Printf("You throw the explosive magara... %s", g.ExplosionSound())
 	g.MakeNoise(ExplosionNoise, g.Player.Target)
-	g.ui.ProjectileTrajectoryAnimation(g, g.Ray(g.Player.Target), ColorFgPlayer)
-	g.ui.ExplosionAnimation(g, FireExplosion, g.Player.Target)
+	g.ui.ProjectileTrajectoryAnimation(g.Ray(g.Player.Target), ColorFgPlayer)
+	g.ui.ExplosionAnimation(FireExplosion, g.Player.Target)
 	for _, pos := range append(neighbors, g.Player.Target) {
 		g.ExplosionAt(ev, pos)
 	}
@@ -582,12 +582,12 @@ func (g *game) ThrowExplosiveMagara(ev event) error {
 }
 
 func (g *game) ThrowTeleportMagara(ev event) error {
-	if err := g.ui.ChooseTarget(g, &chooser{area: true, minDist: true}); err != nil {
+	if err := g.ui.ChooseTarget(&chooser{area: true, minDist: true}); err != nil {
 		return err
 	}
 	neighbors := g.Player.Target.ValidNeighbors()
 	g.Print("You throw the teleport magara.")
-	g.ui.ProjectileTrajectoryAnimation(g, g.Ray(g.Player.Target), ColorFgPlayer)
+	g.ui.ProjectileTrajectoryAnimation(g.Ray(g.Player.Target), ColorFgPlayer)
 	for _, pos := range append(neighbors, g.Player.Target) {
 		mons := g.MonsterAt(pos)
 		if mons.Exists() {
@@ -600,13 +600,13 @@ func (g *game) ThrowTeleportMagara(ev event) error {
 }
 
 func (g *game) ThrowSlowingMagara(ev event) error {
-	if err := g.ui.ChooseTarget(g, &chooser{}); err != nil {
+	if err := g.ui.ChooseTarget(&chooser{}); err != nil {
 		return err
 	}
 	ray := g.Ray(g.Player.Target)
 	g.MakeNoise(MagicCastNoise, g.Player.Pos)
 	g.Print("Whoosh! A bolt of slowing emerges out of the magara.")
-	g.ui.SlowingMagaraAnimation(g, ray)
+	g.ui.SlowingMagaraAnimation(ray)
 	for _, pos := range ray {
 		mons := g.MonsterAt(pos)
 		if !mons.Exists() {
@@ -651,11 +651,11 @@ func (g *game) NightFog(at position, radius int, ev event) {
 }
 
 func (g *game) ThrowNightMagara(ev event) error {
-	if err := g.ui.ChooseTarget(g, &chooser{needsFreeWay: true}); err != nil {
+	if err := g.ui.ChooseTarget(&chooser{needsFreeWay: true}); err != nil {
 		return err
 	}
 	g.Print("You throw the night magara… Clouds come out of it.")
-	g.ui.ProjectileTrajectoryAnimation(g, g.Ray(g.Player.Target), ColorFgSleepingMonster)
+	g.ui.ProjectileTrajectoryAnimation(g.Ray(g.Player.Target), ColorFgSleepingMonster)
 	g.NightFog(g.Player.Target, 2, ev)
 
 	ev.Renew(g, 7)

@@ -37,10 +37,10 @@ func (m *monster) InflictDamage(g *game, damage, max int) {
 	g.Stats.Damage += damage
 	oldHP := g.Player.HP
 	g.Player.HP -= damage
-	g.ui.WoundedAnimation(g)
+	g.ui.WoundedAnimation()
 	if oldHP > max && g.Player.HP <= max {
 		g.StoryPrintf("Critical HP: %d (hit by %s)", g.Player.HP, m.Kind.Indefinite(false))
-		g.ui.CriticalHPWarning(g)
+		g.ui.CriticalHPWarning()
 	}
 	if g.Player.HP <= 0 {
 		return
@@ -253,7 +253,7 @@ func (g *game) AttractMonster(pos position) *monster {
 		mons := g.MonsterAt(cpos)
 		if mons.Exists() {
 			mons.MoveTo(g, pos)
-			g.ui.TeleportAnimation(g, cpos, pos, false)
+			g.ui.TeleportAnimation(cpos, pos, false)
 			return mons
 		}
 	}
@@ -441,7 +441,7 @@ func (g *game) HitMonster(dt dmgType, dmg int, mons *monster, ev event) (hit boo
 				g.Player.HP += healing
 			}
 		}
-		g.ui.HitAnimation(g, mons.Pos, false)
+		g.ui.HitAnimation(mons.Pos, false)
 		if mons.HP > 0 {
 			g.PrintfStyled("You hit %s (%d dmg).%s", logPlayerHit, mons.Kind.Definite(false), attack, sclang)
 		} else if oldHP > 0 {

@@ -324,7 +324,7 @@ func (g *game) Teleportation(ev event) {
 		// should always happen
 		opos := g.Player.Pos
 		g.Print("You teleport away.")
-		g.ui.TeleportAnimation(g, opos, pos, true)
+		g.ui.TeleportAnimation(opos, pos, true)
 		g.PlacePlayerAt(pos)
 	} else {
 		// should not happen

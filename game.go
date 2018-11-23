@@ -76,29 +76,29 @@ type startOpts struct {
 }
 
 type UI interface {
-	ExploreStep(*game) bool
-	HandlePlayerTurn(*game, event) bool
-	Death(*game)
-	ChooseTarget(*game, Targeter) error
-	CriticalHPWarning(*game)
-	ExplosionAnimation(*game, explosionStyle, position)
-	TormentExplosionAnimation(*game)
-	FireBoltAnimation(*game, []position)
-	SlowingMagaraAnimation(*game, []position)
-	ThrowAnimation(*game, []position, bool)
-	MonsterJavelinAnimation(*game, []position, bool)
-	MonsterProjectileAnimation(*game, []position, rune, uicolor)
-	DrinkingPotionAnimation(*game)
-	SwappingAnimation(*game, position, position)
-	TeleportAnimation(*game, position, position, bool)
-	MagicMappingAnimation(*game, []int)
-	HitAnimation(*game, position, bool)
-	LightningHitAnimation(*game, []position)
-	WoundedAnimation(*game)
-	WallExplosionAnimation(*game, position)
-	ProjectileTrajectoryAnimation(*game, []position, uicolor)
-	StatusEndAnimation(*game)
-	DrawDungeonView(*game, uiMode)
+	ExploreStep() bool
+	HandlePlayerTurn(event) bool
+	Death()
+	ChooseTarget(Targeter) error
+	CriticalHPWarning()
+	ExplosionAnimation(explosionStyle, position)
+	TormentExplosionAnimation()
+	FireBoltAnimation([]position)
+	SlowingMagaraAnimation([]position)
+	ThrowAnimation([]position, bool)
+	MonsterJavelinAnimation([]position, bool)
+	MonsterProjectileAnimation([]position, rune, uicolor)
+	DrinkingPotionAnimation()
+	SwappingAnimation(position, position)
+	TeleportAnimation(position, position, bool)
+	MagicMappingAnimation([]int)
+	HitAnimation(position, bool)
+	LightningHitAnimation([]position)
+	WoundedAnimation()
+	WallExplosionAnimation(position)
+	ProjectileTrajectoryAnimation([]position, uicolor)
+	StatusEndAnimation()
+	DrawDungeonView(uiMode)
 }
 
 func (g *game) FreeCell() position {
@@ -881,7 +881,7 @@ func (g *game) AutoPlayer(ev event) bool {
 		}
 		g.Resting = false
 	} else if g.Autoexploring {
-		if g.ui.ExploreStep(g) {
+		if g.ui.ExploreStep() {
 			g.AutoHalt = true
 			g.Print("Stopping, then.")
 		}
@@ -919,13 +919,13 @@ func (g *game) AutoPlayer(ev event) bool {
 		}
 		g.Autoexploring = false
 	} else if g.AutoTarget.valid() {
-		if !g.ui.ExploreStep(g) && g.MoveToTarget(ev) {
+		if !g.ui.ExploreStep() && g.MoveToTarget(ev) {
 			return true
 		} else {
 			g.AutoTarget = InvalidPos
 		}
 	} else if g.AutoDir != NoDir {
-		if !g.ui.ExploreStep(g) && g.AutoToDir(ev) {
+		if !g.ui.ExploreStep() && g.AutoToDir(ev) {
 			return true
 		} else {
 			g.AutoDir = NoDir
@@ -946,7 +946,7 @@ loop:
 				if err != nil {
 					g.PrintfStyled("Error removing save file: %v", logError, err.Error())
 				}
-				g.ui.Death(g)
+				g.ui.Death()
 				break loop
 			}
 		}
