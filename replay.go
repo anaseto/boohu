@@ -134,16 +134,31 @@ func (rep *replay) PollKeyboardEvents() {
 		e := rep.ui.PollEvent()
 		if e.interrupt {
 			rep.evch <- ReplayNext
-		} else if e.key == "Q" {
+			continue
+		}
+		switch e.key {
+		case "Q":
 			rep.evch <- ReplayQuit
-		} else if e.key == "p" {
+		case "p", " ":
 			rep.evch <- ReplayTogglePause
-		} else if e.key == "+" {
+		case "+", ">":
 			rep.evch <- ReplaySpeedMore
-		} else if e.key == "-" {
+		case "-", "<":
 			rep.evch <- ReplaySpeedLess
-		} else if e.key != "" || (e.mouse && e.button != -1) {
+		case ".", "6", "j", "n":
 			rep.evch <- ReplayNext
+		case "4", "k", "N":
+			rep.evch <- ReplayPrevious
+		default:
+			if !e.mouse {
+				break
+			}
+			switch e.button {
+			case 0:
+				rep.evch <- ReplayNext
+			case 2:
+				rep.evch <- ReplayPrevious
+			}
 		}
 	}
 }
