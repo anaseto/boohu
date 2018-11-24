@@ -11,7 +11,7 @@
 .\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 .\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 .\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-.Dd Jul 25, 2018
+.Dd Nov 24, 2018
 .Dt BOOHU 6
 .Os
 .Sh NAME
@@ -22,6 +22,7 @@
 .Op Fl c
 .Op Fl n
 .Op Fl o
+.Op Fl r
 .Op Fl s
 .Op Fl v
 .Op Fl x
@@ -47,6 +48,13 @@ Use a centered camera.
 No animations.
 .It Fl o
 Use 8-color palette.
+.It Fl r Ar file
+Watch replay file
+.Ar file
+instead of launching a normal game.
+If
+.Ar file
+is the empty string, the last game replay is used.
 .It Fl s
 Use the 16-color solarized palette.
 .It Fl v
@@ -62,4 +70,6 @@ Last saved game.
 Last game character and statistics.
 .It Pa "$XDG_DATA_HOME/boohu/config.gob"
 Key bindings configuration.
+.It Pa "$XDG_DATA_HOME/boohu/replay"
+Last game replay file.
 .El
