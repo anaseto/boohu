@@ -65,7 +65,7 @@ type game struct {
 	WizardMap           bool
 	Version             string
 	Opts                startOpts
-	ui                  UI
+	ui                  *gameui
 }
 
 type startOpts struct {
@@ -73,32 +73,6 @@ type startOpts struct {
 	StoneLevel    int
 	SpecialBands  map[int][]monsterBandData
 	UnstableLevel int
-}
-
-type UI interface {
-	ExploreStep() bool
-	HandlePlayerTurn(event) bool
-	Death()
-	ChooseTarget(Targeter) error
-	CriticalHPWarning()
-	ExplosionAnimation(explosionStyle, position)
-	TormentExplosionAnimation()
-	FireBoltAnimation([]position)
-	SlowingMagaraAnimation([]position)
-	ThrowAnimation([]position, bool)
-	MonsterJavelinAnimation([]position, bool)
-	MonsterProjectileAnimation([]position, rune, uicolor)
-	DrinkingPotionAnimation()
-	SwappingAnimation(position, position)
-	TeleportAnimation(position, position, bool)
-	MagicMappingAnimation([]int)
-	HitAnimation(position, bool)
-	LightningHitAnimation([]position)
-	WoundedAnimation()
-	WallExplosionAnimation(position)
-	ProjectileTrajectoryAnimation([]position, uicolor)
-	StatusEndAnimation()
-	DrawDungeonView(uiMode)
 }
 
 func (g *game) FreeCell() position {
