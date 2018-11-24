@@ -55,7 +55,6 @@ func main() {
 	defer tui.Close()
 
 	ApplyDefaultKeyBindings()
-	tui.PostInit()
 	LinkColors()
 
 	go func() {
@@ -101,6 +100,19 @@ func (ui *gameui) Init() error {
 	ui.bStdout = bufio.NewWriter(os.Stdout)
 	ui.Clear()
 	fmt.Fprint(ui.bStdout, "\x1b[2J")
+	ui.HideCursor()
+	fmt.Fprintf(ui.bStdout, "\x1b[?25l")
+	cmd := exec.Command("stty", "-g")
+	cmd.Stdin = os.Stdin
+	save, err := cmd.Output()
+	if err != nil {
+		save = []byte("sane")
+	}
+	ui.stty = string(save)
+	cmd = exec.Command("stty", "raw", "-echo")
+	cmd.Stdin = os.Stdin
+	cmd.Run()
+	ui.menuHover = -1
 	return nil
 }
 
@@ -116,22 +128,6 @@ func (ui *gameui) Close() {
 		cmd.Stdin = os.Stdin
 		cmd.Run()
 	}
-}
-
-func (ui *gameui) PostInit() {
-	ui.HideCursor()
-	fmt.Fprintf(ui.bStdout, "\x1b[?25l")
-	cmd := exec.Command("stty", "-g")
-	cmd.Stdin = os.Stdin
-	save, err := cmd.Output()
-	if err != nil {
-		save = []byte("sane")
-	}
-	ui.stty = string(save)
-	cmd = exec.Command("stty", "raw", "-echo")
-	cmd.Stdin = os.Stdin
-	cmd.Run()
-	ui.menuHover = -1
 }
 
 func (ui *gameui) MoveTo(x, y int) {

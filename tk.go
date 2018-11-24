@@ -71,6 +71,11 @@ bind $can <ButtonPress> {
 	})
 	ui.menuHover = -1
 	ui.InitElements()
+
+	SolarizedPalette()
+	ui.HideCursor()
+	settingsActions = append(settingsActions, toggleTiles)
+	gameConfig.Tiles = true
 	return nil
 }
 
@@ -90,13 +95,6 @@ func init() {
 }
 
 func (ui *gameui) Close() {
-}
-
-func (ui *gameui) PostInit() {
-	SolarizedPalette()
-	ui.HideCursor()
-	settingsActions = append(settingsActions, toggleTiles)
-	gameConfig.Tiles = true
 }
 
 func (ui *gameui) Flush() {

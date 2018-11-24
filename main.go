@@ -58,7 +58,6 @@ func main() {
 	defer tui.Close()
 
 	ApplyDefaultKeyBindings()
-	tui.PostInit()
 	LinkColors()
 
 	load, err := g.LoadConfig()

@@ -24,14 +24,10 @@ func (ui *gameui) Init() error {
 	if err != nil {
 		return err
 	}
-	return ui.Screen.Init()
-}
-
-func (ui *gameui) Close() {
-	ui.Screen.Fini()
-}
-
-func (ui *gameui) PostInit() {
+	err = ui.Screen.Init()
+	if err != nil {
+		return err
+	}
 	ui.Screen.SetStyle(tcell.StyleDefault)
 	if runtime.GOOS != "openbsd" {
 		ui.Screen.EnableMouse()
@@ -39,6 +35,11 @@ func (ui *gameui) PostInit() {
 	ui.Screen.HideCursor()
 	ui.HideCursor()
 	ui.menuHover = -1
+	return nil
+}
+
+func (ui *gameui) Close() {
+	ui.Screen.Fini()
 }
 
 var SmallScreen = false

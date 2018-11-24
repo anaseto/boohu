@@ -9,6 +9,27 @@ import (
 	"path/filepath"
 )
 
+func Replay(file string) error {
+	tui := &gameui{}
+	g := &game{}
+	tui.g = g
+	g.ui = tui
+	err := g.LoadReplay(file)
+	if err != nil {
+		return fmt.Errorf("loading replay: %v", err)
+	}
+	err = tui.Init()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "boohu: %v\n", err)
+		os.Exit(1)
+	}
+	defer tui.Close()
+	tui.DrawBufferInit()
+	tui.Replay()
+	tui.Close()
+	return nil
+}
+
 func (g *game) DataDir() (string, error) {
 	var xdg string
 	if os.Getenv("GOOS") == "windows" {

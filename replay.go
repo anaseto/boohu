@@ -1,32 +1,8 @@
 package main
 
 import (
-	"fmt"
-	"os"
 	"time"
 )
-
-func Replay(file string) error {
-	tui := &gameui{}
-	g := &game{}
-	tui.g = g
-	g.ui = tui
-	err := g.LoadReplay(file)
-	if err != nil {
-		return fmt.Errorf("loading replay: %v", err)
-	}
-	err = tui.Init()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "boohu: %v\n", err)
-		os.Exit(1)
-	}
-	defer tui.Close()
-	tui.PostInit()
-	tui.DrawBufferInit()
-	tui.Replay()
-	tui.Close()
-	return nil
-}
 
 func (ui *gameui) Replay() {
 	g := ui.g

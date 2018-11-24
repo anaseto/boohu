@@ -16,20 +16,21 @@ type gameui struct {
 }
 
 func (ui *gameui) Init() error {
-	return termbox.Init()
-}
-
-func (ui *gameui) Close() {
-	termbox.Close()
-}
-
-func (ui *gameui) PostInit() {
+	err := termbox.Init()
+	if err != nil {
+		return err
+	}
 	FixColor()
 	termbox.SetOutputMode(termbox.Output256)
 	termbox.SetInputMode(termbox.InputEsc | termbox.InputMouse)
 	termbox.HideCursor()
 	ui.HideCursor()
 	ui.menuHover = -1
+	return nil
+}
+
+func (ui *gameui) Close() {
+	termbox.Close()
 }
 
 var SmallScreen = false

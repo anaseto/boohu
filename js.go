@@ -23,7 +23,6 @@ func main() {
 	defer tui.Close()
 	ApplyDefaultKeyBindings()
 	gameConfig.Tiles = true
-	tui.PostInit()
 	LinkColors()
 	gameConfig.DarkLOS = true
 	ApplyDarkLOS()
@@ -277,6 +276,9 @@ func (ui *gameui) Init() error {
 		}))
 	ui.menuHover = -1
 	ui.InitElements()
+	SolarizedPalette()
+	ui.HideCursor()
+	settingsActions = append(settingsActions, toggleTiles)
 	return nil
 }
 
@@ -290,12 +292,6 @@ func init() {
 
 func (ui *gameui) Close() {
 	// TODO
-}
-
-func (ui *gameui) PostInit() {
-	SolarizedPalette()
-	ui.HideCursor()
-	settingsActions = append(settingsActions, toggleTiles)
 }
 
 func (ui *gameui) Flush() {
