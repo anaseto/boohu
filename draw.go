@@ -254,7 +254,7 @@ func (ui *gameui) DrawLogFrame() {
 	}
 }
 
-func (ui *gameui) DrawWelcome() {
+func (ui *gameui) DrawWelcomeCommon() int {
 	ui.DrawBufferInit()
 	ui.Clear()
 	col := 10
@@ -324,12 +324,18 @@ func (ui *gameui) DrawWelcome() {
 	ui.DrawDark("────│/\\/\\/\\/\\/\\/\\/\\│────", col, line, ColorText, false)
 	line++
 	line++
-	if runtime.GOOS == "js" {
-		ui.DrawDark("───Click on the image to play───", col-3, line, ColorFg, false)
+	if runtime.GOARCH == "wasm" {
+		ui.DrawDark("- (N)ew game", col-3, line, ColorFg, false)
+		ui.DrawDark("- (W)atch replay", col-3, line+1, ColorFg, false)
 	} else {
 		ui.DrawDark("───Press any key to continue───", col-3, line, ColorFg, false)
 	}
 	ui.Flush()
+	return line
+}
+
+func (ui *gameui) DrawWelcome() {
+	ui.DrawWelcomeCommon()
 	ui.PressAnyKey()
 }
 

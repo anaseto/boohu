@@ -5,6 +5,7 @@ package main
 import (
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"log"
 	"runtime"
 	"unicode/utf8"
@@ -13,37 +14,44 @@ import (
 )
 
 func main() {
-	tui := &gameui{}
-	g := &game{}
-	tui.g = g
-	err := tui.Init()
+	ui := &gameui{}
+	err := ui.Init()
 	if err != nil {
 		log.Fatalf("boohu: %v\n", err)
 	}
-	defer tui.Close()
+	defer ui.Close()
 	ApplyDefaultKeyBindings()
 	gameConfig.Tiles = true
 	LinkColors()
 	gameConfig.DarkLOS = true
 	ApplyDarkLOS()
 	for {
-		newGame(tui)
+		newGame(ui)
 	}
 }
 
-func newGame(tui *gameui) {
-	g := tui.g
+func newGame(ui *gameui) {
+	g := &game{}
+	ui.g = g
 	load, err := g.LoadConfig()
 	if load && err != nil {
-		g.Print("Error loading config file.")
+		log.Println("Error loading config file.")
 	} else if load {
 		CustomKeys = true
 		if gameConfig.Small {
 			gameConfig.Small = false
-			tui.ApplyToggleLayout()
+			ui.ApplyToggleLayout()
 		}
 	}
-	tui.DrawWelcome()
+	//if runtime.GOARCH != "wasm" {
+	if true { // TODO
+		ui.DrawWelcome()
+	} else {
+		again := ui.HandleStartMenu()
+		if again {
+			return
+		}
+	}
 	load, err = g.Load()
 	if !load {
 		g.InitLevel()
@@ -51,13 +59,36 @@ func newGame(tui *gameui) {
 		g.InitLevel()
 		g.Printf("Error loading saved game… starting new game. (%v)", err)
 	}
-	g.ui = tui
+	g.ui = ui
 	g.EventLoop()
-	tui.Clear()
-	tui.DrawColoredText("Do you want to collect some more simellas today?\n\n───Click or press any key to play again───", 7, 5, ColorFg)
-	tui.DrawText(SaveError, 0, 10)
-	tui.Flush()
-	tui.PressAnyKey()
+	ui.Clear()
+	ui.DrawColoredText("Do you want to collect some more simellas today?\n\n───Click or press any key to play again───", 7, 5, ColorFg)
+	ui.DrawText(SaveError, 0, 10)
+	ui.Flush()
+	ui.PressAnyKey()
+}
+
+func (ui *gameui) HandleStartMenu() (again bool) {
+	l := ui.DrawWelcomeCommon()
+	g := ui.g
+	for {
+		a := ui.StartMenu(l)
+		switch a {
+		case StartWatchReplay:
+			err := g.LoadReplay()
+			if err != nil {
+				log.Printf("Load replay: %v", err)
+				return true
+			}
+			g.DrawBuffer = nil
+			g.drawBackBuffer = nil
+			ui.DrawBufferInit()
+			ui.Replay()
+			return true
+		default:
+			return false
+		}
+	}
 }
 
 var SaveError string
@@ -165,6 +196,25 @@ func (g *game) SaveConfig() error {
 	return nil
 }
 
+func (g *game) SaveReplay() error {
+	if runtime.GOARCH != "wasm" {
+		return nil
+	}
+	storage := js.Global().Get("localStorage")
+	if storage.Type() != js.TypeObject {
+		SaveError = "localStorage not found"
+		return errors.New("localStorage not found")
+	}
+	data, err := g.EncodeDrawLog()
+	if err != nil {
+		return err
+	}
+	s := base64.StdEncoding.EncodeToString(data)
+	storage.Call("setItem", "boohureplay", s)
+	SaveError = ""
+	return nil
+}
+
 func (g *game) RemoveSaveFile() error {
 	storage := js.Global().Get("localStorage")
 	storage.Call("removeItem", "boohusave")
@@ -228,18 +278,35 @@ func (g *game) LoadConfig() (bool, error) {
 	return true, nil
 }
 
-func (g *game) WriteDump() error {
-	pre := js.Global().Get("document").Call("getElementById", "dump")
-	pre.Set("innerHTML", g.Dump())
+func (g *game) LoadReplay() error {
+	storage := js.Global().Get("localStorage")
+	if storage.Type() != js.TypeObject {
+		return errors.New("localStorage not found")
+	}
+	save := storage.Call("getItem", "boohureplay")
+	if save.Type() != js.TypeString || runtime.GOARCH != "wasm" {
+		return errors.New("invalid storage")
+	}
+	data, err := base64.StdEncoding.DecodeString(save.String())
+	if err != nil {
+		return err
+	}
+	dl, err := g.DecodeDrawLog(data)
+	if err != nil {
+		return err
+	}
+	g.DrawLog = dl
 	return nil
 }
 
-func (g *game) SaveReplay() error {
-	// TODO
-}
-
-func (g *game) LoadReplay() error {
-	// TODO
+func (g *game) WriteDump() error {
+	pre := js.Global().Get("document").Call("getElementById", "dump")
+	pre.Set("innerHTML", g.Dump())
+	err := g.SaveReplay()
+	if err != nil {
+		return fmt.Errorf("writing replay: %v", err)
+	}
+	return nil
 }
 
 // End of io compatibility functions
