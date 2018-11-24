@@ -169,18 +169,21 @@ func (g *game) SaveReplay() error {
 	return nil
 }
 
-func (g *game) LoadReplay() error {
+func (g *game) LoadReplay(file string) error {
 	dataDir, err := g.DataDir()
 	if err != nil {
 		return err
 	}
-	saveFile := filepath.Join(dataDir, "replay")
-	_, err = os.Stat(saveFile)
+	replayFile := filepath.Join(dataDir, "replay")
+	if file != "" {
+		replayFile = file
+	}
+	_, err = os.Stat(replayFile)
 	if err != nil {
 		// no save file, new game
 		return err
 	}
-	data, err := ioutil.ReadFile(saveFile)
+	data, err := ioutil.ReadFile(replayFile)
 	if err != nil {
 		return err
 	}

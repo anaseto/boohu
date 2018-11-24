@@ -11,7 +11,7 @@ func Replay(file string) error {
 	g := &game{}
 	tui.g = g
 	g.ui = tui
-	err := g.LoadReplay()
+	err := g.LoadReplay(file)
 	if err != nil {
 		return fmt.Errorf("loading replay: %v", err)
 	}
