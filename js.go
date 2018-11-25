@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"runtime"
+	"time"
 	"unicode/utf8"
 
 	"github.com/gopherjs/gopherwasm/js"
@@ -77,6 +78,9 @@ func (ui *gameui) HandleStartMenu() (again bool) {
 		case StartWatchReplay:
 			err := g.LoadReplay()
 			if err != nil {
+				ui.ColorLine(l+1, ColorRed)
+				ui.Flush()
+				time.Sleep(25 * time.Millisecond)
 				log.Printf("Load replay: %v", err)
 				return true
 			}

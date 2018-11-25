@@ -92,8 +92,14 @@ func (ui *gameui) StartMenu(l int) startAction {
 		in := ui.PollEvent()
 		switch in.key {
 		case "P":
+			ui.ColorLine(l, ColorRed)
+			ui.Flush()
+			time.Sleep(10 * time.Millisecond)
 			return StartPlay
 		case "W":
+			ui.ColorLine(l+1, ColorRed)
+			ui.Flush()
+			time.Sleep(10 * time.Millisecond)
 			return StartWatchReplay
 		}
 		if in.key != "" && !in.mouse {
