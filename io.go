@@ -196,7 +196,7 @@ func (g *game) LoadReplay(file string) error {
 		return err
 	}
 	replayFile := filepath.Join(dataDir, "replay")
-	if file != "" {
+	if file != "_" {
 		replayFile = file
 	}
 	_, err = os.Stat(replayFile)
