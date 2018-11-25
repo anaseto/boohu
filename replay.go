@@ -87,10 +87,10 @@ func (rep *replay) DrawFrame() {
 	rep.undo = append(rep.undo, []cellDraw{})
 	j := len(rep.undo) - 1
 	for _, dr := range df.Draws {
-		x, y := ui.GetPos(dr.I)
-		c := ui.g.DrawBuffer[dr.I]
-		rep.undo[j] = append(rep.undo[j], cellDraw{Cell: c, I: dr.I})
-		ui.SetGenCell(x, y, dr.Cell.R, dr.Cell.Fg, dr.Cell.Bg, dr.Cell.InMap)
+		i := ui.GetIndex(dr.X, dr.Y)
+		c := ui.g.DrawBuffer[i]
+		rep.undo[j] = append(rep.undo[j], cellDraw{Cell: c, X: dr.X, Y: dr.Y})
+		ui.SetGenCell(dr.X, dr.Y, dr.Cell.R, dr.Cell.Fg, dr.Cell.Bg, dr.Cell.InMap)
 	}
 	ui.Flush()
 	ui.g.DrawLog = nil
@@ -100,8 +100,7 @@ func (rep *replay) UndoFrame() {
 	ui := rep.ui
 	df := rep.undo[len(rep.undo)-1]
 	for _, dr := range df {
-		x, y := ui.GetPos(dr.I)
-		ui.SetGenCell(x, y, dr.Cell.R, dr.Cell.Fg, dr.Cell.Bg, dr.Cell.InMap)
+		ui.SetGenCell(dr.X, dr.Y, dr.Cell.R, dr.Cell.Fg, dr.Cell.Bg, dr.Cell.InMap)
 	}
 	rep.undo = rep.undo[:len(rep.undo)-1]
 	ui.Flush()
@@ -109,8 +108,13 @@ func (rep *replay) UndoFrame() {
 }
 
 func (rep *replay) PollEvent() (in repEvent) {
-	if rep.auto && rep.frame < len(rep.frames)-1 && rep.frame >= 0 {
-		d := rep.frames[rep.frame+1].Time.Sub(rep.frames[rep.frame].Time)
+	if rep.auto && rep.frame <= len(rep.frames)-1 && rep.frame >= 0 {
+		var d time.Duration
+		if rep.frame > 0 {
+			d = rep.frames[rep.frame].Time.Sub(rep.frames[rep.frame-1].Time)
+		} else {
+			d = 0
+		}
 		if d >= 2*time.Second {
 			d = 2 * time.Second
 		}
@@ -141,6 +145,7 @@ func (rep *replay) PollKeyboardEvents() {
 		switch e.key {
 		case "Q":
 			rep.evch <- ReplayQuit
+			return
 		case "p", " ":
 			rep.evch <- ReplayTogglePause
 		case "+", ">":

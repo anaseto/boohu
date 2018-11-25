@@ -40,11 +40,11 @@ func newGame(ui *gameui) {
 		CustomKeys = true
 		if gameConfig.Small {
 			gameConfig.Small = false
-			ui.ApplyToggleLayout()
+			ui.ApplyToggleLayoutWithClear(false)
 		}
 	}
-	//if runtime.GOARCH != "wasm" {
-	if true { // TODO
+	if runtime.GOARCH != "wasm" {
+		//if true { // TODO
 		ui.DrawWelcome()
 	} else {
 		again := ui.HandleStartMenu()
@@ -80,10 +80,15 @@ func (ui *gameui) HandleStartMenu() (again bool) {
 				log.Printf("Load replay: %v", err)
 				return true
 			}
-			g.DrawBuffer = nil
-			g.drawBackBuffer = nil
-			ui.DrawBufferInit()
+			small := gameConfig.Small
+			gameConfig.Small = true
+			ui.ApplyToggleLayoutWithClear(false)
+			ui.RestartDrawBuffers()
 			ui.Replay()
+			if small {
+				gameConfig.Small = false
+				ui.ApplyToggleLayoutWithClear(false)
+			}
 			return true
 		default:
 			return false
@@ -365,11 +370,13 @@ func (ui *gameui) Flush() {
 	js.Global().Get("window").Call("requestAnimationFrame", js.NewEventCallback(0, ui.FlushCallback))
 }
 
-func (ui *gameui) ApplyToggleLayout() {
+func (ui *gameui) ApplyToggleLayoutWithClear(clear bool) {
 	gameConfig.Small = !gameConfig.Small
 	if gameConfig.Small {
-		ui.Clear()
-		ui.Flush()
+		if clear {
+			ui.Clear()
+			ui.Flush()
+		}
 		UIHeight = 24
 		UIWidth = 80
 	} else {
@@ -381,16 +388,20 @@ func (ui *gameui) ApplyToggleLayout() {
 	canvas.Set("width", 16*UIWidth)
 	ui.g.DrawBuffer = make([]UICell, UIWidth*UIHeight)
 	ui.cache = make(map[UICell]js.Value)
-	ui.Clear()
+	if clear {
+		ui.Clear()
+	}
+}
+
+func (ui *gameui) ApplyToggleLayout() {
+	ui.ApplyToggleLayoutWithClear(true)
 }
 
 func (ui *gameui) FlushCallback(obj js.Value) {
 	ui.DrawLogFrame()
 	for _, cdraw := range ui.g.DrawLog[len(ui.g.DrawLog)-1].Draws {
 		cell := cdraw.Cell
-		i := cdraw.I
-		x, y := ui.GetPos(i)
-		ui.Draw(cell, x, y)
+		ui.Draw(cell, cdraw.X, cdraw.Y)
 	}
 }
 

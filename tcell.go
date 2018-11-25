@@ -48,11 +48,9 @@ func (ui *gameui) Flush() {
 	ui.DrawLogFrame()
 	for _, cdraw := range ui.g.DrawLog[len(ui.g.DrawLog)-1].Draws {
 		cell := cdraw.Cell
-		i := cdraw.I
-		x, y := ui.GetPos(i)
 		st := tcell.StyleDefault
 		st = st.Foreground(tcell.Color(cell.Fg)).Background(tcell.Color(cell.Bg))
-		ui.Screen.SetContent(x, y, cell.R, nil, st)
+		ui.Screen.SetContent(cdraw.X, cdraw.Y, cell.R, nil, st)
 	}
 	//ui.g.Printf("%d %d %d", ui.g.DrawFrame, ui.g.DrawFrameStart, len(ui.g.DrawLog))
 	ui.Screen.Show()

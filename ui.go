@@ -83,7 +83,7 @@ func (ui *gameui) PressAnyKey() error {
 type startAction int
 
 const (
-	StartNew startAction = iota
+	StartPlay startAction = iota
 	StartWatchReplay
 )
 
@@ -91,8 +91,8 @@ func (ui *gameui) StartMenu(l int) startAction {
 	for {
 		in := ui.PollEvent()
 		switch in.key {
-		case "N":
-			return StartNew
+		case "P":
+			return StartPlay
 		case "W":
 			return StartWatchReplay
 		}
@@ -103,7 +103,7 @@ func (ui *gameui) StartMenu(l int) startAction {
 		switch in.button {
 		case -1:
 			oih := ui.itemHover
-			if y <= l || y >= l+2 {
+			if y < l || y >= l+2 {
 				ui.itemHover = -1
 				if oih != -1 {
 					ui.ColorLine(oih, ColorFg)
@@ -128,7 +128,7 @@ func (ui *gameui) StartMenu(l int) startAction {
 			ui.itemHover = -1
 			switch y - l {
 			case 0:
-				return StartNew
+				return StartPlay
 			case 1:
 				return StartWatchReplay
 			}

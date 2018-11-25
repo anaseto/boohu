@@ -10,23 +10,23 @@ import (
 )
 
 func Replay(file string) error {
-	tui := &gameui{}
+	ui := &gameui{}
 	g := &game{}
-	tui.g = g
-	g.ui = tui
+	ui.g = g
+	g.ui = ui
 	err := g.LoadReplay(file)
 	if err != nil {
 		return fmt.Errorf("loading replay: %v", err)
 	}
-	err = tui.Init()
+	err = ui.Init()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "boohu: %v\n", err)
 		os.Exit(1)
 	}
-	defer tui.Close()
-	tui.DrawBufferInit()
-	tui.Replay()
-	tui.Close()
+	defer ui.Close()
+	ui.DrawBufferInit()
+	ui.Replay()
+	ui.Close()
 	return nil
 }
 

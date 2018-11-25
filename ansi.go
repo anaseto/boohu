@@ -6,6 +6,7 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 )
@@ -24,12 +25,21 @@ func main() {
 	optCenteredCamera := flag.Bool("c", false, "centered camera")
 	optMinimalUI := flag.Bool("m", false, "80x24 minimal UI")
 	optNoAnim := flag.Bool("n", false, "no animations")
+	optReplay := flag.String("r", "", "path to replay file")
 	flag.Parse()
 	if *opt {
 		SolarizedPalette()
 	}
 	if *optVersion {
 		fmt.Println(Version)
+		os.Exit(0)
+	}
+	if *optReplay != "" {
+		err := Replay(*optReplay)
+		if err != nil {
+			log.Printf("boohu: replay: %v\n", err)
+			os.Exit(1)
+		}
 		os.Exit(0)
 	}
 	if *optCenteredCamera {
@@ -39,32 +49,23 @@ func main() {
 		DisableAnimations = true
 	}
 
-	tui := &gameui{}
+	ui := &gameui{}
 	g := &game{}
-	tui.g = g
+	ui.g = g
 	if *optMinimalUI {
 		gameConfig.Small = true
 		UIHeight = 24
 		UIWidth = 80
 	}
-	err := tui.Init()
+	err := ui.Init()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "boohu: %v\n", err)
 		os.Exit(1)
 	}
-	defer tui.Close()
+	defer ui.Close()
 
 	ApplyDefaultKeyBindings()
 	LinkColors()
-
-	go func() {
-		for {
-			r, _, err := tui.bStdin.ReadRune()
-			if err == nil {
-				ch <- uiInput{key: string(r)}
-			}
-		}
-	}()
 
 	load, err := g.LoadConfig()
 	if load && err != nil {
@@ -72,7 +73,7 @@ func main() {
 	} else if load {
 		CustomKeys = true
 	}
-	tui.DrawWelcome()
+	ui.DrawWelcome()
 	load, err = g.Load()
 	if !load {
 		g.InitLevel()
@@ -80,7 +81,7 @@ func main() {
 		g.InitLevel()
 		g.Print("Error loading saved game… starting new game.")
 	}
-	g.ui = tui
+	g.ui = ui
 	g.EventLoop()
 }
 
@@ -98,7 +99,7 @@ type gameui struct {
 func (ui *gameui) Init() error {
 	ui.bStdin = bufio.NewReader(os.Stdin)
 	ui.bStdout = bufio.NewWriter(os.Stdout)
-	ui.Clear()
+	//ui.Clear()
 	fmt.Fprint(ui.bStdout, "\x1b[2J")
 	ui.HideCursor()
 	fmt.Fprintf(ui.bStdout, "\x1b[?25l")
@@ -113,6 +114,15 @@ func (ui *gameui) Init() error {
 	cmd.Stdin = os.Stdin
 	cmd.Run()
 	ui.menuHover = -1
+	go func() {
+		for {
+			r, _, err := ui.bStdin.ReadRune()
+			if err == nil {
+				ch <- uiInput{key: string(r)}
+			}
+		}
+	}()
+
 	return nil
 }
 
@@ -141,8 +151,7 @@ func (ui *gameui) Flush() {
 	var prevx, prevy int
 	for _, cdraw := range ui.g.DrawLog[len(ui.g.DrawLog)-1].Draws {
 		cell := cdraw.Cell
-		i := cdraw.I
-		x, y := ui.GetPos(i)
+		x, y := cdraw.X, cdraw.Y
 		pfg := true
 		pbg := true
 		pxy := true

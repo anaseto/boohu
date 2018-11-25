@@ -217,7 +217,8 @@ type drawFrame struct {
 
 type cellDraw struct {
 	Cell UICell
-	I    int
+	X    int
+	Y    int
 }
 
 func (ui *gameui) SetCell(x, y int, r rune, fg, bg uicolor) {
@@ -247,7 +248,8 @@ func (ui *gameui) DrawLogFrame() {
 			continue
 		}
 		c := ui.g.DrawBuffer[i]
-		cdraw := cellDraw{Cell: c, I: i}
+		x, y := ui.GetPos(i)
+		cdraw := cellDraw{Cell: c, X: x, Y: y}
 		last := len(ui.g.DrawLog) - 1
 		ui.g.DrawLog[last].Draws = append(ui.g.DrawLog[last].Draws, cdraw)
 		ui.g.drawBackBuffer[i] = c
@@ -325,7 +327,7 @@ func (ui *gameui) DrawWelcomeCommon() int {
 	line++
 	line++
 	if runtime.GOARCH == "wasm" {
-		ui.DrawDark("- (N)ew game", col-3, line, ColorFg, false)
+		ui.DrawDark("- (P)lay", col-3, line, ColorFg, false)
 		ui.DrawDark("- (W)atch replay", col-3, line+1, ColorFg, false)
 	} else {
 		ui.DrawDark("───Press any key to continue───", col-3, line, ColorFg, false)
@@ -337,6 +339,13 @@ func (ui *gameui) DrawWelcomeCommon() int {
 func (ui *gameui) DrawWelcome() {
 	ui.DrawWelcomeCommon()
 	ui.PressAnyKey()
+}
+
+func (ui *gameui) RestartDrawBuffers() {
+	g := ui.g
+	g.DrawBuffer = nil
+	g.drawBackBuffer = nil
+	ui.DrawBufferInit()
 }
 
 func (ui *gameui) DrawColored(text string, x, y int, fg, bg uicolor) {

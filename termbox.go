@@ -39,9 +39,7 @@ func (ui *gameui) Flush() {
 	ui.DrawLogFrame()
 	for _, cdraw := range ui.g.DrawLog[len(ui.g.DrawLog)-1].Draws {
 		cell := cdraw.Cell
-		i := cdraw.I
-		x, y := ui.GetPos(i)
-		termbox.SetCell(x, y, cell.R, termbox.Attribute(cell.Fg), termbox.Attribute(cell.Bg))
+		termbox.SetCell(cdraw.X, cdraw.Y, cell.R, termbox.Attribute(cell.Fg), termbox.Attribute(cell.Bg))
 	}
 	termbox.Flush()
 	w, h := termbox.Size()

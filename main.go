@@ -47,15 +47,15 @@ func main() {
 		DisableAnimations = true
 	}
 
-	tui := &gameui{}
+	ui := &gameui{}
 	g := &game{}
-	tui.g = g
-	err := tui.Init()
+	ui.g = g
+	err := ui.Init()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "boohu: %v\n", err)
 		os.Exit(1)
 	}
-	defer tui.Close()
+	defer ui.Close()
 
 	ApplyDefaultKeyBindings()
 	LinkColors()
@@ -66,7 +66,7 @@ func main() {
 	} else if load {
 		CustomKeys = true
 	}
-	tui.DrawWelcome()
+	ui.DrawWelcome()
 	load, err = g.Load()
 	if !load {
 		g.InitLevel()
@@ -75,6 +75,6 @@ func main() {
 		g.PrintfStyled("Error: %v", logError, err)
 		g.PrintStyled("Could not load saved game… starting new game.", logError)
 	}
-	g.ui = tui
+	g.ui = ui
 	g.EventLoop()
 }

@@ -105,8 +105,7 @@ func (ui *gameui) Flush() {
 	ymax := 0
 	for _, cdraw := range ui.g.DrawLog[len(ui.g.DrawLog)-1].Draws {
 		cell := cdraw.Cell
-		i := cdraw.I
-		x, y := ui.GetPos(i)
+		x, y := cdraw.X, cdraw.Y
 		ui.Draw(cell, x, y)
 		if x < xmin {
 			xmin = x
