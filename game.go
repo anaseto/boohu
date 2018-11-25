@@ -514,6 +514,11 @@ func (g *game) InitLevel() {
 			g.CollectableScore-- // these are extra
 		}
 	}
+	if g.Depth == 1 {
+		// extra collectable
+		g.GenCollectable()
+		g.CollectableScore--
+	}
 
 	// Aptitudes/Mutations
 	if g.Depth == 2 || g.Depth == 5 {
