@@ -326,7 +326,7 @@ func (g *game) HitConnected(pos position, dt dmgType, ev event) {
 func (g *game) HitNoise(clang bool) int {
 	noise := BaseHitNoise
 	if g.Player.Weapon == Frundis {
-		noise -= 4
+		noise -= 5
 	}
 	if g.Player.Armour == HarmonistRobe {
 		noise -= 3
