@@ -104,11 +104,11 @@ func (ui *gameui) Flush() {
 	xdgnmax := 0
 	ydgnmin := UIHeight - 1
 	ydgnmax := 0
-	xlogmin := UIHeight - 1
+	xlogmin := UIWidth - 1
 	xlogmax := 0
 	ylogmin := UIHeight - 1
 	ylogmax := 0
-	xbarmin := UIHeight - 1
+	xbarmin := UIWidth - 1
 	xbarmax := 0
 	ybarmin := UIHeight - 1
 	ybarmax := 0
