@@ -8,6 +8,7 @@ import (
 	"image"
 	"image/draw"
 	"image/png"
+	"unicode/utf8"
 
 	"github.com/nsf/gothic"
 )
@@ -227,6 +228,10 @@ func (ui *gameui) PollEvent() (in uiInput) {
 		in.key = "3"
 	case "KP_Begin", "KP_Delete":
 		in.key = "5"
+	default:
+		if utf8.RuneCountInString(in.key) != 1 {
+			in.key = ""
+		}
 	}
 	return in
 }

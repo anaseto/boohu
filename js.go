@@ -9,6 +9,7 @@ import (
 	"log"
 	"runtime"
 	"time"
+	"unicode/utf8"
 
 	"github.com/gopherjs/gopherwasm/js"
 )
@@ -431,6 +432,10 @@ func (ui *gameui) PollEvent() (in uiInput) {
 		in.key = "3"
 	case "Numpad5", "Delete":
 		in.key = "5"
+	default:
+		if utf8.RuneCountInString(in.key) != 1 {
+			in.key = ""
+		}
 	}
 	return in
 }
