@@ -77,6 +77,9 @@ func (g *game) LosRange() int {
 	if g.Player.Armour == HarmonistRobe {
 		losRange -= 1
 	}
+	if g.Player.Weapon == Frundis {
+		losRange -= 1
+	}
 	if g.Player.HasStatus(StatusShadows) {
 		losRange = 1
 	}

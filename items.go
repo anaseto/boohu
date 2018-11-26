@@ -799,7 +799,7 @@ func (ar armour) Desc() string {
 	case CelmistRobe:
 		text = "The celmist robe improves your magic reserves, rod recharge rate, and rods can gain two extra charges. In Hareka, celmists are what most people would call mages."
 	case HarmonistRobe:
-		text = "The harmonist robe makes you harder to detect (reduced LOS, stealthy, noise mitigation). Harmonists are mages specialized in manipulation of light and noise."
+		text = "The harmonist robe makes you harder to detect (reduced LOS range, stealthy movement, noise mitigation). Harmonists are mages specialized in manipulation of light and noise."
 	}
 	return text
 }
@@ -940,7 +940,7 @@ func (wp weapon) Desc() string {
 	case HopeSword:
 		text = "The hopeful sword is a big two-handed weapon that hits with extra damage when you are injured."
 	case Frundis:
-		text = "Frundis is a musician and harmonist, which happens to be a two-handed staff too. It may occasionally confuse monsters on hit. It magically helps reducing noise in combat too."
+		text = "Frundis is a musician and harmonist, which happens to be a two-handed staff too. It may occasionally confuse monsters on hit. It magically helps reducing noise in combat too, and reduces your line of sight range by 1."
 	case ElecWhip:
 		text = "The lightning whip is a one-handed weapon that inflicts electrical damage to a monster and any foes connected to it."
 	case HarKarGauntlets:
