@@ -99,27 +99,71 @@ func (ui *gameui) Close() {
 
 func (ui *gameui) Flush() {
 	ui.DrawLogFrame()
-	xmin := UIWidth - 1
-	xmax := 0
-	ymin := UIHeight - 1
-	ymax := 0
+	// very ugly optimisation
+	xdgnmin := UIWidth - 1
+	xdgnmax := 0
+	ydgnmin := UIHeight - 1
+	ydgnmax := 0
+	xlogmin := UIHeight - 1
+	xlogmax := 0
+	ylogmin := UIHeight - 1
+	ylogmax := 0
+	xbarmin := UIHeight - 1
+	xbarmax := 0
+	ybarmin := UIHeight - 1
+	ybarmax := 0
 	for _, cdraw := range ui.g.DrawLog[len(ui.g.DrawLog)-1].Draws {
 		cell := cdraw.Cell
 		x, y := cdraw.X, cdraw.Y
 		ui.Draw(cell, x, y)
-		if x < xmin {
-			xmin = x
-		}
-		if x > xmax {
-			xmax = x
-		}
-		if y < ymin {
-			ymin = y
-		}
-		if y > ymax {
-			ymax = y
+		switch {
+		case x < DungeonWidth && y < DungeonHeight:
+			if x < xdgnmin {
+				xdgnmin = x
+			}
+			if x > xdgnmax {
+				xdgnmax = x
+			}
+			if y < ydgnmin {
+				ydgnmin = y
+			}
+			if y > ydgnmax {
+				ydgnmax = y
+			}
+		case x > DungeonWidth:
+			if x < xbarmin {
+				xbarmin = x
+			}
+			if x > xbarmax {
+				xbarmax = x
+			}
+			if y < ybarmin {
+				ybarmin = y
+			}
+			if y > ybarmax {
+				ybarmax = y
+			}
+		default:
+			if x < xlogmin {
+				xlogmin = x
+			}
+			if x > xlogmax {
+				xlogmax = x
+			}
+			if y < ylogmin {
+				ylogmin = y
+			}
+			if y > ylogmax {
+				ylogmax = y
+			}
 		}
 	}
+	ui.UpdateRectangle(xdgnmin, ydgnmin, xdgnmax, ydgnmax)
+	ui.UpdateRectangle(xbarmin, ybarmin, xbarmax, ybarmax)
+	ui.UpdateRectangle(xlogmin, ylogmin, xlogmax, ylogmax)
+}
+
+func (ui *gameui) UpdateRectangle(xmin, ymin, xmax, ymax int) {
 	if xmin > xmax || ymin > ymax {
 		return
 	}
