@@ -12,17 +12,21 @@ func (ui *gameui) Replay() {
 	}
 	g.DrawLog = nil
 	rep := &replay{ui: ui, frames: dl, frame: 0}
+	if ColorBase03 == Color256Base03 {
+		rep.color256 = true
+	}
 	rep.Run()
 }
 
 type replay struct {
-	ui     *gameui
-	frames []drawFrame
-	undo   [][]cellDraw
-	frame  int
-	auto   bool
-	speed  time.Duration
-	evch   chan repEvent
+	ui       *gameui
+	frames   []drawFrame
+	undo     [][]cellDraw
+	frame    int
+	auto     bool
+	speed    time.Duration
+	evch     chan repEvent
+	color256 bool
 }
 
 type repEvent int
@@ -89,6 +93,13 @@ func (rep *replay) DrawFrame() {
 	for _, dr := range df.Draws {
 		i := ui.GetIndex(dr.X, dr.Y)
 		c := ui.g.DrawBuffer[i]
+		if rep.color256 {
+			dr.Cell.Fg = rep.ui.Map16ColorTo256(dr.Cell.Fg)
+			dr.Cell.Bg = rep.ui.Map16ColorTo256(dr.Cell.Bg)
+		} else {
+			dr.Cell.Bg = ui.Map256ColorTo16(dr.Cell.Bg)
+			dr.Cell.Fg = ui.Map256ColorTo16(dr.Cell.Fg)
+		}
 		rep.undo[j] = append(rep.undo[j], cellDraw{Cell: c, X: dr.X, Y: dr.Y})
 		ui.SetGenCell(dr.X, dr.Y, dr.Cell.R, dr.Cell.Fg, dr.Cell.Bg, dr.Cell.InMap)
 	}

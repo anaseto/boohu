@@ -18,25 +18,139 @@ var (
 
 type uicolor int
 
+const (
+	Color256Base03  uicolor = 234
+	Color256Base02  uicolor = 235
+	Color256Base01  uicolor = 240
+	Color256Base00  uicolor = 241 // for dark on light background
+	Color256Base0   uicolor = 244
+	Color256Base1   uicolor = 245
+	Color256Base2   uicolor = 254
+	Color256Base3   uicolor = 230
+	Color256Yellow  uicolor = 136
+	Color256Orange  uicolor = 166
+	Color256Red     uicolor = 160
+	Color256Magenta uicolor = 125
+	Color256Violet  uicolor = 61
+	Color256Blue    uicolor = 33
+	Color256Cyan    uicolor = 37
+	Color256Green   uicolor = 64
+
+	Color16Base03  uicolor = 8
+	Color16Base02  uicolor = 0
+	Color16Base01  uicolor = 10
+	Color16Base00  uicolor = 11
+	Color16Base0   uicolor = 12
+	Color16Base1   uicolor = 14
+	Color16Base2   uicolor = 7
+	Color16Base3   uicolor = 15
+	Color16Yellow  uicolor = 3
+	Color16Orange  uicolor = 9
+	Color16Red     uicolor = 1
+	Color16Magenta uicolor = 5
+	Color16Violet  uicolor = 13
+	Color16Blue    uicolor = 4
+	Color16Cyan    uicolor = 6
+	Color16Green   uicolor = 2
+)
+
 // uicolors: http://ethanschoonover.com/solarized
 var (
-	ColorBase03  uicolor = 234
-	ColorBase02  uicolor = 235
-	ColorBase01  uicolor = 240
-	ColorBase00  uicolor = 241 // for dark on light background
-	ColorBase0   uicolor = 244
-	ColorBase1   uicolor = 245
-	ColorBase2   uicolor = 254
-	ColorBase3   uicolor = 230
-	ColorYellow  uicolor = 136
-	ColorOrange  uicolor = 166
-	ColorRed     uicolor = 160
-	ColorMagenta uicolor = 125
-	ColorViolet  uicolor = 61
-	ColorBlue    uicolor = 33
-	ColorCyan    uicolor = 37
-	ColorGreen   uicolor = 64
+	ColorBase03  uicolor = Color256Base03
+	ColorBase02  uicolor = Color256Base02
+	ColorBase01  uicolor = Color256Base01
+	ColorBase00  uicolor = Color256Base00 // for dark on light background
+	ColorBase0   uicolor = Color256Base0
+	ColorBase1   uicolor = Color256Base1
+	ColorBase2   uicolor = Color256Base2
+	ColorBase3   uicolor = Color256Base3
+	ColorYellow  uicolor = Color256Yellow
+	ColorOrange  uicolor = Color256Orange
+	ColorRed     uicolor = Color256Red
+	ColorMagenta uicolor = Color256Magenta
+	ColorViolet  uicolor = Color256Violet
+	ColorBlue    uicolor = Color256Blue
+	ColorCyan    uicolor = Color256Cyan
+	ColorGreen   uicolor = Color256Green
 )
+
+func (ui *gameui) Map256ColorTo16(c uicolor) uicolor {
+	switch c {
+	case Color256Base03:
+		return Color16Base03
+	case Color256Base02:
+		return Color16Base02
+	case Color256Base01:
+		return Color16Base01
+	case Color256Base00:
+		return Color16Base00
+	case Color256Base0:
+		return Color16Base0
+	case Color256Base1:
+		return Color16Base1
+	case Color256Base2:
+		return Color16Base2
+	case Color256Base3:
+		return Color16Base3
+	case Color256Yellow:
+		return Color16Yellow
+	case Color256Orange:
+		return Color16Orange
+	case Color256Red:
+		return Color16Red
+	case Color256Magenta:
+		return Color16Magenta
+	case Color256Violet:
+		return Color16Violet
+	case Color256Blue:
+		return Color16Blue
+	case Color256Cyan:
+		return Color16Cyan
+	case Color256Green:
+		return Color16Green
+	default:
+		return c
+	}
+}
+
+func (ui *gameui) Map16ColorTo256(c uicolor) uicolor {
+	switch c {
+	case Color16Base03:
+		return Color256Base03
+	case Color16Base02:
+		return Color256Base02
+	case Color16Base01:
+		return Color256Base01
+	case Color16Base00:
+		return Color256Base00
+	case Color16Base0:
+		return Color256Base0
+	case Color16Base1:
+		return Color256Base1
+	case Color16Base2:
+		return Color256Base2
+	case Color16Base3:
+		return Color256Base3
+	case Color16Yellow:
+		return Color256Yellow
+	case Color16Orange:
+		return Color256Orange
+	case Color16Red:
+		return Color256Red
+	case Color16Magenta:
+		return Color256Magenta
+	case Color16Violet:
+		return Color256Violet
+	case Color16Blue:
+		return Color256Blue
+	case Color16Cyan:
+		return Color256Cyan
+	case Color16Green:
+		return Color256Green
+	default:
+		return c
+	}
+}
 
 var (
 	ColorBg,
@@ -148,22 +262,22 @@ func ApplyLightLOS() {
 }
 
 func SolarizedPalette() {
-	ColorBase03 = 8
-	ColorBase02 = 0
-	ColorBase01 = 10
-	ColorBase00 = 11
-	ColorBase0 = 12
-	ColorBase1 = 14
-	ColorBase2 = 7
-	ColorBase3 = 15
-	ColorYellow = 3
-	ColorOrange = 9
-	ColorRed = 1
-	ColorMagenta = 5
-	ColorViolet = 13
-	ColorBlue = 4
-	ColorCyan = 6
-	ColorGreen = 2
+	ColorBase03 = Color16Base03
+	ColorBase02 = Color16Base02
+	ColorBase01 = Color16Base01
+	ColorBase00 = Color16Base00
+	ColorBase0 = Color16Base0
+	ColorBase1 = Color16Base1
+	ColorBase2 = Color16Base2
+	ColorBase3 = Color16Base3
+	ColorYellow = Color16Yellow
+	ColorOrange = Color16Orange
+	ColorRed = Color16Red
+	ColorMagenta = Color16Magenta
+	ColorViolet = Color16Violet
+	ColorBlue = Color16Blue
+	ColorCyan = Color16Cyan
+	ColorGreen = Color16Green
 }
 
 func FixColor() {
