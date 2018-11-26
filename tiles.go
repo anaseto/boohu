@@ -19,8 +19,8 @@ func (ui *gameui) ApplyToggleTiles() {
 			delete(ui.cache, c)
 		}
 	}
-	for i := 0; i < len(ui.g.DrawBuffer); i++ {
-		ui.g.DrawBuffer[i] = UICell{}
+	for i := 0; i < len(ui.g.drawBackBuffer); i++ {
+		ui.g.drawBackBuffer[i] = UICell{}
 	}
 }
 
