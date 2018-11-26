@@ -143,8 +143,12 @@ func (g *game) Dump() string {
 	if len(rs) > 0 {
 		fmt.Fprintf(buf, "Rods:\n")
 		for _, r := range rs {
+			mc := r.MaxCharge()
+			if g.Player.Armour == CelmistRobe {
+				mc += 2
+			}
 			fmt.Fprintf(buf, "- %s (%d/%d charges) (used %d times)\n",
-				r, g.Player.Rods[r].Charge, r.MaxCharge(), g.Stats.UsedRod[r])
+				r, g.Player.Rods[r].Charge, mc, g.Stats.UsedRod[r])
 		}
 	} else {
 		fmt.Fprintf(buf, "You do not have any rods.\n")
