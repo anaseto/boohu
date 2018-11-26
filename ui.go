@@ -1680,3 +1680,18 @@ func (ui *gameui) DrawBufferInit() {
 		ui.g.DrawBuffer = make([]UICell, UIHeight*UIWidth)
 	}
 }
+
+func ApplyConfig() {
+	if gameConfig.RuneNormalModeKeys == nil || gameConfig.RuneTargetModeKeys == nil {
+		ApplyDefaultKeyBindings()
+	}
+	if gameConfig.DarkLOS {
+		ApplyDarkLOS()
+	} else {
+		ApplyLightLOS()
+	}
+	if gameConfig.Small {
+		UIHeight = 24
+		UIWidth = 80
+	}
+}

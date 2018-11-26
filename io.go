@@ -141,16 +141,7 @@ func (g *game) LoadConfig() (bool, error) {
 		return true, err
 	}
 	gameConfig = *c
-	if gameConfig.RuneNormalModeKeys == nil || gameConfig.RuneTargetModeKeys == nil {
-		ApplyDefaultKeyBindings()
-	}
-	if gameConfig.DarkLOS {
-		ApplyDarkLOS()
-	}
-	if gameConfig.Small {
-		UIHeight = 24
-		UIWidth = 80
-	}
+	ApplyConfig()
 	return true, nil
 }
 

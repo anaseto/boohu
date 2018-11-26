@@ -278,12 +278,7 @@ func (g *game) LoadConfig() (bool, error) {
 		return true, err
 	}
 	gameConfig = *c
-	if gameConfig.RuneNormalModeKeys == nil || gameConfig.RuneTargetModeKeys == nil {
-		ApplyDefaultKeyBindings()
-	}
-	if !gameConfig.DarkLOS {
-		ApplyLightLOS()
-	}
+	ApplyConfig()
 	return true, nil
 }
 
