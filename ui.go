@@ -34,6 +34,13 @@ func (ui *gameui) SetCursor(pos position) {
 	ui.cursor = pos
 }
 
+func (ui *gameui) KeyToRuneKeyAction(in uiInput) rune {
+	if utf8.RuneCountInString(in.key) != 1 {
+		return 0
+	}
+	return ui.ReadKey(in.key)
+}
+
 func (ui *gameui) WaitForContinue(line int) {
 loop:
 	for {

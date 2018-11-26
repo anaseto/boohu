@@ -9,7 +9,6 @@ import (
 	"log"
 	"runtime"
 	"time"
-	"unicode/utf8"
 
 	"github.com/gopherjs/gopherwasm/js"
 )
@@ -404,7 +403,11 @@ func (ui *gameui) FlushCallback(obj js.Value) {
 	}
 }
 
-func (ui *gameui) KeyToRuneKeyAction(in uiInput) rune {
+func (ui *gameui) PollEvent() (in uiInput) {
+	select {
+	case in = <-ch:
+	case in.interrupt = <-interrupt:
+	}
 	switch in.key {
 	case "Escape":
 		in.key = "\x1b"
@@ -429,8 +432,5 @@ func (ui *gameui) KeyToRuneKeyAction(in uiInput) rune {
 	case "Numpad5", "Delete":
 		in.key = "5"
 	}
-	if utf8.RuneCountInString(in.key) != 1 {
-		return 0
-	}
-	return ui.ReadKey(in.key)
+	return in
 }

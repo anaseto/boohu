@@ -154,18 +154,18 @@ func (rep *replay) PollKeyboardEvents() {
 			continue
 		}
 		switch e.key {
-		case "Q":
+		case "Q", "q", "\x1b":
 			rep.evch <- ReplayQuit
 			return
-		case "p", " ":
+		case "p", "P", " ":
 			rep.evch <- ReplayTogglePause
 		case "+", ">":
 			rep.evch <- ReplaySpeedMore
 		case "-", "<":
 			rep.evch <- ReplaySpeedLess
-		case ".", "6", "j", "n":
+		case ".", "6", "j", "n", "f":
 			rep.evch <- ReplayNext
-		case "4", "k", "N":
+		case "4", "k", "N", "b":
 			rep.evch <- ReplayPrevious
 		default:
 			if !e.mouse {

@@ -206,14 +206,6 @@ func (ui *gameui) Small() bool {
 	return gameConfig.Small
 }
 
-func (ui *gameui) PollEvent() (in uiInput) {
-	select {
-	case in = <-ch:
-	case in.interrupt = <-interrupt:
-	}
-	return in
-}
-
 func (ui *gameui) ColorLine(y int, fg uicolor) {
 	for x := 0; x < DungeonWidth; x++ {
 		i := ui.GetIndex(x, y)

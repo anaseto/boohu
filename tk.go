@@ -8,7 +8,6 @@ import (
 	"image"
 	"image/draw"
 	"image/png"
-	"unicode/utf8"
 
 	"github.com/nsf/gothic"
 )
@@ -202,7 +201,11 @@ func (ui *gameui) Draw(cell UICell, x, y int) {
 	draw.Draw(ui.canvas, image.Rect(x*ui.width, ui.height*y, (x+1)*ui.width, (y+1)*ui.height), img, image.Point{0, 0}, draw.Over)
 }
 
-func (ui *gameui) KeyToRuneKeyAction(in uiInput) rune {
+func (ui *gameui) PollEvent() (in uiInput) {
+	select {
+	case in = <-ch:
+	case in.interrupt = <-interrupt:
+	}
 	switch in.key {
 	case "Enter":
 		in.key = "."
@@ -225,8 +228,5 @@ func (ui *gameui) KeyToRuneKeyAction(in uiInput) rune {
 	case "KP_Begin", "KP_Delete":
 		in.key = "5"
 	}
-	if utf8.RuneCountInString(in.key) > 1 {
-		return 0
-	}
-	return ui.ReadKey(in.key)
+	return in
 }
