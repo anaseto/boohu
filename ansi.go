@@ -66,6 +66,7 @@ func main() {
 
 	ApplyDefaultKeyBindings()
 	LinkColors()
+	gameConfig.DarkLOS = true
 
 	load, err := g.LoadConfig()
 	if load && err != nil {
