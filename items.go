@@ -963,8 +963,10 @@ func (wp weapon) Attack() int {
 		return 11
 	case BattleAxe, Halberd, HopeSword, FinalBlade:
 		return 15
-	case Frundis, HarKarGauntlets:
+	case Frundis:
 		return 13
+	case HarKarGauntlets:
+		return 14
 	case DefenderFlail:
 		return 10
 	case Dagger, VampDagger:
