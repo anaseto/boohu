@@ -91,12 +91,12 @@ func (ui *gameui) StartMenu(l int) startAction {
 	for {
 		in := ui.PollEvent()
 		switch in.key {
-		case "P":
+		case "P", "p":
 			ui.ColorLine(l, ColorRed)
 			ui.Flush()
 			time.Sleep(10 * time.Millisecond)
 			return StartPlay
-		case "W":
+		case "W", "w":
 			ui.ColorLine(l+1, ColorRed)
 			ui.Flush()
 			time.Sleep(10 * time.Millisecond)
