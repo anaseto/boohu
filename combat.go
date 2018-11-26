@@ -387,7 +387,7 @@ func (g *game) HitMonster(dt dmgType, dmg int, mons *monster, ev event) (hit boo
 			noise -= 3
 		}
 		if g.Player.Weapon == Frundis {
-			noise -= 4
+			noise -= 5
 		}
 		bonus := 0
 		if g.Player.HasStatus(StatusBerserk) {
