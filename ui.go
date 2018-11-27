@@ -1054,31 +1054,6 @@ func (ui *gameui) HandleKey(rka runeKeyAction) (err error, again bool, quit bool
 	return err, again, quit
 }
 
-func (ui *gameui) GoToPos(ev event, pos position) (err error, again bool) {
-	// XXX this function is obsolete
-	if !pos.valid() {
-		return errors.New("Invalid location."), true
-	}
-	g := ui.g
-	switch pos.Distance(g.Player.Pos) {
-	case 0:
-		g.WaitTurn(ev)
-	case 1:
-		dir := pos.Dir(g.Player.Pos)
-		err = g.MovePlayer(g.Player.Pos.To(dir), ev)
-		if err != nil {
-			again = true
-		}
-	default:
-		ex := &examiner{}
-		err = ex.Action(g, pos)
-		if !ex.done || !g.MoveToTarget(ev) {
-			again = true
-		}
-	}
-	return err, again
-}
-
 func (ui *gameui) ExaminePos(ev event, pos position) (err error, again, quit bool) {
 	var start *position
 	if pos.valid() {
