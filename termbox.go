@@ -20,7 +20,6 @@ func (ui *gameui) Init() error {
 	if err != nil {
 		return err
 	}
-	FixColor()
 	termbox.SetOutputMode(termbox.Output256)
 	termbox.SetInputMode(termbox.InputEsc | termbox.InputMouse)
 	termbox.HideCursor()
@@ -39,7 +38,7 @@ func (ui *gameui) Flush() {
 	ui.DrawLogFrame()
 	for _, cdraw := range ui.g.DrawLog[len(ui.g.DrawLog)-1].Draws {
 		cell := cdraw.Cell
-		termbox.SetCell(cdraw.X, cdraw.Y, cell.R, termbox.Attribute(cell.Fg), termbox.Attribute(cell.Bg))
+		termbox.SetCell(cdraw.X, cdraw.Y, cell.R, termbox.Attribute(cell.Fg)+1, termbox.Attribute(cell.Bg)+1)
 	}
 	termbox.Flush()
 	w, h := termbox.Size()

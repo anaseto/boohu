@@ -280,25 +280,6 @@ func SolarizedPalette() {
 	ColorGreen = Color16Green
 }
 
-func FixColor() {
-	ColorBase03++
-	ColorBase02++
-	ColorBase01++
-	ColorBase00++
-	ColorBase0++
-	ColorBase1++
-	ColorBase2++
-	ColorBase3++
-	ColorYellow++
-	ColorOrange++
-	ColorRed++
-	ColorMagenta++
-	ColorViolet++
-	ColorBlue++
-	ColorCyan++
-	ColorGreen++
-}
-
 const (
 	Black uicolor = iota
 	Maroon
