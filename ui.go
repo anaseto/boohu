@@ -99,12 +99,12 @@ func (ui *gameui) StartMenu(l int) startAction {
 		in := ui.PollEvent()
 		switch in.key {
 		case "P", "p":
-			ui.ColorLine(l, ColorRed)
+			ui.ColorLine(l, ColorYellow)
 			ui.Flush()
 			time.Sleep(10 * time.Millisecond)
 			return StartPlay
 		case "W", "w":
-			ui.ColorLine(l+1, ColorRed)
+			ui.ColorLine(l+1, ColorYellow)
 			ui.Flush()
 			time.Sleep(10 * time.Millisecond)
 			return StartWatchReplay
