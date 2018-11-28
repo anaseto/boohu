@@ -57,8 +57,6 @@ Other:
 + A new replay feature: automatic recording of playthroughs. You can play ASCII
   and then replay with tiles (and vice-versa).
 + Many other minor gameplay and user interface fixes and improvements.
-There is also a new native Tk backend with graphical tiles, and many minor
-gameplay and user interface fixes or improvements.
 
 -----------------------------------------------------------------------------
 v0.10.0 2018-09-21
