@@ -1,4 +1,4 @@
-v0.11-dev
+v0.11.0 2018-11-28
 
 Gameplay:
 
@@ -44,8 +44,9 @@ Gameplay:
   HP such as dragons or hydras.
 + Renamed sabre into assassin sabre.
 + Removed berserk sword.
-+ Removed plain chain mail.
-+ Make shields a little less useful when surrounded.
++ Removed plain chain mail, leather armour and buckler.
++ Make shields a little less useful when surrounded: you can only block once
+  per turn.
 + Reworked stealth: now hunting monsters may return to wandering mode when not
   seing you. The effect is much increased by wearing the harmonist robe. This
   gives more depth to stealth (the wandering/hunting difference matters now
