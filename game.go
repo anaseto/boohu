@@ -571,7 +571,7 @@ func (g *game) InitLevel() {
 		nstones = 3
 	}
 	ustone := stone(0)
-	if g.Depth > 0 && g.Depth == g.Opts.StoneLevel {
+	if g.Depth == g.Opts.StoneLevel {
 		ustone = stone(1 + RandInt(NumStones-1))
 		nstones = 10 + RandInt(3)
 		if RandInt(4) == 0 {
@@ -604,7 +604,7 @@ func (g *game) InitLevel() {
 	}
 
 	// initialize LOS
-	if g.Depth == 0 {
+	if g.Depth == 1 {
 		g.Print("You're in Hareka's Underground searching for medicinal simellas. Good luck!")
 		g.PrintStyled("► Press ? for help on keys or use the mouse and [buttons].", logSpecial)
 	}
@@ -622,7 +622,7 @@ func (g *game) InitLevel() {
 	}
 
 	// recharge rods
-	if g.Depth > 0 {
+	if g.Depth > 1 {
 		g.RechargeRods()
 	}
 
@@ -640,7 +640,7 @@ func (g *game) InitLevel() {
 	for i := range g.Monsters {
 		g.PushEvent(&monsterEvent{ERank: g.Turn + RandInt(10), EAction: MonsterTurn, NMons: i})
 	}
-	if g.Depth > 0 && g.Depth == g.Opts.UnstableLevel {
+	if g.Depth == g.Opts.UnstableLevel {
 		g.PrintStyled("You sense magic instability on this level.", logSpecial)
 		for i := 0; i < 15; i++ {
 			g.PushEvent(&cloudEvent{ERank: g.Turn + 100 + RandInt(900), EAction: ObstructionProgression})
