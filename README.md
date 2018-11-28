@@ -1,4 +1,6 @@
-Break Out Of Hareka's Underground (Boohu) is a roguelike game mainly inspired from DCSS and its tavern, with some ideas from Brogue, but aiming for very short games, almost no character building, and a simplified inventory.
+Break Out Of Hareka's Underground (Boohu) is a roguelike game mainly inspired
+from DCSS and its tavern, with some ideas from Brogue, but aiming for very
+short games, almost no character building, and a simplified inventory.
 
 *Every year, the elders send someone to collect medicinal simella plants in the
 Underground.  This year, the honor fell upon you, and so here you are.
@@ -71,5 +73,16 @@ Colors
 If the default colors do not display nicely on your terminal emulator, you can
 use the `-s` option: `boohu -s` to use the 16-color palette, which
 will display nicely if the [solarized](http://ethanschoonover.com/solarized)
-palette is used. Configurations are available for most terminal emulators, otherwise, colors may have to be configured manually to one's liking in
+palette is used. Configurations are available for most terminal emulators,
+otherwise, colors may have to be configured manually to one's liking in
 the terminal emulator options.
+
+Documentation
+-------------
+
+See the man page boohu(6) for more information on command line options and use
+of the replay file. For example:
+
+    boohu -r _
+
+launches an auto-replay of your last game.
