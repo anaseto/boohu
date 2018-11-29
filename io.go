@@ -26,7 +26,6 @@ func Replay(file string) error {
 	defer ui.Close()
 	ui.DrawBufferInit()
 	ui.Replay()
-	ui.Close()
 	return nil
 }
 
