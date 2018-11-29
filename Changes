@@ -1,3 +1,13 @@
+v0.11.1 2018-11-29
+
+Bugfix release:
+
++ Fix colour handling issue in replay for the termbox-go backend.
++ Get the starting log message back (it was removed during the dungeon
+  structure overhaul).
++ Make replay exit properly with the termbox-go backend.
+
+-----------------------------------------------------------------------------
 v0.11.0 2018-11-28
 
 Gameplay:
