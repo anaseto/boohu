@@ -26,6 +26,7 @@ func main() {
 	if *optSolarized {
 		SolarizedPalette()
 	} else if color8 && !*opt256colors || !color8 && *opt8colors {
+		SolarizedPalette()
 		Simple8ColorPalette()
 	}
 	if *optVersion {

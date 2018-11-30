@@ -231,34 +231,32 @@ func LinkColors() {
 }
 
 func ApplyDarkLOS() {
-	if ColorBg == Black && ColorBgLOS == Silver {
-		ColorFgLOS = Green
-		ColorBgLOS = Black
+	ColorBg = ColorBase03
+	ColorBgBorder = ColorBase02
+	ColorBgDark = ColorBase03
+	ColorBgLOS = ColorBase02
+	ColorFgDark = ColorBase01
+	ColorFg = ColorBase0
+	if Only8Colors {
+		ColorFgLOS = ColorGreen
 	} else {
-		ColorBg = ColorBase03
-		ColorBgBorder = ColorBase02
-		ColorBgDark = ColorBase03
-		ColorBgLOS = ColorBase02
-		ColorFg = ColorBase0
-		ColorFgDark = ColorBase01
 		ColorFgLOS = ColorBase0
 	}
 }
 
 func ApplyLightLOS() {
-	if ColorBg == Black && ColorBgLOS == Black {
-		ColorFg = ColorBase0
-		ColorFgLOS = Black
-		ColorBgLOS = Silver
+	ColorBg = ColorBase3
+	ColorBgBorder = ColorBase2
+	ColorBgDark = ColorBase3
+	ColorBgLOS = ColorBase2
+	if Only8Colors {
+		ColorFgDark = ColorBase00
+		ColorFgLOS = ColorGreen
 	} else {
-		ColorBg = ColorBase3
-		ColorBgBorder = ColorBase2
-		ColorBgDark = ColorBase3
-		ColorBgLOS = ColorBase2
-		ColorFg = ColorBase00
 		ColorFgDark = ColorBase1
 		ColorFgLOS = ColorBase00
 	}
+	ColorFg = ColorBase00
 }
 
 func SolarizedPalette() {
@@ -291,23 +289,49 @@ const (
 	Silver
 )
 
+func Map16ColorTo8Color(c uicolor) uicolor {
+	switch c {
+	case Color16Base03:
+		return Black
+	case Color16Base02:
+		return Black
+	case Color16Base01:
+		return Silver
+	case Color16Base00:
+		return Black
+	case Color16Base0:
+		return Silver
+	case Color16Base1:
+		return Silver
+	case Color16Base2:
+		return Silver
+	case Color16Base3:
+		return Silver
+	case Color16Yellow:
+		return Olive
+	case Color16Orange:
+		return Purple
+	case Color16Red:
+		return Maroon
+	case Color16Magenta:
+		return Purple
+	case Color16Violet:
+		return Teal
+	case Color16Blue:
+		return Navy
+	case Color16Cyan:
+		return Teal
+	case Color16Green:
+		return Green
+	default:
+		return c
+	}
+}
+
+var Only8Colors bool
+
 func Simple8ColorPalette() {
-	ColorBase03 = Black
-	ColorBase02 = Black
-	ColorBase01 = Silver
-	ColorBase00 = Black
-	ColorBase0 = Silver
-	ColorBase1 = Silver
-	ColorBase2 = Silver
-	ColorBase3 = Silver
-	ColorYellow = Olive
-	ColorOrange = Purple
-	ColorRed = Maroon
-	ColorMagenta = Purple
-	ColorViolet = Teal
-	ColorBlue = Navy
-	ColorCyan = Teal
-	ColorGreen = Green
+	Only8Colors = true
 }
 
 type drawFrame struct {

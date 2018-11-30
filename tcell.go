@@ -49,7 +49,13 @@ func (ui *gameui) Flush() {
 	for _, cdraw := range ui.g.DrawLog[len(ui.g.DrawLog)-1].Draws {
 		cell := cdraw.Cell
 		st := tcell.StyleDefault
-		st = st.Foreground(tcell.Color(cell.Fg)).Background(tcell.Color(cell.Bg))
+		fg := cell.Fg
+		bg := cell.Bg
+		if Only8Colors {
+			fg = Map16ColorTo8Color(fg)
+			bg = Map16ColorTo8Color(bg)
+		}
+		st = st.Foreground(tcell.Color(fg)).Background(tcell.Color(bg))
 		ui.Screen.SetContent(cdraw.X, cdraw.Y, cell.R, nil, st)
 	}
 	//ui.g.Printf("%d %d %d", ui.g.DrawFrame, ui.g.DrawFrameStart, len(ui.g.DrawLog))

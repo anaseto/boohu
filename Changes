@@ -2,7 +2,7 @@ v???-dev
 
 Bugfix release:
 
-+ Fix colour scheme when there is no config file.
++ Fix colour scheme when there is no config file. Fix windows 8-colour scheme.
 + Fix spelling of “cyclops”.
 + Winged monsters produce wing flapping noise instead of footsteps noise.
 
