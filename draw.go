@@ -245,18 +245,19 @@ func ApplyDarkLOS() {
 }
 
 func ApplyLightLOS() {
-	ColorBg = ColorBase3
-	ColorBgBorder = ColorBase2
-	ColorBgDark = ColorBase3
-	ColorBgLOS = ColorBase2
 	if Only8Colors {
-		ColorFgDark = ColorBase00
-		ColorFgLOS = ColorGreen
+		ApplyDarkLOS()
+		ColorBgLOS = ColorBase2
+		ColorFgLOS = ColorBase00
 	} else {
+		ColorBg = ColorBase3
+		ColorBgBorder = ColorBase2
+		ColorBgDark = ColorBase3
+		ColorBgLOS = ColorBase2
 		ColorFgDark = ColorBase1
 		ColorFgLOS = ColorBase00
+		ColorFg = ColorBase00
 	}
-	ColorFg = ColorBase00
 }
 
 func SolarizedPalette() {
@@ -1518,8 +1519,8 @@ const (
 )
 
 func (ui *gameui) DrawInfoLine(text string) {
-	ui.ClearLineWithColor(DungeonHeight+1, ColorBgLOS)
-	ui.DrawColoredTextOnBG(text, 0, DungeonHeight+1, ColorBlue, ColorBgLOS)
+	ui.ClearLineWithColor(DungeonHeight+1, ColorBgBorder)
+	ui.DrawColoredTextOnBG(text, 0, DungeonHeight+1, ColorBlue, ColorBgBorder)
 }
 
 func (ui *gameui) DrawStyledTextLine(text string, lnum int, st linestyle) {
@@ -1566,7 +1567,7 @@ func (ui *gameui) ClearLineWithColor(lnum int, bg uicolor) {
 func (ui *gameui) ListItemBG(i int) uicolor {
 	bg := ColorBg
 	if i%2 == 1 {
-		bg = ColorBgLOS
+		bg = ColorBgBorder
 	}
 	return bg
 }
