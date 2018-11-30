@@ -255,8 +255,12 @@ func (g *game) ComputeNoise() {
 		mons := g.MonsterAt(pos)
 		if mons.Exists() && mons.State != Resting && RandInt(rmax) == 0 {
 			switch mons.Kind {
-			case MonsMirrorSpecter, MonsGiantBee, MonsSatowalgaPlant:
+			case MonsMirrorSpecter, MonsSatowalgaPlant:
 				// no footsteps
+			case MonsTinyHarpy, MonsWingedMilfid, MonsGiantBee:
+				noise[pos] = true
+				g.Print("You hear the flapping of wings.")
+				count++
 			default:
 				noise[pos] = true
 				g.Print("You hear footsteps.")
