@@ -4,6 +4,7 @@ Bugfix release:
 
 + Fix colour scheme when there is no config file.
 + Fix spelling of “cyclops”.
++ Winged monsters produce wing flapping noise instead of footsteps noise.
 
 -----------------------------------------------------------------------------
 v0.11.1 2018-11-29
