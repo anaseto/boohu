@@ -1,3 +1,11 @@
+v???-dev
+
+Bugfix release:
+
++ Fix colour scheme when there is no config file.
++ Fix spelling of “cyclops”.
+
+-----------------------------------------------------------------------------
 v0.11.1 2018-11-29
 
 Bugfix release:
