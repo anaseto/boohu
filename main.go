@@ -57,7 +57,6 @@ func main() {
 	}
 	defer ui.Close()
 
-	ApplyDefaultKeyBindings()
 	LinkColors()
 	gameConfig.DarkLOS = true
 
@@ -67,6 +66,7 @@ func main() {
 	} else if load {
 		CustomKeys = true
 	}
+	ApplyConfig()
 	ui.DrawWelcome()
 	load, err = g.Load()
 	if !load {

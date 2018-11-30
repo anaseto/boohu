@@ -21,7 +21,6 @@ func main() {
 		log.Fatalf("boohu: %v\n", err)
 	}
 	defer ui.Close()
-	ApplyDefaultKeyBindings()
 	gameConfig.Tiles = true
 	LinkColors()
 	gameConfig.DarkLOS = true
@@ -44,6 +43,7 @@ func newGame(ui *gameui) {
 			ui.ApplyToggleLayoutWithClear(false)
 		}
 	}
+	ApplyConfig()
 	if runtime.GOARCH != "wasm" {
 		//if true { // TODO
 		ui.DrawWelcome()
@@ -278,7 +278,6 @@ func (g *game) LoadConfig() (bool, error) {
 		return true, err
 	}
 	gameConfig = *c
-	ApplyConfig()
 	return true, nil
 }
 
