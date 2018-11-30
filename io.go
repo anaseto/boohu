@@ -140,7 +140,6 @@ func (g *game) LoadConfig() (bool, error) {
 		return true, err
 	}
 	gameConfig = *c
-	ApplyConfig()
 	return true, nil
 }
 
