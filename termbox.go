@@ -38,13 +38,13 @@ func (ui *gameui) Flush() {
 	ui.DrawLogFrame()
 	for _, cdraw := range ui.g.DrawLog[len(ui.g.DrawLog)-1].Draws {
 		cell := cdraw.Cell
-		fg := cell.Fg + 1
-		bg := cell.Bg + 1
+		fg := cell.Fg
+		bg := cell.Bg
 		if Only8Colors {
 			fg = Map16ColorTo8Color(fg)
 			bg = Map16ColorTo8Color(bg)
 		}
-		termbox.SetCell(cdraw.X, cdraw.Y, cell.R, termbox.Attribute(fg), termbox.Attribute(bg))
+		termbox.SetCell(cdraw.X, cdraw.Y, cell.R, termbox.Attribute(fg)+1, termbox.Attribute(bg)+1)
 	}
 	termbox.Flush()
 	w, h := termbox.Size()
