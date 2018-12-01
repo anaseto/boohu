@@ -378,6 +378,9 @@ func (g *game) MakeCreatureSleep(pos position, ev event) {
 		// do not always make already exhausted monsters sleep (they were probably awaken)
 		return
 	}
+	if mons.State != Resting && g.Player.LOS[mons.Pos] {
+		g.Printf("%s falls asleep.", mons.Kind.Definite(true))
+	}
 	mons.State = Resting
 	mons.ExhaustTime(g, 40+RandInt(10))
 }

@@ -262,6 +262,9 @@ func (g *game) EvokeRodSleeping(ev event) error {
 		if !mons.Exists() {
 			continue
 		}
+		if mons.State != Resting {
+			g.Printf("%s falls asleep.", mons.Kind.Definite(true))
+		}
 		mons.State = Resting
 		mons.ExhaustTime(g, 40+RandInt(10))
 	}
