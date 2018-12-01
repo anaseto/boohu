@@ -261,6 +261,14 @@ func (g *game) ComputeNoise() {
 				noise[pos] = true
 				g.Print("You hear the flapping of wings.")
 				count++
+			case MonsOgre, MonsCyclop, MonsBrizzia, MonsHydra, MonsEarthDragon, MonsTreeMushroom:
+				noise[pos] = true
+				g.Print("You hear heavy footsteps.")
+				count++
+			case MonsWorm, MonsAcidMound:
+				noise[pos] = true
+				g.Print("You hear a creep noise.")
+				count++
 			default:
 				noise[pos] = true
 				g.Print("You hear footsteps.")
