@@ -68,13 +68,13 @@ func (r rod) Desc() string {
 	case RodDigging:
 		text = "digs through up to 3 walls in a given direction."
 	case RodBlink:
-		text = "makes you blink away within your line of sight."
+		text = "makes you blink away within your line of sight. The rod is more susceptible to send you to the cells thar are most far from you."
 	case RodTeleportOther:
 		text = "teleports away one of your foes. Note that the monster remembers where it saw you last time."
 	case RodFog:
-		text = "creates a dense fog that reduces your (and monster's) line of sight."
+		text = "creates a dense fog that reduces your line of sight. Monsters at more than 1 cell away from you will not be able to see you."
 	case RodFireBall:
-		text = "throws a 1-radius fireball at your foes. You cannot use it at melee range. It can burn foliage and doors."
+		text = "throws a 1-radius fireball at your foes. You cannot use it against yourself. It can burn foliage and doors."
 	case RodFireBolt:
 		text = "throws a fire bolt through one or more enemies. It can burn foliage and doors."
 	case RodLightning:
@@ -82,9 +82,9 @@ func (r rod) Desc() string {
 	case RodObstruction:
 		text = "creates a temporary wall at targeted location."
 	case RodShatter:
-		text = "induces an explosion around a wall, hurting adjacent monsters. The wall can disintegrate. You cannot use it at melee range."
+		text = "induces an explosion around a wall, hurting adjacent monsters. The wall can disintegrate. You cannot use against yourself."
 	case RodSleeping:
-		text = "induces deep sleeping and exhaustion for monsters in the targeted area."
+		text = "induces deep sleeping and exhaustion for monsters in the targeted area. You cannot use it against yourself."
 	case RodLignification:
 		text = "lignifies a monster, so that it cannot move, but can still fight with improved resistance."
 	case RodHope:

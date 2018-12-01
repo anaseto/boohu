@@ -96,11 +96,11 @@ func (p potion) Desc() (text string) {
 	case HealWoundsPotion:
 		text = "heals you a good deal."
 	case TeleportationPotion:
-		text = "teleports you away after a short delay."
+		text = "teleports you away after a few turns."
 	case DescentPotion:
 		text = "makes you go deeper in the Underground."
 	case MagicMappingPotion:
-		text = "shows you the map."
+		text = "shows you the map layout and item locations."
 	case MagicPotion:
 		text = "replenishes your magical reserves."
 	case BerserkPotion:
@@ -108,23 +108,23 @@ func (p potion) Desc() (text string) {
 	case SwiftnessPotion:
 		text = "makes you move faster and better at avoiding blows for a short time."
 	case LignificationPotion:
-		text = "makes you more resistant to physical blows, but you are attached to the ground while the effect lasts (you can still descend)."
+		text = "increases your armour against physical blows, but you are attached to the ground while the effect lasts (you can still descend)."
 	case WallPotion:
 		text = "replaces free cells around you with temporary walls."
 	case CBlinkPotion:
 		text = "makes you blink to a targeted cell in your line of sight."
 	case DigPotion:
-		text = "makes you dig walls like an earth dragon."
+		text = "makes you dig walls by walking into them like an earth dragon."
 	case SwapPotion:
 		text = "makes you swap positions with monsters instead of attacking. Ranged monsters can still damage you."
 	case ShadowsPotion:
-		text = "reduces your line of sight range to 1."
+		text = "reduces your line of sight range to 1. Because monsters only can see you if you see them, this makes it easier to get out of sight of monsters so that they eventually stop chasing you."
 	case TormentPotion:
 		text = "halves HP of every creature in sight, including the player, and destroys visible walls. Extremely noisy. It can burn foliage and doors."
 	case AccuracyPotion:
 		text = "makes you never miss for a few turns."
 	case DreamPotion:
-		text = "shows you the position of monsters sleeping at drink time."
+		text = "shows you the position in the map of monsters sleeping at drink time."
 	}
 	return fmt.Sprintf("The %s %s", p, text)
 }
@@ -467,9 +467,9 @@ func (p projectile) Desc() (text string) {
 	case SlowingMagara:
 		text = "can be activated to release a slowing bolt inducing slow movement and attack in one or more foes."
 	case ConfuseMagara:
-		text = "generates a harmonic light that confuses monsters in your line of sight."
+		text = "generates a harmonic light that confuses all the monsters in your line of sight."
 	case NightMagara:
-		text = "can be thrown at a monster to produce sleep inducing clouds in a 2-radius area. You are affected too by the clouds, but they will slow your actions instead. Can burn doors and foliage."
+		text = "can be thrown at a monster to produce sleep inducing clouds in a 2-radius area. You are affected too by the clouds, but they will slow your actions instead."
 	}
 	return fmt.Sprintf("The %s %s", p, text)
 }
@@ -789,7 +789,7 @@ func (ar armour) Desc() string {
 	case Robe:
 		text = "A robe provides no special protection, and will not help you much in your journey."
 	case SmokingScales:
-		text = "Smoking scales provide protection against blows. They leave short-lived fog as you move."
+		text = "Smoking scales provide protection against blows. They leave short-lived fog behind as you move."
 	case ShinyPlates:
 		text = "Shiny plates provide good protection against blows, but increase your line of sight range."
 	case TurtlePlates:
@@ -936,9 +936,9 @@ func (wp weapon) Desc() string {
 	case AssassinSabre:
 		text = "The assassin sabre is a one-handed weapon. It is more accurate against injured opponents."
 	case DancingRapier:
-		text = "The dancing rapier is a one-handed weapon. It makes you swap with your foe and can hit another monster behind with extra damage."
+		text = "The dancing rapier is a one-handed weapon. It makes you swap positions with your foe and can hit another monster behind with extra damage."
 	case HopeSword:
-		text = "The hopeful sword is a big two-handed weapon that hits with extra damage when you are injured."
+		text = "The hopeful sword is a big two-handed weapon. The more injured you are, the more damage increases."
 	case Frundis:
 		text = "Frundis is a musician and harmonist, which happens to be a two-handed staff too. It may occasionally confuse monsters on hit. It magically helps reducing noise in combat too, and reduces your line of sight range by 1."
 	case ElecWhip:
@@ -950,7 +950,7 @@ func (wp weapon) Desc() string {
 	case DragonSabre:
 		text = "The dragon sabre is a one-handed weapon that inflicts extra damage on healthy big monsters."
 	case FinalBlade:
-		text = "The final blade is an accurate two-handed weapon that instantly kills monsters at less than half full health. Wielding this weapon hurts your maximum health."
+		text = "The final blade is an accurate two-handed weapon that instantly kills monsters at less than half full health. Wielding this weapon will reduce your maximum health by a third."
 	case DefenderFlail:
 		text = "The defender flail is a one-handed weapon that moves foes toward you, and hits harder as you keep attacking without moving."
 	}
