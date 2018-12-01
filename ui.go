@@ -223,11 +223,11 @@ func (ui *gameui) Scroll(n int) (m int, quit bool) {
 	switch in.key {
 	case "Escape", "\x1b", " ":
 		quit = true
-	case "u":
+	case "u", "9", "b":
 		n -= 12
-	case "d":
+	case "d", "3", "f":
 		n += 12
-	case "j", "2":
+	case "j", "2", ".":
 		n++
 	case "k", "8":
 		n--

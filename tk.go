@@ -214,7 +214,7 @@ func (ui *gameui) PollEvent() (in uiInput) {
 		in.key = "4"
 	case "Right", "KP_Right":
 		in.key = "6"
-	case "Up", "KP_Up":
+	case "Up", "KP_Up", "BackSpace":
 		in.key = "8"
 	case "Down", "KP_Down":
 		in.key = "2"
