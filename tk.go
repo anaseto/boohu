@@ -222,9 +222,9 @@ func (ui *gameui) PollEvent() (in uiInput) {
 		in.key = "7"
 	case "KP_End":
 		in.key = "1"
-	case "KP_Prior":
+	case "KP_Prior", "Prior":
 		in.key = "9"
-	case "KP_Next":
+	case "KP_Next", "Next":
 		in.key = "3"
 	case "KP_Begin", "KP_Delete":
 		in.key = "5"
