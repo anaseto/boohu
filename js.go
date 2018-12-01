@@ -151,12 +151,14 @@ func (ui *gameui) Draw(cell UICell, x, y int) {
 	ui.ctx.Call("drawImage", canvas, x*ui.width, ui.height*y)
 }
 
-func (ui *gameui) GetMousePos(evt js.Value) (x, y int) {
+func (ui *gameui) GetMousePos(evt js.Value) (int, int) {
 	canvas := js.Global().Get("document").Call("getElementById", "gamecanvas")
 	rect := canvas.Call("getBoundingClientRect")
-	x = evt.Get("clientX").Int() - rect.Get("left").Int()
-	y = evt.Get("clientY").Int() - rect.Get("top").Int()
-	return (x - 1) / ui.width, (y - 1) / ui.height
+	scaleX := canvas.Get("width").Float() / rect.Get("width").Float()
+	scaleY := canvas.Get("height").Float() / rect.Get("height").Float()
+	x := (evt.Get("clientX").Float() - rect.Get("left").Float()) * scaleX
+	y := (evt.Get("clientY").Float() - rect.Get("top").Float()) * scaleY
+	return (int(x) - 1) / ui.width, (int(y) - 1) / ui.height
 }
 
 // io compatibility functions
