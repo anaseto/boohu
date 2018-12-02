@@ -110,7 +110,7 @@ func (g *game) SortedProjectiles() consumableSlice {
 
 func (g *game) Dump() string {
 	buf := &bytes.Buffer{}
-	fmt.Fprintf(buf, " -- Boohu version %s character file --\n\n", Version)
+	fmt.Fprintf(buf, " -- Boohu (stealth) version %s character file --\n\n", Version)
 	if g.Wizard {
 		fmt.Fprintf(buf, "**WIZARD MODE**\n")
 	}
@@ -365,7 +365,7 @@ func (g *game) DumpedKilledMonsters() string {
 
 func (g *game) SimplifedDump(err error) string {
 	buf := &bytes.Buffer{}
-	fmt.Fprintf(buf, " ♣ Boohu version %s play summary ♣\n\n", Version)
+	fmt.Fprintf(buf, " ♣ Boohu (stealth) version %s play summary ♣\n\n", Version)
 	if g.Wizard {
 		fmt.Fprintf(buf, "**WIZARD MODE**\n")
 	}
