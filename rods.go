@@ -454,11 +454,7 @@ func (g *game) EvokeRodShatter(ev event) error {
 		if !mons.Exists() {
 			continue
 		}
-		dmg := 0
-		for i := 0; i < 3; i++ {
-			dmg += RandInt(30)
-		}
-		dmg /= 3
+		dmg := 2 + RandInt(2)
 		mons.HP -= dmg
 		if mons.HP <= 0 {
 			g.Printf("%s is killed by the explosion.", mons.Kind.Indefinite(true))
@@ -523,14 +519,9 @@ func (g *game) EvokeRodHope(ev event) error {
 	if attack > 130 {
 		attack = 130
 	}
-	dmg := 0
-	for i := 0; i < 5; i++ {
-		dmg += RandInt(attack)
-	}
-	dmg /= 5
-	if dmg < 0 {
-		// should not happen
-		dmg = 0
+	dmg := DefaultHealth - g.Player.HP + 1
+	if dmg <= 0 {
+		dmg = 1
 	}
 	mons.HP -= dmg
 	g.Burn(g.Player.Target, ev)
