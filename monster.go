@@ -1833,7 +1833,7 @@ func (m *monster) MoveTo(g *game, pos position) {
 	if g.Player.Sees(pos) {
 		m.LastSeenState = m.State
 		m.LastSeenPos = pos
-		g.DreamingMonster[pos] = m
+		g.LastMonsterAt[pos] = m
 	}
 	if !g.Player.Sees(m.Pos) && g.Player.Sees(pos) {
 		if !m.Seen {

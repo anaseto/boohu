@@ -41,7 +41,7 @@ type game struct {
 	WrongDoor           map[position]bool
 	ExclusionsMap       map[position]bool
 	Noise               map[position]bool
-	DreamingMonster     map[position]*monster
+	LastMonsterAt       map[position]*monster
 	MonsterLOS          map[position]bool
 	Resting             bool
 	RestingTurns        int
@@ -481,7 +481,7 @@ func (g *game) InitLevel() {
 	g.WrongDoor = map[position]bool{}
 	g.ExclusionsMap = map[position]bool{}
 	g.TemporalWalls = map[position]bool{}
-	g.DreamingMonster = map[position]*monster{}
+	g.LastMonsterAt = map[position]*monster{}
 
 	// Monsters
 	g.BandData = MonsBands

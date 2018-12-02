@@ -123,7 +123,7 @@ func (g *game) ComputeLOS() {
 		if mons.Exists() && g.Player.Sees(mons.Pos) {
 			mons.LastSeenState = mons.State
 			mons.LastSeenPos = mons.Pos
-			g.DreamingMonster[mons.Pos] = mons
+			g.LastMonsterAt[mons.Pos] = mons
 			if mons.Seen {
 				g.StopAuto()
 				continue
@@ -188,8 +188,8 @@ func (g *game) SeePosition(pos position) {
 	if _, ok := g.WrongFoliage[pos]; ok {
 		delete(g.WrongFoliage, pos)
 	}
-	if mons, ok := g.DreamingMonster[pos]; ok && !(mons.Exists() && mons.Pos == pos) {
-		delete(g.DreamingMonster, pos)
+	if mons, ok := g.LastMonsterAt[pos]; ok && !(mons.Exists() && mons.Pos == pos) {
+		delete(g.LastMonsterAt, pos)
 	}
 }
 
