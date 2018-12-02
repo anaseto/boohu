@@ -7,6 +7,8 @@ Bugfix and minor improvements release:
   cannot be sure what kind of monster it is, but you can have an idea.
 + Add a message when a monster falls asleep because of rod of sleeping or night
   magara.
++ Make fireball do a little more damage to account for the fact that it is
+  somewhat more difficult to use than firebolt.
 + Fix colour scheme when there is no config file. Fix windows 8-colour scheme.
 + Fix spelling of “cyclops”.
 + Allow Page Up/Down as alternative scroll keys in log messages window.
