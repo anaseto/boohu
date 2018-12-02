@@ -11,6 +11,7 @@ Bugfix and minor improvements release:
 + Fix spelling of “cyclops”.
 + Allow Page Up/Down as alternative scroll keys in log messages window.
 + Allow “z” and some other keys as alternatives to “.” to select target.
++ Make layout toggle automatically resize the window in Tk backend.
 
 -----------------------------------------------------------------------------
 v0.11.1 2018-11-29

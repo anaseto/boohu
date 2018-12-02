@@ -256,3 +256,10 @@ func getImage(cell UICell) *image.RGBA {
 	}
 	return rgbaimg
 }
+
+func (ui *gameui) PostConfig() {
+	if gameConfig.Small {
+		gameConfig.Small = false
+		ui.ApplyToggleLayoutWithClear(false)
+	}
+}

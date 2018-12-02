@@ -1675,8 +1675,4 @@ func ApplyConfig() {
 	} else {
 		ApplyLightLOS()
 	}
-	if gameConfig.Small {
-		UIHeight = 24
-		UIWidth = 80
-	}
 }

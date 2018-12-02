@@ -1,4 +1,4 @@
-// +build !js,!ansi
+// +build !js
 
 package main
 
@@ -68,6 +68,7 @@ func main() {
 		CustomKeys = true
 	}
 	ApplyConfig()
+	ui.PostConfig()
 	ui.DrawWelcome()
 	load, err = g.Load()
 	if !load {

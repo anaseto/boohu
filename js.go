@@ -38,12 +38,9 @@ func newGame(ui *gameui) {
 		log.Println("Error loading config file.")
 	} else if load {
 		CustomKeys = true
-		if gameConfig.Small {
-			gameConfig.Small = false
-			ui.ApplyToggleLayoutWithClear(false)
-		}
 	}
 	ApplyConfig()
+	ui.PostConfig()
 	if runtime.GOARCH != "wasm" {
 		//if true { // TODO
 		ui.DrawWelcome()

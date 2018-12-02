@@ -4,9 +4,7 @@ package main
 
 import (
 	"bufio"
-	"flag"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 )
@@ -17,73 +15,6 @@ var interrupt chan bool
 func init() {
 	ch = make(chan uiInput, 100)
 	interrupt = make(chan bool)
-}
-
-func main() {
-	opt := flag.Bool("s", false, "Use true 16-color solarized palette")
-	optVersion := flag.Bool("v", false, "print version number")
-	optCenteredCamera := flag.Bool("c", false, "centered camera")
-	optMinimalUI := flag.Bool("m", false, "80x24 minimal UI")
-	optNoAnim := flag.Bool("n", false, "no animations")
-	optReplay := flag.String("r", "", "path to replay file")
-	flag.Parse()
-	if *opt {
-		SolarizedPalette()
-	}
-	if *optVersion {
-		fmt.Println(Version)
-		os.Exit(0)
-	}
-	if *optReplay != "" {
-		err := Replay(*optReplay)
-		if err != nil {
-			log.Printf("boohu: replay: %v\n", err)
-			os.Exit(1)
-		}
-		os.Exit(0)
-	}
-	if *optCenteredCamera {
-		CenteredCamera = true
-	}
-	if *optNoAnim {
-		DisableAnimations = true
-	}
-
-	ui := &gameui{}
-	g := &game{}
-	ui.g = g
-	if *optMinimalUI {
-		gameConfig.Small = true
-		UIHeight = 24
-		UIWidth = 80
-	}
-	err := ui.Init()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "boohu: %v\n", err)
-		os.Exit(1)
-	}
-	defer ui.Close()
-
-	LinkColors()
-	gameConfig.DarkLOS = true
-
-	load, err := g.LoadConfig()
-	if load && err != nil {
-		g.Print("Error loading config file.")
-	} else if load {
-		CustomKeys = true
-	}
-	ApplyConfig()
-	ui.DrawWelcome()
-	load, err = g.Load()
-	if !load {
-		g.InitLevel()
-	} else if err != nil {
-		g.InitLevel()
-		g.Print("Error loading saved game… starting new game.")
-	}
-	g.ui = ui
-	g.EventLoop()
 }
 
 type gameui struct {
@@ -100,7 +31,6 @@ type gameui struct {
 func (ui *gameui) Init() error {
 	ui.bStdin = bufio.NewReader(os.Stdin)
 	ui.bStdout = bufio.NewWriter(os.Stdout)
-	//ui.Clear()
 	fmt.Fprint(ui.bStdout, "\x1b[2J")
 	ui.HideCursor()
 	fmt.Fprintf(ui.bStdout, "\x1b[?25l")

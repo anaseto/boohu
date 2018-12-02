@@ -30,9 +30,12 @@ type gameui struct {
 func (ui *gameui) Init() error {
 	ui.canvas = image.NewRGBA(image.Rect(0, 0, UIWidth*16, UIHeight*24))
 	ui.ir = gothic.NewInterpreter(`
+wm title . "Boohu Tk"
+wm resizable . 0 0
 set width [expr {16 * 100}]
 set height [expr {24 * 26}]
-set can [canvas .c -width $width -height $height -background black]
+wm geometry . =${width}x$height
+set can [canvas .c -width $width -height $height -background #002b36]
 grid $can -row 0 -column 0
 focus $can
 image create photo gamescreen -width $width -height $height -palette 256/256/256
@@ -176,19 +179,29 @@ func (ui *gameui) UpdateRectangle(xmin, ymin, xmax, ymax int) {
 }
 
 func (ui *gameui) ApplyToggleLayout() {
+	ui.ApplyToggleLayoutWithClear(true)
+}
+
+func (ui *gameui) ApplyToggleLayoutWithClear(clear bool) {
 	gameConfig.Small = !gameConfig.Small
 	if gameConfig.Small {
-		ui.Clear()
-		ui.Flush()
+		ui.ir.Eval("wm geometry . =1280x576")
+		if clear {
+			ui.Clear()
+			ui.Flush()
+		}
 		UIHeight = 24
 		UIWidth = 80
 	} else {
+		ui.ir.Eval("wm geometry . =${width}x$height")
 		UIHeight = 26
 		UIWidth = 100
 	}
 	ui.cache = make(map[UICell]*image.RGBA)
 	ui.g.DrawBuffer = make([]UICell, UIWidth*UIHeight)
-	ui.Clear()
+	if clear {
+		ui.Clear()
+	}
 }
 
 func (ui *gameui) Draw(cell UICell, x, y int) {
