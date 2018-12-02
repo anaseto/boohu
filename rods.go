@@ -287,7 +287,7 @@ func (g *game) EvokeRodFireBolt(ev event) error {
 		if !mons.Exists() {
 			continue
 		}
-		dmg := 1 + RandInt(2)
+		dmg := 1
 		mons.HP -= dmg
 		if mons.HP <= 0 {
 			g.Printf("%s is killed by the bolt.", mons.Kind.Indefinite(true))
@@ -315,7 +315,7 @@ func (g *game) EvokeRodFireball(ev event) error {
 		if mons == nil {
 			continue
 		}
-		dmg := 1 + RandInt(3)
+		dmg := 1 + RandInt(2)
 		mons.HP -= dmg
 		if mons.HP <= 0 {
 			g.Printf("%s is killed by the fireball.", mons.Kind.Indefinite(true))
@@ -454,7 +454,7 @@ func (g *game) EvokeRodShatter(ev event) error {
 		if !mons.Exists() {
 			continue
 		}
-		dmg := 2 + RandInt(2)
+		dmg := 2
 		mons.HP -= dmg
 		if mons.HP <= 0 {
 			g.Printf("%s is killed by the explosion.", mons.Kind.Indefinite(true))
