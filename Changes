@@ -1,10 +1,16 @@
-v???-dev
+v0.12-dev
 
-Bugfix release:
+Bugfix and minor improvements release:
 
++ Winged monsters produce wing flapping noise instead of footsteps noise, and
+  there's a distinction between heavy and normal footsteps. This way you still
+  cannot be sure what kind of monster it is, but you can have an idea.
++ Add a message when a monster falls asleep because of rod of sleeping or night
+  magara.
 + Fix colour scheme when there is no config file. Fix windows 8-colour scheme.
 + Fix spelling of “cyclops”.
-+ Winged monsters produce wing flapping noise instead of footsteps noise.
++ Allow Page Up/Down as alternative scroll keys in log messages window.
++ Allow “z” and some other keys as alternatives to “.” to select target.
 
 -----------------------------------------------------------------------------
 v0.11.1 2018-11-29
