@@ -100,6 +100,7 @@ func (sev *simpleEvent) Action(g *game) {
 	switch sev.EAction {
 	case PlayerTurn:
 		g.ComputeNoise()
+		g.ComputeMonsterLOS()
 		g.LogNextTick = g.LogIndex
 		g.AutoNext = g.AutoPlayer(sev)
 		if g.AutoNext {
@@ -122,7 +123,10 @@ func (sev *simpleEvent) Action(g *game) {
 		g.Player.Statuses[StatusBerserk] = 0
 		g.Player.Statuses[StatusSlow]++
 		g.Player.Statuses[StatusExhausted] = 1
-		g.Player.HP -= int(10 * g.Player.HP / Max(g.Player.HPMax(), g.Player.HP))
+		g.Player.HP -= 2
+		if g.Player.HP < 1 {
+			g.Player.HP = 1
+		}
 		g.PrintStyled("You are no longer berserk.", logStatusEnd)
 		g.PushEvent(&simpleEvent{ERank: sev.Rank() + 90 + RandInt(30), EAction: SlowEnd})
 		g.PushEvent(&simpleEvent{ERank: sev.Rank() + 270 + RandInt(60), EAction: ExhaustionEnd})
@@ -151,7 +155,10 @@ func (sev *simpleEvent) Action(g *game) {
 		}
 	case LignificationEnd:
 		g.Player.Statuses[StatusLignification]--
-		g.Player.HP -= int(10 * g.Player.HP / Max(g.Player.HPMax(), g.Player.HP))
+		g.Player.HP -= 4
+		if g.Player.HP < 1 {
+			g.Player.HP = 1
+		}
 		if g.Player.Statuses[StatusLignification] == 0 {
 			g.PrintStyled("You no longer feel attached to the ground.", logStatusEnd)
 			g.ui.StatusEndAnimation()
@@ -228,7 +235,7 @@ func (mev *monsterEvent) Action(g *game) {
 		mons := g.Monsters[mev.NMons]
 		if mons.Exists() {
 			mons.Statuses[MonsConfused] = 0
-			if g.Player.LOS[mons.Pos] {
+			if g.Player.Sees(mons.Pos) {
 				g.Printf("The %s is no longer confused.", mons.Kind)
 			}
 			mons.Path = mons.APath(g, mons.Pos, mons.Target)
@@ -237,7 +244,7 @@ func (mev *monsterEvent) Action(g *game) {
 		mons := g.Monsters[mev.NMons]
 		if mons.Exists() {
 			mons.Statuses[MonsLignified] = 0
-			if g.Player.LOS[mons.Pos] {
+			if g.Player.Sees(mons.Pos) {
 				g.Printf("%s is no longer lignified.", mons.Kind.Definite(true))
 			}
 			mons.Path = mons.APath(g, mons.Pos, mons.Target)
@@ -246,7 +253,7 @@ func (mev *monsterEvent) Action(g *game) {
 		mons := g.Monsters[mev.NMons]
 		if mons.Exists() {
 			mons.Statuses[MonsSlow]--
-			if g.Player.LOS[mons.Pos] {
+			if g.Player.Sees(mons.Pos) {
 				g.Printf("%s is no longer slowed.", mons.Kind.Definite(true))
 			}
 		}
@@ -293,7 +300,7 @@ func (cev *cloudEvent) Action(g *game) {
 		delete(g.Clouds, cev.Pos)
 		g.ComputeLOS()
 	case ObstructionEnd:
-		if !g.Player.LOS[cev.Pos] && g.Dungeon.Cell(cev.Pos).T == WallCell {
+		if !g.Player.Sees(cev.Pos) && g.Dungeon.Cell(cev.Pos).T == WallCell {
 			g.WrongWall[cev.Pos] = !g.WrongWall[cev.Pos]
 		} else {
 			delete(g.TemporalWalls, cev.Pos)
@@ -308,7 +315,7 @@ func (cev *cloudEvent) Action(g *game) {
 	case ObstructionProgression:
 		pos := g.FreeCell()
 		g.TemporalWallAt(pos, cev)
-		if g.Player.LOS[pos] {
+		if g.Player.Sees(pos) {
 			g.Printf("You see a wall appear out of thin air.")
 			g.StopAuto()
 		}
@@ -357,19 +364,20 @@ func (g *game) MakeCreatureSleep(pos position, ev event) {
 		// do not always make already exhausted monsters sleep (they were probably awaken)
 		return
 	}
-	if mons.State != Resting && g.Player.LOS[mons.Pos] {
+	if mons.State != Resting && g.Player.Sees(mons.Pos) {
 		g.Printf("%s falls asleep.", mons.Kind.Definite(true))
 	}
 	mons.State = Resting
+	mons.Dir = NoDir
 	mons.ExhaustTime(g, 40+RandInt(10))
 }
 
 func (g *game) BurnCreature(pos position, ev event) {
 	mons := g.MonsterAt(pos)
 	if mons.Exists() {
-		mons.HP -= 1 + RandInt(10)
+		mons.HP -= 1
 		if mons.HP <= 0 {
-			if g.Player.LOS[mons.Pos] {
+			if g.Player.Sees(mons.Pos) {
 				g.PrintfStyled("%s is killed by the fire.", logPlayerHit, mons.Kind.Definite(true))
 			}
 			g.HandleKill(mons, ev)
@@ -378,10 +386,7 @@ func (g *game) BurnCreature(pos position, ev event) {
 		}
 	}
 	if pos == g.Player.Pos {
-		damage := 1 + RandInt(10)
-		if damage > g.Player.HP {
-			damage = 1 + RandInt(10)
-		}
+		damage := 1
 		g.Player.HP -= damage
 		g.PrintfStyled("The fire burns you (%d dmg).", logMonsterHit, damage)
 		if g.Player.HP+damage < 10 {
@@ -409,7 +414,7 @@ func (g *game) Burn(pos position, ev event) {
 		g.Print("The door vanishes in flames.")
 	}
 	g.Clouds[pos] = CloudFire
-	if !g.Player.LOS[pos] {
+	if !g.Player.Sees(pos) {
 		if foliage {
 			g.WrongFoliage[pos] = true
 		} else {

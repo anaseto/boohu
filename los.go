@@ -67,10 +67,7 @@ func (g *game) buildRayMap(from position, distance int) rayMap {
 }
 
 func (g *game) LosRange() int {
-	losRange := 6
-	if g.Player.Armour == ShinyPlates {
-		losRange++
-	}
+	losRange := 7
 	if g.Player.Aptitudes[AptStealthyLOS] {
 		losRange -= 2
 	}
@@ -114,12 +111,19 @@ func (g *game) ComputeLOS() {
 	for pos, n := range g.Player.Rays {
 		if n.Cost < g.LosRange() {
 			m[pos] = true
-			g.SeePosition(pos)
 		}
 	}
 	g.Player.LOS = m
+	for pos, b := range g.Player.LOS {
+		if b && g.Player.Sees(pos) {
+			g.SeePosition(pos)
+		}
+	}
 	for _, mons := range g.Monsters {
-		if mons.Exists() && g.Player.LOS[mons.Pos] {
+		if mons.Exists() && g.Player.Sees(mons.Pos) {
+			mons.LastSeenState = mons.State
+			mons.LastSeenPos = mons.Pos
+			g.DreamingMonster[mons.Pos] = mons
 			if mons.Seen {
 				g.StopAuto()
 				continue
@@ -184,7 +188,7 @@ func (g *game) SeePosition(pos position) {
 	if _, ok := g.WrongFoliage[pos]; ok {
 		delete(g.WrongFoliage, pos)
 	}
-	if _, ok := g.DreamingMonster[pos]; ok {
+	if mons, ok := g.DreamingMonster[pos]; ok && !(mons.Exists() && mons.Pos == pos) {
 		delete(g.DreamingMonster, pos)
 	}
 }
@@ -249,7 +253,7 @@ func (g *game) ComputeNoise() {
 		rmax--
 	}
 	for pos := range nm {
-		if g.Player.LOS[pos] {
+		if g.Player.Sees(pos) {
 			continue
 		}
 		mons := g.MonsterAt(pos)
@@ -280,4 +284,33 @@ func (g *game) ComputeNoise() {
 		g.StopAuto()
 	}
 	g.Noise = noise
+}
+
+func (p *player) Sees(pos position) bool {
+	return pos == p.Pos || p.LOS[pos] && p.Dir.InViewCone(p.Pos, pos)
+}
+
+func (m *monster) SeesPlayer(g *game) bool {
+	return g.Player.LOS[m.Pos] && m.Dir.InViewCone(m.Pos, g.Player.Pos)
+}
+
+func (m *monster) Sees(g *game, pos position) bool {
+	return g.Player.LOS[m.Pos] && m.Dir.InViewCone(m.Pos, pos)
+}
+
+func (g *game) ComputeMonsterLOS() {
+	g.MonsterLOS = make(map[position]bool)
+	for _, mons := range g.Monsters {
+		if !mons.Exists() || !g.Player.Sees(mons.Pos) {
+			continue
+		}
+		for pos, _ := range g.Player.LOS {
+			if !g.Player.Sees(pos) {
+				continue
+			}
+			if pos == mons.Pos || mons.Sees(g, pos) {
+				g.MonsterLOS[pos] = true
+			}
+		}
+	}
 }

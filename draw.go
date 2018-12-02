@@ -652,7 +652,7 @@ func (ui *gameui) DescribePosition(pos position, targ Targeter) {
 		desc = "This is you"
 	}
 	see := "see"
-	if !g.Player.LOS[pos] {
+	if !g.Player.Sees(pos) {
 		see = "saw"
 	}
 	if g.Dungeon.Cell(pos).T == WallCell && !g.WrongWall[pos] || g.Dungeon.Cell(pos).T == FreeCell && g.WrongWall[pos] {
@@ -661,7 +661,7 @@ func (ui *gameui) DescribePosition(pos position, targ Targeter) {
 		g.InfoEntry = desc + "."
 		return
 	}
-	if mons.Exists() && g.Player.LOS[pos] {
+	if mons.Exists() && g.Player.Sees(pos) {
 		desc = ui.AddComma(see, desc)
 		desc += fmt.Sprintf("%s (%s)", mons.Kind.Indefinite(false), ui.MonsterInfo(mons))
 	}
@@ -700,7 +700,7 @@ func (ui *gameui) DescribePosition(pos position, targ Targeter) {
 		desc = ui.AddComma(see, desc)
 		desc += fmt.Sprintf("a door")
 	}
-	if cld, ok := g.Clouds[pos]; ok && g.Player.LOS[pos] {
+	if cld, ok := g.Clouds[pos]; ok && g.Player.Sees(pos) {
 		if cld == CloudFire {
 			desc = ui.AddComma(see, desc)
 			desc += fmt.Sprintf("burning flames")
@@ -728,7 +728,7 @@ func (ui *gameui) ViewPositionDescription(pos position) {
 		return
 	}
 	mons := g.MonsterAt(pos)
-	if mons.Exists() && g.Player.LOS[mons.Pos] {
+	if mons.Exists() && g.Player.Sees(mons.Pos) {
 		ui.HideCursor()
 		ui.DrawMonsterDescription(mons)
 		ui.SetCursor(pos)
@@ -890,7 +890,7 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 			r = '¤'
 			fgColor = ColorFgDark
 		}
-		if g.DreamingMonster[pos] {
+		if mons := g.DreamingMonster[pos]; mons.Exists() && !mons.Seen {
 			r = '☻'
 			fgColor = ColorFgSleepingMonster
 		}
@@ -914,7 +914,7 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 			}
 		}
 	}
-	if g.Player.LOS[pos] && !g.WizardMap {
+	if g.Player.Sees(pos) && !g.WizardMap {
 		fgColor = ColorFgLOS
 		bgColor = ColorBgLOS
 	} else {
@@ -935,10 +935,13 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 		fgColor = ColorFgPlayer
 	default:
 		r = '.'
+		if g.MonsterLOS[pos] {
+			fgColor = ColorFgWanderingMonster // TODO: other color?
+		}
 		if _, ok := g.Fungus[pos]; ok && !g.WrongFoliage[pos] || !ok && g.WrongFoliage[pos] {
 			r = '"'
 		}
-		if cld, ok := g.Clouds[pos]; ok && g.Player.LOS[pos] {
+		if cld, ok := g.Clouds[pos]; ok && g.Player.Sees(pos) {
 			r = '§'
 			if cld == CloudFire {
 				fgColor = ColorFgWanderingMonster
@@ -976,7 +979,7 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 			r = '+'
 			fgColor = ColorFgPlace
 		}
-		if (g.Player.LOS[pos] || g.Wizard) && !g.WizardMap {
+		if (g.Player.Sees(pos) || g.Wizard) && !g.WizardMap {
 			m := g.MonsterAt(pos)
 			if m.Exists() {
 				r = m.Kind.Letter()
@@ -997,9 +1000,23 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 		} else if !g.Wizard && g.Noise[pos] {
 			r = '♫'
 			fgColor = ColorFgWanderingMonster
-		} else if !g.Wizard && g.DreamingMonster[pos] {
-			r = '☻'
-			fgColor = ColorFgSleepingMonster
+		} else if !g.Wizard {
+			mons := g.DreamingMonster[pos]
+			if mons.Exists() && mons.LastSeenPos == pos {
+				if !mons.Seen {
+					r = '☻'
+					fgColor = ColorFgSleepingMonster
+				} else {
+					r = mons.Kind.Letter()
+					if mons.State == Resting {
+						fgColor = ColorFgSleepingMonster
+					} else {
+						fgColor = ColorFgWanderingMonster
+					}
+				}
+			} else {
+				delete(g.DreamingMonster, pos)
+			}
 		}
 	}
 	return

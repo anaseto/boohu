@@ -9,6 +9,7 @@ type player struct {
 	HP          int
 	MP          int
 	Simellas    int
+	Dir         direction
 	Armour      armour
 	Weapon      weapon
 	Consumables map[consumable]int
@@ -101,15 +102,12 @@ func (g *game) AutoToDir(ev event) bool {
 }
 
 func (g *game) GoToDir(dir direction, ev event) error {
-	if g.MonsterInLOS() != nil {
-		g.AutoDir = NoDir
-		return errors.New("You cannot travel while there are monsters in view.")
+	if g.Player.Dir == dir {
+		return errors.New("You are already looking in that direction.")
 	}
-	err := g.MovePlayer(g.Player.Pos.To(dir), ev)
-	if err != nil {
-		return err
-	}
-	g.AutoDir = dir
+	g.Player.Dir = dir
+	ev.Renew(g, 5)
+	g.ComputeLOS() // TODO: not really needed
 	return nil
 }
 
@@ -371,6 +369,7 @@ func (g *game) MovePlayer(pos position, ev event) error {
 		}
 	} else {
 		g.FunAction()
+		g.Player.Dir = mons.Pos.Dir(g.Player.Pos)
 		g.AttackMonster(mons, ev)
 	}
 	if g.Player.HasStatus(StatusBerserk) {
@@ -435,6 +434,17 @@ func (g *game) Confusion(ev event) {
 }
 
 func (g *game) PlacePlayerAt(pos position) {
+	g.Player.Dir = pos.Dir(g.Player.Pos)
+	switch g.Player.Dir {
+	case ENE, ESE:
+		g.Player.Dir = E
+	case NNE, NNW:
+		g.Player.Dir = N
+	case WNW, WSW:
+		g.Player.Dir = W
+	case SSW, SSE:
+		g.Player.Dir = S
+	}
 	g.Player.Pos = pos
 	g.CollectGround()
 	g.ComputeLOS()
@@ -444,5 +454,5 @@ func (g *game) PlacePlayerAt(pos position) {
 func (g *game) EnterLignification(ev event) {
 	g.Player.Statuses[StatusLignification]++
 	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 150 + RandInt(100), EAction: LignificationEnd})
-	g.Player.HP += 10
+	g.Player.HP += 4
 }

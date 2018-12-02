@@ -199,6 +199,7 @@ func (g *game) EvokeRodBlink(ev event) error {
 func (g *game) BlinkPos() position {
 	losPos := []position{}
 	for pos, b := range g.Player.LOS {
+		// TODO: skip if not seen?
 		if !b {
 			continue
 		}
@@ -266,6 +267,7 @@ func (g *game) EvokeRodSleeping(ev event) error {
 			g.Printf("%s falls asleep.", mons.Kind.Definite(true))
 		}
 		mons.State = Resting
+		mons.Dir = NoDir
 		mons.ExhaustTime(g, 40+RandInt(10))
 	}
 	return nil
@@ -285,11 +287,7 @@ func (g *game) EvokeRodFireBolt(ev event) error {
 		if !mons.Exists() {
 			continue
 		}
-		dmg := 0
-		for i := 0; i < 2; i++ {
-			dmg += RandInt(21)
-		}
-		dmg /= 2
+		dmg := 1 + RandInt(2)
 		mons.HP -= dmg
 		if mons.HP <= 0 {
 			g.Printf("%s is killed by the bolt.", mons.Kind.Indefinite(true))
@@ -317,11 +315,7 @@ func (g *game) EvokeRodFireball(ev event) error {
 		if mons == nil {
 			continue
 		}
-		dmg := 0
-		for i := 0; i < 2; i++ {
-			dmg += RandInt(24)
-		}
-		dmg /= 2
+		dmg := 1 + RandInt(3)
 		mons.HP -= dmg
 		if mons.HP <= 0 {
 			g.Printf("%s is killed by the fireball.", mons.Kind.Indefinite(true))
@@ -366,11 +360,7 @@ func (g *game) EvokeRodLightning(ev event) error {
 			continue
 		}
 		targets = append(targets, pos)
-		dmg := 0
-		for i := 0; i < 2; i++ {
-			dmg += RandInt(17)
-		}
-		dmg /= 2
+		dmg := 1
 		mons.HP -= dmg
 		if mons.HP <= 0 {
 			g.Printf("%s is killed by lightning.", mons.Kind.Indefinite(true))
@@ -432,7 +422,7 @@ func (g *game) EvokeRodDigging(ev event) error {
 		g.MakeNoise(WallNoise, pos)
 		g.Fog(pos, 1, ev)
 		pos = pos.To(pos.Dir(g.Player.Pos))
-		if !g.Player.LOS[pos] {
+		if !g.Player.Sees(pos) {
 			g.WrongWall[pos] = true
 		}
 		if !pos.valid() || g.Dungeon.Cell(pos).T != WallCell {
@@ -507,7 +497,7 @@ func (g *game) TemporalWallAt(pos position, ev event) {
 	if g.Dungeon.Cell(pos).T == WallCell {
 		return
 	}
-	if !g.Player.LOS[pos] {
+	if !g.Player.Sees(pos) {
 		g.WrongWall[pos] = true
 	}
 	g.CreateTemporalWallAt(pos, ev)

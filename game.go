@@ -41,7 +41,8 @@ type game struct {
 	WrongDoor           map[position]bool
 	ExclusionsMap       map[position]bool
 	Noise               map[position]bool
-	DreamingMonster     map[position]bool
+	DreamingMonster     map[position]*monster
+	MonsterLOS          map[position]bool
 	Resting             bool
 	RestingTurns        int
 	Autoexploring       bool
@@ -480,7 +481,7 @@ func (g *game) InitLevel() {
 	g.WrongDoor = map[position]bool{}
 	g.ExclusionsMap = map[position]bool{}
 	g.TemporalWalls = map[position]bool{}
-	g.DreamingMonster = map[position]bool{}
+	g.DreamingMonster = map[position]*monster{}
 
 	// Monsters
 	g.BandData = MonsBands
@@ -723,7 +724,7 @@ func (g *game) GenCollectables() {
 }
 
 func (g *game) GenArmour() {
-	ars := [6]armour{SmokingScales, ShinyPlates, TurtlePlates, SpeedRobe, CelmistRobe, HarmonistRobe}
+	ars := [4]armour{SmokingScales, SpeedRobe, CelmistRobe, HarmonistRobe}
 	for {
 		i := RandInt(len(ars))
 		if g.GeneratedEquipables[ars[i]] {
@@ -738,7 +739,7 @@ func (g *game) GenArmour() {
 }
 
 func (g *game) GenWeapon() {
-	wps := [WeaponNum - 1]weapon{Axe, BattleAxe, Spear, Halberd, AssassinSabre, DancingRapier, HopeSword, Frundis, ElecWhip, HarKarGauntlets, VampDagger, DragonSabre, FinalBlade, DefenderFlail}
+	wps := [3]weapon{DancingRapier, Frundis, HarKarGauntlets}
 	for {
 		i := RandInt(len(wps))
 		if g.GeneratedEquipables[wps[i]] {

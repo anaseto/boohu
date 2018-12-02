@@ -210,7 +210,7 @@ func (g *game) QuaffBerserk(ev event) error {
 	g.PushEvent(&simpleEvent{ERank: end, EAction: BerserkEnd})
 	g.Player.Expire[StatusBerserk] = end
 	g.Printf("You quaff the %s. You feel a sudden urge to kill things.", BerserkPotion)
-	g.Player.HP += 10
+	g.Player.HP += 2
 	return nil
 }
 
@@ -354,8 +354,8 @@ func (g *game) QuaffTormentPotion(ev event) error {
 
 func (g *game) QuaffDreamPotion(ev event) error {
 	for _, mons := range g.Monsters {
-		if mons.Exists() && mons.State == Resting && !g.Player.LOS[mons.Pos] {
-			g.DreamingMonster[mons.Pos] = true
+		if mons.Exists() && mons.State == Resting && !g.Player.Sees(mons.Pos) {
+			g.DreamingMonster[mons.Pos] = mons
 		}
 	}
 	g.Printf("You quaff the %s. You perceive monsters' dreams.", DreamPotion)
@@ -535,7 +535,7 @@ func (g *game) ExplosionAt(ev event, pos position) {
 	} else if g.Dungeon.Cell(pos).T == WallCell && RandInt(2) == 0 {
 		g.Dungeon.SetCell(pos, FreeCell)
 		g.Stats.Digs++
-		if !g.Player.LOS[pos] {
+		if !g.Player.Sees(pos) {
 			g.WrongWall[pos] = true
 		} else {
 			g.ui.WallExplosionAnimation(pos)

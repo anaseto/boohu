@@ -1658,29 +1658,34 @@ func init() {
 }
 
 type monster struct {
-	Kind        monsterKind
-	Band        int
-	Index       int
-	Attack      int
-	Accuracy    int
-	Armor       int
-	Evasion     int
-	HPmax       int
-	HP          int
-	State       monsterState
-	Statuses    [NMonsStatus]int
-	Pos         position
-	Target      position
-	Path        []position // cache
-	Obstructing bool
-	FireReady   bool
-	Seen        bool
+	Kind          monsterKind
+	Band          int
+	Index         int
+	Dir           direction
+	Attack        int
+	Accuracy      int
+	Armor         int
+	Evasion       int
+	HPmax         int
+	HP            int
+	State         monsterState
+	Statuses      [NMonsStatus]int
+	Pos           position
+	Target        position
+	Path          []position // cache
+	Obstructing   bool
+	FireReady     bool
+	Seen          bool
+	LastSeenState monsterState
+	LastSeenPos   position
 }
 
 func (m *monster) Init() {
-	m.HPmax = MonsData[m.Kind].maxHP - 1 + RandInt(3)
+	m.HPmax = MonsData[m.Kind].maxHP
 	m.Attack = MonsData[m.Kind].baseAttack
 	m.HP = m.HPmax
+	m.Pos = InvalidPos
+	m.LastSeenPos = InvalidPos
 	m.Accuracy = MonsData[m.Kind].accuracy
 	m.Armor = MonsData[m.Kind].armor
 	m.Evasion = MonsData[m.Kind].evasion
@@ -1814,25 +1819,30 @@ func (m *monster) TeleportAway(g *game) {
 		m.State = Wandering
 		m.Target = m.Pos
 	}
-	if g.Player.LOS[m.Pos] {
+	if g.Player.Sees(m.Pos) {
 		g.Printf("%s teleports away.", m.Kind.Definite(true))
 	}
 	opos := m.Pos
 	m.MoveTo(g, pos)
-	if g.Player.LOS[opos] {
+	if g.Player.Sees(opos) {
 		g.ui.TeleportAnimation(opos, pos, false)
 	}
 }
 
 func (m *monster) MoveTo(g *game, pos position) {
-	if !g.Player.LOS[m.Pos] && g.Player.LOS[pos] {
+	if g.Player.Sees(pos) {
+		m.LastSeenState = m.State
+		m.LastSeenPos = pos
+		g.DreamingMonster[pos] = m
+	}
+	if !g.Player.Sees(m.Pos) && g.Player.Sees(pos) {
 		if !m.Seen {
 			m.Seen = true
 			g.Printf("%s (%v) comes into view.", m.Kind.Indefinite(true), m.State)
 		}
 		g.StopAuto()
 	}
-	recomputeLOS := g.Player.LOS[m.Pos] && g.Doors[m.Pos] || g.Player.LOS[pos] && g.Doors[pos]
+	recomputeLOS := g.Player.Sees(m.Pos) && g.Doors[m.Pos] || g.Player.Sees(pos) && g.Doors[pos]
 	m.PlaceAt(g, pos)
 	if recomputeLOS {
 		g.ComputeLOS()
@@ -1840,6 +1850,26 @@ func (m *monster) MoveTo(g *game, pos position) {
 }
 
 func (m *monster) PlaceAt(g *game, pos position) {
+	if !m.Pos.valid() {
+		m.Pos = pos
+		g.MonstersPosCache[m.Pos.idx()] = m.Index + 1
+		return
+	}
+	if pos == m.Pos {
+		// should not happen
+		return
+	}
+	m.Dir = pos.Dir(m.Pos)
+	switch m.Dir {
+	case ENE, ESE:
+		m.Dir = E
+	case NNE, NNW:
+		m.Dir = N
+	case WNW, WSW:
+		m.Dir = W
+	case SSW, SSE:
+		m.Dir = S
+	}
 	g.MonstersPosCache[m.Pos.idx()] = 0
 	m.Pos = pos
 	g.MonstersPosCache[m.Pos.idx()] = m.Index + 1
@@ -1853,7 +1883,7 @@ func (m *monster) TeleportMonsterAway(g *game) bool {
 		}
 		mons := g.MonsterAt(pos)
 		if mons.Exists() {
-			if g.Player.LOS[m.Pos] {
+			if g.Player.Sees(m.Pos) {
 				g.Print("Marevor makes some strange gestures.")
 			}
 			mons.TeleportAway(g)
@@ -1902,7 +1932,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	ppos := g.Player.Pos
 	mpos := m.Pos
 	m.MakeAware(g)
-	if !g.Player.LOS[m.Pos] && m.State == Hunting {
+	if !m.SeesPlayer(g) && m.State == Hunting {
 		if g.Player.Armour == HarmonistRobe && RandInt(2) == 0 ||
 			g.Player.Aptitudes[AptStealthyMovement] && RandInt(4) == 0 ||
 			RandInt(10) == 0 {
@@ -1933,7 +1963,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 		// oklob plants are static ranged-only
 		return
 	case MonsMindCelmist:
-		if m.State == Hunting && !g.Player.LOS[m.Pos] && m.Pos.Distance(g.Player.Pos) <= 2 {
+		if m.State == Hunting && !m.SeesPlayer(g) && m.Pos.Distance(g.Player.Pos) <= 2 {
 			// “smart” wait at short distance
 			ev.Renew(g, movedelay)
 			return
@@ -2023,7 +2053,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 		if m.Kind == MonsEarthDragon && g.Dungeon.Cell(target).T == WallCell {
 			g.Dungeon.SetCell(target, FreeCell)
 			g.Stats.Digs++
-			if !g.Player.LOS[target] {
+			if !g.Player.Sees(target) {
 				g.WrongWall[m.Pos] = true
 			}
 			g.MakeNoise(WallNoise, m.Pos)
@@ -2040,7 +2070,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 		} else {
 			m.InvertFoliage(g)
 			m.MoveTo(g, target)
-			if (m.Kind.Ranged() || m.Kind.Smiting()) && !m.FireReady && g.Player.LOS[m.Pos] {
+			if (m.Kind.Ranged() || m.Kind.Smiting()) && !m.FireReady && m.SeesPlayer(g) {
 				m.FireReady = true
 			}
 			m.Path = m.Path[:len(m.Path)-1]
@@ -2058,7 +2088,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 		} else {
 			m.Path = m.APath(g, mpos, m.Target)
 		}
-	case !g.Player.LOS[mons.Pos] && g.Player.Pos.Distance(mons.Target) > 2 && mons.State != Hunting:
+	case !mons.SeesPlayer(g) && g.Player.Pos.Distance(mons.Target) > 2 && mons.State != Hunting:
 		r := RandInt(5)
 		if r == 0 {
 			m.Target = g.FreeCell()
@@ -2102,7 +2132,7 @@ func (m *monster) InvertFoliage(g *game) {
 		delete(g.Fungus, m.Pos)
 		invert = true
 	}
-	if !g.Player.LOS[m.Pos] && invert {
+	if !g.Player.Sees(m.Pos) && invert {
 		g.WrongFoliage[m.Pos] = !g.WrongFoliage[m.Pos]
 	} else if invert {
 		g.ComputeLOS()
@@ -2189,7 +2219,7 @@ func (m *monster) EnterLignification(g *game, ev event) {
 		m.Path = m.Path[:0]
 		g.PushEvent(&monsterEvent{
 			ERank: ev.Rank() + 150 + RandInt(100), NMons: m.Index, EAction: MonsLignificationEnd})
-		if g.Player.LOS[m.Pos] {
+		if g.Player.Sees(m.Pos) {
 			g.Printf("%s is rooted to the ground.", m.Kind.Definite(true))
 		}
 	}
@@ -2204,7 +2234,7 @@ func (m *monster) HitSideEffects(g *game, ev event) {
 	case MonsGiantBee:
 		if RandInt(5) == 0 && !g.Player.HasStatus(StatusBerserk) && !g.Player.HasStatus(StatusExhausted) {
 			g.Player.Statuses[StatusBerserk] = 1
-			g.Player.HP += 10
+			g.Player.HP += 2
 			end := ev.Rank() + 25 + RandInt(30)
 			g.PushEvent(&simpleEvent{ERank: end, EAction: BerserkEnd})
 			g.Player.Expire[StatusBerserk] = end
@@ -2253,7 +2283,7 @@ func (m *monster) RangedAttack(g *game, ev event) bool {
 	if m.Pos.Distance(g.Player.Pos) <= 1 && m.Kind != MonsSatowalgaPlant {
 		return false
 	}
-	if !g.Player.LOS[m.Pos] {
+	if !m.SeesPlayer(g) {
 		m.FireReady = false
 		return false
 	}
@@ -2310,10 +2340,10 @@ func (m *monster) TormentBolt(g *game, ev event) bool {
 	g.MakeNoise(9, m.Pos)
 	if RandInt(3) > 0 {
 		g.MakeNoise(MagicHitNoise, g.Player.Pos)
-		damage := g.Player.HP - g.Player.HP/2
+		damage := g.Player.HP / 2
 		g.PrintfStyled("%s throws a bolt of torment at you.", logMonsterHit, m.Kind.Definite(true))
 		g.ui.MonsterProjectileAnimation(g.Ray(m.Pos), '*', ColorCyan)
-		m.InflictDamage(g, damage, 15)
+		m.InflictDamage(g, damage, 2)
 	} else {
 		g.Printf("You dodge the %s's bolt of torment.", m.Kind)
 		g.ui.MonsterProjectileAnimation(g.Ray(m.Pos), '*', ColorCyan)
@@ -2480,7 +2510,7 @@ func (m *monster) SmitingAttack(g *game, ev event) bool {
 	if !m.Kind.Smiting() {
 		return false
 	}
-	if !g.Player.LOS[m.Pos] {
+	if !m.SeesPlayer(g) {
 		m.FireReady = false
 		return false
 	}
@@ -2564,7 +2594,7 @@ func (m *monster) Explode(g *game, ev event) {
 		} else if c.T == WallCell && RandInt(2) == 0 {
 			g.Dungeon.SetCell(pos, FreeCell)
 			g.Stats.Digs++
-			if !g.Player.LOS[pos] {
+			if !g.Player.Sees(pos) {
 				g.WrongWall[pos] = true
 			} else {
 				g.ui.WallExplosionAnimation(pos)
@@ -2617,7 +2647,7 @@ func (m *monster) MakeAwareIfHurt(g *game) {
 }
 
 func (m *monster) MakeAware(g *game) {
-	if !g.Player.LOS[m.Pos] {
+	if !m.SeesPlayer(g) {
 		return
 	}
 	if m.State == Resting {
@@ -2884,7 +2914,7 @@ loop:
 
 func (g *game) MonsterInLOS() *monster {
 	for _, mons := range g.Monsters {
-		if mons.Exists() && g.Player.LOS[mons.Pos] {
+		if mons.Exists() && g.Player.Sees(mons.Pos) {
 			return mons
 		}
 	}

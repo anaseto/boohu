@@ -287,3 +287,53 @@ func (pos position) Laterals(dir direction) []position {
 		return []position{}
 	}
 }
+
+func (dir direction) InViewCone(from, to position) bool {
+	d := to.Dir(from)
+	if d == dir || from.Distance(to) <= 1 {
+		return true
+	}
+	switch dir {
+	case E:
+		switch d {
+		case ESE, ENE, NE, SE:
+			return true
+		}
+	case NE:
+		switch d {
+		case ENE, NNE, N, E:
+			return true
+		}
+	case N:
+		switch d {
+		case NNE, NNW, NE, NW:
+			return true
+		}
+	case NW:
+		switch d {
+		case NNW, WNW, N, W:
+			return true
+		}
+	case W:
+		switch d {
+		case WNW, WSW, NW, SW:
+			return true
+		}
+	case SW:
+		switch d {
+		case WSW, SSW, W, S:
+			return true
+		}
+	case S:
+		switch d {
+		case SSW, SSE, SW, SE:
+			return true
+		}
+	case SE:
+		switch d {
+		case SSE, ESE, S, E:
+			return true
+		}
+	}
+	return false
+}

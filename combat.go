@@ -16,16 +16,15 @@ func (g *game) Absorb(armor int) int {
 }
 
 func (g *game) HitDamage(base int, armor int) (attack int, clang bool) {
-	min := base / 2
-	attack = min + RandInt(base-min+1)
-	absorb := g.Absorb(armor)
-	attack -= absorb
-	if absorb > 0 && absorb >= 2*armor/3 && RandInt(2) == 0 {
-		clang = true
-	}
-	if attack < 0 {
-		attack = 0
-	}
+	attack = base
+	//absorb := g.Absorb(armor)
+	//attack -= absorb
+	//if absorb > 0 && absorb >= 2*armor/3 && RandInt(2) == 0 {
+	//clang = true
+	//}
+	//if attack < 0 {
+	//attack = 0
+	//}
 	return attack, clang
 }
 
@@ -137,7 +136,7 @@ func (g *game) MakeNoise(noise int, at position) {
 			v = 2 * v / 3
 		}
 		if v > r {
-			if g.Player.LOS[m.Pos] {
+			if m.SeesPlayer(g) {
 				m.MakeHunt(g)
 			} else {
 				m.Target = at
