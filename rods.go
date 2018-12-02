@@ -319,7 +319,7 @@ func (g *game) EvokeRodFireball(ev event) error {
 		}
 		dmg := 0
 		for i := 0; i < 2; i++ {
-			dmg += RandInt(21)
+			dmg += RandInt(24)
 		}
 		dmg /= 2
 		mons.HP -= dmg
