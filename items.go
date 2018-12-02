@@ -41,7 +41,6 @@ const (
 	SwapPotion
 	ShadowsPotion
 	TormentPotion
-	AccuracyPotion
 	DreamPotion
 )
 
@@ -78,8 +77,6 @@ func (p potion) String() (text string) {
 		text += " of shadows"
 	case TormentPotion:
 		text += " of torment explosion"
-	case AccuracyPotion:
-		text += " of accuracy"
 	case DreamPotion:
 		text += " of dreams"
 	}
@@ -121,8 +118,6 @@ func (p potion) Desc() (text string) {
 		text = "reduces your line of sight range to 1. Because monsters only can see you if you see them, this makes it easier to get out of sight of monsters so that they eventually stop chasing you."
 	case TormentPotion:
 		text = "halves HP of every creature in sight, including the player, and destroys visible walls. Extremely noisy. It can burn foliage and doors."
-	case AccuracyPotion:
-		text = "makes you never miss for a few turns."
 	case DreamPotion:
 		text = "shows you the position in the map of monsters sleeping at drink time."
 	}
@@ -176,8 +171,6 @@ func (p potion) Use(g *game, ev event) error {
 		err = g.QuaffShadowsPotion(ev)
 	case TormentPotion:
 		err = g.QuaffTormentPotion(ev)
-	case AccuracyPotion:
-		err = g.QuaffAccuracyPotion(ev)
 	case DreamPotion:
 		err = g.QuaffDreamPotion(ev)
 	}
@@ -223,10 +216,7 @@ func (g *game) QuaffBerserk(ev event) error {
 
 func (g *game) QuaffHealWounds(ev event) error {
 	hp := g.Player.HP
-	g.Player.HP += 2 * DefaultHealth / 3
-	if g.Player.HP > g.Player.HPMax() {
-		g.Player.HP = g.Player.HPMax()
-	}
+	g.Player.HP = g.Player.HPMax()
 	g.Printf("You quaff the %s (%d -> %d).", HealWoundsPotion, hp, g.Player.HP)
 	return nil
 }
@@ -359,15 +349,6 @@ func (g *game) QuaffTormentPotion(ev event) error {
 		}
 		g.ExplosionAt(ev, pos)
 	}
-	return nil
-}
-
-func (g *game) QuaffAccuracyPotion(ev event) error {
-	g.Player.Statuses[StatusAccurate]++
-	end := ev.Rank() + 85 + RandInt(20)
-	g.PushEvent(&simpleEvent{ERank: end, EAction: AccurateEnd})
-	g.Player.Expire[StatusAccurate] = end
-	g.Printf("You quaff the %s. You feel accurate.", SwiftnessPotion)
 	return nil
 }
 
@@ -523,7 +504,7 @@ func (g *game) ThrowConfusingDart(ev event) error {
 	if g.Player.Aptitudes[AptStrong] {
 		bonus += 2
 	}
-	attack, _ := g.HitDamage(DmgPhysical, 7+bonus, mons.Armor) // no clang with darts
+	attack, _ := g.HitDamage(7+bonus, mons.Armor) // no clang with darts
 	mons.HP -= attack
 	if mons.HP > 0 {
 		mons.EnterConfusion(g, ev)
@@ -694,7 +675,6 @@ var ConsumablesCollectData = map[consumable]collectData{
 	MagicMappingPotion:  {rarity: 18, quantity: 1},
 	DreamPotion:         {rarity: 18, quantity: 1},
 	TormentPotion:       {rarity: 30, quantity: 1},
-	AccuracyPotion:      {rarity: 18, quantity: 1},
 }
 
 type equipable interface {
@@ -1007,86 +987,4 @@ func (wp weapon) Pierce() bool {
 	default:
 		return false
 	}
-}
-
-type shield int
-
-const (
-	NoShield shield = iota
-	ConfusingShield
-	EarthShield
-	BashingShield
-	FireShield
-)
-
-func (sh shield) Equip(g *game) {
-	osh := g.Player.Shield
-	g.Player.Shield = sh
-	if !g.FoundEquipables[sh] {
-		g.StoryPrintf("You found and put on %s.", Indefinite(sh.String(), false))
-		g.FoundEquipables[sh] = true
-	}
-	if osh != NoShield {
-		g.Equipables[g.Player.Pos] = osh
-		g.Printf("You put the %s on and leave your %s.", sh, osh)
-	} else {
-		delete(g.Equipables, g.Player.Pos)
-		g.Printf("You put the %s on.", sh)
-	}
-}
-
-func (sh shield) String() (text string) {
-	switch sh {
-	case ConfusingShield:
-		text = "confusing shield"
-	case EarthShield:
-		text = "earth shield"
-	case BashingShield:
-		text = "bashing shield"
-	case FireShield:
-		text = "fire shield"
-	}
-	return text
-}
-
-func (sh shield) Short() (text string) {
-	switch sh {
-	case ConfusingShield:
-		text = "Cn"
-	case EarthShield:
-		text = "Er"
-	case BashingShield:
-		text = "Bs"
-	case FireShield:
-		text = "Fr"
-	}
-	return text
-}
-
-func (sh shield) Desc() (text string) {
-	switch sh {
-	case ConfusingShield:
-		text = "A confusing shield can block an attack, sometimes confusing the monster."
-	case EarthShield:
-		text = "An earth shield offers great protection, but impact sound can disintegrate nearby walls."
-	case BashingShield:
-		text = "A bashing shield can block an attack and push the ennemy away."
-	case FireShield:
-		text = "A fire shield can block an attack, sometimes burning nearby foliage."
-	}
-	return text
-}
-
-func (sh shield) Letter() rune {
-	return ']'
-}
-
-func (sh shield) Block() (block int) {
-	switch sh {
-	case ConfusingShield, BashingShield, FireShield:
-		block += 10
-	case EarthShield:
-		block += 15
-	}
-	return block
 }

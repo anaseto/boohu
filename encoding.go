@@ -14,7 +14,6 @@ func init() {
 	gob.Register(&cloudEvent{})
 	gob.Register(armour(0))
 	gob.Register(weapon(0))
-	gob.Register(shield(0))
 }
 
 func (g *game) GameSave() ([]byte, error) {

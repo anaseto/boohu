@@ -186,32 +186,32 @@ type monsterData struct {
 }
 
 var MonsData = []monsterData{
-	MonsGoblin:          {10, 7, 10, 15, 14, 0, 12, 'g', "goblin", 2},
-	MonsTinyHarpy:       {10, 8, 10, 14, 14, 0, 14, 't', "tiny harpy", 3},
-	MonsOgre:            {10, 15, 12, 28, 13, 0, 8, 'O', "ogre", 6},
-	MonsCyclop:          {10, 12, 12, 28, 13, 0, 8, 'C', "cyclops", 9},
-	MonsWorm:            {12, 9, 10, 25, 13, 0, 10, 'w', "farmer worm", 3},
-	MonsBrizzia:         {12, 10, 10, 30, 13, 0, 10, 'z', "brizzia", 7},
-	MonsAcidMound:       {10, 9, 10, 19, 16, 0, 8, 'a', "acid mound", 7},
-	MonsHound:           {8, 9, 10, 15, 14, 0, 12, 'h', "hound", 4},
-	MonsYack:            {10, 11, 10, 21, 14, 0, 10, 'y', "yack", 6},
-	MonsGiantBee:        {6, 10, 10, 11, 15, 0, 15, 'B', "giant bee", 6},
-	MonsGoblinWarrior:   {10, 11, 10, 22, 15, 3, 12, 'G', "goblin warrior", 8},
-	MonsHydra:           {10, 9, 10, 45, 13, 0, 6, 'H', "hydra", 15},
-	MonsSkeletonWarrior: {10, 12, 10, 25, 15, 4, 12, 'S', "skeleton warrior", 10},
-	MonsSpider:          {8, 7, 10, 13, 17, 0, 15, 's', "spider", 6},
-	MonsWingedMilfid:    {8, 9, 10, 17, 15, 0, 13, 'W', "winged milfid", 7},
-	MonsBlinkingFrog:    {10, 10, 10, 20, 15, 0, 12, 'F', "blinking frog", 7},
-	MonsLich:            {10, 10, 10, 23, 15, 3, 12, 'L', "lich", 16},
-	MonsEarthDragon:     {10, 14, 10, 40, 14, 6, 8, 'D', "earth dragon", 20},
-	MonsMirrorSpecter:   {10, 10, 10, 18, 15, 0, 17, 'm', "mirror specter", 11},
-	MonsExplosiveNadre:  {10, 6, 10, 3, 14, 0, 10, 'n', "explosive nadre", 6},
-	MonsSatowalgaPlant:  {10, 12, 12, 30, 15, 0, 4, 'P', "satowalga plant", 7},
-	MonsMadNixe:         {10, 11, 10, 20, 15, 0, 15, 'N', "mad nixe", 12},
-	MonsMindCelmist:     {10, 9, 20, 18, 99, 0, 14, 'c', "mind celmist", 14},
-	MonsVampire:         {10, 9, 10, 21, 17, 0, 15, 'V', "vampire", 13},
-	MonsTreeMushroom:    {12, 15, 12, 38, 14, 4, 6, 'T', "tree mushroom", 17},
-	MonsMarevorHelith:   {10, 0, 10, 97, 18, 10, 15, 'M', "Marevor Helith", 18},
+	MonsGoblin:          {10, 1, 10, 2, 14, 0, 12, 'g', "goblin", 2},
+	MonsTinyHarpy:       {10, 1, 10, 2, 14, 0, 14, 't', "tiny harpy", 3},
+	MonsOgre:            {10, 2, 12, 3, 13, 0, 8, 'O', "ogre", 6},
+	MonsCyclop:          {10, 1, 12, 3, 13, 0, 8, 'C', "cyclops", 9},
+	MonsWorm:            {12, 1, 10, 3, 13, 0, 10, 'w', "farmer worm", 3},
+	MonsBrizzia:         {12, 1, 10, 3, 13, 0, 10, 'z', "brizzia", 7},
+	MonsAcidMound:       {10, 1, 10, 2, 16, 0, 8, 'a', "acid mound", 7},
+	MonsHound:           {8, 1, 10, 2, 14, 0, 12, 'h', "hound", 4},
+	MonsYack:            {10, 1, 10, 2, 14, 0, 10, 'y', "yack", 6},
+	MonsGiantBee:        {6, 1, 10, 1, 15, 0, 15, 'B', "giant bee", 6},
+	MonsGoblinWarrior:   {10, 1, 10, 2, 15, 3, 12, 'G', "goblin warrior", 8},
+	MonsHydra:           {10, 1, 10, 4, 13, 0, 6, 'H', "hydra", 15},
+	MonsSkeletonWarrior: {10, 1, 10, 2, 15, 4, 12, 'S', "skeleton warrior", 10},
+	MonsSpider:          {8, 1, 10, 2, 17, 0, 15, 's', "spider", 6},
+	MonsWingedMilfid:    {8, 1, 10, 2, 15, 0, 13, 'W', "winged milfid", 7},
+	MonsBlinkingFrog:    {10, 1, 10, 2, 15, 0, 12, 'F', "blinking frog", 7},
+	MonsLich:            {10, 1, 10, 2, 15, 3, 12, 'L', "lich", 16},
+	MonsEarthDragon:     {10, 2, 10, 4, 14, 6, 8, 'D', "earth dragon", 20},
+	MonsMirrorSpecter:   {10, 1, 10, 2, 15, 0, 17, 'm', "mirror specter", 11},
+	MonsExplosiveNadre:  {10, 1, 10, 1, 14, 0, 10, 'n', "explosive nadre", 6},
+	MonsSatowalgaPlant:  {10, 1, 12, 3, 15, 0, 4, 'P', "satowalga plant", 7},
+	MonsMadNixe:         {10, 1, 10, 2, 15, 0, 15, 'N', "mad nixe", 12},
+	MonsMindCelmist:     {10, 1, 20, 2, 99, 0, 14, 'c', "mind celmist", 14},
+	MonsVampire:         {10, 1, 10, 2, 17, 0, 15, 'V', "vampire", 13},
+	MonsTreeMushroom:    {12, 2, 12, 4, 14, 4, 6, 'T', "tree mushroom", 17},
+	MonsMarevorHelith:   {10, 0, 10, 10, 18, 10, 15, 'M', "Marevor Helith", 18},
 }
 
 var monsDesc = []string{
@@ -1779,13 +1779,11 @@ func (m *monster) SafePlacement(g *game) *position {
 }
 
 func (m *monster) TeleportPlayer(g *game, ev event) {
-	evasion := RandInt(g.Player.Evasion())
-	acc := RandInt(m.Accuracy)
-	if acc > evasion {
+	if RandInt(2) == 0 {
 		g.Print("Marevor pushes you through a monolith.")
 		g.StoryPrint("Marevor pushed you through a monolith.")
 		g.Teleportation(ev)
-	} else if RandInt(2) == 0 {
+	} else {
 		g.Print("Marevor inadvertently goes into a monolith.")
 		m.TeleportAway(g)
 	}
@@ -2111,25 +2109,6 @@ func (m *monster) InvertFoliage(g *game) {
 	}
 }
 
-func (m *monster) DramaticAdjustment(g *game, baseAttack, attack, evasion, acc int, clang bool) (int, int, bool) {
-	if attack >= g.Player.HP {
-		// a little dramatic effect
-		if RandInt(2) == 0 {
-			attack, clang = g.HitDamage(DmgPhysical, baseAttack, g.Player.Armor())
-		}
-		if attack >= g.Player.HP {
-			n := RandInt(g.Player.Evasion())
-			if n > evasion {
-				evasion = n
-			}
-		}
-	}
-	if baseAttack >= g.Player.HP && (acc <= evasion || attack < g.Player.HP) {
-		g.Stats.TimesLucky++
-	}
-	return attack, evasion, clang
-}
-
 func (m *monster) Exhaust(g *game) {
 	m.ExhaustTime(g, 100+RandInt(50))
 }
@@ -2143,69 +2122,55 @@ func (m *monster) HitPlayer(g *game, ev event) {
 	if g.Player.HP <= 0 || g.Player.Pos.Distance(m.Pos) > 1 {
 		return
 	}
-	evasion := RandInt(g.Player.Evasion())
-	acc := RandInt(m.Accuracy)
-	attack, clang := g.HitDamage(DmgPhysical, m.Attack, g.Player.Armor())
-	attack, evasion, clang = m.DramaticAdjustment(g, m.Attack, attack, evasion, acc, clang)
-	if acc > evasion {
-		if m.Blocked(g) {
-			g.Printf("Clang! You block %s's attack.", m.Kind.Definite(false))
-			g.MakeNoise(ShieldBlockNoise, g.Player.Pos)
-			g.BlockEffects(m)
-			return
+	attack, clang := g.HitDamage(m.Attack, 0)
+	if g.Player.HasStatus(StatusSwap) && !g.Player.HasStatus(StatusLignification) && !m.Status(MonsLignified) {
+		g.SwapWithMonster(m)
+		return
+	}
+	noise := g.HitNoise(clang)
+	g.MakeNoise(noise, g.Player.Pos)
+	var sclang string
+	if clang {
+		sclang = g.ArmourClang()
+	}
+	g.PrintfStyled("%s hits you (%d dmg).%s", logMonsterHit, m.Kind.Definite(true), attack, sclang)
+	m.InflictDamage(g, attack, m.Attack)
+	if m.Kind == MonsVampire {
+		healing := attack
+		if healing > 2*m.Attack/3 {
+			healing = 2 * m.Attack / 3
 		}
-		if g.Player.HasStatus(StatusSwap) && !g.Player.HasStatus(StatusLignification) && !m.Status(MonsLignified) {
-			g.SwapWithMonster(m)
-			return
+		m.HP += healing
+		if m.HP > m.HPmax {
+			m.HP = m.HPmax
 		}
-		noise := g.HitNoise(clang)
-		g.MakeNoise(noise, g.Player.Pos)
-		var sclang string
-		if clang {
-			sclang = g.ArmourClang()
+	}
+	if g.Player.HP <= 0 {
+		return
+	}
+	m.HitSideEffects(g, ev)
+	const HeavyWoundHP = 18
+	if g.Player.Aptitudes[AptConfusingGas] && g.Player.HP < HeavyWoundHP && RandInt(2) == 0 {
+		m.EnterConfusion(g, ev)
+		g.Printf("You release some confusing gas against the %s.", m.Kind)
+	}
+	if g.Player.Aptitudes[AptSmoke] && g.Player.HP < HeavyWoundHP && RandInt(2) == 0 {
+		g.Smoke(ev)
+	}
+	if g.Player.Aptitudes[AptObstruction] && g.Player.HP <= HeavyWoundHP && RandInt(2) == 0 {
+		opos := m.Pos
+		m.Blink(g)
+		if opos != m.Pos {
+			g.TemporalWallAt(opos, ev)
+			g.Print("A temporal wall emerges.")
+			m.Exhaust(g)
 		}
-		g.PrintfStyled("%s hits you (%d dmg).%s", logMonsterHit, m.Kind.Definite(true), attack, sclang)
-		m.InflictDamage(g, attack, m.Attack)
-		if m.Kind == MonsVampire {
-			healing := attack
-			if healing > 2*m.Attack/3 {
-				healing = 2 * m.Attack / 3
-			}
-			m.HP += healing
-			if m.HP > m.HPmax {
-				m.HP = m.HPmax
-			}
-		}
-		if g.Player.HP <= 0 {
-			return
-		}
-		m.HitSideEffects(g, ev)
-		const HeavyWoundHP = 18
-		if g.Player.Aptitudes[AptConfusingGas] && g.Player.HP < HeavyWoundHP && RandInt(2) == 0 {
-			m.EnterConfusion(g, ev)
-			g.Printf("You release some confusing gas against the %s.", m.Kind)
-		}
-		if g.Player.Aptitudes[AptSmoke] && g.Player.HP < HeavyWoundHP && RandInt(2) == 0 {
-			g.Smoke(ev)
-		}
-		if g.Player.Aptitudes[AptObstruction] && g.Player.HP <= HeavyWoundHP && RandInt(2) == 0 {
-			opos := m.Pos
-			m.Blink(g)
-			if opos != m.Pos {
-				g.TemporalWallAt(opos, ev)
-				g.Print("A temporal wall emerges.")
-				m.Exhaust(g)
-			}
-		}
-		if g.Player.Aptitudes[AptTeleport] && g.Player.HP < HeavyWoundHP && RandInt(2) == 0 {
-			m.TeleportAway(g)
-		}
-		if g.Player.Aptitudes[AptLignification] && g.Player.HP < HeavyWoundHP && RandInt(2) == 0 {
-			m.EnterLignification(g, ev)
-		}
-	} else {
-		g.Stats.Dodges++
-		g.Printf("%s misses you.", m.Kind.Definite(true))
+	}
+	if g.Player.Aptitudes[AptTeleport] && g.Player.HP < HeavyWoundHP && RandInt(2) == 0 {
+		m.TeleportAway(g)
+	}
+	if g.Player.Aptitudes[AptLignification] && g.Player.HP < HeavyWoundHP && RandInt(2) == 0 {
+		m.EnterLignification(g, ev)
 	}
 }
 
@@ -2342,34 +2307,21 @@ func (m *monster) TormentBolt(g *game, ev event) bool {
 	if blocked {
 		return false
 	}
-	hit := !m.Blocked(g)
 	g.MakeNoise(9, m.Pos)
-	if hit {
+	if RandInt(3) > 0 {
 		g.MakeNoise(MagicHitNoise, g.Player.Pos)
 		damage := g.Player.HP - g.Player.HP/2
 		g.PrintfStyled("%s throws a bolt of torment at you.", logMonsterHit, m.Kind.Definite(true))
 		g.ui.MonsterProjectileAnimation(g.Ray(m.Pos), '*', ColorCyan)
 		m.InflictDamage(g, damage, 15)
 	} else {
-		g.Printf("You block the %s's bolt of torment.", m.Kind)
-		g.BlockEffects(m)
+		g.Printf("You dodge the %s's bolt of torment.", m.Kind)
 		g.ui.MonsterProjectileAnimation(g.Ray(m.Pos), '*', ColorCyan)
+		// TODO: hit monster behind?
 	}
 	m.Exhaust(g)
 	ev.Renew(g, m.Kind.AttackDelay())
 	return true
-}
-
-func (m *monster) Blocked(g *game) bool {
-	blocked := false
-	if g.Player.Shield != NoShield && !g.Player.Weapon.TwoHanded() && !g.Player.Blocked {
-		block := RandInt(g.Player.Block())
-		acc := RandInt(m.Accuracy)
-		if block >= acc {
-			blocked = true
-		}
-	}
-	return blocked
 }
 
 func (m *monster) ThrowRock(g *game, ev event) bool {
@@ -2377,21 +2329,9 @@ func (m *monster) ThrowRock(g *game, ev event) bool {
 	if blocked {
 		return false
 	}
-	block := false
-	hit := true
-	evasion := RandInt(g.Player.Evasion())
-	acc := RandInt(m.Accuracy)
-	const rockdmg = 15
-	attack, clang := g.HitDamage(DmgPhysical, rockdmg, g.Player.Armor())
-	attack, evasion, clang = m.DramaticAdjustment(g, rockdmg, attack, evasion, acc, clang)
-	if 4*acc/3 <= evasion {
-		// rocks are big and do not miss so often
-		hit = false
-	} else {
-		block = m.Blocked(g)
-		hit = !block
-	}
-	if hit {
+	const rockdmg = 2
+	attack, clang := g.HitDamage(rockdmg, 0)
+	if RandInt(2) == 0 {
 		noise := g.HitNoise(clang)
 		g.MakeNoise(noise, g.Player.Pos)
 		var sclang string
@@ -2410,15 +2350,6 @@ func (m *monster) ThrowRock(g *game, ev event) bool {
 			}
 		}
 		m.InflictDamage(g, attack, rockdmg)
-	} else if block {
-		g.Printf("You block %s's rock. Clang!", m.Kind.Indefinite(false))
-		g.MakeNoise(ShieldBlockNoise, g.Player.Pos)
-		g.BlockEffects(m)
-		g.ui.MonsterProjectileAnimation(g.Ray(m.Pos), '●', ColorMagenta)
-		ray := g.Ray(m.Pos)
-		if len(ray) > 0 {
-			g.TemporalWallAt(ray[len(ray)-1], ev)
-		}
 	} else {
 		g.Stats.Dodges++
 		g.Printf("You dodge %s's rock.", m.Kind.Indefinite(false))
@@ -2476,20 +2407,9 @@ func (m *monster) ThrowJavelin(g *game, ev event) bool {
 	if blocked {
 		return false
 	}
-	block := false
-	hit := true
-	evasion := RandInt(g.Player.Evasion())
-	acc := RandInt(m.Accuracy)
-	const jdmg = 11
-	attack, clang := g.HitDamage(DmgPhysical, jdmg, g.Player.Armor())
-	attack, evasion, clang = m.DramaticAdjustment(g, jdmg, attack, evasion, acc, clang)
-	if acc <= evasion {
-		hit = false
-	} else {
-		block = m.Blocked(g)
-		hit = !block
-	}
-	if hit {
+	const jdmg = 1
+	attack, clang := g.HitDamage(jdmg, 0)
+	if RandInt(2) == 0 {
 		noise := g.HitNoise(clang)
 		g.MakeNoise(noise, g.Player.Pos)
 		var sclang string
@@ -2499,19 +2419,6 @@ func (m *monster) ThrowJavelin(g *game, ev event) bool {
 		g.Printf("%s throws %s at you (%d dmg).%s", m.Kind.Definite(true), Indefinite("javelin", false), attack, sclang)
 		g.ui.MonsterJavelinAnimation(g.Ray(m.Pos), true)
 		m.InflictDamage(g, attack, jdmg)
-	} else if block {
-		if RandInt(3) == 0 {
-			g.Printf("You block %s's %s. Clang!", m.Kind.Indefinite(false), "javelin")
-			g.MakeNoise(ShieldBlockNoise, g.Player.Pos)
-			g.BlockEffects(m)
-			g.ui.MonsterJavelinAnimation(g.Ray(m.Pos), false)
-		} else if !g.Player.HasStatus(StatusDisabledShield) {
-			g.Player.Statuses[StatusDisabledShield] = 1
-			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 100 + RandInt(100), EAction: DisabledShieldEnd})
-			g.Printf("%s's %s gets embedded in your shield.", m.Kind.Indefinite(true), "javelin")
-			g.MakeNoise(ShieldBlockNoise, g.Player.Pos)
-			g.ui.MonsterJavelinAnimation(g.Ray(m.Pos), false)
-		}
 	} else {
 		g.Stats.Dodges++
 		g.Printf("You dodge %s's %s.", m.Kind.Indefinite(false), "javelin")
@@ -2527,20 +2434,9 @@ func (m *monster) ThrowAcid(g *game, ev event) bool {
 	if blocked {
 		return false
 	}
-	block := false
-	hit := true
-	evasion := RandInt(g.Player.Evasion())
-	acc := RandInt(m.Accuracy)
-	acdmg := 12
-	attack, clang := g.HitDamage(DmgPhysical, acdmg, g.Player.Armor())
-	attack, evasion, clang = m.DramaticAdjustment(g, acdmg, attack, evasion, acc, clang)
-	if acc <= evasion {
-		hit = false
-	} else {
-		block = m.Blocked(g)
-		hit = !block
-	}
-	if hit {
+	acdmg := 1
+	attack, _ := g.HitDamage(acdmg, 0)
+	if RandInt(2) == 0 {
 		noise := g.HitNoise(false) // no clang with acid projectiles
 		g.MakeNoise(noise, g.Player.Pos)
 		g.Printf("%s throws acid at you (%d dmg).", m.Kind.Definite(true), attack)
@@ -2551,13 +2447,6 @@ func (m *monster) ThrowAcid(g *game, ev event) bool {
 			if RandInt(2) == 0 {
 				g.Confusion(ev)
 			}
-		}
-	} else if block {
-		g.Printf("You block %s's acid projectile.", m.Kind.Indefinite(false))
-		g.MakeNoise(BaseHitNoise, g.Player.Pos) // no real clang
-		g.ui.MonsterProjectileAnimation(g.Ray(m.Pos), '*', ColorGreen)
-		if RandInt(2) == 0 {
-			g.Corrosion(ev)
 		}
 	} else {
 		g.Stats.Dodges++
@@ -2635,8 +2524,7 @@ func (m *monster) MindAttack(g *game, ev event) bool {
 			return false
 		}
 	}
-	dmg := 3 + RandInt(m.Attack) + RandInt(m.Attack) + RandInt(m.Attack)
-	dmg /= 3
+	dmg := 1
 	m.InflictDamage(g, dmg, m.Attack)
 	g.Printf("The celmist mage hurts your mind (%d dmg).", dmg)
 	if RandInt(2) == 0 {
@@ -2672,7 +2560,7 @@ func (m *monster) Explode(g *game, ev event) {
 			mons.MakeHuntIfHurt(g)
 		} else if g.Player.Pos == pos {
 			dmg := g.Player.HP / 2
-			m.InflictDamage(g, dmg, 15)
+			m.InflictDamage(g, dmg, 2)
 		} else if c.T == WallCell && RandInt(2) == 0 {
 			g.Dungeon.SetCell(pos, FreeCell)
 			g.Stats.Digs++
@@ -2871,7 +2759,7 @@ func (g *game) MaxDanger() int {
 			adjust += Min(5, g.Depth) * Min(q, Min(5, g.Depth))
 		case TeleportationPotion, DigPotion, WallPotion:
 			adjust += Min(3, g.Depth) * Min(q, 3)
-		case SwiftnessPotion, LignificationPotion, MagicPotion, BerserkPotion, ExplosiveMagara, ShadowsPotion, AccuracyPotion, TormentPotion, TeleportMagara, NightMagara:
+		case SwiftnessPotion, LignificationPotion, MagicPotion, BerserkPotion, ExplosiveMagara, ShadowsPotion, TormentPotion, TeleportMagara, NightMagara:
 			adjust += Min(2, g.Depth) * Min(q, 3)
 		case ConfusingDart:
 			adjust += Min(1, g.Depth) * Min(q, 7)

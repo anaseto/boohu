@@ -11,7 +11,6 @@ type player struct {
 	Simellas    int
 	Armour      armour
 	Weapon      weapon
-	Shield      shield
 	Consumables map[consumable]int
 	Rods        map[rod]rodProps
 	Aptitudes   map[aptitude]bool
@@ -22,29 +21,29 @@ type player struct {
 	LOS         map[position]bool
 	Rays        rayMap
 	Bored       int
-	AccScore    int
-	Blocked     bool
 }
 
-const DefaultHealth = 42
+const DefaultHealth = 4
 
 func (p *player) HPMax() int {
 	hpmax := DefaultHealth
 	if p.Aptitudes[AptHealthy] {
-		hpmax += 10
+		hpmax += 1
 	}
-	hpmax -= 3 * p.Bored
+	hpmax -= p.Bored
 	if p.Weapon == FinalBlade {
-		hpmax = 2 * hpmax / 3
+		hpmax -= 1
 	}
-	if hpmax < 21 {
-		hpmax = 21
+	if hpmax < 2 {
+		hpmax = 2
 	}
 	return hpmax
 }
 
+const DefaultMPmax = 3
+
 func (p *player) MPMax() int {
-	mpmax := 3
+	mpmax := DefaultMPmax
 	if p.Aptitudes[AptMagic] {
 		mpmax += 2
 	}
@@ -54,81 +53,23 @@ func (p *player) MPMax() int {
 	return mpmax
 }
 
-func (p *player) Accuracy() int {
-	acc := 15
-	return acc
-}
-
-func (p *player) RangedAccuracy() int {
-	acc := 15
-	return acc
-}
-
-func (p *player) Armor() int {
-	ar := 0
-	switch p.Armour {
-	case SmokingScales:
-		ar += 4
-	case ShinyPlates:
-		ar += 6
-	case TurtlePlates:
-		ar += 9
-	}
-	if p.Aptitudes[AptScales] {
-		ar += 2
-	}
-	if p.HasStatus(StatusLignification) {
-		ar = 9 + ar/2
-	}
-	if p.HasStatus(StatusCorrosion) {
-		ar -= 2 * p.Statuses[StatusCorrosion]
-		if ar < 0 {
-			ar = 0
-		}
-	}
-	return ar
-}
-
 func (p *player) Attack() int {
+	// TODO
 	attack := p.Weapon.Attack()
 	if p.Aptitudes[AptStrong] {
-		attack += attack / 5
+		attack += 1
 	}
 	if p.HasStatus(StatusCorrosion) {
 		penalty := p.Statuses[StatusCorrosion]
-		if penalty > 5 {
-			penalty = 5
+		if penalty > 2 {
+			penalty = 2
 		}
 		attack -= penalty
 	}
+	if attack <= 0 {
+		attack = 0
+	}
 	return attack
-}
-
-func (p *player) Block() int {
-	block := p.Shield.Block()
-	if p.HasStatus(StatusDisabledShield) {
-		block /= 3
-	}
-	return block
-}
-
-func (p *player) Evasion() int {
-	ev := 15
-	if p.Aptitudes[AptAgile] {
-		ev += 3
-	}
-	switch p.Armour {
-	case TurtlePlates:
-		ev -= 2
-	case HarmonistRobe, CelmistRobe, Robe:
-		ev += 1
-	case SpeedRobe:
-		ev += 3
-	}
-	if p.HasStatus(StatusAgile) {
-		ev += 7
-	}
-	return ev
 }
 
 func (p *player) HasStatus(st status) bool {
@@ -427,9 +368,6 @@ func (g *game) MovePlayer(pos position, ev event) error {
 		g.PlacePlayerAt(pos)
 		if !g.Autoexploring {
 			g.BoredomAction(ev, 1)
-		}
-		if g.Player.Statuses[StatusSlay] > 0 {
-			g.Player.Statuses[StatusSlay] /= 2
 		}
 	} else {
 		g.FunAction()

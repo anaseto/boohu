@@ -131,13 +131,6 @@ func (g *game) Dump() string {
 	fmt.Fprintf(buf, "Equipment:\n")
 	fmt.Fprintf(buf, "You are wearing %s.\n", g.Player.Armour.StringIndefinite())
 	fmt.Fprintf(buf, "You are wielding %s.\n", Indefinite(g.Player.Weapon.String(), false))
-	if g.Player.Shield != NoShield {
-		if g.Player.Weapon.TwoHanded() {
-			fmt.Fprintf(buf, "You have %s (unused).\n", Indefinite(g.Player.Shield.String(), false))
-		} else {
-			fmt.Fprintf(buf, "You are wearing %s.\n", Indefinite(g.Player.Shield.String(), false))
-		}
-	}
 	fmt.Fprintf(buf, "\n")
 	rs := g.SortedRods()
 	if len(rs) > 0 {

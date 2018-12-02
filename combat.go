@@ -15,13 +15,10 @@ func (g *game) Absorb(armor int) int {
 	return q
 }
 
-func (g *game) HitDamage(dt dmgType, base int, armor int) (attack int, clang bool) {
+func (g *game) HitDamage(base int, armor int) (attack int, clang bool) {
 	min := base / 2
 	attack = min + RandInt(base-min+1)
 	absorb := g.Absorb(armor)
-	if dt == DmgMagical {
-		absorb = 2 * absorb / 3
-	}
 	attack -= absorb
 	if absorb > 0 && absorb >= 2*armor/3 && RandInt(2) == 0 {
 		clang = true
@@ -169,41 +166,16 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 	case g.Player.HasStatus(StatusSwap) && !g.Player.HasStatus(StatusLignification) && !mons.Status(MonsLignified):
 		g.SwapWithMonster(mons)
 	case g.Player.Weapon == Frundis:
-		if !g.HitMonster(DmgPhysical, g.Player.Attack(), mons, ev) {
+		if !g.HitMonster(mons) {
 			break
 		}
 		if RandInt(2) == 0 {
 			mons.EnterConfusion(g, ev)
 			g.PrintfStyled("Frundis glows… %s appears confused.", logPlayerHit, mons.Kind.Definite(false))
 		}
-	case g.Player.Weapon.Cleave():
-		var neighbors []position
-		if g.Player.HasStatus(StatusConfusion) {
-			neighbors = g.Dungeon.CardinalFreeNeighbors(g.Player.Pos)
-		} else {
-			neighbors = g.Dungeon.FreeNeighbors(g.Player.Pos)
-		}
-		for _, pos := range neighbors {
-			m := g.MonsterAt(pos)
-			if m.Exists() {
-				g.HitMonster(DmgPhysical, g.Player.Attack(), m, ev)
-			}
-		}
-	case g.Player.Weapon.Pierce():
-		g.HitMonster(DmgPhysical, g.Player.Attack(), mons, ev)
-		dir := mons.Pos.Dir(g.Player.Pos)
-		behind := g.Player.Pos.To(dir).To(dir)
-		if behind.valid() {
-			m := g.MonsterAt(behind)
-			if m.Exists() {
-				g.HitMonster(DmgPhysical, g.Player.Attack(), m, ev)
-			}
-		}
-	case g.Player.Weapon == ElecWhip:
-		g.HitConnected(mons.Pos, DmgMagical, ev)
 	case g.Player.Weapon == DancingRapier:
 		ompos := mons.Pos
-		g.HitMonster(DmgPhysical, g.Player.Attack(), mons, ev)
+		g.HitMonster(mons)
 		if g.Player.HasStatus(StatusLignification) || mons.Status(MonsLignified) {
 			break
 		}
@@ -212,7 +184,7 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 		if behind.valid() {
 			m := g.MonsterAt(behind)
 			if m.Exists() {
-				g.HitMonster(DmgPhysical, g.Player.Attack()+3, m, ev)
+				g.HitMonster(m)
 			}
 		}
 		if mons.Exists() {
@@ -221,29 +193,10 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 		g.PlacePlayerAt(ompos)
 	case g.Player.Weapon == HarKarGauntlets:
 		g.HarKarAttack(mons, ev)
-	case g.Player.Weapon == HopeSword:
-		attack := g.Player.Attack()
-		fact := -60 + 100*DefaultHealth/g.Player.HP
-		if fact < 100 {
-			fact = 100
-		}
-		if fact > 250 {
-			fact = 250
-		}
-		attack *= fact
-		attack /= 100
-		g.HitMonster(DmgPhysical, attack, mons, ev)
-	case g.Player.Weapon == DragonSabre:
-		mfact := 100 * (mons.HPmax * mons.HPmax) / (45 * 45)
-		bonus := -1 + 13*mfact/100
-		g.HitMonster(DmgPhysical, g.Player.Attack()+bonus, mons, ev)
 	case g.Player.Weapon == DefenderFlail:
-		bonus := g.Player.Statuses[StatusSlay]
-		g.HitMonster(DmgPhysical, g.Player.Attack()+bonus, mons, ev)
-		g.Player.Statuses[StatusSlay]++
-		g.PushEvent(&simpleEvent{ERank: ev.Rank() + 60, EAction: SlayEnd})
+		g.HitMonster(mons)
 	default:
-		g.HitMonster(DmgPhysical, g.Player.Attack(), mons, ev)
+		g.HitMonster(mons)
 	}
 }
 
@@ -284,16 +237,16 @@ func (g *game) HarKarAttack(mons *monster, ev event) {
 			if !m.Exists() {
 				break
 			}
-			g.HitMonster(DmgPhysical, g.Player.Attack(), m, ev)
+			g.HitMonster(m)
 		}
 		g.PlacePlayerAt(pos)
 		behind := pos.To(dir)
 		m := g.MonsterAt(behind)
 		if m.Exists() {
-			g.HitMonster(DmgPhysical, g.Player.Attack(), m, ev)
+			g.HitMonster(m)
 		}
 	} else {
-		g.HitMonster(DmgPhysical, g.Player.Attack(), mons, ev)
+		g.HitMonster(mons)
 	}
 }
 
@@ -310,7 +263,7 @@ func (g *game) HitConnected(pos position, dt dmgType, ev event) {
 		if !mons.Exists() {
 			continue
 		}
-		g.HitMonster(dt, g.Player.Attack(), mons, ev)
+		g.HitMonster(mons)
 		nb = pos.Neighbors(nb, func(npos position) bool {
 			return npos.valid() && d.Cell(npos).T != WallCell
 		})
@@ -335,11 +288,7 @@ func (g *game) HitNoise(clang bool) int {
 		noise -= 1
 	}
 	if clang {
-		arnoise := g.Player.Armor()
-		if arnoise > 7 {
-			arnoise = 7
-		}
-		noise += arnoise
+		noise += 5
 	}
 	return noise
 }
@@ -351,119 +300,70 @@ const (
 	DmgMagical
 )
 
-func (g *game) HitMonster(dt dmgType, dmg int, mons *monster, ev event) (hit bool) {
-	maxacc := g.Player.Accuracy()
-	if g.Player.Weapon == AssassinSabre && mons.HP > 0 {
-		adjust := 6 * (-100 + 100*mons.HPmax/mons.HP) / 100
-		if adjust > 25 {
-			adjust = 25
-		}
-		maxacc += adjust
-	} else if g.Player.Weapon == FinalBlade {
-		maxacc += 10
-	}
-	acc := RandInt(maxacc)
-	if g.Player.AccScore == 1 && acc >= maxacc/2 {
-		acc -= RandInt(1 + maxacc/2)
-	} else if g.Player.AccScore == -1 && acc < maxacc/2 {
-		acc += RandInt(1 + maxacc/2)
-	}
-	if acc >= maxacc/2 {
-		g.Player.AccScore = 1
-	} else {
-		g.Player.AccScore = -1
-	}
-	evasion := RandInt(mons.Evasion)
+func (g *game) HitMonster(mons *monster) (hit bool) {
+	ev := g.Ev
+	dmg := 2
 	if mons.State == Resting {
-		evasion /= 2 + 1
+		dmg += 1
 	}
-	if acc > evasion || g.Player.HasStatus(StatusAccurate) {
-		hit = true
-		noise := BaseHitNoise
+	hit = true
+	noise := BaseHitNoise
+	if g.Player.Weapon == Dagger || g.Player.Weapon == VampDagger {
+		noise -= 2
+	}
+	if g.Player.Armour == HarmonistRobe {
+		noise -= 3
+	}
+	if g.Player.Weapon == Frundis {
+		noise -= 5
+	}
+	bonus := 0
+	if g.Player.HasStatus(StatusBerserk) {
+		bonus += 2 + RandInt(4)
+	}
+	pa := dmg + bonus
+	attack, clang := g.HitDamage(pa, 0)
+	if clang {
+		// TODO
+		noise += 3
+	}
+	g.MakeNoise(noise, mons.Pos)
+	if mons.State == Resting {
 		if g.Player.Weapon == Dagger || g.Player.Weapon == VampDagger {
-			noise -= 2
+			attack *= 4
+		} else {
+			attack *= 2
 		}
-		if g.Player.Armour == HarmonistRobe {
-			noise -= 3
-		}
-		if g.Player.Weapon == Frundis {
-			noise -= 5
-		}
-		bonus := 0
-		if g.Player.HasStatus(StatusBerserk) {
-			bonus += 2 + RandInt(4)
-		}
-		pa := dmg + bonus
-		if g.Player.Weapon.Cleave() && g.InOpenMons(mons) {
-			if g.Player.Attack() >= 15 {
-				pa += 1 + RandInt(3)
-			} else {
-				pa += 1 + RandInt(2)
-			}
-		}
-		marmor := mons.Armor
-		marmor = 6 + marmor/2
-		attack, clang := g.HitDamage(dt, pa, marmor)
-		if clang {
-			noise += marmor
-		}
-		g.MakeNoise(noise, mons.Pos)
-		if mons.State == Resting {
-			if g.Player.Weapon == Dagger || g.Player.Weapon == VampDagger {
-				attack *= 4
-			} else {
-				attack *= 2
-			}
-		}
-		var sclang string
-		if clang {
-			if marmor > 3 {
-				sclang = " ♫ Clang!"
-			} else {
-				sclang = " ♪ Clang!"
-			}
-		}
-		oldHP := mons.HP
-		if g.Player.Weapon == FinalBlade {
-			if mons.HP <= mons.HPmax/2 {
-				attack = mons.HP
-			}
-		}
-		mons.HP -= attack
-		if g.Player.Weapon == VampDagger && mons.Kind.Living() {
-			healing := attack
-			if healing > 2*pa/3 {
-				healing = 2 * pa / 3
-			}
-			if g.Player.HP+healing > g.Player.HPMax() {
-				g.Player.HP = g.Player.HPMax()
-			} else {
-				g.Player.HP += healing
-			}
-		}
-		g.ui.HitAnimation(mons.Pos, false)
-		if mons.HP > 0 {
-			g.PrintfStyled("You hit %s (%d dmg).%s", logPlayerHit, mons.Kind.Definite(false), attack, sclang)
-		} else if oldHP > 0 {
-			// test oldHP > 0 because of sword special attack
-			g.PrintfStyled("You kill %s (%d dmg).%s", logPlayerHit, mons.Kind.Definite(false), attack, sclang)
-			g.HandleKill(mons, ev)
-		}
-		if mons.Kind == MonsBrizzia && RandInt(4) == 0 && !g.Player.HasStatus(StatusNausea) &&
-			mons.Pos.Distance(g.Player.Pos) == 1 {
-			g.Player.Statuses[StatusNausea]++
-			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 30 + RandInt(20), EAction: NauseaEnd})
-			g.Print("The brizzia's corpse releases some nauseating gas. You feel sick.")
-		}
-		if mons.Kind == MonsTinyHarpy && mons.HP > 0 {
-			mons.Blink(g)
-		}
-		g.HandleStone(mons)
-		g.Stats.Hits++
-	} else {
-		g.Printf("You miss %s.", mons.Kind.Definite(false))
-		g.Stats.Misses++
 	}
+	var sclang string
+	if clang {
+		if RandInt(2) == 0 {
+			sclang = " ♫ Clang!"
+		} else {
+			sclang = " ♪ Clang!"
+		}
+	}
+	oldHP := mons.HP
+	mons.HP -= attack
+	g.ui.HitAnimation(mons.Pos, false)
+	if mons.HP > 0 {
+		g.PrintfStyled("You hit %s (%d dmg).%s", logPlayerHit, mons.Kind.Definite(false), attack, sclang)
+	} else if oldHP > 0 {
+		// test oldHP > 0 because of sword special attack
+		g.PrintfStyled("You kill %s (%d dmg).%s", logPlayerHit, mons.Kind.Definite(false), attack, sclang)
+		g.HandleKill(mons, ev) // TODO
+	}
+	if mons.Kind == MonsBrizzia && RandInt(4) == 0 && !g.Player.HasStatus(StatusNausea) &&
+		mons.Pos.Distance(g.Player.Pos) == 1 {
+		g.Player.Statuses[StatusNausea]++
+		g.PushEvent(&simpleEvent{ERank: ev.Rank() + 30 + RandInt(20), EAction: NauseaEnd})
+		g.Print("The brizzia's corpse releases some nauseating gas. You feel sick.")
+	}
+	if mons.Kind == MonsTinyHarpy && mons.HP > 0 {
+		mons.Blink(g)
+	}
+	g.HandleStone(mons)
+	g.Stats.Hits++
 	mons.MakeHuntIfHurt(g)
 	return hit
 }
@@ -559,80 +459,10 @@ const (
 )
 
 func (g *game) ArmourClang() (sclang string) {
-	if g.Player.Armor() > 3 {
+	if RandInt(2) == 0 {
 		sclang = " Clang!"
 	} else {
 		sclang = " Smash!"
 	}
 	return sclang
-}
-
-func (g *game) BlockEffects(m *monster) {
-	g.Stats.Blocks++
-	// only one shield block per turn
-	g.Player.Blocked = true
-	g.PushEvent(&simpleEvent{ERank: g.Ev.Rank() + 10, EAction: BlockEnd})
-	switch g.Player.Shield {
-	case EarthShield:
-		dir := m.Pos.Dir(g.Player.Pos)
-		lat := g.Player.Pos.Laterals(dir)
-		for _, pos := range lat {
-			if !pos.valid() {
-				continue
-			}
-			if RandInt(3) == 0 && g.Dungeon.Cell(pos).T == WallCell {
-				g.Dungeon.SetCell(pos, FreeCell)
-				g.Stats.Digs++
-				g.MakeNoise(WallNoise+3, pos)
-				g.Fog(pos, 1, g.Ev)
-				g.Printf("%s The sound of blocking breaks a wall.", g.CrackSound())
-			}
-		}
-	case BashingShield:
-		if m.Kind == MonsSatowalgaPlant || m.Pos.Distance(g.Player.Pos) > 1 {
-			break
-		}
-		if RandInt(5) == 0 {
-			break
-		}
-		dir := m.Pos.Dir(g.Player.Pos)
-		pos := m.Pos
-		npos := pos
-		i := 0
-		for {
-			i++
-			npos = npos.To(dir)
-			if !npos.valid() || g.Dungeon.Cell(npos).T == WallCell {
-				break
-			}
-			mons := g.MonsterAt(npos)
-			if mons.Exists() {
-				continue
-			}
-			pos = npos
-			if i >= 3 {
-				break
-			}
-		}
-		m.Exhaust(g)
-		if pos != m.Pos {
-			m.MoveTo(g, pos)
-			g.Printf("%s is repelled.", m.Kind.Definite(true))
-		}
-	case ConfusingShield:
-		if m.Pos.Distance(g.Player.Pos) > 1 {
-			break
-		}
-		if RandInt(4) == 0 {
-			m.EnterConfusion(g, g.Ev)
-			g.Printf("%s appears confused.", m.Kind.Definite(true))
-		}
-	case FireShield:
-		dir := m.Pos.Dir(g.Player.Pos)
-		burnpos := g.Player.Pos.To(dir)
-		if RandInt(4) == 0 {
-			g.Print("Sparks emerge out of the shield.")
-			g.Burn(burnpos, g.Ev)
-		}
-	}
 }

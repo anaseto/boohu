@@ -290,8 +290,8 @@ func (g *game) GenDungeon() {
 
 func (g *game) InitPlayer() {
 	g.Player = &player{
-		HP:        42,
-		MP:        3,
+		HP:        DefaultHealth,
+		MP:        DefaultMPmax,
 		Simellas:  0,
 		Aptitudes: map[aptitude]bool{},
 	}
@@ -312,7 +312,7 @@ func (g *game) InitPlayer() {
 	default:
 		g.Player.Consumables[ConfusingDart] = 2
 	}
-	switch RandInt(12) {
+	switch RandInt(11) {
 	case 0, 1:
 		g.Player.Consumables[TeleportationPotion] = 1
 	case 2, 3:
@@ -331,8 +331,6 @@ func (g *game) InitPlayer() {
 		g.Player.Consumables[SwapPotion] = 1
 	case 10:
 		g.Player.Consumables[ShadowsPotion] = 1
-	case 11:
-		g.Player.Consumables[AccuracyPotion] = 1
 	}
 	r := g.RandomRod()
 	g.Player.Rods = map[rod]rodProps{r: rodProps{r.MaxCharge() - 1}}
@@ -374,7 +372,7 @@ func (g *game) InitPlayer() {
 	//g.Player.Shield = FireShield
 	//g.Player.Shield = BashingShield
 	//g.Player.Armour = TurtlePlates
-	//g.Player.Armour = HarmonistRobe
+	g.Player.Armour = HarmonistRobe
 	//g.Player.Armour = CelmistRobe
 	//g.Player.Armour = ShinyPlates
 	//g.Player.Armour = SmokingScales
@@ -724,21 +722,6 @@ func (g *game) GenCollectables() {
 	}
 }
 
-func (g *game) GenShield() {
-	ars := [4]shield{ConfusingShield, BashingShield, EarthShield, FireShield}
-	for {
-		i := RandInt(len(ars))
-		if g.GeneratedEquipables[ars[i]] {
-			// do not generate duplicates
-			continue
-		}
-		pos := g.FreeCellForStatic()
-		g.Equipables[pos] = ars[i]
-		g.GeneratedEquipables[ars[i]] = true
-		break
-	}
-}
-
 func (g *game) GenArmour() {
 	ars := [6]armour{SmokingScales, ShinyPlates, TurtlePlates, SpeedRobe, CelmistRobe, HarmonistRobe}
 	for {
@@ -756,7 +739,6 @@ func (g *game) GenArmour() {
 
 func (g *game) GenWeapon() {
 	wps := [WeaponNum - 1]weapon{Axe, BattleAxe, Spear, Halberd, AssassinSabre, DancingRapier, HopeSword, Frundis, ElecWhip, HarKarGauntlets, VampDagger, DragonSabre, FinalBlade, DefenderFlail}
-	onehanded := false
 	for {
 		i := RandInt(len(wps))
 		if g.GeneratedEquipables[wps[i]] {
@@ -765,14 +747,8 @@ func (g *game) GenWeapon() {
 		}
 		pos := g.FreeCellForStatic()
 		g.Equipables[pos] = wps[i]
-		if !wps[i].TwoHanded() {
-			onehanded = true
-		}
 		g.GeneratedEquipables[wps[i]] = true
 		break
-	}
-	if onehanded {
-		g.GenShield()
 	}
 }
 

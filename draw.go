@@ -573,10 +573,6 @@ func (ui *gameui) CharacterInfo() {
 	b.WriteString("\n\n")
 	b.WriteString(formatText(fmt.Sprintf("You are wearing %s. %s", g.Player.Armour.StringIndefinite(), g.Player.Armour.Desc()), TextWidth))
 	b.WriteString("\n\n")
-	if g.Player.Shield != NoShield {
-		b.WriteString(formatText(fmt.Sprintf("You are wearing a %s. %s", g.Player.Shield, g.Player.Shield.Desc()), TextWidth))
-		b.WriteString("\n\n")
-	}
 	b.WriteString(ui.AptitudesText())
 
 	desc := b.String()
@@ -863,16 +859,6 @@ func (ui *gameui) DrawDungeonView(m uiMode) {
 		ui.SetMapCell(BarCol, line, ')', ColorFg, ColorBg)
 		ui.DrawText(fmt.Sprintf(" %v", g.Player.Weapon), BarCol+1, line)
 		line++
-		if g.Player.Shield != NoShield {
-			if g.Player.Weapon.TwoHanded() {
-				ui.SetMapCell(BarCol, line, ']', ColorFg, ColorBg)
-				ui.DrawText(" (unusable)", BarCol+1, line)
-			} else {
-				ui.SetMapCell(BarCol, line, ']', ColorFg, ColorBg)
-				ui.DrawText(fmt.Sprintf(" %v", g.Player.Shield), BarCol+1, line)
-			}
-		}
-		line++
 		line++
 	}
 	if ui.Small() {
@@ -1132,13 +1118,6 @@ func (ui *gameui) DrawStatusLine() {
 	armour := fmt.Sprintf("%s ", g.Player.Armour.Short())
 	ui.DrawText(armour, col, line)
 	col += utf8.RuneCountInString(armour)
-	if g.Player.Shield != NoShield {
-		ui.SetMapCell(col, line, ']', ColorFg, ColorBg)
-		col++
-		shield := fmt.Sprintf("%s ", g.Player.Shield.Short())
-		ui.DrawText(shield, col, line)
-		col += utf8.RuneCountInString(shield)
-	}
 	ui.SetMapCell(col, line, '♣', ColorFg, ColorBg)
 	col++
 	simellas := fmt.Sprintf(":%d ", g.Player.Simellas)

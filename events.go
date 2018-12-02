@@ -59,9 +59,7 @@ const (
 	DigEnd
 	SwapEnd
 	ShadowsEnd
-	SlayEnd
 	AccurateEnd
-	BlockEnd
 )
 
 func (g *game) PushEvent(ev event) {
@@ -196,25 +194,6 @@ func (sev *simpleEvent) Action(g *game) {
 			g.ComputeLOS()
 			g.MakeMonstersAware()
 		}
-	case SlayEnd:
-		if g.Player.Statuses[StatusSlay] <= 0 {
-			break
-		}
-		g.Player.Statuses[StatusSlay]--
-		if g.Player.Statuses[StatusSlay] == 0 {
-			g.PrintStyled("You no longer feel extra slaying power.", logStatusEnd)
-			g.ui.StatusEndAnimation()
-			g.ComputeLOS()
-			g.MakeMonstersAware()
-		}
-	case AccurateEnd:
-		g.Player.Statuses[StatusAccurate]--
-		if g.Player.Statuses[StatusAccurate] == 0 {
-			g.PrintStyled("You no longer feel accurate.", logStatusEnd)
-			g.ui.StatusEndAnimation()
-		}
-	case BlockEnd:
-		g.Player.Blocked = false
 	}
 }
 
