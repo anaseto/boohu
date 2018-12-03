@@ -102,12 +102,15 @@ func (g *game) AutoToDir(ev event) bool {
 }
 
 func (g *game) GoToDir(dir direction, ev event) error {
-	if g.Player.Dir == dir {
-		return errors.New("You are already looking in that direction.")
+	if g.MonsterInLOS() != nil {
+		g.AutoDir = NoDir
+		return errors.New("You cannot travel while there are monsters in view.")
 	}
-	g.Player.Dir = dir
-	ev.Renew(g, 5)
-	g.ComputeLOS() // TODO: not really needed
+	err := g.MovePlayer(g.Player.Pos.To(dir), ev)
+	if err != nil {
+		return err
+	}
+	g.AutoDir = dir
 	return nil
 }
 
@@ -312,6 +315,12 @@ func (g *game) CollectGround() {
 }
 
 func (g *game) MovePlayer(pos position, ev event) error {
+	//if g.Player.Dir != pos.Dir(g.Player.Pos) {
+	//g.Player.Dir = pos.Dir(g.Player.Pos)
+	//ev.Renew(g, 5)
+	//g.ComputeLOS() // TODO: not really needed
+	//return nil
+	//}
 	if !pos.valid() {
 		return errors.New("You cannot move there.")
 	}

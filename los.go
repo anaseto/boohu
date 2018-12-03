@@ -287,7 +287,8 @@ func (g *game) ComputeNoise() {
 }
 
 func (p *player) Sees(pos position) bool {
-	return pos == p.Pos || p.LOS[pos] && p.Dir.InViewCone(p.Pos, pos)
+	//return pos == p.Pos || p.LOS[pos] && p.Dir.InViewCone(p.Pos, pos)
+	return p.LOS[pos]
 }
 
 func (m *monster) SeesPlayer(g *game) bool {
