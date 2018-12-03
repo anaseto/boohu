@@ -337,3 +337,26 @@ func (dir direction) InViewCone(from, to position) bool {
 	}
 	return false
 }
+
+func (dir direction) Alternate() direction {
+	var directions [2]direction
+	switch dir {
+	case E:
+		directions = [2]direction{NE, SE}
+	case NE:
+		directions = [2]direction{N, E}
+	case N:
+		directions = [2]direction{NE, NW}
+	case NW:
+		directions = [2]direction{N, W}
+	case W:
+		directions = [2]direction{NW, SW}
+	case SW:
+		directions = [2]direction{W, S}
+	case S:
+		directions = [2]direction{SW, SE}
+	case SE:
+		directions = [2]direction{S, E}
+	}
+	return directions[RandInt(2)]
+}

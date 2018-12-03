@@ -9,14 +9,14 @@ type rayMap map[position]raynode
 func (g *game) bestParent(rm rayMap, from, pos position) (position, int) {
 	p := pos.Parents(from)
 	b := p[0]
-	if len(p) > 1 && rm[p[1]].Cost+g.losCost(p[1]) < rm[b].Cost+g.losCost(b) {
+	if len(p) > 1 && rm[p[1]].Cost+g.losCost(from, p[1]) < rm[b].Cost+g.losCost(from, b) {
 		b = p[1]
 	}
-	return b, rm[b].Cost + g.losCost(b)
+	return b, rm[b].Cost + g.losCost(from, b)
 }
 
-func (g *game) losCost(pos position) int {
-	if g.Player.Pos == pos {
+func (g *game) losCost(from, pos position) int {
+	if from == pos {
 		return 0
 	}
 	c := g.Dungeon.Cell(pos)
@@ -27,7 +27,7 @@ func (g *game) losCost(pos position) int {
 		return g.LosRange()
 	}
 	if _, ok := g.Doors[pos]; ok {
-		if pos != g.Player.Pos {
+		if pos != from {
 			mons := g.MonsterAt(pos)
 			if !mons.Exists() {
 				return g.LosRange()
@@ -134,6 +134,18 @@ func (g *game) ComputeLOS() {
 			g.StopAuto()
 		}
 	}
+}
+
+func (m *monster) ComputeLOS(g *game) {
+	mlos := map[position]bool{}
+	losRange := g.LosRange()
+	rays := g.buildRayMap(m.Pos, losRange)
+	for pos, n := range rays {
+		if n.Cost < g.LosRange() {
+			mlos[pos] = true
+		}
+	}
+	m.LOS = mlos
 }
 
 func (g *game) SeePosition(pos position) {
@@ -295,7 +307,7 @@ func (m *monster) SeesPlayer(g *game) bool {
 }
 
 func (m *monster) Sees(g *game, pos position) bool {
-	return g.Player.LOS[m.Pos] && m.Dir.InViewCone(m.Pos, pos)
+	return m.LOS[m.Pos] && m.Dir.InViewCone(m.Pos, pos)
 }
 
 func (g *game) ComputeMonsterLOS() {

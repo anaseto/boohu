@@ -1671,6 +1671,7 @@ type monster struct {
 	Obstructing   bool
 	FireReady     bool
 	Seen          bool
+	LOS           map[position]bool
 	LastSeenState monsterState
 }
 
@@ -1865,6 +1866,7 @@ func (m *monster) PlaceAt(g *game, pos position) {
 	g.MonstersPosCache[m.Pos.idx()] = 0
 	m.Pos = pos
 	g.MonstersPosCache[m.Pos.idx()] = m.Index + 1
+	m.ComputeLOS(g)
 }
 
 func (m *monster) TeleportMonsterAway(g *game) bool {
@@ -1929,8 +1931,8 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	mpos := m.Pos
 	m.MakeAware(g)
 	if !m.SeesPlayer(g) && m.State == Hunting {
-		if g.Player.Armour == HarmonistRobe && RandInt(2) == 0 ||
-			g.Player.Aptitudes[AptStealthyMovement] && RandInt(4) == 0 ||
+		if g.Player.Armour == HarmonistRobe && RandInt(5) == 0 ||
+			g.Player.Aptitudes[AptStealthyMovement] && RandInt(5) == 0 ||
 			RandInt(10) == 0 {
 			m.State = Wandering
 		}
@@ -2029,15 +2031,19 @@ func (m *monster) HandleTurn(g *game, ev event) {
 			}
 			m.GatherBand(g)
 		case Hunting:
-			// pick a random cell: more escape strategies for the player
-			if m.Kind == MonsHound && m.Pos.Distance(g.Player.Pos) <= 6 &&
-				!(g.Player.Aptitudes[AptStealthyMovement] && RandInt(2) == 0) {
-				m.Target = g.Player.Pos
+			if RandInt(3) > 0 {
+				m.Dir = m.Dir.Alternate()
 			} else {
-				m.Target = g.FreeCell()
+				// pick a random cell: more escape strategies for the player
+				if m.Kind == MonsHound && m.Pos.Distance(g.Player.Pos) <= 6 &&
+					!(g.Player.Aptitudes[AptStealthyMovement] && RandInt(2) == 0) {
+					m.Target = g.Player.Pos
+				} else {
+					m.Target = g.FreeCell()
+				}
+				m.State = Wandering
+				m.GatherBand(g)
 			}
-			m.State = Wandering
-			m.GatherBand(g)
 		}
 		ev.Renew(g, movedelay)
 		return
