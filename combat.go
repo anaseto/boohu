@@ -301,10 +301,7 @@ const (
 
 func (g *game) HitMonster(mons *monster) (hit bool) {
 	ev := g.Ev
-	dmg := 2
-	if mons.State == Resting {
-		dmg += 1
-	}
+	dmg := 1
 	hit = true
 	noise := BaseHitNoise
 	if g.Player.Weapon == Dagger || g.Player.Weapon == VampDagger {
@@ -318,7 +315,7 @@ func (g *game) HitMonster(mons *monster) (hit bool) {
 	}
 	bonus := 0
 	if g.Player.HasStatus(StatusBerserk) {
-		bonus += 2 + RandInt(4)
+		bonus += 1
 	}
 	pa := dmg + bonus
 	attack, clang := g.HitDamage(pa, 0)
@@ -329,9 +326,9 @@ func (g *game) HitMonster(mons *monster) (hit bool) {
 	g.MakeNoise(noise, mons.Pos)
 	if mons.State == Resting {
 		if g.Player.Weapon == Dagger || g.Player.Weapon == VampDagger {
-			attack *= 4
+			attack = 3
 		} else {
-			attack *= 2
+			attack = 2
 		}
 	}
 	var sclang string
