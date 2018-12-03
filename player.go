@@ -56,11 +56,7 @@ func (p *player) MPMax() int {
 }
 
 func (p *player) Attack() int {
-	// TODO
 	attack := p.Weapon.Attack()
-	if p.Aptitudes[AptStrong] {
-		attack += 1
-	}
 	if p.HasStatus(StatusCorrosion) {
 		penalty := p.Statuses[StatusCorrosion]
 		if penalty > 2 {
@@ -352,15 +348,7 @@ func (g *game) MovePlayer(pos position, ev event) error {
 			g.Fog(pos, 1, ev)
 			g.Stats.Digs++
 		}
-		if g.Player.Aptitudes[AptFast] {
-			// only fast for movement
-			delay -= 2
-		}
 		switch g.Player.Armour {
-		case TurtlePlates:
-			delay += 3
-		case SpeedRobe:
-			delay -= 3
 		case SmokingScales:
 			_, ok := g.Clouds[g.Player.Pos]
 			if !ok {
@@ -370,7 +358,7 @@ func (g *game) MovePlayer(pos position, ev event) error {
 		}
 		if g.Player.HasStatus(StatusSwift) {
 			// only fast for movement
-			delay -= 3
+			delay /= 2
 		}
 		g.Stats.Moves++
 		g.PlacePlayerAt(pos)
@@ -383,13 +371,15 @@ func (g *game) MovePlayer(pos position, ev event) error {
 		g.AttackMonster(mons, ev)
 	}
 	if g.Player.HasStatus(StatusBerserk) {
-		delay -= 3
+		delay /= 2
 	}
 	if g.Player.HasStatus(StatusSlow) {
-		delay += 3 * g.Player.Statuses[StatusSlow]
+		delay *= 2
 	}
-	if delay < 3 {
-		delay = 3
+	if delay < 5 {
+		delay = 5
+	} else if delay > 20 {
+		delay = 20
 	}
 	ev.Renew(g, delay)
 	return nil
@@ -418,11 +408,11 @@ func (g *game) Smoke(ev event) {
 		_, ok := g.Clouds[pos]
 		if !ok {
 			g.Clouds[pos] = CloudFog
-			g.PushEvent(&cloudEvent{ERank: ev.Rank() + 100 + RandInt(100), EAction: CloudEnd, Pos: pos})
+			g.PushEvent(&cloudEvent{ERank: ev.Rank() + DurationFog + RandInt(DurationFog/2), EAction: CloudEnd, Pos: pos})
 		}
 	}
 	g.Player.Statuses[StatusSwift]++
-	end := ev.Rank() + 20 + RandInt(10)
+	end := ev.Rank() + DurationShortSwiftness
 	g.PushEvent(&simpleEvent{ERank: end, EAction: HasteEnd})
 	g.Player.Expire[StatusSwift] = end
 	g.ComputeLOS()
@@ -438,7 +428,7 @@ func (g *game) Corrosion(ev event) {
 func (g *game) Confusion(ev event) {
 	if !g.Player.HasStatus(StatusConfusion) {
 		g.Player.Statuses[StatusConfusion]++
-		g.PushEvent(&simpleEvent{ERank: ev.Rank() + 100 + RandInt(100), EAction: ConfusionEnd})
+		g.PushEvent(&simpleEvent{ERank: ev.Rank() + DurationConfusion + RandInt(DurationConfusion/2), EAction: ConfusionEnd})
 		g.Print("You feel confused.")
 	}
 }
@@ -463,6 +453,6 @@ func (g *game) PlacePlayerAt(pos position) {
 
 func (g *game) EnterLignification(ev event) {
 	g.Player.Statuses[StatusLignification]++
-	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 150 + RandInt(100), EAction: LignificationEnd})
+	g.PushEvent(&simpleEvent{ERank: ev.Rank() + DurationLignification + RandInt(DurationLignification/2), EAction: LignificationEnd})
 	g.Player.HP += 4
 }

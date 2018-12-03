@@ -128,8 +128,8 @@ func (sev *simpleEvent) Action(g *game) {
 			g.Player.HP = 1
 		}
 		g.PrintStyled("You are no longer berserk.", logStatusEnd)
-		g.PushEvent(&simpleEvent{ERank: sev.Rank() + 90 + RandInt(30), EAction: SlowEnd})
-		g.PushEvent(&simpleEvent{ERank: sev.Rank() + 270 + RandInt(60), EAction: ExhaustionEnd})
+		g.PushEvent(&simpleEvent{ERank: sev.Rank() + DurationSlow, EAction: SlowEnd})
+		g.PushEvent(&simpleEvent{ERank: sev.Rank() + DurationExhaustion, EAction: ExhaustionEnd})
 		g.ui.StatusEndAnimation()
 	case SlowEnd:
 		g.Player.Statuses[StatusSlow]--
@@ -319,7 +319,8 @@ func (cev *cloudEvent) Action(g *game) {
 			g.Printf("You see a wall appear out of thin air.")
 			g.StopAuto()
 		}
-		g.PushEvent(&cloudEvent{ERank: cev.Rank() + 200 + RandInt(50), EAction: ObstructionProgression})
+		g.PushEvent(&cloudEvent{ERank: cev.Rank() + DurationObstructionProgression + RandInt(DurationObstructionProgression/4),
+			EAction: ObstructionProgression})
 	case FireProgression:
 		if _, ok := g.Clouds[cev.Pos]; !ok {
 			break
@@ -355,7 +356,7 @@ func (cev *cloudEvent) Action(g *game) {
 func (g *game) MakeCreatureSleep(pos position, ev event) {
 	if pos == g.Player.Pos {
 		g.Player.Statuses[StatusSlow]++
-		g.PushEvent(&simpleEvent{ERank: ev.Rank() + 30 + RandInt(10), EAction: SlowEnd})
+		g.PushEvent(&simpleEvent{ERank: ev.Rank() + DurationSleepSlow, EAction: SlowEnd})
 		g.Print("The clouds of night make you sleepy.")
 		return
 	}
@@ -423,7 +424,7 @@ func (g *game) Burn(pos position, ev event) {
 	} else {
 		g.ComputeLOS()
 	}
-	g.PushEvent(&cloudEvent{ERank: ev.Rank() + 10, EAction: FireProgression, Pos: pos})
+	g.PushEvent(&cloudEvent{ERank: ev.Rank() + DurationCloudProgression, EAction: FireProgression, Pos: pos})
 	g.BurnCreature(pos, ev)
 }
 
@@ -431,3 +432,27 @@ func (cev *cloudEvent) Renew(g *game, delay int) {
 	cev.ERank += delay
 	g.PushEvent(cev)
 }
+
+const (
+	DurationBerserk                = 40
+	DurationSick                   = 50
+	DurationShortBerserk           = 30
+	DurationTeleportationDelay     = 30
+	DurationThrowItem              = 10
+	DurationEvokeRod               = 10
+	DurationDrinkPotion            = 5
+	DurationSwiftness              = 50
+	DurationShortSwiftness         = 20
+	DurationDigging                = 80
+	DurationSwap                   = 140
+	DurationShadows                = 140
+	DurationSlow                   = 100
+	DurationSleepSlow              = 40
+	DurationCloudProgression       = 10
+	DurationFog                    = 100
+	DurationExhaustion             = 300
+	DurationConfusion              = 100
+	DurationLignification          = 150
+	DurationTemporalWall           = 150
+	DurationObstructionProgression = 200
+)

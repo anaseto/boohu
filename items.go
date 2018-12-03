@@ -191,7 +191,7 @@ func (g *game) QuaffTeleportation(ev event) error {
 	if g.Player.HasStatus(StatusTele) {
 		return errors.New("You already quaffed a potion of teleportation.")
 	}
-	delay := 20 + RandInt(30)
+	delay := DurationTeleportationDelay
 	g.Player.Statuses[StatusTele] = 1
 	g.PushEvent(&simpleEvent{ERank: ev.Rank() + delay, EAction: Teleportation})
 	g.Printf("You quaff the %s. You feel unstable.", TeleportationPotion)
@@ -206,7 +206,7 @@ func (g *game) QuaffBerserk(ev event) error {
 		return errors.New("You are already berserk.")
 	}
 	g.Player.Statuses[StatusBerserk] = 1
-	end := ev.Rank() + 65 + RandInt(20)
+	end := ev.Rank() + DurationBerserk
 	g.PushEvent(&simpleEvent{ERank: end, EAction: BerserkEnd})
 	g.Player.Expire[StatusBerserk] = end
 	g.Printf("You quaff the %s. You feel a sudden urge to kill things.", BerserkPotion)
@@ -251,7 +251,7 @@ func (g *game) QuaffDescent(ev event) error {
 
 func (g *game) QuaffSwiftness(ev event) error {
 	g.Player.Statuses[StatusSwift]++
-	end := ev.Rank() + 85 + RandInt(20)
+	end := ev.Rank() + DurationSwiftness
 	g.PushEvent(&simpleEvent{ERank: end, EAction: HasteEnd})
 	g.Player.Expire[StatusSwift] = end
 	g.Player.Statuses[StatusAgile]++
@@ -263,7 +263,7 @@ func (g *game) QuaffSwiftness(ev event) error {
 
 func (g *game) QuaffDigPotion(ev event) error {
 	g.Player.Statuses[StatusDig] = 1
-	end := ev.Rank() + 75 + RandInt(20)
+	end := ev.Rank() + DurationDigging
 	g.PushEvent(&simpleEvent{ERank: end, EAction: DigEnd})
 	g.Player.Expire[StatusDig] = end
 	g.Printf("You quaff the %s. You feel like an earth dragon.", DigPotion)
@@ -275,7 +275,7 @@ func (g *game) QuaffSwapPotion(ev event) error {
 		return errors.New("You cannot drink this potion while lignified.")
 	}
 	g.Player.Statuses[StatusSwap] = 1
-	end := ev.Rank() + 130 + RandInt(41)
+	end := ev.Rank() + DurationSwap
 	g.PushEvent(&simpleEvent{ERank: end, EAction: SwapEnd})
 	g.Player.Expire[StatusSwap] = end
 	g.Printf("You quaff the %s. You feel light-footed.", SwapPotion)
@@ -287,7 +287,7 @@ func (g *game) QuaffShadowsPotion(ev event) error {
 		return errors.New("You are already surrounded by shadows.")
 	}
 	g.Player.Statuses[StatusShadows] = 1
-	end := ev.Rank() + 130 + RandInt(41)
+	end := ev.Rank() + DurationShadows
 	g.PushEvent(&simpleEvent{ERank: end, EAction: ShadowsEnd})
 	g.Player.Expire[StatusShadows] = end
 	g.Printf("You quaff the %s. You feel surrounded by shadows.", ShadowsPotion)
@@ -497,14 +497,7 @@ func (g *game) ThrowConfusingDart(ev event) error {
 		return err
 	}
 	mons := g.MonsterAt(g.Player.Target)
-	bonus := 0
-	if g.Player.HasStatus(StatusBerserk) {
-		bonus += RandInt(5)
-	}
-	if g.Player.Aptitudes[AptStrong] {
-		bonus += 2
-	}
-	attack, _ := g.HitDamage(7+bonus, mons.Armor) // no clang with darts
+	attack, _ := g.HitDamage(1, 0) // no clang with darts
 	mons.HP -= attack
 	if mons.HP > 0 {
 		mons.EnterConfusion(g, ev)
@@ -517,7 +510,7 @@ func (g *game) ThrowConfusingDart(ev event) error {
 		g.HandleKill(mons, ev)
 	}
 	g.HandleStone(mons)
-	ev.Renew(g, 7)
+	ev.Renew(g, DurationThrowItem)
 	return nil
 }
 
@@ -558,7 +551,7 @@ func (g *game) ThrowExplosiveMagara(ev event) error {
 		g.ExplosionAt(ev, pos)
 	}
 
-	ev.Renew(g, 7)
+	ev.Renew(g, DurationThrowItem)
 	return nil
 }
 
@@ -576,7 +569,7 @@ func (g *game) ThrowTeleportMagara(ev event) error {
 		}
 	}
 
-	ev.Renew(g, 7)
+	ev.Renew(g, DurationThrowItem)
 	return nil
 }
 
@@ -594,10 +587,10 @@ func (g *game) ThrowSlowingMagara(ev event) error {
 			continue
 		}
 		mons.Statuses[MonsSlow]++
-		g.PushEvent(&monsterEvent{ERank: g.Ev.Rank() + 130 + RandInt(40), NMons: mons.Index, EAction: MonsSlowEnd})
+		g.PushEvent(&monsterEvent{ERank: g.Ev.Rank() + DurationSlow, NMons: mons.Index, EAction: MonsSlowEnd})
 	}
 
-	ev.Renew(g, 7)
+	ev.Renew(g, DurationThrowItem)
 	return nil
 }
 
@@ -613,7 +606,7 @@ func (g *game) ThrowConfuseMagara(ev event) error {
 		}
 	}
 
-	ev.Renew(g, 7)
+	ev.Renew(g, DurationThrowItem)
 	return nil
 }
 
@@ -624,7 +617,7 @@ func (g *game) NightFog(at position, radius int, ev event) {
 		_, ok := g.Clouds[pos]
 		if !ok {
 			g.Clouds[pos] = CloudNight
-			g.PushEvent(&cloudEvent{ERank: ev.Rank() + 10, EAction: NightProgression, Pos: pos})
+			g.PushEvent(&cloudEvent{ERank: ev.Rank() + DurationCloudProgression, EAction: NightProgression, Pos: pos})
 			g.MakeCreatureSleep(pos, ev)
 		}
 	}
@@ -639,7 +632,7 @@ func (g *game) ThrowNightMagara(ev event) error {
 	g.ui.ProjectileTrajectoryAnimation(g.Ray(g.Player.Target), ColorFgSleepingMonster)
 	g.NightFog(g.Player.Target, 2, ev)
 
-	ev.Renew(g, 7)
+	ev.Renew(g, DurationThrowItem)
 	return nil
 }
 

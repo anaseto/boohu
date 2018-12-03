@@ -184,7 +184,7 @@ func (r rod) Use(g *game, ev event) error {
 	g.Stats.UsedRod[r]++
 	g.Stats.Evocations++
 	g.FunAction()
-	ev.Renew(g, 7)
+	ev.Renew(g, DurationEvokeRod)
 	return nil
 }
 
@@ -405,7 +405,7 @@ func (g *game) Fog(at position, radius int, ev event) {
 		_, ok := g.Clouds[pos]
 		if !ok {
 			g.Clouds[pos] = CloudFog
-			g.PushEvent(&cloudEvent{ERank: ev.Rank() + 100 + RandInt(100), EAction: CloudEnd, Pos: pos})
+			g.PushEvent(&cloudEvent{ERank: ev.Rank() + DurationFog + RandInt(DurationFog/2), EAction: CloudEnd, Pos: pos})
 		}
 	}
 	g.ComputeLOS()
@@ -504,7 +504,7 @@ func (g *game) CreateTemporalWallAt(pos position, ev event) {
 	g.Dungeon.SetCell(pos, WallCell)
 	delete(g.Clouds, pos)
 	g.TemporalWalls[pos] = true
-	g.PushEvent(&cloudEvent{ERank: ev.Rank() + 200 + RandInt(50), Pos: pos, EAction: ObstructionEnd})
+	g.PushEvent(&cloudEvent{ERank: ev.Rank() + DurationTemporalWall + RandInt(DurationTemporalWall/2), Pos: pos, EAction: ObstructionEnd})
 }
 
 func (g *game) EvokeRodHope(ev event) error {

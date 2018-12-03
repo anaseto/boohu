@@ -313,11 +313,7 @@ func (g *game) HitMonster(mons *monster) (hit bool) {
 	if g.Player.Weapon == Frundis {
 		noise -= 5
 	}
-	bonus := 0
-	if g.Player.HasStatus(StatusBerserk) {
-		bonus += 1
-	}
-	pa := dmg + bonus
+	pa := dmg
 	attack, clang := g.HitDamage(pa, 0)
 	if clang {
 		// TODO

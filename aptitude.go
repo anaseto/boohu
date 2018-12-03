@@ -4,11 +4,8 @@ type aptitude int
 
 const (
 	AptObstruction aptitude = iota
-	AptAgile
-	AptFast
 	AptHealthy
 	AptStealthyMovement
-	AptScales
 	AptStealthyLOS
 	AptMagic
 	AptConfusingGas
@@ -16,30 +13,21 @@ const (
 	AptHear
 	AptTeleport
 	AptLignification
-	AptStrong
 )
 
-const NumApts = int(AptStrong) + 1
+const NumApts = int(AptLignification) + 1
 
 func (ap aptitude) String() string {
 	var text string
 	switch ap {
 	case AptObstruction:
 		text = "The earth occasionally blows monsters away when hurt."
-	case AptAgile:
-		text = "You are agile."
-	case AptFast:
-		text = "You move fast."
 	case AptHealthy:
 		text = "You are healthy."
 	case AptStealthyMovement:
 		text = "You move stealthily."
-	case AptScales:
-		text = "You are covered by scales."
 	case AptHear:
 		text = "You have good ears."
-	case AptStrong:
-		text = "You are strong."
 	case AptMagic:
 		text = "You have big magic reserves."
 	case AptStealthyLOS:

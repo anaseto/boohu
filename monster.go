@@ -177,41 +177,38 @@ type monsterData struct {
 	baseAttack    int
 	attackDelay   int
 	maxHP         int
-	accuracy      int
-	armor         int
-	evasion       int
 	letter        rune
 	name          string
 	dangerousness int
 }
 
 var MonsData = []monsterData{
-	MonsGoblin:          {10, 1, 10, 2, 14, 0, 12, 'g', "goblin", 2},
-	MonsTinyHarpy:       {10, 1, 10, 2, 14, 0, 14, 't', "tiny harpy", 3},
-	MonsOgre:            {10, 2, 20, 3, 13, 0, 8, 'O', "ogre", 6},
-	MonsCyclop:          {10, 2, 20, 3, 13, 0, 8, 'C', "cyclops", 9},
-	MonsWorm:            {12, 1, 10, 3, 13, 0, 10, 'w', "farmer worm", 3},
-	MonsBrizzia:         {12, 1, 10, 3, 13, 0, 10, 'z', "brizzia", 7},
-	MonsAcidMound:       {10, 1, 10, 2, 16, 0, 8, 'a', "acid mound", 7},
-	MonsHound:           {10, 1, 10, 2, 14, 0, 12, 'h', "hound", 4},
-	MonsYack:            {10, 1, 10, 2, 14, 0, 10, 'y', "yack", 6},
-	MonsGiantBee:        {5, 1, 10, 1, 15, 0, 15, 'B', "giant bee", 6},
-	MonsGoblinWarrior:   {10, 1, 10, 2, 15, 3, 12, 'G', "goblin warrior", 8},
-	MonsHydra:           {10, 1, 10, 4, 13, 0, 6, 'H', "hydra", 15},
-	MonsSkeletonWarrior: {10, 1, 10, 2, 15, 4, 12, 'S', "skeleton warrior", 10},
-	MonsSpider:          {10, 1, 10, 2, 17, 0, 15, 's', "spider", 6},
-	MonsWingedMilfid:    {10, 1, 10, 2, 15, 0, 13, 'W', "winged milfid", 7},
-	MonsBlinkingFrog:    {10, 1, 10, 2, 15, 0, 12, 'F', "blinking frog", 7},
-	MonsLich:            {10, 1, 10, 2, 15, 3, 12, 'L', "lich", 16},
-	MonsEarthDragon:     {10, 2, 10, 4, 14, 6, 8, 'D', "earth dragon", 20},
-	MonsMirrorSpecter:   {10, 1, 10, 2, 15, 0, 17, 'm', "mirror specter", 11},
-	MonsExplosiveNadre:  {10, 1, 10, 1, 14, 0, 10, 'n', "explosive nadre", 6},
-	MonsSatowalgaPlant:  {10, 1, 10, 3, 15, 0, 4, 'P', "satowalga plant", 7},
-	MonsMadNixe:         {10, 1, 10, 2, 15, 0, 15, 'N', "mad nixe", 12},
-	MonsMindCelmist:     {10, 1, 20, 2, 99, 0, 14, 'c', "mind celmist", 14},
-	MonsVampire:         {10, 1, 10, 2, 17, 0, 15, 'V', "vampire", 13},
-	MonsTreeMushroom:    {12, 2, 20, 4, 14, 4, 6, 'T', "tree mushroom", 17},
-	MonsMarevorHelith:   {10, 0, 10, 10, 18, 10, 15, 'M', "Marevor Helith", 18},
+	MonsGoblin:          {10, 1, 10, 2, 'g', "goblin", 3},
+	MonsTinyHarpy:       {10, 1, 10, 2, 't', "tiny harpy", 4},
+	MonsOgre:            {10, 2, 20, 3, 'O', "ogre", 7},
+	MonsCyclop:          {10, 2, 20, 3, 'C', "cyclops", 9},
+	MonsWorm:            {15, 1, 10, 3, 'w', "farmer worm", 4},
+	MonsBrizzia:         {15, 1, 10, 3, 'z', "brizzia", 6},
+	MonsAcidMound:       {10, 1, 10, 2, 'a', "acid mound", 6},
+	MonsHound:           {10, 1, 10, 2, 'h', "hound", 5},
+	MonsYack:            {10, 1, 10, 2, 'y', "yack", 5},
+	MonsGiantBee:        {5, 1, 10, 1, 'B', "giant bee", 6},
+	MonsGoblinWarrior:   {10, 1, 10, 2, 'G', "goblin warrior", 5},
+	MonsHydra:           {10, 1, 10, 4, 'H', "hydra", 10},
+	MonsSkeletonWarrior: {10, 1, 10, 3, 'S', "skeleton warrior", 6},
+	MonsSpider:          {10, 1, 10, 2, 's', "spider", 6},
+	MonsWingedMilfid:    {10, 1, 10, 2, 'W', "winged milfid", 6},
+	MonsBlinkingFrog:    {10, 1, 10, 2, 'F', "blinking frog", 6},
+	MonsLich:            {10, 1, 10, 2, 'L', "lich", 15},
+	MonsEarthDragon:     {10, 2, 10, 4, 'D', "earth dragon", 20},
+	MonsMirrorSpecter:   {10, 1, 10, 2, 'm', "mirror specter", 11},
+	MonsExplosiveNadre:  {10, 1, 10, 1, 'n', "explosive nadre", 6},
+	MonsSatowalgaPlant:  {10, 1, 10, 3, 'P', "satowalga plant", 7},
+	MonsMadNixe:         {10, 1, 10, 2, 'N', "mad nixe", 14},
+	MonsMindCelmist:     {10, 1, 20, 2, 'c', "mind celmist", 12},
+	MonsVampire:         {10, 1, 10, 2, 'V', "vampire", 13},
+	MonsTreeMushroom:    {15, 2, 20, 4, 'T', "tree mushroom", 16},
+	MonsMarevorHelith:   {10, 0, 10, 10, 'M', "Marevor Helith", 18},
 }
 
 var monsDesc = []string{
@@ -1663,9 +1660,6 @@ type monster struct {
 	Index         int
 	Dir           direction
 	Attack        int
-	Accuracy      int
-	Armor         int
-	Evasion       int
 	HPmax         int
 	HP            int
 	State         monsterState
@@ -1686,9 +1680,6 @@ func (m *monster) Init() {
 	m.HP = m.HPmax
 	m.Pos = InvalidPos
 	m.LastKnownPos = InvalidPos
-	m.Accuracy = MonsData[m.Kind].accuracy
-	m.Armor = MonsData[m.Kind].armor
-	m.Evasion = MonsData[m.Kind].evasion
 	if m.Kind == MonsMarevorHelith {
 		m.State = Wandering
 	}
@@ -1988,11 +1979,11 @@ func (m *monster) HandleTurn(g *game, ev event) {
 				}
 			}
 		} else if m.Kind == MonsMindCelmist {
-			// we can avoid melee
+			// we try to avoid melee
 			safepos := m.SafePlacement(g)
-			m.Path = nil
-			attack = false
 			if safepos != nil {
+				attack = false
+				m.Path = nil
 				m.Target = *safepos
 			}
 		}
@@ -2171,11 +2162,7 @@ func (m *monster) HitPlayer(g *game, ev event) {
 	g.PrintfStyled("%s hits you (%d dmg).%s", logMonsterHit, m.Kind.Definite(true), attack, sclang)
 	m.InflictDamage(g, attack, m.Attack)
 	if m.Kind == MonsVampire {
-		healing := attack
-		if healing > 2*m.Attack/3 {
-			healing = 2 * m.Attack / 3
-		}
-		m.HP += healing
+		m.HP += 1
 		if m.HP > m.HPmax {
 			m.HP = m.HPmax
 		}
@@ -2214,7 +2201,7 @@ func (m *monster) EnterConfusion(g *game, ev event) {
 		m.Statuses[MonsConfused] = 1
 		m.Path = m.Path[:0]
 		g.PushEvent(&monsterEvent{
-			ERank: ev.Rank() + 50 + RandInt(100), NMons: m.Index, EAction: MonsConfusionEnd})
+			ERank: ev.Rank() + DurationConfusion + RandInt(DurationConfusion/4), NMons: m.Index, EAction: MonsConfusionEnd})
 	}
 }
 
@@ -2223,7 +2210,7 @@ func (m *monster) EnterLignification(g *game, ev event) {
 		m.Statuses[MonsLignified] = 1
 		m.Path = m.Path[:0]
 		g.PushEvent(&monsterEvent{
-			ERank: ev.Rank() + 150 + RandInt(100), NMons: m.Index, EAction: MonsLignificationEnd})
+			ERank: ev.Rank() + DurationLignification + RandInt(DurationLignification/2), NMons: m.Index, EAction: MonsLignificationEnd})
 		if g.Player.Sees(m.Pos) {
 			g.Printf("%s is rooted to the ground.", m.Kind.Definite(true))
 		}
@@ -2240,7 +2227,7 @@ func (m *monster) HitSideEffects(g *game, ev event) {
 		if RandInt(5) == 0 && !g.Player.HasStatus(StatusBerserk) && !g.Player.HasStatus(StatusExhausted) {
 			g.Player.Statuses[StatusBerserk] = 1
 			g.Player.HP += 2
-			end := ev.Rank() + 25 + RandInt(30)
+			end := ev.Rank() + DurationShortBerserk
 			g.PushEvent(&simpleEvent{ERank: end, EAction: BerserkEnd})
 			g.Player.Expire[StatusBerserk] = end
 			g.Print("You feel a sudden urge to kill things.")
@@ -2418,7 +2405,7 @@ func (m *monster) VampireSpit(g *game, ev event) bool {
 		return false
 	}
 	g.Player.Statuses[StatusNausea]++
-	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 30 + RandInt(20), EAction: NauseaEnd})
+	g.PushEvent(&simpleEvent{ERank: ev.Rank() + DurationSick, EAction: NauseaEnd})
 	g.Print("The vampire spits at you. You feel sick.")
 	m.Exhaust(g)
 	ev.Renew(g, m.Kind.AttackDelay())
@@ -2552,23 +2539,16 @@ func (m *monster) AbsorbMana(g *game, ev event) bool {
 }
 
 func (m *monster) MindAttack(g *game, ev event) bool {
-	if g.Player.Pos.Distance(m.Pos) == 1 && (m.HP < m.HPmax || RandInt(2) == 0) {
-		// try to avoid melee
-		safepos := m.SafePlacement(g)
-		if safepos != nil {
-			return false
-		}
+	if g.Player.Pos.Distance(m.Pos) == 1 {
+		return false
 	}
-	dmg := 1
-	m.InflictDamage(g, dmg, m.Attack)
-	g.Printf("The celmist mage hurts your mind (%d dmg).", dmg)
+	g.Print("The celmist mage attacks your mind.")
 	if RandInt(2) == 0 {
-		if RandInt(2) == 0 {
-			g.Player.Statuses[StatusSlow]++
-			g.PushEvent(&simpleEvent{ERank: ev.Rank() + 30 + RandInt(10), EAction: SlowEnd})
-		} else {
-			g.Confusion(ev)
-		}
+		g.Player.Statuses[StatusSlow]++
+		g.PushEvent(&simpleEvent{ERank: ev.Rank() + DurationSleepSlow, EAction: SlowEnd})
+		g.Print("You feel slow.")
+	} else {
+		g.Confusion(ev)
 	}
 	ev.Renew(g, m.Kind.AttackDelay())
 	return true
