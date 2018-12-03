@@ -11,19 +11,20 @@ const (
 	RodDigging rod = iota
 	RodBlink
 	RodTeleportOther
-	RodFireBolt
-	RodFireBall
-	RodLightning
 	RodFog
 	RodObstruction
-	RodShatter
 	RodSleeping
 	RodLignification
 	RodHope
 	RodSwapping
+	RodShatter
+	RodFireBolt
+	RodFireBall
+	RodLightning
 )
 
-const NumRods = int(RodSwapping) + 1
+const NumUtilityRods = int(RodSwapping) + 1
+const NumRods = int(RodLightning) + 1
 
 func (r rod) Letter() rune {
 	return '/'
@@ -569,12 +570,16 @@ func (g *game) GeneratedRodsCount() int {
 	return count
 }
 
-func (g *game) RandomRod() rod {
-	r := rod(RandInt(NumRods))
+func (g *game) RandomRod(conjuration bool) (r rod) {
+	if conjuration {
+		r = rod(NumUtilityRods + RandInt(NumRods-NumUtilityRods))
+	} else {
+		r = rod(RandInt(NumUtilityRods))
+	}
 	return r
 }
 
-func (g *game) GenerateRod() {
+func (g *game) GenerateRod(conjuration bool) {
 	count := 0
 	for {
 		count++
@@ -582,7 +587,7 @@ func (g *game) GenerateRod() {
 			panic("GenerateRod")
 		}
 		pos := g.FreeCellForStatic()
-		r := g.RandomRod()
+		r := g.RandomRod(true)
 		if _, ok := g.Player.Rods[r]; !ok && !g.GeneratedRods[r] {
 			g.GeneratedRods[r] = true
 			g.Rods[pos] = r

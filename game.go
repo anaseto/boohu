@@ -333,7 +333,7 @@ func (g *game) InitPlayer() {
 	case 10:
 		g.Player.Consumables[ShadowsPotion] = 1
 	}
-	r := g.RandomRod()
+	r := g.RandomRod(false)
 	g.Player.Rods = map[rod]rodProps{r: rodProps{r.MaxCharge() - 1}}
 	g.Player.Statuses = map[status]int{}
 	g.Player.Expire = map[status]int{}
@@ -404,6 +404,7 @@ type genFlavour int
 
 const (
 	GenRod genFlavour = iota
+	GenConjurationRod
 	GenWeapon
 	GenArmour
 	GenWpArm
@@ -442,7 +443,7 @@ func (g *game) InitFirstLevel() {
 	}
 	g.Version = Version
 	g.GenPlan = [MaxDepth + 1]genFlavour{
-		1:  GenRod,
+		1:  GenConjurationRod,
 		2:  GenWeapon,
 		3:  GenArmour,
 		4:  GenRod,
@@ -506,7 +507,9 @@ func (g *game) InitLevel() {
 		g.GenWeapon()
 		g.GenArmour()
 	case GenRod:
-		g.GenerateRod()
+		g.GenerateRod(false)
+	case GenConjurationRod:
+		g.GenerateRod(true)
 	case GenExtraCollectables:
 		for i := 0; i < 2; i++ {
 			g.GenCollectable()
