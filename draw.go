@@ -889,7 +889,7 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 			r = '¤'
 			fgColor = ColorFgDark
 		}
-		if mons := g.LastMonsterAt[pos]; mons.Exists() && !mons.Seen {
+		if mons, ok := g.LastMonsterKnownAt[pos]; ok && !mons.Seen {
 			r = '☻'
 			fgColor = ColorFgSleepingMonster
 		}
@@ -999,22 +999,18 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 		} else if !g.Wizard && g.Noise[pos] {
 			r = '♫'
 			fgColor = ColorFgWanderingMonster
-		} else if !g.Wizard {
-			mons := g.LastMonsterAt[pos]
-			if mons.Exists() && mons.LastSeenPos == pos {
-				if !mons.Seen {
-					r = '☻'
+		} else if mons, ok := g.LastMonsterKnownAt[pos]; !g.Wizard && ok {
+			if !mons.Seen {
+				// potion of dreams
+				r = '☻'
+				fgColor = ColorFgSleepingMonster
+			} else {
+				r = mons.Kind.Letter()
+				if mons.LastSeenState == Resting {
 					fgColor = ColorFgSleepingMonster
 				} else {
-					r = mons.Kind.Letter()
-					if mons.LastSeenState == Resting {
-						fgColor = ColorFgSleepingMonster
-					} else {
-						fgColor = ColorFgWanderingMonster
-					}
+					fgColor = ColorFgWanderingMonster
 				}
-			} else {
-				delete(g.LastMonsterAt, pos)
 			}
 		}
 	}

@@ -121,9 +121,7 @@ func (g *game) ComputeLOS() {
 	}
 	for _, mons := range g.Monsters {
 		if mons.Exists() && g.Player.Sees(mons.Pos) {
-			mons.LastSeenState = mons.State
-			mons.LastSeenPos = mons.Pos
-			g.LastMonsterAt[mons.Pos] = mons
+			mons.UpdateKnowledge(g, mons.Pos)
 			if mons.Seen {
 				g.StopAuto()
 				continue
@@ -188,8 +186,9 @@ func (g *game) SeePosition(pos position) {
 	if _, ok := g.WrongFoliage[pos]; ok {
 		delete(g.WrongFoliage, pos)
 	}
-	if mons := g.LastMonsterAt[pos]; !mons.Exists() || mons.Seen && (mons.Pos != mons.LastSeenPos || pos != mons.LastSeenPos) {
-		delete(g.LastMonsterAt, pos)
+	if mons, ok := g.LastMonsterKnownAt[pos]; ok && (mons.Pos != pos || !mons.Exists()) {
+		delete(g.LastMonsterKnownAt, pos)
+		mons.LastKnownPos = InvalidPos
 	}
 }
 
@@ -314,4 +313,16 @@ func (g *game) ComputeMonsterLOS() {
 			}
 		}
 	}
+}
+
+func (m *monster) UpdateKnowledge(g *game, pos position) {
+	if mons, ok := g.LastMonsterKnownAt[pos]; ok {
+		mons.LastKnownPos = InvalidPos
+	}
+	if m.LastKnownPos != InvalidPos {
+		delete(g.LastMonsterKnownAt, m.LastKnownPos)
+	}
+	g.LastMonsterKnownAt[pos] = m
+	m.LastSeenState = m.State
+	m.LastKnownPos = pos
 }

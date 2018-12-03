@@ -355,7 +355,7 @@ func (g *game) QuaffTormentPotion(ev event) error {
 func (g *game) QuaffDreamPotion(ev event) error {
 	for _, mons := range g.Monsters {
 		if mons.Exists() && mons.State == Resting && !g.Player.Sees(mons.Pos) {
-			g.LastMonsterAt[mons.Pos] = mons
+			mons.UpdateKnowledge(g, mons.Pos)
 		}
 	}
 	g.Printf("You quaff the %s. You perceive monsters' dreams.", DreamPotion)

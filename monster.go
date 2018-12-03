@@ -1671,13 +1671,13 @@ type monster struct {
 	State         monsterState
 	Statuses      [NMonsStatus]int
 	Pos           position
+	LastKnownPos  position
 	Target        position
 	Path          []position // cache
 	Obstructing   bool
 	FireReady     bool
 	Seen          bool
 	LastSeenState monsterState
-	LastSeenPos   position
 }
 
 func (m *monster) Init() {
@@ -1685,7 +1685,7 @@ func (m *monster) Init() {
 	m.Attack = MonsData[m.Kind].baseAttack
 	m.HP = m.HPmax
 	m.Pos = InvalidPos
-	m.LastSeenPos = InvalidPos
+	m.LastKnownPos = InvalidPos
 	m.Accuracy = MonsData[m.Kind].accuracy
 	m.Armor = MonsData[m.Kind].armor
 	m.Evasion = MonsData[m.Kind].evasion
@@ -1826,18 +1826,15 @@ func (m *monster) TeleportAway(g *game) {
 	m.MoveTo(g, pos)
 	if g.Player.Sees(opos) {
 		g.ui.TeleportAnimation(opos, pos, false)
-		m.LastSeenPos = InvalidPos
 	}
 }
 
 func (m *monster) MoveTo(g *game, pos position) {
 	if g.Player.Sees(pos) {
-		m.LastSeenState = m.State
-		m.LastSeenPos = pos
-		g.LastMonsterAt[pos] = m
+		m.UpdateKnowledge(g, pos)
 	} else if g.Player.Sees(m.Pos) {
-		m.LastSeenPos = InvalidPos
-		delete(g.LastMonsterAt, m.Pos)
+		delete(g.LastMonsterKnownAt, m.Pos)
+		m.LastKnownPos = InvalidPos
 	}
 	if !g.Player.Sees(m.Pos) && g.Player.Sees(pos) {
 		if !m.Seen {
@@ -1909,9 +1906,13 @@ func (m *monster) AttackAction(g *game, ev event) {
 		}
 		fallthrough
 	default:
+		m.Dir = g.Player.Pos.Dir(m.Pos)
 		if m.Kind == MonsHydra {
 			for i := 0; i <= 3; i++ {
-				m.HitPlayer(g, ev)
+				if RandInt(3) == 0 {
+					// XXX: hydras now use a random number of heads (solve: probably remove hydras).
+					m.HitPlayer(g, ev)
+				}
 			}
 		} else if m.Kind == MonsMarevorHelith {
 			m.TeleportPlayer(g, ev)
