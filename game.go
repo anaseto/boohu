@@ -373,7 +373,7 @@ func (g *game) InitPlayer() {
 	//g.Player.Shield = FireShield
 	//g.Player.Shield = BashingShield
 	//g.Player.Armour = TurtlePlates
-	g.Player.Armour = HarmonistRobe
+	//g.Player.Armour = HarmonistRobe
 	//g.Player.Armour = CelmistRobe
 	//g.Player.Armour = ShinyPlates
 	//g.Player.Armour = SmokingScales
@@ -724,7 +724,7 @@ func (g *game) GenCollectables() {
 }
 
 func (g *game) GenArmour() {
-	ars := [4]armour{SmokingScales, SpeedRobe, CelmistRobe, HarmonistRobe}
+	ars := [3]armour{SmokingScales, CelmistRobe, HarmonistRobe}
 	for {
 		i := RandInt(len(ars))
 		if g.GeneratedEquipables[ars[i]] {
@@ -739,7 +739,7 @@ func (g *game) GenArmour() {
 }
 
 func (g *game) GenWeapon() {
-	wps := [3]weapon{DancingRapier, Frundis, HarKarGauntlets}
+	wps := [4]weapon{DancingRapier, Frundis, HarKarGauntlets, DefenderFlail}
 	for {
 		i := RandInt(len(wps))
 		if g.GeneratedEquipables[wps[i]] {

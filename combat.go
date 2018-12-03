@@ -165,16 +165,16 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 	case g.Player.HasStatus(StatusSwap) && !g.Player.HasStatus(StatusLignification) && !mons.Status(MonsLignified):
 		g.SwapWithMonster(mons)
 	case g.Player.Weapon == Frundis:
-		if !g.HitMonster(mons) {
+		if !g.HitMonster(mons, DmgNormal) {
 			break
 		}
-		if RandInt(2) == 0 {
+		if RandInt(3) > 0 {
 			mons.EnterConfusion(g, ev)
 			g.PrintfStyled("Frundis glows… %s appears confused.", logPlayerHit, mons.Kind.Definite(false))
 		}
 	case g.Player.Weapon == DancingRapier:
 		ompos := mons.Pos
-		g.HitMonster(mons)
+		g.HitMonster(mons, DmgNormal)
 		if g.Player.HasStatus(StatusLignification) || mons.Status(MonsLignified) {
 			break
 		}
@@ -183,7 +183,7 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 		if behind.valid() {
 			m := g.MonsterAt(behind)
 			if m.Exists() {
-				g.HitMonster(m)
+				g.HitMonster(m, DmgExtra)
 			}
 		}
 		if mons.Exists() {
@@ -193,9 +193,9 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 	case g.Player.Weapon == HarKarGauntlets:
 		g.HarKarAttack(mons, ev)
 	case g.Player.Weapon == DefenderFlail:
-		g.HitMonster(mons)
+		g.HitMonster(mons, DmgNormal)
 	default:
-		g.HitMonster(mons)
+		g.HitMonster(mons, DmgNormal)
 	}
 }
 
@@ -236,42 +236,16 @@ func (g *game) HarKarAttack(mons *monster, ev event) {
 			if !m.Exists() {
 				break
 			}
-			g.HitMonster(m)
+			g.HitMonster(m, DmgNormal)
 		}
 		g.PlacePlayerAt(pos)
 		behind := pos.To(dir)
 		m := g.MonsterAt(behind)
 		if m.Exists() {
-			g.HitMonster(m)
+			g.HitMonster(m, DmgNormal)
 		}
 	} else {
-		g.HitMonster(mons)
-	}
-}
-
-func (g *game) HitConnected(pos position, dt dmgType, ev event) {
-	d := g.Dungeon
-	conn := map[position]bool{}
-	stack := []position{pos}
-	conn[pos] = true
-	nb := make([]position, 0, 8)
-	for len(stack) > 0 {
-		pos = stack[len(stack)-1]
-		stack = stack[:len(stack)-1]
-		mons := g.MonsterAt(pos)
-		if !mons.Exists() {
-			continue
-		}
-		g.HitMonster(mons)
-		nb = pos.Neighbors(nb, func(npos position) bool {
-			return npos.valid() && d.Cell(npos).T != WallCell
-		})
-		for _, npos := range nb {
-			if !conn[npos] {
-				conn[npos] = true
-				stack = append(stack, npos)
-			}
-		}
+		g.HitMonster(mons, DmgNormal)
 	}
 }
 
@@ -292,16 +266,13 @@ func (g *game) HitNoise(clang bool) int {
 	return noise
 }
 
-type dmgType int
-
 const (
-	DmgPhysical dmgType = iota
-	DmgMagical
+	DmgNormal = 1
+	DmgExtra  = 2
 )
 
-func (g *game) HitMonster(mons *monster) (hit bool) {
+func (g *game) HitMonster(mons *monster, dmg int) (hit bool) {
 	ev := g.Ev
-	dmg := 1
 	hit = true
 	noise := BaseHitNoise
 	if g.Player.Weapon == Dagger || g.Player.Weapon == VampDagger {

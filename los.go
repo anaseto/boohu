@@ -307,7 +307,7 @@ func (m *monster) SeesPlayer(g *game) bool {
 }
 
 func (m *monster) Sees(g *game, pos position) bool {
-	return m.LOS[m.Pos] && m.Dir.InViewCone(m.Pos, pos)
+	return pos == m.Pos || m.LOS[pos] && m.Dir.InViewCone(m.Pos, pos)
 }
 
 func (g *game) ComputeMonsterLOS() {
@@ -320,10 +320,19 @@ func (g *game) ComputeMonsterLOS() {
 			if !g.Player.Sees(pos) {
 				continue
 			}
-			if pos == mons.Pos || mons.Sees(g, pos) {
+			if mons.Sees(g, pos) {
 				g.MonsterLOS[pos] = true
 			}
 		}
+		// unoptimized version for testing:
+		//if !mons.Exists() {
+		//continue
+		//}
+		//for pos := range mons.LOS {
+		//if mons.Sees(g, pos) {
+		//g.MonsterLOS[pos] = true
+		//}
+		//}
 	}
 }
 
