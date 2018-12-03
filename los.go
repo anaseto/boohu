@@ -114,8 +114,8 @@ func (g *game) ComputeLOS() {
 		}
 	}
 	g.Player.LOS = m
-	for pos, b := range g.Player.LOS {
-		if b && g.Player.Sees(pos) {
+	for pos := range g.Player.LOS {
+		if g.Player.Sees(pos) {
 			g.SeePosition(pos)
 		}
 	}
@@ -188,7 +188,7 @@ func (g *game) SeePosition(pos position) {
 	if _, ok := g.WrongFoliage[pos]; ok {
 		delete(g.WrongFoliage, pos)
 	}
-	if mons, ok := g.LastMonsterAt[pos]; ok && !(mons.Exists() && mons.Pos == pos) {
+	if mons := g.LastMonsterAt[pos]; !mons.Exists() || mons.Seen && (mons.Pos != mons.LastSeenPos || pos != mons.LastSeenPos) {
 		delete(g.LastMonsterAt, pos)
 	}
 }

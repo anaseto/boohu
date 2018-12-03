@@ -196,6 +196,7 @@ var LetterNames = map[rune]string{
 	'☻':  "dreaming",
 	'…':  "dots",
 	'_':  "stone",
+	'♥':  "heart",
 }
 
 func (ui *gameui) Interrupt() {
@@ -236,7 +237,7 @@ func getImage(cell UICell) *image.RGBA {
 	br := bytes.NewReader(buf)
 	img, err := png.Decode(br)
 	if err != nil {
-		log.Printf("Could not decode png: %v", err)
+		log.Printf("Rune %s: could not decode png: %v", string(cell.R), err)
 	}
 	rect := img.Bounds()
 	rgbaimg := image.NewRGBA(rect)

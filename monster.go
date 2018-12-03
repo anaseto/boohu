@@ -1826,6 +1826,7 @@ func (m *monster) TeleportAway(g *game) {
 	m.MoveTo(g, pos)
 	if g.Player.Sees(opos) {
 		g.ui.TeleportAnimation(opos, pos, false)
+		m.LastSeenPos = InvalidPos
 	}
 }
 
@@ -1834,6 +1835,9 @@ func (m *monster) MoveTo(g *game, pos position) {
 		m.LastSeenState = m.State
 		m.LastSeenPos = pos
 		g.LastMonsterAt[pos] = m
+	} else if g.Player.Sees(m.Pos) {
+		m.LastSeenPos = InvalidPos
+		delete(g.LastMonsterAt, m.Pos)
 	}
 	if !g.Player.Sees(m.Pos) && g.Player.Sees(pos) {
 		if !m.Seen {

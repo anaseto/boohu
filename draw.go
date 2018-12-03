@@ -779,8 +779,7 @@ func (ui *gameui) MonsterInfo(m *monster) string {
 			infos = append(infos, monsterStatus(st).String())
 		}
 	}
-	p := (m.HP * 100) / m.HPmax
-	health := fmt.Sprintf("%d %% HP", p)
+	health := fmt.Sprintf("%d HP", m.HP)
 	infos = append(infos, health)
 	return strings.Join(infos, ", ")
 }
@@ -1038,12 +1037,21 @@ func (ui *gameui) DrawStatusBar(line int) {
 	}
 	sort.Sort(sts)
 	hpColor := ColorFgHPok
-	switch {
-	case g.Player.HP*100/g.Player.HPMax() < 30:
+	switch g.Player.HP + g.Player.HPbonus {
+	case 1:
 		hpColor = ColorFgHPcritical
-	case g.Player.HP*100/g.Player.HPMax() < 70:
+	case 2, 3:
 		hpColor = ColorFgHPwounded
 	}
+	nWounds := g.Player.HPMax() - g.Player.HP - g.Player.HPbonus
+	if nWounds <= 0 {
+		nWounds = 0
+	}
+	ui.DrawColoredText("HP: ", BarCol, line, hpColor)
+	ui.DrawColoredText(strings.Repeat("♥", g.Player.HP), BarCol+4, line, hpColor) // TODO: define color variables
+	ui.DrawColoredText(strings.Repeat("♥", g.Player.HPbonus), BarCol+4+g.Player.HP, line, ColorCyan)
+	ui.DrawColoredText(strings.Repeat("♥", nWounds), BarCol+4+g.Player.HP+g.Player.HPbonus, line, ColorFg)
+	line++
 	mpColor := ColorFgMPok
 	switch {
 	case g.Player.MP*100/g.Player.MPMax() < 30:
@@ -1051,8 +1059,6 @@ func (ui *gameui) DrawStatusBar(line int) {
 	case g.Player.MP*100/g.Player.MPMax() < 70:
 		mpColor = ColorFgMPpartial
 	}
-	ui.DrawColoredText(fmt.Sprintf("HP: %d", g.Player.HP), BarCol, line, hpColor)
-	line++
 	ui.DrawColoredText(fmt.Sprintf("MP: %d", g.Player.MP), BarCol, line, mpColor)
 	line++
 	line++

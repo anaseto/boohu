@@ -7,6 +7,7 @@ import (
 
 type player struct {
 	HP          int
+	HPbonus     int
 	MP          int
 	Simellas    int
 	Dir         direction
