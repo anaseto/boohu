@@ -1044,18 +1044,28 @@ func (ui *gameui) DrawStatusBar(line int) {
 		nWounds = 0
 	}
 	ui.DrawColoredText("HP: ", BarCol, line, hpColor)
-	ui.DrawColoredText(strings.Repeat("♥", g.Player.HP), BarCol+4, line, hpColor) // TODO: define color variables
-	ui.DrawColoredText(strings.Repeat("♥", g.Player.HPbonus), BarCol+4+g.Player.HP, line, ColorCyan)
+	ui.DrawColoredText(strings.Repeat("♥", g.Player.HP), BarCol+4, line, hpColor)
+	ui.DrawColoredText(strings.Repeat("♥", g.Player.HPbonus), BarCol+4+g.Player.HP, line, ColorCyan) // TODO: define color variables
 	ui.DrawColoredText(strings.Repeat("♥", nWounds), BarCol+4+g.Player.HP+g.Player.HPbonus, line, ColorFg)
+
 	line++
 	mpColor := ColorFgMPok
-	switch {
-	case g.Player.MP*100/g.Player.MPMax() < 30:
+	switch g.Player.MP {
+	case 1:
 		mpColor = ColorFgMPcritical
-	case g.Player.MP*100/g.Player.MPMax() < 70:
+	case 2:
 		mpColor = ColorFgMPpartial
 	}
 	ui.DrawColoredText(fmt.Sprintf("MP: %d", g.Player.MP), BarCol, line, mpColor)
+
+	MPspent := g.Player.MPMax() - g.Player.MP
+	if MPspent <= 0 {
+		MPspent = 0
+	}
+	ui.DrawColoredText("MP: ", BarCol, line, mpColor)
+	ui.DrawColoredText(strings.Repeat("♥", g.Player.MP), BarCol+4, line, mpColor)
+	ui.DrawColoredText(strings.Repeat("♥", MPspent), BarCol+4+g.Player.MP, line, ColorFg)
+
 	line++
 	line++
 	ui.DrawText(fmt.Sprintf("Simellas: %d", g.Player.Simellas), BarCol, line)
@@ -1110,17 +1120,17 @@ func (ui *gameui) DrawStatusLine() {
 	}
 	sort.Sort(sts)
 	hpColor := ColorFgHPok
-	switch {
-	case g.Player.HP*100/g.Player.HPMax() < 30:
+	switch g.Player.HP + g.Player.HPbonus {
+	case 1:
 		hpColor = ColorFgHPcritical
-	case g.Player.HP*100/g.Player.HPMax() < 70:
+	case 2, 3:
 		hpColor = ColorFgHPwounded
 	}
 	mpColor := ColorFgMPok
-	switch {
-	case g.Player.MP*100/g.Player.MPMax() < 30:
+	switch g.Player.MP {
+	case 1:
 		mpColor = ColorFgMPcritical
-	case g.Player.MP*100/g.Player.MPMax() < 70:
+	case 2:
 		mpColor = ColorFgMPpartial
 	}
 	line := DungeonHeight
@@ -1153,12 +1163,31 @@ func (ui *gameui) DrawStatusLine() {
 	turns := fmt.Sprintf("T:%.1f ", float64(g.Turn)/10)
 	ui.DrawText(turns, col, line)
 	col += utf8.RuneCountInString(turns)
-	hp := fmt.Sprintf("HP:%2d ", g.Player.HP)
-	ui.DrawColoredText(hp, col, line, hpColor)
-	col += utf8.RuneCountInString(hp)
-	mp := fmt.Sprintf("MP:%d ", g.Player.MP)
-	ui.DrawColoredText(mp, col, line, mpColor)
-	col += utf8.RuneCountInString(mp)
+
+	nWounds := g.Player.HPMax() - g.Player.HP - g.Player.HPbonus
+	if nWounds <= 0 {
+		nWounds = 0
+	}
+	ui.DrawColoredText("HP:", col, line, hpColor)
+	col += 3
+	ui.DrawColoredText(strings.Repeat("♥", g.Player.HP), col, line, hpColor)
+	col += g.Player.HP
+	ui.DrawColoredText(strings.Repeat("♥", g.Player.HPbonus), col, line, ColorCyan) // TODO: define color variables
+	col += g.Player.HPbonus
+	ui.DrawColoredText(strings.Repeat("♥", nWounds), col, line, ColorFg)
+	col += nWounds
+
+	MPspent := g.Player.MPMax() - g.Player.MP
+	if MPspent <= 0 {
+		MPspent = 0
+	}
+	ui.DrawColoredText(" MP:", col, line, mpColor)
+	col += 4
+	ui.DrawColoredText(strings.Repeat("♥", g.Player.MP), col, line, mpColor)
+	col += g.Player.MP
+	ui.DrawColoredText(strings.Repeat("♥", MPspent), col, line, ColorFg)
+	col += MPspent
+
 	if len(sts) > 0 {
 		ui.DrawText("| ", col, line)
 		col += 2
