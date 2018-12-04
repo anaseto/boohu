@@ -15,8 +15,8 @@ const (
 	RodObstruction
 	RodSleeping
 	RodLignification
-	RodHope
 	RodSwapping
+	RodHope
 	RodShatter
 	RodFireBolt
 	RodFireBall
