@@ -1846,6 +1846,7 @@ func (m *monster) PlaceAt(g *game, pos position) {
 	if !m.Pos.valid() {
 		m.Pos = pos
 		g.MonstersPosCache[m.Pos.idx()] = m.Index + 1
+		m.ComputeLOS(g)
 		return
 	}
 	if pos == m.Pos {

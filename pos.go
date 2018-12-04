@@ -289,6 +289,9 @@ func (pos position) Laterals(dir direction) []position {
 }
 
 func (dir direction) InViewCone(from, to position) bool {
+	if to == from {
+		return true
+	}
 	d := to.Dir(from)
 	if d == dir || from.Distance(to) <= 1 {
 		return true

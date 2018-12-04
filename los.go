@@ -307,7 +307,7 @@ func (m *monster) SeesPlayer(g *game) bool {
 }
 
 func (m *monster) Sees(g *game, pos position) bool {
-	return pos == m.Pos || m.LOS[pos] && m.Dir.InViewCone(m.Pos, pos)
+	return m.LOS[pos] && m.Dir.InViewCone(m.Pos, pos)
 }
 
 func (g *game) ComputeMonsterLOS() {
