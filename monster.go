@@ -215,7 +215,7 @@ var monsDesc = []string{
 	MonsGoblin:          "Goblins are little humanoid creatures. They often appear in a group.",
 	MonsTinyHarpy:       "Tiny harpies are little humanoid flying creatures. They blink away when hurt. They often appear in a group.",
 	MonsOgre:            "Ogres are big clunky humanoids that can hit really hard.",
-	MonsCyclop:          "Cyclopes are very similar to ogres, but they also like to throw rocks at their foes (for up to 15 damage). The rocks can block your way for a while.",
+	MonsCyclop:          "Cyclopes are very similar to ogres, but they also like to throw rocks at their foes (2 damage). The rocks can block your way for a while.",
 	MonsWorm:            "Farmer worms are ugly slow moving creatures, but surprisingly hardy at times, and they furrow as they move, helping new foliage to grow.",
 	MonsBrizzia:         "Brizzias are big slow moving biped creatures. They are quite hardy, and when hurt they can cause nausea, impeding the use of potions.",
 	MonsAcidMound:       "Acid mounds are acidic creatures. They can temporarily corrode your equipment.",
@@ -2359,7 +2359,7 @@ func (m *monster) ThrowRock(g *game, ev event) bool {
 	if blocked {
 		return false
 	}
-	dmg := 2
+	dmg := DmgExtra
 	clang := RandInt(3) == 0
 	if RandInt(2) == 0 {
 		noise := g.HitNoise(clang)
@@ -2437,7 +2437,7 @@ func (m *monster) ThrowJavelin(g *game, ev event) bool {
 	if blocked {
 		return false
 	}
-	const dmg = 1
+	dmg := DmgNormal
 	clang := RandInt(4) == 0
 	if RandInt(2) == 0 {
 		noise := g.HitNoise(clang)
@@ -2464,7 +2464,7 @@ func (m *monster) ThrowAcid(g *game, ev event) bool {
 	if blocked {
 		return false
 	}
-	dmg := 1
+	dmg := DmgNormal
 	if RandInt(2) == 0 {
 		noise := g.HitNoise(false) // no clang with acid projectiles
 		g.MakeNoise(noise, g.Player.Pos)
