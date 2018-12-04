@@ -123,9 +123,9 @@ func (sev *simpleEvent) Action(g *game) {
 		g.Player.Statuses[StatusBerserk] = 0
 		g.Player.Statuses[StatusSlow]++
 		g.Player.Statuses[StatusExhausted] = 1
-		g.Player.HP -= 2
-		if g.Player.HP < 1 {
-			g.Player.HP = 1
+		g.Player.HPbonus -= 2
+		if g.Player.HPbonus < 0 {
+			g.Player.HPbonus = 0
 		}
 		g.PrintStyled("You are no longer berserk.", logStatusEnd)
 		g.PushEvent(&simpleEvent{ERank: sev.Rank() + DurationSlow, EAction: SlowEnd})
@@ -155,9 +155,9 @@ func (sev *simpleEvent) Action(g *game) {
 		}
 	case LignificationEnd:
 		g.Player.Statuses[StatusLignification]--
-		g.Player.HP -= 4
-		if g.Player.HP < 1 {
-			g.Player.HP = 1
+		g.Player.HPbonus -= 4
+		if g.Player.HPbonus < 0 {
+			g.Player.HPbonus = 0
 		}
 		if g.Player.Statuses[StatusLignification] == 0 {
 			g.PrintStyled("You no longer feel attached to the ground.", logStatusEnd)

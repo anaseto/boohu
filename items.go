@@ -210,7 +210,7 @@ func (g *game) QuaffBerserk(ev event) error {
 	g.PushEvent(&simpleEvent{ERank: end, EAction: BerserkEnd})
 	g.Player.Expire[StatusBerserk] = end
 	g.Printf("You quaff the %s. You feel a sudden urge to kill things.", BerserkPotion)
-	g.Player.HP += 2
+	g.Player.HPbonus += 2
 	return nil
 }
 
@@ -337,9 +337,7 @@ func (g *game) QuaffMagicMapping(ev event) error {
 
 func (g *game) QuaffTormentPotion(ev event) error {
 	g.Printf("You quaff the %s. %s It hurts!", TormentPotion, g.ExplosionSound())
-	damage := g.Player.HP / 2
-	g.Player.HP = g.Player.HP - damage
-	g.Stats.Damage += damage
+	g.DamagePlayer(g.Player.HP / 2)
 	g.ui.WoundedAnimation()
 	g.MakeNoise(ExplosionNoise+10, g.Player.Pos)
 	g.ui.TormentExplosionAnimation()

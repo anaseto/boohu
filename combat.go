@@ -2,11 +2,19 @@
 
 package main
 
+func (g *game) DamagePlayer(damage int) {
+	g.Stats.Damage += damage
+	g.Player.HPbonus -= damage
+	if g.Player.HPbonus < 0 {
+		g.Player.HP += g.Player.HPbonus
+		g.Player.HPbonus = 0
+	}
+}
+
 func (m *monster) InflictDamage(g *game, damage, max int) {
 	g.Stats.ReceivedHits++
-	g.Stats.Damage += damage
 	oldHP := g.Player.HP
-	g.Player.HP -= damage
+	g.DamagePlayer(damage)
 	g.ui.WoundedAnimation()
 	if oldHP > max && g.Player.HP <= max {
 		g.StoryPrintf("Critical HP: %d (hit by %s)", g.Player.HP, m.Kind.Indefinite(false))
