@@ -1943,7 +1943,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 		movedelay += 3
 	}
 	if m.State == Resting {
-		wander := RandInt(100 + 6*Max(800-(g.DepthPlayerTurn+1), 0))
+		wander := RandInt(100 + 6*Max(700-(g.DepthPlayerTurn+1), 0))
 		if wander == 0 {
 			m.NaturalAwake(g)
 		}
@@ -2179,15 +2179,15 @@ func (m *monster) HitPlayer(g *game, ev event) {
 		return
 	}
 	m.HitSideEffects(g, ev)
-	const HeavyWoundHP = 18
-	if g.Player.Aptitudes[AptConfusingGas] && g.Player.HP < HeavyWoundHP && RandInt(2) == 0 {
+	const HeavyWoundHP = 2
+	if g.Player.Aptitudes[AptConfusingGas] && g.Player.HP < HeavyWoundHP {
 		m.EnterConfusion(g, ev)
 		g.Printf("You release some confusing gas against the %s.", m.Kind)
 	}
-	if g.Player.Aptitudes[AptSmoke] && g.Player.HP < HeavyWoundHP && RandInt(2) == 0 {
+	if g.Player.Aptitudes[AptSmoke] && g.Player.HP < HeavyWoundHP {
 		g.Smoke(ev)
 	}
-	if g.Player.Aptitudes[AptObstruction] && g.Player.HP <= HeavyWoundHP && RandInt(2) == 0 {
+	if g.Player.Aptitudes[AptObstruction] && g.Player.HP <= HeavyWoundHP {
 		opos := m.Pos
 		m.Blink(g)
 		if opos != m.Pos {
@@ -2196,10 +2196,10 @@ func (m *monster) HitPlayer(g *game, ev event) {
 			m.Exhaust(g)
 		}
 	}
-	if g.Player.Aptitudes[AptTeleport] && g.Player.HP < HeavyWoundHP && RandInt(2) == 0 {
+	if g.Player.Aptitudes[AptTeleport] && g.Player.HP < HeavyWoundHP {
 		m.TeleportAway(g)
 	}
-	if g.Player.Aptitudes[AptLignification] && g.Player.HP < HeavyWoundHP && RandInt(2) == 0 {
+	if g.Player.Aptitudes[AptLignification] && g.Player.HP < HeavyWoundHP {
 		m.EnterLignification(g, ev)
 	}
 }

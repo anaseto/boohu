@@ -6,7 +6,6 @@ const (
 	AptObstruction aptitude = iota
 	AptHealthy
 	AptStealthyMovement
-	AptStealthyLOS
 	AptMagic
 	AptConfusingGas
 	AptSmoke
@@ -30,8 +29,6 @@ func (ap aptitude) String() string {
 		text = "You have good ears."
 	case AptMagic:
 		text = "You have big magic reserves."
-	case AptStealthyLOS:
-		text = "The shadows follow you. (reduced LOS)"
 	case AptConfusingGas:
 		text = "You occasionally release some confusing gas when hurt."
 	case AptSmoke:

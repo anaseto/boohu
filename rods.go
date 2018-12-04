@@ -516,10 +516,6 @@ func (g *game) EvokeRodHope(ev event) error {
 	g.ui.ProjectileTrajectoryAnimation(g.Ray(g.Player.Target), ColorFgExplosionStart)
 	mons := g.MonsterAt(g.Player.Target)
 	// mons not nil (check done in the targeter)
-	attack := -20 + 30*DefaultHealth/g.Player.HP
-	if attack > 130 {
-		attack = 130
-	}
 	dmg := DefaultHealth - g.Player.HP + 1
 	if dmg <= 0 {
 		dmg = 1

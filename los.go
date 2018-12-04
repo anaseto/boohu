@@ -66,17 +66,10 @@ func (g *game) buildRayMap(from position, distance int) rayMap {
 	return rm
 }
 
+const DefaultLOSRange = 7
+
 func (g *game) LosRange() int {
-	losRange := 7
-	if g.Player.Aptitudes[AptStealthyLOS] {
-		losRange -= 2
-	}
-	if g.Player.Armour == HarmonistRobe {
-		losRange -= 1
-	}
-	if g.Player.Weapon == Frundis {
-		losRange -= 1
-	}
+	losRange := DefaultLOSRange
 	if g.Player.HasStatus(StatusShadows) {
 		losRange = 1
 	}
@@ -249,26 +242,23 @@ func (g *game) ComputeRayHighlight(pos position) {
 
 func (g *game) ComputeNoise() {
 	dij := &noisePath{game: g}
-	rg := g.LosRange() + 2
-	if rg <= 5 {
-		rg++
-	}
+	rg := DefaultLOSRange + 2
 	if g.Player.Aptitudes[AptHear] {
 		rg++
 	}
 	nm := Dijkstra(dij, []position{g.Player.Pos}, rg)
 	count := 0
 	noise := map[position]bool{}
-	rmax := 3
+	rmax := 2
 	if g.Player.Aptitudes[AptHear] {
-		rmax--
+		rmax += 2
 	}
 	for pos := range nm {
 		if g.Player.Sees(pos) {
 			continue
 		}
 		mons := g.MonsterAt(pos)
-		if mons.Exists() && mons.State != Resting && RandInt(rmax) == 0 {
+		if mons.Exists() && mons.State != Resting && RandInt(rmax) > 0 {
 			switch mons.Kind {
 			case MonsMirrorSpecter, MonsSatowalgaPlant:
 				// no footsteps
