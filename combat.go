@@ -2,32 +2,6 @@
 
 package main
 
-func (g *game) Absorb(armor int) int {
-	absorb := 0
-	for i := 0; i <= 2; i++ {
-		absorb += RandInt(armor + 1)
-	}
-	q := absorb / 3
-	r := absorb % 3
-	if r == 2 {
-		q++
-	}
-	return q
-}
-
-func (g *game) HitDamage(base int, armor int) (attack int, clang bool) {
-	attack = base
-	//absorb := g.Absorb(armor)
-	//attack -= absorb
-	//if absorb > 0 && absorb >= 2*armor/3 && RandInt(2) == 0 {
-	//clang = true
-	//}
-	//if attack < 0 {
-	//attack = 0
-	//}
-	return attack, clang
-}
-
 func (m *monster) InflictDamage(g *game, damage, max int) {
 	g.Stats.ReceivedHits++
 	g.Stats.Damage += damage
@@ -284,18 +258,16 @@ func (g *game) HitMonster(mons *monster, dmg int) (hit bool) {
 	if g.Player.Weapon == Frundis {
 		noise -= 5
 	}
-	pa := dmg
-	attack, clang := g.HitDamage(pa, 0)
+	clang := RandInt(4) == 0
 	if clang {
-		// TODO
 		noise += 3
 	}
 	g.MakeNoise(noise, mons.Pos)
 	if mons.State == Resting {
 		if g.Player.Weapon == Dagger || g.Player.Weapon == VampDagger {
-			attack = 3
+			dmg = 3
 		} else {
-			attack = 2
+			dmg = 2
 		}
 	}
 	var sclang string
@@ -307,13 +279,13 @@ func (g *game) HitMonster(mons *monster, dmg int) (hit bool) {
 		}
 	}
 	oldHP := mons.HP
-	mons.HP -= attack
+	mons.HP -= dmg
 	g.ui.HitAnimation(mons.Pos, false)
 	if mons.HP > 0 {
-		g.PrintfStyled("You hit %s (%d dmg).%s", logPlayerHit, mons.Kind.Definite(false), attack, sclang)
+		g.PrintfStyled("You hit %s (%d dmg).%s", logPlayerHit, mons.Kind.Definite(false), dmg, sclang)
 	} else if oldHP > 0 {
-		// test oldHP > 0 because of sword special attack
-		g.PrintfStyled("You kill %s (%d dmg).%s", logPlayerHit, mons.Kind.Definite(false), attack, sclang)
+		// test oldHP > 0 because of sword special dmg
+		g.PrintfStyled("You kill %s (%d dmg).%s", logPlayerHit, mons.Kind.Definite(false), dmg, sclang)
 		g.HandleKill(mons, ev) // TODO
 	}
 	if mons.Kind == MonsBrizzia && RandInt(4) == 0 && !g.Player.HasStatus(StatusNausea) &&

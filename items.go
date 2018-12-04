@@ -497,7 +497,7 @@ func (g *game) ThrowConfusingDart(ev event) error {
 		return err
 	}
 	mons := g.MonsterAt(g.Player.Target)
-	attack, _ := g.HitDamage(1, 0) // no clang with darts
+	attack := 1
 	mons.HP -= attack
 	if mons.HP > 0 {
 		mons.EnterConfusion(g, ev)
@@ -519,8 +519,11 @@ func (g *game) ExplosionAt(ev event, pos position) {
 	mons := g.MonsterAt(pos)
 	if mons.Exists() {
 		mons.HP /= 2
-		if mons.HP == 0 {
-			mons.HP = 1
+		if mons.HP <= 0 {
+			g.HandleKill(mons, ev)
+			if g.Player.Sees(mons.Pos) {
+				g.Printf("%s dies.", mons.Kind.Definite(true))
+			}
 		}
 		g.MakeNoise(ExplosionHitNoise, mons.Pos)
 		g.HandleStone(mons)
