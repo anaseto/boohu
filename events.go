@@ -455,4 +455,6 @@ const (
 	DurationLignification          = 150
 	DurationTemporalWall           = 150
 	DurationObstructionProgression = 200
+	DurationSmokingScalesFog       = 20
+	DurationMonsterExhaustion      = 100
 )

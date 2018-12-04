@@ -104,28 +104,22 @@ func (g *game) MakeNoise(noise int, at position) {
 		}
 		d := n.Cost
 		v := noise - d
-		if v <= 0 {
-			continue
-		}
-		if v > 25 {
-			v = 25
-		}
-		r := RandInt(30)
 		if m.State == Resting {
-			v /= 2
+			v -= 3
 		}
 		if m.Status(MonsExhausted) {
-			v = 2 * v / 3
+			v -= 3
 		}
-		if v > r {
-			if m.SeesPlayer(g) {
-				m.MakeHunt(g)
-			} else {
-				m.Target = at
-				m.State = Wandering
-			}
-			m.GatherBand(g)
+		if v <= 0 || v <= 5 && RandInt(2) == 0 || v <= 10 && RandInt(4) == 0 {
+			continue
 		}
+		if m.SeesPlayer(g) {
+			m.MakeHunt(g)
+		} else {
+			m.Target = at
+			m.State = Wandering
+		}
+		m.GatherBand(g)
 	}
 }
 
@@ -257,6 +251,7 @@ func (g *game) HitMonster(mons *monster, dmg int) (hit bool) {
 	ev := g.Ev
 	hit = true
 	noise := BaseHitNoise
+	// TODO: improve this noise mitigation stuff
 	if g.Player.Weapon == Dagger || g.Player.Weapon == VampDagger {
 		noise -= 2
 	}
@@ -296,10 +291,10 @@ func (g *game) HitMonster(mons *monster, dmg int) (hit bool) {
 		g.PrintfStyled("You kill %s (%d dmg).%s", logPlayerHit, mons.Kind.Definite(false), dmg, sclang)
 		g.HandleKill(mons, ev) // TODO
 	}
-	if mons.Kind == MonsBrizzia && RandInt(4) == 0 && !g.Player.HasStatus(StatusNausea) &&
+	if mons.Kind == MonsBrizzia && !g.Player.HasStatus(StatusNausea) &&
 		mons.Pos.Distance(g.Player.Pos) == 1 {
 		g.Player.Statuses[StatusNausea]++
-		g.PushEvent(&simpleEvent{ERank: ev.Rank() + 30 + RandInt(20), EAction: NauseaEnd})
+		g.PushEvent(&simpleEvent{ERank: ev.Rank() + DurationSick, EAction: NauseaEnd})
 		g.Print("The brizzia's corpse releases some nauseating gas. You feel sick.")
 	}
 	if mons.Kind == MonsTinyHarpy && mons.HP > 0 {
@@ -388,17 +383,16 @@ func (g *game) HandleKill(mons *monster, ev event) {
 }
 
 const (
-	WallNoise           = 18
-	TemporalWallNoise   = 13
-	ExplosionHitNoise   = 13
-	ExplosionNoise      = 18
-	MagicHitNoise       = 15
-	BarkNoise           = 13
-	MagicExplosionNoise = 16
-	MagicCastNoise      = 16
-	BaseHitNoise        = 11
-	ShieldBlockNoise    = 17
-	QueenStoneNoise     = 19
+	WallNoise           = 12
+	TemporalWallNoise   = 9
+	ExplosionHitNoise   = 12
+	ExplosionNoise      = 15
+	MagicHitNoise       = 12
+	BarkNoise           = 12
+	MagicExplosionNoise = 15
+	MagicCastNoise      = 9
+	BaseHitNoise        = 9
+	QueenStoneNoise     = 15
 )
 
 func (g *game) ArmourClang() (sclang string) {

@@ -173,20 +173,19 @@ func (g *game) BoredomAction(ev event, grade int) {
 		}
 		return
 	}
-	if g.Boredom >= 120 && obor < 120 {
-		if g.MonsterCount() > 4 {
-			g.PrintStyled("You feel a little bored, your health may decline.", logCritic)
-			g.StopAuto()
-		}
+	if g.MonsterCount() <= 4 {
+		return
 	}
-	if g.Boredom >= 130 && (obor/10 != g.Boredom/10) {
-		if g.MonsterCount() > 4 {
-			g.Player.Bored++
-			g.PrintStyled("You feel unhealthy.", logCritic)
-			g.StopAuto()
-			if g.Player.HP > g.Player.HPMax() {
-				g.Player.HP -= 3
-			}
+	if g.Boredom >= 200 && obor < 200 {
+		g.PrintStyled("You feel a little bored, your health may decline.", logCritic)
+		g.StopAuto()
+	}
+	if g.Boredom >= 210 && (obor/10 != g.Boredom/10) {
+		g.Player.Bored++
+		g.PrintStyled("You feel unhealthy.", logCritic)
+		g.StopAuto()
+		if g.Player.HP > g.Player.HPMax() {
+			g.Player.HP--
 		}
 	}
 }
@@ -353,7 +352,7 @@ func (g *game) MovePlayer(pos position, ev event) error {
 			_, ok := g.Clouds[g.Player.Pos]
 			if !ok {
 				g.Clouds[g.Player.Pos] = CloudFog
-				g.PushEvent(&cloudEvent{ERank: ev.Rank() + 15 + RandInt(10), EAction: CloudEnd, Pos: g.Player.Pos})
+				g.PushEvent(&cloudEvent{ERank: ev.Rank() + DurationSmokingScalesFog, EAction: CloudEnd, Pos: g.Player.Pos})
 			}
 		}
 		if g.Player.HasStatus(StatusSwift) {

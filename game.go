@@ -9,7 +9,7 @@ type game struct {
 	Player              *player
 	Monsters            []*monster
 	MonstersPosCache    []int // monster (dungeon index + 1) / no monster (0)
-	Bands               []monsterBand
+	Bands               []bandInfo
 	BandData            []monsterBandData
 	Events              *eventQueue
 	Ev                  event

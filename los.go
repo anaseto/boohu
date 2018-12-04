@@ -131,7 +131,10 @@ func (g *game) ComputeLOS() {
 
 func (m *monster) ComputeLOS(g *game) {
 	mlos := map[position]bool{}
-	losRange := g.LosRange()
+	losRange := g.LosRange() - 1
+	if losRange < 1 {
+		losRange = 1
+	}
 	rays := g.buildRayMap(m.Pos, losRange)
 	for pos, n := range rays {
 		if n.Cost < g.LosRange() {

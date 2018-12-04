@@ -240,6 +240,12 @@ var monsDesc = []string{
 	MonsMarevorHelith:   "Marevor Helith is an ancient undead nakrus very fond of teleporting people away. He is a well-known expert in the field of magaras - items that many people simply call magical objects. His current research focus is monolith creation. Marevor, a repentant necromancer, is now searching for his old disciple Jaixel in the Underground to help him overcome the past.",
 }
 
+type bandInfo struct {
+	Path []position
+	I    int
+	Kind monsterBand
+}
+
 type monsterBand int
 
 const (
@@ -1922,9 +1928,23 @@ func (m *monster) AttackAction(g *game, ev event) {
 }
 
 func (m *monster) NaturalAwake(g *game) {
-	m.Target = g.FreeCell()
+	m.Target = m.NextTarget(g)
 	m.State = Wandering
 	m.GatherBand(g)
+}
+
+func (m *monster) NextTarget(g *game) position {
+	// TODO: improve this to handle more varied cases
+	band := g.Bands[m.Band]
+	if len(band.Path) == 0 {
+		return g.FreeCell()
+	} else if len(band.Path) == 1 {
+		return band.Path[0]
+	}
+	if band.Path[0] == m.Target {
+		return band.Path[1]
+	}
+	return band.Path[0]
 }
 
 func (m *monster) HandleTurn(g *game, ev event) {
@@ -1943,8 +1963,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 		movedelay += 3
 	}
 	if m.State == Resting {
-		wander := RandInt(100 + 6*Max(700-(g.DepthPlayerTurn+1), 0))
-		if wander == 0 {
+		if g.DepthPlayerTurn > 600 || g.DepthPlayerTurn > m.Band*50+25 {
 			m.NaturalAwake(g)
 		}
 		ev.Renew(g, m.Kind.MovementDelay())
@@ -2022,17 +2041,10 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	if len(m.Path) < 2 {
 		switch m.State {
 		case Wandering:
-			keepWandering := RandInt(100)
-			if keepWandering > 75 && g.BandData[g.Bands[m.Band]].Band {
-				for _, mons := range g.Monsters {
-					m.Target = mons.Pos
-				}
-			} else {
-				m.Target = g.FreeCell()
-			}
+			m.Target = m.NextTarget(g)
 			m.GatherBand(g)
 		case Hunting:
-			if RandInt(3) > 0 {
+			if RandInt(4) > 0 {
 				m.Dir = m.Dir.Alternate()
 			} else {
 				// pick a random cell: more escape strategies for the player
@@ -2040,7 +2052,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 					!(g.Player.Aptitudes[AptStealthyMovement] && RandInt(2) == 0) {
 					m.Target = g.Player.Pos
 				} else {
-					m.Target = g.FreeCell()
+					m.Target = m.NextTarget(g)
 				}
 				m.State = Wandering
 				m.GatherBand(g)
@@ -2085,7 +2097,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 			mons.State = Wandering
 			mons.GatherBand(g)
 		} else if (r == 1 || r == 2) && g.Player.Pos.Distance(mons.Target) > 2 {
-			mons.Target = g.FreeCell()
+			mons.Target = mons.NextTarget(g)
 			mons.State = Wandering
 			mons.GatherBand(g)
 		} else {
@@ -2094,10 +2106,10 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	case !mons.SeesPlayer(g) && g.Player.Pos.Distance(mons.Target) > 2 && mons.State != Hunting:
 		r := RandInt(5)
 		if r == 0 {
-			m.Target = g.FreeCell()
+			m.Target = m.NextTarget(g)
 			m.GatherBand(g)
 		} else if (r == 1 || r == 2) && mons.State == Resting {
-			mons.Target = g.FreeCell()
+			mons.Target = m.NextTarget(g)
 			mons.State = Wandering
 			mons.GatherBand(g)
 		} else {
@@ -2143,7 +2155,7 @@ func (m *monster) InvertFoliage(g *game) {
 }
 
 func (m *monster) Exhaust(g *game) {
-	m.ExhaustTime(g, 100+RandInt(50))
+	m.ExhaustTime(g, DurationMonsterExhaustion+RandInt(DurationMonsterExhaustion/2))
 }
 
 func (m *monster) ExhaustTime(g *game, t int) {
@@ -2627,7 +2639,7 @@ func (m *monster) MakeHuntIfHurt(g *game) {
 }
 
 func (m *monster) MakeAwareIfHurt(g *game) {
-	if g.Player.LOS[m.Pos] && m.State != Hunting {
+	if m.SeesPlayer(g) && m.State != Hunting {
 		m.MakeHuntIfHurt(g)
 		return
 	}
@@ -2635,7 +2647,7 @@ func (m *monster) MakeAwareIfHurt(g *game) {
 		return
 	}
 	m.State = Wandering
-	m.Target = g.FreeCell()
+	m.Target = m.NextTarget(g)
 }
 
 func (m *monster) MakeAware(g *game) {
@@ -2715,7 +2727,7 @@ func (m *monster) Heal(g *game, ev event) {
 }
 
 func (m *monster) GatherBand(g *game) {
-	if !g.BandData[g.Bands[m.Band]].Band {
+	if !g.BandData[g.Bands[m.Band].Kind].Band {
 		return
 	}
 	dij := &normalPath{game: g}
@@ -2726,15 +2738,12 @@ func (m *monster) GatherBand(g *game) {
 				continue
 			}
 			n, ok := nm[mons.Pos]
-			if !ok || n.Cost > 4 || mons.State == Resting && mons.Status(MonsExhausted) && RandInt(2) == 0 {
+			if !ok || n.Cost > 4 || mons.State == Resting && mons.Status(MonsExhausted) {
 				continue
 			}
-			r := RandInt(100)
-			if r > 50 || mons.State == Wandering && r > 10 {
-				mons.Target = m.Target
-				if mons.State == Resting {
-					mons.State = Wandering
-				}
+			mons.Target = m.Target
+			if mons.State == Resting {
+				mons.State = Wandering
 			}
 		}
 	}
@@ -2829,17 +2838,17 @@ func (g *game) MaxDanger() int {
 
 func (g *game) MaxMonsters() int {
 	nmons := [MaxDepth + 1]int{
-		1:  13,
-		2:  17,
-		3:  22,
-		4:  28,
-		5:  33,
-		6:  33,
-		7:  33,
-		8:  36,
-		9:  36,
-		10: 39,
-		11: 42,
+		1:  11,
+		2:  15,
+		3:  20,
+		4:  26,
+		5:  31,
+		6:  31,
+		7:  31,
+		8:  33,
+		9:  33,
+		10: 36,
+		11: 39,
 	}
 	max := nmons[g.Depth]
 	switch g.Dungeon.Gen {
@@ -2853,7 +2862,7 @@ func (g *game) MaxMonsters() int {
 
 func (g *game) GenMonsters() {
 	g.Monsters = []*monster{}
-	g.Bands = []monsterBand{}
+	g.Bands = []bandInfo{}
 	danger := g.MaxDanger()
 	nmons := g.MaxMonsters()
 	nband := 0
@@ -2872,8 +2881,11 @@ loop:
 			if data.Unique {
 				g.GeneratedUniques[monsterBand(band)]++
 			}
-			g.Bands = append(g.Bands, monsterBand(band))
+			bandinfo := bandInfo{Kind: monsterBand(band)}
 			pos := g.FreeCellForMonster()
+			bandinfo.Path = append(bandinfo.Path, pos)
+			bandinfo.Path = append(bandinfo.Path, g.FreeCellForMonster())
+			g.Bands = append(g.Bands, bandinfo)
 			for _, mk := range monsters {
 				if mk == MonsGoblin {
 					mk = g.Opts.Alternate
