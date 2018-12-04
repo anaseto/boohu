@@ -792,6 +792,7 @@ func (g *game) WizardMode() {
 
 func (g *game) ApplyRest() {
 	g.Player.HP = g.Player.HPMax()
+	g.Player.HPbonus = 0
 	g.Player.MP = g.Player.MPMax()
 	for _, mons := range g.Monsters {
 		if !mons.Exists() {
