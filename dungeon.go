@@ -339,8 +339,8 @@ func (d *dungeon) DigRoom(r room) {
 }
 
 func (d *dungeon) PutCols(r room) {
-	for i := r.pos.X + 1; i < r.pos.X+r.w-1; i += 2 {
-		for j := r.pos.Y + 1; j < r.pos.Y+r.h-1; j += 2 {
+	for i := r.pos.X + 2; i < r.pos.X+r.w-2; i += 2 {
+		for j := r.pos.Y + 2; j < r.pos.Y+r.h-2; j += 2 {
 			rpos := position{i, j}
 			if rpos.valid() {
 				d.SetCell(rpos, WallCell)
@@ -350,18 +350,20 @@ func (d *dungeon) PutCols(r room) {
 }
 
 func (d *dungeon) PutDiagCols(r room) {
-	n := RandInt(2)
-	for i := r.pos.X + 1; i < r.pos.X+r.w-1; i++ {
-		m := n
-		for j := r.pos.Y + 1; j < r.pos.Y+r.h-1; j++ {
-			rpos := position{i, j}
-			if rpos.valid() && m%2 == 0 {
-				d.SetCell(rpos, WallCell)
-			}
-			m++
-		}
-		n++
-	}
+	d.PutCols(r)
+	// XXX
+	//n := RandInt(2)
+	//for i := r.pos.X + 1; i < r.pos.X+r.w-1; i++ {
+	//m := n
+	//for j := r.pos.Y + 1; j < r.pos.Y+r.h-1; j++ {
+	//rpos := position{i, j}
+	//if rpos.valid() && m%2 == 0 {
+	//d.SetCell(rpos, WallCell)
+	//}
+	//m++
+	//}
+	//n++
+	//}
 }
 
 func (d *dungeon) IsAreaFree(pos position, h, w int) bool {
@@ -444,35 +446,35 @@ func (d *dungeon) BuildRoom(pos position, w, h int, outside bool) map[position]b
 		d.SetCell(position{pos.X, i}, WallCell)
 		d.SetCell(position{pos.X + w - 1, i}, WallCell)
 	}
-	if RandInt(2) == 0 || !outside {
-		n := RandInt(2)
-		for x := pos.X + 1; x < pos.X+w-1; x++ {
-			m := n
-			for y := pos.Y + 1; y < pos.Y+h-1; y++ {
-				if m%2 == 0 {
-					d.SetCell(position{x, y}, WallCell)
-				}
-				m++
-			}
-			n++
+	//if RandInt(2) == 0 || !outside {
+	//n := RandInt(2)
+	//for x := pos.X + 2; x < pos.X+w-2; x++ {
+	//m := n
+	//for y := pos.Y + 2; y < pos.Y+h-2; y++ {
+	//if m%2 == 0 {
+	//d.SetCell(position{x, y}, WallCell)
+	//}
+	//m++
+	//}
+	//n++
+	//}
+	//} else {
+	//n := RandInt(2)
+	//m := RandInt(2)
+	//if n == 0 && m == 0 {
+	//// round room
+	//d.SetCell(pos, FreeCell)
+	//d.SetCell(position{pos.X, pos.Y + h - 1}, FreeCell)
+	//d.SetCell(position{pos.X + w - 1, pos.Y}, FreeCell)
+	//d.SetCell(position{pos.X + w - 1, pos.Y + h - 1}, FreeCell)
+	//}
+	for x := pos.X + 2; x < pos.X+w-2; x += 2 {
+		for y := pos.Y + 2; y < pos.Y+h-2; y += 2 {
+			d.SetCell(position{x, y}, WallCell)
 		}
-	} else {
-		n := RandInt(2)
-		m := RandInt(2)
-		//if n == 0 && m == 0 {
-		//// round room
-		//d.SetCell(pos, FreeCell)
-		//d.SetCell(position{pos.X, pos.Y + h - 1}, FreeCell)
-		//d.SetCell(position{pos.X + w - 1, pos.Y}, FreeCell)
-		//d.SetCell(position{pos.X + w - 1, pos.Y + h - 1}, FreeCell)
-		//}
-		for x := pos.X + 1 + m; x < pos.X+w-1; x += 2 {
-			for y := pos.Y + 1 + n; y < pos.Y+h-1; y += 2 {
-				d.SetCell(position{x, y}, WallCell)
-			}
-		}
-
 	}
+
+	//}
 	area := make([]position, 9)
 	if outside {
 		for _, p := range [4]position{pos, {pos.X, pos.Y + h - 1}, {pos.X + w - 1, pos.Y}, {pos.X + w - 1, pos.Y + h - 1}} {
@@ -750,9 +752,8 @@ func (g *game) GenCaveMap(h, w int) {
 	cells := 1
 	notValid := 0
 	lastValid := pos
-	diag := RandInt(4) == 0
 	for cells < max {
-		npos := pos.RandomNeighbor(diag)
+		npos := pos.RandomNeighborCardinal()
 		if !pos.valid() && npos.valid() && d.Cell(npos).T == WallCell {
 			pos = lastValid
 			continue
@@ -786,8 +787,7 @@ loop:
 		if i > 1000 {
 			break
 		}
-		diag = RandInt(2) == 0
-		block = d.DigBlock(block, diag)
+		block = d.DigBlock(block, false)
 		if len(block) == 0 {
 			continue loop
 		}
@@ -851,7 +851,7 @@ func GenLittleRoomSize() (int, int) {
 }
 
 func (d *dungeon) HasFreeNeighbor(pos position) bool {
-	neighbors := pos.ValidNeighbors()
+	neighbors := pos.ValidCardinalNeighbors()
 	for _, pos := range neighbors {
 		if d.Cell(pos).T == FreeCell {
 			return true
@@ -862,7 +862,7 @@ func (d *dungeon) HasFreeNeighbor(pos position) bool {
 
 func (g *game) HasFreeExploredNeighbor(pos position) bool {
 	d := g.Dungeon
-	neighbors := pos.ValidNeighbors()
+	neighbors := pos.ValidCardinalNeighbors()
 	for _, pos := range neighbors {
 		c := d.Cell(pos)
 		if c.T == FreeCell && c.Explored && !g.WrongWall[pos] {
@@ -880,7 +880,7 @@ func (d *dungeon) DigBlock(block []position, diag bool) []position {
 		if d.HasFreeNeighbor(pos) {
 			break
 		}
-		pos = pos.RandomNeighbor(diag)
+		pos = pos.RandomNeighborCardinal()
 		if !pos.valid() {
 			block = block[:0]
 			pos = d.WallCell()
@@ -908,11 +908,11 @@ func (g *game) GenCaveMapTree(h, w int) {
 	d.SetCell(center.SW(), FreeCell)
 	max := 21 * 23
 	cells := 1
-	diag := RandInt(2) == 0
+	//diag := RandInt(2) == 0
 	block := make([]position, 0, 64)
 loop:
 	for cells < max {
-		block = d.DigBlock(block, diag)
+		block = d.DigBlock(block, false)
 		if len(block) == 0 {
 			continue loop
 		}
@@ -976,7 +976,7 @@ func (d *dungeon) Connected(pos position, nf func(position) bool) (map[position]
 		pos = stack[len(stack)-1]
 		stack = stack[:len(stack)-1]
 		count++
-		nb = pos.Neighbors(nb, nf)
+		nb = pos.CardinalNeighbors(nb, nf)
 		for _, npos := range nb {
 			if !conn[npos] {
 				conn[npos] = true
@@ -1073,8 +1073,8 @@ loop:
 		if i > 1000 {
 			break
 		}
-		diag := RandInt(2) == 0
-		block = d.DigBlock(block, diag)
+		//diag := RandInt(2) == 0
+		block = d.DigBlock(block, false)
 		if len(block) == 0 {
 			continue loop
 		}

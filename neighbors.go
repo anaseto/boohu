@@ -32,7 +32,13 @@ func (pos position) OutsideNeighbors() []position {
 
 func (pos position) ValidNeighbors() []position {
 	nb := make([]position, 0, 8)
-	nb = pos.Neighbors(nb, position.valid)
+	nb = pos.Neighbors(nb, func(npos position) bool { return npos.valid() })
+	return nb
+}
+
+func (pos position) ValidCardinalNeighbors() []position {
+	nb := make([]position, 0, 4)
+	nb = pos.CardinalNeighbors(nb, func(npos position) bool { return npos.valid() })
 	return nb
 }
 

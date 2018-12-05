@@ -42,10 +42,11 @@ func (pos position) NW() position {
 func (pos position) Distance(to position) int {
 	deltaX := Abs(to.X - pos.X)
 	deltaY := Abs(to.Y - pos.Y)
-	if deltaX > deltaY {
-		return deltaX
-	}
-	return deltaY
+	//if deltaX > deltaY {
+	//return deltaX
+	//}
+	//return deltaY
+	return deltaX + deltaY
 }
 
 func (pos position) DistanceX(to position) int {
@@ -239,15 +240,13 @@ func (pos position) RandomNeighborDiagonals() position {
 }
 
 func (pos position) RandomNeighborCardinal() position {
-	neighbors := [8]position{pos.E(), pos.W(), pos.N(), pos.S(), pos.NE(), pos.NW(), pos.SE(), pos.SW()}
+	neighbors := [4]position{pos.E(), pos.W(), pos.N(), pos.S()}
 	var r int
-	switch RandInt(6) {
-	case 0:
+	switch RandInt(4) {
+	case 0, 1, 2:
 		r = RandInt(len(neighbors[0:4]))
-	case 1:
-		r = RandInt(len(neighbors))
 	default:
-		r = RandInt(len(neighbors[0:2]))
+		r = RandInt(len(neighbors))
 	}
 	return neighbors[r]
 }

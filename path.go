@@ -1,6 +1,8 @@
 package main
 
-import "sort"
+import (
+	"sort"
+)
 
 type dungeonPath struct {
 	dungeon   *dungeon
@@ -10,7 +12,7 @@ type dungeonPath struct {
 
 func (dp *dungeonPath) Neighbors(pos position) []position {
 	nb := dp.neighbors[:0]
-	return pos.Neighbors(nb, position.valid)
+	return pos.CardinalNeighbors(nb, func(npos position) bool { return npos.valid() })
 }
 
 func (dp *dungeonPath) Cost(from, to position) int {
@@ -42,11 +44,11 @@ func (pp *playerPath) Neighbors(pos position) []position {
 		return npos.valid() && ((d.Cell(npos).T == FreeCell && !pp.game.WrongWall[npos] || d.Cell(npos).T == WallCell && pp.game.WrongWall[npos]) || pp.game.Player.HasStatus(StatusDig)) &&
 			d.Cell(npos).Explored
 	}
-	if pp.game.Player.HasStatus(StatusConfusion) {
-		nb = pos.CardinalNeighbors(nb, keep)
-	} else {
-		nb = pos.Neighbors(nb, keep)
-	}
+	//if pp.game.Player.HasStatus(StatusConfusion) {
+	nb = pos.CardinalNeighbors(nb, keep)
+	//} else {
+	//nb = pos.Neighbors(nb, keep)
+	//}
 	return nb
 }
 
@@ -90,10 +92,10 @@ func (np *normalPath) Neighbors(pos position) []position {
 	keep := func(npos position) bool {
 		return npos.valid() && d.Cell(npos).T != WallCell
 	}
-	if np.game.Player.HasStatus(StatusConfusion) {
-		return pos.CardinalNeighbors(nb, keep)
-	}
-	return pos.Neighbors(nb, keep)
+	//if np.game.Player.HasStatus(StatusConfusion) {
+	return pos.CardinalNeighbors(nb, keep)
+	//}
+	//return pos.Neighbors(nb, keep)
 }
 
 func (np *normalPath) Cost(from, to position) int {
@@ -119,11 +121,11 @@ func (ap *autoexplorePath) Neighbors(pos position) []position {
 		return npos.valid() && (d.Cell(npos).T == FreeCell && !ap.game.WrongWall[npos] || d.Cell(npos).T == WallCell && ap.game.WrongWall[npos]) &&
 			!ap.game.ExclusionsMap[npos]
 	}
-	if ap.game.Player.HasStatus(StatusConfusion) {
-		nb = pos.CardinalNeighbors(nb, keep)
-	} else {
-		nb = pos.Neighbors(nb, keep)
-	}
+	//if ap.game.Player.HasStatus(StatusConfusion) {
+	nb = pos.CardinalNeighbors(nb, keep)
+	//} else {
+	//nb = pos.Neighbors(nb, keep)
+	//}
 	return nb
 }
 
@@ -144,10 +146,10 @@ func (mp *monPath) Neighbors(pos position) []position {
 	keep := func(npos position) bool {
 		return npos.valid() && (d.Cell(npos).T != WallCell || mp.wall)
 	}
-	if mp.monster.Status(MonsConfused) {
-		return pos.CardinalNeighbors(nb, keep)
-	}
-	return pos.Neighbors(nb, keep)
+	//if mp.monster.Status(MonsConfused) {
+	return pos.CardinalNeighbors(nb, keep)
+	//}
+	//return pos.Neighbors(nb, keep)
 }
 
 func (mp *monPath) Cost(from, to position) int {

@@ -9,15 +9,15 @@ type rayMap map[position]raynode
 func (g *game) bestParent(rm rayMap, from, pos position) (position, int) {
 	p := pos.Parents(from)
 	b := p[0]
-	if len(p) > 1 && rm[p[1]].Cost+g.losCost(from, p[1]) < rm[b].Cost+g.losCost(from, b) {
+	if len(p) > 1 && rm[p[1]].Cost+g.losCost(from, p[1], pos) < rm[b].Cost+g.losCost(from, b, pos) {
 		b = p[1]
 	}
-	return b, rm[b].Cost + g.losCost(from, b)
+	return b, rm[b].Cost + g.losCost(from, b, pos)
 }
 
-func (g *game) losCost(from, pos position) int {
+func (g *game) losCost(from, pos, to position) int {
 	if from == pos {
-		return 0
+		return to.Distance(pos) - 1
 	}
 	c := g.Dungeon.Cell(pos)
 	if c.T == WallCell {
@@ -35,9 +35,9 @@ func (g *game) losCost(from, pos position) int {
 		}
 	}
 	if _, ok := g.Fungus[pos]; ok {
-		return g.LosRange() - 1
+		return g.LosRange() - 2
 	}
-	return 1
+	return to.Distance(pos)
 }
 
 func (g *game) buildRayMap(from position, distance int) rayMap {
@@ -66,7 +66,8 @@ func (g *game) buildRayMap(from position, distance int) rayMap {
 	return rm
 }
 
-const DefaultLOSRange = 7
+const DefaultLOSRange = 10
+const DefaultMonsterLOSRange = 7
 
 func (g *game) LosRange() int {
 	losRange := DefaultLOSRange
@@ -131,13 +132,13 @@ func (g *game) ComputeLOS() {
 
 func (m *monster) ComputeLOS(g *game) {
 	mlos := map[position]bool{}
-	losRange := g.LosRange() - 1
+	losRange := DefaultMonsterLOSRange
 	if losRange < 1 {
 		losRange = 1
 	}
 	rays := g.buildRayMap(m.Pos, losRange)
 	for pos, n := range rays {
-		if n.Cost < g.LosRange() {
+		if n.Cost < losRange {
 			mlos[pos] = true
 		}
 	}
