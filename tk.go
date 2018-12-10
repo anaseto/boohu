@@ -51,6 +51,7 @@ bind $can <ButtonPress> {
 	MouseDown %x %y %b
 }
 `)
+	ui.InitElements()
 	ui.ir.RegisterCommand("GetKey", func(c, keysym string) {
 		var s string
 		if c != "" {
@@ -73,7 +74,6 @@ bind $can <ButtonPress> {
 		}
 	})
 	ui.menuHover = -1
-	ui.InitElements()
 
 	SolarizedPalette()
 	ui.HideCursor()
