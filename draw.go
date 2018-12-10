@@ -1045,9 +1045,13 @@ func (ui *gameui) DrawStatusBar(line int) {
 		nWounds = 0
 	}
 	ui.DrawColoredText("HP: ", BarCol, line, hpColor)
-	ui.DrawColoredText(strings.Repeat("♥", g.Player.HP), BarCol+4, line, hpColor)
-	ui.DrawColoredText(strings.Repeat("♥", g.Player.HPbonus), BarCol+4+g.Player.HP, line, ColorCyan) // TODO: define color variables
-	ui.DrawColoredText(strings.Repeat("♥", nWounds), BarCol+4+g.Player.HP+g.Player.HPbonus, line, ColorFg)
+	hp := g.Player.HP
+	if hp < 0 {
+		hp = 0
+	}
+	ui.DrawColoredText(strings.Repeat("♥", hp), BarCol+4, line, hpColor)
+	ui.DrawColoredText(strings.Repeat("♥", g.Player.HPbonus), BarCol+4+hp, line, ColorCyan) // TODO: define color variables
+	ui.DrawColoredText(strings.Repeat("♥", nWounds), BarCol+4+hp+g.Player.HPbonus, line, ColorFg)
 
 	line++
 	mpColor := ColorFgMPok
@@ -1171,8 +1175,12 @@ func (ui *gameui) DrawStatusLine() {
 	}
 	ui.DrawColoredText("HP:", col, line, hpColor)
 	col += 3
-	ui.DrawColoredText(strings.Repeat("♥", g.Player.HP), col, line, hpColor)
-	col += g.Player.HP
+	hp := g.Player.HP
+	if hp < 0 {
+		hp = 0
+	}
+	ui.DrawColoredText(strings.Repeat("♥", hp), col, line, hpColor)
+	col += hp
 	ui.DrawColoredText(strings.Repeat("♥", g.Player.HPbonus), col, line, ColorCyan) // TODO: define color variables
 	col += g.Player.HPbonus
 	ui.DrawColoredText(strings.Repeat("♥", nWounds), col, line, ColorFg)
