@@ -2821,18 +2821,18 @@ func (g *game) MaxDanger() int {
 	if g.Player.Consumables[DreamPotion] > 0 && WinDepth-g.Depth < g.Player.Consumables[DreamPotion] {
 		max = max * 105 / 100
 	}
-	switch g.Dungeon.Gen {
-	case GenCaveMapTree:
-		max = max * 90 / 100
-	case GenCaveMap:
-		max = max * 95 / 100
-	case GenRoomMap:
-		max = max * 105 / 100
-	case GenRuinsMap:
-		max = max * 108 / 100
-	case GenBSPMap:
-		max = max * 115 / 100
-	}
+	//switch g.Dungeon.Gen {
+	//case GenCaveMapTree:
+	//max = max * 90 / 100
+	//case GenCaveMap:
+	//max = max * 95 / 100
+	//case GenRoomMap:
+	//max = max * 105 / 100
+	//case GenRuinsMap:
+	//max = max * 108 / 100
+	//case GenBSPMap:
+	//max = max * 115 / 100
+	//}
 	return max
 }
 
@@ -2851,12 +2851,12 @@ func (g *game) MaxMonsters() int {
 		11: 39,
 	}
 	max := nmons[g.Depth]
-	switch g.Dungeon.Gen {
-	case GenCaveMapTree, GenCaveMap:
-		max = max * 90 / 100
-	case GenBSPMap:
-		max = max * 110 / 100
-	}
+	//switch g.Dungeon.Gen {
+	//case GenCaveMapTree, GenCaveMap:
+	//max = max * 90 / 100
+	//case GenBSPMap:
+	//max = max * 110 / 100
+	//}
 	return max
 }
 

@@ -29,6 +29,29 @@ func (dp *dungeonPath) Estimation(from, to position) int {
 	return from.Distance(to)
 }
 
+type tunnelPath struct {
+	dg        *dgen
+	neighbors [4]position
+	area      [9]position
+}
+
+func (tp *tunnelPath) Neighbors(pos position) []position {
+	nb := tp.neighbors[:0]
+	return pos.CardinalNeighbors(nb, func(npos position) bool { return npos.valid() })
+}
+
+func (tp *tunnelPath) Cost(from, to position) int {
+	if tp.dg.room[from] && !tp.dg.tunnel[from] {
+		return 50
+	}
+	wc := tp.dg.WallAreaCount(tp.area[:0], from, 1)
+	return 10 - wc
+}
+
+func (tp *tunnelPath) Estimation(from, to position) int {
+	return from.Distance(to)
+}
+
 type playerPath struct {
 	game      *game
 	neighbors [8]position
