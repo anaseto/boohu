@@ -264,31 +264,7 @@ const (
 )
 
 func (g *game) GenDungeon() {
-	g.Fungus = make(map[position]vegetation)
-	for {
-		dg := GenRoomTunnels
-		//switch RandInt(8) {
-		//switch 5 {
-		//case 0:
-		//dg = GenCaveMap
-		//case 1:
-		//dg = GenRoomMap
-		//case 2:
-		//dg = GenCellularAutomataCaveMap
-		//case 3:
-		//dg = GenCaveMapTree
-		//case 4:
-		//dg = GenBSPMap
-		//case 5:
-		//dg = GenRoomTunnels
-		//}
-		if g.Depth > 1 && dg.String() == g.Stats.DLayout[g.Depth-1] && RandInt(4) > 0 {
-			// avoid too often the same layout in a row
-			continue
-		}
-		dg.Use(g)
-		break
-	}
+	g.GenRoomTunnels(DungeonHeight, DungeonWidth)
 }
 
 func (g *game) InitPlayer() {

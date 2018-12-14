@@ -265,18 +265,6 @@ func (g *game) DetailedStatistics(w io.Writer) {
 		fmt.Fprintf(w, " %3d", n)
 	}
 	fmt.Fprintf(w, "\n")
-	fmt.Fprintf(w, hfmt, "Dungeon Layout")
-	for i, s := range g.Stats.DLayout {
-		if i == 0 {
-			continue
-		}
-		if i > maxDepth {
-			break
-		}
-		fmt.Fprintf(w, " %3s", s)
-	}
-	fmt.Fprintf(w, "\n")
-	fmt.Fprintf(w, "\n")
 	//fmt.Fprintf(w, "Legend:")
 	//for i, c := range []dungen{GenCaveMap, GenRoomMap, GenCellularAutomataCaveMap, GenCaveMapTree, GenRuinsMap, GenBSPMap} {
 	//if i == 4 {

@@ -10,7 +10,6 @@ import (
 )
 
 type dungeon struct {
-	Gen   dungen
 	Cells []cell
 }
 
@@ -25,37 +24,6 @@ const (
 	WallCell terrain = iota
 	FreeCell
 )
-
-type dungen int
-
-const (
-	GenRoomTunnels dungen = iota
-)
-
-func (dg dungen) Use(g *game) {
-	switch dg {
-	case GenRoomTunnels:
-		g.GenRoomTunnels(DungeonHeight, DungeonWidth)
-	}
-	g.Dungeon.Gen = dg
-	g.Stats.DLayout[g.Depth] = dg.String()
-}
-
-func (dg dungen) String() (text string) {
-	switch dg {
-	case GenRoomTunnels:
-		text = "RI"
-	}
-	return text
-}
-
-func (dg dungen) Description() (text string) {
-	switch dg {
-	case GenRoomTunnels:
-		text = "rooms improved"
-	}
-	return text
-}
 
 func (d *dungeon) Cell(pos position) cell {
 	return d.Cells[pos.idx()]
@@ -487,7 +455,7 @@ func (r *room) HasSpace(dg *dgen) bool {
 	return true
 }
 
-func (r *room) Build(dg *dgen) {
+func (r *room) Dig(dg *dgen) {
 	x := 0
 	y := 0
 	for _, c := range r.kind {
@@ -529,7 +497,7 @@ func (dg *dgen) NewRoom(rpos position, kind string) *room {
 	if !r.HasSpace(dg) {
 		return nil
 	}
-	r.Build(dg)
+	r.Dig(dg)
 	return r
 }
 
@@ -556,8 +524,8 @@ func (dg *dgen) PutDoors(g *game) {
 			//if e.used && g.DoorCandidate(e.pos) {
 			if e.used {
 				g.Doors[e.pos] = true
-				if _, ok := g.Fungus[e.pos]; ok {
-					delete(g.Fungus, e.pos)
+				if _, ok := dg.fungus[e.pos]; ok {
+					delete(dg.fungus, e.pos)
 				}
 			}
 		}
@@ -603,18 +571,7 @@ func (dg *dgen) GenRooms(templates []string, n int) {
 	}
 }
 
-func (g *game) GenRoomTunnels(h, w int) {
-	dg := dgen{}
-	d := &dungeon{}
-	d.Cells = make([]cell, h*w)
-	dg.d = d
-	dg.tunnel = make(map[position]bool)
-	dg.room = make(map[position]bool)
-	dg.rooms = []*room{}
-	dg.fungus = make(map[position]vegetation)
-	dg.GenRooms(roomCaveTemplates, 1)
-	dg.GenRooms(roomSpecialTemplates, 3)
-	dg.GenRooms(roomNormalTemplates, 10)
+func (dg *dgen) ConnectRooms() {
 	sort.Sort(roomSlice(dg.rooms))
 	for i := range dg.rooms {
 		if i == 0 {
@@ -632,6 +589,21 @@ func (g *game) GenRoomTunnels(h, w int) {
 			dg.ConnectRoomsShortestPath(j, k)
 		}
 	}
+}
+
+func (g *game) GenRoomTunnels(h, w int) {
+	dg := dgen{}
+	d := &dungeon{}
+	d.Cells = make([]cell, h*w)
+	dg.d = d
+	dg.tunnel = make(map[position]bool)
+	dg.room = make(map[position]bool)
+	dg.rooms = []*room{}
+	dg.fungus = make(map[position]vegetation)
+	dg.GenRooms(roomCaveTemplates, 1)
+	dg.GenRooms(roomSpecialTemplates, 3)
+	dg.GenRooms(roomNormalTemplates, 10)
+	dg.ConnectRooms()
 	g.Dungeon = d
 	dg.PutDoors(g)
 	g.Fungus = dg.fungus
@@ -643,90 +615,90 @@ const (
 	foliage vegetation = iota
 )
 
-func (g *game) Foliage(h, w int) map[position]vegetation {
-	// use same structure as for the dungeon
-	// walls will become foliage
-	d := &dungeon{}
-	d.Cells = make([]cell, h*w)
-	for i := range d.Cells {
-		r := RandInt(100)
-		pos := idxtopos(i)
-		if r >= 43 {
-			d.SetCell(pos, WallCell)
-		} else {
-			d.SetCell(pos, FreeCell)
-		}
-	}
-	area := make([]position, 0, 25)
-	for i := 0; i < 6; i++ {
-		bufm := &dungeon{}
-		bufm.Cells = make([]cell, h*w)
-		copy(bufm.Cells, d.Cells)
-		for j := range bufm.Cells {
-			pos := idxtopos(j)
-			c1 := d.WallAreaCount(area, pos, 1)
-			if i < 4 {
-				if c1 <= 4 {
-					bufm.SetCell(pos, FreeCell)
-				} else {
-					bufm.SetCell(pos, WallCell)
-				}
-			}
-			if i == 4 {
-				if c1 > 6 {
-					bufm.SetCell(pos, WallCell)
-				}
-			}
-			if i == 5 {
-				c2 := d.WallAreaCount(area, pos, 2)
-				if c2 < 5 && c1 <= 2 {
-					bufm.SetCell(pos, FreeCell)
-				}
-			}
-		}
-		d.Cells = bufm.Cells
-	}
-	fungus := make(map[position]vegetation)
-	for i, c := range d.Cells {
-		if _, ok := g.Doors[idxtopos(i)]; !ok && c.T == FreeCell {
-			fungus[idxtopos(i)] = foliage
-		}
-	}
-	return fungus
-}
+//func (g *game) Foliage(h, w int) map[position]vegetation {
+//// use same structure as for the dungeon
+//// walls will become foliage
+//d := &dungeon{}
+//d.Cells = make([]cell, h*w)
+//for i := range d.Cells {
+//r := RandInt(100)
+//pos := idxtopos(i)
+//if r >= 43 {
+//d.SetCell(pos, WallCell)
+//} else {
+//d.SetCell(pos, FreeCell)
+//}
+//}
+//area := make([]position, 0, 25)
+//for i := 0; i < 6; i++ {
+//bufm := &dungeon{}
+//bufm.Cells = make([]cell, h*w)
+//copy(bufm.Cells, d.Cells)
+//for j := range bufm.Cells {
+//pos := idxtopos(j)
+//c1 := d.WallAreaCount(area, pos, 1)
+//if i < 4 {
+//if c1 <= 4 {
+//bufm.SetCell(pos, FreeCell)
+//} else {
+//bufm.SetCell(pos, WallCell)
+//}
+//}
+//if i == 4 {
+//if c1 > 6 {
+//bufm.SetCell(pos, WallCell)
+//}
+//}
+//if i == 5 {
+//c2 := d.WallAreaCount(area, pos, 2)
+//if c2 < 5 && c1 <= 2 {
+//bufm.SetCell(pos, FreeCell)
+//}
+//}
+//}
+//d.Cells = bufm.Cells
+//}
+//fungus := make(map[position]vegetation)
+//for i, c := range d.Cells {
+//if _, ok := g.Doors[idxtopos(i)]; !ok && c.T == FreeCell {
+//fungus[idxtopos(i)] = foliage
+//}
+//}
+//return fungus
+//}
 
-func (g *game) DigFungus(n int) {
-	d := g.Dungeon
-	count := 0
-	fungus := g.Foliage(DungeonHeight, DungeonWidth)
-loop:
-	for i := 0; i < 100; i++ {
-		if count > 100 {
-			break loop
-		}
-		if n <= 0 {
-			break
-		}
-		pos := d.FreeCell()
-		if _, ok := fungus[pos]; ok {
-			continue
-		}
-		conn, count := d.Connected(pos, func(npos position) bool {
-			_, ok := fungus[npos]
-			//return ok && d.IsFreeCell(npos)
-			return ok
-		})
-		if count < 3 {
-			continue
-		}
-		if len(conn) > 150 {
-			continue
-		}
-		for cpos := range conn {
-			d.SetCell(cpos, FreeCell)
-			g.Fungus[cpos] = foliage
-			count++
-		}
-		n--
-	}
-}
+//func (g *game) DigFungus(n int) {
+//d := g.Dungeon
+//count := 0
+//fungus := g.Foliage(DungeonHeight, DungeonWidth)
+//loop:
+//for i := 0; i < 100; i++ {
+//if count > 100 {
+//break loop
+//}
+//if n <= 0 {
+//break
+//}
+//pos := d.FreeCell()
+//if _, ok := fungus[pos]; ok {
+//continue
+//}
+//conn, count := d.Connected(pos, func(npos position) bool {
+//_, ok := fungus[npos]
+////return ok && d.IsFreeCell(npos)
+//return ok
+//})
+//if count < 3 {
+//continue
+//}
+//if len(conn) > 150 {
+//continue
+//}
+//for cpos := range conn {
+//d.SetCell(cpos, FreeCell)
+//g.Fungus[cpos] = foliage
+//count++
+//}
+//n--
+//}
+//}
