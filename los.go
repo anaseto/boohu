@@ -290,15 +290,16 @@ func (g *game) ComputeNoise() {
 			switch mons.Kind {
 			case MonsMirrorSpecter, MonsSatowalgaPlant:
 				// no footsteps
-			case MonsTinyHarpy, MonsWingedMilfid, MonsGiantBee:
-				noise[pos] = true
-				g.Print("You hear the flapping of wings.")
-				count++
-			case MonsOgre, MonsCyclop, MonsBrizzia, MonsHydra, MonsEarthDragon, MonsTreeMushroom:
-				noise[pos] = true
-				g.Print("You hear heavy footsteps.")
-				count++
-			case MonsWorm, MonsAcidMound:
+			//case MonsTinyHarpy, MonsWingedMilfid, MonsGiantBee:
+			//noise[pos] = true
+			//g.Print("You hear the flapping of wings.")
+			//count++
+			//case MonsOgre, MonsCyclop, MonsBrizzia, MonsHydra, MonsEarthDragon, MonsTreeMushroom:
+			//noise[pos] = true
+			//g.Print("You hear heavy footsteps.")
+			//count++
+			//case MonsWorm, MonsAcidMound:
+			case MonsWorm:
 				noise[pos] = true
 				g.Print("You hear a creep noise.")
 				count++

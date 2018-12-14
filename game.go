@@ -65,16 +65,15 @@ type game struct {
 	Wizard              bool
 	WizardMap           bool
 	Version             string
-	Opts                startOpts
-	ui                  *gameui
+	//Opts                startOpts
+	ui *gameui
 }
 
-type startOpts struct {
-	Alternate     monsterKind
-	StoneLevel    int
-	SpecialBands  map[int][]monsterBandData
-	UnstableLevel int
-}
+//type startOpts struct {
+//Alternate     monsterKind
+//StoneLevel    int
+//UnstableLevel int
+//}
 
 func (g *game) FreeCell() position {
 	d := g.Dungeon
@@ -357,27 +356,6 @@ func (g *game) InitPlayer() {
 	//g.Player.Armour = SmokingScales
 }
 
-func (g *game) InitSpecialBands() {
-	g.Opts.SpecialBands = map[int][]monsterBandData{}
-	sb := MonsSpecialBands[RandInt(len(MonsSpecialBands))]
-	depth := sb.minDepth + RandInt(sb.maxDepth-sb.minDepth+1)
-	g.Opts.SpecialBands[depth] = sb.bands
-	seb := MonsSpecialEndBands[RandInt(len(MonsSpecialEndBands))]
-	if RandInt(4) == 0 {
-		if RandInt(5) > 1 || depth == WinDepth {
-			g.Opts.SpecialBands[WinDepth+1] = seb.bands
-		} else {
-			g.Opts.SpecialBands[WinDepth] = seb.bands
-		}
-	} else if RandInt(5) > 0 {
-		if RandInt(3) > 0 {
-			g.Opts.SpecialBands[MaxDepth] = seb.bands
-		} else {
-			g.Opts.SpecialBands[MaxDepth-1] = seb.bands
-		}
-	}
-}
-
 type genFlavour int
 
 const (
@@ -399,26 +377,6 @@ func (g *game) InitFirstLevel() {
 	g.FoundEquipables = map[equipable]bool{Robe: true, Dagger: true}
 	g.GeneratedUniques = map[monsterBand]int{}
 	g.Stats.KilledMons = map[monsterKind]int{}
-	g.InitSpecialBands()
-	if RandInt(4) > 0 {
-		g.Opts.UnstableLevel = 1 + RandInt(MaxDepth)
-	}
-	if g.Opts.UnstableLevel >= 1 && g.Opts.UnstableLevel <= 3 {
-		// it should happen less often in the first levels
-		g.Opts.UnstableLevel += RandInt(MaxDepth - 2)
-	}
-	if RandInt(3) > 0 || RandInt(2) == 0 && g.Opts.UnstableLevel == 0 {
-		g.Opts.StoneLevel = 1 + RandInt(MaxDepth)
-	}
-	if g.Opts.StoneLevel >= 1 && g.Opts.StoneLevel <= 3 {
-		g.Opts.StoneLevel += RandInt(MaxDepth - 2)
-	}
-	if RandInt(3) == 0 {
-		g.Opts.Alternate = MonsTinyHarpy
-		if RandInt(10) == 0 {
-			g.Opts.Alternate = MonsWorm
-		}
-	}
 	g.Version = Version
 	g.GenPlan = [MaxDepth + 1]genFlavour{
 		1:  GenConjurationRod,
@@ -464,9 +422,6 @@ func (g *game) InitLevel() {
 
 	// Monsters
 	g.BandData = MonsBands
-	if bd, ok := g.Opts.SpecialBands[g.Depth]; ok {
-		g.BandData = bd
-	}
 	g.GenMonsters()
 
 	// Collectables
@@ -551,13 +506,6 @@ func (g *game) InitLevel() {
 		nstones = 3
 	}
 	ustone := stone(0)
-	if g.Depth == g.Opts.StoneLevel {
-		ustone = stone(1 + RandInt(NumStones-1))
-		nstones = 10 + RandInt(3)
-		if RandInt(4) == 0 {
-			g.Opts.StoneLevel = g.Opts.StoneLevel + RandInt(MaxDepth-g.Opts.StoneLevel) + 1
-		}
-	}
 	for i := 0; i < nstones; i++ {
 		pos := g.FreeCellForStatic()
 		var st stone
@@ -619,15 +567,6 @@ func (g *game) InitLevel() {
 	}
 	for i := range g.Monsters {
 		g.PushEvent(&monsterEvent{ERank: g.Turn + RandInt(10), EAction: MonsterTurn, NMons: i})
-	}
-	if g.Depth == g.Opts.UnstableLevel {
-		g.PrintStyled("You sense magic instability on this level.", logSpecial)
-		for i := 0; i < 15; i++ {
-			g.PushEvent(&cloudEvent{ERank: g.Turn + 100 + RandInt(900), EAction: ObstructionProgression})
-		}
-		if RandInt(4) == 0 {
-			g.Opts.UnstableLevel = g.Opts.UnstableLevel + RandInt(MaxDepth-g.Opts.UnstableLevel) + 1
-		}
 	}
 }
 

@@ -291,15 +291,15 @@ func (g *game) HitMonster(mons *monster, dmg int) (hit bool) {
 		g.PrintfStyled("You kill %s (%d dmg).%s", logPlayerHit, mons.Kind.Definite(false), dmg, sclang)
 		g.HandleKill(mons, ev) // TODO
 	}
-	if mons.Kind == MonsBrizzia && !g.Player.HasStatus(StatusNausea) &&
-		mons.Pos.Distance(g.Player.Pos) == 1 {
-		g.Player.Statuses[StatusNausea]++
-		g.PushEvent(&simpleEvent{ERank: ev.Rank() + DurationSick, EAction: NauseaEnd})
-		g.Print("The brizzia's corpse releases some nauseating gas. You feel sick.")
-	}
-	if mons.Kind == MonsTinyHarpy && mons.HP > 0 {
-		mons.Blink(g)
-	}
+	//if mons.Kind == MonsBrizzia && !g.Player.HasStatus(StatusNausea) &&
+	//mons.Pos.Distance(g.Player.Pos) == 1 {
+	//g.Player.Statuses[StatusNausea]++
+	//g.PushEvent(&simpleEvent{ERank: ev.Rank() + DurationSick, EAction: NauseaEnd})
+	//g.Print("The brizzia's corpse releases some nauseating gas. You feel sick.")
+	//}
+	//if mons.Kind == MonsTinyHarpy && mons.HP > 0 {
+	//mons.Blink(g)
+	//}
 	g.HandleStone(mons)
 	g.Stats.Hits++
 	mons.MakeHuntIfHurt(g)
@@ -371,9 +371,9 @@ func (g *game) HandleStone(mons *monster) {
 func (g *game) HandleKill(mons *monster, ev event) {
 	g.Stats.Killed++
 	g.Stats.KilledMons[mons.Kind]++
-	if mons.Kind == MonsExplosiveNadre {
-		mons.Explode(g, ev)
-	}
+	//if mons.Kind == MonsExplosiveNadre {
+	//mons.Explode(g, ev)
+	//}
 	if g.Doors[mons.Pos] {
 		g.ComputeLOS()
 	}

@@ -597,11 +597,11 @@ func (ui *gameui) CharacterInfo() {
 }
 
 func (ui *gameui) WizardInfo() {
-	g := ui.g
+	//g := ui.g
 	ui.Clear()
 	b := &bytes.Buffer{}
-	fmt.Fprintf(b, "Monsters: %d (%d)\n", len(g.Monsters), g.MaxMonsters())
-	fmt.Fprintf(b, "Danger: %d (%d)\n", g.Danger(), g.MaxDanger())
+	//fmt.Fprintf(b, "Monsters: %d (%d)\n", len(g.Monsters), g.MaxMonsters())
+	//fmt.Fprintf(b, "Danger: %d (%d)\n", g.Danger(), g.MaxDanger())
 	ui.DrawText(b.String(), 0, 0)
 	ui.Flush()
 	ui.WaitForContinue(-1)
