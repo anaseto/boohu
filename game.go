@@ -356,7 +356,7 @@ type genFlavour int
 
 const (
 	GenRod genFlavour = iota
-	GenWeapon
+	//GenWeapon
 	GenArmour
 	GenWpArm
 	GenExtraCollectables
@@ -375,14 +375,14 @@ func (g *game) InitFirstLevel() {
 	g.Version = Version
 	g.GenPlan = [MaxDepth + 1]genFlavour{
 		1:  GenRod,
-		2:  GenWeapon,
-		3:  GenArmour,
+		2:  GenArmour,
+		3:  GenExtraCollectables,
 		4:  GenRod,
 		5:  GenExtraCollectables,
-		6:  GenWpArm,
-		7:  GenRod,
+		6:  GenRod,
+		7:  GenExtraCollectables,
 		8:  GenExtraCollectables,
-		9:  GenWeapon,
+		9:  GenRod,
 		10: GenExtraCollectables,
 		11: GenExtraCollectables,
 	}
@@ -427,13 +427,13 @@ func (g *game) InitLevel() {
 	g.Equipables = make(map[position]equipable)
 	g.Rods = map[position]rod{}
 	switch g.GenPlan[g.Depth] {
-	case GenWeapon:
-		g.GenWeapon()
+	//case GenWeapon:
+	//g.GenWeapon()
 	case GenArmour:
 		g.GenArmour()
-	case GenWpArm:
-		g.GenWeapon()
-		g.GenArmour()
+	//case GenWpArm:
+	//g.GenWeapon()
+	//g.GenArmour()
 	case GenRod:
 		g.GenerateRod()
 	case GenExtraCollectables:

@@ -255,6 +255,13 @@ const (
 	LoneGuard monsterBand = iota
 	LoneYack
 	LoneCyclop
+	LoneSatowalgaPlant
+	LoneBlinkingFrog
+	LoneWorm
+	LoneMirrorSpecter
+	LoneHound
+	LoneWingedMilfid
+	LoneMarevorHelith
 )
 
 type monsterBandData struct {
@@ -265,9 +272,16 @@ type monsterBandData struct {
 }
 
 var MonsBands = []monsterBandData{
-	LoneGuard:  {Monster: MonsGuard},
-	LoneYack:   {Monster: MonsYack},
-	LoneCyclop: {Monster: MonsCyclop},
+	LoneGuard:          {Monster: MonsGuard},
+	LoneYack:           {Monster: MonsYack},
+	LoneCyclop:         {Monster: MonsCyclop},
+	LoneSatowalgaPlant: {Monster: MonsSatowalgaPlant},
+	LoneBlinkingFrog:   {Monster: MonsBlinkingFrog},
+	LoneWorm:           {Monster: MonsWorm},
+	LoneMirrorSpecter:  {Monster: MonsMirrorSpecter},
+	LoneHound:          {Monster: MonsHound},
+	LoneWingedMilfid:   {Monster: MonsWingedMilfid},
+	LoneMarevorHelith:  {Monster: MonsMarevorHelith},
 }
 
 type monster struct {
@@ -573,7 +587,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 		movedelay += 3
 	}
 	if m.State == Resting {
-		if g.DepthPlayerTurn > 600 || g.DepthPlayerTurn > m.Band*50+25 {
+		if RandInt(3000) == 0 {
 			m.NaturalAwake(g)
 		}
 		ev.Renew(g, m.Kind.MovementDelay())
@@ -1398,8 +1412,12 @@ func (g *game) PutMonsterBand(band monsterBand) bool {
 	bandinfo.Path = append(bandinfo.Path, pos)
 	bandinfo.Path = append(bandinfo.Path, g.FreeCellForMonster())
 	g.Bands = append(g.Bands, bandinfo)
+	awake := RandInt(3) > 0
 	for _, mk := range monsters {
 		mons := &monster{Kind: mk}
+		if awake {
+			mons.State = Wandering
+		}
 		mons.Init()
 		mons.Index = len(g.Monsters)
 		mons.Band = len(g.Bands) - 1
@@ -1410,24 +1428,59 @@ func (g *game) PutMonsterBand(band monsterBand) bool {
 	return true
 }
 
+func (g *game) PutRandomBand(bands []monsterBand) bool {
+	return g.PutMonsterBand(bands[RandInt(len(bands))])
+}
+
 func (g *game) GenMonsters() {
 	g.Monsters = []*monster{}
 	g.Bands = []bandInfo{}
 	// TODO, just for testing now
+	bandsL1 := []monsterBand{LoneGuard}
+	bandsL2 := []monsterBand{LoneYack, LoneWorm, LoneHound}
+	bandsL3 := []monsterBand{LoneCyclop, LoneSatowalgaPlant, LoneBlinkingFrog, LoneMirrorSpecter, LoneWingedMilfid}
+	mlevel := 1 + RandInt(MaxDepth)
 	for i := 0; i < 5; i++ {
-		if !g.PutMonsterBand(LoneGuard) {
+		if !g.PutRandomBand(bandsL1) {
 			i--
 		}
 	}
-	for i := 0; i < 1; i++ {
-		if !g.PutMonsterBand(LoneYack) {
-			i--
-		}
+	g.PutRandomBand(bandsL2)
+	if g.Depth > 1 {
+		g.PutRandomBand(bandsL2)
 	}
-	for i := 1; i < g.Depth; i++ {
-		if !g.PutMonsterBand(LoneCyclop) {
-			i--
-		}
+	if g.Depth > 2 {
+		g.PutRandomBand(bandsL3)
+	}
+	if g.Depth > 3 {
+		g.PutRandomBand(bandsL2)
+	}
+	if g.Depth > 4 {
+		g.PutRandomBand(bandsL3)
+	}
+	if g.Depth > 5 {
+		g.PutRandomBand(bandsL2)
+	}
+	if g.Depth > 6 {
+		g.PutRandomBand(bandsL3)
+	}
+	if g.Depth > 7 {
+		g.PutRandomBand(bandsL2)
+	}
+	if g.Depth > 8 {
+		g.PutRandomBand(bandsL2)
+		g.PutRandomBand(bandsL3)
+	}
+	if g.Depth > 9 {
+		g.PutRandomBand(bandsL2)
+		g.PutRandomBand(bandsL3)
+	}
+	if g.Depth > 10 {
+		g.PutRandomBand(bandsL2)
+		g.PutRandomBand(bandsL3)
+	}
+	if mlevel == g.Depth {
+		g.PutMonsterBand(LoneMarevorHelith)
 	}
 }
 
