@@ -450,7 +450,7 @@ const (
 	DurationSleepSlow              = 40
 	DurationCloudProgression       = 10
 	DurationFog                    = 100
-	DurationExhaustion             = 300
+	DurationExhaustion             = 100
 	DurationConfusion              = 100
 	DurationLignification          = 150
 	DurationTemporalWall           = 150

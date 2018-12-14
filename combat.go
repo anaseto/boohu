@@ -2,6 +2,8 @@
 
 package main
 
+import "errors"
+
 func (g *game) DamagePlayer(damage int) {
 	g.Stats.Damage += damage
 	g.Player.HPbonus -= damage
@@ -223,6 +225,34 @@ func (g *game) HarKarAttack(mons *monster, ev event) {
 	} else {
 		g.HitMonster(mons, DmgNormal)
 	}
+}
+
+func (g *game) Jump(mons *monster, ev event) error {
+	dir := mons.Pos.Dir(g.Player.Pos)
+	pos := g.Player.Pos
+	for {
+		pos = pos.To(dir)
+		if !pos.valid() || g.Dungeon.Cell(pos).T != FreeCell {
+			break
+		}
+		m := g.MonsterAt(pos)
+		if !m.Exists() {
+			break
+		}
+	}
+	if !pos.valid() || g.Dungeon.Cell(pos).T == WallCell {
+		return errors.New("You cannot jump in that direction.")
+	}
+	if g.Player.HasStatus(StatusSlow) {
+		return errors.New("You cannot jump while slowed.")
+	}
+	if g.Player.HasStatus(StatusExhausted) {
+		return errors.New("You cannot jump while exhausted.")
+	}
+	g.Player.Statuses[StatusExhausted] = 1
+	g.PushEvent(&simpleEvent{ERank: ev.Rank() + DurationExhaustion, EAction: ExhaustionEnd})
+	g.PlacePlayerAt(pos)
+	return nil
 }
 
 func (g *game) HitNoise(clang bool) int {

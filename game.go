@@ -291,14 +291,10 @@ func (g *game) InitPlayer() {
 		g.Player.Consumables[ConfusingDart] = 2
 	}
 	switch RandInt(11) {
-	case 0, 1:
+	case 0, 1, 5:
 		g.Player.Consumables[TeleportationPotion] = 1
-	case 2, 3:
-		g.Player.Consumables[BerserkPotion] = 1
-	case 4:
+	case 2, 3, 4:
 		g.Player.Consumables[SwiftnessPotion] = 1
-	case 5:
-		g.Player.Consumables[LignificationPotion] = 1
 	case 6:
 		g.Player.Consumables[WallPotion] = 1
 	case 7:
@@ -310,7 +306,7 @@ func (g *game) InitPlayer() {
 	case 10:
 		g.Player.Consumables[ShadowsPotion] = 1
 	}
-	r := g.RandomRod(false)
+	r := g.RandomRod()
 	g.Player.Rods = map[rod]rodProps{r: rodProps{r.MaxCharge() - 1}}
 	g.Player.Statuses = map[status]int{}
 	g.Player.Expire = map[status]int{}
@@ -360,7 +356,6 @@ type genFlavour int
 
 const (
 	GenRod genFlavour = iota
-	GenConjurationRod
 	GenWeapon
 	GenArmour
 	GenWpArm
@@ -379,7 +374,7 @@ func (g *game) InitFirstLevel() {
 	g.Stats.KilledMons = map[monsterKind]int{}
 	g.Version = Version
 	g.GenPlan = [MaxDepth + 1]genFlavour{
-		1:  GenConjurationRod,
+		1:  GenRod,
 		2:  GenWeapon,
 		3:  GenArmour,
 		4:  GenRod,
@@ -440,9 +435,7 @@ func (g *game) InitLevel() {
 		g.GenWeapon()
 		g.GenArmour()
 	case GenRod:
-		g.GenerateRod(false)
-	case GenConjurationRod:
-		g.GenerateRod(true)
+		g.GenerateRod()
 	case GenExtraCollectables:
 		for i := 0; i < 2; i++ {
 			g.GenCollectable()

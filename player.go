@@ -355,21 +355,16 @@ func (g *game) MovePlayer(pos position, ev event) error {
 				g.PushEvent(&cloudEvent{ERank: ev.Rank() + DurationSmokingScalesFog, EAction: CloudEnd, Pos: g.Player.Pos})
 			}
 		}
-		if g.Player.HasStatus(StatusSwift) {
-			// only fast for movement
-			delay /= 2
-		}
 		g.Stats.Moves++
 		g.PlacePlayerAt(pos)
 		if !g.Autoexploring {
 			g.BoredomAction(ev, 1)
 		}
-	} else {
-		g.FunAction()
-		g.Player.Dir = mons.Pos.Dir(g.Player.Pos)
-		g.AttackMonster(mons, ev)
+	} else if err := g.Jump(mons, ev); err != nil {
+		return err
 	}
-	if g.Player.HasStatus(StatusBerserk) {
+	if g.Player.HasStatus(StatusSwift) {
+		// only fast for movement
 		delay /= 2
 	}
 	if g.Player.HasStatus(StatusSlow) {

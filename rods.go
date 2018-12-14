@@ -16,15 +16,14 @@ const (
 	RodSleeping
 	RodLignification
 	RodSwapping
-	RodHope
-	RodShatter
-	RodFireBolt
-	RodFireBall
-	RodLightning
+	//RodHope
+	//RodShatter
+	//RodFireBolt
+	//RodFireBall
+	//RodLightning
 )
 
-const NumUtilityRods = int(RodSwapping) + 1
-const NumRods = int(RodLightning) + 1
+const NumRods = int(RodSwapping) + 1
 
 func (r rod) Letter() rune {
 	return '/'
@@ -41,22 +40,22 @@ func (r rod) String() string {
 		text = "rod of teleport other"
 	case RodFog:
 		text = "rod of fog"
-	case RodFireBall:
-		text = "rod of fireball"
-	case RodFireBolt:
-		text = "rod of fire bolt"
-	case RodLightning:
-		text = "rod of lightning"
+	//case RodFireBall:
+	//text = "rod of fireball"
+	//case RodFireBolt:
+	//text = "rod of fire bolt"
+	//case RodLightning:
+	//text = "rod of lightning"
 	case RodObstruction:
 		text = "rod of obstruction"
-	case RodShatter:
-		text = "rod of shatter"
+	//case RodShatter:
+	//text = "rod of shatter"
 	case RodSleeping:
 		text = "rod of sleeping"
 	case RodLignification:
 		text = "rod of lignification"
-	case RodHope:
-		text = "rod of last hope"
+	//case RodHope:
+	//text = "rod of last hope"
 	case RodSwapping:
 		text = "rod of swapping"
 	}
@@ -74,22 +73,22 @@ func (r rod) Desc() string {
 		text = "teleports away one of your foes. Note that the monster remembers where it saw you last time."
 	case RodFog:
 		text = "creates a dense fog that reduces your line of sight. Monsters at more than 1 cell away from you will not be able to see you."
-	case RodFireBall:
-		text = "throws a 1-radius fireball at your foes. You cannot use it against yourself. It can burn foliage and doors."
-	case RodFireBolt:
-		text = "throws a fire bolt through one or more enemies. It can burn foliage and doors."
-	case RodLightning:
-		text = "deals electrical damage to foes connected to you. It can burn foliage and doors."
+	//case RodFireBall:
+	//text = "throws a 1-radius fireball at your foes. You cannot use it against yourself. It can burn foliage and doors."
+	//case RodFireBolt:
+	//text = "throws a fire bolt through one or more enemies. It can burn foliage and doors."
+	//case RodLightning:
+	//text = "deals electrical damage to foes connected to you. It can burn foliage and doors."
 	case RodObstruction:
 		text = "creates a temporary wall at targeted location."
-	case RodShatter:
-		text = "induces an explosion around a wall, hurting adjacent monsters. The wall can disintegrate. You cannot use against yourself."
+	//case RodShatter:
+	//text = "induces an explosion around a wall, hurting adjacent monsters. The wall can disintegrate. You cannot use against yourself."
 	case RodSleeping:
 		text = "induces deep sleeping and exhaustion for monsters in the targeted area. You cannot use it against yourself."
 	case RodLignification:
 		text = "lignifies a monster, so that it cannot move, but can still fight with improved resistance."
-	case RodHope:
-		text = "creates an energy channel against a targeted monster. The damage done is inversely proportional to your health. It can burn foliage and doors."
+	//case RodHope:
+	//text = "creates an energy channel against a targeted monster. The damage done is inversely proportional to your health. It can burn foliage and doors."
 	case RodSwapping:
 		text = "makes you swap positions with a targeted monster."
 	}
@@ -104,7 +103,8 @@ func (r rod) MaxCharge() (charges int) {
 	switch r {
 	case RodBlink:
 		charges = 5
-	case RodDigging, RodShatter:
+	//case RodDigging, RodShatter:
+	case RodDigging:
 		charges = 3
 	default:
 		charges = 4
@@ -150,26 +150,26 @@ func (r rod) Use(g *game, ev event) error {
 		err = g.EvokeRodBlink(ev)
 	case RodTeleportOther:
 		err = g.EvokeRodTeleportOther(ev)
-	case RodFireBolt:
-		err = g.EvokeRodFireBolt(ev)
-	case RodFireBall:
-		err = g.EvokeRodFireball(ev)
-	case RodLightning:
-		err = g.EvokeRodLightning(ev)
+	//case RodFireBolt:
+	//err = g.EvokeRodFireBolt(ev)
+	//case RodFireBall:
+	//err = g.EvokeRodFireball(ev)
+	//case RodLightning:
+	//err = g.EvokeRodLightning(ev)
 	case RodFog:
 		err = g.EvokeRodFog(ev)
 	case RodDigging:
 		err = g.EvokeRodDigging(ev)
 	case RodObstruction:
 		err = g.EvokeRodObstruction(ev)
-	case RodShatter:
-		err = g.EvokeRodShatter(ev)
+	//case RodShatter:
+	//err = g.EvokeRodShatter(ev)
 	case RodSleeping:
 		err = g.EvokeRodSleeping(ev)
 	case RodLignification:
 		err = g.EvokeRodLignification(ev)
-	case RodHope:
-		err = g.EvokeRodHope(ev)
+	//case RodHope:
+	//err = g.EvokeRodHope(ev)
 	case RodSwapping:
 		err = g.EvokeRodSwapping(ev)
 	}
@@ -566,16 +566,12 @@ func (g *game) GeneratedRodsCount() int {
 	return count
 }
 
-func (g *game) RandomRod(conjuration bool) (r rod) {
-	if conjuration {
-		r = rod(NumUtilityRods + RandInt(NumRods-NumUtilityRods))
-	} else {
-		r = rod(RandInt(NumUtilityRods))
-	}
+func (g *game) RandomRod() (r rod) {
+	r = rod(RandInt(NumRods))
 	return r
 }
 
-func (g *game) GenerateRod(conjuration bool) {
+func (g *game) GenerateRod() {
 	count := 0
 	for {
 		count++
@@ -583,7 +579,7 @@ func (g *game) GenerateRod(conjuration bool) {
 			panic("GenerateRod")
 		}
 		pos := g.FreeCellForStatic()
-		r := g.RandomRod(true)
+		r := g.RandomRod()
 		if _, ok := g.Player.Rods[r]; !ok && !g.GeneratedRods[r] {
 			g.GeneratedRods[r] = true
 			g.Rods[pos] = r

@@ -29,10 +29,10 @@ type potion int
 const (
 	HealWoundsPotion potion = iota
 	TeleportationPotion
-	BerserkPotion
+	//BerserkPotion
 	DescentPotion
 	SwiftnessPotion
-	LignificationPotion
+	//LignificationPotion
 	MagicMappingPotion
 	MagicPotion
 	WallPotion
@@ -59,12 +59,12 @@ func (p potion) String() (text string) {
 		text += " of magic mapping"
 	case MagicPotion:
 		text += " of refill magic"
-	case BerserkPotion:
-		text += " of berserk"
+	//case BerserkPotion:
+	//text += " of berserk"
 	case SwiftnessPotion:
 		text += " of swiftness"
-	case LignificationPotion:
-		text += " of lignification"
+	//case LignificationPotion:
+	//text += " of lignification"
 	case WallPotion:
 		text += " of walls"
 	case CBlinkPotion:
@@ -100,12 +100,12 @@ func (p potion) Desc() (text string) {
 		text = "shows you the map layout and item locations."
 	case MagicPotion:
 		text = "replenishes your magical reserves."
-	case BerserkPotion:
-		text = "makes you enter a crazy rage, temporarily making you act twice as fast with an HP bonus. You cannot use rods while berserk, and afterwards it leaves you twice as slow and exhausted."
+	//case BerserkPotion:
+	//text = "makes you enter a crazy rage, temporarily making you act twice as fast with an HP bonus. You cannot use rods while berserk, and afterwards it leaves you twice as slow and exhausted."
 	case SwiftnessPotion:
 		text = "makes you move twice as fast for several turns."
-	case LignificationPotion:
-		text = "gives you a big HP bonus, but you are attached to the ground while the effect lasts (you can still descend)."
+	//case LignificationPotion:
+	//text = "gives you a big HP bonus, but you are attached to the ground while the effect lasts (you can still descend)."
 	case WallPotion:
 		text = "replaces free cells around you with temporary walls."
 	case CBlinkPotion:
@@ -147,14 +147,14 @@ func (p potion) Use(g *game, ev event) error {
 		err = g.QuaffHealWounds(ev)
 	case TeleportationPotion:
 		err = g.QuaffTeleportation(ev)
-	case BerserkPotion:
-		err = g.QuaffBerserk(ev)
+	//case BerserkPotion:
+	//err = g.QuaffBerserk(ev)
 	case DescentPotion:
 		err = g.QuaffDescent(ev)
 	case SwiftnessPotion:
 		err = g.QuaffSwiftness(ev)
-	case LignificationPotion:
-		err = g.QuaffLignification(ev)
+	//case LignificationPotion:
+	//err = g.QuaffLignification(ev)
 	case MagicMappingPotion:
 		err = g.QuaffMagicMapping(ev)
 	case MagicPotion:
@@ -198,21 +198,21 @@ func (g *game) QuaffTeleportation(ev event) error {
 	return nil
 }
 
-func (g *game) QuaffBerserk(ev event) error {
-	if g.Player.HasStatus(StatusExhausted) {
-		return errors.New("You are too exhausted to berserk.")
-	}
-	if g.Player.HasStatus(StatusBerserk) {
-		return errors.New("You are already berserk.")
-	}
-	g.Player.Statuses[StatusBerserk] = 1
-	end := ev.Rank() + DurationBerserk
-	g.PushEvent(&simpleEvent{ERank: end, EAction: BerserkEnd})
-	g.Player.Expire[StatusBerserk] = end
-	g.Printf("You quaff the %s. You feel a sudden urge to kill things.", BerserkPotion)
-	g.Player.HPbonus += 2
-	return nil
-}
+//func (g *game) QuaffBerserk(ev event) error {
+//if g.Player.HasStatus(StatusExhausted) {
+//return errors.New("You are too exhausted to berserk.")
+//}
+//if g.Player.HasStatus(StatusBerserk) {
+//return errors.New("You are already berserk.")
+//}
+//g.Player.Statuses[StatusBerserk] = 1
+//end := ev.Rank() + DurationBerserk
+//g.PushEvent(&simpleEvent{ERank: end, EAction: BerserkEnd})
+//g.Player.Expire[StatusBerserk] = end
+//g.Printf("You quaff the %s. You feel a sudden urge to kill things.", BerserkPotion)
+//g.Player.HPbonus += 2
+//return nil
+//}
 
 func (g *game) QuaffHealWounds(ev event) error {
 	hp := g.Player.HP
@@ -295,14 +295,14 @@ func (g *game) QuaffShadowsPotion(ev event) error {
 	return nil
 }
 
-func (g *game) QuaffLignification(ev event) error {
-	if g.Player.HasStatus(StatusLignification) {
-		return errors.New("You are already lignified.")
-	}
-	g.EnterLignification(ev)
-	g.Printf("You quaff the %s. You feel rooted to the ground.", LignificationPotion)
-	return nil
-}
+//func (g *game) QuaffLignification(ev event) error {
+//if g.Player.HasStatus(StatusLignification) {
+//return errors.New("You are already lignified.")
+//}
+//g.EnterLignification(ev)
+//g.Printf("You quaff the %s. You feel rooted to the ground.", LignificationPotion)
+//return nil
+//}
 
 func (g *game) QuaffMagicMapping(ev event) error {
 	dp := &dungeonPath{dungeon: g.Dungeon}
@@ -655,20 +655,20 @@ var ConsumablesCollectData = map[consumable]collectData{
 	SlowingMagara:       {rarity: 12, quantity: 1},
 	ConfuseMagara:       {rarity: 15, quantity: 1},
 	TeleportationPotion: {rarity: 6, quantity: 1},
-	BerserkPotion:       {rarity: 6, quantity: 1},
-	HealWoundsPotion:    {rarity: 6, quantity: 1},
-	SwiftnessPotion:     {rarity: 6, quantity: 1},
-	LignificationPotion: {rarity: 9, quantity: 1},
-	MagicPotion:         {rarity: 9, quantity: 1},
-	WallPotion:          {rarity: 12, quantity: 1},
-	CBlinkPotion:        {rarity: 12, quantity: 1},
-	DigPotion:           {rarity: 12, quantity: 1},
-	SwapPotion:          {rarity: 12, quantity: 1},
-	ShadowsPotion:       {rarity: 15, quantity: 1},
-	DescentPotion:       {rarity: 18, quantity: 1},
-	MagicMappingPotion:  {rarity: 18, quantity: 1},
-	DreamPotion:         {rarity: 18, quantity: 1},
-	TormentPotion:       {rarity: 30, quantity: 1},
+	//BerserkPotion:       {rarity: 6, quantity: 1},
+	HealWoundsPotion: {rarity: 6, quantity: 1},
+	SwiftnessPotion:  {rarity: 6, quantity: 1},
+	//LignificationPotion: {rarity: 9, quantity: 1},
+	MagicPotion:        {rarity: 9, quantity: 1},
+	WallPotion:         {rarity: 12, quantity: 1},
+	CBlinkPotion:       {rarity: 12, quantity: 1},
+	DigPotion:          {rarity: 12, quantity: 1},
+	SwapPotion:         {rarity: 12, quantity: 1},
+	ShadowsPotion:      {rarity: 15, quantity: 1},
+	DescentPotion:      {rarity: 18, quantity: 1},
+	MagicMappingPotion: {rarity: 18, quantity: 1},
+	DreamPotion:        {rarity: 18, quantity: 1},
+	TormentPotion:      {rarity: 30, quantity: 1},
 }
 
 type equipable interface {
