@@ -15,7 +15,31 @@ func (g *game) bestParent(rm rayMap, from, pos position) (position, int) {
 	return b, rm[b].Cost + g.losCost(from, b, pos)
 }
 
+func (g *game) DiagonalWall(from, to position) bool {
+	p := make([]position, 0, 2)
+	switch to.Dir(from) {
+	case NE:
+		p = append(p, to.S(), to.W())
+	case NW:
+		p = append(p, to.S(), to.E())
+	case SW:
+		p = append(p, to.N(), to.E())
+	case SE:
+		p = append(p, to.N(), to.W())
+	}
+	count := 0
+	for _, pos := range p {
+		if pos.valid() && g.Dungeon.Cell(pos).T == WallCell {
+			count++
+		}
+	}
+	return count > 1
+}
+
 func (g *game) losCost(from, pos, to position) int {
+	if g.DiagonalWall(pos, to) {
+		return g.LosRange()
+	}
 	if from == pos {
 		return to.Distance(pos) - 1
 	}
