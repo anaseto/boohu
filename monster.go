@@ -575,13 +575,6 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	ppos := g.Player.Pos
 	mpos := m.Pos
 	m.MakeAware(g)
-	if !m.SeesPlayer(g) && m.State == Hunting {
-		if g.Player.Armour == HarmonistRobe && RandInt(5) == 0 ||
-			g.Player.Aptitudes[AptStealthyMovement] && RandInt(5) == 0 ||
-			RandInt(10) == 0 {
-			m.State = Wandering
-		}
-	}
 	movedelay := m.Kind.MovementDelay()
 	if m.Status(MonsSlow) {
 		movedelay += 3
@@ -1280,61 +1273,14 @@ func (m *monster) MakeAware(g *game) {
 		return
 	}
 	if m.State == Resting {
-		if m.Status(MonsExhausted) && (m.Pos.Distance(g.Player.Pos) > 1 || RandInt(3) > 0) {
-			return
-		}
-		adjust := g.LosRange() - m.Pos.Distance(g.Player.Pos)
-		max := 28
-		if g.Player.Aptitudes[AptStealthyMovement] {
-			max += 3
-		}
-		if g.Player.Armour == HarmonistRobe {
-			max += 10
-		}
-		stealth := max - 4*adjust
-		fact := 2
-		if m.Pos.Distance(g.Player.Pos) > 1 {
-			fact = 3
-		} else if stealth > 15 {
-			stealth = 15
-		}
-		r := RandInt(stealth)
-		if g.Player.Aptitudes[AptStealthyMovement] {
-			r *= fact
-		}
-		if g.Player.Armour == HarmonistRobe {
-			r *= fact
-		}
-		if r >= 5 {
-			return
-		}
-	}
-	if m.State == Wandering {
-		adjust := g.LosRange() - m.Pos.Distance(g.Player.Pos)
-		max := 37
-		if g.Player.Aptitudes[AptStealthyMovement] {
-			max += 5
-		}
-		if g.Player.Armour == HarmonistRobe {
-			max += 10
-		}
-		stealth := max - 4*adjust
-		r := RandInt(stealth)
-		if g.Player.Aptitudes[AptStealthyMovement] {
-			r *= 2
-		}
-		if g.Player.Armour == HarmonistRobe {
-			r *= 2
-			r += 5
-		}
-		if r >= 25 && m.Pos.Distance(g.Player.Pos) > 1 {
+		// XXX maybe in some rare cases you could be able to move near them unnoticed
+		if RandInt(3) == 0 {
 			return
 		}
 	}
 	if m.State == Resting {
 		g.Printf("%s awakens.", m.Kind.Definite(true))
-	}
-	if m.State == Wandering {
+	} else if m.State == Wandering {
 		g.Printf("%s notices you.", m.Kind.Definite(true))
 	}
 	if m.State != Hunting && m.Kind == MonsHound {
