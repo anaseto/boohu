@@ -270,7 +270,7 @@ func (g *game) ComputeRayHighlight(pos position) {
 
 func (g *game) ComputeNoise() {
 	dij := &noisePath{game: g}
-	rg := DefaultLOSRange + 2
+	rg := DefaultLOSRange
 	if g.Player.Aptitudes[AptHear] {
 		rg++
 	}
