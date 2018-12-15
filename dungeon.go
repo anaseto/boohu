@@ -225,7 +225,13 @@ func (rs roomSlice) Swap(i, j int) { rs[i], rs[j] = rs[j], rs[i] }
 func (rs roomSlice) Less(i, j int) bool {
 	//return rs[i].pos.Y < rs[j].pos.Y || rs[i].pos.Y == rs[j].pos.Y && rs[i].pos.X < rs[j].pos.X
 	center := position{DungeonWidth / 2, DungeonHeight / 2}
-	return rs[i].pos.Distance(center) <= rs[j].pos.Distance(center)
+	ipos := rs[i].pos
+	ipos.X += rs[i].w / 2
+	ipos.Y += rs[i].h / 2
+	jpos := rs[j].pos
+	jpos.X += rs[j].w / 2
+	jpos.Y += rs[j].h / 2
+	return ipos.Distance(center) <= jpos.Distance(center)
 }
 
 type dgen struct {
@@ -636,6 +642,12 @@ func (g *game) GenRoomTunnels(h, w int) {
 	dg.PutDoors(g)
 	g.Fungus = dg.fungus
 	dg.PlayerStartCell(g)
+	if g.Depth < MaxDepth {
+		dg.Stairs(g, NormalStair)
+	}
+	if g.Depth == WinDepth || g.Depth == MaxDepth {
+		dg.Stairs(g, WinStair)
+	}
 	dg.GenMonsters(g)
 }
 
@@ -656,6 +668,24 @@ func (r *room) RandomPlace(kind placeKind) position {
 
 func (dg *dgen) PlayerStartCell(g *game) {
 	g.Player.Pos = dg.rooms[len(dg.rooms)-1].RandomPlace(PlacePatrol)
+}
+
+func (dg *dgen) Stairs(g *game, st stair) {
+	var ri, pj int
+	best := 0
+	for i, r := range dg.rooms {
+		for j, pl := range r.places {
+			if !pl.used && pl.kind == PlaceSpecialStatic && pl.pos.Distance(g.Player.Pos) > best && (RandInt(3) == 0 || best == 0) {
+				ri = i
+				pj = j
+				best = pl.pos.Distance(g.Player.Pos)
+			}
+		}
+	}
+	r := dg.rooms[ri]
+	r.places[pj].used = true
+	r.places[pj].used = true
+	g.Stairs[r.places[pj].pos] = st
 }
 
 type vegetation int

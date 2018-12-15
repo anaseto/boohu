@@ -408,6 +408,7 @@ func (g *game) InitLevel() {
 	g.ExclusionsMap = map[position]bool{}
 	g.TemporalWalls = map[position]bool{}
 	g.LastMonsterKnownAt = map[position]*monster{}
+	g.Stairs = make(map[position]stair)
 
 	// Dungeon terrain
 	g.GenDungeon()
@@ -446,37 +447,6 @@ func (g *game) InitLevel() {
 		apt, ok := g.RandomApt()
 		if ok {
 			g.ApplyAptitude(apt)
-		}
-	}
-
-	// Stairs
-	g.Stairs = make(map[position]stair)
-	nstairs := 2
-	if RandInt(3) == 0 {
-		if RandInt(2) == 0 {
-			nstairs++
-		} else {
-			nstairs--
-		}
-	}
-	if g.Depth >= WinDepth {
-		nstairs = 1
-	} else if g.Depth == WinDepth-1 && nstairs > 2 {
-		nstairs = 2
-	}
-	for i := 0; i < nstairs; i++ {
-		var pos position
-		if g.Depth >= WinDepth && g.Depth != MaxDepth-1 {
-			pos = g.FreeCellForStair(60)
-			g.Stairs[pos] = WinStair
-		}
-		if g.Depth < MaxDepth {
-			if g.Depth > 5 {
-				pos = g.FreeCellForStair(50)
-			} else {
-				pos = g.FreeCellForStair(0)
-			}
-			g.Stairs[pos] = NormalStair
 		}
 	}
 
