@@ -1298,7 +1298,7 @@ func (m *monster) Heal(g *game, ev event) {
 }
 
 func (m *monster) GatherBand(g *game) {
-	if !g.BandData[g.Bands[m.Band].Kind].Band {
+	if !MonsBands[g.Bands[m.Band].Kind].Band {
 		return
 	}
 	dij := &normalPath{game: g}
@@ -1348,13 +1348,20 @@ func (g *game) GenBand(band monsterBand) []monsterKind {
 	return bandMonsters
 }
 
-func (g *game) PutMonsterBand(band monsterBand) bool {
+func (dg *dgen) PutMonsterBand(g *game, band monsterBand) bool {
 	monsters := g.GenBand(band)
 	if monsters == nil {
 		return false
 	}
 	bandinfo := bandInfo{Kind: monsterBand(band)}
-	pos := g.FreeCellForMonster()
+	pos := InvalidPos
+	for pos == InvalidPos {
+		pos = dg.rooms[RandInt(len(dg.rooms)-1)].RandomPlace(PlacePatrol)
+	}
+	target := InvalidPos
+	for target == InvalidPos || target.Distance(pos) < 10 {
+		target = dg.rooms[RandInt(len(dg.rooms)-1)].RandomPlace(PlacePatrol)
+	}
 	bandinfo.Path = append(bandinfo.Path, pos)
 	bandinfo.Path = append(bandinfo.Path, g.FreeCellForMonster())
 	g.Bands = append(g.Bands, bandinfo)
@@ -1374,11 +1381,11 @@ func (g *game) PutMonsterBand(band monsterBand) bool {
 	return true
 }
 
-func (g *game) PutRandomBand(bands []monsterBand) bool {
-	return g.PutMonsterBand(bands[RandInt(len(bands))])
+func (dg *dgen) PutRandomBand(g *game, bands []monsterBand) bool {
+	return dg.PutMonsterBand(g, bands[RandInt(len(bands))])
 }
 
-func (g *game) GenMonsters() {
+func (dg *dgen) GenMonsters(g *game) {
 	g.Monsters = []*monster{}
 	g.Bands = []bandInfo{}
 	// TODO, just for testing now
@@ -1387,46 +1394,46 @@ func (g *game) GenMonsters() {
 	bandsL3 := []monsterBand{LoneCyclop, LoneSatowalgaPlant, LoneBlinkingFrog, LoneMirrorSpecter, LoneWingedMilfid}
 	mlevel := 1 + RandInt(MaxDepth)
 	for i := 0; i < 5; i++ {
-		if !g.PutRandomBand(bandsL1) {
+		if !dg.PutRandomBand(g, bandsL1) {
 			i--
 		}
 	}
-	g.PutRandomBand(bandsL2)
+	dg.PutRandomBand(g, bandsL2)
 	if g.Depth > 1 {
-		g.PutRandomBand(bandsL2)
+		dg.PutRandomBand(g, bandsL2)
 	}
 	if g.Depth > 2 {
-		g.PutRandomBand(bandsL3)
+		dg.PutRandomBand(g, bandsL3)
 	}
 	if g.Depth > 3 {
-		g.PutRandomBand(bandsL2)
+		dg.PutRandomBand(g, bandsL2)
 	}
 	if g.Depth > 4 {
-		g.PutRandomBand(bandsL3)
+		dg.PutRandomBand(g, bandsL3)
 	}
 	if g.Depth > 5 {
-		g.PutRandomBand(bandsL2)
+		dg.PutRandomBand(g, bandsL2)
 	}
 	if g.Depth > 6 {
-		g.PutRandomBand(bandsL3)
+		dg.PutRandomBand(g, bandsL3)
 	}
 	if g.Depth > 7 {
-		g.PutRandomBand(bandsL2)
+		dg.PutRandomBand(g, bandsL2)
 	}
 	if g.Depth > 8 {
-		g.PutRandomBand(bandsL2)
-		g.PutRandomBand(bandsL3)
+		dg.PutRandomBand(g, bandsL2)
+		dg.PutRandomBand(g, bandsL3)
 	}
 	if g.Depth > 9 {
-		g.PutRandomBand(bandsL2)
-		g.PutRandomBand(bandsL3)
+		dg.PutRandomBand(g, bandsL2)
+		dg.PutRandomBand(g, bandsL3)
 	}
 	if g.Depth > 10 {
-		g.PutRandomBand(bandsL2)
-		g.PutRandomBand(bandsL3)
+		dg.PutRandomBand(g, bandsL2)
+		dg.PutRandomBand(g, bandsL3)
 	}
 	if mlevel == g.Depth {
-		g.PutMonsterBand(LoneMarevorHelith)
+		dg.PutMonsterBand(g, LoneMarevorHelith)
 	}
 }
 

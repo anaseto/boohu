@@ -188,11 +188,28 @@ type rentry struct {
 	used bool
 }
 
+type placeKind int
+
+const (
+	PlaceDoor placeKind = iota
+	PlacePatrol
+	PlaceStatic
+	PlaceSpecialStatic
+	PlaceItem
+)
+
+type place struct {
+	pos  position
+	kind placeKind
+	used bool
+}
+
 type room struct {
 	pos     position
 	w       int
 	h       int
 	entries []rentry
+	places  []place
 	kind    string
 }
 
@@ -288,35 +305,35 @@ func (dg *dgen) ConnectRoomsShortestPath(i, j int) bool {
 const (
 	RoomSquare = `
 ?###+###?
-#.......#
-+.......+
-#.......#
+#_..!.._#
++..!P!..+
+#_..!.._#
 ?###+###?`
 	RoomLittle = `
 ?#+#?
-#...#
-+...+
-#...#
+#_._#
++.P.+
+#_._#
 ?#+#?`
 	RoomLittleDiamond = `
 ??#+#??
-##...##
-+.....+
-##...##
+##_._##
++..P..+
+##_._##
 ??#+#??`
 	RoomLittleColumnDiamond = `
 ??#+#??
-##...##
-+..#..+
-##...##
+##_._##
++.P#P.+
+##_._##
 ??#+#??`
 	RoomRound = `
 ???##+##???
-??#"..."#??
-##"..#.."##
-+...###...+
-##"..#.."##
-??#"..."#??
+??#".P."#??
+##"._#_."##
++.P.###.P.+
+##"._#_."##
+??#".P."#??
 ???##+##???`
 )
 
@@ -325,53 +342,53 @@ var roomNormalTemplates = []string{RoomSquare, RoomLittle, RoomLittleDiamond, Ro
 const (
 	RoomBigColumns = `
 ?####?#++#?####?
-#....##..##....#
-##............##
-+.....####.....+
-##............##
-#....##..##....#
+#!..>##..##>..!#
+##.P........P.##
++...._####_....+
+##.P........P.##
+#!..>##..##>..!#
 ?####?#++#?####?`
 	RoomBigGarden = `
 ?####?#++#?####?
 #""""##..##""""#
-#""""""..""""""#
-#""""""..""""""#
-#""""""..""""""#
+#""""""!!""""""#
+#""""""P>""""""#
+#""""""!!""""""#
 #""""##..##""""#
 ?####?#++#?####?`
 	RoomColumns = `
 ###+##+###
-+........+
-#.#.##.#.#
-#.#.##.#.#
-+........+
++..P..P..+
+#.#>##!#.#
+#.#!##>#.#
++..P..P..+
 ###+##+###`
 	RoomRoundColumns = `
 ???##+##???
-??#.....#??
-##..#.#..##
-+.........+
-##..#.#..##
-??#.....#??
+??#_..._#??
+##!.#P#.!##
++...P>P...+
+##!.#P#.!##
+??#_..._#??
 ???##+##???`
 	RoomRoundGarden = `
 ???##+##???
-??#.....#??
-##.."""..##
-+.."""""..+
-##.."""..##
-??#.....#??
+??#>.P.>#??
+##!.""".!##
++.P"""""P.+
+##!.""".!##
+??#>.P.>#??
 ???##+##???`
 	RoomLongHall = `
 ####################
-+..................+
-#...##...##...##...#
-+..................+
++.P..............P.+
+#..!##!>.##.>!##!..#
++.P..............P.+
 ####################`
 	RoomGardenHall = `
 ?##################?
 #""""""""""""""""""#
-+..................+
++...P..!.>.!...P...+
 #""""""""""""""""""#
 ?##################?`
 )
@@ -381,42 +398,42 @@ var roomSpecialTemplates = []string{RoomBigColumns, RoomBigGarden, RoomColumns, 
 const (
 	RoomCave1 = `
 ???##???????#+#?????????
-###..#?????##.#????#####
-+...###??##...#####""..+
+###.!#?????##.#????#####
++..P###??##>.P#####""P.+
 ###."""##""......"""".##
-??#."""#"..."".###.".#??
-??#""""".##""""##...#???
+??#."""#".._""!###.".#??
+??#""""".##""""##..P#???
 ???###"######"""".#.#???
 ??????#??????######+#???
 `
 	RoomCave2 = `
 ?????######+#???????????
 ????#.....#.##???????##?
-??##..###.....#?????#""#
+??##..###!.P.>#?????#""#
 ?#""..#??##..""#??###"##
-#"""..#????##"""##.."..+
-##"..#????#"""""#...""##
+#"""..#????##"""##.."P.+
+##"P.#????#"""""#!_.""##
 +..##??????#"""""...##??
 ##+#????????########????
 `
 	RoomCave3 = `
 ??#+#??############?????
 ??#.#?#........."""#?#??
-?#...#...######"""""#"#?
+?#.P.#..!######"""""#"#?
 ##.....#########""""""#?
-+....""####..######"..##
-##."""""""......###....+
++..P.""####>_######"..##
+##."""""""..P..!###.P..+
 ??##""""####.#......####
 ????####???#+#######????
 `
 	RoomCave4 = `
 ????#+############???###
 #####.#...""""""".###..+
-+.......###""""#....#.##
++....P..###""""#!...#P##
 ###"".#####""####.....#?
-?#"".#####""""####....#?
-?#""..##""""""""#..""#??
-??#"...#.""#"""....""#??
+?#"".#####""""####..._#?
+?#"".!##""""""""#>.""#??
+??#"...#.""#"""P...""#??
 ???##....###"##.."""#???
 ?????####??#+#?#####????
 `
@@ -469,10 +486,20 @@ func (r *room) Dig(dg *dgen) {
 			dg.room[pos] = true
 		}
 		switch c {
-		case '.':
+		case '.', '>', '!', 'P', '_':
 			if pos.valid() {
 				dg.d.SetCell(pos, FreeCell)
 			}
+		}
+		switch c {
+		case '>':
+			r.places = append(r.places, place{pos: pos, kind: PlaceSpecialStatic})
+		case '!':
+			r.places = append(r.places, place{pos: pos, kind: PlaceItem})
+		case 'P':
+			r.places = append(r.places, place{pos: pos, kind: PlacePatrol})
+		case '_':
+			r.places = append(r.places, place{pos: pos, kind: PlaceStatic})
 		case '+':
 			if pos.X == 0 || pos.X == DungeonWidth-1 || pos.Y == 0 || pos.Y == DungeonHeight-1 {
 				break
@@ -524,6 +551,7 @@ func (dg *dgen) PutDoors(g *game) {
 			//if e.used && g.DoorCandidate(e.pos) {
 			if e.used {
 				g.Doors[e.pos] = true
+				r.places = append(r.places, place{pos: e.pos, kind: PlaceDoor})
 				if _, ok := dg.fungus[e.pos]; ok {
 					delete(dg.fungus, e.pos)
 				}
@@ -607,6 +635,27 @@ func (g *game) GenRoomTunnels(h, w int) {
 	g.Dungeon = d
 	dg.PutDoors(g)
 	g.Fungus = dg.fungus
+	dg.PlayerStartCell(g)
+	dg.GenMonsters(g)
+}
+
+func (r *room) RandomPlace(kind placeKind) position {
+	var p []int
+	for i, pl := range r.places {
+		if pl.kind == kind && (!pl.used || RandInt(4) == 0) {
+			p = append(p, i)
+		}
+	}
+	if len(p) == 0 {
+		return InvalidPos
+	}
+	j := p[RandInt(len(p))]
+	r.places[j].used = true
+	return r.places[j].pos
+}
+
+func (dg *dgen) PlayerStartCell(g *game) {
+	g.Player.Pos = dg.rooms[len(dg.rooms)-1].RandomPlace(PlacePatrol)
 }
 
 type vegetation int

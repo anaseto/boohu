@@ -176,11 +176,11 @@ func (g *game) BoredomAction(ev event, grade int) {
 	if g.MonsterCount() <= 4 {
 		return
 	}
-	if g.Boredom >= 200 && obor < 200 {
+	if g.Boredom >= 500 && obor < 500 {
 		g.PrintStyled("You feel a little bored, your health may decline.", logCritic)
 		g.StopAuto()
 	}
-	if g.Boredom >= 210 && (obor/10 != g.Boredom/10) {
+	if g.Boredom >= 510 && (obor/10 != g.Boredom/10) {
 		g.Player.Bored++
 		g.PrintStyled("You feel unhealthy.", logCritic)
 		g.StopAuto()

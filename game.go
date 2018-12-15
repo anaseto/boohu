@@ -10,7 +10,6 @@ type game struct {
 	Monsters            []*monster
 	MonstersPosCache    []int // monster (dungeon index + 1) / no monster (0)
 	Bands               []bandInfo
-	BandData            []monsterBandData
 	Events              *eventQueue
 	Ev                  event
 	EventIndex          int
@@ -402,12 +401,7 @@ func (g *game) InitLevel() {
 		g.InitFirstLevel()
 	}
 
-	// Dungeon terrain
-	g.GenDungeon()
-
 	g.MonstersPosCache = make([]int, DungeonNCells)
-	g.Player.Pos = g.FreeCellForPlayer()
-
 	g.WrongWall = map[position]bool{}
 	g.WrongFoliage = map[position]bool{}
 	g.WrongDoor = map[position]bool{}
@@ -415,9 +409,8 @@ func (g *game) InitLevel() {
 	g.TemporalWalls = map[position]bool{}
 	g.LastMonsterKnownAt = map[position]*monster{}
 
-	// Monsters
-	g.BandData = MonsBands
-	g.GenMonsters()
+	// Dungeon terrain
+	g.GenDungeon()
 
 	// Collectables
 	g.Collectables = make(map[position]collectable)
