@@ -951,6 +951,7 @@ func (m *monster) RangedAttack(g *game, ev event) bool {
 func (m *monster) RangeBlocked(g *game) bool {
 	ray := g.Ray(m.Pos)
 	if len(ray) < 2 {
+		// XXX see why this can happen
 		return false
 	}
 	blocked := false

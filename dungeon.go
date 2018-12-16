@@ -184,8 +184,9 @@ func (d *dungeon) IsAreaWall(pos position, h, w int) bool {
 }
 
 type rentry struct {
-	pos  position
-	used bool
+	pos     position
+	used    bool
+	virtual bool
 }
 
 type placeKind int
@@ -362,6 +363,14 @@ const (
 #""""""!!""""""#
 #""""##..##""""#
 ?####?#++#?####?`
+	RoomBigRooms = `
+?####?#++#?####?
+#>..!##..##!..>#
+#"""..#..#.."""#
+#"""P.|..|.P"""#
+#"""..#..#.."""#
+#>..!##..##!..>#
+?####?#++#?####?`
 	RoomColumns = `
 ###+##+###
 +..P..P..+
@@ -369,6 +378,45 @@ const (
 #.#!##>#.#
 +..P..P..+
 ###+##+###`
+	RoomHome1 = `
+?##########+#?
+#>..P...|..P.#
+#......!#!!..#
+####|#######|#
+#....P....|..#
+#>.......!#P.#
+?##########+#?
+`
+	RoomHome2 = `
+?############?
++...#.......>#
+#.P.|....P...#
+##|###!.....!#
+#...>##|######
+#!P..|...P...+
+?##########+#?
+`
+	RoomHome3 = `
+?###############?
+#>....|.........#
+#..P.!##|##!.P..+
+######!...!#....#
++....|.P>._###|##
+######!...!#!...#
+#!...>##|##..P..+
+#..P......|.....#
+?###############?
+`
+	RoomCaban = `
+?????????-???????
+???????""""??????
+?????""""""""????
+???""""###.""""??
+??""""#>!|P."""??
+-""""""###."""""-
+??"""""""""""""??
+?????""""""""????
+?????????-???????`
 	RoomRoundColumns = `
 ???##+##???
 ??#_..._#??
@@ -399,7 +447,8 @@ const (
 ?##################?`
 )
 
-var roomSpecialTemplates = []string{RoomBigColumns, RoomBigGarden, RoomColumns, RoomRoundColumns, RoomRoundGarden, RoomLongHall, RoomGardenHall}
+var roomSpecialTemplates = []string{RoomBigColumns, RoomBigGarden, RoomColumns, RoomRoundColumns, RoomRoundGarden, RoomLongHall,
+	RoomGardenHall, RoomHome1, RoomHome2, RoomHome3, RoomBigRooms, RoomCaban}
 
 const (
 	RoomCave1 = `
@@ -492,7 +541,7 @@ func (r *room) Dig(dg *dgen) {
 			dg.room[pos] = true
 		}
 		switch c {
-		case '.', '>', '!', 'P', '_':
+		case '.', '>', '!', 'P', '_', '|':
 			if pos.valid() {
 				dg.d.SetCell(pos, FreeCell)
 			}
@@ -506,12 +555,17 @@ func (r *room) Dig(dg *dgen) {
 			r.places = append(r.places, place{pos: pos, kind: PlacePatrol})
 		case '_':
 			r.places = append(r.places, place{pos: pos, kind: PlaceStatic})
-		case '+':
+		case '|':
+			r.places = append(r.places, place{pos: pos, kind: PlaceDoor})
+		case '+', '-':
 			if pos.X == 0 || pos.X == DungeonWidth-1 || pos.Y == 0 || pos.Y == DungeonHeight-1 {
 				break
 			}
 			e := rentry{}
 			e.pos = pos
+			if c == '-' {
+				e.virtual = true
+			}
 			r.entries = append(r.entries, e)
 		case '"':
 			if pos.valid() {
@@ -555,12 +609,18 @@ func (dg *dgen) PutDoors(g *game) {
 	for _, r := range dg.rooms {
 		for _, e := range r.entries {
 			//if e.used && g.DoorCandidate(e.pos) {
-			if e.used {
-				g.Doors[e.pos] = true
+			if e.used && !e.virtual {
 				r.places = append(r.places, place{pos: e.pos, kind: PlaceDoor})
-				if _, ok := dg.fungus[e.pos]; ok {
-					delete(dg.fungus, e.pos)
-				}
+			}
+		}
+		for _, pl := range r.places {
+			if pl.kind != PlaceDoor {
+				continue
+			}
+			g.Doors[pl.pos] = true
+			r.places = append(r.places, place{pos: pl.pos, kind: PlaceDoor})
+			if _, ok := dg.fungus[pl.pos]; ok {
+				delete(dg.fungus, pl.pos)
 			}
 		}
 	}
@@ -635,8 +695,8 @@ func (g *game) GenRoomTunnels(h, w int) {
 	dg.rooms = []*room{}
 	dg.fungus = make(map[position]vegetation)
 	dg.GenRooms(roomCaveTemplates, 1)
-	dg.GenRooms(roomSpecialTemplates, 3)
-	dg.GenRooms(roomNormalTemplates, 10)
+	dg.GenRooms(roomSpecialTemplates, 4)
+	dg.GenRooms(roomNormalTemplates, 9)
 	dg.ConnectRooms()
 	g.Dungeon = d
 	dg.PutDoors(g)
