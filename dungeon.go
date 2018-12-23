@@ -709,6 +709,34 @@ func (g *game) GenRoomTunnels(h, w int) {
 		dg.Stairs(g, WinStair)
 	}
 	dg.GenMonsters(g)
+	dg.GenCollectables(g)
+	dg.AddSpecial(g)
+}
+
+func (dg *dgen) AddSpecial(g *game) {
+	// Equipment
+	switch g.GenPlan[g.Depth] {
+	//case GenWeapon:
+	//g.GenWeapon()
+	case GenArmour:
+		g.GenArmour()
+	//case GenWpArm:
+	//g.GenWeapon()
+	//g.GenArmour()
+	case GenRod:
+		g.GenerateRod()
+	case GenExtraCollectables:
+		for i := 0; i < 2; i++ {
+			dg.GenCollectable(g)
+			g.CollectableScore-- // these are extra
+		}
+	}
+	if g.Depth == 1 {
+		// extra collectable
+		dg.GenCollectable(g)
+		g.CollectableScore--
+	}
+
 }
 
 func (r *room) RandomPlace(kind placeKind) position {

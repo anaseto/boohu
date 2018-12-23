@@ -409,38 +409,12 @@ func (g *game) InitLevel() {
 	g.TemporalWalls = map[position]bool{}
 	g.LastMonsterKnownAt = map[position]*monster{}
 	g.Stairs = make(map[position]stair)
+	g.Collectables = make(map[position]collectable)
+	g.Equipables = make(map[position]equipable)
+	g.Rods = map[position]rod{}
 
 	// Dungeon terrain
 	g.GenDungeon()
-
-	// Collectables
-	g.Collectables = make(map[position]collectable)
-	g.GenCollectables()
-
-	// Equipment
-	g.Equipables = make(map[position]equipable)
-	g.Rods = map[position]rod{}
-	switch g.GenPlan[g.Depth] {
-	//case GenWeapon:
-	//g.GenWeapon()
-	case GenArmour:
-		g.GenArmour()
-	//case GenWpArm:
-	//g.GenWeapon()
-	//g.GenArmour()
-	case GenRod:
-		g.GenerateRod()
-	case GenExtraCollectables:
-		for i := 0; i < 2; i++ {
-			g.GenCollectable()
-			g.CollectableScore-- // these are extra
-		}
-	}
-	if g.Depth == 1 {
-		// extra collectable
-		g.GenCollectable()
-		g.CollectableScore--
-	}
 
 	// Aptitudes/Mutations
 	if g.Depth == 2 || g.Depth == 5 {
@@ -550,7 +524,7 @@ func (g *game) StairsSlice() []position {
 	return stairs
 }
 
-func (g *game) GenCollectable() {
+func (dg *dgen) GenCollectable(g *game) {
 	rounds := 100
 	if len(g.LastConsumables) > 3 {
 		g.LastConsumables = g.LastConsumables[1:]
@@ -571,7 +545,10 @@ func (g *game) GenCollectable() {
 			}
 			g.LastConsumables = append(g.LastConsumables, c)
 			g.CollectableScore++
-			pos := g.FreeCellForStatic()
+			pos := InvalidPos
+			for pos == InvalidPos {
+				pos = dg.rooms[RandInt(len(dg.rooms)-1)].RandomPlace(PlaceItem)
+			}
 			g.Collectables[pos] = collectable{Consumable: c, Quantity: data.quantity}
 			return
 		}
@@ -579,7 +556,7 @@ func (g *game) GenCollectable() {
 
 }
 
-func (g *game) GenCollectables() {
+func (dg *dgen) GenCollectables(g *game) {
 	score := g.CollectableScore - 2*(g.Depth-1)
 	n := 2
 	if score >= 0 && RandInt(4) == 0 {
@@ -595,7 +572,7 @@ func (g *game) GenCollectables() {
 		n++
 	}
 	for i := 0; i < n; i++ {
-		g.GenCollectable()
+		dg.GenCollectable(g)
 	}
 }
 
