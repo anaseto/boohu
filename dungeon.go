@@ -408,15 +408,15 @@ const (
 ?###############?
 `
 	RoomCaban = `
-?????????-???????
-???????""""??????
-?????""""""""????
-???""""###.""""??
-??""""#>!|P."""??
--""""""###."""""-
-??"""""""""""""??
-?????""""""""????
-?????????-???????`
+???????-??????
+?????""""?????
+???""""""""???
+??"""###."""??
+?"""#>!|P."""?
+-""""###.""""-
+??""""""""""??
+????"""""?????
+???????-??????`
 	RoomRoundColumns = `
 ???##+##???
 ??#_..._#??
@@ -441,60 +441,14 @@ const (
 ####################`
 	RoomGardenHall = `
 ?##################?
-#""""""""""""""""""#
-+...P..!.>.!...P...+
-#""""""""""""""""""#
+#"""""".>!>."""""""#
++....P........P....+
+#"""""".>!>."""""""#
 ?##################?`
 )
 
 var roomSpecialTemplates = []string{RoomBigColumns, RoomBigGarden, RoomColumns, RoomRoundColumns, RoomRoundGarden, RoomLongHall,
 	RoomGardenHall, RoomHome1, RoomHome2, RoomHome3, RoomBigRooms, RoomCaban}
-
-const (
-	RoomCave1 = `
-???##???????#+#?????????
-###.!#?????##.#????#####
-+..P###??##>.P#####""P.+
-###."""##""......"""".##
-??#."""#".._""!###.".#??
-??#""""".##""""##..P#???
-???###"######"""".#.#???
-??????#??????######+#???
-`
-	RoomCave2 = `
-?????######+#???????????
-????#.....#.##???????##?
-??##..###!.P.>#?????#""#
-?#""..#??##..""#??###"##
-#"""..#????##"""##.."P.+
-##"P.#????#"""""#!_.""##
-+..##??????#"""""...##??
-##+#????????########????
-`
-	RoomCave3 = `
-??#+#??############?????
-??#.#?#........."""#?#??
-?#.P.#..!######"""""#"#?
-##.....#########""""""#?
-+..P.""####>_######"..##
-##."""""""..P..!###.P..+
-??##""""####.#......####
-????####???#+#######????
-`
-	RoomCave4 = `
-????#+############???###
-#####.#...""""""".###..+
-+....P..###""""#!...#P##
-###"".#####""####.....#?
-?#"".#####""""####..._#?
-?#"".!##""""""""#>.""#??
-??#"...#.""#"""P...""#??
-???##....###"##.."""#???
-?????####??#+#?#####????
-`
-)
-
-var roomCaveTemplates = []string{RoomCave1, RoomCave2, RoomCave3, RoomCave4}
 
 func (r *room) ComputeDimensions() {
 	x := 0
@@ -545,6 +499,10 @@ func (r *room) Dig(dg *dgen) {
 			if pos.valid() {
 				dg.d.SetCell(pos, FreeCell)
 			}
+		case '#', '+':
+			if pos.valid() {
+				dg.d.SetCell(pos, WallCell)
+			}
 		}
 		switch c {
 		case '>':
@@ -572,6 +530,9 @@ func (r *room) Dig(dg *dgen) {
 				dg.d.SetCell(pos, FreeCell)
 				dg.fungus[pos] = foliage
 			}
+		}
+		if c != '"' {
+			delete(dg.fungus, pos)
 		}
 		x++
 	}
@@ -685,23 +646,24 @@ func (dg *dgen) ConnectRooms() {
 	}
 }
 
-func (g *game) GenRoomTunnels(h, w int) {
+func (g *game) GenRoomTunnels() {
 	dg := dgen{}
 	d := &dungeon{}
-	d.Cells = make([]cell, h*w)
+	d.Cells = make([]cell, DungeonNCells)
 	dg.d = d
 	dg.tunnel = make(map[position]bool)
 	dg.room = make(map[position]bool)
 	dg.rooms = []*room{}
 	dg.fungus = make(map[position]vegetation)
-	dg.GenRooms(roomCaveTemplates, 1)
-	dg.GenRooms(roomSpecialTemplates, 4)
-	dg.GenRooms(roomNormalTemplates, 9)
+	dg.GenCellularAutomataCaveMap()
+	dg.GenRooms(roomSpecialTemplates, 3)
+	dg.GenRooms(roomNormalTemplates, 7)
 	dg.ConnectRooms()
 	g.Dungeon = d
 	dg.PutDoors(g)
 	g.Fungus = dg.fungus
 	dg.PlayerStartCell(g)
+	dg.ClearUnconnected(g)
 	if g.Depth < MaxDepth {
 		dg.Stairs(g, NormalStair)
 	}
@@ -711,6 +673,17 @@ func (g *game) GenRoomTunnels(h, w int) {
 	dg.GenMonsters(g)
 	dg.GenCollectables(g)
 	dg.AddSpecial(g)
+}
+
+func (dg *dgen) ClearUnconnected(g *game) {
+	d := dg.d
+	conn, _ := d.Connected(g.Player.Pos, d.IsFreeCell)
+	for i, c := range d.Cells {
+		pos := idxtopos(i)
+		if c.T == FreeCell && !conn[pos] {
+			d.SetCell(pos, WallCell)
+		}
+	}
 }
 
 func (dg *dgen) AddSpecial(g *game) {
@@ -869,3 +842,104 @@ const (
 //n--
 //}
 //}
+
+func (dg *dgen) GenCellularAutomataCaveMap() {
+	count := 0
+	for {
+		count++
+		if count > 100 {
+			panic("genCellularAutomataCaveMap")
+		}
+		if dg.RunCellularAutomataCave() {
+			break
+		}
+		// refresh cells
+		dg.d.Cells = make([]cell, DungeonNCells)
+	}
+	dg.Foliage()
+}
+
+func (dg *dgen) RunCellularAutomataCave() bool {
+	d := dg.d // TODO: reset
+	for i := range d.Cells {
+		r := RandInt(100)
+		pos := idxtopos(i)
+		if r >= 45 {
+			d.SetCell(pos, FreeCell)
+		} else {
+			d.SetCell(pos, WallCell)
+		}
+	}
+	bufm := &dungeon{}
+	bufm.Cells = make([]cell, DungeonNCells)
+	area := make([]position, 0, 25)
+	for i := 0; i < 5; i++ {
+		for j := range bufm.Cells {
+			pos := idxtopos(j)
+			c1 := d.WallAreaCount(area, pos, 1)
+			if c1 >= 5 {
+				bufm.SetCell(pos, WallCell)
+			} else {
+				bufm.SetCell(pos, FreeCell)
+			}
+			if i == 3 {
+				c2 := d.WallAreaCount(area, pos, 2)
+				if c2 <= 2 {
+					bufm.SetCell(pos, WallCell)
+				}
+			}
+		}
+		copy(d.Cells, bufm.Cells)
+	}
+	return true
+}
+
+func (dg *dgen) Foliage() {
+	// use same structure as for the dungeon
+	// walls will become foliage
+	d := &dungeon{}
+	d.Cells = make([]cell, DungeonNCells)
+	for i := range d.Cells {
+		r := RandInt(100)
+		pos := idxtopos(i)
+		if r >= 43 {
+			d.SetCell(pos, WallCell)
+		} else {
+			d.SetCell(pos, FreeCell)
+		}
+	}
+	area := make([]position, 0, 25)
+	for i := 0; i < 6; i++ {
+		bufm := &dungeon{}
+		bufm.Cells = make([]cell, DungeonNCells)
+		copy(bufm.Cells, d.Cells)
+		for j := range bufm.Cells {
+			pos := idxtopos(j)
+			c1 := d.WallAreaCount(area, pos, 1)
+			if i < 4 {
+				if c1 <= 4 {
+					bufm.SetCell(pos, FreeCell)
+				} else {
+					bufm.SetCell(pos, WallCell)
+				}
+			}
+			if i == 4 {
+				if c1 > 6 {
+					bufm.SetCell(pos, WallCell)
+				}
+			}
+			if i == 5 {
+				c2 := d.WallAreaCount(area, pos, 2)
+				if c2 < 5 && c1 <= 2 {
+					bufm.SetCell(pos, FreeCell)
+				}
+			}
+		}
+		d.Cells = bufm.Cells
+	}
+	for i, c := range d.Cells {
+		if c.T == FreeCell {
+			dg.fungus[idxtopos(i)] = foliage
+		}
+	}
+}

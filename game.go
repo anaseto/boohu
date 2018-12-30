@@ -262,7 +262,7 @@ const (
 )
 
 func (g *game) GenDungeon() {
-	g.GenRoomTunnels(DungeonHeight, DungeonWidth)
+	g.GenRoomTunnels()
 }
 
 func (g *game) InitPlayer() {

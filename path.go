@@ -45,6 +45,9 @@ func (tp *tunnelPath) Cost(from, to position) int {
 		return 50
 	}
 	wc := tp.dg.WallAreaCount(tp.area[:0], from, 1)
+	if tp.dg.d.Cell(from).T == FreeCell {
+		return 1
+	}
 	return 10 - wc
 }
 
