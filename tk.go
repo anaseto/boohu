@@ -41,15 +41,6 @@ focus $can
 image create photo gamescreen -width $width -height $height -palette 256/256/256
 image create photo bufscreen -width $width -height $height -palette 256/256/256
 $can create image 0 0 -anchor nw -image gamescreen
-bind $can <Key> {
-	GetKey %A %K
-}
-bind $can <Motion> {
-	MouseMotion %x %y
-}
-bind $can <ButtonPress> {
-	MouseDown %x %y %b
-}
 `)
 	ui.InitElements()
 	ui.ir.RegisterCommand("GetKey", func(c, keysym string) {
@@ -73,6 +64,17 @@ bind $can <ButtonPress> {
 			ch <- uiInput{mouse: true, mouseX: nx, mouseY: ny, button: -1}
 		}
 	})
+	ui.ir.Eval(`
+bind .c <Key> {
+	GetKey %A %K
+}
+bind .c <Motion> {
+	MouseMotion %x %y
+}
+bind .c <ButtonPress> {
+	MouseDown %x %y %b
+}
+`)
 	ui.menuHover = -1
 
 	SolarizedPalette()
