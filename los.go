@@ -172,24 +172,8 @@ func (m *monster) ComputeLOS(g *game) {
 func (g *game) SeePosition(pos position) {
 	if !g.Dungeon.Cell(pos).Explored {
 		see := "see"
-		if c, ok := g.Collectables[pos]; ok {
-			if c.Quantity > 1 {
-				g.Printf("You %s %d %s.", see, c.Quantity, c.Consumable.Plural())
-			} else {
-				g.Printf("You %s %s.", see, Indefinite(c.Consumable.String(), false))
-			}
-			g.StopAuto()
-		} else if _, ok := g.Stairs[pos]; ok {
-			g.Printf("You %s stairs.", see)
-			g.StopAuto()
-		} else if eq, ok := g.Equipables[pos]; ok {
-			g.Printf("You %s %s.", see, Indefinite(eq.String(), false))
-			g.StopAuto()
-		} else if rd, ok := g.Rods[pos]; ok {
-			g.Printf("You %s %s.", see, Indefinite(rd.String(), false))
-			g.StopAuto()
-		} else if stn, ok := g.MagicalStones[pos]; ok {
-			g.Printf("You %s %s.", see, Indefinite(stn.String(), false))
+		if obj, ok := g.Object[pos]; ok {
+			g.Printf("You %s %s.", see, obj.ShortDesc(g))
 			g.StopAuto()
 		}
 		g.FunAction()

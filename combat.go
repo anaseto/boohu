@@ -25,7 +25,11 @@ func (m *monster) InflictDamage(g *game, damage, max int) {
 	if g.Player.HP <= 0 {
 		return
 	}
-	stn, ok := g.MagicalStones[g.Player.Pos]
+	obj, ok := g.Object[g.Player.Pos]
+	if !ok {
+		return
+	}
+	stn, ok := obj.(stone)
 	if !ok {
 		return
 	}
@@ -337,7 +341,11 @@ func (g *game) HitMonster(mons *monster, dmg int) (hit bool) {
 }
 
 func (g *game) HandleStone(mons *monster) {
-	stn, ok := g.MagicalStones[mons.Pos]
+	obj, ok := g.Object[mons.Pos]
+	if !ok {
+		return
+	}
+	stn, ok := obj.(stone)
 	if !ok {
 		return
 	}

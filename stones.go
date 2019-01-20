@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 type stone int
 
 const (
@@ -13,8 +15,8 @@ const (
 
 const NumStones = int(ObstructionStone) + 1
 
-func (s stone) String() (text string) {
-	switch s {
+func (stn stone) String() (text string) {
+	switch stn {
 	case InertStone:
 		text = "inert stone"
 	case TeleStone:
@@ -31,8 +33,8 @@ func (s stone) String() (text string) {
 	return text
 }
 
-func (s stone) Description() (text string) {
-	switch s {
+func (stn stone) Desc(g *game) (text string) {
+	switch stn {
 	case InertStone:
 		text = "This stone has been depleted of magical energies."
 	case TeleStone:
@@ -49,9 +51,23 @@ func (s stone) Description() (text string) {
 	return text
 }
 
+func (stn stone) ShortDesc(g *game) string {
+	return fmt.Sprintf("%s", Indefinite(stn.String(), false))
+}
+
+func (stn stone) Style(g *game) (r rune, fg uicolor) {
+	r = '_'
+	if stn == InertStone {
+		fg = ColorFgPlace
+	} else {
+		fg = ColorFgMagicPlace
+	}
+	return r, fg
+}
+
 func (g *game) UseStone(pos position) {
-	g.StoryPrintf("You activated a %s.", g.MagicalStones[pos])
-	g.MagicalStones[pos] = InertStone
+	g.StoryPrintf("You activated %s.", g.Object[pos].ShortDesc(g))
+	g.Object[pos] = InertStone
 	g.Stats.UsedStones++
 	g.Print("The stone becomes inert.")
 }

@@ -746,7 +746,7 @@ func (dg *dgen) Stairs(g *game, st stair) {
 	r := dg.rooms[ri]
 	r.places[pj].used = true
 	r.places[pj].used = true
-	g.Stairs[r.places[pj].pos] = st
+	g.Object[r.places[pj].pos] = st
 }
 
 type vegetation int

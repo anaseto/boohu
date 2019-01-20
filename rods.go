@@ -62,7 +62,17 @@ func (r rod) String() string {
 	return text
 }
 
-func (r rod) Desc() string {
+func (r rod) ShortDesc(g *game) string {
+	return Indefinite(r.String(), false)
+}
+
+func (r rod) Style(g *game) (c rune, fg uicolor) {
+	c = r.Letter()
+	fg = ColorFgCollectable
+	return c, fg
+}
+
+func (r rod) Desc(g *game) string {
 	var text string
 	switch r {
 	case RodDigging:
@@ -582,7 +592,7 @@ func (g *game) GenerateRod() {
 		r := g.RandomRod()
 		if _, ok := g.Player.Rods[r]; !ok && !g.GeneratedRods[r] {
 			g.GeneratedRods[r] = true
-			g.Rods[pos] = r
+			g.Object[pos] = r
 			return
 		}
 	}

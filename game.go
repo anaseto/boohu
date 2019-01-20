@@ -18,17 +18,13 @@ type game struct {
 	DepthPlayerTurn     int
 	Turn                int
 	Highlight           map[position]bool // highlighted positions (e.g. targeted ray)
-	Collectables        map[position]collectable
 	CollectableScore    int
 	LastConsumables     []consumable
-	Equipables          map[position]equipable
-	Rods                map[position]rod
-	Stairs              map[position]stair
+	Object              map[position]object
 	Clouds              map[position]cloud
 	Fungus              map[position]vegetation
 	Doors               map[position]bool
 	TemporalWalls       map[position]bool
-	MagicalStones       map[position]stone
 	GeneratedUniques    map[monsterBand]int
 	GeneratedEquipables map[equipable]bool
 	GeneratedRods       map[rod]bool
@@ -163,19 +159,7 @@ func (g *game) FreeCellForStatic() position {
 		if g.Simellas[pos] > 0 {
 			continue
 		}
-		if _, ok := g.Collectables[pos]; ok {
-			continue
-		}
-		if _, ok := g.Stairs[pos]; ok {
-			continue
-		}
-		if _, ok := g.Rods[pos]; ok {
-			continue
-		}
-		if _, ok := g.Equipables[pos]; ok {
-			continue
-		}
-		if _, ok := g.MagicalStones[pos]; ok {
+		if _, ok := g.Object[pos]; ok {
 			continue
 		}
 		return pos
@@ -223,29 +207,6 @@ func (g *game) FreeCellForBandMonster(pos position) position {
 		}
 		mons := g.MonsterAt(pos)
 		if mons.Exists() {
-			continue
-		}
-		return pos
-	}
-}
-
-func (g *game) FreeForStairs() position {
-	d := g.Dungeon
-	count := 0
-	for {
-		count++
-		if count > 1000 {
-			panic("FreeForStairs")
-		}
-		x := RandInt(DungeonWidth)
-		y := RandInt(DungeonHeight)
-		pos := position{x, y}
-		c := d.Cell(pos)
-		if c.T != FreeCell {
-			continue
-		}
-		_, ok := g.Collectables[pos]
-		if ok {
 			continue
 		}
 		return pos
@@ -408,10 +369,7 @@ func (g *game) InitLevel() {
 	g.ExclusionsMap = map[position]bool{}
 	g.TemporalWalls = map[position]bool{}
 	g.LastMonsterKnownAt = map[position]*monster{}
-	g.Stairs = make(map[position]stair)
-	g.Collectables = make(map[position]collectable)
-	g.Equipables = make(map[position]equipable)
-	g.Rods = map[position]rod{}
+	g.Object = make(map[position]object)
 
 	// Dungeon terrain
 	g.GenDungeon()
@@ -425,7 +383,6 @@ func (g *game) InitLevel() {
 	}
 
 	// Magical Stones
-	g.MagicalStones = map[position]stone{}
 	nstones := 1
 	switch RandInt(8) {
 	case 0:
@@ -444,7 +401,7 @@ func (g *game) InitLevel() {
 		} else {
 			st = stone(1 + RandInt(NumStones-1))
 		}
-		g.MagicalStones[pos] = st
+		g.Object[pos] = st
 	}
 
 	// Simellas
@@ -516,9 +473,10 @@ func (g *game) CleanEvents() {
 
 func (g *game) StairsSlice() []position {
 	stairs := []position{}
-	for stairPos, _ := range g.Stairs {
-		if g.Dungeon.Cell(stairPos).Explored {
-			stairs = append(stairs, stairPos)
+	for pos, obj := range g.Object {
+		_, ok := obj.(stair)
+		if ok && g.Dungeon.Cell(pos).Explored {
+			stairs = append(stairs, pos)
 		}
 	}
 	return stairs
@@ -549,7 +507,7 @@ func (dg *dgen) GenCollectable(g *game) {
 			for pos == InvalidPos {
 				pos = dg.rooms[RandInt(len(dg.rooms)-1)].RandomPlace(PlaceItem)
 			}
-			g.Collectables[pos] = collectable{Consumable: c, Quantity: data.quantity}
+			g.Object[pos] = collectable{Consumable: c, Quantity: data.quantity}
 			return
 		}
 	}
@@ -585,7 +543,7 @@ func (g *game) GenArmour() {
 			continue
 		}
 		pos := g.FreeCellForStatic()
-		g.Equipables[pos] = ars[i]
+		g.Object[pos] = ars[i]
 		g.GeneratedEquipables[ars[i]] = true
 		break
 	}
@@ -600,14 +558,18 @@ func (g *game) GenWeapon() {
 			continue
 		}
 		pos := g.FreeCellForStatic()
-		g.Equipables[pos] = wps[i]
+		g.Object[pos] = wps[i]
 		g.GeneratedEquipables[wps[i]] = true
 		break
 	}
 }
 
 func (g *game) FrundisInLevel() bool {
-	for _, eq := range g.Equipables {
+	for _, obj := range g.Object {
+		eq, ok := obj.(equipable)
+		if !ok {
+			continue
+		}
 		if wp, ok := eq.(weapon); ok && wp == Frundis {
 			return true
 		}
@@ -617,11 +579,13 @@ func (g *game) FrundisInLevel() bool {
 
 func (g *game) Descend() bool {
 	g.LevelStats()
-	if strt, ok := g.Stairs[g.Player.Pos]; ok && strt == WinStair {
-		g.StoryPrint("You escaped!")
-		g.ExploredLevels = g.Depth
-		g.Depth = -1
-		return true
+	if obj, ok := g.Object[g.Player.Pos]; ok {
+		if strt, ok := obj.(stair); ok && strt == WinStair {
+			g.StoryPrint("You escaped!")
+			g.ExploredLevels = g.Depth
+			g.Depth = -1
+			return true
+		}
 	}
 	g.Print("You descend deeper in the dungeon.")
 	g.StoryPrint("You descended deeper in the dungeon.")

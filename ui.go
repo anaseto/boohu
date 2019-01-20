@@ -949,9 +949,14 @@ func (ui *gameui) HandleKey(rka runeKeyAction) (err error, again bool, quit bool
 		err = g.Rest(g.Ev)
 		ui.MenuSelectedAnimation(MenuRest, err == nil)
 	case KeyDescend:
-		if st, ok := g.Stairs[g.Player.Pos]; ok {
+		var okStairs bool
+		var strt stair
+		if obj, ok := g.Object[g.Player.Pos]; ok {
+			strt, okStairs = obj.(stair)
+		}
+		if okStairs {
 			ui.MenuSelectedAnimation(MenuInteract, true)
-			err = ui.OptionalDescendConfirmation(st)
+			err = ui.OptionalDescendConfirmation(strt)
 			if err != nil {
 				break
 			}
@@ -1136,19 +1141,13 @@ func (ui *gameui) NextObject(pos position, data *examineData) {
 	g := ui.g
 	nobject := data.nobject
 	if len(data.objects) == 0 {
-		for p := range g.Collectables {
-			data.objects = append(data.objects, p)
-		}
-		for p := range g.Rods {
-			data.objects = append(data.objects, p)
-		}
-		for p := range g.Equipables {
-			data.objects = append(data.objects, p)
+		for p, obj := range g.Object {
+			switch obj.(type) {
+			case stone, rod, equipable, collectable:
+				data.objects = append(data.objects, p)
+			}
 		}
 		for p := range g.Simellas {
-			data.objects = append(data.objects, p)
-		}
-		for p := range g.MagicalStones {
 			data.objects = append(data.objects, p)
 		}
 		data.objects = g.SortedNearestTo(data.objects, g.Player.Pos)
@@ -1232,7 +1231,12 @@ func (ui *gameui) CursorKeyAction(targ Targeter, rka runeKeyAction, data *examin
 	case KeyNextStairs:
 		ui.NextStair(data)
 	case KeyDescend:
-		if strt, ok := g.Stairs[g.Player.Pos]; ok {
+		var okStairs bool
+		var strt stair
+		if obj, ok := g.Object[g.Player.Pos]; ok {
+			strt, okStairs = obj.(stair)
+		}
+		if okStairs {
 			ui.MenuSelectedAnimation(MenuInteract, true)
 			err = ui.OptionalDescendConfirmation(strt)
 			if err != nil {
@@ -1448,10 +1452,13 @@ func (m menu) Key(g *game) (key keyAction) {
 	case MenuOther:
 		key = KeyMenu
 	case MenuInteract:
-		if _, ok := g.Equipables[g.Player.Pos]; ok {
-			key = KeyEquip
-		} else if _, ok := g.Stairs[g.Player.Pos]; ok {
-			key = KeyDescend
+		if obj, ok := g.Object[g.Player.Pos]; ok {
+			switch obj.(type) {
+			case equipable:
+				key = KeyEquip
+			case stair:
+				key = KeyDescend
+			}
 		}
 	}
 	return key
@@ -1483,10 +1490,11 @@ func (ui *gameui) WhichButton(col int) (menu, bool) {
 		return MenuOther, false
 	}
 	end := len(MenuCols) - 1
-	if _, ok := g.Equipables[g.Player.Pos]; ok {
-		end++
-	} else if _, ok := g.Stairs[g.Player.Pos]; ok {
-		end++
+	if obj, ok := g.Object[g.Player.Pos]; ok {
+		switch obj.(type) {
+		case equipable, stair:
+			end++
+		}
 	}
 	for i, cols := range MenuCols[0:end] {
 		if cols[0] >= 0 && col >= cols[0] && col < cols[1] {
@@ -1500,12 +1508,15 @@ func (ui *gameui) UpdateInteractButton() string {
 	g := ui.g
 	var interactMenu string
 	var show bool
-	if _, ok := g.Equipables[g.Player.Pos]; ok {
-		interactMenu = "[equip]"
-		show = true
-	} else if _, ok := g.Stairs[g.Player.Pos]; ok {
-		interactMenu = "[descend]"
-		show = true
+	if obj, ok := g.Object[g.Player.Pos]; ok {
+		switch obj.(type) {
+		case stair:
+			interactMenu = "[descend]"
+			show = true
+		case equipable:
+			interactMenu = "[equip]"
+			show = true
+		}
 	}
 	if !show {
 		return ""

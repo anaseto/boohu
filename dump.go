@@ -312,16 +312,8 @@ func (g *game) DumpDungeon() string {
 				if _, ok := g.Clouds[pos]; ok && g.Player.LOS[pos] {
 					r = '§'
 				}
-				if c, ok := g.Collectables[pos]; ok {
-					r = c.Consumable.Letter()
-				} else if eq, ok := g.Equipables[pos]; ok {
-					r = eq.Letter()
-				} else if rd, ok := g.Rods[pos]; ok {
-					r = rd.Letter()
-				} else if _, ok := g.Stairs[pos]; ok {
-					r = '>'
-				} else if _, ok := g.MagicalStones[pos]; ok {
-					r = '_'
+				if obj, ok := g.Object[pos]; ok {
+					r, _ = obj.Style(g)
 				} else if _, ok := g.Simellas[pos]; ok {
 					r = '♣'
 				} else if _, ok := g.Doors[pos]; ok {

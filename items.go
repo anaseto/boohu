@@ -10,9 +10,9 @@ type consumable interface {
 	Use(*game, event) error
 	String() string
 	Plural() string
-	Desc() string
 	Letter() rune
 	Int() int
+	object
 }
 
 func (g *game) UseConsumable(c consumable) {
@@ -88,7 +88,7 @@ func (p potion) Plural() (text string) {
 	return p.String()
 }
 
-func (p potion) Desc() (text string) {
+func (p potion) Desc(g *game) (text string) {
 	switch p {
 	case HealWoundsPotion:
 		text = "heals you."
@@ -122,6 +122,14 @@ func (p potion) Desc() (text string) {
 		text = "shows you the position in the map of monsters sleeping at drink time."
 	}
 	return fmt.Sprintf("The %s %s", p, text)
+}
+
+func (p potion) ShortDesc(g *game) string {
+	return Indefinite(p.String(), false)
+}
+
+func (p potion) Style(g *game) (rune, uicolor) {
+	return p.Letter(), ColorFgCollectable
 }
 
 func (p potion) Letter() rune {
@@ -435,7 +443,7 @@ func (p projectile) Plural() (text string) {
 	return text
 }
 
-func (p projectile) Desc() (text string) {
+func (p projectile) Desc(g *game) (text string) {
 	switch p {
 	case ConfusingDart:
 		text = "can be silently thrown to confuse foes, dealing 1 damage. Confused monsters cannot move diagonally."
@@ -451,6 +459,14 @@ func (p projectile) Desc() (text string) {
 		text = "can be thrown at a monster to produce sleep inducing clouds in a 2-radius area. You are affected too by the clouds, but they will slow your actions instead."
 	}
 	return fmt.Sprintf("The %s %s", p, text)
+}
+
+func (p projectile) ShortDesc(g *game) string {
+	return Indefinite(p.String(), false)
+}
+
+func (p projectile) Style(g *game) (rune, uicolor) {
+	return p.Letter(), ColorFgCollectable
 }
 
 func (p projectile) Letter() rune {
@@ -642,6 +658,23 @@ type collectable struct {
 	Quantity   int
 }
 
+func (cl collectable) Desc(g *game) string {
+	return cl.Consumable.Desc(g)
+}
+
+func (cl collectable) ShortDesc(g *game) (desc string) {
+	if cl.Quantity > 1 {
+		desc = fmt.Sprintf("%d %s.", cl.Quantity, cl.Consumable.Plural())
+	} else {
+		desc = fmt.Sprintf("%s.", Indefinite(cl.Consumable.String(), false))
+	}
+	return desc
+}
+
+func (cl collectable) Style(g *game) (rune, uicolor) {
+	return cl.Consumable.Style(g)
+}
+
 type collectData struct {
 	rarity   int
 	quantity int
@@ -675,7 +708,7 @@ type equipable interface {
 	Equip(g *game)
 	String() string
 	Letter() rune
-	Desc() string
+	object
 }
 
 type armour int
@@ -698,7 +731,7 @@ func (ar armour) Equip(g *game) {
 		g.FoundEquipables[ar] = true
 	}
 	g.Printf("You put the %s on and leave your %s.", ar, oar)
-	g.Equipables[g.Player.Pos] = oar
+	g.Object[g.Player.Pos] = oar
 	if oar == CelmistRobe && g.Player.MP > g.Player.MPMax() {
 		g.Player.MP = g.Player.MPMax()
 	}
@@ -757,7 +790,7 @@ func (ar armour) Short() string {
 	}
 }
 
-func (ar armour) Desc() string {
+func (ar armour) Desc(g *game) string {
 	var text string
 	switch ar {
 	case Robe:
@@ -776,6 +809,14 @@ func (ar armour) Desc() string {
 		text = "The harmonist robe makes you harder to detect (stealthy movement, noise mitigation). Harmonists are mages specialized in manipulation of light and noise."
 	}
 	return text
+}
+
+func (ar armour) ShortDesc(g *game) string {
+	return Indefinite(ar.String(), false)
+}
+
+func (ar armour) Style(g *game) (rune, uicolor) {
+	return ar.Letter(), ColorFgCollectable
 }
 
 func (ar armour) Letter() rune {
@@ -812,7 +853,7 @@ func (wp weapon) Equip(g *game) {
 	if wp == Frundis {
 		g.PrintfStyled("♫ ♪ … Oh, you're there, let's fight our way out!", logSpecial)
 	}
-	g.Equipables[g.Player.Pos] = owp
+	g.Object[g.Player.Pos] = owp
 }
 
 func (wp weapon) String() string {
@@ -879,7 +920,7 @@ func (wp weapon) Short() string {
 	}
 }
 
-func (wp weapon) Desc() string {
+func (wp weapon) Desc(g *game) string {
 	var text string
 	switch wp {
 	case Dagger:
@@ -921,6 +962,14 @@ func (wp weapon) TwoHanded() bool {
 	default:
 		return false
 	}
+}
+
+func (wp weapon) ShortDesc(g *game) string {
+	return Indefinite(wp.String(), false)
+}
+
+func (wp weapon) Style(g *game) (rune, uicolor) {
+	return wp.Letter(), ColorFgCollectable
 }
 
 func (wp weapon) Letter() rune {

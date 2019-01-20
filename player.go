@@ -232,7 +232,11 @@ func (g *game) NeedsRegenRest() bool {
 }
 
 func (g *game) Equip(ev event) error {
-	if eq, ok := g.Equipables[g.Player.Pos]; ok {
+	obj, ok := g.Object[g.Player.Pos]
+	if !ok {
+		return errors.New("Found nothing to equip here.")
+	}
+	if eq, ok := obj.(equipable); ok {
 		eq.Equip(g)
 		ev.Renew(g, 10)
 		g.BoredomAction(ev, 1)
@@ -282,29 +286,24 @@ func (g *game) CollectGround() {
 		g.DijkstraMapRebuild = true
 		delete(g.Simellas, pos)
 	}
-	if c, ok := g.Collectables[pos]; ok {
-		g.Player.Consumables[c.Consumable] += c.Quantity
+	if obj, ok := g.Object[pos]; ok {
 		g.DijkstraMapRebuild = true
-		delete(g.Collectables, pos)
-		if c.Quantity > 1 {
-			g.Printf("You take %d %s.", c.Quantity, c.Consumable.Plural())
-		} else {
-			g.Printf("You take %s.", Indefinite(c.Consumable.String(), false))
+		delete(g.Object, pos)
+		switch o := obj.(type) {
+		case rod:
+			g.Player.Rods[o] = rodProps{Charge: o.MaxCharge() - 1}
+			g.Printf("You take %s.", obj.ShortDesc(g))
+			g.StoryPrintf("You found and took %s.", obj.ShortDesc(g))
+		case collectable:
+			g.Player.Consumables[o.Consumable] += o.Quantity
+			if o.Quantity > 1 {
+				g.Printf("You take %d %s.", o.Quantity, o.Consumable.Plural())
+			} else {
+				g.Printf("You take %s.", obj.ShortDesc(g))
+			}
+		default:
+			g.Printf("You are standing over %s.", obj.ShortDesc(g))
 		}
-	}
-	if r, ok := g.Rods[pos]; ok {
-		g.Player.Rods[r] = rodProps{Charge: r.MaxCharge() - 1}
-		g.DijkstraMapRebuild = true
-		delete(g.Rods, pos)
-		g.Printf("You take a %s.", r)
-		g.StoryPrintf("You found and took a %s.", r)
-	}
-	if eq, ok := g.Equipables[pos]; ok {
-		g.Printf("You are standing over %s.", Indefinite(eq.String(), false))
-	} else if _, ok := g.Stairs[pos]; ok {
-		g.Print("You are standing on a staircase.")
-	} else if stn, ok := g.MagicalStones[pos]; ok {
-		g.Printf("You are standing on %s.", Indefinite(stn.String(), false))
 	} else if g.Doors[pos] {
 		g.Print("You stand at the door.")
 	}

@@ -569,9 +569,9 @@ func (ui *gameui) CharacterInfo() {
 	b.WriteString(formatText("Every year, the elders send someone to collect medicinal simella plants in the Underground.  This year, the honor fell upon you, and so here you are.  According to the elders, deep in the Underground, magical stairs will lead you back to your village.", TextWidth))
 	b.WriteString("\n\n")
 	b.WriteString(formatText(
-		fmt.Sprintf("You are wielding %s. %s", Indefinite(g.Player.Weapon.String(), false), g.Player.Weapon.Desc()), TextWidth))
+		fmt.Sprintf("You are wielding %s. %s", Indefinite(g.Player.Weapon.String(), false), g.Player.Weapon.Desc(g)), TextWidth))
 	b.WriteString("\n\n")
-	b.WriteString(formatText(fmt.Sprintf("You are wearing %s. %s", g.Player.Armour.StringIndefinite(), g.Player.Armour.Desc()), TextWidth))
+	b.WriteString(formatText(fmt.Sprintf("You are wearing %s. %s", g.Player.Armour.StringIndefinite(), g.Player.Armour.Desc(g)), TextWidth))
 	b.WriteString("\n\n")
 	b.WriteString(ui.AptitudesText())
 
@@ -645,9 +645,6 @@ func (ui *gameui) DescribePosition(pos position, targ Targeter) {
 		return
 	}
 	mons := g.MonsterAt(pos)
-	c, okCollectable := g.Collectables[pos]
-	eq, okEq := g.Equipables[pos]
-	rod, okRod := g.Rods[pos]
 	if pos == g.Player.Pos {
 		desc = "This is you"
 	}
@@ -665,37 +662,25 @@ func (ui *gameui) DescribePosition(pos position, targ Targeter) {
 		desc = ui.AddComma(see, desc)
 		desc += fmt.Sprintf("%s (%s)", mons.Kind.Indefinite(false), ui.MonsterInfo(mons))
 	}
-	strt, okStair := g.Stairs[pos]
-	stn, okStone := g.MagicalStones[pos]
+	obj, okObj := g.Object[pos]
 	switch {
 	case g.Simellas[pos] > 0:
 		desc = ui.AddComma(see, desc)
 		desc += fmt.Sprintf("some simellas (%d)", g.Simellas[pos])
-	case okCollectable:
-		if c.Quantity > 1 {
+	case okObj:
+		switch o := obj.(type) {
+		case collectable:
+			if o.Quantity > 1 {
+				desc = ui.AddComma(see, desc)
+				desc += fmt.Sprintf("%d %s", o.Quantity, o.Consumable)
+			} else {
+				desc = ui.AddComma(see, desc)
+				desc += obj.ShortDesc(g)
+			}
+		default:
 			desc = ui.AddComma(see, desc)
-			desc += fmt.Sprintf("%d %s", c.Quantity, c.Consumable)
-		} else {
-			desc = ui.AddComma(see, desc)
-			desc += fmt.Sprintf("%s", Indefinite(c.Consumable.String(), false))
+			desc += obj.ShortDesc(g)
 		}
-	case okEq:
-		desc = ui.AddComma(see, desc)
-		desc += fmt.Sprintf("%s", Indefinite(eq.String(), false))
-	case okRod:
-		desc = ui.AddComma(see, desc)
-		desc += fmt.Sprintf("a %v", rod)
-	case okStair:
-		if strt == WinStair {
-			desc = ui.AddComma(see, desc)
-			desc += fmt.Sprintf("glowing stairs")
-		} else {
-			desc = ui.AddComma(see, desc)
-			desc += fmt.Sprintf("stairs downwards")
-		}
-	case okStone:
-		desc = ui.AddComma(see, desc)
-		desc += fmt.Sprint(Indefinite(stn.String(), false))
 	case g.Doors[pos] || g.WrongDoor[pos]:
 		desc = ui.AddComma(see, desc)
 		desc += fmt.Sprintf("a door")
@@ -732,28 +717,8 @@ func (ui *gameui) ViewPositionDescription(pos position) {
 		ui.HideCursor()
 		ui.DrawMonsterDescription(mons)
 		ui.SetCursor(pos)
-	} else if c, ok := g.Collectables[pos]; ok {
-		ui.DrawDescription(c.Consumable.Desc())
-	} else if r, ok := g.Rods[pos]; ok {
-		ui.DrawDescription(r.Desc())
-	} else if eq, ok := g.Equipables[pos]; ok {
-		ui.DrawDescription(eq.Desc())
-	} else if strt, ok := g.Stairs[pos]; ok {
-		if strt == WinStair {
-			desc := "These shiny-looking stairs are in fact a magical monolith. It is said they were made some centuries ago by Marevor Helith. They will lead you back to your village."
-			if g.Depth < MaxDepth {
-				desc += " Note that this is not the last floor, so you may want to find a normal stair and continue collecting simellas, if you're courageous enough."
-			}
-			ui.DrawDescription(desc)
-		} else {
-			desc := "Stairs lead to the next level of the Underground. There's no way back. Monsters do not follow you."
-			if g.Depth == WinDepth {
-				desc += " If you're afraid, you could instead just win by taking the magical stairs somewhere in the same map."
-			}
-			ui.DrawDescription(desc)
-		}
-	} else if stn, ok := g.MagicalStones[pos]; ok {
-		ui.DrawDescription(stn.Description())
+	} else if obj, ok := g.Object[pos]; ok {
+		ui.DrawDescription(obj.Desc(g))
 	} else if g.Doors[pos] {
 		ui.DrawDescription("A closed door blocks your line of sight. Doors open automatically when you or a monster stand on them. Doors are flammable.")
 	} else if g.Simellas[pos] > 0 {
@@ -948,30 +913,8 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 			} else if cld == CloudNight {
 				fgColor = ColorFgSleepingMonster
 			}
-		}
-		if c, ok := g.Collectables[pos]; ok {
-			r = c.Consumable.Letter()
-			fgColor = ColorFgCollectable
-		} else if eq, ok := g.Equipables[pos]; ok {
-			r = eq.Letter()
-			fgColor = ColorFgCollectable
-		} else if rod, ok := g.Rods[pos]; ok {
-			r = rod.Letter()
-			fgColor = ColorFgCollectable
-		} else if strt, ok := g.Stairs[pos]; ok {
-			r = '>'
-			if strt == WinStair {
-				fgColor = ColorFgMagicPlace
-			} else {
-				fgColor = ColorFgPlace
-			}
-		} else if stn, ok := g.MagicalStones[pos]; ok {
-			r = '_'
-			if stn == InertStone {
-				fgColor = ColorFgPlace
-			} else {
-				fgColor = ColorFgMagicPlace
-			}
+		} else if obj, ok := g.Object[pos]; ok {
+			r, fgColor = obj.Style(g)
 		} else if _, ok := g.Simellas[pos]; ok {
 			r = '♣'
 			fgColor = ColorFgSimellas
@@ -1494,7 +1437,7 @@ func (ui *gameui) DrawMonsterDescription(mons *monster) {
 }
 
 func (ui *gameui) DrawConsumableDescription(c consumable) {
-	ui.DrawDescription(c.Desc())
+	ui.DrawDescription(c.Desc(ui.g))
 }
 
 func (ui *gameui) DrawDescription(desc string) {
@@ -1648,7 +1591,7 @@ func (ui *gameui) SelectProjectile(ev event) error {
 			ui.Flush()
 			time.Sleep(75 * time.Millisecond)
 			if desc {
-				ui.DrawDescription(cs[index].Desc())
+				ui.DrawDescription(cs[index].Desc(g))
 				continue
 			}
 			err = cs[index].Use(g, ev)
@@ -1690,7 +1633,7 @@ func (ui *gameui) SelectPotion(ev event) error {
 			ui.Flush()
 			time.Sleep(75 * time.Millisecond)
 			if desc {
-				ui.DrawDescription(cs[index].Desc())
+				ui.DrawDescription(cs[index].Desc(g))
 				continue
 			}
 			err = cs[index].Use(g, ev)
@@ -1744,7 +1687,7 @@ func (ui *gameui) SelectRod(ev event) error {
 			ui.Flush()
 			time.Sleep(75 * time.Millisecond)
 			if desc {
-				ui.DrawDescription(rs[index].Desc())
+				ui.DrawDescription(rs[index].Desc(g))
 				continue
 			}
 			err = rs[index].Use(g, ev)
