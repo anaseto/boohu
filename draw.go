@@ -388,7 +388,7 @@ func (ui *gameui) DrawWelcomeCommon() int {
 	line := 5
 	rcol := col + 20
 	ColorText := ColorFgHPok
-	ui.DrawDark(fmt.Sprintf("       Boohu (stealth) %s", Version), col, line-2, ColorText, false)
+	ui.DrawDark(fmt.Sprintf("       Harmonist %s", Version), col, line-2, ColorText, false)
 	ui.DrawDark("────│\\/\\/\\/\\/\\/\\/\\/│────", col, line, ColorText, false)
 	line++
 	ui.DrawDark("##", col, line, ColorFgDark, true)
