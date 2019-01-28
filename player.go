@@ -232,7 +232,7 @@ func (g *game) NeedsRegenRest() bool {
 }
 
 func (g *game) Equip(ev event) error {
-	obj, ok := g.Object[g.Player.Pos]
+	obj, ok := g.Objects[g.Player.Pos]
 	if !ok {
 		return errors.New("Found nothing to equip here.")
 	}
@@ -286,15 +286,16 @@ func (g *game) CollectGround() {
 		g.DijkstraMapRebuild = true
 		delete(g.Simellas, pos)
 	}
-	if obj, ok := g.Object[pos]; ok {
+	if obj, ok := g.Objects[pos]; ok {
 		g.DijkstraMapRebuild = true
-		delete(g.Object, pos)
 		switch o := obj.(type) {
 		case rod:
+			delete(g.Objects, pos)
 			g.Player.Rods[o] = rodProps{Charge: o.MaxCharge() - 1}
 			g.Printf("You take %s.", obj.ShortDesc(g))
 			g.StoryPrintf("You found and took %s.", obj.ShortDesc(g))
 		case collectable:
+			delete(g.Objects, pos)
 			g.Player.Consumables[o.Consumable] += o.Quantity
 			if o.Quantity > 1 {
 				g.Printf("You take %d %s.", o.Quantity, o.Consumable.Plural())
@@ -304,7 +305,7 @@ func (g *game) CollectGround() {
 		default:
 			g.Printf("You are standing over %s.", obj.ShortDesc(g))
 		}
-	} else if g.Doors[pos] {
+	} else if g.Dungeon.Cell(pos).T == DoorCell {
 		g.Print("You stand at the door.")
 	}
 }
@@ -340,7 +341,7 @@ func (g *game) MovePlayer(pos position, ev event) error {
 			return errors.New("You cannot move while lignified")
 		}
 		if c.T == WallCell {
-			g.Dungeon.SetCell(pos, FreeCell)
+			g.Dungeon.SetCell(pos, GroundCell)
 			g.MakeNoise(WallNoise, pos)
 			g.Print(g.CrackSound())
 			g.Fog(pos, 1, ev)

@@ -66,8 +66,8 @@ func (stn stone) Style(g *game) (r rune, fg uicolor) {
 }
 
 func (g *game) UseStone(pos position) {
-	g.StoryPrintf("You activated %s.", g.Object[pos].ShortDesc(g))
-	g.Object[pos] = InertStone
+	g.StoryPrintf("You activated %s.", g.Objects[pos].ShortDesc(g))
+	g.Objects[pos] = InertStone
 	g.Stats.UsedStones++
 	g.Print("The stone becomes inert.")
 }

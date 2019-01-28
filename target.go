@@ -40,7 +40,7 @@ func (ex *examiner) Action(g *game, pos position) error {
 		}
 		return errors.New("There is no safe path to this place.")
 	}
-	if c := g.Dungeon.Cell(pos); c.Explored && c.T == FreeCell {
+	if c := g.Dungeon.Cell(pos); c.Explored && c.IsFree() {
 		g.AutoTarget = pos
 		g.Targeting = pos
 		ex.done = true
@@ -128,9 +128,12 @@ func (ch *chooser) Action(g *game, pos position) error {
 			continue
 		}
 		mons := g.MonsterAt(npos)
-		_, okFungus := g.Fungus[pos]
-		_, okDoors := g.Doors[pos]
-		if ch.flammable && (okFungus || okDoors) || mons.Exists() || nc.T == WallCell {
+		var okFlam bool
+		switch c.T {
+		case FungusCell, DoorCell:
+			okFlam = true
+		}
+		if ch.flammable && okFlam || mons.Exists() || nc.T == WallCell {
 			g.Player.Target = pos
 			ch.done = true
 			return nil
@@ -171,10 +174,8 @@ func (ch *chooser) flammableInWay(g *game, pos position) bool {
 		if rpos == g.Player.Pos {
 			continue
 		}
-		if _, ok := g.Fungus[rpos]; ok {
-			return true
-		}
-		if _, ok := g.Doors[rpos]; ok {
+		switch g.Dungeon.Cell(rpos).T {
+		case FungusCell, DoorCell:
 			return true
 		}
 	}

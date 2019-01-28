@@ -301,14 +301,16 @@ func (cev *cloudEvent) Action(g *game) {
 		g.ComputeLOS()
 	case ObstructionEnd:
 		if !g.Player.Sees(cev.Pos) && g.Dungeon.Cell(cev.Pos).T == WallCell {
-			g.WrongWall[cev.Pos] = !g.WrongWall[cev.Pos]
+			g.TerrainKnowledge[cev.Pos] = WallCell
 		} else {
 			delete(g.TemporalWalls, cev.Pos)
+			delete(g.TerrainKnowledge, cev.Pos)
 		}
-		if g.Dungeon.Cell(cev.Pos).T == FreeCell {
+		// TODO: rework temporal walls so that they preserve doors and foliage
+		if g.Dungeon.Cell(cev.Pos).T == GroundCell {
 			break
 		}
-		g.Dungeon.SetCell(cev.Pos, FreeCell)
+		g.Dungeon.SetCell(cev.Pos, GroundCell)
 		g.MakeNoise(TemporalWallNoise, cev.Pos)
 		g.Fog(cev.Pos, 1, &simpleEvent{ERank: cev.Rank()})
 		g.ComputeLOS()
@@ -401,26 +403,19 @@ func (g *game) Burn(pos position, ev event) {
 	if _, ok := g.Clouds[pos]; ok {
 		return
 	}
-	_, okFungus := g.Fungus[pos]
-	_, okDoor := g.Doors[pos]
-	if !okFungus && !okDoor {
+	c := g.Dungeon.Cell(pos)
+	if !c.Flammable() {
 		return
 	}
 	g.Stats.Burns++
-	foliage := true
-	delete(g.Fungus, pos)
-	if _, ok := g.Doors[pos]; ok {
-		delete(g.Doors, pos)
-		foliage = false
+	switch c.T {
+	case DoorCell:
 		g.Print("The door vanishes in flames.")
 	}
+	g.Dungeon.SetCell(pos, GroundCell)
 	g.Clouds[pos] = CloudFire
 	if !g.Player.Sees(pos) {
-		if foliage {
-			g.WrongFoliage[pos] = true
-		} else {
-			g.WrongDoor[pos] = true
-		}
+		// TODO: knowledge
 	} else {
 		g.ComputeLOS()
 	}

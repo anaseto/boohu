@@ -37,7 +37,7 @@ func (g *game) AllExplored() bool {
 				continue
 			}
 		}
-		if obj, ok := g.Object[pos]; ok {
+		if obj, ok := g.Objects[pos]; ok {
 			switch obj.(type) {
 			case rod, collectable:
 				return false
@@ -62,7 +62,7 @@ func (g *game) AutoexploreSources() []int {
 		}
 		if !c.Explored || g.Simellas[pos] > 0 {
 			sources = append(sources, i)
-		} else if obj, ok := g.Object[pos]; ok {
+		} else if obj, ok := g.Objects[pos]; ok {
 			switch obj.(type) {
 			case rod, collectable:
 				sources = append(sources, i)

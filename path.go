@@ -45,7 +45,7 @@ func (tp *tunnelPath) Cost(from, to position) int {
 		return 50
 	}
 	wc := tp.dg.WallAreaCount(tp.area[:0], from, 1)
-	if tp.dg.d.Cell(from).T == FreeCell {
+	if tp.dg.d.Cell(from).IsFree() {
 		return 1
 	}
 	return 10 - wc
@@ -64,10 +64,11 @@ func (pp *playerPath) Neighbors(pos position) []position {
 	d := pp.game.Dungeon
 	nb := pp.neighbors[:0]
 	keep := func(npos position) bool {
-		if cld, ok := pp.game.Clouds[npos]; ok && cld == CloudFire && !(pp.game.WrongDoor[npos] || pp.game.WrongFoliage[npos]) {
+		t, okT := pp.game.TerrainKnowledge[npos]
+		if cld, ok := pp.game.Clouds[npos]; ok && cld == CloudFire && (!okT || t != FungusCell && t != DoorCell) {
 			return false
 		}
-		return npos.valid() && ((d.Cell(npos).T == FreeCell && !pp.game.WrongWall[npos] || d.Cell(npos).T == WallCell && pp.game.WrongWall[npos]) || pp.game.Player.HasStatus(StatusDig)) &&
+		return npos.valid() && (d.Cell(npos).IsFree() && (!okT || t != WallCell) || pp.game.Player.HasStatus(StatusDig)) &&
 			d.Cell(npos).Explored
 	}
 	//if pp.game.Player.HasStatus(StatusConfusion) {
@@ -140,11 +141,12 @@ func (ap *autoexplorePath) Neighbors(pos position) []position {
 	d := ap.game.Dungeon
 	nb := ap.neighbors[:0]
 	keep := func(npos position) bool {
-		if cld, ok := ap.game.Clouds[npos]; ok && cld == CloudFire && !(ap.game.WrongDoor[npos] || ap.game.WrongFoliage[npos]) {
+		t, okT := ap.game.TerrainKnowledge[npos]
+		if cld, ok := ap.game.Clouds[npos]; ok && cld == CloudFire && (!okT || t != FungusCell && t != DoorCell) {
 			// XXX little info leak
 			return false
 		}
-		return npos.valid() && (d.Cell(npos).T == FreeCell && !ap.game.WrongWall[npos] || d.Cell(npos).T == WallCell && ap.game.WrongWall[npos]) &&
+		return npos.valid() && (d.Cell(npos).IsFree() && (!okT || t != WallCell)) &&
 			!ap.game.ExclusionsMap[npos]
 	}
 	//if ap.game.Player.HasStatus(StatusConfusion) {

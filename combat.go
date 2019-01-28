@@ -25,7 +25,7 @@ func (m *monster) InflictDamage(g *game, damage, max int) {
 	if g.Player.HP <= 0 {
 		return
 	}
-	obj, ok := g.Object[g.Player.Pos]
+	obj, ok := g.Objects[g.Player.Pos]
 	if !ok {
 		return
 	}
@@ -199,7 +199,7 @@ func (g *game) HarKarAttack(mons *monster, ev event) {
 	pos := g.Player.Pos
 	for {
 		pos = pos.To(dir)
-		if !pos.valid() || g.Dungeon.Cell(pos).T != FreeCell {
+		if !pos.valid() || g.Dungeon.Cell(pos).IsFree() {
 			break
 		}
 		m := g.MonsterAt(pos)
@@ -207,11 +207,11 @@ func (g *game) HarKarAttack(mons *monster, ev event) {
 			break
 		}
 	}
-	if pos.valid() && g.Dungeon.Cell(pos).T == FreeCell && !g.Player.HasStatus(StatusLignification) {
+	if pos.valid() && g.Dungeon.Cell(pos).IsFree() && !g.Player.HasStatus(StatusLignification) {
 		pos = g.Player.Pos
 		for {
 			pos = pos.To(dir)
-			if !pos.valid() || g.Dungeon.Cell(pos).T != FreeCell {
+			if !pos.valid() || !g.Dungeon.Cell(pos).IsFree() {
 				break
 			}
 			m := g.MonsterAt(pos)
@@ -236,7 +236,7 @@ func (g *game) Jump(mons *monster, ev event) error {
 	pos := g.Player.Pos
 	for {
 		pos = pos.To(dir)
-		if !pos.valid() || g.Dungeon.Cell(pos).T != FreeCell {
+		if !pos.valid() || !g.Dungeon.Cell(pos).IsFree() {
 			break
 		}
 		m := g.MonsterAt(pos)
@@ -244,7 +244,7 @@ func (g *game) Jump(mons *monster, ev event) error {
 			break
 		}
 	}
-	if !pos.valid() || g.Dungeon.Cell(pos).T == WallCell {
+	if !pos.valid() || !g.Dungeon.Cell(pos).IsFree() {
 		return errors.New("You cannot jump in that direction.")
 	}
 	if g.Player.HasStatus(StatusSlow) {
@@ -341,7 +341,7 @@ func (g *game) HitMonster(mons *monster, dmg int) (hit bool) {
 }
 
 func (g *game) HandleStone(mons *monster) {
-	obj, ok := g.Object[mons.Pos]
+	obj, ok := g.Objects[mons.Pos]
 	if !ok {
 		return
 	}
@@ -412,7 +412,7 @@ func (g *game) HandleKill(mons *monster, ev event) {
 	//if mons.Kind == MonsExplosiveNadre {
 	//mons.Explode(g, ev)
 	//}
-	if g.Doors[mons.Pos] {
+	if g.Dungeon.Cell(mons.Pos).T == DoorCell {
 		g.ComputeLOS()
 	}
 	if mons.Kind.Dangerousness() > 10 {

@@ -9,7 +9,7 @@ func TestInitLevel(t *testing.T) {
 			g.Depth = depth
 			g.InitLevel()
 			for _, m := range g.Monsters {
-				if g.Dungeon.Cell(m.Pos).T != FreeCell {
+				if !g.Dungeon.Cell(m.Pos).IsFree() {
 					t.Errorf("Not free: %+v", m.Pos)
 				}
 			}

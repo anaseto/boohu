@@ -330,7 +330,7 @@ func (g *game) QuaffMagicMapping(ev event) error {
 		for _, i := range cdists[d] {
 			pos := idxtopos(i)
 			c := g.Dungeon.Cell(pos)
-			if (c.T == FreeCell || g.Dungeon.HasFreeNeighbor(pos)) && !c.Explored {
+			if (c.IsFree() || g.Dungeon.HasFreeNeighbor(pos)) && !c.Explored {
 				g.Dungeon.SetExplored(pos)
 				draw = true
 			}
@@ -542,11 +542,11 @@ func (g *game) ExplosionAt(ev event, pos position) {
 		g.MakeNoise(ExplosionHitNoise, mons.Pos)
 		g.HandleStone(mons)
 		mons.MakeHuntIfHurt(g)
-	} else if g.Dungeon.Cell(pos).T == WallCell && RandInt(2) == 0 {
-		g.Dungeon.SetCell(pos, FreeCell)
+	} else if c := g.Dungeon.Cell(pos); !c.IsFree() && RandInt(2) == 0 {
+		g.Dungeon.SetCell(pos, GroundCell)
 		g.Stats.Digs++
 		if !g.Player.Sees(pos) {
-			g.WrongWall[pos] = true
+			g.TerrainKnowledge[pos] = c.T
 		} else {
 			g.ui.WallExplosionAnimation(pos)
 		}
@@ -731,7 +731,7 @@ func (ar armour) Equip(g *game) {
 		g.FoundEquipables[ar] = true
 	}
 	g.Printf("You put the %s on and leave your %s.", ar, oar)
-	g.Object[g.Player.Pos] = oar
+	g.Objects[g.Player.Pos] = oar
 	if oar == CelmistRobe && g.Player.MP > g.Player.MPMax() {
 		g.Player.MP = g.Player.MPMax()
 	}
@@ -853,7 +853,7 @@ func (wp weapon) Equip(g *game) {
 	if wp == Frundis {
 		g.PrintfStyled("♫ ♪ … Oh, you're there, let's fight our way out!", logSpecial)
 	}
-	g.Object[g.Player.Pos] = owp
+	g.Objects[g.Player.Pos] = owp
 }
 
 func (wp weapon) String() string {

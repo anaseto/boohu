@@ -214,7 +214,7 @@ func (g *game) BlinkPos() position {
 		if !b {
 			continue
 		}
-		if g.Dungeon.Cell(pos).T != FreeCell {
+		if !g.Dungeon.Cell(pos).IsFree() {
 			continue
 		}
 		mons := g.MonsterAt(pos)
@@ -428,13 +428,13 @@ func (g *game) EvokeRodDigging(ev event) error {
 	}
 	pos := g.Player.Target
 	for i := 0; i < 3; i++ {
-		g.Dungeon.SetCell(pos, FreeCell)
+		g.Dungeon.SetCell(pos, GroundCell)
 		g.Stats.Digs++
 		g.MakeNoise(WallNoise, pos)
 		g.Fog(pos, 1, ev)
 		pos = pos.To(pos.Dir(g.Player.Pos))
 		if !g.Player.Sees(pos) {
-			g.WrongWall[pos] = true
+			g.TerrainKnowledge[pos] = WallCell
 		}
 		if !pos.valid() || g.Dungeon.Cell(pos).T != WallCell {
 			break
@@ -451,7 +451,7 @@ func (g *game) EvokeRodShatter(ev event) error {
 		return err
 	}
 	neighbors := g.Dungeon.FreeNeighbors(g.Player.Target)
-	g.Dungeon.SetCell(g.Player.Target, FreeCell)
+	g.Dungeon.SetCell(g.Player.Target, GroundCell)
 	g.Stats.Digs++
 	g.ComputeLOS()
 	g.MakeMonstersAware()
@@ -505,7 +505,7 @@ func (g *game) TemporalWallAt(pos position, ev event) {
 		return
 	}
 	if !g.Player.Sees(pos) {
-		g.WrongWall[pos] = true
+		g.TerrainKnowledge[pos] = g.Dungeon.Cell(pos).T
 	}
 	g.CreateTemporalWallAt(pos, ev)
 	g.ComputeLOS()
@@ -592,7 +592,7 @@ func (g *game) GenerateRod() {
 		r := g.RandomRod()
 		if _, ok := g.Player.Rods[r]; !ok && !g.GeneratedRods[r] {
 			g.GeneratedRods[r] = true
-			g.Object[pos] = r
+			g.Objects[pos] = r
 			return
 		}
 	}

@@ -26,7 +26,7 @@ func (d *dungeon) String() string {
 func TestRoomMap(t *testing.T) {
 	for i := 0; i < Rounds; i++ {
 		g := &game{}
-		g.GenRoomTunnels(DungeonHeight, DungeonWidth)
+		g.GenRoomTunnels()
 		if !g.Dungeon.connex() {
 			t.Errorf("Not connex:\n%s\n", g.Dungeon.String())
 		}

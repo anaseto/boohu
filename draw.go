@@ -652,7 +652,7 @@ func (ui *gameui) DescribePosition(pos position, targ Targeter) {
 	if !g.Player.Sees(pos) {
 		see = "saw"
 	}
-	if g.Dungeon.Cell(pos).T == WallCell && !g.WrongWall[pos] || g.Dungeon.Cell(pos).T == FreeCell && g.WrongWall[pos] {
+	if t, ok := g.TerrainKnowledge[pos]; !ok && !g.Dungeon.Cell(pos).IsFree() || ok && t == WallCell {
 		desc = ui.AddComma(see, "")
 		desc += fmt.Sprintf("a wall")
 		g.InfoEntry = desc + "."
@@ -662,7 +662,7 @@ func (ui *gameui) DescribePosition(pos position, targ Targeter) {
 		desc = ui.AddComma(see, desc)
 		desc += fmt.Sprintf("%s (%s)", mons.Kind.Indefinite(false), ui.MonsterInfo(mons))
 	}
-	obj, okObj := g.Object[pos]
+	obj, okObj := g.Objects[pos]
 	switch {
 	case g.Simellas[pos] > 0:
 		desc = ui.AddComma(see, desc)
@@ -681,9 +681,6 @@ func (ui *gameui) DescribePosition(pos position, targ Targeter) {
 			desc = ui.AddComma(see, desc)
 			desc += obj.ShortDesc(g)
 		}
-	case g.Doors[pos] || g.WrongDoor[pos]:
-		desc = ui.AddComma(see, desc)
-		desc += fmt.Sprintf("a door")
 	}
 	if cld, ok := g.Clouds[pos]; ok && g.Player.Sees(pos) {
 		if cld == CloudFire {
@@ -696,12 +693,10 @@ func (ui *gameui) DescribePosition(pos position, targ Targeter) {
 			desc = ui.AddComma(see, desc)
 			desc += fmt.Sprintf("a dense fog")
 		}
-	} else if _, ok := g.Fungus[pos]; ok && !g.WrongFoliage[pos] || !ok && g.WrongFoliage[pos] {
-		desc = ui.AddComma(see, desc)
-		desc += fmt.Sprintf("foliage")
 	} else if desc == "" {
+		// TODO: wrong knowledge
 		desc = ui.AddComma(see, desc)
-		desc += fmt.Sprintf("the ground")
+		desc += fmt.Sprintf("%s", g.Dungeon.Cell(pos))
 	}
 	g.InfoEntry = desc + "."
 }
@@ -717,18 +712,21 @@ func (ui *gameui) ViewPositionDescription(pos position) {
 		ui.HideCursor()
 		ui.DrawMonsterDescription(mons)
 		ui.SetCursor(pos)
-	} else if obj, ok := g.Object[pos]; ok {
+	} else if obj, ok := g.Objects[pos]; ok {
 		ui.DrawDescription(obj.Desc(g))
-	} else if g.Doors[pos] {
-		ui.DrawDescription("A closed door blocks your line of sight. Doors open automatically when you or a monster stand on them. Doors are flammable.")
 	} else if g.Simellas[pos] > 0 {
 		ui.DrawDescription("A simella is a plant with big white flowers which are used in the Underground for their medicinal properties. They can also make tasty infusions. You were actually sent here by your village to collect as many as possible of those plants.")
-	} else if _, ok := g.Fungus[pos]; ok && g.Dungeon.Cell(pos).T == FreeCell {
-		ui.DrawDescription("Blue dense foliage grows in the Underground. It is difficult to see through, and is flammable.")
-	} else if g.Dungeon.Cell(pos).T == WallCell {
-		ui.DrawDescription("A wall is an impassable pile of rocks. It can be destructed by using some items.")
 	} else {
-		ui.DrawDescription("This is just plain ground.")
+		switch g.Dungeon.Cell(pos).T {
+		case WallCell:
+			ui.DrawDescription("A wall is an impassable pile of rocks. It can be destructed by using some items.")
+		case GroundCell:
+			ui.DrawDescription("This is just plain ground.")
+		case DoorCell:
+			ui.DrawDescription("A closed door blocks your line of sight. Doors open automatically when you or a monster stand on them. Doors are flammable.")
+		case FungusCell:
+			ui.DrawDescription("Blue dense foliage grows in the Underground. It is difficult to see through, and is flammable.")
+		}
 	}
 }
 
@@ -888,8 +886,11 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 	if g.ExclusionsMap[pos] && c.T != WallCell {
 		fgColor = ColorFgExcluded
 	}
+	if trkn, okTrkn := g.TerrainKnowledge[pos]; okTrkn && !g.Wizard {
+		c.T = trkn
+	}
 	switch {
-	case c.T == WallCell && (!g.WrongWall[pos] || g.Wizard) || c.T == FreeCell && g.WrongWall[pos] && !g.Wizard:
+	case !c.IsFree():
 		r = '#'
 		if g.TemporalWalls[pos] {
 			fgColor = ColorFgMagicPlace
@@ -903,9 +904,8 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 		if g.MonsterLOS[pos] {
 			fgColor = ColorMagenta // TODO: other color?
 		}
-		if _, ok := g.Fungus[pos]; ok && !g.WrongFoliage[pos] || !ok && g.WrongFoliage[pos] {
-			r = '"'
-		}
+		// TODO: wrong knowledge
+		r, fgColor = c.Style()
 		if cld, ok := g.Clouds[pos]; ok && g.Player.Sees(pos) {
 			r = '§'
 			if cld == CloudFire {
@@ -913,14 +913,11 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 			} else if cld == CloudNight {
 				fgColor = ColorFgSleepingMonster
 			}
-		} else if obj, ok := g.Object[pos]; ok {
+		} else if obj, ok := g.Objects[pos]; ok {
 			r, fgColor = obj.Style(g)
 		} else if _, ok := g.Simellas[pos]; ok {
 			r = '♣'
 			fgColor = ColorFgSimellas
-		} else if _, ok := g.Doors[pos]; ok {
-			r = '+'
-			fgColor = ColorFgPlace
 		}
 		if (g.Player.Sees(pos) || g.Wizard) && !g.WizardMap {
 			m := g.MonsterAt(pos)

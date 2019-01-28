@@ -465,7 +465,8 @@ func (m *monster) MoveTo(g *game, pos position) {
 		}
 		g.StopAuto()
 	}
-	recomputeLOS := g.Player.Sees(m.Pos) && g.Doors[m.Pos] || g.Player.Sees(pos) && g.Doors[pos]
+	recomputeLOS := g.Player.Sees(m.Pos) && g.Dungeon.Cell(m.Pos).T == DoorCell ||
+		g.Player.Sees(pos) && g.Dungeon.Cell(pos).T == DoorCell
 	m.PlaceAt(g, pos)
 	if recomputeLOS {
 		g.ComputeLOS()
@@ -684,10 +685,10 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	switch {
 	case !mons.Exists():
 		if m.Kind == MonsEarthDragon && g.Dungeon.Cell(target).T == WallCell {
-			g.Dungeon.SetCell(target, FreeCell)
+			g.Dungeon.SetCell(target, GroundCell)
 			g.Stats.Digs++
 			if !g.Player.Sees(target) {
-				g.WrongWall[m.Pos] = true
+				g.TerrainKnowledge[m.Pos] = WallCell
 			}
 			g.MakeNoise(WallNoise, m.Pos)
 			g.Fog(m.Pos, 1, ev)
@@ -756,17 +757,15 @@ func (m *monster) InvertFoliage(g *game) {
 		return
 	}
 	invert := false
-	if _, ok := g.Fungus[m.Pos]; !ok {
-		if _, ok := g.Doors[m.Pos]; !ok {
-			g.Fungus[m.Pos] = foliage
-			invert = true
-		}
-	} else {
-		delete(g.Fungus, m.Pos)
+	if g.Dungeon.Cell(m.Pos).T == GroundCell {
+		g.Dungeon.SetCell(m.Pos, FungusCell)
+		invert = true
+	} else if g.Dungeon.Cell(m.Pos).T == FungusCell {
+		g.Dungeon.SetCell(m.Pos, GroundCell)
 		invert = true
 	}
 	if !g.Player.Sees(m.Pos) && invert {
-		g.WrongFoliage[m.Pos] = !g.WrongFoliage[m.Pos]
+		g.TerrainKnowledge[m.Pos] = g.Dungeon.Cell(m.Pos).T
 	} else if invert {
 		g.ComputeLOS()
 	}
@@ -896,7 +895,7 @@ func (m *monster) PushPlayer(g *game) (pushed bool) {
 	dir := g.Player.Pos.Dir(m.Pos)
 	pos := g.Player.Pos.To(dir)
 	if !g.Player.HasStatus(StatusLignification) &&
-		pos.valid() && g.Dungeon.Cell(pos).T == FreeCell {
+		pos.valid() && g.Dungeon.Cell(pos).IsFree() {
 		mons := g.MonsterAt(pos)
 		if !mons.Exists() {
 			g.PlacePlayerAt(pos)
@@ -1202,7 +1201,7 @@ func (m *monster) Explode(g *game, ev event) {
 	g.ui.ExplosionAnimation(FireExplosion, m.Pos)
 	for _, pos := range append(neighbors, m.Pos) {
 		c := g.Dungeon.Cell(pos)
-		if c.T == FreeCell {
+		if c.IsFree() {
 			g.Burn(pos, ev)
 		}
 		mons := g.MonsterAt(pos)
@@ -1218,10 +1217,10 @@ func (m *monster) Explode(g *game, ev event) {
 			dmg := g.Player.HP / 2
 			m.InflictDamage(g, dmg, 2)
 		} else if c.T == WallCell && RandInt(2) == 0 {
-			g.Dungeon.SetCell(pos, FreeCell)
+			g.Dungeon.SetCell(pos, GroundCell)
 			g.Stats.Digs++
 			if !g.Player.Sees(pos) {
-				g.WrongWall[pos] = true
+				g.TerrainKnowledge[m.Pos] = WallCell
 			} else {
 				g.ui.WallExplosionAnimation(pos)
 			}

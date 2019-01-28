@@ -5,25 +5,25 @@ import "container/heap"
 var Version string = "v0.1-dev"
 
 type game struct {
-	Dungeon             *dungeon
-	Player              *player
-	Monsters            []*monster
-	MonstersPosCache    []int // monster (dungeon index + 1) / no monster (0)
-	Bands               []bandInfo
-	Events              *eventQueue
-	Ev                  event
-	EventIndex          int
-	Depth               int
-	ExploredLevels      int
-	DepthPlayerTurn     int
-	Turn                int
-	Highlight           map[position]bool // highlighted positions (e.g. targeted ray)
-	CollectableScore    int
-	LastConsumables     []consumable
-	Object              map[position]object
-	Clouds              map[position]cloud
-	Fungus              map[position]vegetation
-	Doors               map[position]bool
+	Dungeon          *dungeon
+	Player           *player
+	Monsters         []*monster
+	MonstersPosCache []int // monster (dungeon index + 1) / no monster (0)
+	Bands            []bandInfo
+	Events           *eventQueue
+	Ev               event
+	EventIndex       int
+	Depth            int
+	ExploredLevels   int
+	DepthPlayerTurn  int
+	Turn             int
+	Highlight        map[position]bool // highlighted positions (e.g. targeted ray)
+	CollectableScore int
+	LastConsumables  []consumable
+	Objects          map[position]object
+	Clouds           map[position]cloud
+	//Fungus              map[position]vegetation
+	//Doors               map[position]bool
 	TemporalWalls       map[position]bool
 	GeneratedUniques    map[monsterBand]int
 	GeneratedEquipables map[equipable]bool
@@ -31,35 +31,35 @@ type game struct {
 	GenPlan             [MaxDepth + 1]genFlavour
 	FoundEquipables     map[equipable]bool
 	Simellas            map[position]int
-	WrongWall           map[position]bool
-	WrongFoliage        map[position]bool
-	WrongDoor           map[position]bool
-	ExclusionsMap       map[position]bool
-	Noise               map[position]bool
-	LastMonsterKnownAt  map[position]*monster
-	MonsterLOS          map[position]bool
-	Resting             bool
-	RestingTurns        int
-	Autoexploring       bool
-	DijkstraMapRebuild  bool
-	Targeting           position
-	AutoTarget          position
-	AutoDir             direction
-	AutoHalt            bool
-	AutoNext            bool
-	DrawBuffer          []UICell
-	drawBackBuffer      []UICell
-	DrawLog             []drawFrame
-	Log                 []logEntry
-	LogIndex            int
-	LogNextTick         int
-	InfoEntry           string
-	Stats               stats
-	Boredom             int
-	Quit                bool
-	Wizard              bool
-	WizardMap           bool
-	Version             string
+	TerrainKnowledge    map[position]terrain
+	//WrongFoliage        map[position]bool
+	//WrongDoor           map[position]bool
+	ExclusionsMap      map[position]bool
+	Noise              map[position]bool
+	LastMonsterKnownAt map[position]*monster
+	MonsterLOS         map[position]bool
+	Resting            bool
+	RestingTurns       int
+	Autoexploring      bool
+	DijkstraMapRebuild bool
+	Targeting          position
+	AutoTarget         position
+	AutoDir            direction
+	AutoHalt           bool
+	AutoNext           bool
+	DrawBuffer         []UICell
+	drawBackBuffer     []UICell
+	DrawLog            []drawFrame
+	Log                []logEntry
+	LogIndex           int
+	LogNextTick        int
+	InfoEntry          string
+	Stats              stats
+	Boredom            int
+	Quit               bool
+	Wizard             bool
+	WizardMap          bool
+	Version            string
 	//Opts                startOpts
 	ui *gameui
 }
@@ -82,7 +82,7 @@ func (g *game) FreeCell() position {
 		y := RandInt(DungeonHeight)
 		pos := position{x, y}
 		c := d.Cell(pos)
-		if c.T != FreeCell {
+		if !c.IsFree() {
 			continue
 		}
 		if g.Player != nil && g.Player.Pos == pos {
@@ -143,7 +143,7 @@ func (g *game) FreeCellForStatic() position {
 		y := RandInt(DungeonHeight)
 		pos := position{x, y}
 		c := d.Cell(pos)
-		if c.T != FreeCell {
+		if !c.IsOpen() {
 			continue
 		}
 		if g.Player != nil && g.Player.Pos == pos {
@@ -153,13 +153,10 @@ func (g *game) FreeCellForStatic() position {
 		if mons.Exists() {
 			continue
 		}
-		if g.Doors[pos] {
-			continue
-		}
 		if g.Simellas[pos] > 0 {
 			continue
 		}
-		if _, ok := g.Object[pos]; ok {
+		if _, ok := g.Objects[pos]; ok {
 			continue
 		}
 		return pos
@@ -178,7 +175,7 @@ func (g *game) FreeCellForMonster() position {
 		y := RandInt(DungeonHeight)
 		pos := position{x, y}
 		c := d.Cell(pos)
-		if c.T != FreeCell {
+		if !c.IsFree() {
 			continue
 		}
 		if g.Player != nil && g.Player.Pos.Distance(pos) < 8 {
@@ -363,13 +360,11 @@ func (g *game) InitLevel() {
 	}
 
 	g.MonstersPosCache = make([]int, DungeonNCells)
-	g.WrongWall = map[position]bool{}
-	g.WrongFoliage = map[position]bool{}
-	g.WrongDoor = map[position]bool{}
+	g.TerrainKnowledge = map[position]terrain{}
 	g.ExclusionsMap = map[position]bool{}
 	g.TemporalWalls = map[position]bool{}
 	g.LastMonsterKnownAt = map[position]*monster{}
-	g.Object = make(map[position]object)
+	g.Objects = make(map[position]object)
 
 	// Dungeon terrain
 	g.GenDungeon()
@@ -401,7 +396,7 @@ func (g *game) InitLevel() {
 		} else {
 			st = stone(1 + RandInt(NumStones-1))
 		}
-		g.Object[pos] = st
+		g.Objects[pos] = st
 	}
 
 	// Simellas
@@ -473,7 +468,7 @@ func (g *game) CleanEvents() {
 
 func (g *game) StairsSlice() []position {
 	stairs := []position{}
-	for pos, obj := range g.Object {
+	for pos, obj := range g.Objects {
 		_, ok := obj.(stair)
 		if ok && g.Dungeon.Cell(pos).Explored {
 			stairs = append(stairs, pos)
@@ -507,7 +502,7 @@ func (dg *dgen) GenCollectable(g *game) {
 			for pos == InvalidPos {
 				pos = dg.rooms[RandInt(len(dg.rooms)-1)].RandomPlace(PlaceItem)
 			}
-			g.Object[pos] = collectable{Consumable: c, Quantity: data.quantity}
+			g.Objects[pos] = collectable{Consumable: c, Quantity: data.quantity}
 			return
 		}
 	}
@@ -543,7 +538,7 @@ func (g *game) GenArmour() {
 			continue
 		}
 		pos := g.FreeCellForStatic()
-		g.Object[pos] = ars[i]
+		g.Objects[pos] = ars[i]
 		g.GeneratedEquipables[ars[i]] = true
 		break
 	}
@@ -558,14 +553,14 @@ func (g *game) GenWeapon() {
 			continue
 		}
 		pos := g.FreeCellForStatic()
-		g.Object[pos] = wps[i]
+		g.Objects[pos] = wps[i]
 		g.GeneratedEquipables[wps[i]] = true
 		break
 	}
 }
 
 func (g *game) FrundisInLevel() bool {
-	for _, obj := range g.Object {
+	for _, obj := range g.Objects {
 		eq, ok := obj.(equipable)
 		if !ok {
 			continue
@@ -579,7 +574,7 @@ func (g *game) FrundisInLevel() bool {
 
 func (g *game) Descend() bool {
 	g.LevelStats()
-	if obj, ok := g.Object[g.Player.Pos]; ok {
+	if obj, ok := g.Objects[g.Player.Pos]; ok {
 		if strt, ok := obj.(stair); ok && strt == WinStair {
 			g.StoryPrint("You escaped!")
 			g.ExploredLevels = g.Depth

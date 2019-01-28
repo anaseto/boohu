@@ -22,8 +22,65 @@ type terrain int
 
 const (
 	WallCell terrain = iota
-	FreeCell
+	GroundCell
+	DoorCell
+	FungusCell
 )
+
+func (c cell) IsFree() bool {
+	switch c.T {
+	case WallCell:
+		return false
+	default:
+		return true
+	}
+}
+
+func (c cell) Flammable() bool {
+	switch c.T {
+	case FungusCell, DoorCell:
+		return true
+	default:
+		return false
+	}
+}
+
+func (c cell) IsOpen() bool {
+	switch c.T {
+	case WallCell, DoorCell:
+		return false
+	default:
+		return true
+	}
+}
+
+func (c cell) String() (s string) {
+	switch c.T {
+	case WallCell:
+		s = "a wall"
+	case GroundCell:
+		s = "the ground"
+	case DoorCell:
+		s = "a door"
+	case FungusCell:
+		s = "foliage"
+	}
+	return s
+}
+
+func (c cell) Style() (r rune, fg uicolor) {
+	switch c.T {
+	case WallCell:
+		r, fg = '#', ColorFgLOS
+	case GroundCell:
+		r, fg = '.', ColorFgLOS
+	case DoorCell:
+		r, fg = '+', ColorFgPlace
+	case FungusCell:
+		r, fg = '"', ColorFgLOS
+	}
+	return r, fg
+}
 
 func (d *dungeon) Cell(pos position) cell {
 	return d.Cells[pos.idx()]
@@ -82,7 +139,7 @@ func (d *dungeon) FreeCell() position {
 		y := RandInt(DungeonHeight)
 		pos := position{x, y}
 		c := d.Cell(pos)
-		if c.T == FreeCell {
+		if c.IsFree() {
 			return pos
 		}
 	}
@@ -108,7 +165,7 @@ func (d *dungeon) WallCell() position {
 func (d *dungeon) HasFreeNeighbor(pos position) bool {
 	neighbors := pos.ValidCardinalNeighbors()
 	for _, pos := range neighbors {
-		if d.Cell(pos).T == FreeCell {
+		if d.Cell(pos).IsFree() {
 			return true
 		}
 	}
@@ -120,7 +177,10 @@ func (g *game) HasFreeExploredNeighbor(pos position) bool {
 	neighbors := pos.ValidCardinalNeighbors()
 	for _, pos := range neighbors {
 		c := d.Cell(pos)
-		if c.T == FreeCell && c.Explored && !g.WrongWall[pos] {
+		if t, ok := g.TerrainKnowledge[pos]; ok {
+			c.T = t
+		}
+		if c.IsFree() && c.Explored {
 			return true
 		}
 	}
@@ -152,7 +212,7 @@ func (d *dungeon) connex() bool {
 	pos := d.FreeCell()
 	conn, _ := d.Connected(pos, d.IsFreeCell)
 	for i, c := range d.Cells {
-		if c.T == FreeCell && !conn[idxtopos(i)] {
+		if c.IsFree() && !conn[idxtopos(i)] {
 			return false
 		}
 	}
@@ -163,7 +223,7 @@ func (d *dungeon) IsAreaFree(pos position, h, w int) bool {
 	for i := pos.X; i < pos.X+w; i++ {
 		for j := pos.Y; j < pos.Y+h; j++ {
 			rpos := position{i, j}
-			if !rpos.valid() || d.Cell(rpos).T != FreeCell {
+			if !rpos.valid() || d.Cell(rpos).IsFree() {
 				return false
 			}
 		}
@@ -300,7 +360,7 @@ func (dg *dgen) ConnectRoomsShortestPath(i, j int) bool {
 			panic(fmt.Sprintf("position %v from %v to %v", pos, e1pos, e2pos))
 		}
 		if dg.d.Cell(pos).T == WallCell {
-			dg.d.SetCell(pos, FreeCell)
+			dg.d.SetCell(pos, GroundCell)
 			dg.tunnel[pos] = true
 		}
 	}
@@ -497,7 +557,7 @@ func (r *room) Dig(dg *dgen) {
 		switch c {
 		case '.', '>', '!', 'P', '_', '|':
 			if pos.valid() {
-				dg.d.SetCell(pos, FreeCell)
+				dg.d.SetCell(pos, GroundCell)
 			}
 		case '#', '+':
 			if pos.valid() {
@@ -527,8 +587,7 @@ func (r *room) Dig(dg *dgen) {
 			r.entries = append(r.entries, e)
 		case '"':
 			if pos.valid() {
-				dg.d.SetCell(pos, FreeCell)
-				dg.fungus[pos] = foliage
+				dg.d.SetCell(pos, FungusCell)
 			}
 		}
 		if c != '"' {
@@ -566,7 +625,6 @@ func (dg *dgen) nearestRoom(i int) (k int) {
 }
 
 func (dg *dgen) PutDoors(g *game) {
-	g.Doors = map[position]bool{}
 	for _, r := range dg.rooms {
 		for _, e := range r.entries {
 			//if e.used && g.DoorCandidate(e.pos) {
@@ -578,7 +636,7 @@ func (dg *dgen) PutDoors(g *game) {
 			if pl.kind != PlaceDoor {
 				continue
 			}
-			g.Doors[pl.pos] = true
+			dg.d.SetCell(pl.pos, DoorCell)
 			r.places = append(r.places, place{pos: pl.pos, kind: PlaceDoor})
 			if _, ok := dg.fungus[pl.pos]; ok {
 				delete(dg.fungus, pl.pos)
@@ -589,27 +647,25 @@ func (dg *dgen) PutDoors(g *game) {
 
 func (g *game) DoorCandidate(pos position) bool {
 	d := g.Dungeon
-	if !pos.valid() || d.Cell(pos).T != FreeCell {
+	if !pos.valid() || d.Cell(pos).IsFree() {
 		return false
 	}
 	return pos.W().valid() && pos.E().valid() &&
-		d.Cell(pos.W()).T == FreeCell && d.Cell(pos.E()).T == FreeCell &&
-		!g.Doors[pos.W()] && !g.Doors[pos.E()] &&
+		d.Cell(pos.W()).IsOpen() && d.Cell(pos.E()).IsOpen() &&
 		(!pos.N().valid() || d.Cell(pos.N()).T == WallCell) &&
 		(!pos.S().valid() || d.Cell(pos.S()).T == WallCell) &&
-		((pos.NW().valid() && d.Cell(pos.NW()).T == FreeCell) ||
-			(pos.SW().valid() && d.Cell(pos.SW()).T == FreeCell) ||
-			(pos.NE().valid() && d.Cell(pos.NE()).T == FreeCell) ||
-			(pos.SE().valid() && d.Cell(pos.SE()).T == FreeCell)) ||
+		((pos.NW().valid() && d.Cell(pos.NW()).IsFree()) ||
+			(pos.SW().valid() && d.Cell(pos.SW()).IsFree()) ||
+			(pos.NE().valid() && d.Cell(pos.NE()).IsFree()) ||
+			(pos.SE().valid() && d.Cell(pos.SE()).IsFree())) ||
 		pos.N().valid() && pos.S().valid() &&
-			d.Cell(pos.N()).T == FreeCell && d.Cell(pos.S()).T == FreeCell &&
-			!g.Doors[pos.N()] && !g.Doors[pos.S()] &&
+			d.Cell(pos.N()).IsOpen() && d.Cell(pos.S()).IsOpen() &&
 			(!pos.E().valid() || d.Cell(pos.E()).T == WallCell) &&
 			(!pos.W().valid() || d.Cell(pos.W()).T == WallCell) &&
-			((pos.NW().valid() && d.Cell(pos.NW()).T == FreeCell) ||
-				(pos.SW().valid() && d.Cell(pos.SW()).T == FreeCell) ||
-				(pos.NE().valid() && d.Cell(pos.NE()).T == FreeCell) ||
-				(pos.SE().valid() && d.Cell(pos.SE()).T == FreeCell))
+			((pos.NW().valid() && d.Cell(pos.NW()).IsFree()) ||
+				(pos.SW().valid() && d.Cell(pos.SW()).IsFree()) ||
+				(pos.NE().valid() && d.Cell(pos.NE()).IsFree()) ||
+				(pos.SE().valid() && d.Cell(pos.SE()).IsFree()))
 }
 
 func (dg *dgen) GenRooms(templates []string, n int) {
@@ -661,7 +717,6 @@ func (g *game) GenRoomTunnels() {
 	dg.ConnectRooms()
 	g.Dungeon = d
 	dg.PutDoors(g)
-	g.Fungus = dg.fungus
 	dg.PlayerStartCell(g)
 	dg.ClearUnconnected(g)
 	if g.Depth < MaxDepth {
@@ -680,7 +735,7 @@ func (dg *dgen) ClearUnconnected(g *game) {
 	conn, _ := d.Connected(g.Player.Pos, d.IsFreeCell)
 	for i, c := range d.Cells {
 		pos := idxtopos(i)
-		if c.T == FreeCell && !conn[pos] {
+		if c.IsFree() && !conn[pos] {
 			d.SetCell(pos, WallCell)
 		}
 	}
@@ -746,7 +801,7 @@ func (dg *dgen) Stairs(g *game, st stair) {
 	r := dg.rooms[ri]
 	r.places[pj].used = true
 	r.places[pj].used = true
-	g.Object[r.places[pj].pos] = st
+	g.Objects[r.places[pj].pos] = st
 }
 
 type vegetation int
@@ -754,94 +809,6 @@ type vegetation int
 const (
 	foliage vegetation = iota
 )
-
-//func (g *game) Foliage(h, w int) map[position]vegetation {
-//// use same structure as for the dungeon
-//// walls will become foliage
-//d := &dungeon{}
-//d.Cells = make([]cell, h*w)
-//for i := range d.Cells {
-//r := RandInt(100)
-//pos := idxtopos(i)
-//if r >= 43 {
-//d.SetCell(pos, WallCell)
-//} else {
-//d.SetCell(pos, FreeCell)
-//}
-//}
-//area := make([]position, 0, 25)
-//for i := 0; i < 6; i++ {
-//bufm := &dungeon{}
-//bufm.Cells = make([]cell, h*w)
-//copy(bufm.Cells, d.Cells)
-//for j := range bufm.Cells {
-//pos := idxtopos(j)
-//c1 := d.WallAreaCount(area, pos, 1)
-//if i < 4 {
-//if c1 <= 4 {
-//bufm.SetCell(pos, FreeCell)
-//} else {
-//bufm.SetCell(pos, WallCell)
-//}
-//}
-//if i == 4 {
-//if c1 > 6 {
-//bufm.SetCell(pos, WallCell)
-//}
-//}
-//if i == 5 {
-//c2 := d.WallAreaCount(area, pos, 2)
-//if c2 < 5 && c1 <= 2 {
-//bufm.SetCell(pos, FreeCell)
-//}
-//}
-//}
-//d.Cells = bufm.Cells
-//}
-//fungus := make(map[position]vegetation)
-//for i, c := range d.Cells {
-//if _, ok := g.Doors[idxtopos(i)]; !ok && c.T == FreeCell {
-//fungus[idxtopos(i)] = foliage
-//}
-//}
-//return fungus
-//}
-
-//func (g *game) DigFungus(n int) {
-//d := g.Dungeon
-//count := 0
-//fungus := g.Foliage(DungeonHeight, DungeonWidth)
-//loop:
-//for i := 0; i < 100; i++ {
-//if count > 100 {
-//break loop
-//}
-//if n <= 0 {
-//break
-//}
-//pos := d.FreeCell()
-//if _, ok := fungus[pos]; ok {
-//continue
-//}
-//conn, count := d.Connected(pos, func(npos position) bool {
-//_, ok := fungus[npos]
-////return ok && d.IsFreeCell(npos)
-//return ok
-//})
-//if count < 3 {
-//continue
-//}
-//if len(conn) > 150 {
-//continue
-//}
-//for cpos := range conn {
-//d.SetCell(cpos, FreeCell)
-//g.Fungus[cpos] = foliage
-//count++
-//}
-//n--
-//}
-//}
 
 func (dg *dgen) GenCellularAutomataCaveMap() {
 	count := 0
@@ -865,7 +832,7 @@ func (dg *dgen) RunCellularAutomataCave() bool {
 		r := RandInt(100)
 		pos := idxtopos(i)
 		if r >= 45 {
-			d.SetCell(pos, FreeCell)
+			d.SetCell(pos, GroundCell)
 		} else {
 			d.SetCell(pos, WallCell)
 		}
@@ -880,7 +847,7 @@ func (dg *dgen) RunCellularAutomataCave() bool {
 			if c1 >= 5 {
 				bufm.SetCell(pos, WallCell)
 			} else {
-				bufm.SetCell(pos, FreeCell)
+				bufm.SetCell(pos, GroundCell)
 			}
 			if i == 3 {
 				c2 := d.WallAreaCount(area, pos, 2)
@@ -905,7 +872,7 @@ func (dg *dgen) Foliage() {
 		if r >= 43 {
 			d.SetCell(pos, WallCell)
 		} else {
-			d.SetCell(pos, FreeCell)
+			d.SetCell(pos, GroundCell)
 		}
 	}
 	area := make([]position, 0, 25)
@@ -918,7 +885,7 @@ func (dg *dgen) Foliage() {
 			c1 := d.WallAreaCount(area, pos, 1)
 			if i < 4 {
 				if c1 <= 4 {
-					bufm.SetCell(pos, FreeCell)
+					bufm.SetCell(pos, GroundCell)
 				} else {
 					bufm.SetCell(pos, WallCell)
 				}
@@ -931,15 +898,15 @@ func (dg *dgen) Foliage() {
 			if i == 5 {
 				c2 := d.WallAreaCount(area, pos, 2)
 				if c2 < 5 && c1 <= 2 {
-					bufm.SetCell(pos, FreeCell)
+					bufm.SetCell(pos, GroundCell)
 				}
 			}
 		}
 		d.Cells = bufm.Cells
 	}
 	for i, c := range d.Cells {
-		if c.T == FreeCell {
-			dg.fungus[idxtopos(i)] = foliage
+		if c.T == GroundCell {
+			dg.d.SetCell(idxtopos(i), FungusCell)
 		}
 	}
 }

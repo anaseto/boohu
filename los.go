@@ -50,7 +50,7 @@ func (g *game) losCost(from, pos, to position) int {
 	if _, ok := g.Clouds[pos]; ok {
 		return g.LosRange()
 	}
-	if _, ok := g.Doors[pos]; ok {
+	if c.T == DoorCell {
 		if pos != from {
 			mons := g.MonsterAt(pos)
 			if !mons.Exists() {
@@ -58,7 +58,7 @@ func (g *game) losCost(from, pos, to position) int {
 			}
 		}
 	}
-	if _, ok := g.Fungus[pos]; ok {
+	if c.T == FungusCell {
 		return g.LosRange() - 2
 	}
 	return to.Distance(pos)
@@ -170,9 +170,11 @@ func (m *monster) ComputeLOS(g *game) {
 }
 
 func (g *game) SeePosition(pos position) {
-	if !g.Dungeon.Cell(pos).Explored {
+	c := g.Dungeon.Cell(pos)
+	t, okT := g.TerrainKnowledge[pos]
+	if !c.Explored {
 		see := "see"
-		if obj, ok := g.Object[pos]; ok {
+		if obj, ok := g.Objects[pos]; ok {
 			g.Printf("You %s %s.", see, obj.ShortDesc(g))
 			g.StopAuto()
 		}
@@ -180,28 +182,22 @@ func (g *game) SeePosition(pos position) {
 		g.Dungeon.SetExplored(pos)
 		g.DijkstraMapRebuild = true
 	} else {
-		if g.WrongWall[pos] {
+		if okT && t == WallCell && c.T != WallCell {
 			g.Printf("There is no longer a wall there.")
 			g.StopAuto()
 			g.DijkstraMapRebuild = true
 		}
-		if cld, ok := g.Clouds[pos]; ok && cld == CloudFire && (g.WrongDoor[pos] || g.WrongFoliage[pos]) {
+		if cld, ok := g.Clouds[pos]; ok && cld == CloudFire && okT && (t == FungusCell || t == DoorCell) {
 			g.Printf("There are flames there.")
 			g.StopAuto()
 			g.DijkstraMapRebuild = true
 		}
 	}
-	if g.WrongWall[pos] {
-		delete(g.WrongWall, pos)
-		if g.Dungeon.Cell(pos).T == FreeCell {
+	if okT {
+		delete(g.TerrainKnowledge, pos)
+		if c.IsFree() {
 			delete(g.TemporalWalls, pos)
 		}
-	}
-	if _, ok := g.WrongDoor[pos]; ok {
-		delete(g.WrongDoor, pos)
-	}
-	if _, ok := g.WrongFoliage[pos]; ok {
-		delete(g.WrongFoliage, pos)
 	}
 	if mons, ok := g.LastMonsterKnownAt[pos]; ok && (mons.Pos != pos || !mons.Exists()) {
 		delete(g.LastMonsterKnownAt, pos)

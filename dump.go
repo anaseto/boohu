@@ -300,23 +300,23 @@ func (g *game) DumpDungeon() string {
 		switch c.T {
 		case WallCell:
 			r = '#'
-		case FreeCell:
+		default:
 			switch {
 			case pos == g.Player.Pos:
 				r = '@'
 			default:
 				r = '.'
-				if _, ok := g.Fungus[pos]; ok {
+				if c.T == FungusCell {
 					r = '"'
 				}
 				if _, ok := g.Clouds[pos]; ok && g.Player.LOS[pos] {
 					r = '§'
 				}
-				if obj, ok := g.Object[pos]; ok {
+				if obj, ok := g.Objects[pos]; ok {
 					r, _ = obj.Style(g)
 				} else if _, ok := g.Simellas[pos]; ok {
 					r = '♣'
-				} else if _, ok := g.Doors[pos]; ok {
+				} else if c.T == DoorCell {
 					r = '+'
 				}
 				m := g.MonsterAt(pos)
