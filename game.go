@@ -30,7 +30,6 @@ type game struct {
 	GeneratedRods       map[rod]bool
 	GenPlan             [MaxDepth + 1]genFlavour
 	FoundEquipables     map[equipable]bool
-	Simellas            map[position]int
 	TerrainKnowledge    map[position]terrain
 	//WrongFoliage        map[position]bool
 	//WrongDoor           map[position]bool
