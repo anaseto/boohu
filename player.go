@@ -199,8 +199,8 @@ func (g *game) FunAction() {
 }
 
 func (g *game) Rest(ev event) error {
-	if g.MonsterInLOS() != nil {
-		return fmt.Errorf("You cannot sleep while monsters are in view.")
+	if g.Dungeon.Cell(g.Player.Pos).T != BarrelCell {
+		return fmt.Errorf("This place is not safe for sleeping.")
 	}
 	if cld, ok := g.Clouds[g.Player.Pos]; ok && cld == CloudFire {
 		return errors.New("You cannot rest on flames.")
@@ -322,6 +322,8 @@ func (g *game) MovePlayer(pos position, ev event) error {
 	c := g.Dungeon.Cell(pos)
 	if c.T == WallCell && !g.Player.HasStatus(StatusDig) {
 		return errors.New("You cannot move into a wall.")
+	} else if c.T == BarrelCell && g.MonsterLOS[g.Player.Pos] {
+		return errors.New("You cannot enter a barrel while seen.")
 	}
 	if g.Player.HasStatus(StatusConfusion) {
 		switch pos.Dir(g.Player.Pos) {
@@ -332,12 +334,12 @@ func (g *game) MovePlayer(pos position, ev event) error {
 	}
 	delay := 10
 	mons := g.MonsterAt(pos)
-	if g.Player.Weapon == DefenderFlail && !mons.Exists() {
-		mons = g.AttractMonster(pos)
-	}
 	if !mons.Exists() {
 		if g.Player.HasStatus(StatusLignification) {
 			return errors.New("You cannot move while lignified")
+		}
+		if c.T == BarrelCell {
+			g.Print("You hide yourself inside the barrel.")
 		}
 		if c.T == WallCell {
 			g.Dungeon.SetCell(pos, GroundCell)

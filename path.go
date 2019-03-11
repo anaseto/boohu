@@ -117,7 +117,7 @@ func (np *normalPath) Neighbors(pos position) []position {
 	nb := np.neighbors[:0]
 	d := np.game.Dungeon
 	keep := func(npos position) bool {
-		return npos.valid() && d.Cell(npos).T != WallCell
+		return npos.valid() && d.Cell(npos).IsFree()
 	}
 	//if np.game.Player.HasStatus(StatusConfusion) {
 	return pos.CardinalNeighbors(nb, keep)
@@ -172,7 +172,7 @@ func (mp *monPath) Neighbors(pos position) []position {
 	nb := mp.neighbors[:0]
 	d := mp.game.Dungeon
 	keep := func(npos position) bool {
-		return npos.valid() && (d.Cell(npos).T != WallCell || mp.wall)
+		return npos.valid() && (d.Cell(npos).IsFree() || mp.wall)
 	}
 	//if mp.monster.Status(MonsConfused) {
 	return pos.CardinalNeighbors(nb, keep)
@@ -184,7 +184,7 @@ func (mp *monPath) Cost(from, to position) int {
 	g := mp.game
 	mons := g.MonsterAt(to)
 	if !mons.Exists() {
-		if mp.wall && g.Dungeon.Cell(to).T == WallCell && mp.monster.State != Hunting {
+		if mp.wall && !g.Dungeon.Cell(to).IsFree() && mp.monster.State != Hunting {
 			return 6
 		}
 		return 1

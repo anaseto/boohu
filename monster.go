@@ -605,7 +605,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 		//return
 		//}
 	}
-	if mpos.Distance(ppos) == 1 {
+	if mpos.Distance(ppos) == 1 && g.Dungeon.Cell(ppos).T != BarrelCell {
 		attack := true
 		if m.Status(MonsConfused) {
 			switch m.Pos.Dir(g.Player.Pos) {

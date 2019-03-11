@@ -25,11 +25,12 @@ const (
 	GroundCell
 	DoorCell
 	FungusCell
+	BarrelCell
 )
 
 func (c cell) IsFree() bool {
 	switch c.T {
-	case WallCell:
+	case WallCell, BarrelCell:
 		return false
 	default:
 		return true
@@ -38,7 +39,7 @@ func (c cell) IsFree() bool {
 
 func (c cell) Flammable() bool {
 	switch c.T {
-	case FungusCell, DoorCell:
+	case FungusCell, DoorCell, BarrelCell:
 		return true
 	default:
 		return false
@@ -47,7 +48,7 @@ func (c cell) Flammable() bool {
 
 func (c cell) IsOpen() bool {
 	switch c.T {
-	case WallCell, DoorCell:
+	case WallCell, DoorCell, BarrelCell:
 		return false
 	default:
 		return true
@@ -64,6 +65,8 @@ func (c cell) String() (s string) {
 		s = "a door"
 	case FungusCell:
 		s = "foliage"
+	case BarrelCell:
+		s = "a barrel"
 	}
 	return s
 }
@@ -78,6 +81,8 @@ func (c cell) Style() (r rune, fg uicolor) {
 		r, fg = '+', ColorFgPlace
 	case FungusCell:
 		r, fg = '"', ColorFgLOS
+	case BarrelCell:
+		r, fg = '_', ColorFgCollectable // TODO: change letter and color
 	}
 	return r, fg
 }
@@ -725,6 +730,8 @@ func (g *game) GenRoomTunnels() {
 	if g.Depth == WinDepth || g.Depth == MaxDepth {
 		dg.Stairs(g, WinStair)
 	}
+	dg.Barrel(g)
+	dg.Barrel(g)
 	dg.GenMonsters(g)
 	dg.GenCollectables(g)
 	dg.AddSpecial(g)
@@ -802,6 +809,25 @@ func (dg *dgen) Stairs(g *game, st stair) {
 	r.places[pj].used = true
 	r.places[pj].used = true
 	g.Objects[r.places[pj].pos] = st
+}
+
+func (dg *dgen) Barrel(g *game) {
+	var ri, pj int
+	best := 0
+	for i, r := range dg.rooms {
+		for j, pl := range r.places {
+			n := RandInt(100)
+			if !pl.used && pl.kind == PlaceSpecialStatic && n >= best {
+				ri = i
+				pj = j
+				best = n
+			}
+		}
+	}
+	r := dg.rooms[ri]
+	r.places[pj].used = true
+	r.places[pj].used = true
+	g.Dungeon.SetCell(r.places[pj].pos, BarrelCell)
 }
 
 type vegetation int

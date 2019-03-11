@@ -721,6 +721,8 @@ func (ui *gameui) ViewPositionDescription(pos position) {
 			ui.DrawDescription("A closed door blocks your line of sight. Doors open automatically when you or a monster stand on them. Doors are flammable.")
 		case FungusCell:
 			ui.DrawDescription("Blue dense foliage grows in the Underground. It is difficult to see through, and is flammable.")
+		case BarrelCell:
+			ui.DrawDescription("A barrel. You can hide yourself inside it when no monsters see you. It is a safe place for resting and recovering.")
 		}
 	}
 }
@@ -884,9 +886,15 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 	if trkn, okTrkn := g.TerrainKnowledge[pos]; okTrkn && !g.Wizard {
 		c.T = trkn
 	}
+	var fgTerrain uicolor
 	switch {
 	case !c.IsFree():
-		r = '#'
+		r, fgTerrain = c.Style()
+		if pos == g.Player.Pos {
+			fgColor = ColorFgPlayer
+		} else if fgTerrain != ColorFgLOS {
+			fgColor = fgTerrain
+		}
 		if g.TemporalWalls[pos] {
 			fgColor = ColorFgMagicPlace
 		}
@@ -894,9 +902,11 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 		r = '@'
 		fgColor = ColorFgPlayer
 	default:
-		r = '.'
 		// TODO: wrong knowledge
-		r, fgColor = c.Style()
+		r, fgTerrain = c.Style()
+		if fgTerrain != ColorFgLOS {
+			fgColor = fgTerrain
+		}
 		//if g.MonsterLOS[pos] && (g.Player.Sees(pos) || g.Wizard) {
 		if g.MonsterLOS[pos] {
 			fgColor = ColorFgWanderingMonster // TODO: other color?

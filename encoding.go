@@ -17,6 +17,7 @@ func init() {
 	gob.Register(stair(0))
 	gob.Register(stone(0))
 	gob.Register(rod(0))
+	gob.Register(simella(0))
 	gob.Register(collectable{})
 }
 

@@ -6,13 +6,13 @@ type raynode struct {
 
 type rayMap map[position]raynode
 
-func (g *game) bestParent(rm rayMap, from, pos position) (position, int) {
+func (g *game) bestParent(rm rayMap, from, pos position, losrange int) (position, int) {
 	p := pos.Parents(from)
 	b := p[0]
-	if len(p) > 1 && rm[p[1]].Cost+g.losCost(from, p[1], pos) < rm[b].Cost+g.losCost(from, b, pos) {
+	if len(p) > 1 && rm[p[1]].Cost+g.losCost(from, p[1], pos, losrange) < rm[b].Cost+g.losCost(from, b, pos, losrange) {
 		b = p[1]
 	}
-	return b, rm[b].Cost + g.losCost(from, b, pos)
+	return b, rm[b].Cost + g.losCost(from, b, pos, losrange)
 }
 
 func (g *game) DiagonalWall(from, to position) bool {
@@ -36,30 +36,30 @@ func (g *game) DiagonalWall(from, to position) bool {
 	return count > 1
 }
 
-func (g *game) losCost(from, pos, to position) int {
+func (g *game) losCost(from, pos, to position, losrange int) int {
 	if g.DiagonalWall(pos, to) {
-		return g.LosRange()
+		return losrange
 	}
 	if from == pos {
 		return to.Distance(pos) - 1
 	}
 	c := g.Dungeon.Cell(pos)
 	if c.T == WallCell {
-		return g.LosRange()
+		return losrange
 	}
 	if _, ok := g.Clouds[pos]; ok {
-		return g.LosRange()
+		return losrange
 	}
 	if c.T == DoorCell {
 		if pos != from {
 			mons := g.MonsterAt(pos)
 			if !mons.Exists() {
-				return g.LosRange()
+				return losrange
 			}
 		}
 	}
 	if c.T == FungusCell {
-		return g.LosRange() - 2
+		return losrange - 2
 	}
 	return to.Distance(pos)
 }
@@ -73,7 +73,7 @@ func (g *game) buildRayMap(from position, distance int) rayMap {
 				if !pos.valid() {
 					continue
 				}
-				_, c := g.bestParent(rm, from, pos)
+				_, c := g.bestParent(rm, from, pos, distance)
 				rm[pos] = raynode{Cost: c}
 			}
 		}
@@ -82,7 +82,7 @@ func (g *game) buildRayMap(from position, distance int) rayMap {
 				if !pos.valid() {
 					continue
 				}
-				_, c := g.bestParent(rm, from, pos)
+				_, c := g.bestParent(rm, from, pos, distance)
 				rm[pos] = raynode{Cost: c}
 			}
 		}
@@ -162,7 +162,7 @@ func (m *monster) ComputeLOS(g *game) {
 	}
 	rays := g.buildRayMap(m.Pos, losRange)
 	for pos, n := range rays {
-		if n.Cost < losRange {
+		if n.Cost < losRange && g.Dungeon.Cell(pos).T != BarrelCell {
 			mlos[pos] = true
 		}
 	}
@@ -235,7 +235,7 @@ func (g *game) Ray(pos position) []position {
 	ray := []position{}
 	for pos != g.Player.Pos {
 		ray = append(ray, pos)
-		pos, _ = g.bestParent(g.Player.Rays, g.Player.Pos, pos)
+		pos, _ = g.bestParent(g.Player.Rays, g.Player.Pos, pos, g.LosRange())
 	}
 	return ray
 }
@@ -302,7 +302,7 @@ func (p *player) Sees(pos position) bool {
 }
 
 func (m *monster) SeesPlayer(g *game) bool {
-	return g.Player.LOS[m.Pos] && m.Dir.InViewCone(m.Pos, g.Player.Pos)
+	return m.Sees(g, g.Player.Pos)
 }
 
 func (m *monster) Sees(g *game, pos position) bool {
