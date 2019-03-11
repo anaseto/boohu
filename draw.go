@@ -900,12 +900,12 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 		fgColor = ColorFgPlayer
 	default:
 		r = '.'
-		//if g.MonsterLOS[pos] && (g.Player.Sees(pos) || g.Wizard) {
-		if g.MonsterLOS[pos] {
-			fgColor = ColorMagenta // TODO: other color?
-		}
 		// TODO: wrong knowledge
 		r, fgColor = c.Style()
+		//if g.MonsterLOS[pos] && (g.Player.Sees(pos) || g.Wizard) {
+		if g.MonsterLOS[pos] {
+			fgColor = ColorFgWanderingMonster // TODO: other color?
+		}
 		if cld, ok := g.Clouds[pos]; ok && g.Player.Sees(pos) {
 			r = '§'
 			if cld == CloudFire {
