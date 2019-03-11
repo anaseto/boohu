@@ -276,16 +276,6 @@ func (g *game) Teleportation(ev event) {
 
 func (g *game) CollectGround() {
 	pos := g.Player.Pos
-	if g.Simellas[pos] > 0 {
-		g.Player.Simellas += g.Simellas[pos]
-		if g.Simellas[pos] == 1 {
-			g.Print("You pick up a simella.")
-		} else {
-			g.Printf("You pick up %d simellas.", g.Simellas[pos])
-		}
-		g.DijkstraMapRebuild = true
-		delete(g.Simellas, pos)
-	}
 	if obj, ok := g.Objects[pos]; ok {
 		g.DijkstraMapRebuild = true
 		switch o := obj.(type) {
@@ -302,6 +292,15 @@ func (g *game) CollectGround() {
 			} else {
 				g.Printf("You take %s.", obj.ShortDesc(g))
 			}
+		case simella:
+			delete(g.Objects, pos)
+			g.Player.Simellas += int(o)
+			if o == simella(1) {
+				g.Print("You pick up a simella.")
+			} else {
+				g.Printf("You pick up %d simellas.", o)
+			}
+			g.DijkstraMapRebuild = true
 		default:
 			g.Printf("You are standing over %s.", obj.ShortDesc(g))
 		}

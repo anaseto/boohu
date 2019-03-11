@@ -664,9 +664,6 @@ func (ui *gameui) DescribePosition(pos position, targ Targeter) {
 	}
 	obj, okObj := g.Objects[pos]
 	switch {
-	case g.Simellas[pos] > 0:
-		desc = ui.AddComma(see, desc)
-		desc += fmt.Sprintf("some simellas (%d)", g.Simellas[pos])
 	case okObj:
 		switch o := obj.(type) {
 		case collectable:
@@ -714,8 +711,6 @@ func (ui *gameui) ViewPositionDescription(pos position) {
 		ui.SetCursor(pos)
 	} else if obj, ok := g.Objects[pos]; ok {
 		ui.DrawDescription(obj.Desc(g))
-	} else if g.Simellas[pos] > 0 {
-		ui.DrawDescription("A simella is a plant with big white flowers which are used in the Underground for their medicinal properties. They can also make tasty infusions. You were actually sent here by your village to collect as many as possible of those plants.")
 	} else {
 		switch g.Dungeon.Cell(pos).T {
 		case WallCell:
@@ -915,9 +910,6 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 			}
 		} else if obj, ok := g.Objects[pos]; ok {
 			r, fgColor = obj.Style(g)
-		} else if _, ok := g.Simellas[pos]; ok {
-			r = '♣'
-			fgColor = ColorFgSimellas
 		}
 		if (g.Player.Sees(pos) || g.Wizard) && !g.WizardMap {
 			m := g.MonsterAt(pos)

@@ -314,8 +314,6 @@ func (g *game) DumpDungeon() string {
 				}
 				if obj, ok := g.Objects[pos]; ok {
 					r, _ = obj.Style(g)
-				} else if _, ok := g.Simellas[pos]; ok {
-					r = '♣'
 				} else if c.T == DoorCell {
 					r = '+'
 				}

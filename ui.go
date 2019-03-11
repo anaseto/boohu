@@ -1143,12 +1143,9 @@ func (ui *gameui) NextObject(pos position, data *examineData) {
 	if len(data.objects) == 0 {
 		for p, obj := range g.Objects {
 			switch obj.(type) {
-			case stone, rod, equipable, collectable:
+			case stone, rod, equipable, collectable, simella:
 				data.objects = append(data.objects, p)
 			}
-		}
-		for p := range g.Simellas {
-			data.objects = append(data.objects, p)
 		}
 		data.objects = g.SortedNearestTo(data.objects, g.Player.Pos)
 	}

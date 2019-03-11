@@ -60,11 +60,9 @@ func (g *game) AutoexploreSources() []int {
 		if g.ExclusionsMap[pos] {
 			continue
 		}
-		if !c.Explored || g.Simellas[pos] > 0 {
-			sources = append(sources, i)
-		} else if obj, ok := g.Objects[pos]; ok {
+		if obj, ok := g.Objects[pos]; ok {
 			switch obj.(type) {
-			case rod, collectable:
+			case rod, collectable, simella:
 				sources = append(sources, i)
 			}
 		}

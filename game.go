@@ -153,9 +153,6 @@ func (g *game) FreeCellForStatic() position {
 		if mons.Exists() {
 			continue
 		}
-		if g.Simellas[pos] > 0 {
-			continue
-		}
 		if _, ok := g.Objects[pos]; ok {
 			continue
 		}
@@ -400,16 +397,17 @@ func (g *game) InitLevel() {
 	}
 
 	// Simellas
-	g.Simellas = make(map[position]int)
 	for i := 0; i < 5; i++ {
 		pos := g.FreeCellForStatic()
 		const rounds = 5
+		var sum = 0
 		for j := 0; j < rounds; j++ {
-			g.Simellas[pos] += 1 + RandInt(g.Depth+g.Depth*g.Depth/6)
+			sum += 1 + RandInt(g.Depth+g.Depth*g.Depth/6)
 		}
-		g.Simellas[pos] /= rounds
-		if g.Simellas[pos] == 0 {
-			g.Simellas[pos] = 1
+		sum /= rounds
+		g.Objects[pos] = simella(sum)
+		if g.Objects[pos] == simella(0) {
+			g.Objects[pos] = simella(1)
 		}
 	}
 
