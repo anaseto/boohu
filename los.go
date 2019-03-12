@@ -174,8 +174,8 @@ func (g *game) SeePosition(pos position) {
 	t, okT := g.TerrainKnowledge[pos]
 	if !c.Explored {
 		see := "see"
-		if obj, ok := g.Objects[pos]; ok {
-			g.Printf("You %s %s.", see, obj.ShortDesc(g))
+		if c.IsNotable() {
+			g.Printf("You %s %s.", see, c.ShortDesc(g, pos))
 			g.StopAuto()
 		}
 		g.FunAction()

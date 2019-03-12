@@ -25,11 +25,7 @@ func (m *monster) InflictDamage(g *game, damage, max int) {
 	if g.Player.HP <= 0 {
 		return
 	}
-	obj, ok := g.Objects[g.Player.Pos]
-	if !ok {
-		return
-	}
-	stn, ok := obj.(stone)
+	stn, ok := g.Objects.Stones[g.Player.Pos]
 	if !ok {
 		return
 	}
@@ -142,45 +138,6 @@ func (g *game) InOpenMons(mons *monster) bool {
 	return true
 }
 
-func (g *game) AttackMonster(mons *monster, ev event) {
-	switch {
-	case g.Player.HasStatus(StatusSwap) && !g.Player.HasStatus(StatusLignification) && !mons.Status(MonsLignified):
-		g.SwapWithMonster(mons)
-	case g.Player.Weapon == Frundis:
-		if !g.HitMonster(mons, DmgNormal) {
-			break
-		}
-		if RandInt(3) > 0 {
-			mons.EnterConfusion(g, ev)
-			g.PrintfStyled("Frundis glows… %s appears confused.", logPlayerHit, mons.Kind.Definite(false))
-		}
-	case g.Player.Weapon == DancingRapier:
-		ompos := mons.Pos
-		g.HitMonster(mons, DmgNormal)
-		if g.Player.HasStatus(StatusLignification) || mons.Status(MonsLignified) {
-			break
-		}
-		dir := ompos.Dir(g.Player.Pos)
-		behind := g.Player.Pos.To(dir).To(dir)
-		if behind.valid() {
-			m := g.MonsterAt(behind)
-			if m.Exists() {
-				g.HitMonster(m, DmgExtra)
-			}
-		}
-		if mons.Exists() {
-			mons.MoveTo(g, g.Player.Pos)
-		}
-		g.PlacePlayerAt(ompos)
-	case g.Player.Weapon == HarKarGauntlets:
-		g.HarKarAttack(mons, ev)
-	case g.Player.Weapon == DefenderFlail:
-		g.HitMonster(mons, DmgNormal)
-	default:
-		g.HitMonster(mons, DmgNormal)
-	}
-}
-
 func (g *game) AttractMonster(pos position) *monster {
 	dir := pos.Dir(g.Player.Pos)
 	for cpos := pos.To(dir); g.Player.LOS[cpos]; cpos = cpos.To(dir) {
@@ -194,42 +151,42 @@ func (g *game) AttractMonster(pos position) *monster {
 	return nil
 }
 
-func (g *game) HarKarAttack(mons *monster, ev event) {
-	dir := mons.Pos.Dir(g.Player.Pos)
-	pos := g.Player.Pos
-	for {
-		pos = pos.To(dir)
-		if !pos.valid() || g.Dungeon.Cell(pos).IsFree() {
-			break
-		}
-		m := g.MonsterAt(pos)
-		if !m.Exists() {
-			break
-		}
-	}
-	if pos.valid() && g.Dungeon.Cell(pos).IsFree() && !g.Player.HasStatus(StatusLignification) {
-		pos = g.Player.Pos
-		for {
-			pos = pos.To(dir)
-			if !pos.valid() || !g.Dungeon.Cell(pos).IsFree() {
-				break
-			}
-			m := g.MonsterAt(pos)
-			if !m.Exists() {
-				break
-			}
-			g.HitMonster(m, DmgNormal)
-		}
-		g.PlacePlayerAt(pos)
-		behind := pos.To(dir)
-		m := g.MonsterAt(behind)
-		if m.Exists() {
-			g.HitMonster(m, DmgNormal)
-		}
-	} else {
-		g.HitMonster(mons, DmgNormal)
-	}
-}
+// func (g *game) HarKarAttack(mons *monster, ev event) {
+// 	dir := mons.Pos.Dir(g.Player.Pos)
+// 	pos := g.Player.Pos
+// 	for {
+// 		pos = pos.To(dir)
+// 		if !pos.valid() || g.Dungeon.Cell(pos).IsFree() {
+// 			break
+// 		}
+// 		m := g.MonsterAt(pos)
+// 		if !m.Exists() {
+// 			break
+// 		}
+// 	}
+// 	if pos.valid() && g.Dungeon.Cell(pos).IsFree() && !g.Player.HasStatus(StatusLignification) {
+// 		pos = g.Player.Pos
+// 		for {
+// 			pos = pos.To(dir)
+// 			if !pos.valid() || !g.Dungeon.Cell(pos).IsFree() {
+// 				break
+// 			}
+// 			m := g.MonsterAt(pos)
+// 			if !m.Exists() {
+// 				break
+// 			}
+// 			g.HitMonster(m, DmgNormal)
+// 		}
+// 		g.PlacePlayerAt(pos)
+// 		behind := pos.To(dir)
+// 		m := g.MonsterAt(behind)
+// 		if m.Exists() {
+// 			g.HitMonster(m, DmgNormal)
+// 		}
+// 	} else {
+// 		g.HitMonster(mons, DmgNormal)
+// 	}
+// }
 
 func (g *game) Jump(mons *monster, ev event) error {
 	dir := mons.Pos.Dir(g.Player.Pos)
@@ -261,15 +218,6 @@ func (g *game) Jump(mons *monster, ev event) error {
 
 func (g *game) HitNoise(clang bool) int {
 	noise := BaseHitNoise
-	if g.Player.Weapon == Frundis {
-		noise -= 5
-	}
-	if g.Player.Armour == HarmonistRobe {
-		noise -= 3
-	}
-	if g.Player.Armour == Robe {
-		noise -= 1
-	}
 	if clang {
 		noise += 5
 	}
@@ -281,71 +229,8 @@ const (
 	DmgExtra  = 2
 )
 
-func (g *game) HitMonster(mons *monster, dmg int) (hit bool) {
-	ev := g.Ev
-	hit = true
-	noise := BaseHitNoise
-	// TODO: improve this noise mitigation stuff
-	if g.Player.Weapon == Dagger || g.Player.Weapon == VampDagger {
-		noise -= 2
-	}
-	if g.Player.Armour == HarmonistRobe {
-		noise -= 3
-	}
-	if g.Player.Weapon == Frundis {
-		noise -= 5
-	}
-	clang := RandInt(4) == 0
-	if clang {
-		noise += 3
-	}
-	g.MakeNoise(noise, mons.Pos)
-	if mons.State == Resting {
-		if g.Player.Weapon == Dagger || g.Player.Weapon == VampDagger {
-			dmg = 3
-		} else {
-			dmg = 2
-		}
-	}
-	var sclang string
-	if clang {
-		if RandInt(2) == 0 {
-			sclang = " ♫ Clang!"
-		} else {
-			sclang = " ♪ Clang!"
-		}
-	}
-	oldHP := mons.HP
-	mons.HP -= dmg
-	g.ui.HitAnimation(mons.Pos, false)
-	if mons.HP > 0 {
-		g.PrintfStyled("You hit %s (%d dmg).%s", logPlayerHit, mons.Kind.Definite(false), dmg, sclang)
-	} else if oldHP > 0 {
-		// test oldHP > 0 because of sword special dmg
-		g.PrintfStyled("You kill %s (%d dmg).%s", logPlayerHit, mons.Kind.Definite(false), dmg, sclang)
-		g.HandleKill(mons, ev) // TODO
-	}
-	//if mons.Kind == MonsBrizzia && !g.Player.HasStatus(StatusNausea) &&
-	//mons.Pos.Distance(g.Player.Pos) == 1 {
-	//g.Player.Statuses[StatusNausea]++
-	//g.PushEvent(&simpleEvent{ERank: ev.Rank() + DurationSick, EAction: NauseaEnd})
-	//g.Print("The brizzia's corpse releases some nauseating gas. You feel sick.")
-	//}
-	//if mons.Kind == MonsTinyHarpy && mons.HP > 0 {
-	//mons.Blink(g)
-	//}
-	g.HandleStone(mons)
-	g.Stats.Hits++
-	mons.MakeHuntIfHurt(g)
-	return hit
-}
-
 func (g *game) HandleStone(mons *monster) {
-	obj, ok := g.Objects[mons.Pos]
-	if !ok {
-		return
-	}
-	stn, ok := obj.(stone)
+	stn, ok := g.Objects.Stones[mons.Pos]
 	if !ok {
 		return
 	}

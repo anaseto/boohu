@@ -9,18 +9,6 @@ import (
 	"strings"
 )
 
-type rodSlice []rod
-
-func (rs rodSlice) Len() int           { return len(rs) }
-func (rs rodSlice) Swap(i, j int)      { rs[i], rs[j] = rs[j], rs[i] }
-func (rs rodSlice) Less(i, j int) bool { return int(rs[i]) < int(rs[j]) }
-
-type consumableSlice []consumable
-
-func (cs consumableSlice) Len() int           { return len(cs) }
-func (cs consumableSlice) Swap(i, j int)      { cs[i], cs[j] = cs[j], cs[i] }
-func (cs consumableSlice) Less(i, j int) bool { return cs[i].Int() < cs[j].Int() }
-
 type statusSlice []status
 
 func (sts statusSlice) Len() int           { return len(sts) }
@@ -63,15 +51,6 @@ func (g *game) DumpStatuses() string {
 	return "Statuses:\n" + strings.Join(sts, "\n")
 }
 
-func (g *game) SortedRods() rodSlice {
-	var rs rodSlice
-	for k, _ := range g.Player.Rods {
-		rs = append(rs, k)
-	}
-	sort.Sort(rs)
-	return rs
-}
-
 func (g *game) SortedKilledMonsters() monsSlice {
 	var ms monsSlice
 	for mk, p := range g.Stats.KilledMons {
@@ -82,30 +61,6 @@ func (g *game) SortedKilledMonsters() monsSlice {
 	}
 	sort.Sort(ms)
 	return ms
-}
-
-func (g *game) SortedPotions() consumableSlice {
-	var cs consumableSlice
-	for k := range g.Player.Consumables {
-		switch k := k.(type) {
-		case potion:
-			cs = append(cs, k)
-		}
-	}
-	sort.Sort(cs)
-	return cs
-}
-
-func (g *game) SortedProjectiles() consumableSlice {
-	var cs consumableSlice
-	for k := range g.Player.Consumables {
-		switch k := k.(type) {
-		case projectile:
-			cs = append(cs, k)
-		}
-	}
-	sort.Sort(cs)
-	return cs
 }
 
 func (g *game) Dump() string {
@@ -128,47 +83,7 @@ func (g *game) Dump() string {
 	fmt.Fprintf(buf, "\n\n")
 	fmt.Fprintf(buf, g.DumpStatuses())
 	fmt.Fprintf(buf, "\n\n")
-	fmt.Fprintf(buf, "Equipment:\n")
-	fmt.Fprintf(buf, "You are wearing %s.\n", g.Player.Armour.StringIndefinite())
-	fmt.Fprintf(buf, "You are wielding %s.\n", Indefinite(g.Player.Weapon.String(), false))
-	fmt.Fprintf(buf, "\n")
-	rs := g.SortedRods()
-	if len(rs) > 0 {
-		fmt.Fprintf(buf, "Rods:\n")
-		for _, r := range rs {
-			mc := r.MaxCharge()
-			if g.Player.Armour == CelmistRobe {
-				mc += 2
-			}
-			fmt.Fprintf(buf, "- %s (%d/%d charges) (used %d times)\n",
-				r, g.Player.Rods[r].Charge, mc, g.Stats.UsedRod[r])
-		}
-	} else {
-		fmt.Fprintf(buf, "You do not have any rods.\n")
-	}
-	fmt.Fprintf(buf, "\n")
-	ps := g.SortedPotions()
-	if len(ps) > 0 {
-		fmt.Fprintf(buf, "Potions:\n")
-		for _, p := range ps {
-			fmt.Fprintf(buf, "- %s (%d available)\n", p, g.Player.Consumables[p])
-		}
-	} else {
-		fmt.Fprintf(buf, "You do not have any potions.\n")
-	}
-	fmt.Fprintf(buf, "\n")
-	ps = g.SortedProjectiles()
-	if len(ps) > 0 {
-		fmt.Fprintf(buf, "Projectiles:\n")
-		for _, p := range ps {
-			fmt.Fprintf(buf, "- %s (%d available)\n", p, g.Player.Consumables[p])
-		}
-	} else {
-		fmt.Fprintf(buf, "You do not have any projectiles.\n")
-	}
-	fmt.Fprintf(buf, "\n")
 	fmt.Fprintf(buf, "Miscellaneous:\n")
-	fmt.Fprintf(buf, "You collected %d simellas.\n", g.Player.Simellas)
 	fmt.Fprintf(buf, "You killed %d monsters.\n", g.Stats.Killed)
 	fmt.Fprintf(buf, "You spent %.1f turns in the Underground.\n", float64(g.Turn)/10)
 	maxDepth := Max(g.Depth, g.ExploredLevels)
@@ -202,7 +117,6 @@ func (g *game) Dump() string {
 func (g *game) DetailedStatistics(w io.Writer) {
 	fmt.Fprintf(w, "\n")
 	fmt.Fprintf(w, "Statistics:\n")
-	fmt.Fprintf(w, "You drank %d potions, throwed %d items, and evoked rods %d times.\n", g.Stats.Drinks, g.Stats.Throws, g.Stats.Evocations)
 	fmt.Fprintf(w, "You had %d hits (%.1f per 100 turns), %d misses (%.1f), and %d moves (%.1f).\n",
 		g.Stats.Hits, float64(g.Stats.Hits)*100/float64(g.Stats.Turns+1),
 		g.Stats.Misses, float64(g.Stats.Misses)*100/float64(g.Stats.Turns+1),
@@ -305,17 +219,9 @@ func (g *game) DumpDungeon() string {
 			case pos == g.Player.Pos:
 				r = '@'
 			default:
-				r = '.'
-				if c.T == FungusCell {
-					r = '"'
-				}
+				r, _ = c.Style(g, pos)
 				if _, ok := g.Clouds[pos]; ok && g.Player.LOS[pos] {
 					r = '§'
-				}
-				if obj, ok := g.Objects[pos]; ok {
-					r, _ = obj.Style(g)
-				} else if c.T == DoorCell {
-					r = '+'
 				}
 				m := g.MonsterAt(pos)
 				if m.Exists() && (g.Player.LOS[m.Pos] || g.Wizard) {

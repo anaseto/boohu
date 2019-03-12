@@ -505,10 +505,6 @@ const (
 	KeyGoToStairs
 	KeyExplore
 	KeyExamine
-	KeyEquip
-	KeyDrink
-	KeyThrow
-	KeyEvoke
 	KeyCharacterInfo
 	KeyLogs
 	KeyDump
@@ -556,10 +552,6 @@ var configurableKeyActions = [...]keyAction{
 	KeyGoToStairs,
 	KeyExplore,
 	KeyExamine,
-	KeyEquip,
-	KeyDrink,
-	KeyThrow,
-	KeyEvoke,
 	KeyCharacterInfo,
 	KeyLogs,
 	KeyDump,
@@ -596,10 +588,6 @@ func (k keyAction) NormalModeKey() bool {
 		KeyGoToStairs,
 		KeyExplore,
 		KeyExamine,
-		KeyEquip,
-		KeyDrink,
-		KeyThrow,
-		KeyEvoke,
 		KeyCharacterInfo,
 		KeyLogs,
 		KeyDump,
@@ -663,14 +651,6 @@ func (k keyAction) NormalModeDescription() (text string) {
 		text = "Autoexplore"
 	case KeyExamine:
 		text = "Examine"
-	case KeyEquip:
-		text = "Equip weapon/armour/..."
-	case KeyDrink:
-		text = "Quaff potion"
-	case KeyThrow:
-		text = "Throw/Fire item"
-	case KeyEvoke:
-		text = "Evoke rod"
 	case KeyCharacterInfo:
 		text = "View Character and Quest Information"
 	case KeyLogs:
@@ -818,15 +798,6 @@ func ApplyDefaultKeyBindings() {
 		'G': KeyGoToStairs,
 		'o': KeyExplore,
 		'x': KeyExamine,
-		'e': KeyEquip,
-		'g': KeyEquip,
-		',': KeyEquip,
-		'q': KeyDrink,
-		//'d': KeyDrink,
-		't': KeyThrow,
-		'f': KeyThrow,
-		'v': KeyEvoke,
-		'z': KeyEvoke,
 		'%': KeyCharacterInfo,
 		'C': KeyCharacterInfo,
 		'm': KeyLogs,
@@ -949,13 +920,12 @@ func (ui *gameui) HandleKey(rka runeKeyAction) (err error, again bool, quit bool
 		err = g.Rest(g.Ev)
 		ui.MenuSelectedAnimation(MenuRest, err == nil)
 	case KeyDescend:
-		var okStairs bool
-		var strt stair
-		if obj, ok := g.Objects[g.Player.Pos]; ok {
-			strt, okStairs = obj.(stair)
-		}
-		if okStairs {
+		if g.Dungeon.Cell(g.Player.Pos).T == StairCell {
 			ui.MenuSelectedAnimation(MenuInteract, true)
+			strt := NormalStair
+			if g.WinStair == g.Player.Pos {
+				strt = WinStair
+			}
 			err = ui.OptionalDescendConfirmation(strt)
 			if err != nil {
 				break
@@ -989,18 +959,6 @@ func (ui *gameui) HandleKey(rka runeKeyAction) (err error, again bool, quit bool
 		} else {
 			err = errors.New("You cannot go to any stairs.")
 		}
-	case KeyEquip:
-		err = g.Equip(g.Ev)
-		ui.MenuSelectedAnimation(MenuInteract, err == nil)
-	case KeyDrink:
-		err = ui.SelectPotion(g.Ev)
-		err = ui.CleanError(err)
-	case KeyThrow:
-		err = ui.SelectProjectile(g.Ev)
-		err = ui.CleanError(err)
-	case KeyEvoke:
-		err = ui.SelectRod(g.Ev)
-		err = ui.CleanError(err)
 	case KeyExplore:
 		err = g.Autoexplore(g.Ev)
 		ui.MenuSelectedAnimation(MenuExplore, err == nil)
@@ -1141,12 +1099,13 @@ func (ui *gameui) NextObject(pos position, data *examineData) {
 	g := ui.g
 	nobject := data.nobject
 	if len(data.objects) == 0 {
-		for p, obj := range g.Objects {
-			switch obj.(type) {
-			case stone, rod, equipable, collectable, simella:
-				data.objects = append(data.objects, p)
-			}
+		for p := range g.Objects.Stairs {
+			data.objects = append(data.objects, p)
 		}
+		for p := range g.Objects.Stones {
+			data.objects = append(data.objects, p)
+		}
+		// TODO: add barrels
 		data.objects = g.SortedNearestTo(data.objects, g.Player.Pos)
 	}
 	for i := 0; i < len(data.objects); i++ {
@@ -1228,13 +1187,12 @@ func (ui *gameui) CursorKeyAction(targ Targeter, rka runeKeyAction, data *examin
 	case KeyNextStairs:
 		ui.NextStair(data)
 	case KeyDescend:
-		var okStairs bool
-		var strt stair
-		if obj, ok := g.Objects[g.Player.Pos]; ok {
-			strt, okStairs = obj.(stair)
-		}
-		if okStairs {
+		if g.Dungeon.Cell(g.Player.Pos).T == StairCell {
 			ui.MenuSelectedAnimation(MenuInteract, true)
+			strt := NormalStair
+			if g.WinStair == g.Player.Pos {
+				strt = WinStair
+			}
 			err = ui.OptionalDescendConfirmation(strt)
 			if err != nil {
 				break
@@ -1284,7 +1242,7 @@ func (ui *gameui) CursorKeyAction(targ Targeter, rka runeKeyAction, data *examin
 		g.Targeting = InvalidPos
 		notarg = true
 		err = errors.New(DoNothing)
-	case KeyExplore, KeyRest, KeyThrow, KeyDrink, KeyEvoke, KeyLogs, KeyEquip, KeyCharacterInfo:
+	case KeyExplore, KeyRest, KeyLogs, KeyCharacterInfo:
 		if _, ok := targ.(*examiner); !ok {
 			break
 		}
@@ -1440,22 +1398,12 @@ func (m menu) Key(g *game) (key keyAction) {
 		key = KeyRest
 	case MenuExplore:
 		key = KeyExplore
-	case MenuThrow:
-		key = KeyThrow
-	case MenuDrink:
-		key = KeyDrink
-	case MenuEvoke:
-		key = KeyEvoke
 	case MenuOther:
 		key = KeyMenu
 	case MenuInteract:
-		if obj, ok := g.Objects[g.Player.Pos]; ok {
-			switch obj.(type) {
-			case equipable:
-				key = KeyEquip
-			case stair:
-				key = KeyDescend
-			}
+		switch g.Dungeon.Cell(g.Player.Pos).T {
+		case StairCell:
+			key = KeyDescend
 		}
 	}
 	return key
@@ -1487,11 +1435,9 @@ func (ui *gameui) WhichButton(col int) (menu, bool) {
 		return MenuOther, false
 	}
 	end := len(MenuCols) - 1
-	if obj, ok := g.Objects[g.Player.Pos]; ok {
-		switch obj.(type) {
-		case equipable, stair:
-			end++
-		}
+	switch g.Dungeon.Cell(g.Player.Pos).T {
+	case StairCell:
+		end++
 	}
 	for i, cols := range MenuCols[0:end] {
 		if cols[0] >= 0 && col >= cols[0] && col < cols[1] {
@@ -1505,15 +1451,10 @@ func (ui *gameui) UpdateInteractButton() string {
 	g := ui.g
 	var interactMenu string
 	var show bool
-	if obj, ok := g.Objects[g.Player.Pos]; ok {
-		switch obj.(type) {
-		case stair:
-			interactMenu = "[descend]"
-			show = true
-		case equipable:
-			interactMenu = "[equip]"
-			show = true
-		}
+	switch g.Dungeon.Cell(g.Player.Pos).T {
+	case StairCell:
+		interactMenu = "[descend]"
+		show = true
 	}
 	if !show {
 		return ""

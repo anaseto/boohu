@@ -2,195 +2,8 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"sort"
 )
-
-type consumable interface {
-	Use(*game, event) error
-	String() string
-	Plural() string
-	Letter() rune
-	Int() int
-	object
-}
-
-func (g *game) UseConsumable(c consumable) {
-	g.Player.Consumables[c]--
-	g.StoryPrintf("You used %s.", Indefinite(c.String(), false))
-	if g.Player.Consumables[c] <= 0 {
-		delete(g.Player.Consumables, c)
-	}
-	g.FunAction()
-}
-
-type potion int
-
-const (
-	HealWoundsPotion potion = iota
-	TeleportationPotion
-	//BerserkPotion
-	DescentPotion
-	SwiftnessPotion
-	//LignificationPotion
-	MagicMappingPotion
-	MagicPotion
-	WallPotion
-	CBlinkPotion
-	DigPotion
-	SwapPotion
-	ShadowsPotion
-	TormentPotion
-	DreamPotion
-)
-
-const NumPotions = int(DreamPotion) + 1
-
-func (p potion) String() (text string) {
-	text = "potion"
-	switch p {
-	case HealWoundsPotion:
-		text += " of heal wounds"
-	case TeleportationPotion:
-		text += " of teleportation"
-	case DescentPotion:
-		text += " of descent"
-	case MagicMappingPotion:
-		text += " of magic mapping"
-	case MagicPotion:
-		text += " of refill magic"
-	//case BerserkPotion:
-	//text += " of berserk"
-	case SwiftnessPotion:
-		text += " of swiftness"
-	//case LignificationPotion:
-	//text += " of lignification"
-	case WallPotion:
-		text += " of walls"
-	case CBlinkPotion:
-		text += " of controlled blink"
-	case DigPotion:
-		text += " of digging"
-	case SwapPotion:
-		text += " of swapping"
-	case ShadowsPotion:
-		text += " of shadows"
-	case TormentPotion:
-		text += " of torment explosion"
-	case DreamPotion:
-		text += " of dreams"
-	}
-	return text
-}
-
-func (p potion) Plural() (text string) {
-	// never used for potions
-	return p.String()
-}
-
-func (p potion) Desc(g *game) (text string) {
-	switch p {
-	case HealWoundsPotion:
-		text = "heals you."
-	case TeleportationPotion:
-		text = "teleports you away after a few turns."
-	case DescentPotion:
-		text = "makes you go deeper in the Underground."
-	case MagicMappingPotion:
-		text = "shows you the map layout and item locations."
-	case MagicPotion:
-		text = "replenishes your magical reserves."
-	//case BerserkPotion:
-	//text = "makes you enter a crazy rage, temporarily making you act twice as fast with an HP bonus. You cannot use rods while berserk, and afterwards it leaves you twice as slow and exhausted."
-	case SwiftnessPotion:
-		text = "makes you move twice as fast for several turns."
-	//case LignificationPotion:
-	//text = "gives you a big HP bonus, but you are attached to the ground while the effect lasts (you can still descend)."
-	case WallPotion:
-		text = "replaces free cells around you with temporary walls."
-	case CBlinkPotion:
-		text = "makes you blink to a targeted cell in your line of sight."
-	case DigPotion:
-		text = "makes you dig walls by walking into them like an earth dragon."
-	case SwapPotion:
-		text = "makes you swap positions with monsters instead of attacking. Ranged monsters can still damage you."
-	case ShadowsPotion:
-		text = "reduces your line of sight range to 1. Because monsters only can see you if you see them, this makes it easier to get out of sight of monsters so that they eventually stop chasing you."
-	case TormentPotion:
-		text = "halves HP of every creature in sight, including the player, and destroys visible walls. Extremely noisy. It can burn foliage and doors. It kills creatures with only 1 HP."
-	case DreamPotion:
-		text = "shows you the position in the map of monsters sleeping at drink time."
-	}
-	return fmt.Sprintf("The %s %s", p, text)
-}
-
-func (p potion) ShortDesc(g *game) string {
-	return Indefinite(p.String(), false)
-}
-
-func (p potion) Style(g *game) (rune, uicolor) {
-	return p.Letter(), ColorFgCollectable
-}
-
-func (p potion) Letter() rune {
-	return '!'
-}
-
-func (p potion) Int() int {
-	return int(p)
-}
-
-func (p potion) Use(g *game, ev event) error {
-	quant, ok := g.Player.Consumables[p]
-	if !ok || quant <= 0 {
-		// should not happen
-		return errors.New("no such consumable: " + p.String())
-	}
-	if g.Player.HasStatus(StatusNausea) {
-		return errors.New("You cannot drink potions while sick.")
-	}
-	var err error
-	switch p {
-	case HealWoundsPotion:
-		err = g.QuaffHealWounds(ev)
-	case TeleportationPotion:
-		err = g.QuaffTeleportation(ev)
-	//case BerserkPotion:
-	//err = g.QuaffBerserk(ev)
-	case DescentPotion:
-		err = g.QuaffDescent(ev)
-	case SwiftnessPotion:
-		err = g.QuaffSwiftness(ev)
-	//case LignificationPotion:
-	//err = g.QuaffLignification(ev)
-	case MagicMappingPotion:
-		err = g.QuaffMagicMapping(ev)
-	case MagicPotion:
-		err = g.QuaffMagic(ev)
-	case WallPotion:
-		err = g.QuaffWallPotion(ev)
-	case CBlinkPotion:
-		err = g.QuaffCBlinkPotion(ev)
-	case DigPotion:
-		err = g.QuaffDigPotion(ev)
-	case SwapPotion:
-		err = g.QuaffSwapPotion(ev)
-	case ShadowsPotion:
-		err = g.QuaffShadowsPotion(ev)
-	case TormentPotion:
-		err = g.QuaffTormentPotion(ev)
-	case DreamPotion:
-		err = g.QuaffDreamPotion(ev)
-	}
-	if err != nil {
-		return err
-	}
-	ev.Renew(g, 5)
-	g.UseConsumable(p)
-	g.Stats.Drinks++
-	g.ui.DrinkingPotionAnimation()
-	return nil
-}
 
 func (g *game) QuaffTeleportation(ev event) error {
 	if g.Player.HasStatus(StatusLignification) {
@@ -202,7 +15,7 @@ func (g *game) QuaffTeleportation(ev event) error {
 	delay := DurationTeleportationDelay
 	g.Player.Statuses[StatusTele] = 1
 	g.PushEvent(&simpleEvent{ERank: ev.Rank() + delay, EAction: Teleportation})
-	g.Printf("You quaff the %s. You feel unstable.", TeleportationPotion)
+	//g.Printf("You quaff the %s. You feel unstable.", TeleportationPotion)
 	return nil
 }
 
@@ -223,19 +36,19 @@ func (g *game) QuaffTeleportation(ev event) error {
 //}
 
 func (g *game) QuaffHealWounds(ev event) error {
-	hp := g.Player.HP
+	//hp := g.Player.HP
 	g.Player.HP = g.Player.HPMax()
-	g.Printf("You quaff the %s (%d -> %d).", HealWoundsPotion, hp, g.Player.HP)
+	//g.Printf("You quaff the %s (%d -> %d).", HealWoundsPotion, hp, g.Player.HP)
 	return nil
 }
 
 func (g *game) QuaffMagic(ev event) error {
-	mp := g.Player.MP
+	//mp := g.Player.MP
 	g.Player.MP += 2 * g.Player.MPMax() / 3
 	if g.Player.MP > g.Player.MPMax() {
 		g.Player.MP = g.Player.MPMax()
 	}
-	g.Printf("You quaff the %s (%d -> %d).", MagicPotion, mp, g.Player.MP)
+	//g.Printf("You quaff the %s (%d -> %d).", MagicPotion, mp, g.Player.MP)
 	return nil
 }
 
@@ -247,7 +60,7 @@ func (g *game) QuaffDescent(ev event) error {
 	if g.Depth >= MaxDepth {
 		return errors.New("You cannot descend any deeper!")
 	}
-	g.Printf("You quaff the %s. You fall through the ground.", DescentPotion)
+	//g.Printf("You quaff the %s. You fall through the ground.", DescentPotion)
 	g.LevelStats()
 	g.StoryPrint("You descended deeper into the dungeon.")
 	g.Depth++
@@ -265,7 +78,7 @@ func (g *game) QuaffSwiftness(ev event) error {
 	g.Player.Statuses[StatusAgile]++
 	g.PushEvent(&simpleEvent{ERank: end, EAction: EvasionEnd})
 	g.Player.Expire[StatusAgile] = end
-	g.Printf("You quaff the %s. You feel speedy and agile.", SwiftnessPotion)
+	//g.Printf("You quaff the %s. You feel speedy and agile.", SwiftnessPotion)
 	return nil
 }
 
@@ -274,7 +87,7 @@ func (g *game) QuaffDigPotion(ev event) error {
 	end := ev.Rank() + DurationDigging
 	g.PushEvent(&simpleEvent{ERank: end, EAction: DigEnd})
 	g.Player.Expire[StatusDig] = end
-	g.Printf("You quaff the %s. You feel like an earth dragon.", DigPotion)
+	//g.Printf("You quaff the %s. You feel like an earth dragon.", DigPotion)
 	return nil
 }
 
@@ -286,7 +99,7 @@ func (g *game) QuaffSwapPotion(ev event) error {
 	end := ev.Rank() + DurationSwap
 	g.PushEvent(&simpleEvent{ERank: end, EAction: SwapEnd})
 	g.Player.Expire[StatusSwap] = end
-	g.Printf("You quaff the %s. You feel light-footed.", SwapPotion)
+	//g.Printf("You quaff the %s. You feel light-footed.", SwapPotion)
 	return nil
 }
 
@@ -298,7 +111,7 @@ func (g *game) QuaffShadowsPotion(ev event) error {
 	end := ev.Rank() + DurationShadows
 	g.PushEvent(&simpleEvent{ERank: end, EAction: ShadowsEnd})
 	g.Player.Expire[StatusShadows] = end
-	g.Printf("You quaff the %s. You feel surrounded by shadows.", ShadowsPotion)
+	//g.Printf("You quaff the %s. You feel surrounded by shadows.", ShadowsPotion)
 	g.ComputeLOS()
 	return nil
 }
@@ -339,12 +152,12 @@ func (g *game) QuaffMagicMapping(ev event) error {
 			g.ui.MagicMappingAnimation(cdists[d])
 		}
 	}
-	g.Printf("You quaff the %s. You feel aware of your surroundings..", MagicMappingPotion)
+	//g.Printf("You quaff the %s. You feel aware of your surroundings..", MagicMappingPotion)
 	return nil
 }
 
 func (g *game) QuaffTormentPotion(ev event) error {
-	g.Printf("You quaff the %s. %s It hurts!", TormentPotion, g.ExplosionSound())
+	//g.Printf("You quaff the %s. %s It hurts!", TormentPotion, g.ExplosionSound())
 	g.DamagePlayer(g.Player.HP / 2)
 	g.ui.WoundedAnimation()
 	g.MakeNoise(ExplosionNoise+10, g.Player.Pos)
@@ -364,7 +177,7 @@ func (g *game) QuaffDreamPotion(ev event) error {
 			mons.UpdateKnowledge(g, mons.Pos)
 		}
 	}
-	g.Printf("You quaff the %s. You perceive monsters' dreams.", DreamPotion)
+	//g.Printf("You quaff the %s. You perceive monsters' dreams.", DreamPotion)
 	return nil
 }
 
@@ -377,7 +190,7 @@ func (g *game) QuaffWallPotion(ev event) error {
 		}
 		g.CreateTemporalWallAt(pos, ev)
 	}
-	g.Printf("You quaff the %s. You feel surrounded by temporary walls.", WallPotion)
+	//g.Printf("You quaff the %s. You feel surrounded by temporary walls.", WallPotion)
 	g.ComputeLOS()
 	return nil
 }
@@ -389,120 +202,8 @@ func (g *game) QuaffCBlinkPotion(ev event) error {
 	if err := g.ui.ChooseTarget(&chooser{free: true}); err != nil {
 		return err
 	}
-	g.Printf("You quaff the %s. You blink.", CBlinkPotion)
+	//g.Printf("You quaff the %s. You blink.", CBlinkPotion)
 	g.PlacePlayerAt(g.Player.Target)
-	return nil
-}
-
-type projectile int
-
-const (
-	ConfusingDart projectile = iota
-	ExplosiveMagara
-	TeleportMagara
-	SlowingMagara
-	ConfuseMagara
-	NightMagara
-)
-
-const NumProjectiles = int(NightMagara) + 1
-
-func (p projectile) String() (text string) {
-	switch p {
-	case ConfusingDart:
-		text = "dart of confusion"
-	case ExplosiveMagara:
-		text = "explosive magara"
-	case TeleportMagara:
-		text = "teleport magara"
-	case SlowingMagara:
-		text = "slowing magara"
-	case ConfuseMagara:
-		text = "confusion magara"
-	case NightMagara:
-		text = "night magara"
-	}
-	return text
-}
-
-func (p projectile) Plural() (text string) {
-	switch p {
-	case ConfusingDart:
-		text = "darts of confusion"
-	case ExplosiveMagara:
-		text = "explosive magaras"
-	case TeleportMagara:
-		text = "teleport magaras"
-	case SlowingMagara:
-		text = "slowing magaras"
-	case ConfuseMagara:
-		text = "confusion magaras"
-	case NightMagara:
-		text = "night magaras"
-	}
-	return text
-}
-
-func (p projectile) Desc(g *game) (text string) {
-	switch p {
-	case ConfusingDart:
-		text = "can be silently thrown to confuse foes, dealing 1 damage. Confused monsters cannot move diagonally."
-	case ExplosiveMagara:
-		text = "can be thrown to cause a fire explosion halving HP of monsters in a square area. It can occasionally destruct walls. It can burn doors and foliage. It kills creatures with only 1 HP."
-	case TeleportMagara:
-		text = "can be thrown to make monsters in a square area teleport."
-	case SlowingMagara:
-		text = "can be activated to release a slowing bolt inducing slow movement and attack in one or more foes."
-	case ConfuseMagara:
-		text = "generates a harmonic light that confuses all the monsters in your line of sight."
-	case NightMagara:
-		text = "can be thrown at a monster to produce sleep inducing clouds in a 2-radius area. You are affected too by the clouds, but they will slow your actions instead."
-	}
-	return fmt.Sprintf("The %s %s", p, text)
-}
-
-func (p projectile) ShortDesc(g *game) string {
-	return Indefinite(p.String(), false)
-}
-
-func (p projectile) Style(g *game) (rune, uicolor) {
-	return p.Letter(), ColorFgCollectable
-}
-
-func (p projectile) Letter() rune {
-	return '('
-}
-
-func (p projectile) Int() int {
-	return int(p)
-}
-
-func (p projectile) Use(g *game, ev event) error {
-	quant, ok := g.Player.Consumables[p]
-	if !ok || quant <= 0 {
-		// should not happen
-		return errors.New("no such consumable: " + p.String())
-	}
-	var err error
-	switch p {
-	case ConfusingDart:
-		err = g.ThrowConfusingDart(ev)
-	case ExplosiveMagara:
-		err = g.ThrowExplosiveMagara(ev)
-	case TeleportMagara:
-		err = g.ThrowTeleportMagara(ev)
-	case SlowingMagara:
-		err = g.ThrowSlowingMagara(ev)
-	case ConfuseMagara:
-		err = g.ThrowConfuseMagara(ev)
-	case NightMagara:
-		err = g.ThrowNightMagara(ev)
-	}
-	if err != nil {
-		return err
-	}
-	g.UseConsumable(p)
-	g.Stats.Throws++
 	return nil
 }
 
@@ -515,11 +216,11 @@ func (g *game) ThrowConfusingDart(ev event) error {
 	mons.HP -= attack
 	if mons.HP > 0 {
 		mons.EnterConfusion(g, ev)
-		g.PrintfStyled("Your %s hits the %s (%d dmg), who appears confused.", logPlayerHit, ConfusingDart, mons.Kind, attack)
+		//g.PrintfStyled("Your %s hits the %s (%d dmg), who appears confused.", logPlayerHit, ConfusingDart, mons.Kind, attack)
 		g.ui.ThrowAnimation(g.Ray(mons.Pos), true)
 		mons.MakeHuntIfHurt(g)
 	} else {
-		g.PrintfStyled("Your %s kills the %s.", logPlayerHit, ConfusingDart, mons.Kind)
+		//g.PrintfStyled("Your %s kills the %s.", logPlayerHit, ConfusingDart, mons.Kind)
 		g.ui.ThrowAnimation(g.Ray(mons.Pos), true)
 		g.HandleKill(mons, ev)
 	}
@@ -612,7 +313,7 @@ func (g *game) ThrowSlowingMagara(ev event) error {
 }
 
 func (g *game) ThrowConfuseMagara(ev event) error {
-	g.Printf("You activate the %s. A harmonic light confuses monsters.", ConfuseMagara)
+	//g.Printf("You activate the %s. A harmonic light confuses monsters.", ConfuseMagara)
 	for pos, b := range g.Player.LOS {
 		if !b {
 			continue
@@ -651,345 +352,4 @@ func (g *game) ThrowNightMagara(ev event) error {
 
 	ev.Renew(g, DurationThrowItem)
 	return nil
-}
-
-type collectable struct {
-	Consumable consumable
-	Quantity   int
-}
-
-func (cl collectable) Desc(g *game) string {
-	return cl.Consumable.Desc(g)
-}
-
-func (cl collectable) ShortDesc(g *game) (desc string) {
-	if cl.Quantity > 1 {
-		desc = fmt.Sprintf("%d %s.", cl.Quantity, cl.Consumable.Plural())
-	} else {
-		desc = fmt.Sprintf("%s.", Indefinite(cl.Consumable.String(), false))
-	}
-	return desc
-}
-
-func (cl collectable) Style(g *game) (rune, uicolor) {
-	return cl.Consumable.Style(g)
-}
-
-type collectData struct {
-	rarity   int
-	quantity int
-}
-
-var ConsumablesCollectData = map[consumable]collectData{
-	ConfusingDart:       {rarity: 4, quantity: 2},
-	ExplosiveMagara:     {rarity: 6, quantity: 1},
-	NightMagara:         {rarity: 9, quantity: 1},
-	TeleportMagara:      {rarity: 12, quantity: 1},
-	SlowingMagara:       {rarity: 12, quantity: 1},
-	ConfuseMagara:       {rarity: 15, quantity: 1},
-	TeleportationPotion: {rarity: 6, quantity: 1},
-	//BerserkPotion:       {rarity: 6, quantity: 1},
-	HealWoundsPotion: {rarity: 6, quantity: 1},
-	SwiftnessPotion:  {rarity: 6, quantity: 1},
-	//LignificationPotion: {rarity: 9, quantity: 1},
-	MagicPotion:        {rarity: 9, quantity: 1},
-	WallPotion:         {rarity: 12, quantity: 1},
-	CBlinkPotion:       {rarity: 12, quantity: 1},
-	DigPotion:          {rarity: 12, quantity: 1},
-	SwapPotion:         {rarity: 12, quantity: 1},
-	ShadowsPotion:      {rarity: 15, quantity: 1},
-	DescentPotion:      {rarity: 18, quantity: 1},
-	MagicMappingPotion: {rarity: 18, quantity: 1},
-	DreamPotion:        {rarity: 18, quantity: 1},
-	TormentPotion:      {rarity: 30, quantity: 1},
-}
-
-type equipable interface {
-	Equip(g *game)
-	String() string
-	Letter() rune
-	object
-}
-
-type armour int
-
-const (
-	Robe armour = iota
-	SmokingScales
-	ShinyPlates
-	TurtlePlates
-	SpeedRobe
-	CelmistRobe
-	HarmonistRobe
-)
-
-func (ar armour) Equip(g *game) {
-	oar := g.Player.Armour
-	g.Player.Armour = ar
-	if !g.FoundEquipables[ar] {
-		g.StoryPrintf("You found and put on %s.", ar.StringIndefinite())
-		g.FoundEquipables[ar] = true
-	}
-	g.Printf("You put the %s on and leave your %s.", ar, oar)
-	g.Objects[g.Player.Pos] = oar
-	if oar == CelmistRobe && g.Player.MP > g.Player.MPMax() {
-		g.Player.MP = g.Player.MPMax()
-	}
-}
-
-func (ar armour) String() string {
-	switch ar {
-	case Robe:
-		return "robe"
-	case SmokingScales:
-		return "smoking scales"
-	case ShinyPlates:
-		return "shiny plates"
-	case TurtlePlates:
-		return "turtle plates"
-	case SpeedRobe:
-		return "robe of speed"
-	case CelmistRobe:
-		return "celmist robe"
-	case HarmonistRobe:
-		return "harmonist robe"
-	default:
-		// should not happen
-		return "?"
-	}
-}
-
-func (ar armour) StringIndefinite() string {
-	switch ar {
-	case ShinyPlates, TurtlePlates, SmokingScales:
-		return ar.String()
-	default:
-		return "a " + ar.String()
-	}
-}
-
-func (ar armour) Short() string {
-	switch ar {
-	case Robe:
-		return "Rb"
-	case SmokingScales:
-		return "Sm"
-	case ShinyPlates:
-		return "Sh"
-	case TurtlePlates:
-		return "Tr"
-	case SpeedRobe:
-		return "Sp"
-	case CelmistRobe:
-		return "Cl"
-	case HarmonistRobe:
-		return "Hr"
-	default:
-		// should not happen
-		return "?"
-	}
-}
-
-func (ar armour) Desc(g *game) string {
-	var text string
-	switch ar {
-	case Robe:
-		text = "A robe provides no special protection, and will not help you much in your journey."
-	case SmokingScales:
-		text = "Smoking scales provide protection against blows. They leave short-lived fog behind as you move."
-	case ShinyPlates:
-		text = "Shiny plates provide good protection against blows, but increase your line of sight range."
-	case TurtlePlates:
-		text = "Turtle plates provide great protection against blows, but make you move slower and a little less good at evading blows."
-	case SpeedRobe:
-		text = "The speed robe makes you move faster, with a minor evasion bonus."
-	case CelmistRobe:
-		text = "The celmist robe improves your magic reserves, rod recharge rate, and rods can gain two extra charges. In Hareka, celmists are what most people would call mages."
-	case HarmonistRobe:
-		text = "The harmonist robe makes you harder to detect (stealthy movement, noise mitigation). Harmonists are mages specialized in manipulation of light and noise."
-	}
-	return text
-}
-
-func (ar armour) ShortDesc(g *game) string {
-	return Indefinite(ar.String(), false)
-}
-
-func (ar armour) Style(g *game) (rune, uicolor) {
-	return ar.Letter(), ColorFgCollectable
-}
-
-func (ar armour) Letter() rune {
-	return '['
-}
-
-type weapon int
-
-const (
-	Dagger weapon = iota
-	Axe
-	BattleAxe
-	Spear
-	Halberd
-	DancingRapier
-	HopeSword
-	Frundis
-	HarKarGauntlets
-	VampDagger
-	FinalBlade
-	DefenderFlail
-)
-
-const WeaponNum = int(DefenderFlail) + 1
-
-func (wp weapon) Equip(g *game) {
-	owp := g.Player.Weapon
-	g.Player.Weapon = wp
-	if !g.FoundEquipables[wp] {
-		g.StoryPrintf("You found and took %s.", Indefinite(wp.String(), false))
-		g.FoundEquipables[wp] = true
-	}
-	g.Printf("You take the %s and leave your %s.", wp, owp)
-	if wp == Frundis {
-		g.PrintfStyled("♫ ♪ … Oh, you're there, let's fight our way out!", logSpecial)
-	}
-	g.Objects[g.Player.Pos] = owp
-}
-
-func (wp weapon) String() string {
-	switch wp {
-	case Dagger:
-		return "dagger"
-	case Axe:
-		return "axe"
-	case BattleAxe:
-		return "battle axe"
-	case Spear:
-		return "spear"
-	case Halberd:
-		return "halberd"
-	case DancingRapier:
-		return "dancing rapier"
-	case HopeSword:
-		return "hopeful sword"
-	case Frundis:
-		return "staff Frundis"
-	case HarKarGauntlets:
-		return "har-kar gauntlets"
-	case VampDagger:
-		return "vampiric dagger"
-	case FinalBlade:
-		return "final blade"
-	case DefenderFlail:
-		return "defender flail"
-	default:
-		// should not happen
-		return "some weapon"
-	}
-}
-
-func (wp weapon) Short() string {
-	switch wp {
-	case Dagger:
-		return "Dg"
-	case Axe:
-		return "Ax"
-	case BattleAxe:
-		return "Bt"
-	case Spear:
-		return "Sp"
-	case Halberd:
-		return "Hl"
-	case DancingRapier:
-		return "Dn"
-	case HopeSword:
-		return "Ds"
-	case Frundis:
-		return "Fr"
-	case HarKarGauntlets:
-		return "Hk"
-	case VampDagger:
-		return "Vm"
-	case FinalBlade:
-		return "Fn"
-	case DefenderFlail:
-		return "Fl"
-	default:
-		// should not happen
-		return "?"
-	}
-}
-
-func (wp weapon) Desc(g *game) string {
-	var text string
-	switch wp {
-	case Dagger:
-		text = "A dagger is the most basic weapon. Great against sleeping monsters, but that's all."
-	case Axe:
-		text = "An axe is a one-handed weapon that can hit at once any foes adjacent to you, dealing extra damage in the open."
-	case BattleAxe:
-		text = "A battle axe is a big two-handed weapon that can hit at once any foes adjacent to you, dealing extra damage in the open."
-	case Spear:
-		text = "A spear is a one-handed weapon that can hit two opponents in a row at once. Useful in corridors."
-	case Halberd:
-		text = "An halberd is a big two-handed weapon that can hit two opponents in a row at once. Useful in corridors."
-	case DancingRapier:
-		text = "The dancing rapier is a one-handed weapon. It makes you swap positions with your foe and can hit another monster behind with extra damage."
-	case HopeSword:
-		text = "The hopeful sword is a big two-handed weapon. The more injured you are, the more damage increases."
-	case Frundis:
-		text = "Frundis is a musician and harmonist, which happens to be a two-handed staff too. It may occasionally confuse monsters on hit. It magically helps reducing noise in combat too, and reduces your line of sight range by 1."
-	case HarKarGauntlets:
-		text = "Har-kar gauntlets are an unarmed combat weapon. They allow you to make a wind attack, passing over foes in a direction."
-	case VampDagger:
-		text = "The vampiric dagger is a one-handed weapon that gives you some healing when you hit living monsters."
-	case FinalBlade:
-		text = "The final blade is an accurate two-handed weapon that instantly kills monsters at less than half full health. Wielding this weapon will reduce your maximum health by a third."
-	case DefenderFlail:
-		text = "The defender flail is a one-handed weapon that moves foes toward you, and hits harder as you keep attacking without moving."
-	}
-	return fmt.Sprintf("%s It deals %d damage.", text, wp.Attack())
-}
-
-func (wp weapon) Attack() int {
-	return 1
-}
-
-func (wp weapon) TwoHanded() bool {
-	switch wp {
-	case BattleAxe, Halberd, HopeSword, Frundis, HarKarGauntlets, FinalBlade:
-		return true
-	default:
-		return false
-	}
-}
-
-func (wp weapon) ShortDesc(g *game) string {
-	return Indefinite(wp.String(), false)
-}
-
-func (wp weapon) Style(g *game) (rune, uicolor) {
-	return wp.Letter(), ColorFgCollectable
-}
-
-func (wp weapon) Letter() rune {
-	return ')'
-}
-
-func (wp weapon) Cleave() bool {
-	switch wp {
-	case Axe, BattleAxe:
-		return true
-	default:
-		return false
-	}
-}
-
-func (wp weapon) Pierce() bool {
-	switch wp {
-	case Spear, Halberd:
-		return true
-	default:
-		return false
-	}
 }

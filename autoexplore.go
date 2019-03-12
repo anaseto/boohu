@@ -37,12 +37,9 @@ func (g *game) AllExplored() bool {
 				continue
 			}
 		}
-		if obj, ok := g.Objects[pos]; ok {
-			switch obj.(type) {
-			case rod, collectable:
-				return false
-			}
-		}
+		//if obj, ok := g.Objects[pos]; ok {
+		// TODO
+		//}
 	}
 	return true
 }
@@ -60,12 +57,9 @@ func (g *game) AutoexploreSources() []int {
 		if g.ExclusionsMap[pos] {
 			continue
 		}
-		if obj, ok := g.Objects[pos]; ok {
-			switch obj.(type) {
-			case rod, collectable, simella:
-				sources = append(sources, i)
-			}
-		}
+		//if obj, ok := g.Objects[pos]; ok {
+		// TODO
+		//}
 
 	}
 	return sources

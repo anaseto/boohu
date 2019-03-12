@@ -7,18 +7,11 @@ import (
 )
 
 func init() {
-	gob.Register(potion(0))
-	gob.Register(projectile(0))
 	gob.Register(&simpleEvent{})
 	gob.Register(&monsterEvent{})
 	gob.Register(&cloudEvent{})
-	gob.Register(armour(0))
-	gob.Register(weapon(0))
 	gob.Register(stair(0))
 	gob.Register(stone(0))
-	gob.Register(rod(0))
-	gob.Register(simella(0))
-	gob.Register(collectable{})
 }
 
 func (g *game) GameSave() ([]byte, error) {

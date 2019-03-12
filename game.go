@@ -18,19 +18,14 @@ type game struct {
 	DepthPlayerTurn  int
 	Turn             int
 	Highlight        map[position]bool // highlighted positions (e.g. targeted ray)
-	CollectableScore int
-	LastConsumables  []consumable
-	Objects          map[position]object
+	Objects          objects
 	Clouds           map[position]cloud
 	//Fungus              map[position]vegetation
 	//Doors               map[position]bool
-	TemporalWalls       map[position]bool
-	GeneratedUniques    map[monsterBand]int
-	GeneratedEquipables map[equipable]bool
-	GeneratedRods       map[rod]bool
-	GenPlan             [MaxDepth + 1]genFlavour
-	FoundEquipables     map[equipable]bool
-	TerrainKnowledge    map[position]terrain
+	TemporalWalls    map[position]bool
+	GeneratedUniques map[monsterBand]int
+	GenPlan          [MaxDepth + 1]genFlavour
+	TerrainKnowledge map[position]terrain
 	//WrongFoliage        map[position]bool
 	//WrongDoor           map[position]bool
 	ExclusionsMap      map[position]bool
@@ -58,6 +53,7 @@ type game struct {
 	Quit               bool
 	Wizard             bool
 	WizardMap          bool
+	WinStair           position
 	Version            string
 	//Opts                startOpts
 	ui *gameui
@@ -68,6 +64,11 @@ type game struct {
 //StoneLevel    int
 //UnstableLevel int
 //}
+
+type objects struct {
+	Stairs map[position]stair
+	Stones map[position]stone
+}
 
 func (g *game) FreeCell() position {
 	d := g.Dungeon
@@ -142,7 +143,7 @@ func (g *game) FreeCellForStatic() position {
 		y := RandInt(DungeonHeight)
 		pos := position{x, y}
 		c := d.Cell(pos)
-		if !c.IsOpen() {
+		if !c.IsGround() {
 			continue
 		}
 		if g.Player != nil && g.Player.Pos == pos {
@@ -150,9 +151,6 @@ func (g *game) FreeCellForStatic() position {
 		}
 		mons := g.MonsterAt(pos)
 		if mons.Exists() {
-			continue
-		}
-		if _, ok := g.Objects[pos]; ok {
 			continue
 		}
 		return pos
@@ -226,83 +224,9 @@ func (g *game) InitPlayer() {
 		Simellas:  0,
 		Aptitudes: map[aptitude]bool{},
 	}
-	g.Player.Consumables = map[consumable]int{
-		HealWoundsPotion: 1,
-	}
-	switch RandInt(7) {
-	case 0:
-		g.Player.Consumables[ExplosiveMagara] = 1
-	case 1:
-		g.Player.Consumables[NightMagara] = 1
-	case 2:
-		g.Player.Consumables[TeleportMagara] = 1
-	case 3:
-		g.Player.Consumables[SlowingMagara] = 1
-	case 4:
-		g.Player.Consumables[ConfuseMagara] = 1
-	default:
-		g.Player.Consumables[ConfusingDart] = 2
-	}
-	switch RandInt(11) {
-	case 0, 1, 5:
-		g.Player.Consumables[TeleportationPotion] = 1
-	case 2, 3, 4:
-		g.Player.Consumables[SwiftnessPotion] = 1
-	case 6:
-		g.Player.Consumables[WallPotion] = 1
-	case 7:
-		g.Player.Consumables[CBlinkPotion] = 1
-	case 8:
-		g.Player.Consumables[DigPotion] = 1
-	case 9:
-		g.Player.Consumables[SwapPotion] = 1
-	case 10:
-		g.Player.Consumables[ShadowsPotion] = 1
-	}
-	r := g.RandomRod()
-	g.Player.Rods = map[rod]rodProps{r: rodProps{r.MaxCharge() - 1}}
 	g.Player.Statuses = map[status]int{}
 	g.Player.Expire = map[status]int{}
 
-	// Testing
-	//g.Player.Aptitudes[AptStealthyLOS] = true
-	//g.Player.Aptitudes[AptStealthyMovement] = true
-	//g.Player.Rods[RodSwapping] = rodProps{Charge: 3}
-	//g.Player.Rods[RodFireball] = rodProps{Charge: 3}
-	//g.Player.Rods[RodLightning] = rodProps{Charge: 3}
-	//g.Player.Rods[RodLightningBolt] = rodProps{Charge: 3}
-	//g.Player.Rods[RodShatter] = rodProps{Charge: 3}
-	//g.Player.Rods[RodFog] = rodProps{Charge: 3}
-	//g.Player.Rods[RodSleeping] = rodProps{Charge: 3}
-	//g.Player.Consumables[BerserkPotion] = 5
-	//g.Player.Consumables[MagicMappingPotion] = 1
-	//g.Player.Consumables[ExplosiveMagara] = 5
-	//g.Player.Consumables[NightMagara] = 5
-	//g.Player.Consumables[SlowingMagara] = 5
-	//g.Player.Consumables[ConfuseMagara] = 5
-	//g.Player.Consumables[DigPotion] = 5
-	//g.Player.Consumables[SwapPotion] = 5
-	//g.Player.Consumables[DreamPotion] = 5
-	//g.Player.Consumables[ShadowsPotion] = 5
-	//g.Player.Consumables[TormentPotion] = 5
-	//g.Player.Consumables[AccuracyPotion] = 5
-	//g.Player.Weapon = ElecWhip
-	//g.Player.Weapon = DancingRapier
-	//g.Player.Weapon = Sabre
-	//g.Player.Weapon = HarKarGauntlets
-	//g.Player.Weapon = DefenderFlail
-	//g.Player.Weapon = HopeSword
-	//g.Player.Weapon = DragonSabre
-	//g.Player.Weapon = FinalBlade
-	//g.Player.Weapon = VampDagger
-	//g.Player.Shield = EarthShield
-	//g.Player.Shield = FireShield
-	//g.Player.Shield = BashingShield
-	//g.Player.Armour = TurtlePlates
-	//g.Player.Armour = HarmonistRobe
-	//g.Player.Armour = CelmistRobe
-	//g.Player.Armour = ShinyPlates
-	//g.Player.Armour = SmokingScales
 }
 
 type genFlavour int
@@ -320,9 +244,6 @@ func (g *game) InitFirstLevel() {
 	g.InitPlayer()
 	g.AutoTarget = InvalidPos
 	g.Targeting = InvalidPos
-	g.GeneratedRods = map[rod]bool{}
-	g.GeneratedEquipables = map[equipable]bool{}
-	g.FoundEquipables = map[equipable]bool{Robe: true, Dagger: true}
 	g.GeneratedUniques = map[monsterBand]int{}
 	g.Stats.KilledMons = map[monsterKind]int{}
 	g.Version = Version
@@ -360,7 +281,6 @@ func (g *game) InitLevel() {
 	g.ExclusionsMap = map[position]bool{}
 	g.TemporalWalls = map[position]bool{}
 	g.LastMonsterKnownAt = map[position]*monster{}
-	g.Objects = make(map[position]object)
 
 	// Dungeon terrain
 	g.GenDungeon()
@@ -384,6 +304,7 @@ func (g *game) InitLevel() {
 		nstones = 3
 	}
 	ustone := stone(0)
+	g.Objects.Stones = map[position]stone{}
 	for i := 0; i < nstones; i++ {
 		pos := g.FreeCellForStatic()
 		var st stone
@@ -392,22 +313,8 @@ func (g *game) InitLevel() {
 		} else {
 			st = stone(1 + RandInt(NumStones-1))
 		}
-		g.Objects[pos] = st
-	}
-
-	// Simellas
-	for i := 0; i < 5; i++ {
-		pos := g.FreeCellForStatic()
-		const rounds = 5
-		var sum = 0
-		for j := 0; j < rounds; j++ {
-			sum += 1 + RandInt(g.Depth+g.Depth*g.Depth/6)
-		}
-		sum /= rounds
-		g.Objects[pos] = simella(sum)
-		if g.Objects[pos] == simella(0) {
-			g.Objects[pos] = simella(1)
-		}
+		g.Objects.Stones[pos] = st
+		g.Dungeon.SetCell(pos, StoneCell)
 	}
 
 	// initialize LOS
@@ -422,16 +329,6 @@ func (g *game) InitLevel() {
 	}
 	g.ComputeLOS()
 	g.MakeMonstersAware()
-
-	// Frundis is somewhere in the level
-	if g.FrundisInLevel() {
-		g.PrintStyled("You hear some faint music… ♫ larilon, larila ♫ ♪", logSpecial)
-	}
-
-	// recharge rods
-	if g.Depth > 1 {
-		g.RechargeRods()
-	}
 
 	// clouds
 	g.Clouds = map[position]cloud{}
@@ -464,120 +361,26 @@ func (g *game) CleanEvents() {
 }
 
 func (g *game) StairsSlice() []position {
+	// TODO: use cache?
 	stairs := []position{}
-	for pos, obj := range g.Objects {
-		_, ok := obj.(stair)
-		if ok && g.Dungeon.Cell(pos).Explored {
-			stairs = append(stairs, pos)
+	for i, c := range g.Dungeon.Cells {
+		if c.T != StairCell || !c.Explored {
+			continue
 		}
+		pos := idxtopos(i)
+		stairs = append(stairs, pos)
 	}
 	return stairs
 }
 
-func (dg *dgen) GenCollectable(g *game) {
-	rounds := 100
-	if len(g.LastConsumables) > 3 {
-		g.LastConsumables = g.LastConsumables[1:]
-	}
-	for {
-	loopcons:
-		for c, data := range ConsumablesCollectData {
-			r := RandInt(data.rarity * rounds)
-			if r != 0 {
-				continue
-			}
-
-			// avoid too many of the same
-			for _, co := range g.LastConsumables {
-				if co == c && RandInt(4) > 0 {
-					continue loopcons
-				}
-			}
-			g.LastConsumables = append(g.LastConsumables, c)
-			g.CollectableScore++
-			pos := InvalidPos
-			for pos == InvalidPos {
-				pos = dg.rooms[RandInt(len(dg.rooms)-1)].RandomPlace(PlaceItem)
-			}
-			g.Objects[pos] = collectable{Consumable: c, Quantity: data.quantity}
-			return
-		}
-	}
-
-}
-
-func (dg *dgen) GenCollectables(g *game) {
-	score := g.CollectableScore - 2*(g.Depth-1)
-	n := 2
-	if score >= 0 && RandInt(4) == 0 {
-		n--
-	}
-	if score <= 0 && RandInt(4) == 0 {
-		n++
-	}
-	if score > 0 && n >= 2 {
-		n--
-	}
-	if score < 0 && n <= -2 {
-		n++
-	}
-	for i := 0; i < n; i++ {
-		dg.GenCollectable(g)
-	}
-}
-
-func (g *game) GenArmour() {
-	ars := [3]armour{SmokingScales, CelmistRobe, HarmonistRobe}
-	for {
-		i := RandInt(len(ars))
-		if g.GeneratedEquipables[ars[i]] {
-			// do not generate duplicates
-			continue
-		}
-		pos := g.FreeCellForStatic()
-		g.Objects[pos] = ars[i]
-		g.GeneratedEquipables[ars[i]] = true
-		break
-	}
-}
-
-func (g *game) GenWeapon() {
-	wps := [4]weapon{DancingRapier, Frundis, HarKarGauntlets, DefenderFlail}
-	for {
-		i := RandInt(len(wps))
-		if g.GeneratedEquipables[wps[i]] {
-			// do not generate duplicates
-			continue
-		}
-		pos := g.FreeCellForStatic()
-		g.Objects[pos] = wps[i]
-		g.GeneratedEquipables[wps[i]] = true
-		break
-	}
-}
-
-func (g *game) FrundisInLevel() bool {
-	for _, obj := range g.Objects {
-		eq, ok := obj.(equipable)
-		if !ok {
-			continue
-		}
-		if wp, ok := eq.(weapon); ok && wp == Frundis {
-			return true
-		}
-	}
-	return false
-}
-
 func (g *game) Descend() bool {
 	g.LevelStats()
-	if obj, ok := g.Objects[g.Player.Pos]; ok {
-		if strt, ok := obj.(stair); ok && strt == WinStair {
-			g.StoryPrint("You escaped!")
-			g.ExploredLevels = g.Depth
-			g.Depth = -1
-			return true
-		}
+	c := g.Dungeon.Cell(g.Player.Pos)
+	if c.T == StairCell && g.WinStair == g.Player.Pos {
+		g.StoryPrint("You escaped!")
+		g.ExploredLevels = g.Depth
+		g.Depth = -1
+		return true
 	}
 	g.Print("You descend deeper in the dungeon.")
 	g.StoryPrint("You descended deeper in the dungeon.")
@@ -592,7 +395,7 @@ func (g *game) Descend() bool {
 
 func (g *game) WizardMode() {
 	g.Wizard = true
-	g.Player.Consumables[DescentPotion] = 15
+	//g.Player.Consumables[DescentPotion] = 15
 	g.PrintStyled("You are now in wizard mode and cannot obtain winner status.", logSpecial)
 }
 
@@ -607,10 +410,6 @@ func (g *game) ApplyRest() {
 		mons.HP = mons.HPmax
 	}
 	adjust := 0
-	if g.Player.Armour == HarmonistRobe {
-		// the harmonist robe mitigates the sound of your snorts
-		adjust = 100
-	}
 	if g.DepthPlayerTurn < 100+adjust && RandInt(5) > 2 || g.DepthPlayerTurn >= 100+adjust && g.DepthPlayerTurn < 250+adjust && RandInt(2) == 0 ||
 		g.DepthPlayerTurn >= 250+adjust && RandInt(3) > 0 {
 		rmons := []int{}

@@ -28,7 +28,6 @@ type stats struct {
 	TWounded      int
 	TMWounded     int
 	TMonsLOS      int
-	UsedRod       [NumRods]int
 }
 
 func (g *game) TurnStats() {

@@ -6,23 +6,19 @@ import (
 )
 
 type player struct {
-	HP          int
-	HPbonus     int
-	MP          int
-	Simellas    int
-	Dir         direction
-	Armour      armour
-	Weapon      weapon
-	Consumables map[consumable]int
-	Rods        map[rod]rodProps
-	Aptitudes   map[aptitude]bool
-	Statuses    map[status]int
-	Expire      map[status]int
-	Pos         position
-	Target      position
-	LOS         map[position]bool
-	Rays        rayMap
-	Bored       int
+	HP        int
+	HPbonus   int
+	MP        int
+	Simellas  int
+	Dir       direction
+	Aptitudes map[aptitude]bool
+	Statuses  map[status]int
+	Expire    map[status]int
+	Pos       position
+	Target    position
+	LOS       map[position]bool
+	Rays      rayMap
+	Bored     int
 }
 
 const DefaultHealth = 4
@@ -33,9 +29,6 @@ func (p *player) HPMax() int {
 		hpmax += 1
 	}
 	hpmax -= p.Bored
-	if p.Weapon == FinalBlade {
-		hpmax -= 1
-	}
 	if hpmax < 2 {
 		hpmax = 2
 	}
@@ -49,25 +42,7 @@ func (p *player) MPMax() int {
 	if p.Aptitudes[AptMagic] {
 		mpmax += 2
 	}
-	if p.Armour == CelmistRobe {
-		mpmax += 2
-	}
 	return mpmax
-}
-
-func (p *player) Attack() int {
-	attack := p.Weapon.Attack()
-	if p.HasStatus(StatusCorrosion) {
-		penalty := p.Statuses[StatusCorrosion]
-		if penalty > 2 {
-			penalty = 2
-		}
-		attack -= penalty
-	}
-	if attack <= 0 {
-		attack = 0
-	}
-	return attack
 }
 
 func (p *player) HasStatus(st status) bool {
@@ -231,20 +206,6 @@ func (g *game) NeedsRegenRest() bool {
 	return g.Player.HP < g.Player.HPMax() || g.Player.MP < g.Player.MPMax()
 }
 
-func (g *game) Equip(ev event) error {
-	obj, ok := g.Objects[g.Player.Pos]
-	if !ok {
-		return errors.New("Found nothing to equip here.")
-	}
-	if eq, ok := obj.(equipable); ok {
-		eq.Equip(g)
-		ev.Renew(g, 10)
-		g.BoredomAction(ev, 1)
-		return nil
-	}
-	return errors.New("Found nothing to equip here.")
-}
-
 func (g *game) Teleportation(ev event) {
 	var pos position
 	i := 0
@@ -276,35 +237,16 @@ func (g *game) Teleportation(ev event) {
 
 func (g *game) CollectGround() {
 	pos := g.Player.Pos
-	if obj, ok := g.Objects[pos]; ok {
+	c := g.Dungeon.Cell(pos)
+	if c.IsNotable() {
 		g.DijkstraMapRebuild = true
-		switch o := obj.(type) {
-		case rod:
-			delete(g.Objects, pos)
-			g.Player.Rods[o] = rodProps{Charge: o.MaxCharge() - 1}
-			g.Printf("You take %s.", obj.ShortDesc(g))
-			g.StoryPrintf("You found and took %s.", obj.ShortDesc(g))
-		case collectable:
-			delete(g.Objects, pos)
-			g.Player.Consumables[o.Consumable] += o.Quantity
-			if o.Quantity > 1 {
-				g.Printf("You take %d %s.", o.Quantity, o.Consumable.Plural())
-			} else {
-				g.Printf("You take %s.", obj.ShortDesc(g))
-			}
-		case simella:
-			delete(g.Objects, pos)
-			g.Player.Simellas += int(o)
-			if o == simella(1) {
-				g.Print("You pick up a simella.")
-			} else {
-				g.Printf("You pick up %d simellas.", o)
-			}
-			g.DijkstraMapRebuild = true
+		switch c.T {
+		case BarrelCell:
+			// TODO: move here message
 		default:
-			g.Printf("You are standing over %s.", obj.ShortDesc(g))
+			g.Printf("You are standing over %s.", c.ShortDesc(g, pos))
 		}
-	} else if g.Dungeon.Cell(pos).T == DoorCell {
+	} else if c.T == DoorCell {
 		g.Print("You stand at the door.")
 	}
 }
@@ -348,14 +290,14 @@ func (g *game) MovePlayer(pos position, ev event) error {
 			g.Fog(pos, 1, ev)
 			g.Stats.Digs++
 		}
-		switch g.Player.Armour {
-		case SmokingScales:
-			_, ok := g.Clouds[g.Player.Pos]
-			if !ok {
-				g.Clouds[g.Player.Pos] = CloudFog
-				g.PushEvent(&cloudEvent{ERank: ev.Rank() + DurationSmokingScalesFog, EAction: CloudEnd, Pos: g.Player.Pos})
-			}
-		}
+		//switch g.Player.Armour {
+		//case SmokingScales:
+		//_, ok := g.Clouds[g.Player.Pos]
+		//if !ok {
+		//g.Clouds[g.Player.Pos] = CloudFog
+		//g.PushEvent(&cloudEvent{ERank: ev.Rank() + DurationSmokingScalesFog, EAction: CloudEnd, Pos: g.Player.Pos})
+		//}
+		//}
 		g.Stats.Moves++
 		g.PlacePlayerAt(pos)
 		if !g.Autoexploring {

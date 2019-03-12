@@ -13,80 +13,6 @@ type dungeon struct {
 	Cells []cell
 }
 
-type cell struct {
-	T        terrain
-	Explored bool
-}
-
-type terrain int
-
-const (
-	WallCell terrain = iota
-	GroundCell
-	DoorCell
-	FungusCell
-	BarrelCell
-)
-
-func (c cell) IsFree() bool {
-	switch c.T {
-	case WallCell, BarrelCell:
-		return false
-	default:
-		return true
-	}
-}
-
-func (c cell) Flammable() bool {
-	switch c.T {
-	case FungusCell, DoorCell, BarrelCell:
-		return true
-	default:
-		return false
-	}
-}
-
-func (c cell) IsOpen() bool {
-	switch c.T {
-	case WallCell, DoorCell, BarrelCell:
-		return false
-	default:
-		return true
-	}
-}
-
-func (c cell) String() (s string) {
-	switch c.T {
-	case WallCell:
-		s = "a wall"
-	case GroundCell:
-		s = "the ground"
-	case DoorCell:
-		s = "a door"
-	case FungusCell:
-		s = "foliage"
-	case BarrelCell:
-		s = "a barrel"
-	}
-	return s
-}
-
-func (c cell) Style() (r rune, fg uicolor) {
-	switch c.T {
-	case WallCell:
-		r, fg = '#', ColorFgLOS
-	case GroundCell:
-		r, fg = '.', ColorFgLOS
-	case DoorCell:
-		r, fg = '+', ColorFgPlace
-	case FungusCell:
-		r, fg = '"', ColorFgLOS
-	case BarrelCell:
-		r, fg = '_', ColorFgCollectable // TODO: change letter and color
-	}
-	return r, fg
-}
-
 func (d *dungeon) Cell(pos position) cell {
 	return d.Cells[pos.idx()]
 }
@@ -656,7 +582,7 @@ func (g *game) DoorCandidate(pos position) bool {
 		return false
 	}
 	return pos.W().valid() && pos.E().valid() &&
-		d.Cell(pos.W()).IsOpen() && d.Cell(pos.E()).IsOpen() &&
+		d.Cell(pos.W()).IsGround() && d.Cell(pos.E()).IsGround() &&
 		(!pos.N().valid() || d.Cell(pos.N()).T == WallCell) &&
 		(!pos.S().valid() || d.Cell(pos.S()).T == WallCell) &&
 		((pos.NW().valid() && d.Cell(pos.NW()).IsFree()) ||
@@ -664,7 +590,7 @@ func (g *game) DoorCandidate(pos position) bool {
 			(pos.NE().valid() && d.Cell(pos.NE()).IsFree()) ||
 			(pos.SE().valid() && d.Cell(pos.SE()).IsFree())) ||
 		pos.N().valid() && pos.S().valid() &&
-			d.Cell(pos.N()).IsOpen() && d.Cell(pos.S()).IsOpen() &&
+			d.Cell(pos.N()).IsGround() && d.Cell(pos.S()).IsGround() &&
 			(!pos.E().valid() || d.Cell(pos.E()).T == WallCell) &&
 			(!pos.W().valid() || d.Cell(pos.W()).T == WallCell) &&
 			((pos.NW().valid() && d.Cell(pos.NW()).IsFree()) ||
@@ -724,6 +650,7 @@ func (g *game) GenRoomTunnels() {
 	dg.PutDoors(g)
 	dg.PlayerStartCell(g)
 	dg.ClearUnconnected(g)
+	g.Objects.Stairs = map[position]stair{}
 	if g.Depth < MaxDepth {
 		dg.Stairs(g, NormalStair)
 	}
@@ -733,7 +660,6 @@ func (g *game) GenRoomTunnels() {
 	dg.Barrel(g)
 	dg.Barrel(g)
 	dg.GenMonsters(g)
-	dg.GenCollectables(g)
 	dg.AddSpecial(g)
 }
 
@@ -753,23 +679,23 @@ func (dg *dgen) AddSpecial(g *game) {
 	switch g.GenPlan[g.Depth] {
 	//case GenWeapon:
 	//g.GenWeapon()
-	case GenArmour:
-		g.GenArmour()
+	//case GenArmour:
+	//g.GenArmour()
 	//case GenWpArm:
 	//g.GenWeapon()
 	//g.GenArmour()
 	case GenRod:
-		g.GenerateRod()
+		//g.GenerateRod()
 	case GenExtraCollectables:
-		for i := 0; i < 2; i++ {
-			dg.GenCollectable(g)
-			g.CollectableScore-- // these are extra
-		}
+		//for i := 0; i < 2; i++ {
+		//dg.GenCollectable(g)
+		//g.CollectableScore-- // these are extra
+		//}
 	}
 	if g.Depth == 1 {
 		// extra collectable
-		dg.GenCollectable(g)
-		g.CollectableScore--
+		//dg.GenCollectable(g)
+		//g.CollectableScore--
 	}
 
 }
@@ -808,7 +734,9 @@ func (dg *dgen) Stairs(g *game, st stair) {
 	r := dg.rooms[ri]
 	r.places[pj].used = true
 	r.places[pj].used = true
-	g.Objects[r.places[pj].pos] = st
+	pos := r.places[pj].pos
+	g.Dungeon.SetCell(pos, StairCell)
+	g.Objects.Stairs[pos] = st
 }
 
 func (dg *dgen) Barrel(g *game) {
