@@ -20,16 +20,196 @@ const (
 	ShadowsCard
 	FogCard
 	MagicMappingCard
-	DreamCard // XXX: maybe needs change
-	WallCard
+	SensingCard // XXX: maybe needs change
+	WallsCard
 	SlowingCard
-	GoodNightCard
+	SleepingCard
 	NoiseCard
 	ObstructionCard
 	SmokeCard
 )
 
-func (g *game) QuaffTeleportation(ev event) error {
+func (g *game) DrawCard(n int) {
+	cards := []card{
+		BlinkCard,
+		DigCard,
+		TeleportCard,
+		TeleportOtherCard,
+		HealWoundsCard,
+		MagicCard,
+		DescentCard,
+		SwiftnessCard,
+		SwappingCard, // XXX: swap with random monster?
+		ShadowsCard,
+		FogCard,
+		MagicMappingCard,
+		SensingCard,
+		WallsCard,
+		SlowingCard,
+		SleepingCard,
+		NoiseCard,
+		ObstructionCard,
+		SmokeCard,
+	}
+	g.Hand[n] = cards[RandInt(len(cards))] // TODO: probability distribution
+	// TODO: add message
+}
+
+func (g *game) UseCard(n int, ev event) (err error) {
+	if g.Player.HasStatus(StatusNausea) {
+		return errors.New("You cannot use cards while sick.")
+	}
+	switch g.Hand[n] {
+	case BlinkCard:
+		err = g.EvokeBlink(ev)
+	case TeleportCard:
+		err = g.EvokeTeleport(ev)
+	case DigCard:
+		err = g.EvokeDig(ev)
+	case TeleportOtherCard:
+		err = g.EvokeTeleportOther(ev)
+	case HealWoundsCard:
+		err = g.EvokeHealWounds(ev)
+	case MagicCard:
+		err = g.EvokeRefillMagic(ev)
+	case DescentCard:
+		err = g.EvokeDescent(ev)
+	case SwiftnessCard:
+		err = g.EvokeSwiftness(ev)
+	case SwappingCard:
+		err = g.EvokeSwapping(ev)
+	case ShadowsCard:
+		err = g.EvokeShadows(ev)
+	case FogCard:
+		err = g.EvokeFog(ev)
+	case MagicMappingCard:
+		err = g.EvokeMagicMapping(ev)
+	case SensingCard:
+		err = g.EvokeSensing(ev)
+	case WallsCard:
+		err = g.EvokeWalls(ev)
+	case SlowingCard:
+		err = g.EvokeSlowing(ev)
+	case SleepingCard:
+		err = g.EvokeSleeping(ev)
+	case NoiseCard:
+		err = g.EvokeBlink(ev)
+		// TODO
+	case ObstructionCard:
+	case SmokeCard:
+		err = g.EvokeFog(ev)
+		// TODO
+	}
+	if err != nil {
+		return err
+	}
+	g.Stats.Drinks++ // TODO
+	// TODO: animation
+	g.StoryPrintf("You evoked your %s.", g.Hand[n])
+	g.DrawCard(n)
+	g.FunAction()
+	ev.Renew(g, 5)
+	return nil
+}
+
+func (c card) String() (desc string) {
+	switch c {
+	case BlinkCard:
+		desc = "card of blinking"
+	case TeleportCard:
+		desc = "card of teleportation"
+	case DigCard:
+		desc = "card of digging"
+	case TeleportOtherCard:
+		desc = "card of teleport other"
+	case HealWoundsCard:
+		desc = "card of heal wounds"
+	case MagicCard:
+		desc = "card of refill magic"
+	case DescentCard:
+		desc = "card of descent"
+	case SwiftnessCard:
+		desc = "card of swiftness"
+	case SwappingCard:
+		desc = "card of swapping"
+	case ShadowsCard:
+		desc = "card of shadows"
+	case FogCard:
+		desc = "card of fog"
+	case MagicMappingCard:
+		desc = "card of magic mapping"
+	case SensingCard:
+		desc = "card of sensing"
+	case WallsCard:
+		desc = "card of walls"
+	case SlowingCard:
+		desc = "card of slowing"
+	case SleepingCard:
+		desc = "card of sleeping"
+	case NoiseCard:
+		desc = "card of noise"
+	case ObstructionCard:
+		desc = "card of obstruction"
+	case SmokeCard:
+		desc = "card of smoke"
+	}
+	return desc
+}
+
+func (c card) Desc(g *game) (desc string) {
+	// TODO
+	switch c {
+	case BlinkCard:
+		desc = "card of blinking"
+	case TeleportCard:
+		desc = "card of teleportation"
+	case DigCard:
+		desc = "card of digging"
+	case TeleportOtherCard:
+		desc = "card of teleport other"
+	case HealWoundsCard:
+		desc = "card of heal wounds"
+	case MagicCard:
+		desc = "card of refill magic"
+	case DescentCard:
+		desc = "card of descent"
+	case SwiftnessCard:
+		desc = "card of swiftness"
+	case SwappingCard:
+		desc = "card of swapping"
+	case ShadowsCard:
+		desc = "card of shadows"
+	case FogCard:
+		desc = "card of fog"
+	case MagicMappingCard:
+		desc = "card of magic mapping"
+	case SensingCard:
+		desc = "card of sensing"
+	case WallsCard:
+		desc = "card of walls"
+	case SlowingCard:
+		desc = "card of slowing"
+	case SleepingCard:
+		desc = "card of sleeping"
+	case NoiseCard:
+		desc = "card of noise"
+	case ObstructionCard:
+		desc = "card of obstruction"
+	case SmokeCard:
+		desc = "card of smoke"
+	}
+	return desc
+}
+
+func (g *game) EvokeBlink(ev event) error {
+	if g.Player.HasStatus(StatusLignification) {
+		return errors.New("You cannot blink while lignified.")
+	}
+	g.Blink(ev)
+	return nil
+}
+
+func (g *game) EvokeTeleport(ev event) error {
 	if g.Player.HasStatus(StatusLignification) {
 		return errors.New("You cannot teleport while lignified.")
 	}
@@ -43,30 +223,34 @@ func (g *game) QuaffTeleportation(ev event) error {
 	return nil
 }
 
-//func (g *game) QuaffBerserk(ev event) error {
-//if g.Player.HasStatus(StatusExhausted) {
-//return errors.New("You are too exhausted to berserk.")
-//}
-//if g.Player.HasStatus(StatusBerserk) {
-//return errors.New("You are already berserk.")
-//}
-//g.Player.Statuses[StatusBerserk] = 1
-//end := ev.Rank() + DurationBerserk
-//g.PushEvent(&simpleEvent{ERank: end, EAction: BerserkEnd})
-//g.Player.Expire[StatusBerserk] = end
-//g.Printf("You quaff the %s. You feel a sudden urge to kill things.", BerserkPotion)
-//g.Player.HPbonus += 2
-//return nil
-//}
+func (g *game) EvokeDig(ev event) error {
+	g.Player.Statuses[StatusDig] = 1
+	end := ev.Rank() + DurationDigging
+	g.PushEvent(&simpleEvent{ERank: end, EAction: DigEnd})
+	g.Player.Expire[StatusDig] = end
+	//g.Printf("You quaff the %s. You feel like an earth dragon.", DigPotion)
+	return nil
+}
 
-func (g *game) QuaffHealWounds(ev event) error {
+func (g *game) EvokeTeleportOther(ev event) error {
+	// TODO: remove targeting?
+	if err := g.ui.ChooseTarget(&chooser{}); err != nil {
+		return err
+	}
+	mons := g.MonsterAt(g.Player.Target)
+	// mons not nil (check done in the targeter)
+	mons.TeleportAway(g)
+	return nil
+}
+
+func (g *game) EvokeHealWounds(ev event) error {
 	//hp := g.Player.HP
 	g.Player.HP = g.Player.HPMax()
 	//g.Printf("You quaff the %s (%d -> %d).", HealWoundsPotion, hp, g.Player.HP)
 	return nil
 }
 
-func (g *game) QuaffMagic(ev event) error {
+func (g *game) EvokeRefillMagic(ev event) error {
 	//mp := g.Player.MP
 	g.Player.MP += 2 * g.Player.MPMax() / 3
 	if g.Player.MP > g.Player.MPMax() {
@@ -76,7 +260,7 @@ func (g *game) QuaffMagic(ev event) error {
 	return nil
 }
 
-func (g *game) QuaffDescent(ev event) error {
+func (g *game) EvokeDescent(ev event) error {
 	// why not?
 	//if g.Player.HasStatus(StatusLignification) {
 	//return errors.New("You cannot descend while lignified.")
@@ -94,7 +278,7 @@ func (g *game) QuaffDescent(ev event) error {
 	return nil
 }
 
-func (g *game) QuaffSwiftness(ev event) error {
+func (g *game) EvokeSwiftness(ev event) error {
 	g.Player.Statuses[StatusSwift]++
 	end := ev.Rank() + DurationSwiftness
 	g.PushEvent(&simpleEvent{ERank: end, EAction: HasteEnd})
@@ -106,28 +290,33 @@ func (g *game) QuaffSwiftness(ev event) error {
 	return nil
 }
 
-func (g *game) QuaffDigPotion(ev event) error {
-	g.Player.Statuses[StatusDig] = 1
-	end := ev.Rank() + DurationDigging
-	g.PushEvent(&simpleEvent{ERank: end, EAction: DigEnd})
-	g.Player.Expire[StatusDig] = end
-	//g.Printf("You quaff the %s. You feel like an earth dragon.", DigPotion)
-	return nil
-}
-
-func (g *game) QuaffSwapPotion(ev event) error {
+func (g *game) EvokeSwapping(ev event) error {
 	if g.Player.HasStatus(StatusLignification) {
-		return errors.New("You cannot drink this potion while lignified.")
+		return errors.New("You cannot use this rod while lignified.")
 	}
-	g.Player.Statuses[StatusSwap] = 1
-	end := ev.Rank() + DurationSwap
-	g.PushEvent(&simpleEvent{ERank: end, EAction: SwapEnd})
-	g.Player.Expire[StatusSwap] = end
-	//g.Printf("You quaff the %s. You feel light-footed.", SwapPotion)
+	// TODO: remove targeting?
+	if err := g.ui.ChooseTarget(&chooser{}); err != nil {
+		return err
+	}
+	mons := g.MonsterAt(g.Player.Target)
+	// mons not nil (check done in the targeter)
+	if mons.Status(MonsLignified) {
+		return errors.New("You cannot target a lignified monster.")
+	}
+	g.SwapWithMonster(mons)
 	return nil
 }
 
-func (g *game) QuaffShadowsPotion(ev event) error {
+func (g *game) SwapWithMonster(mons *monster) {
+	ompos := mons.Pos
+	g.Printf("You swap positions with the %s.", mons.Kind)
+	g.ui.SwappingAnimation(mons.Pos, g.Player.Pos)
+	mons.MoveTo(g, g.Player.Pos)
+	g.PlacePlayerAt(ompos)
+	mons.MakeAware(g)
+}
+
+func (g *game) EvokeShadows(ev event) error {
 	if g.Player.HasStatus(StatusShadows) {
 		return errors.New("You are already surrounded by shadows.")
 	}
@@ -140,16 +329,34 @@ func (g *game) QuaffShadowsPotion(ev event) error {
 	return nil
 }
 
-//func (g *game) QuaffLignification(ev event) error {
-//if g.Player.HasStatus(StatusLignification) {
-//return errors.New("You are already lignified.")
-//}
-//g.EnterLignification(ev)
-//g.Printf("You quaff the %s. You feel rooted to the ground.", LignificationPotion)
-//return nil
-//}
+type cloud int
 
-func (g *game) QuaffMagicMapping(ev event) error {
+const (
+	CloudFog cloud = iota
+	CloudFire
+	CloudNight
+)
+
+func (g *game) EvokeFog(ev event) error {
+	g.Fog(g.Player.Pos, 3, ev)
+	g.Print("You are surrounded by a dense fog.")
+	return nil
+}
+
+func (g *game) Fog(at position, radius int, ev event) {
+	dij := &normalPath{game: g}
+	nm := Dijkstra(dij, []position{at}, radius)
+	for pos := range nm {
+		_, ok := g.Clouds[pos]
+		if !ok {
+			g.Clouds[pos] = CloudFog
+			g.PushEvent(&cloudEvent{ERank: ev.Rank() + DurationFog + RandInt(DurationFog/2), EAction: CloudEnd, Pos: pos})
+		}
+	}
+	g.ComputeLOS()
+}
+
+func (g *game) EvokeMagicMapping(ev event) error {
 	dp := &dungeonPath{dungeon: g.Dungeon}
 	g.AutoExploreDijkstra(dp, []int{g.Player.Pos.idx()})
 	cdists := make(map[int][]int)
@@ -180,9 +387,9 @@ func (g *game) QuaffMagicMapping(ev event) error {
 	return nil
 }
 
-func (g *game) QuaffDreamPotion(ev event) error {
+func (g *game) EvokeSensing(ev event) error {
 	for _, mons := range g.Monsters {
-		if mons.Exists() && mons.State == Resting && !g.Player.Sees(mons.Pos) {
+		if mons.Exists() && !g.Player.Sees(mons.Pos) {
 			mons.UpdateKnowledge(g, mons.Pos)
 		}
 	}
@@ -190,7 +397,7 @@ func (g *game) QuaffDreamPotion(ev event) error {
 	return nil
 }
 
-func (g *game) QuaffWallPotion(ev event) error {
+func (g *game) EvokeWalls(ev event) error {
 	neighbors := g.Dungeon.FreeNeighbors(g.Player.Pos)
 	for _, pos := range neighbors {
 		mons := g.MonsterAt(pos)
@@ -203,6 +410,100 @@ func (g *game) QuaffWallPotion(ev event) error {
 	g.ComputeLOS()
 	return nil
 }
+
+func (g *game) EvokeSlowing(ev event) error {
+	// TODO: remove targeting
+	if err := g.ui.ChooseTarget(&chooser{}); err != nil {
+		return err
+	}
+	ray := g.Ray(g.Player.Target)
+	g.MakeNoise(MagicCastNoise, g.Player.Pos)
+	g.Print("Whoosh! A bolt of slowing emerges out of the magara.")
+	g.ui.SlowingMagaraAnimation(ray)
+	for _, pos := range ray {
+		mons := g.MonsterAt(pos)
+		if !mons.Exists() {
+			continue
+		}
+		mons.Statuses[MonsSlow]++
+		g.PushEvent(&monsterEvent{ERank: g.Ev.Rank() + DurationSlow, NMons: mons.Index, EAction: MonsSlowEnd})
+	}
+
+	ev.Renew(g, DurationThrowItem)
+	return nil
+}
+
+func (g *game) EvokeSleeping(ev event) error {
+	// TODO: remove targeting?
+	if err := g.ui.ChooseTarget(&chooser{area: true, minDist: true}); err != nil {
+		return err
+	}
+	neighbors := g.Dungeon.FreeNeighbors(g.Player.Target)
+	g.Print("A sleeping ball emerges straight out of the rod.")
+	g.ui.ProjectileTrajectoryAnimation(g.Ray(g.Player.Target), ColorFgSleepingMonster)
+	for _, pos := range append(neighbors, g.Player.Target) {
+		mons := g.MonsterAt(pos)
+		if !mons.Exists() {
+			continue
+		}
+		if mons.State != Resting {
+			g.Printf("%s falls asleep.", mons.Kind.Definite(true))
+		}
+		mons.State = Resting
+		mons.Dir = NoDir
+		mons.ExhaustTime(g, 40+RandInt(10))
+	}
+	return nil
+}
+
+func (g *game) EvokeObstruction(ev event) error {
+	// TODO: remove targeting?
+	if err := g.ui.ChooseTarget(&chooser{free: true}); err != nil {
+		return err
+	}
+	g.TemporalWallAt(g.Player.Target, ev)
+	g.Printf("You see a wall appear out of thin air.")
+	return nil
+}
+
+////////////////////////////////////////////////////////////////
+
+//func (g *game) QuaffBerserk(ev event) error {
+//if g.Player.HasStatus(StatusExhausted) {
+//return errors.New("You are too exhausted to berserk.")
+//}
+//if g.Player.HasStatus(StatusBerserk) {
+//return errors.New("You are already berserk.")
+//}
+//g.Player.Statuses[StatusBerserk] = 1
+//end := ev.Rank() + DurationBerserk
+//g.PushEvent(&simpleEvent{ERank: end, EAction: BerserkEnd})
+//g.Player.Expire[StatusBerserk] = end
+//g.Printf("You quaff the %s. You feel a sudden urge to kill things.", BerserkPotion)
+//g.Player.HPbonus += 2
+//return nil
+//}
+
+func (g *game) QuaffSwapPotion(ev event) error {
+	if g.Player.HasStatus(StatusLignification) {
+		return errors.New("You cannot drink this potion while lignified.")
+	}
+	g.Player.Statuses[StatusSwap] = 1
+	end := ev.Rank() + DurationSwap
+	g.PushEvent(&simpleEvent{ERank: end, EAction: SwapEnd})
+	g.Player.Expire[StatusSwap] = end
+	//g.Printf("You quaff the %s. You feel light-footed.", SwapPotion)
+	return nil
+}
+
+//func (g *game) QuaffLignification(ev event) error {
+//if g.Player.HasStatus(StatusLignification) {
+//return errors.New("You are already lignified.")
+//}
+//g.EnterLignification(ev)
+//g.Printf("You quaff the %s. You feel rooted to the ground.", LignificationPotion)
+//return nil
+//}
 
 func (g *game) QuaffCBlinkPotion(ev event) error {
 	if g.Player.HasStatus(StatusLignification) {
@@ -278,27 +579,6 @@ func (g *game) ThrowTeleportMagara(ev event) error {
 	return nil
 }
 
-func (g *game) ThrowSlowingMagara(ev event) error {
-	if err := g.ui.ChooseTarget(&chooser{}); err != nil {
-		return err
-	}
-	ray := g.Ray(g.Player.Target)
-	g.MakeNoise(MagicCastNoise, g.Player.Pos)
-	g.Print("Whoosh! A bolt of slowing emerges out of the magara.")
-	g.ui.SlowingMagaraAnimation(ray)
-	for _, pos := range ray {
-		mons := g.MonsterAt(pos)
-		if !mons.Exists() {
-			continue
-		}
-		mons.Statuses[MonsSlow]++
-		g.PushEvent(&monsterEvent{ERank: g.Ev.Rank() + DurationSlow, NMons: mons.Index, EAction: MonsSlowEnd})
-	}
-
-	ev.Renew(g, DurationThrowItem)
-	return nil
-}
-
 func (g *game) NightFog(at position, radius int, ev event) {
 	dij := &normalPath{game: g}
 	nm := Dijkstra(dij, []position{at}, radius)
@@ -322,14 +602,6 @@ func (g *game) ThrowNightMagara(ev event) error {
 	g.NightFog(g.Player.Target, 2, ev)
 
 	ev.Renew(g, DurationThrowItem)
-	return nil
-}
-
-func (g *game) EvokeRodBlink(ev event) error {
-	if g.Player.HasStatus(StatusLignification) {
-		return errors.New("You cannot blink while lignified.")
-	}
-	g.Blink(ev)
 	return nil
 }
 
@@ -376,38 +648,6 @@ func (g *game) Blink(ev event) {
 	g.Print("You blink away.")
 	g.ui.TeleportAnimation(opos, npos, true)
 	g.PlacePlayerAt(npos)
-}
-
-func (g *game) EvokeRodTeleportOther(ev event) error {
-	if err := g.ui.ChooseTarget(&chooser{}); err != nil {
-		return err
-	}
-	mons := g.MonsterAt(g.Player.Target)
-	// mons not nil (check done in the targeter)
-	mons.TeleportAway(g)
-	return nil
-}
-
-func (g *game) EvokeRodSleeping(ev event) error {
-	if err := g.ui.ChooseTarget(&chooser{area: true, minDist: true}); err != nil {
-		return err
-	}
-	neighbors := g.Dungeon.FreeNeighbors(g.Player.Target)
-	g.Print("A sleeping ball emerges straight out of the rod.")
-	g.ui.ProjectileTrajectoryAnimation(g.Ray(g.Player.Target), ColorFgSleepingMonster)
-	for _, pos := range append(neighbors, g.Player.Target) {
-		mons := g.MonsterAt(pos)
-		if !mons.Exists() {
-			continue
-		}
-		if mons.State != Resting {
-			g.Printf("%s falls asleep.", mons.Kind.Definite(true))
-		}
-		mons.State = Resting
-		mons.Dir = NoDir
-		mons.ExhaustTime(g, 40+RandInt(10))
-	}
-	return nil
 }
 
 func (g *game) EvokeRodFireBolt(ev event) error {
@@ -521,33 +761,6 @@ func (g *game) EvokeRodLightning(ev event) error {
 	return nil
 }
 
-type cloud int
-
-const (
-	CloudFog cloud = iota
-	CloudFire
-	CloudNight
-)
-
-func (g *game) EvokeRodFog(ev event) error {
-	g.Fog(g.Player.Pos, 3, ev)
-	g.Print("You are surrounded by a dense fog.")
-	return nil
-}
-
-func (g *game) Fog(at position, radius int, ev event) {
-	dij := &normalPath{game: g}
-	nm := Dijkstra(dij, []position{at}, radius)
-	for pos := range nm {
-		_, ok := g.Clouds[pos]
-		if !ok {
-			g.Clouds[pos] = CloudFog
-			g.PushEvent(&cloudEvent{ERank: ev.Rank() + DurationFog + RandInt(DurationFog/2), EAction: CloudEnd, Pos: pos})
-		}
-	}
-	g.ComputeLOS()
-}
-
 func (g *game) EvokeRodDigging(ev event) error {
 	if err := g.ui.ChooseTarget(&wallChooser{}); err != nil {
 		return err
@@ -604,15 +817,6 @@ func (g *game) EvokeRodShatter(ev event) error {
 	return nil
 }
 
-func (g *game) EvokeRodObstruction(ev event) error {
-	if err := g.ui.ChooseTarget(&chooser{free: true}); err != nil {
-		return err
-	}
-	g.TemporalWallAt(g.Player.Target, ev)
-	g.Printf("You see a wall appear out of thin air.")
-	return nil
-}
-
 func (g *game) EvokeRodLignification(ev event) error {
 	if err := g.ui.ChooseTarget(&chooser{}); err != nil {
 		return err
@@ -665,29 +869,4 @@ func (g *game) EvokeRodHope(ev event) error {
 		g.HandleKill(mons, ev)
 	}
 	return nil
-}
-
-func (g *game) EvokeRodSwapping(ev event) error {
-	if g.Player.HasStatus(StatusLignification) {
-		return errors.New("You cannot use this rod while lignified.")
-	}
-	if err := g.ui.ChooseTarget(&chooser{}); err != nil {
-		return err
-	}
-	mons := g.MonsterAt(g.Player.Target)
-	// mons not nil (check done in the targeter)
-	if mons.Status(MonsLignified) {
-		return errors.New("You cannot target a lignified monster.")
-	}
-	g.SwapWithMonster(mons)
-	return nil
-}
-
-func (g *game) SwapWithMonster(mons *monster) {
-	ompos := mons.Pos
-	g.Printf("You swap positions with the %s.", mons.Kind)
-	g.ui.SwappingAnimation(mons.Pos, g.Player.Pos)
-	mons.MoveTo(g, g.Player.Pos)
-	g.PlacePlayerAt(ompos)
-	mons.MakeAware(g)
 }

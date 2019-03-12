@@ -505,6 +505,7 @@ const (
 	KeyGoToStairs
 	KeyExplore
 	KeyExamine
+	KeyEvoke
 	KeyCharacterInfo
 	KeyLogs
 	KeyDump
@@ -552,6 +553,7 @@ var configurableKeyActions = [...]keyAction{
 	KeyGoToStairs,
 	KeyExplore,
 	KeyExamine,
+	KeyEvoke,
 	KeyCharacterInfo,
 	KeyLogs,
 	KeyDump,
@@ -588,6 +590,7 @@ func (k keyAction) NormalModeKey() bool {
 		KeyGoToStairs,
 		KeyExplore,
 		KeyExamine,
+		KeyEvoke,
 		KeyCharacterInfo,
 		KeyLogs,
 		KeyDump,
@@ -651,6 +654,8 @@ func (k keyAction) NormalModeDescription() (text string) {
 		text = "Autoexplore"
 	case KeyExamine:
 		text = "Examine"
+	case KeyEvoke:
+		text = "Evoke card"
 	case KeyCharacterInfo:
 		text = "View Character and Quest Information"
 	case KeyLogs:
@@ -798,6 +803,9 @@ func ApplyDefaultKeyBindings() {
 		'G': KeyGoToStairs,
 		'o': KeyExplore,
 		'x': KeyExamine,
+		'v': KeyEvoke,
+		'z': KeyEvoke,
+		'u': KeyEvoke,
 		'%': KeyCharacterInfo,
 		'C': KeyCharacterInfo,
 		'm': KeyLogs,
@@ -956,6 +964,9 @@ func (ui *gameui) HandleKey(rka runeKeyAction) (err error, again bool, quit bool
 		} else {
 			err = errors.New("You cannot go to any stairs.")
 		}
+	case KeyEvoke:
+		err = ui.SelectCard(g.Ev)
+		err = ui.CleanError(err)
 	case KeyExplore:
 		err = g.Autoexplore(g.Ev)
 		ui.MenuSelectedAnimation(MenuExplore, err == nil)
@@ -1236,7 +1247,7 @@ func (ui *gameui) CursorKeyAction(targ Targeter, rka runeKeyAction, data *examin
 		g.Targeting = InvalidPos
 		notarg = true
 		err = errors.New(DoNothing)
-	case KeyExplore, KeyRest, KeyLogs, KeyCharacterInfo:
+	case KeyExplore, KeyRest, KeyLogs, KeyEvoke, KeyCharacterInfo:
 		if _, ok := targ.(*examiner); !ok {
 			break
 		}
@@ -1404,10 +1415,10 @@ func (m menu) Key(g *game) (key keyAction) {
 }
 
 var MenuCols = [][2]int{
-	MenuRest:     {0, 0},
-	MenuExplore:  {0, 0},
-	MenuThrow:    {0, 0},
-	MenuDrink:    {0, 0},
+	MenuRest:    {0, 0},
+	MenuExplore: {0, 0},
+	//MenuThrow:    {0, 0},
+	//MenuDrink:    {0, 0},
 	MenuEvoke:    {0, 0},
 	MenuOther:    {0, 0},
 	MenuInteract: {0, 0}}

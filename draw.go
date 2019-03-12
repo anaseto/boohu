@@ -1579,59 +1579,58 @@ func (ui *gameui) ListItemBG(i int) uicolor {
 // 	}
 // }
 //
-// func (ui *gameui) RodItem(i, lnum int, r rod, fg uicolor) {
-// 	g := ui.g
-// 	bg := ui.ListItemBG(i)
-// 	ui.ClearLineWithColor(lnum, bg)
-// 	mc := r.MaxCharge()
-// 	if g.Player.Armour == CelmistRobe {
-// 		mc += 2
-// 	}
-// 	ui.DrawColoredTextOnBG(fmt.Sprintf("%c - %s (%d/%d charges, %d mana cost)",
-// 		rune(i+97), r, g.Player.Rods[r].Charge, mc, r.MPCost()), 0, lnum, fg, bg)
-// }
-//
-// func (ui *gameui) SelectRod(ev event) error {
-// 	g := ui.g
-// 	desc := false
-// 	for {
-// 		rs := g.SortedRods()
-// 		ui.ClearLine(0)
-// 		if !ui.Small() {
-// 			ui.DrawColoredText(MenuEvoke.String(), MenuCols[MenuEvoke][0], DungeonHeight, ColorCyan)
-// 		}
-// 		if desc {
-// 			ui.DrawColoredText("Describe", 0, 0, ColorBlue)
-// 			col := utf8.RuneCountInString("Describe")
-// 			ui.DrawText(" which rod? (press ? or click here for evocation menu)", col, 0)
-// 		} else {
-// 			ui.DrawColoredText("Evoke", 0, 0, ColorCyan)
-// 			col := utf8.RuneCountInString("Evoke")
-// 			ui.DrawText(" which rod? (press ? or click here for description menu)", col, 0)
-// 		}
-// 		for i, r := range rs {
-// 			ui.RodItem(i, i+1, r, ColorFg)
-// 		}
-// 		ui.DrawTextLine(" press esc or space to cancel ", len(rs)+1)
-// 		ui.Flush()
-// 		index, alt, err := ui.Select(len(rs))
-// 		if alt {
-// 			desc = !desc
-// 			continue
-// 		}
-// 		if err == nil {
-// 			ui.RodItem(index, index+1, rs[index], ColorYellow)
-// 			ui.Flush()
-// 			time.Sleep(75 * time.Millisecond)
-// 			if desc {
-// 				ui.DrawDescription(rs[index].Desc(g))
-// 				continue
-// 			}
-// 			err = rs[index].Use(g, ev)
-// 		}
-// 		return err
-// 	}
-// }
+func (ui *gameui) CardItem(i, lnum int, c card, fg uicolor) {
+	//g := ui.g
+	bg := ui.ListItemBG(i)
+	ui.ClearLineWithColor(lnum, bg)
+	//mc := c.MaxCharge()
+	//if g.Player.Armour == CelmistRobe {
+	//mc += 2
+	//}
+	ui.DrawColoredTextOnBG(fmt.Sprintf("%c - %s", rune(i+97), c), 0, lnum, fg, bg)
+}
+
+func (ui *gameui) SelectCard(ev event) error {
+	g := ui.g
+	desc := false
+	for {
+		cards := g.Hand
+		ui.ClearLine(0)
+		if !ui.Small() {
+			ui.DrawColoredText(MenuEvoke.String(), MenuCols[MenuEvoke][0], DungeonHeight, ColorCyan)
+		}
+		if desc {
+			ui.DrawColoredText("Describe", 0, 0, ColorBlue)
+			col := utf8.RuneCountInString("Describe")
+			ui.DrawText(" which card? (press ? or click here for evocation menu)", col, 0)
+		} else {
+			ui.DrawColoredText("Evoke", 0, 0, ColorCyan)
+			col := utf8.RuneCountInString("Evoke")
+			ui.DrawText(" which card? (press ? or click here for description menu)", col, 0)
+		}
+		for i, r := range cards {
+			ui.CardItem(i, i+1, r, ColorFg)
+		}
+		ui.DrawTextLine(" press esc or space to cancel ", len(cards)+1)
+		ui.Flush()
+		index, alt, err := ui.Select(len(cards))
+		if alt {
+			desc = !desc
+			continue
+		}
+		if err == nil {
+			ui.CardItem(index, index+1, cards[index], ColorYellow)
+			ui.Flush()
+			time.Sleep(75 * time.Millisecond)
+			if desc {
+				ui.DrawDescription(cards[index].Desc(g))
+				continue
+			}
+			err = g.UseCard(index, ev)
+		}
+		return err
+	}
+}
 
 func (ui *gameui) ActionItem(i, lnum int, ka keyAction, fg uicolor) {
 	bg := ui.ListItemBG(i)

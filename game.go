@@ -22,6 +22,7 @@ type game struct {
 	Clouds             map[position]cloud
 	TemporalWalls      map[position]bool
 	GeneratedUniques   map[monsterBand]int
+	GeneratedCards     []card
 	GenPlan            [MaxDepth + 1]genFlavour
 	TerrainKnowledge   map[position]terrain
 	ExclusionsMap      map[position]bool
@@ -40,6 +41,7 @@ type game struct {
 	DrawBuffer         []UICell
 	drawBackBuffer     []UICell
 	DrawLog            []drawFrame
+	Hand               []card
 	Log                []logEntry
 	LogIndex           int
 	LogNextTick        int
@@ -216,7 +218,12 @@ func (g *game) InitPlayer() {
 	}
 	g.Player.Statuses = map[status]int{}
 	g.Player.Expire = map[status]int{}
-
+	g.Hand = []card{
+		HealWoundsCard,
+		BlinkCard,
+		TeleportCard,
+		FogCard,
+	}
 }
 
 type genFlavour int
