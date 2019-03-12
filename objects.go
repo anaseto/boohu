@@ -2,6 +2,11 @@ package main
 
 import "fmt"
 
+type objects struct {
+	Stairs map[position]stair
+	Stones map[position]stone
+}
+
 type stair int
 
 const (

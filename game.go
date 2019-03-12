@@ -60,11 +60,6 @@ type game struct {
 //UnstableLevel int
 //}
 
-type objects struct {
-	Stairs map[position]stair
-	Stones map[position]stone
-}
-
 func (g *game) FreeCell() position {
 	d := g.Dungeon
 	count := 0
