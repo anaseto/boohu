@@ -922,10 +922,7 @@ func (ui *gameui) HandleKey(rka runeKeyAction) (err error, again bool, quit bool
 	case KeyDescend:
 		if g.Dungeon.Cell(g.Player.Pos).T == StairCell {
 			ui.MenuSelectedAnimation(MenuInteract, true)
-			strt := NormalStair
-			if g.WinStair == g.Player.Pos {
-				strt = WinStair
-			}
+			strt := g.Objects.Stairs[g.Player.Pos]
 			err = ui.OptionalDescendConfirmation(strt)
 			if err != nil {
 				break
@@ -1189,10 +1186,7 @@ func (ui *gameui) CursorKeyAction(targ Targeter, rka runeKeyAction, data *examin
 	case KeyDescend:
 		if g.Dungeon.Cell(g.Player.Pos).T == StairCell {
 			ui.MenuSelectedAnimation(MenuInteract, true)
-			strt := NormalStair
-			if g.WinStair == g.Player.Pos {
-				strt = WinStair
-			}
+			strt := g.Objects.Stairs[g.Player.Pos]
 			err = ui.OptionalDescendConfirmation(strt)
 			if err != nil {
 				break

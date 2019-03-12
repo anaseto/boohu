@@ -33,6 +33,16 @@ func (st stair) Desc(g *game) (desc string) {
 	return desc
 }
 
+func (st stair) Style(g *game) (r rune, fg uicolor) {
+	r = '>'
+	if st == WinStair {
+		fg = ColorFgMagicPlace
+	} else {
+		fg = ColorFgPlace
+	}
+	return r, fg
+}
+
 type stone int
 
 const (

@@ -102,12 +102,8 @@ func (c cell) Style(g *game, pos position) (r rune, fg uicolor) {
 	case BarrelCell:
 		r, fg = '_', ColorFgCollectable // TODO: change letter and color
 	case StairCell:
-		r = '>'
-		if g.WinStair == pos {
-			fg = ColorFgMagicPlace
-		} else {
-			fg = ColorFgPlace
-		}
+		st := g.Objects.Stairs[pos]
+		r, fg = st.Style(g)
 	}
 	return r, fg
 }

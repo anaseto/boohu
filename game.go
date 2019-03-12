@@ -5,29 +5,25 @@ import "container/heap"
 var Version string = "v0.1-dev"
 
 type game struct {
-	Dungeon          *dungeon
-	Player           *player
-	Monsters         []*monster
-	MonstersPosCache []int // monster (dungeon index + 1) / no monster (0)
-	Bands            []bandInfo
-	Events           *eventQueue
-	Ev               event
-	EventIndex       int
-	Depth            int
-	ExploredLevels   int
-	DepthPlayerTurn  int
-	Turn             int
-	Highlight        map[position]bool // highlighted positions (e.g. targeted ray)
-	Objects          objects
-	Clouds           map[position]cloud
-	//Fungus              map[position]vegetation
-	//Doors               map[position]bool
-	TemporalWalls    map[position]bool
-	GeneratedUniques map[monsterBand]int
-	GenPlan          [MaxDepth + 1]genFlavour
-	TerrainKnowledge map[position]terrain
-	//WrongFoliage        map[position]bool
-	//WrongDoor           map[position]bool
+	Dungeon            *dungeon
+	Player             *player
+	Monsters           []*monster
+	MonstersPosCache   []int // monster (dungeon index + 1) / no monster (0)
+	Bands              []bandInfo
+	Events             *eventQueue
+	Ev                 event
+	EventIndex         int
+	Depth              int
+	ExploredLevels     int
+	DepthPlayerTurn    int
+	Turn               int
+	Highlight          map[position]bool // highlighted positions (e.g. targeted ray)
+	Objects            objects
+	Clouds             map[position]cloud
+	TemporalWalls      map[position]bool
+	GeneratedUniques   map[monsterBand]int
+	GenPlan            [MaxDepth + 1]genFlavour
+	TerrainKnowledge   map[position]terrain
 	ExclusionsMap      map[position]bool
 	Noise              map[position]bool
 	LastMonsterKnownAt map[position]*monster
@@ -53,7 +49,6 @@ type game struct {
 	Quit               bool
 	Wizard             bool
 	WizardMap          bool
-	WinStair           position
 	Version            string
 	//Opts                startOpts
 	ui *gameui
@@ -376,7 +371,7 @@ func (g *game) StairsSlice() []position {
 func (g *game) Descend() bool {
 	g.LevelStats()
 	c := g.Dungeon.Cell(g.Player.Pos)
-	if c.T == StairCell && g.WinStair == g.Player.Pos {
+	if c.T == StairCell && g.Objects.Stairs[g.Player.Pos] == WinStair {
 		g.StoryPrint("You escaped!")
 		g.ExploredLevels = g.Depth
 		g.Depth = -1
