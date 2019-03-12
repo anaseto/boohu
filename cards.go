@@ -7,7 +7,27 @@ import (
 
 type card int
 
-const ()
+const (
+	BlinkCard card = iota
+	DigCard
+	TeleportCard
+	TeleportOtherCard
+	HealWoundsCard
+	MagicCard
+	DescentCard
+	SwiftnessCard
+	SwappingCard // XXX: swap with random monster?
+	ShadowsCard
+	FogCard
+	MagicMappingCard
+	DreamCard // XXX: maybe needs change
+	WallCard
+	SlowingCard
+	GoodNightCard
+	NoiseCard
+	ObstructionCard
+	SmokeCard
+)
 
 func (g *game) QuaffTeleportation(ev event) error {
 	if g.Player.HasStatus(StatusLignification) {
@@ -160,21 +180,6 @@ func (g *game) QuaffMagicMapping(ev event) error {
 	return nil
 }
 
-func (g *game) QuaffTormentPotion(ev event) error {
-	//g.Printf("You quaff the %s. %s It hurts!", TormentPotion, g.ExplosionSound())
-	g.DamagePlayer(g.Player.HP / 2)
-	g.ui.WoundedAnimation()
-	g.MakeNoise(ExplosionNoise+10, g.Player.Pos)
-	g.ui.TormentExplosionAnimation()
-	for pos, b := range g.Player.LOS {
-		if !b {
-			continue
-		}
-		g.ExplosionAt(ev, pos)
-	}
-	return nil
-}
-
 func (g *game) QuaffDreamPotion(ev event) error {
 	for _, mons := range g.Monsters {
 		if mons.Exists() && mons.State == Resting && !g.Player.Sees(mons.Pos) {
@@ -208,28 +213,6 @@ func (g *game) QuaffCBlinkPotion(ev event) error {
 	}
 	//g.Printf("You quaff the %s. You blink.", CBlinkPotion)
 	g.PlacePlayerAt(g.Player.Target)
-	return nil
-}
-
-func (g *game) ThrowConfusingDart(ev event) error {
-	if err := g.ui.ChooseTarget(&chooser{needsFreeWay: true}); err != nil {
-		return err
-	}
-	mons := g.MonsterAt(g.Player.Target)
-	attack := 1
-	mons.HP -= attack
-	if mons.HP > 0 {
-		mons.EnterConfusion(g, ev)
-		//g.PrintfStyled("Your %s hits the %s (%d dmg), who appears confused.", logPlayerHit, ConfusingDart, mons.Kind, attack)
-		g.ui.ThrowAnimation(g.Ray(mons.Pos), true)
-		mons.MakeHuntIfHurt(g)
-	} else {
-		//g.PrintfStyled("Your %s kills the %s.", logPlayerHit, ConfusingDart, mons.Kind)
-		g.ui.ThrowAnimation(g.Ray(mons.Pos), true)
-		g.HandleKill(mons, ev)
-	}
-	g.HandleStone(mons)
-	ev.Renew(g, DurationThrowItem)
 	return nil
 }
 
@@ -310,22 +293,6 @@ func (g *game) ThrowSlowingMagara(ev event) error {
 		}
 		mons.Statuses[MonsSlow]++
 		g.PushEvent(&monsterEvent{ERank: g.Ev.Rank() + DurationSlow, NMons: mons.Index, EAction: MonsSlowEnd})
-	}
-
-	ev.Renew(g, DurationThrowItem)
-	return nil
-}
-
-func (g *game) ThrowConfuseMagara(ev event) error {
-	//g.Printf("You activate the %s. A harmonic light confuses monsters.", ConfuseMagara)
-	for pos, b := range g.Player.LOS {
-		if !b {
-			continue
-		}
-		mons := g.MonsterAt(pos)
-		if mons.Exists() {
-			mons.EnterConfusion(g, ev)
-		}
 	}
 
 	ev.Renew(g, DurationThrowItem)
