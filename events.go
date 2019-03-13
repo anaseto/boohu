@@ -45,7 +45,6 @@ type simpleAction int
 
 const (
 	PlayerTurn simpleAction = iota
-	Teleportation
 	BerserkEnd
 	SlowEnd
 	ExhaustionEnd
@@ -112,13 +111,6 @@ func (sev *simpleEvent) Action(g *game) {
 			return
 		}
 		g.TurnStats()
-	case Teleportation:
-		if !g.Player.HasStatus(StatusLignification) {
-			g.Teleportation(sev)
-		} else {
-			g.Print("Lignification has prevented teleportation.")
-		}
-		g.Player.Statuses[StatusTele] = 0
 	case BerserkEnd:
 		g.Player.Statuses[StatusBerserk] = 0
 		g.Player.Statuses[StatusSlow]++

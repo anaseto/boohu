@@ -268,12 +268,7 @@ func (g *game) EvokeTeleport(ev event) error {
 	if g.Player.HasStatus(StatusLignification) {
 		return errors.New("You cannot teleport while lignified.")
 	}
-	if g.Player.HasStatus(StatusTele) {
-		return errors.New("You already quaffed a potion of teleportation.")
-	}
-	delay := DurationTeleportationDelay
-	g.Player.Statuses[StatusTele] = 1
-	g.PushEvent(&simpleEvent{ERank: ev.Rank() + delay, EAction: Teleportation})
+	g.Teleportation(ev)
 	//g.Printf("You quaff the %s. You feel unstable.", TeleportationPotion)
 	return nil
 }
