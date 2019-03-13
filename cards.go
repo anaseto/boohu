@@ -59,7 +59,11 @@ func (g *game) UseCard(n int, ev event) (err error) {
 	if g.Player.HasStatus(StatusNausea) {
 		return errors.New("You cannot use cards while sick.")
 	}
-	switch g.Hand[n] {
+	c := g.Hand[n]
+	if c.MPCost() > g.Player.MP {
+		return errors.New("Not enough magic points for using this rod.")
+	}
+	switch c {
 	case BlinkCard:
 		err = g.EvokeBlink(ev)
 	case TeleportCard:
@@ -105,9 +109,10 @@ func (g *game) UseCard(n int, ev event) (err error) {
 	}
 	g.Stats.Drinks++ // TODO
 	// TODO: animation
-	g.StoryPrintf("You evoked your %s.", g.Hand[n])
-	g.DrawCard(n)
+	g.Player.MP -= c.MPCost()
 	g.FunAction()
+	g.StoryPrintf("You evoked your %s.", c)
+	g.DrawCard(n)
 	ev.Renew(g, 5)
 	return nil
 }
@@ -199,6 +204,10 @@ func (c card) Desc(g *game) (desc string) {
 		desc = "card of smoke"
 	}
 	return desc
+}
+
+func (c card) MPCost() int {
+	return 1
 }
 
 func (g *game) EvokeBlink(ev event) error {
