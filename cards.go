@@ -283,31 +283,31 @@ func (g *game) EvokeDig(ev event) error {
 }
 
 func (g *game) MonstersInLOS() []*monster {
-	m := []*monster{}
+	ms := []*monster{}
 	for _, mons := range g.Monsters {
 		if mons.Exists() && g.Player.Sees(mons.Pos) {
-			m = append(m, mons)
+			ms = append(ms, mons)
 		}
 	}
 	// shuffle before, because the order could be unnaturally predicted
-	for i := 0; i < len(m); i++ {
-		j := i + RandInt(len(m)-i)
-		m[i], m[j] = m[j], m[i]
+	for i := 0; i < len(ms); i++ {
+		j := i + RandInt(len(ms)-i)
+		ms[i], ms[j] = ms[j], ms[i]
 	}
-	return m
+	return ms
 }
 
 func (g *game) EvokeTeleportOther(ev event) error {
-	m := g.MonstersInLOS()
-	if len(m) == 0 {
+	ms := g.MonstersInLOS()
+	if len(ms) == 0 {
 		return errors.New("There are no monsters in view.")
 	}
 	max := 2
-	if max > len(m) {
-		max = len(m)
+	if max > len(ms) {
+		max = len(ms)
 	}
 	for i := 0; i < max; i++ {
-		m[i].TeleportAway(g)
+		ms[i].TeleportAway(g)
 	}
 
 	return nil
@@ -364,14 +364,20 @@ func (g *game) EvokeSwapping(ev event) error {
 	if g.Player.HasStatus(StatusLignification) {
 		return errors.New("You cannot use this rod while lignified.")
 	}
-	// TODO: remove targeting?
-	if err := g.ui.ChooseTarget(&chooser{}); err != nil {
-		return err
+	ms := g.MonstersInLOS()
+	var mons *monster
+	best := 0
+	for _, m := range ms {
+		if m.Status(MonsLignified) {
+			continue
+		}
+		if m.Pos.Distance(g.Player.Pos) > best {
+			best = m.Pos.Distance(g.Player.Pos)
+			mons = m
+		}
 	}
-	mons := g.MonsterAt(g.Player.Target)
-	// mons not nil (check done in the targeter)
-	if mons.Status(MonsLignified) {
-		return errors.New("You cannot target a lignified monster.")
+	if !mons.Exists() {
+		return errors.New("No monsters suitable for swapping in view.")
 	}
 	g.SwapWithMonster(mons)
 	return nil
