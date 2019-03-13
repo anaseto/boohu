@@ -35,7 +35,7 @@ func (p *player) HPMax() int {
 	return hpmax
 }
 
-const DefaultMPmax = 3
+const DefaultMPmax = 4
 
 func (p *player) MPMax() int {
 	mpmax := DefaultMPmax
