@@ -172,7 +172,7 @@ func (c card) Desc(g *game) (desc string) {
 	case DigCard:
 		desc = ""
 	case TeleportOtherCard:
-		desc = "teleports up to two random monsters in sight."
+		desc = "teleports up to two random monsters in sight"
 	case HealWoundsCard:
 		desc = ""
 	case MagicCard:
@@ -182,7 +182,7 @@ func (c card) Desc(g *game) (desc string) {
 	case SwiftnessCard:
 		desc = ""
 	case SwappingCard:
-		desc = ""
+		desc = "makes you swap positions with the farthest monster in sight"
 	case ShadowsCard:
 		desc = ""
 	case FogCard:
