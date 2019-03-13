@@ -174,10 +174,13 @@ func (mp *monPath) Neighbors(pos position) []position {
 	keep := func(npos position) bool {
 		return npos.valid() && (d.Cell(npos).IsFree() || mp.wall)
 	}
-	//if mp.monster.Status(MonsConfused) {
-	return pos.CardinalNeighbors(nb, keep)
-	//}
-	//return pos.Neighbors(nb, keep)
+	ret := pos.CardinalNeighbors(nb, keep)
+	// shuffle so that monster movement is not unnaturally predictable
+	for i := 0; i < len(ret); i++ {
+		j := i + RandInt(len(ret)-i)
+		ret[i], ret[j] = ret[j], ret[i]
+	}
+	return ret
 }
 
 func (mp *monPath) Cost(from, to position) int {

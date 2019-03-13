@@ -107,7 +107,7 @@ func (g *game) UseCard(n int, ev event) (err error) {
 	if err != nil {
 		return err
 	}
-	g.Stats.Drinks++ // TODO
+	g.Stats.CardsUsed++ // TODO
 	// TODO: animation
 	g.Player.MP -= c.MPCost()
 	g.FunAction()

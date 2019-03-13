@@ -65,6 +65,8 @@ func (c cell) ShortDesc(g *game, pos position) (desc string) {
 		desc = "foliage"
 	case BarrelCell:
 		desc = "a barrel"
+	case StoneCell:
+		desc = g.Objects.Stones[pos].ShortDesc(g)
 	case StairCell:
 		desc = g.Objects.Stairs[pos].ShortDesc(g)
 	}
@@ -83,6 +85,8 @@ func (c cell) Desc(g *game, pos position) (desc string) {
 		desc = "Blue dense foliage grows in the Underground. It is difficult to see through, and is flammable."
 	case BarrelCell:
 		desc = "A barrel. You can hide yourself inside it when no monsters see you. It is a safe place for resting and recovering."
+	case StoneCell:
+		desc = g.Objects.Stones[pos].Desc(g)
 	case StairCell:
 		desc = g.Objects.Stairs[pos].Desc(g)
 	}
@@ -101,6 +105,8 @@ func (c cell) Style(g *game, pos position) (r rune, fg uicolor) {
 		r, fg = '"', ColorFgLOS
 	case BarrelCell:
 		r, fg = '_', ColorFgCollectable // TODO: change letter and color
+	case StoneCell:
+		r, fg = g.Objects.Stones[pos].Style(g)
 	case StairCell:
 		st := g.Objects.Stairs[pos]
 		r, fg = st.Style(g)
