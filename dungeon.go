@@ -657,8 +657,9 @@ func (g *game) GenRoomTunnels() {
 	if g.Depth == WinDepth || g.Depth == MaxDepth {
 		dg.Stairs(g, WinStair)
 	}
-	dg.Barrel(g)
-	dg.Barrel(g)
+	for i := 0; i < 4+RandInt(2); i++ {
+		dg.Barrel(g)
+	}
 	dg.GenMonsters(g)
 	dg.AddSpecial(g)
 }

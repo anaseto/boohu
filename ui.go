@@ -1370,8 +1370,6 @@ type menu int
 const (
 	MenuRest menu = iota
 	MenuExplore
-	MenuThrow
-	MenuDrink
 	MenuEvoke
 	MenuOther
 	MenuInteract
@@ -1383,10 +1381,6 @@ func (m menu) String() (text string) {
 		text = "rest"
 	case MenuExplore:
 		text = "explore"
-	case MenuThrow:
-		text = "throw"
-	case MenuDrink:
-		text = "drink"
 	case MenuEvoke:
 		text = "evoke"
 	case MenuOther:
@@ -1405,6 +1399,8 @@ func (m menu) Key(g *game) (key keyAction) {
 		key = KeyExplore
 	case MenuOther:
 		key = KeyMenu
+	case MenuEvoke:
+		key = KeyEvoke
 	case MenuInteract:
 		switch g.Dungeon.Cell(g.Player.Pos).T {
 		case StairCell:
@@ -1415,10 +1411,8 @@ func (m menu) Key(g *game) (key keyAction) {
 }
 
 var MenuCols = [][2]int{
-	MenuRest:    {0, 0},
-	MenuExplore: {0, 0},
-	//MenuThrow:    {0, 0},
-	//MenuDrink:    {0, 0},
+	MenuRest:     {0, 0},
+	MenuExplore:  {0, 0},
 	MenuEvoke:    {0, 0},
 	MenuOther:    {0, 0},
 	MenuInteract: {0, 0}}
