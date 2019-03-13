@@ -20,7 +20,7 @@ type game struct {
 	Highlight          map[position]bool // highlighted positions (e.g. targeted ray)
 	Objects            objects
 	Clouds             map[position]cloud
-	TemporalWalls      map[position]bool
+	TemporalWalls      map[position]terrain
 	GeneratedUniques   map[monsterBand]int
 	GeneratedCards     []card
 	GenPlan            [MaxDepth + 1]genFlavour
@@ -276,7 +276,7 @@ func (g *game) InitLevel() {
 	g.MonstersPosCache = make([]int, DungeonNCells)
 	g.TerrainKnowledge = map[position]terrain{}
 	g.ExclusionsMap = map[position]bool{}
-	g.TemporalWalls = map[position]bool{}
+	g.TemporalWalls = map[position]terrain{}
 	g.LastMonsterKnownAt = map[position]*monster{}
 
 	// Dungeon terrain

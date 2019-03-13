@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"sort"
 )
 
@@ -165,45 +166,45 @@ func (c card) Desc(g *game) (desc string) {
 	// TODO
 	switch c {
 	case BlinkCard:
-		desc = "card of blinking"
+		desc = "makes you blink away within your line of sight. The rod is more susceptible to send you to the cells thar are most far from you."
 	case TeleportCard:
-		desc = "card of teleportation"
+		desc = ""
 	case DigCard:
-		desc = "card of digging"
+		desc = ""
 	case TeleportOtherCard:
-		desc = "card of teleport other"
+		desc = "teleports up to two random monsters in sight."
 	case HealWoundsCard:
-		desc = "card of heal wounds"
+		desc = ""
 	case MagicCard:
-		desc = "card of refill magic"
+		desc = ""
 	case DescentCard:
-		desc = "card of descent"
+		desc = ""
 	case SwiftnessCard:
-		desc = "card of swiftness"
+		desc = ""
 	case SwappingCard:
-		desc = "card of swapping"
+		desc = ""
 	case ShadowsCard:
-		desc = "card of shadows"
+		desc = ""
 	case FogCard:
-		desc = "card of fog"
+		desc = ""
 	case MagicMappingCard:
-		desc = "card of magic mapping"
+		desc = ""
 	case SensingCard:
-		desc = "card of sensing"
+		desc = ""
 	case WallsCard:
-		desc = "card of walls"
+		desc = ""
 	case SlowingCard:
-		desc = "card of slowing"
+		desc = ""
 	case SleepingCard:
-		desc = "card of sleeping"
+		desc = ""
 	case NoiseCard:
-		desc = "card of noise"
+		desc = ""
 	case ObstructionCard:
-		desc = "card of obstruction"
+		desc = ""
 	case SmokeCard:
-		desc = "card of smoke"
+		desc = ""
 	}
-	return desc
+	return fmt.Sprintf("The %s %s.", c, desc)
 }
 
 func (c card) MPCost() int {
@@ -241,14 +242,34 @@ func (g *game) EvokeDig(ev event) error {
 	return nil
 }
 
-func (g *game) EvokeTeleportOther(ev event) error {
-	// TODO: remove targeting?
-	if err := g.ui.ChooseTarget(&chooser{}); err != nil {
-		return err
+func (g *game) MonstersInLOS() []*monster {
+	m := []*monster{}
+	for _, mons := range g.Monsters {
+		if mons.Exists() && g.Player.Sees(mons.Pos) {
+			m = append(m, mons)
+		}
 	}
-	mons := g.MonsterAt(g.Player.Target)
-	// mons not nil (check done in the targeter)
-	mons.TeleportAway(g)
+	// shuffle before, because the order could be unnaturally predicted
+	for i := 0; i < len(m); i++ {
+		j := i + RandInt(len(m)-i)
+		m[i], m[j] = m[j], m[i]
+	}
+	return m
+}
+
+func (g *game) EvokeTeleportOther(ev event) error {
+	m := g.MonstersInLOS()
+	if len(m) == 0 {
+		return errors.New("There are no monsters in view.")
+	}
+	max := 2
+	if max > len(m) {
+		max = len(m)
+	}
+	for i := 0; i < max; i++ {
+		m[i].TeleportAway(g)
+	}
+
 	return nil
 }
 
@@ -851,9 +872,10 @@ func (g *game) TemporalWallAt(pos position, ev event) {
 }
 
 func (g *game) CreateTemporalWallAt(pos position, ev event) {
+	t := g.Dungeon.Cell(pos).T
 	g.Dungeon.SetCell(pos, WallCell)
 	delete(g.Clouds, pos)
-	g.TemporalWalls[pos] = true
+	g.TemporalWalls[pos] = t
 	g.PushEvent(&cloudEvent{ERank: ev.Rank() + DurationTemporalWall + RandInt(DurationTemporalWall/2), Pos: pos, EAction: ObstructionEnd})
 }
 

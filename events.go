@@ -300,17 +300,19 @@ func (cev *cloudEvent) Action(g *game) {
 		delete(g.Clouds, cev.Pos)
 		g.ComputeLOS()
 	case ObstructionEnd:
+		t := g.TemporalWalls[cev.Pos]
 		if !g.Player.Sees(cev.Pos) && g.Dungeon.Cell(cev.Pos).T == WallCell {
+			// XXX does not handle all cases
 			g.TerrainKnowledge[cev.Pos] = WallCell
 		} else {
 			delete(g.TemporalWalls, cev.Pos)
 			delete(g.TerrainKnowledge, cev.Pos)
 		}
 		// TODO: rework temporal walls so that they preserve doors and foliage
-		if g.Dungeon.Cell(cev.Pos).T == GroundCell {
+		if g.Dungeon.Cell(cev.Pos).T != WallCell {
 			break
 		}
-		g.Dungeon.SetCell(cev.Pos, GroundCell)
+		g.Dungeon.SetCell(cev.Pos, t)
 		g.MakeNoise(TemporalWallNoise, cev.Pos)
 		g.Fog(cev.Pos, 1, &simpleEvent{ERank: cev.Rank()})
 		g.ComputeLOS()
