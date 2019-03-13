@@ -219,6 +219,51 @@ func (g *game) EvokeBlink(ev event) error {
 	return nil
 }
 
+func (g *game) Blink(ev event) {
+	if g.Player.HasStatus(StatusLignification) {
+		return
+	}
+	npos := g.BlinkPos()
+	if !npos.valid() {
+		// should not happen
+		g.Print("You could not blink.")
+		return
+	}
+	opos := g.Player.Pos
+	g.Print("You blink away.")
+	g.ui.TeleportAnimation(opos, npos, true)
+	g.PlacePlayerAt(npos)
+}
+
+func (g *game) BlinkPos() position {
+	losPos := []position{}
+	for pos, b := range g.Player.LOS {
+		// TODO: skip if not seen?
+		if !b {
+			continue
+		}
+		if !g.Dungeon.Cell(pos).IsFree() {
+			continue
+		}
+		mons := g.MonsterAt(pos)
+		if mons.Exists() {
+			continue
+		}
+		losPos = append(losPos, pos)
+	}
+	if len(losPos) == 0 {
+		return InvalidPos
+	}
+	npos := losPos[RandInt(len(losPos))]
+	for i := 0; i < 4; i++ {
+		pos := losPos[RandInt(len(losPos))]
+		if npos.Distance(g.Player.Pos) < pos.Distance(g.Player.Pos) {
+			npos = pos
+		}
+	}
+	return npos
+}
+
 func (g *game) EvokeTeleport(ev event) error {
 	if g.Player.HasStatus(StatusLignification) {
 		return errors.New("You cannot teleport while lignified.")
@@ -633,51 +678,6 @@ func (g *game) ThrowNightMagara(ev event) error {
 
 	ev.Renew(g, DurationThrowItem)
 	return nil
-}
-
-func (g *game) BlinkPos() position {
-	losPos := []position{}
-	for pos, b := range g.Player.LOS {
-		// TODO: skip if not seen?
-		if !b {
-			continue
-		}
-		if !g.Dungeon.Cell(pos).IsFree() {
-			continue
-		}
-		mons := g.MonsterAt(pos)
-		if mons.Exists() {
-			continue
-		}
-		losPos = append(losPos, pos)
-	}
-	if len(losPos) == 0 {
-		return InvalidPos
-	}
-	npos := losPos[RandInt(len(losPos))]
-	for i := 0; i < 4; i++ {
-		pos := losPos[RandInt(len(losPos))]
-		if npos.Distance(g.Player.Pos) < pos.Distance(g.Player.Pos) {
-			npos = pos
-		}
-	}
-	return npos
-}
-
-func (g *game) Blink(ev event) {
-	if g.Player.HasStatus(StatusLignification) {
-		return
-	}
-	npos := g.BlinkPos()
-	if !npos.valid() {
-		// should not happen
-		g.Print("You could not blink.")
-		return
-	}
-	opos := g.Player.Pos
-	g.Print("You blink away.")
-	g.ui.TeleportAnimation(opos, npos, true)
-	g.PlacePlayerAt(npos)
 }
 
 func (g *game) EvokeRodFireBolt(ev event) error {
