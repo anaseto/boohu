@@ -269,7 +269,7 @@ func (g *game) EvokeTeleport(ev event) error {
 		return errors.New("You cannot teleport while lignified.")
 	}
 	g.Teleportation(ev)
-	//g.Printf("You quaff the %s. You feel unstable.", TeleportationPotion)
+	g.Print("You teleported away.")
 	return nil
 }
 
@@ -278,7 +278,7 @@ func (g *game) EvokeDig(ev event) error {
 	end := ev.Rank() + DurationDigging
 	g.PushEvent(&simpleEvent{ERank: end, EAction: DigEnd})
 	g.Player.Expire[StatusDig] = end
-	//g.Printf("You quaff the %s. You feel like an earth dragon.", DigPotion)
+	g.Print("You feel like an earth dragon.")
 	return nil
 }
 
@@ -314,31 +314,22 @@ func (g *game) EvokeTeleportOther(ev event) error {
 }
 
 func (g *game) EvokeHealWounds(ev event) error {
-	//hp := g.Player.HP
 	g.Player.HP = g.Player.HPMax()
-	//g.Printf("You quaff the %s (%d -> %d).", HealWoundsPotion, hp, g.Player.HP)
+	g.Print("Your feel healthy again.")
 	return nil
 }
 
 func (g *game) EvokeRefillMagic(ev event) error {
-	//mp := g.Player.MP
-	g.Player.MP += 2 * g.Player.MPMax() / 3
-	if g.Player.MP > g.Player.MPMax() {
-		g.Player.MP = g.Player.MPMax()
-	}
-	//g.Printf("You quaff the %s (%d -> %d).", MagicPotion, mp, g.Player.MP)
+	g.Player.MP = g.Player.MPMax()
+	g.Print("Your magic forces return.")
 	return nil
 }
 
 func (g *game) EvokeDescent(ev event) error {
-	// why not?
-	//if g.Player.HasStatus(StatusLignification) {
-	//return errors.New("You cannot descend while lignified.")
-	//}
 	if g.Depth >= MaxDepth {
 		return errors.New("You cannot descend any deeper!")
 	}
-	//g.Printf("You quaff the %s. You fall through the ground.", DescentPotion)
+	g.Printf("You fall through the ground.")
 	g.LevelStats()
 	g.StoryPrint("You descended deeper into the dungeon.")
 	g.Depth++
@@ -356,7 +347,8 @@ func (g *game) EvokeSwiftness(ev event) error {
 	g.Player.Statuses[StatusAgile]++
 	g.PushEvent(&simpleEvent{ERank: end, EAction: EvasionEnd})
 	g.Player.Expire[StatusAgile] = end
-	//g.Printf("You quaff the %s. You feel speedy and agile.", SwiftnessPotion)
+	g.Printf("You feel speedy and agile.")
+	// XXX do something with agile?
 	return nil
 }
 
@@ -400,7 +392,7 @@ func (g *game) EvokeShadows(ev event) error {
 	end := ev.Rank() + DurationShadows
 	g.PushEvent(&simpleEvent{ERank: end, EAction: ShadowsEnd})
 	g.Player.Expire[StatusShadows] = end
-	//g.Printf("You quaff the %s. You feel surrounded by shadows.", ShadowsPotion)
+	g.Printf("You feel surrounded by shadows.")
 	g.ComputeLOS()
 	return nil
 }
@@ -459,7 +451,7 @@ func (g *game) EvokeMagicMapping(ev event) error {
 			g.ui.MagicMappingAnimation(cdists[d])
 		}
 	}
-	//g.Printf("You quaff the %s. You feel aware of your surroundings..", MagicMappingPotion)
+	g.Printf("You feel aware of your surroundings..")
 	return nil
 }
 
@@ -469,7 +461,7 @@ func (g *game) EvokeSensing(ev event) error {
 			mons.UpdateKnowledge(g, mons.Pos)
 		}
 	}
-	//g.Printf("You quaff the %s. You perceive monsters' dreams.", DreamPotion)
+	g.Printf("You briefly sense monsters around.")
 	return nil
 }
 
@@ -482,23 +474,17 @@ func (g *game) EvokeWalls(ev event) error {
 		}
 		g.CreateTemporalWallAt(pos, ev)
 	}
-	//g.Printf("You quaff the %s. You feel surrounded by temporary walls.", WallPotion)
+	g.Printf("You feel surrounded by temporary walls.")
 	g.ComputeLOS()
 	return nil
 }
 
 func (g *game) EvokeSlowing(ev event) error {
-	// TODO: remove targeting
-	if err := g.ui.ChooseTarget(&chooser{}); err != nil {
-		return err
-	}
-	ray := g.Ray(g.Player.Target)
 	g.MakeNoise(MagicCastNoise, g.Player.Pos)
-	g.Print("Whoosh! A bolt of slowing emerges out of the magara.")
-	g.ui.SlowingMagaraAnimation(ray)
-	for _, pos := range ray {
-		mons := g.MonsterAt(pos)
-		if !mons.Exists() {
+	g.Print("Whoosh! A slowing luminous wave emerges.")
+	// TODO: animation
+	for _, mons := range g.Monsters {
+		if !mons.Exists() || !g.Player.Sees(mons.Pos) {
 			continue
 		}
 		mons.Statuses[MonsSlow]++
@@ -518,7 +504,9 @@ func (g *game) EvokeSleeping(ev event) error {
 	if max > len(ms) {
 		max = len(ms)
 	}
-	g.Print("A blue light emerges straight out of the rod.")
+	g.Print("Two beams of sleeping emerge.")
+	// TODO: animation
+	// XXX: maybe use noise distance instead of LOS?
 	for i := 0; i < max; i++ {
 		mons := ms[i]
 		if mons.State != Resting {
