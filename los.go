@@ -115,11 +115,11 @@ func (g *game) StopAuto() {
 	g.AutoHalt = true
 	g.AutoDir = NoDir
 	g.AutoTarget = InvalidPos
-	if g.Resting {
-		g.Stats.RestInterrupt++
-		g.Resting = false
-		g.Print("You could not sleep.")
-	}
+	//if g.Resting {
+	//g.Stats.RestInterrupt++
+	//g.Resting = false
+	//g.Print("You could not sleep.")
+	//}
 }
 
 func (g *game) ComputeLOS() {

@@ -426,9 +426,8 @@ func (g *game) ApplyRest() {
 func (g *game) AutoPlayer(ev event) bool {
 	if g.Resting {
 		const enoughRestTurns = 15
-		mons := g.MonsterInLOS()
 		sr := g.StatusRest()
-		if mons == nil && (sr || g.NeedsRegenRest() && g.RestingTurns >= 0) && g.RestingTurns < enoughRestTurns {
+		if (sr || g.NeedsRegenRest() && g.RestingTurns >= 0) && g.RestingTurns < enoughRestTurns {
 			g.WaitTurn(ev)
 			if !sr && g.RestingTurns >= 0 {
 				g.RestingTurns++
@@ -437,9 +436,9 @@ func (g *game) AutoPlayer(ev event) bool {
 		}
 		if g.RestingTurns >= enoughRestTurns {
 			g.ApplyRest()
-		} else if mons != nil {
-			g.Stats.RestInterrupt++
-			g.Print("You could not sleep.")
+			//} else if mons != nil {
+			//g.Stats.RestInterrupt++
+			//g.Print("You could not sleep.")
 		}
 		g.Resting = false
 	} else if g.Autoexploring {
