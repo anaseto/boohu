@@ -647,11 +647,9 @@ func (ui *gameui) DescribePosition(pos position, targ Targeter) {
 	if !g.Player.Sees(pos) {
 		see = "saw"
 	}
-	if t, ok := g.TerrainKnowledge[pos]; !ok && !g.Dungeon.Cell(pos).IsFree() || ok && t == WallCell {
-		desc = ui.AddComma(see, "")
-		desc += fmt.Sprintf("a wall")
-		g.InfoEntry = desc + "."
-		return
+	c := g.Dungeon.Cell(pos)
+	if t, ok := g.TerrainKnowledge[pos]; ok {
+		c.T = t
 	}
 	if mons.Exists() && g.Player.Sees(pos) {
 		desc = ui.AddComma(see, desc)

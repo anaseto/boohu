@@ -104,7 +104,7 @@ func (c cell) Style(g *game, pos position) (r rune, fg uicolor) {
 	case FungusCell:
 		r, fg = '"', ColorFgLOS
 	case BarrelCell:
-		r, fg = '_', ColorFgCollectable // TODO: change letter and color
+		r, fg = '&', ColorFgCollectable // TODO: change letter and color
 	case StoneCell:
 		r, fg = g.Objects.Stones[pos].Style(g)
 	case StairCell:
