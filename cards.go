@@ -196,7 +196,7 @@ func (c card) Desc(g *game) (desc string) {
 	case SlowingCard:
 		desc = ""
 	case SleepingCard:
-		desc = ""
+		desc = "induces deep sleeping and exhaustion for up to two random monsters in sight"
 	case NoiseCard:
 		desc = ""
 	case ObstructionCard:
@@ -510,18 +510,17 @@ func (g *game) EvokeSlowing(ev event) error {
 }
 
 func (g *game) EvokeSleeping(ev event) error {
-	// TODO: remove targeting?
-	if err := g.ui.ChooseTarget(&chooser{area: true, minDist: true}); err != nil {
-		return err
+	ms := g.MonstersInLOS()
+	if len(ms) == 0 {
+		return errors.New("There are no monsters in view.")
 	}
-	neighbors := g.Dungeon.FreeNeighbors(g.Player.Target)
-	g.Print("A sleeping ball emerges straight out of the rod.")
-	g.ui.ProjectileTrajectoryAnimation(g.Ray(g.Player.Target), ColorFgSleepingMonster)
-	for _, pos := range append(neighbors, g.Player.Target) {
-		mons := g.MonsterAt(pos)
-		if !mons.Exists() {
-			continue
-		}
+	max := 2
+	if max > len(ms) {
+		max = len(ms)
+	}
+	g.Print("A blue light emerges straight out of the rod.")
+	for i := 0; i < max; i++ {
+		mons := ms[i]
 		if mons.State != Resting {
 			g.Printf("%s falls asleep.", mons.Kind.Definite(true))
 		}
