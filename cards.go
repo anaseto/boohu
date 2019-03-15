@@ -56,8 +56,27 @@ func (g *game) DrawCard(n int) {
 		ConfusionCard,
 		LignificationCard,
 	}
-	g.Hand[n] = cards[RandInt(len(cards))] // TODO: probability distribution
-	// TODO: add message
+loop:
+	for {
+		c := cards[RandInt(len(cards))]
+		for _, oc := range g.GeneratedCards {
+			if c == oc && RandInt(5) > 0 {
+				continue loop
+			}
+		}
+		switch c {
+		case MagicMappingCard, SensingCard, DescentCard:
+			// rare cards appear less often
+			if RandInt(2) == 0 {
+				continue loop
+			}
+		}
+		g.Hand[n] = c
+		g.GeneratedCards = append(g.GeneratedCards, c)
+		if len(g.GeneratedCards) > 4 {
+			g.GeneratedCards = g.GeneratedCards[len(g.GeneratedCards)-4:]
+		}
+	}
 }
 
 func (g *game) UseCard(n int, ev event) (err error) {
@@ -362,9 +381,6 @@ func (g *game) EvokeSwiftness(ev event) error {
 	end := ev.Rank() + DurationSwiftness
 	g.PushEvent(&simpleEvent{ERank: end, EAction: HasteEnd})
 	g.Player.Expire[StatusSwift] = end
-	g.Player.Statuses[StatusAgile]++
-	g.PushEvent(&simpleEvent{ERank: end, EAction: EvasionEnd})
-	g.Player.Expire[StatusAgile] = end
 	g.Printf("You feel speedy and agile.")
 	// XXX do something with agile?
 	return nil
@@ -869,29 +885,29 @@ func (g *game) CreateTemporalWallAt(pos position, ev event) {
 //return nil
 //}
 
-func (g *game) EvokeRodDigging(ev event) error {
-	if err := g.ui.ChooseTarget(&wallChooser{}); err != nil {
-		return err
-	}
-	pos := g.Player.Target
-	for i := 0; i < 3; i++ {
-		g.Dungeon.SetCell(pos, GroundCell)
-		g.Stats.Digs++
-		g.MakeNoise(WallNoise, pos)
-		g.Fog(pos, 1, ev)
-		pos = pos.To(pos.Dir(g.Player.Pos))
-		if !g.Player.Sees(pos) {
-			g.TerrainKnowledge[pos] = WallCell
-		}
-		if !pos.valid() || g.Dungeon.Cell(pos).T != WallCell {
-			break
-		}
-	}
-	g.Print("You see the wall disintegrate with a crash.")
-	g.ComputeLOS()
-	g.MakeMonstersAware()
-	return nil
-}
+//func (g *game) EvokeRodDigging(ev event) error {
+//if err := g.ui.ChooseTarget(&wallChooser{}); err != nil {
+//return err
+//}
+//pos := g.Player.Target
+//for i := 0; i < 3; i++ {
+//g.Dungeon.SetCell(pos, GroundCell)
+//g.Stats.Digs++
+//g.MakeNoise(WallNoise, pos)
+//g.Fog(pos, 1, ev)
+//pos = pos.To(pos.Dir(g.Player.Pos))
+//if !g.Player.Sees(pos) {
+//g.TerrainKnowledge[pos] = WallCell
+//}
+//if !pos.valid() || g.Dungeon.Cell(pos).T != WallCell {
+//break
+//}
+//}
+//g.Print("You see the wall disintegrate with a crash.")
+//g.ComputeLOS()
+//g.MakeMonstersAware()
+//return nil
+//}
 
 //func (g *game) EvokeRodShatter(ev event) error {
 //if err := g.ui.ChooseTarget(&wallChooser{minDist: true}); err != nil {
@@ -925,18 +941,18 @@ func (g *game) EvokeRodDigging(ev event) error {
 //return nil
 //}
 
-func (g *game) EvokeRodLignification(ev event) error {
-	if err := g.ui.ChooseTarget(&chooser{}); err != nil {
-		return err
-	}
-	mons := g.MonsterAt(g.Player.Target)
-	// mons not nil (check done in targeter)
-	if mons.Status(MonsLignified) {
-		return errors.New("You cannot target a lignified monster.")
-	}
-	mons.EnterLignification(g, ev)
-	return nil
-}
+//func (g *game) EvokeRodLignification(ev event) error {
+//if err := g.ui.ChooseTarget(&chooser{}); err != nil {
+//return err
+//}
+//mons := g.MonsterAt(g.Player.Target)
+//// mons not nil (check done in targeter)
+//if mons.Status(MonsLignified) {
+//return errors.New("You cannot target a lignified monster.")
+//}
+//mons.EnterLignification(g, ev)
+//return nil
+//}
 
 //func (g *game) EvokeRodHope(ev event) error {
 //if err := g.ui.ChooseTarget(&chooser{needsFreeWay: true}); err != nil {
