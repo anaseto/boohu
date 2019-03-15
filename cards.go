@@ -76,6 +76,7 @@ loop:
 		if len(g.GeneratedCards) > 4 {
 			g.GeneratedCards = g.GeneratedCards[len(g.GeneratedCards)-4:]
 		}
+		break
 	}
 }
 
