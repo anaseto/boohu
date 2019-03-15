@@ -98,7 +98,7 @@ func (g *game) UseCard(n int, ev event) (err error) {
 	case SleepingCard:
 		err = g.EvokeSleeping(ev)
 	case NoiseCard:
-		err = g.EvokeBlink(ev)
+		err = g.EvokeNoise(ev)
 		// TODO
 	case ObstructionCard:
 	case SmokeCard:
@@ -168,46 +168,49 @@ func (c card) Desc(g *game) (desc string) {
 	case BlinkCard:
 		desc = "makes you blink away within your line of sight. The rod is more susceptible to send you to the cells thar are most far from you."
 	case TeleportCard:
-		desc = ""
+		desc = "makes you teleport far away."
 	case DigCard:
-		desc = ""
+		desc = "makes you dig walls by walking into them like an earth dragon."
 	case TeleportOtherCard:
-		desc = "teleports up to two random monsters in sight"
+		desc = "teleports up to two random monsters in sight."
 	case HealWoundsCard:
-		desc = ""
+		desc = "heals you a good deal."
 	case MagicCard:
-		desc = ""
+		desc = "replenishes your magical reserves."
 	case DescentCard:
-		desc = ""
+		desc = "makes you go deeper in the Underground."
 	case SwiftnessCard:
-		desc = ""
+		desc = "makes you move faster and better at avoiding blows for a short time." // XXX
 	case SwappingCard:
-		desc = "makes you swap positions with the farthest monster in sight"
+		desc = "makes you swap positions with the farthest monster in sight. If there is more than one at the same distance, it will be chosen randomly."
 	case ShadowsCard:
-		desc = ""
+		desc = "reduces your line of sight range to 1. Because monsters only can see you if you see them, this makes it easier to get out of sight of monsters so that they eventually stop chasing you."
 	case FogCard:
 		desc = ""
 	case MagicMappingCard:
-		desc = ""
+		desc = "shows you the map layout and item locations."
 	case SensingCard:
-		desc = ""
+		desc = "shows you the current position of monsters in the map."
 	case WallsCard:
-		desc = ""
+		desc = "replaces free cells around you with temporary walls."
 	case SlowingCard:
-		desc = ""
+		desc = "induces slow movement and attack for monsters in sight."
 	case SleepingCard:
-		desc = "induces deep sleeping and exhaustion for up to two random monsters in sight"
+		desc = "induces deep sleeping and exhaustion for up to two random monsters in sight."
 	case NoiseCard:
-		desc = ""
+		desc = "produces a noisy bang, attracting monsters in a medium-sized area."
 	case ObstructionCard:
 		desc = ""
 	case SmokeCard:
 		desc = ""
 	}
-	return fmt.Sprintf("The %s %s.", c, desc)
+	return fmt.Sprintf("The %s %s", c, desc)
 }
 
 func (c card) MPCost() int {
+	if c == MagicCard {
+		return 0
+	}
 	return 1
 }
 
@@ -525,7 +528,13 @@ func (g *game) EvokeObstruction(ev event) error {
 		return err
 	}
 	g.TemporalWallAt(g.Player.Target, ev)
-	g.Printf("You see a wall appear out of thin air.")
+	g.Print("You see a wall appear out of thin air.")
+	return nil
+}
+
+func (g *game) EvokeNoise(ev event) error {
+	g.MakeNoise(CardBangNoise, g.Player.Pos)
+	g.Print("Baaang!!! You better get out of here.")
 	return nil
 }
 

@@ -898,7 +898,11 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 			if !mons.Seen {
 				// potion of dreams
 				r = '☻'
-				fgColor = ColorFgSleepingMonster
+				if mons.LastSeenState != Resting {
+					fgColor = ColorFgWanderingMonster
+				} else {
+					fgColor = ColorFgSleepingMonster
+				}
 			} else {
 				r = mons.Kind.Letter()
 				if mons.LastSeenState == Resting {
