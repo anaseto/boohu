@@ -329,7 +329,7 @@ func (cev *cloudEvent) Action(g *game) {
 			g.Burn(pos, cev)
 		}
 		delete(g.Clouds, cev.Pos)
-		g.Fog(cev.Pos, 1, &simpleEvent{ERank: cev.Rank()})
+		g.NightFog(cev.Pos, 1, &simpleEvent{ERank: cev.Rank()})
 		g.ComputeLOS()
 	case NightProgression:
 		if _, ok := g.Clouds[cev.Pos]; !ok {
