@@ -75,7 +75,7 @@ const (
 	//MonsExplosiveNadre
 	//MonsMindCelmist
 	MonsVampire
-	//MonsTreeMushroom
+	MonsTreeMushroom
 	MonsMarevorHelith
 )
 
@@ -110,7 +110,7 @@ func (mk monsterKind) Dangerousness() int {
 func (mk monsterKind) Ranged() bool {
 	switch mk {
 	//case MonsLich, MonsCyclop, MonsGoblinWarrior, MonsSatowalgaPlant, MonsMadNixe, MonsVampire, MonsTreeMushroom:
-	case MonsLich, MonsCyclop, MonsSatowalgaPlant, MonsMadNixe, MonsVampire:
+	case MonsLich, MonsCyclop, MonsSatowalgaPlant, MonsMadNixe, MonsVampire, MonsTreeMushroom:
 		return true
 	default:
 		return false
@@ -209,8 +209,8 @@ var MonsData = []monsterData{
 	MonsSatowalgaPlant: {10, 1, 10, 3, 'P', "satowalga plant", 7},
 	MonsMadNixe:        {10, 1, 10, 2, 'N', "mad nixe", 14},
 	//MonsMindCelmist:     {10, 1, 20, 2, 'c', "mind celmist", 12},
-	MonsVampire: {10, 1, 10, 2, 'V', "vampire", 13},
-	//MonsTreeMushroom:    {15, 2, 20, 4, 'T', "tree mushroom", 16},
+	MonsVampire:       {10, 1, 10, 2, 'V', "vampire", 13},
+	MonsTreeMushroom:  {20, 1, 20, 4, 'T', "tree mushroom", 16},
 	MonsMarevorHelith: {10, 0, 10, 10, 'M', "Marevor Helith", 18},
 }
 
@@ -238,8 +238,8 @@ var monsDesc = []string{
 	MonsSatowalgaPlant: "Satowalga Plants are immobile bushes that throw acidic projectiles at you, sometimes corroding and confusing you.",
 	MonsMadNixe:        "Mad nixes are magical humanoids that can attract you to them.",
 	//MonsMindCelmist:     "Mind celmists are mages that use magical smitting mind attacks that bypass armour. They can occasionally confuse or slow you. They try to avoid melee.",
-	MonsVampire: "Vampires are humanoids that drink blood to survive. Their spitting can cause nausea, impeding the use of potions.",
-	//MonsTreeMushroom:    "Tree mushrooms are big clunky slow-moving creatures. They can throw lignifying spores at you.",
+	MonsVampire:       "Vampires are humanoids that drink blood to survive. Their spitting can cause nausea, impeding the use of potions.",
+	MonsTreeMushroom:  "Tree mushrooms are big clunky slow-moving creatures. They can throw lignifying spores at you.",
 	MonsMarevorHelith: "Marevor Helith is an ancient undead nakrus very fond of teleporting people away. He is a well-known expert in the field of magaras - items that many people simply call magical objects. His current research focus is monolith creation. Marevor, a repentant necromancer, is now searching for his old disciple Jaixel in the Underground to help him overcome the past.",
 }
 
@@ -298,7 +298,6 @@ type monster struct {
 	LastKnownPos  position
 	Target        position
 	Path          []position // cache
-	Obstructing   bool
 	FireReady     bool
 	Seen          bool
 	LOS           map[position]bool
@@ -322,29 +321,6 @@ func (m *monster) Status(st monsterStatus) bool {
 
 func (m *monster) Exists() bool {
 	return m != nil && m.HP > 0
-}
-
-func (m *monster) AlternatePlacement(g *game) *position {
-	if m.Status(MonsLignified) {
-		return nil
-	}
-	var neighbors []position
-	if m.Status(MonsConfused) {
-		neighbors = g.Dungeon.CardinalFreeNeighbors(m.Pos)
-	} else {
-		neighbors = g.Dungeon.FreeNeighbors(m.Pos)
-	}
-	for _, pos := range neighbors {
-		if pos.Distance(g.Player.Pos) != 1 {
-			continue
-		}
-		mons := g.MonsterAt(pos)
-		if mons.Exists() {
-			continue
-		}
-		return &pos
-	}
-	return nil
 }
 
 func (m *monster) AlternateConfusedPlacement(g *game) *position {
@@ -520,36 +496,17 @@ func (m *monster) TeleportMonsterAway(g *game) bool {
 }
 
 func (m *monster) AttackAction(g *game, ev event) {
-	switch {
-	case m.Obstructing:
-		m.Obstructing = false
-		pos := m.AlternatePlacement(g)
-		if pos != nil {
-			m.MoveTo(g, *pos)
-			ev.Renew(g, m.Kind.MovementDelay())
-			return
-		}
-		fallthrough
-	default:
-		m.Dir = g.Player.Pos.Dir(m.Pos)
-		//if m.Kind == MonsHydra {
-		//for i := 0; i <= 3; i++ {
-		//if RandInt(3) == 0 {
-		//// XXX: hydras now use a random number of heads (solve: probably remove hydras).
-		//m.HitPlayer(g, ev)
-		//}
-		//}
-		if m.Kind == MonsMarevorHelith {
-			m.TeleportPlayer(g, ev)
-		} else {
-			m.HitPlayer(g, ev)
-		}
-		adelay := m.Kind.AttackDelay()
-		if m.Status(MonsSlow) {
-			adelay += 10
-		}
-		ev.Renew(g, adelay)
+	m.Dir = g.Player.Pos.Dir(m.Pos)
+	if m.Kind == MonsMarevorHelith {
+		m.TeleportPlayer(g, ev)
+	} else {
+		m.HitPlayer(g, ev)
 	}
+	adelay := m.Kind.AttackDelay()
+	if m.Status(MonsSlow) {
+		adelay += 10
+	}
+	ev.Renew(g, adelay)
 }
 
 func (m *monster) NaturalAwake(g *game) {
@@ -643,7 +600,6 @@ func (m *monster) HandleTurn(g *game, ev event) {
 			return
 		}
 	}
-	m.Obstructing = false
 	if !(len(m.Path) > 0 && m.Path[0] == m.Target && m.Path[len(m.Path)-1] == mpos) {
 		m.Path = m.APath(g, mpos, m.Target)
 		if len(m.Path) == 0 && !m.Status(MonsConfused) {
@@ -736,9 +692,6 @@ func (m *monster) HandleTurn(g *game, ev event) {
 		}
 	case mons.Pos.Distance(g.Player.Pos) == 1:
 		m.Path = m.APath(g, mpos, m.Target)
-		if len(m.Path) < 2 || m.Path[len(m.Path)-2] == mons.Pos {
-			mons.Obstructing = true
-		}
 	case mons.State == Hunting && m.State == Hunting || !g.Player.LOS[m.Target]:
 		if RandInt(4) == 0 {
 			m.Target = mons.Target
@@ -941,8 +894,8 @@ func (m *monster) RangedAttack(g *game, ev event) bool {
 		return m.NixeAttraction(g, ev)
 	case MonsVampire:
 		return m.VampireSpit(g, ev)
-		//case MonsTreeMushroom:
-		//return m.ThrowSpores(g, ev)
+	case MonsTreeMushroom:
+		return m.ThrowSpores(g, ev)
 	}
 	return false
 }
