@@ -17,11 +17,11 @@ const (
 	MagicCard
 	DescentCard
 	SwiftnessCard
-	SwappingCard // XXX: swap with random monster?
+	SwappingCard
 	ShadowsCard
 	FogCard
 	MagicMappingCard
-	SensingCard // XXX: maybe needs change
+	SensingCard
 	WallsCard
 	SlowingCard
 	SleepingCard
@@ -29,6 +29,7 @@ const (
 	ObstructionCard
 	FireCard
 	ConfusionCard
+	LignificationCard
 )
 
 func (g *game) DrawCard(n int) {
@@ -53,6 +54,7 @@ func (g *game) DrawCard(n int) {
 		ObstructionCard,
 		FireCard,
 		ConfusionCard,
+		LignificationCard,
 	}
 	g.Hand[n] = cards[RandInt(len(cards))] // TODO: probability distribution
 	// TODO: add message
@@ -107,6 +109,8 @@ func (g *game) UseCard(n int, ev event) (err error) {
 		err = g.EvokeObstruction(ev)
 	case FireCard:
 		err = g.EvokeFire(ev)
+	case LignificationCard:
+		err = g.EvokeLignification(ev)
 	}
 	if err != nil {
 		return err
@@ -163,6 +167,8 @@ func (c card) String() (desc string) {
 		desc = "card of confusion"
 	case FireCard:
 		desc = "card of fire"
+	case LignificationCard:
+		desc = "card of lignification"
 	}
 	return desc
 }
@@ -210,6 +216,8 @@ func (c card) Desc(g *game) (desc string) {
 		desc = "confuses monsters in sight, leaving them unable to attack you."
 	case FireCard:
 		desc = "produces a small magical fire that will extend to neighbour flammable terrain. The smoke it generates will induce sleep in monsters. As a gawalt monkey, you resist sleepiness, but you will still feel slowed."
+	case LignificationCard:
+		desc = "lignifies up to 2 monsters in view, so that it cannot move. The monster can still fight."
 	}
 	return fmt.Sprintf("The %s %s", c, desc)
 }
@@ -524,6 +532,27 @@ func (g *game) EvokeSleeping(ev event) error {
 		mons.State = Resting
 		mons.Dir = NoDir
 		mons.ExhaustTime(g, 40+RandInt(10))
+	}
+	return nil
+}
+
+func (g *game) EvokeLignification(ev event) error {
+	ms := g.MonstersInLOS()
+	if len(ms) == 0 {
+		return errors.New("There are no monsters in view.")
+	}
+	max := 2
+	if max > len(ms) {
+		max = len(ms)
+	}
+	g.Print("Two beams of lignification emerge.")
+	// TODO: animation
+	for i := 0; i < max; i++ {
+		mons := ms[i]
+		if mons.Status(MonsLignified) {
+			continue
+		}
+		mons.EnterLignification(g, ev)
 	}
 	return nil
 }
