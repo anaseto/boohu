@@ -398,6 +398,16 @@ const (
 #..P......|.....#
 ?###############?
 `
+	RoomHome4 = `
+?############?
+#.....#.....!#
+#.P...|..P...#
+##|####......+
+#....>#>.##|##
++.....####...#
+#!P...|..P...#
+?###+########?
+`
 	RoomCaban = `
 ???????-??????
 ?????""""?????
@@ -439,7 +449,7 @@ const (
 )
 
 var roomSpecialTemplates = []string{RoomBigColumns, RoomBigGarden, RoomColumns, RoomRoundColumns, RoomRoundGarden, RoomLongHall,
-	RoomGardenHall, RoomHome1, RoomHome2, RoomHome3, RoomBigRooms, RoomCaban}
+	RoomGardenHall, RoomHome1, RoomHome2, RoomHome3, RoomHome4, RoomBigRooms, RoomCaban}
 
 func (r *room) ComputeDimensions() {
 	x := 0
