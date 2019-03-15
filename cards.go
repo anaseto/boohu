@@ -101,10 +101,10 @@ func (g *game) UseCard(n int, ev event) (err error) {
 		err = g.EvokeSleeping(ev)
 	case NoiseCard:
 		err = g.EvokeNoise(ev)
-		// TODO
 	case ConfusionCard:
 		err = g.EvokeConfusion(ev)
 	case ObstructionCard:
+		err = g.EvokeObstruction(ev)
 	case FireCard:
 		err = g.EvokeFire(ev)
 	}
@@ -205,7 +205,7 @@ func (c card) Desc(g *game) (desc string) {
 	case NoiseCard:
 		desc = "produces a noisy bang, attracting monsters in a medium-sized area."
 	case ObstructionCard:
-		desc = ""
+		desc = "creates temporal walls between you and up to 3 monsters."
 	case ConfusionCard:
 		desc = "confuses monsters in sight, leaving them unable to attack you."
 	case FireCard:
@@ -490,7 +490,6 @@ func (g *game) EvokeWalls(ev event) error {
 }
 
 func (g *game) EvokeSlowing(ev event) error {
-	g.MakeNoise(MagicCastNoise, g.Player.Pos)
 	g.Print("Whoosh! A slowing luminous wave emerges.")
 	// TODO: animation
 	for _, mons := range g.Monsters {
@@ -529,16 +528,6 @@ func (g *game) EvokeSleeping(ev event) error {
 	return nil
 }
 
-func (g *game) EvokeObstruction(ev event) error {
-	// TODO: remove targeting?
-	if err := g.ui.ChooseTarget(&chooser{free: true}); err != nil {
-		return err
-	}
-	g.TemporalWallAt(g.Player.Target, ev)
-	g.Print("You see a wall appear out of thin air.")
-	return nil
-}
-
 func (g *game) EvokeNoise(ev event) error {
 	g.MakeNoise(CardBangNoise, g.Player.Pos)
 	g.Print("Baaang!!! You better get out of here.")
@@ -546,7 +535,6 @@ func (g *game) EvokeNoise(ev event) error {
 }
 
 func (g *game) EvokeConfusion(ev event) error {
-	g.MakeNoise(MagicCastNoise, g.Player.Pos)
 	g.Print("Whoosh! A slowing luminous wave emerges.")
 	// TODO: animation
 	for _, mons := range g.Monsters {
@@ -570,6 +558,52 @@ func (g *game) EvokeFire(ev event) error {
 	return nil
 }
 
+func (g *game) EvokeObstruction(ev event) error {
+	ms := g.MonstersInLOS()
+	if len(ms) == 0 {
+		return errors.New("There are no monsters in view.")
+	}
+	max := 3
+	if max > len(ms) {
+		max = len(ms)
+	}
+	for i := 0; i < max; i++ {
+		ray := g.Ray(ms[i].Pos)
+		for _, pos := range ray[1:] {
+			if pos == g.Player.Pos {
+				break
+			}
+			mons := g.MonsterAt(pos)
+			if mons.Exists() {
+				continue
+			}
+			g.TemporalWallAt(pos, ev)
+			break
+		}
+	}
+	g.Print("Magical walls emerged.")
+	return nil
+}
+
+func (g *game) TemporalWallAt(pos position, ev event) {
+	if g.Dungeon.Cell(pos).T == WallCell {
+		return
+	}
+	if !g.Player.Sees(pos) {
+		g.TerrainKnowledge[pos] = g.Dungeon.Cell(pos).T
+	}
+	g.CreateTemporalWallAt(pos, ev)
+	g.ComputeLOS()
+}
+
+func (g *game) CreateTemporalWallAt(pos position, ev event) {
+	t := g.Dungeon.Cell(pos).T
+	g.Dungeon.SetCell(pos, WallCell)
+	delete(g.Clouds, pos)
+	g.TemporalWalls[pos] = t
+	g.PushEvent(&cloudEvent{ERank: ev.Rank() + DurationTemporalWall + RandInt(DurationTemporalWall/2), Pos: pos, EAction: ObstructionEnd})
+}
+
 ////////////////////////////////////////////////////////////////
 
 //func (g *game) QuaffBerserk(ev event) error {
@@ -588,17 +622,17 @@ func (g *game) EvokeFire(ev event) error {
 //return nil
 //}
 
-func (g *game) QuaffSwapPotion(ev event) error {
-	if g.Player.HasStatus(StatusLignification) {
-		return errors.New("You cannot drink this potion while lignified.")
-	}
-	g.Player.Statuses[StatusSwap] = 1
-	end := ev.Rank() + DurationSwap
-	g.PushEvent(&simpleEvent{ERank: end, EAction: SwapEnd})
-	g.Player.Expire[StatusSwap] = end
-	//g.Printf("You quaff the %s. You feel light-footed.", SwapPotion)
-	return nil
-}
+//func (g *game) QuaffSwapPotion(ev event) error {
+//if g.Player.HasStatus(StatusLignification) {
+//return errors.New("You cannot drink this potion while lignified.")
+//}
+//g.Player.Statuses[StatusSwap] = 1
+//end := ev.Rank() + DurationSwap
+//g.PushEvent(&simpleEvent{ERank: end, EAction: SwapEnd})
+//g.Player.Expire[StatusSwap] = end
+////g.Printf("You quaff the %s. You feel light-footed.", SwapPotion)
+//return nil
+//}
 
 //func (g *game) QuaffLignification(ev event) error {
 //if g.Player.HasStatus(StatusLignification) {
@@ -609,216 +643,202 @@ func (g *game) QuaffSwapPotion(ev event) error {
 //return nil
 //}
 
-func (g *game) QuaffCBlinkPotion(ev event) error {
-	if g.Player.HasStatus(StatusLignification) {
-		return errors.New("You cannot blink while lignified.")
-	}
-	if err := g.ui.ChooseTarget(&chooser{free: true}); err != nil {
-		return err
-	}
-	//g.Printf("You quaff the %s. You blink.", CBlinkPotion)
-	g.PlacePlayerAt(g.Player.Target)
-	return nil
-}
+//func (g *game) QuaffCBlinkPotion(ev event) error {
+//if g.Player.HasStatus(StatusLignification) {
+//return errors.New("You cannot blink while lignified.")
+//}
+//if err := g.ui.ChooseTarget(&chooser{free: true}); err != nil {
+//return err
+//}
+////g.Printf("You quaff the %s. You blink.", CBlinkPotion)
+//g.PlacePlayerAt(g.Player.Target)
+//return nil
+//}
 
-func (g *game) ExplosionAt(ev event, pos position) {
-	g.Burn(pos, ev)
-	mons := g.MonsterAt(pos)
-	if mons.Exists() {
-		mons.HP /= 2
-		if mons.HP <= 0 {
-			g.HandleKill(mons, ev)
-			if g.Player.Sees(mons.Pos) {
-				g.Printf("%s dies.", mons.Kind.Definite(true))
-			}
-		}
-		g.MakeNoise(ExplosionHitNoise, mons.Pos)
-		g.HandleStone(mons)
-		mons.MakeHuntIfHurt(g)
-	} else if c := g.Dungeon.Cell(pos); !c.IsFree() && RandInt(2) == 0 {
-		g.Dungeon.SetCell(pos, GroundCell)
-		g.Stats.Digs++
-		if !g.Player.Sees(pos) {
-			g.TerrainKnowledge[pos] = c.T
-		} else {
-			g.ui.WallExplosionAnimation(pos)
-		}
-		g.MakeNoise(WallNoise, pos)
-		g.Fog(pos, 1, ev)
-	}
-}
+//func (g *game) ExplosionAt(ev event, pos position) {
+//g.Burn(pos, ev)
+//mons := g.MonsterAt(pos)
+//if mons.Exists() {
+//mons.HP /= 2
+//if mons.HP <= 0 {
+//g.HandleKill(mons, ev)
+//if g.Player.Sees(mons.Pos) {
+//g.Printf("%s dies.", mons.Kind.Definite(true))
+//}
+//}
+//g.MakeNoise(ExplosionHitNoise, mons.Pos)
+//g.HandleStone(mons)
+//mons.MakeHuntIfHurt(g)
+//} else if c := g.Dungeon.Cell(pos); !c.IsFree() && RandInt(2) == 0 {
+//g.Dungeon.SetCell(pos, GroundCell)
+//g.Stats.Digs++
+//if !g.Player.Sees(pos) {
+//g.TerrainKnowledge[pos] = c.T
+//} else {
+//g.ui.WallExplosionAnimation(pos)
+//}
+//g.MakeNoise(WallNoise, pos)
+//g.Fog(pos, 1, ev)
+//}
+//}
 
-func (g *game) ThrowExplosiveMagara(ev event) error {
-	if err := g.ui.ChooseTarget(&chooser{area: true, minDist: true, flammable: true, wall: true}); err != nil {
-		return err
-	}
-	neighbors := g.Player.Target.ValidNeighbors()
-	g.Printf("You throw the explosive magara... %s", g.ExplosionSound())
-	g.MakeNoise(ExplosionNoise, g.Player.Target)
-	g.ui.ProjectileTrajectoryAnimation(g.Ray(g.Player.Target), ColorFgPlayer)
-	g.ui.ExplosionAnimation(FireExplosion, g.Player.Target)
-	for _, pos := range append(neighbors, g.Player.Target) {
-		g.ExplosionAt(ev, pos)
-	}
+//func (g *game) ThrowExplosiveMagara(ev event) error {
+//if err := g.ui.ChooseTarget(&chooser{area: true, minDist: true, flammable: true, wall: true}); err != nil {
+//return err
+//}
+//neighbors := g.Player.Target.ValidNeighbors()
+//g.Printf("You throw the explosive magara... %s", g.ExplosionSound())
+//g.MakeNoise(ExplosionNoise, g.Player.Target)
+//g.ui.ProjectileTrajectoryAnimation(g.Ray(g.Player.Target), ColorFgPlayer)
+//g.ui.ExplosionAnimation(FireExplosion, g.Player.Target)
+//for _, pos := range append(neighbors, g.Player.Target) {
+//g.ExplosionAt(ev, pos)
+//}
 
-	ev.Renew(g, DurationThrowItem)
-	return nil
-}
+//ev.Renew(g, DurationThrowItem)
+//return nil
+//}
 
-func (g *game) ThrowTeleportMagara(ev event) error {
-	if err := g.ui.ChooseTarget(&chooser{area: true, minDist: true}); err != nil {
-		return err
-	}
-	neighbors := g.Player.Target.ValidNeighbors()
-	g.Print("You throw the teleport magara.")
-	g.ui.ProjectileTrajectoryAnimation(g.Ray(g.Player.Target), ColorFgPlayer)
-	for _, pos := range append(neighbors, g.Player.Target) {
-		mons := g.MonsterAt(pos)
-		if mons.Exists() {
-			mons.TeleportAway(g)
-		}
-	}
+//func (g *game) ThrowTeleportMagara(ev event) error {
+//if err := g.ui.ChooseTarget(&chooser{area: true, minDist: true}); err != nil {
+//return err
+//}
+//neighbors := g.Player.Target.ValidNeighbors()
+//g.Print("You throw the teleport magara.")
+//g.ui.ProjectileTrajectoryAnimation(g.Ray(g.Player.Target), ColorFgPlayer)
+//for _, pos := range append(neighbors, g.Player.Target) {
+//mons := g.MonsterAt(pos)
+//if mons.Exists() {
+//mons.TeleportAway(g)
+//}
+//}
 
-	ev.Renew(g, DurationThrowItem)
-	return nil
-}
+//ev.Renew(g, DurationThrowItem)
+//return nil
+//}
 
-func (g *game) NightFog(at position, radius int, ev event) {
-	dij := &normalPath{game: g}
-	nm := Dijkstra(dij, []position{at}, radius)
-	for pos := range nm {
-		_, ok := g.Clouds[pos]
-		if !ok {
-			g.Clouds[pos] = CloudNight
-			g.PushEvent(&cloudEvent{ERank: ev.Rank() + DurationCloudProgression, EAction: NightProgression, Pos: pos})
-			g.MakeCreatureSleep(pos, ev)
-		}
-	}
-	g.ComputeLOS()
-}
+//func (g *game) ThrowNightMagara(ev event) error {
+//if err := g.ui.ChooseTarget(&chooser{needsFreeWay: true}); err != nil {
+//return err
+//}
+//g.Print("You throw the night magara… Clouds come out of it.")
+//g.ui.ProjectileTrajectoryAnimation(g.Ray(g.Player.Target), ColorFgSleepingMonster)
+//g.NightFog(g.Player.Target, 2, ev)
 
-func (g *game) ThrowNightMagara(ev event) error {
-	if err := g.ui.ChooseTarget(&chooser{needsFreeWay: true}); err != nil {
-		return err
-	}
-	g.Print("You throw the night magara… Clouds come out of it.")
-	g.ui.ProjectileTrajectoryAnimation(g.Ray(g.Player.Target), ColorFgSleepingMonster)
-	g.NightFog(g.Player.Target, 2, ev)
+//ev.Renew(g, DurationThrowItem)
+//return nil
+//}
 
-	ev.Renew(g, DurationThrowItem)
-	return nil
-}
+//func (g *game) EvokeRodFireBolt(ev event) error {
+//if err := g.ui.ChooseTarget(&chooser{flammable: true}); err != nil {
+//return err
+//}
+//ray := g.Ray(g.Player.Target)
+//g.MakeNoise(MagicCastNoise, g.Player.Pos)
+//g.Print("Whoosh! A fire bolt emerges straight out of the rod.")
+//g.ui.FireBoltAnimation(ray)
+//for _, pos := range ray {
+//g.Burn(pos, ev)
+//mons := g.MonsterAt(pos)
+//if !mons.Exists() {
+//continue
+//}
+//dmg := 1
+//mons.HP -= dmg
+//if mons.HP <= 0 {
+//g.Printf("%s is killed by the bolt.", mons.Kind.Indefinite(true))
+//g.HandleKill(mons, ev)
+//}
+//g.MakeNoise(MagicHitNoise, mons.Pos)
+//g.HandleStone(mons)
+//mons.MakeHuntIfHurt(g)
+//}
+//return nil
+//}
 
-func (g *game) EvokeRodFireBolt(ev event) error {
-	if err := g.ui.ChooseTarget(&chooser{flammable: true}); err != nil {
-		return err
-	}
-	ray := g.Ray(g.Player.Target)
-	g.MakeNoise(MagicCastNoise, g.Player.Pos)
-	g.Print("Whoosh! A fire bolt emerges straight out of the rod.")
-	g.ui.FireBoltAnimation(ray)
-	for _, pos := range ray {
-		g.Burn(pos, ev)
-		mons := g.MonsterAt(pos)
-		if !mons.Exists() {
-			continue
-		}
-		dmg := 1
-		mons.HP -= dmg
-		if mons.HP <= 0 {
-			g.Printf("%s is killed by the bolt.", mons.Kind.Indefinite(true))
-			g.HandleKill(mons, ev)
-		}
-		g.MakeNoise(MagicHitNoise, mons.Pos)
-		g.HandleStone(mons)
-		mons.MakeHuntIfHurt(g)
-	}
-	return nil
-}
+//func (g *game) EvokeRodFireball(ev event) error {
+//if err := g.ui.ChooseTarget(&chooser{area: true, minDist: true, flammable: true}); err != nil {
+//return err
+//}
+//neighbors := g.Dungeon.FreeNeighbors(g.Player.Target)
+//g.MakeNoise(MagicExplosionNoise, g.Player.Target)
+//g.Printf("A fireball emerges straight out of the rod... %s", g.ExplosionSound())
+//g.ui.ProjectileTrajectoryAnimation(g.Ray(g.Player.Target), ColorFgExplosionStart)
+//g.ui.ExplosionAnimation(FireExplosion, g.Player.Target)
+//for _, pos := range append(neighbors, g.Player.Target) {
+//g.Burn(pos, ev)
+//mons := g.MonsterAt(pos)
+//if mons == nil {
+//continue
+//}
+//dmg := 1 + RandInt(2)
+//mons.HP -= dmg
+//if mons.HP <= 0 {
+//g.Printf("%s is killed by the fireball.", mons.Kind.Indefinite(true))
+//g.HandleKill(mons, ev)
+//}
+//g.MakeNoise(MagicHitNoise, mons.Pos)
+//g.HandleStone(mons)
+//mons.MakeHuntIfHurt(g)
+//}
+//return nil
+//}
 
-func (g *game) EvokeRodFireball(ev event) error {
-	if err := g.ui.ChooseTarget(&chooser{area: true, minDist: true, flammable: true}); err != nil {
-		return err
-	}
-	neighbors := g.Dungeon.FreeNeighbors(g.Player.Target)
-	g.MakeNoise(MagicExplosionNoise, g.Player.Target)
-	g.Printf("A fireball emerges straight out of the rod... %s", g.ExplosionSound())
-	g.ui.ProjectileTrajectoryAnimation(g.Ray(g.Player.Target), ColorFgExplosionStart)
-	g.ui.ExplosionAnimation(FireExplosion, g.Player.Target)
-	for _, pos := range append(neighbors, g.Player.Target) {
-		g.Burn(pos, ev)
-		mons := g.MonsterAt(pos)
-		if mons == nil {
-			continue
-		}
-		dmg := 1 + RandInt(2)
-		mons.HP -= dmg
-		if mons.HP <= 0 {
-			g.Printf("%s is killed by the fireball.", mons.Kind.Indefinite(true))
-			g.HandleKill(mons, ev)
-		}
-		g.MakeNoise(MagicHitNoise, mons.Pos)
-		g.HandleStone(mons)
-		mons.MakeHuntIfHurt(g)
-	}
-	return nil
-}
+//func (g *game) EvokeRodLightning(ev event) error {
+//d := g.Dungeon
+//conn := map[position]bool{}
+//nb := make([]position, 0, 8)
+//nb = g.Player.Pos.Neighbors(nb, func(npos position) bool {
+//return npos.valid() && d.Cell(npos).T != WallCell
+//})
+//stack := []position{}
+//g.MakeNoise(MagicCastNoise, g.Player.Pos)
+//g.Print("Whoosh! Lightning emerges straight out of the rod.")
+//for _, pos := range nb {
+//mons := g.MonsterAt(pos)
+//if !mons.Exists() {
+//continue
+//}
+//stack = append(stack, pos)
+//conn[pos] = true
+//}
+//if len(stack) == 0 {
+//return errors.New("There are no adjacent monsters.")
+//}
+//var pos position
+//targets := []position{}
+//for len(stack) > 0 {
+//pos = stack[len(stack)-1]
+//stack = stack[:len(stack)-1]
+//g.Burn(pos, ev)
+//mons := g.MonsterAt(pos)
+//if !mons.Exists() {
+//continue
+//}
+//targets = append(targets, pos)
+//dmg := 1
+//mons.HP -= dmg
+//if mons.HP <= 0 {
+//g.Printf("%s is killed by lightning.", mons.Kind.Indefinite(true))
+//g.HandleKill(mons, ev)
+//}
+//g.MakeNoise(MagicHitNoise, mons.Pos)
+//g.HandleStone(mons)
+//mons.MakeHuntIfHurt(g)
+//nb = pos.Neighbors(nb, func(npos position) bool {
+//return npos.valid() && d.Cell(npos).T != WallCell
+//})
+//for _, npos := range nb {
+//if !conn[npos] {
+//conn[npos] = true
+//stack = append(stack, npos)
+//}
+//}
+//}
+//g.ui.LightningHitAnimation(targets)
 
-func (g *game) EvokeRodLightning(ev event) error {
-	d := g.Dungeon
-	conn := map[position]bool{}
-	nb := make([]position, 0, 8)
-	nb = g.Player.Pos.Neighbors(nb, func(npos position) bool {
-		return npos.valid() && d.Cell(npos).T != WallCell
-	})
-	stack := []position{}
-	g.MakeNoise(MagicCastNoise, g.Player.Pos)
-	g.Print("Whoosh! Lightning emerges straight out of the rod.")
-	for _, pos := range nb {
-		mons := g.MonsterAt(pos)
-		if !mons.Exists() {
-			continue
-		}
-		stack = append(stack, pos)
-		conn[pos] = true
-	}
-	if len(stack) == 0 {
-		return errors.New("There are no adjacent monsters.")
-	}
-	var pos position
-	targets := []position{}
-	for len(stack) > 0 {
-		pos = stack[len(stack)-1]
-		stack = stack[:len(stack)-1]
-		g.Burn(pos, ev)
-		mons := g.MonsterAt(pos)
-		if !mons.Exists() {
-			continue
-		}
-		targets = append(targets, pos)
-		dmg := 1
-		mons.HP -= dmg
-		if mons.HP <= 0 {
-			g.Printf("%s is killed by lightning.", mons.Kind.Indefinite(true))
-			g.HandleKill(mons, ev)
-		}
-		g.MakeNoise(MagicHitNoise, mons.Pos)
-		g.HandleStone(mons)
-		mons.MakeHuntIfHurt(g)
-		nb = pos.Neighbors(nb, func(npos position) bool {
-			return npos.valid() && d.Cell(npos).T != WallCell
-		})
-		for _, npos := range nb {
-			if !conn[npos] {
-				conn[npos] = true
-				stack = append(stack, npos)
-			}
-		}
-	}
-	g.ui.LightningHitAnimation(targets)
-
-	return nil
-}
+//return nil
+//}
 
 func (g *game) EvokeRodDigging(ev event) error {
 	if err := g.ui.ChooseTarget(&wallChooser{}); err != nil {
@@ -844,37 +864,37 @@ func (g *game) EvokeRodDigging(ev event) error {
 	return nil
 }
 
-func (g *game) EvokeRodShatter(ev event) error {
-	if err := g.ui.ChooseTarget(&wallChooser{minDist: true}); err != nil {
-		return err
-	}
-	neighbors := g.Dungeon.FreeNeighbors(g.Player.Target)
-	g.Dungeon.SetCell(g.Player.Target, GroundCell)
-	g.Stats.Digs++
-	g.ComputeLOS()
-	g.MakeMonstersAware()
-	g.MakeNoise(WallNoise, g.Player.Target)
-	g.Printf("%s The wall disappeared.", g.CrackSound())
-	g.ui.ProjectileTrajectoryAnimation(g.Ray(g.Player.Target), ColorFgExplosionWallStart)
-	g.ui.ExplosionAnimation(WallExplosion, g.Player.Target)
-	g.Fog(g.Player.Target, 2, ev)
-	for _, pos := range neighbors {
-		mons := g.MonsterAt(pos)
-		if !mons.Exists() {
-			continue
-		}
-		dmg := 2
-		mons.HP -= dmg
-		if mons.HP <= 0 {
-			g.Printf("%s is killed by the explosion.", mons.Kind.Indefinite(true))
-			g.HandleKill(mons, ev)
-		}
-		g.MakeNoise(ExplosionHitNoise, mons.Pos)
-		g.HandleStone(mons)
-		mons.MakeHuntIfHurt(g)
-	}
-	return nil
-}
+//func (g *game) EvokeRodShatter(ev event) error {
+//if err := g.ui.ChooseTarget(&wallChooser{minDist: true}); err != nil {
+//return err
+//}
+//neighbors := g.Dungeon.FreeNeighbors(g.Player.Target)
+//g.Dungeon.SetCell(g.Player.Target, GroundCell)
+//g.Stats.Digs++
+//g.ComputeLOS()
+//g.MakeMonstersAware()
+//g.MakeNoise(WallNoise, g.Player.Target)
+//g.Printf("%s The wall disappeared.", g.CrackSound())
+//g.ui.ProjectileTrajectoryAnimation(g.Ray(g.Player.Target), ColorFgExplosionWallStart)
+//g.ui.ExplosionAnimation(WallExplosion, g.Player.Target)
+//g.Fog(g.Player.Target, 2, ev)
+//for _, pos := range neighbors {
+//mons := g.MonsterAt(pos)
+//if !mons.Exists() {
+//continue
+//}
+//dmg := 2
+//mons.HP -= dmg
+//if mons.HP <= 0 {
+//g.Printf("%s is killed by the explosion.", mons.Kind.Indefinite(true))
+//g.HandleKill(mons, ev)
+//}
+//g.MakeNoise(ExplosionHitNoise, mons.Pos)
+//g.HandleStone(mons)
+//mons.MakeHuntIfHurt(g)
+//}
+//return nil
+//}
 
 func (g *game) EvokeRodLignification(ev event) error {
 	if err := g.ui.ChooseTarget(&chooser{}); err != nil {
@@ -889,44 +909,25 @@ func (g *game) EvokeRodLignification(ev event) error {
 	return nil
 }
 
-func (g *game) TemporalWallAt(pos position, ev event) {
-	if g.Dungeon.Cell(pos).T == WallCell {
-		return
-	}
-	if !g.Player.Sees(pos) {
-		g.TerrainKnowledge[pos] = g.Dungeon.Cell(pos).T
-	}
-	g.CreateTemporalWallAt(pos, ev)
-	g.ComputeLOS()
-}
-
-func (g *game) CreateTemporalWallAt(pos position, ev event) {
-	t := g.Dungeon.Cell(pos).T
-	g.Dungeon.SetCell(pos, WallCell)
-	delete(g.Clouds, pos)
-	g.TemporalWalls[pos] = t
-	g.PushEvent(&cloudEvent{ERank: ev.Rank() + DurationTemporalWall + RandInt(DurationTemporalWall/2), Pos: pos, EAction: ObstructionEnd})
-}
-
-func (g *game) EvokeRodHope(ev event) error {
-	if err := g.ui.ChooseTarget(&chooser{needsFreeWay: true}); err != nil {
-		return err
-	}
-	g.MakeNoise(MagicCastNoise, g.Player.Pos)
-	g.ui.ProjectileTrajectoryAnimation(g.Ray(g.Player.Target), ColorFgExplosionStart)
-	mons := g.MonsterAt(g.Player.Target)
-	// mons not nil (check done in the targeter)
-	dmg := DefaultHealth - g.Player.HP + 1
-	if dmg <= 0 {
-		dmg = 1
-	}
-	mons.HP -= dmg
-	g.Burn(g.Player.Target, ev)
-	g.ui.HitAnimation(g.Player.Target, true)
-	g.Printf("An energy channel hits %s (%d dmg).", mons.Kind.Definite(false), dmg)
-	if mons.HP <= 0 {
-		g.Printf("%s dies.", mons.Kind.Indefinite(true))
-		g.HandleKill(mons, ev)
-	}
-	return nil
-}
+//func (g *game) EvokeRodHope(ev event) error {
+//if err := g.ui.ChooseTarget(&chooser{needsFreeWay: true}); err != nil {
+//return err
+//}
+//g.MakeNoise(MagicCastNoise, g.Player.Pos)
+//g.ui.ProjectileTrajectoryAnimation(g.Ray(g.Player.Target), ColorFgExplosionStart)
+//mons := g.MonsterAt(g.Player.Target)
+//// mons not nil (check done in the targeter)
+//dmg := DefaultHealth - g.Player.HP + 1
+//if dmg <= 0 {
+//dmg = 1
+//}
+//mons.HP -= dmg
+//g.Burn(g.Player.Target, ev)
+//g.ui.HitAnimation(g.Player.Target, true)
+//g.Printf("An energy channel hits %s (%d dmg).", mons.Kind.Definite(false), dmg)
+//if mons.HP <= 0 {
+//g.Printf("%s dies.", mons.Kind.Indefinite(true))
+//g.HandleKill(mons, ev)
+//}
+//return nil
+//}

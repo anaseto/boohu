@@ -345,6 +345,20 @@ func (cev *cloudEvent) Action(g *game) {
 	}
 }
 
+func (g *game) NightFog(at position, radius int, ev event) {
+	dij := &normalPath{game: g}
+	nm := Dijkstra(dij, []position{at}, radius)
+	for pos := range nm {
+		_, ok := g.Clouds[pos]
+		if !ok {
+			g.Clouds[pos] = CloudNight
+			g.PushEvent(&cloudEvent{ERank: ev.Rank() + DurationCloudProgression, EAction: NightProgression, Pos: pos})
+			g.MakeCreatureSleep(pos, ev)
+		}
+	}
+	g.ComputeLOS()
+}
+
 func (g *game) MakeCreatureSleep(pos position, ev event) {
 	if pos == g.Player.Pos {
 		g.Player.Statuses[StatusSlow]++
