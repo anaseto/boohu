@@ -343,43 +343,39 @@ func (m *monster) AlternateConfusedPlacement(g *game) *position {
 	return nil
 }
 
-func (m *monster) SafePlacement(g *game) *position {
-	var neighbors []position
-	if m.Status(MonsConfused) {
-		neighbors = g.Dungeon.CardinalFreeNeighbors(m.Pos)
-	} else {
-		neighbors = g.Dungeon.FreeNeighbors(m.Pos)
-	}
-	spos := InvalidPos
-	sbest := 9
-	area := make([]position, 9)
-	for _, pos := range neighbors {
-		if pos.Distance(g.Player.Pos) <= 1 {
-			continue
-		}
-		mons := g.MonsterAt(pos)
-		if mons.Exists() {
-			continue
-		}
-		// simple heuristic
-		nsbest := g.Dungeon.WallAreaCount(area, pos, 1)
-		if nsbest < sbest {
-			sbest = nsbest
-			spos = pos
-		} else if nsbest == sbest {
-			switch pos.Dir(g.Player.Pos) {
-			case N, W, E, S:
-			default:
-				sbest = nsbest
-				spos = pos
-			}
-		}
-	}
-	if spos.valid() {
-		return &spos
-	}
-	return nil
-}
+//func (m *monster) SafePlacement(g *game) *position {
+//var neighbors []position
+//neighbors = g.Dungeon.CardinalFreeNeighbors(m.Pos)
+//spos := InvalidPos
+//sbest := 9
+//area := make([]position, 9)
+//for _, pos := range neighbors {
+//if pos.Distance(g.Player.Pos) <= 1 {
+//continue
+//}
+//mons := g.MonsterAt(pos)
+//if mons.Exists() {
+//continue
+//}
+//// simple heuristic
+//nsbest := g.Dungeon.WallAreaCount(area, pos, 1)
+//if nsbest < sbest {
+//sbest = nsbest
+//spos = pos
+//} else if nsbest == sbest {
+//switch pos.Dir(g.Player.Pos) {
+//case N, W, E, S:
+//default:
+//sbest = nsbest
+//spos = pos
+//}
+//}
+//}
+//if spos.valid() {
+//return &spos
+//}
+//return nil
+//}
 
 func (m *monster) TeleportPlayer(g *game, ev event) {
 	if RandInt(2) == 0 {
@@ -563,18 +559,9 @@ func (m *monster) HandleTurn(g *game, ev event) {
 		//}
 	}
 	if mpos.Distance(ppos) == 1 && g.Dungeon.Cell(ppos).T != BarrelCell {
-		attack := true
 		if m.Status(MonsConfused) {
-			switch m.Pos.Dir(g.Player.Pos) {
-			case E, N, W, S:
-			default:
-				attack = false
-				m.Path = nil
-				safepos := m.AlternateConfusedPlacement(g)
-				if safepos != nil {
-					m.Target = *safepos
-				}
-			}
+			ev.Renew(g, 10) // wait
+			return
 		}
 		//} else if m.Kind == MonsMindCelmist {
 		//// we try to avoid melee
@@ -585,10 +572,8 @@ func (m *monster) HandleTurn(g *game, ev event) {
 		//m.Target = *safepos
 		//}
 		//}
-		if attack {
-			m.AttackAction(g, ev)
-			return
-		}
+		m.AttackAction(g, ev)
+		return
 	}
 	if m.Status(MonsLignified) {
 		ev.Renew(g, 10) // wait
@@ -862,6 +847,9 @@ func (m *monster) RangedAttack(g *game, ev event) bool {
 	if !m.Kind.Ranged() {
 		return false
 	}
+	if m.Status(MonsConfused) {
+		return false
+	}
 	if m.Pos.Distance(g.Player.Pos) <= 1 && m.Kind != MonsSatowalgaPlant {
 		return false
 	}
@@ -1093,6 +1081,9 @@ func (m *monster) NixeAttraction(g *game, ev event) bool {
 
 func (m *monster) SmitingAttack(g *game, ev event) bool {
 	if !m.Kind.Smiting() {
+		return false
+	}
+	if m.Status(MonsConfused) {
 		return false
 	}
 	if !m.SeesPlayer(g) {

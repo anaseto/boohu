@@ -28,6 +28,7 @@ const (
 	NoiseCard
 	ObstructionCard
 	FireCard
+	ConfusionCard
 )
 
 func (g *game) DrawCard(n int) {
@@ -51,6 +52,7 @@ func (g *game) DrawCard(n int) {
 		NoiseCard,
 		ObstructionCard,
 		FireCard,
+		ConfusionCard,
 	}
 	g.Hand[n] = cards[RandInt(len(cards))] // TODO: probability distribution
 	// TODO: add message
@@ -100,6 +102,8 @@ func (g *game) UseCard(n int, ev event) (err error) {
 	case NoiseCard:
 		err = g.EvokeNoise(ev)
 		// TODO
+	case ConfusionCard:
+		err = g.EvokeConfusion(ev)
 	case ObstructionCard:
 	case FireCard:
 		err = g.EvokeFire(ev)
@@ -155,6 +159,8 @@ func (c card) String() (desc string) {
 		desc = "card of noise"
 	case ObstructionCard:
 		desc = "card of obstruction"
+	case ConfusionCard:
+		desc = "card of confusion"
 	case FireCard:
 		desc = "card of fire"
 	}
@@ -200,6 +206,8 @@ func (c card) Desc(g *game) (desc string) {
 		desc = "produces a noisy bang, attracting monsters in a medium-sized area."
 	case ObstructionCard:
 		desc = ""
+	case ConfusionCard:
+		desc = "confuses monsters in sight, leaving them unable to attack you."
 	case FireCard:
 		desc = "produces a small magical fire that will extend to neighbour flammable terrain. The smoke it generates will induce sleep in monsters. As a gawalt monkey, you resist sleepiness, but you will still feel slowed."
 	}
@@ -534,6 +542,22 @@ func (g *game) EvokeObstruction(ev event) error {
 func (g *game) EvokeNoise(ev event) error {
 	g.MakeNoise(CardBangNoise, g.Player.Pos)
 	g.Print("Baaang!!! You better get out of here.")
+	return nil
+}
+
+func (g *game) EvokeConfusion(ev event) error {
+	g.MakeNoise(MagicCastNoise, g.Player.Pos)
+	g.Print("Whoosh! A slowing luminous wave emerges.")
+	// TODO: animation
+	for _, mons := range g.Monsters {
+		if !mons.Exists() || !g.Player.Sees(mons.Pos) {
+			continue
+		}
+		mons.Statuses[MonsConfused]++
+		g.PushEvent(&monsterEvent{ERank: g.Ev.Rank() + DurationConfusion, NMons: mons.Index, EAction: MonsSlowEnd})
+	}
+
+	ev.Renew(g, DurationThrowItem)
 	return nil
 }
 
