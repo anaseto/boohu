@@ -30,7 +30,7 @@ type gameui struct {
 func (ui *gameui) Init() error {
 	ui.canvas = image.NewRGBA(image.Rect(0, 0, UIWidth*16, UIHeight*24))
 	ui.ir = gothic.NewInterpreter(`
-wm title . "Boohu Tk"
+wm title . "Harmonist Tk"
 wm resizable . 0 0
 set width [expr {16 * 100}]
 set height [expr {24 * 26}]
