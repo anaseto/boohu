@@ -27,7 +27,7 @@ const (
 	SleepingCard
 	NoiseCard
 	ObstructionCard
-	SmokeCard
+	FireCard
 )
 
 func (g *game) DrawCard(n int) {
@@ -50,7 +50,7 @@ func (g *game) DrawCard(n int) {
 		SleepingCard,
 		NoiseCard,
 		ObstructionCard,
-		SmokeCard,
+		FireCard,
 	}
 	g.Hand[n] = cards[RandInt(len(cards))] // TODO: probability distribution
 	// TODO: add message
@@ -101,9 +101,8 @@ func (g *game) UseCard(n int, ev event) (err error) {
 		err = g.EvokeNoise(ev)
 		// TODO
 	case ObstructionCard:
-	case SmokeCard:
-		err = g.EvokeFog(ev)
-		// TODO
+	case FireCard:
+		err = g.EvokeFire(ev)
 	}
 	if err != nil {
 		return err
@@ -156,8 +155,8 @@ func (c card) String() (desc string) {
 		desc = "card of noise"
 	case ObstructionCard:
 		desc = "card of obstruction"
-	case SmokeCard:
-		desc = "card of smoke"
+	case FireCard:
+		desc = "card of fire"
 	}
 	return desc
 }
@@ -201,8 +200,8 @@ func (c card) Desc(g *game) (desc string) {
 		desc = "produces a noisy bang, attracting monsters in a medium-sized area."
 	case ObstructionCard:
 		desc = ""
-	case SmokeCard:
-		desc = ""
+	case FireCard:
+		desc = "produces a small magical fire that will extend to neighbour flammable terrain. The smoke it generates will induce sleep in monsters. As a gawalt monkey, you resist sleepiness, but you will still feel slowed."
 	}
 	return fmt.Sprintf("The %s %s", c, desc)
 }
@@ -535,6 +534,15 @@ func (g *game) EvokeObstruction(ev event) error {
 func (g *game) EvokeNoise(ev event) error {
 	g.MakeNoise(CardBangNoise, g.Player.Pos)
 	g.Print("Baaang!!! You better get out of here.")
+	return nil
+}
+
+func (g *game) EvokeFire(ev event) error {
+	if !g.Dungeon.Cell(g.Player.Pos).Flammable() {
+		return errors.New("You are not standing on flammable terrain.")
+	}
+	g.Burn(g.Player.Pos, ev)
+	g.Print("A small fire appears.")
 	return nil
 }
 

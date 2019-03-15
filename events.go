@@ -321,20 +321,16 @@ func (cev *cloudEvent) Action(g *game) {
 		if _, ok := g.Clouds[cev.Pos]; !ok {
 			break
 		}
-		g.BurnCreature(cev.Pos, cev)
-		if RandInt(10) == 0 {
-			delete(g.Clouds, cev.Pos)
-			g.Fog(cev.Pos, 1, &simpleEvent{ERank: cev.Rank()})
-			g.ComputeLOS()
-			break
-		}
+		//g.BurnCreature(cev.Pos, cev)
 		for _, pos := range g.Dungeon.FreeNeighbors(cev.Pos) {
-			if RandInt(3) > 0 {
+			if RandInt(5) > 0 {
 				continue
 			}
 			g.Burn(pos, cev)
 		}
-		cev.Renew(g, 10)
+		delete(g.Clouds, cev.Pos)
+		g.Fog(cev.Pos, 1, &simpleEvent{ERank: cev.Rank()})
+		g.ComputeLOS()
 	case NightProgression:
 		if _, ok := g.Clouds[cev.Pos]; !ok {
 			break
@@ -369,29 +365,29 @@ func (g *game) MakeCreatureSleep(pos position, ev event) {
 	mons.ExhaustTime(g, 40+RandInt(10))
 }
 
-func (g *game) BurnCreature(pos position, ev event) {
-	mons := g.MonsterAt(pos)
-	if mons.Exists() {
-		mons.HP -= 1
-		if mons.HP <= 0 {
-			if g.Player.Sees(mons.Pos) {
-				g.PrintfStyled("%s is killed by the fire.", logPlayerHit, mons.Kind.Definite(true))
-			}
-			g.HandleKill(mons, ev)
-		} else {
-			mons.MakeAwareIfHurt(g)
-		}
-	}
-	if pos == g.Player.Pos {
-		damage := 1
-		g.Player.HP -= damage
-		g.PrintfStyled("The fire burns you (%d dmg).", logMonsterHit, damage)
-		if g.Player.HP+damage < 10 {
-			g.Stats.TimesLucky++
-		}
-		g.StopAuto()
-	}
-}
+//func (g *game) BurnCreature(pos position, ev event) {
+//mons := g.MonsterAt(pos)
+//if mons.Exists() {
+//mons.HP -= 1
+//if mons.HP <= 0 {
+//if g.Player.Sees(mons.Pos) {
+//g.PrintfStyled("%s is killed by the fire.", logPlayerHit, mons.Kind.Definite(true))
+//}
+//g.HandleKill(mons, ev)
+//} else {
+//mons.MakeAwareIfHurt(g)
+//}
+//}
+//if pos == g.Player.Pos {
+//damage := 1
+//g.Player.HP -= damage
+//g.PrintfStyled("The fire burns you (%d dmg).", logMonsterHit, damage)
+//if g.Player.HP+damage < 10 {
+//g.Stats.TimesLucky++
+//}
+//g.StopAuto()
+//}
+//}
 
 func (g *game) Burn(pos position, ev event) {
 	if _, ok := g.Clouds[pos]; ok {
@@ -414,7 +410,7 @@ func (g *game) Burn(pos position, ev event) {
 		g.ComputeLOS()
 	}
 	g.PushEvent(&cloudEvent{ERank: ev.Rank() + DurationCloudProgression, EAction: FireProgression, Pos: pos})
-	g.BurnCreature(pos, ev)
+	//g.BurnCreature(pos, ev)
 }
 
 func (cev *cloudEvent) Renew(g *game, delay int) {
