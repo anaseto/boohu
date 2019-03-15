@@ -261,6 +261,8 @@ const (
 	LoneMirrorSpecter
 	LoneHound
 	LoneWingedMilfid
+	LoneTreeMushroom
+	LoneEarthDragon
 	LoneMarevorHelith
 )
 
@@ -281,6 +283,8 @@ var MonsBands = []monsterBandData{
 	LoneMirrorSpecter:  {Monster: MonsMirrorSpecter},
 	LoneHound:          {Monster: MonsHound},
 	LoneWingedMilfid:   {Monster: MonsWingedMilfid},
+	LoneTreeMushroom:   {Monster: MonsTreeMushroom},
+	LoneEarthDragon:    {Monster: MonsEarthDragon},
 	LoneMarevorHelith:  {Monster: MonsMarevorHelith},
 }
 
@@ -1339,6 +1343,7 @@ func (dg *dgen) GenMonsters(g *game) {
 	bandsL1 := []monsterBand{LoneGuard}
 	bandsL2 := []monsterBand{LoneYack, LoneWorm, LoneHound}
 	bandsL3 := []monsterBand{LoneCyclop, LoneSatowalgaPlant, LoneBlinkingFrog, LoneMirrorSpecter, LoneWingedMilfid}
+	bandsL4 := []monsterBand{LoneTreeMushroom, LoneEarthDragon}
 	mlevel := 1 + RandInt(MaxDepth)
 	for i := 0; i < 5; i++ {
 		if !dg.PutRandomBand(g, bandsL1) {
@@ -1362,7 +1367,7 @@ func (dg *dgen) GenMonsters(g *game) {
 		dg.PutRandomBand(g, bandsL2)
 	}
 	if g.Depth > 6 {
-		dg.PutRandomBand(g, bandsL3)
+		dg.PutRandomBand(g, bandsL4)
 	}
 	if g.Depth > 7 {
 		dg.PutRandomBand(g, bandsL2)
@@ -1376,7 +1381,7 @@ func (dg *dgen) GenMonsters(g *game) {
 		dg.PutRandomBand(g, bandsL3)
 	}
 	if g.Depth > 10 {
-		dg.PutRandomBand(g, bandsL2)
+		dg.PutRandomBand(g, bandsL4)
 		dg.PutRandomBand(g, bandsL3)
 	}
 	if mlevel == g.Depth {
