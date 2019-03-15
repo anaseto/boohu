@@ -210,8 +210,10 @@ func (g *game) Jump(mons *monster, ev event) error {
 	if g.Player.HasStatus(StatusExhausted) {
 		return errors.New("You cannot jump while exhausted.")
 	}
-	g.Player.Statuses[StatusExhausted] = 1
-	g.PushEvent(&simpleEvent{ERank: ev.Rank() + DurationExhaustion, EAction: ExhaustionEnd})
+	if !g.Player.HasStatus(StatusSwift) {
+		g.Player.Statuses[StatusExhausted] = 1
+		g.PushEvent(&simpleEvent{ERank: ev.Rank() + DurationExhaustion, EAction: ExhaustionEnd})
+	}
 	g.PlacePlayerAt(pos)
 	return nil
 }

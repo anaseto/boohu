@@ -139,12 +139,6 @@ func (sev *simpleEvent) Action(g *game) {
 			g.PrintStyled("You no longer feel speedy.", logStatusEnd)
 			g.ui.StatusEndAnimation()
 		}
-	case EvasionEnd:
-		g.Player.Statuses[StatusAgile]--
-		if g.Player.Statuses[StatusAgile] == 0 {
-			g.PrintStyled("You no longer feel agile.", logStatusEnd)
-			g.ui.StatusEndAnimation()
-		}
 	case LignificationEnd:
 		g.Player.Statuses[StatusLignification]--
 		g.Player.HPbonus -= 4

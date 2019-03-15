@@ -7,7 +7,6 @@ const (
 	StatusSlow
 	StatusExhausted
 	StatusSwift
-	StatusAgile
 	StatusLignification
 	StatusConfusion
 	StatusTele
@@ -22,7 +21,7 @@ const (
 
 func (st status) Good() bool {
 	switch st {
-	case StatusBerserk, StatusSwift, StatusAgile, StatusDig, StatusSwap, StatusShadows:
+	case StatusBerserk, StatusSwift, StatusDig, StatusSwap, StatusShadows:
 		return true
 	default:
 		return false
@@ -50,8 +49,6 @@ func (st status) String() string {
 		return "Swift"
 	case StatusLignification:
 		return "Lignified"
-	case StatusAgile:
-		return "Agile"
 	case StatusConfusion:
 		return "Confused"
 	case StatusTele:
@@ -88,8 +85,6 @@ func (st status) Short() string {
 		return "Sw"
 	case StatusLignification:
 		return "Li"
-	case StatusAgile:
-		return "Ag"
 	case StatusConfusion:
 		return "Co"
 	case StatusTele:
