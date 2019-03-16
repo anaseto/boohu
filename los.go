@@ -15,7 +15,7 @@ func (g *game) bestParent(rm rayMap, from, pos position, losrange int) (position
 	return b, rm[b].Cost + g.losCost(from, b, pos, losrange)
 }
 
-func (g *game) DiagonalWall(from, to position) bool {
+func (g *game) DiagonalOpaque(from, to position) bool {
 	p := make([]position, 0, 2)
 	switch to.Dir(from) {
 	case NE:
@@ -29,6 +29,11 @@ func (g *game) DiagonalWall(from, to position) bool {
 	}
 	count := 0
 	for _, pos := range p {
+		_, ok := g.Clouds[pos]
+		if ok {
+			count++
+			continue
+		}
 		if pos.valid() && g.Dungeon.Cell(pos).T == WallCell {
 			count++
 		}
@@ -67,7 +72,7 @@ func (g *game) DiagonalDifficult(from, to position) bool {
 }
 
 func (g *game) losCost(from, pos, to position, losrange int) int {
-	if g.DiagonalWall(pos, to) {
+	if g.DiagonalOpaque(pos, to) {
 		return losrange
 	}
 	if from == pos {
