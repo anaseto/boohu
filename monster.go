@@ -306,6 +306,7 @@ type monster struct {
 	Seen          bool
 	LOS           map[position]bool
 	LastSeenState monsterState
+	Swapped       bool
 }
 
 func (m *monster) Init() {
@@ -530,6 +531,11 @@ func (m *monster) NextTarget(g *game) position {
 }
 
 func (m *monster) HandleTurn(g *game, ev event) {
+	if m.Swapped {
+		m.Swapped = false
+		ev.Renew(g, m.Kind.MovementDelay())
+		return
+	}
 	ppos := g.Player.Pos
 	mpos := m.Pos
 	m.MakeAware(g)
@@ -627,6 +633,10 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	}
 	target := m.Path[len(m.Path)-2]
 	mons := g.MonsterAt(target)
+	monstarget := InvalidPos
+	if mons.Exists() && len(mons.Path) >= 2 {
+		monstarget = mons.Path[len(mons.Path)-2]
+	}
 	switch {
 	case !mons.Exists():
 		if m.Kind == MonsEarthDragon && g.Dungeon.Cell(target).T == WallCell {
@@ -654,6 +664,14 @@ func (m *monster) HandleTurn(g *game, ev event) {
 			}
 			m.Path = m.Path[:len(m.Path)-1]
 		}
+	case mons.Pos == target && m.Pos == monstarget:
+		m.MoveTo(g, target)
+		m.Path = m.Path[:len(m.Path)-1]
+		mons.MoveTo(g, monstarget)
+		mons.Path = mons.Path[:len(mons.Path)-1]
+		g.MonstersPosCache[m.Pos.idx()] = m.Index + 1
+		mons.Swapped = true
+		// XXX this is perhaps not the optimal to handle that case.
 	case m.State == Hunting && mons.State != Hunting:
 		r := RandInt(5)
 		if r == 0 {
