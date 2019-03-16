@@ -101,7 +101,7 @@ func (fp *noisePath) Neighbors(pos position) []position {
 	keep := func(npos position) bool {
 		return npos.valid() && d.Cell(npos).T != WallCell
 	}
-	return pos.Neighbors(nb, keep)
+	return pos.CardinalNeighbors(nb, keep)
 }
 
 func (fp *noisePath) Cost(from, to position) int {
