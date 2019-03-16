@@ -36,11 +36,44 @@ func (g *game) DiagonalWall(from, to position) bool {
 	return count > 1
 }
 
+func (g *game) DiagonalDifficult(from, to position) bool {
+	p := make([]position, 0, 2)
+	switch to.Dir(from) {
+	case NE:
+		p = append(p, to.S(), to.W())
+	case NW:
+		p = append(p, to.S(), to.E())
+	case SW:
+		p = append(p, to.N(), to.E())
+	case SE:
+		p = append(p, to.N(), to.W())
+	}
+	count := 0
+	for _, pos := range p {
+		if !pos.valid() {
+			continue
+		}
+		_, ok := g.Clouds[pos]
+		if ok {
+			count++
+			continue
+		}
+		switch g.Dungeon.Cell(pos).T {
+		case WallCell, FungusCell:
+			count++
+		}
+	}
+	return count > 1
+}
+
 func (g *game) losCost(from, pos, to position, losrange int) int {
 	if g.DiagonalWall(pos, to) {
 		return losrange
 	}
 	if from == pos {
+		if g.DiagonalDifficult(pos, to) {
+			return losrange - 1
+		}
 		return to.Distance(pos) - 1
 	}
 	c := g.Dungeon.Cell(pos)
@@ -59,7 +92,7 @@ func (g *game) losCost(from, pos, to position, losrange int) int {
 		}
 	}
 	if c.T == FungusCell {
-		return losrange - 2
+		return losrange + to.Distance(pos) - 2
 	}
 	return to.Distance(pos)
 }
