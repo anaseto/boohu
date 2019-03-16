@@ -76,7 +76,7 @@ func (g *game) losCost(from, pos, to position, losrange int) int {
 		return losrange
 	}
 	if from == pos {
-		if g.DiagonalDifficult(pos, to) {
+		if g.DiagonalDifficult(pos, to) && losrange > 1 {
 			return losrange - 1
 		}
 		return to.Distance(pos) - 1
