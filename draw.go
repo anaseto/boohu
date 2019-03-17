@@ -527,7 +527,7 @@ func (ui *gameui) DrawKeysDescription(title string, actions []string) {
 
 func (ui *gameui) KeysHelp() {
 	ui.DrawKeysDescription("Commands", []string{
-		"Movement", "h/j/k/l/y/u/b/n or numpad or mouse left",
+		"Move/Jump", "h/j/k/l/y/u/b/n or numpad or mouse left",
 		"Wait a turn", "“.” or 5 or mouse left on @",
 		"Evoke/Zap card", "v or z",
 		"Examine", "x or mouse left",
@@ -545,7 +545,7 @@ func (ui *gameui) KeysHelp() {
 }
 
 func (ui *gameui) ExamineHelp() {
-	ui.DrawKeysDescription("Examine/Travel/Targeting Commands", []string{
+	ui.DrawKeysDescription("Examine/Travel Commands", []string{
 		"Move cursor", "h/j/k/l/y/u/b/n or numpad or mouse left",
 		"Cycle through monsters", "+",
 		"Cycle through stairs", ">",
