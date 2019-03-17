@@ -965,7 +965,7 @@ func (ui *gameui) HandleKey(rka runeKeyAction) (err error, again bool, quit bool
 			err = errors.New("You cannot go to any stairs.")
 		}
 	case KeyEvoke:
-		err = ui.SelectCard(g.Ev)
+		err = ui.SelectMagara(g.Ev)
 		err = ui.CleanError(err)
 	case KeyExplore:
 		err = g.Autoexplore(g.Ev)

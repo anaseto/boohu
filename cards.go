@@ -6,247 +6,227 @@ import (
 	"sort"
 )
 
-type card int
+type magara int
 
 const (
-	BlinkCard card = iota
-	DigCard
-	TeleportCard
-	TeleportOtherCard
-	HealWoundsCard
-	MagicCard
-	DescentCard
-	SwiftnessCard
-	SwappingCard
-	ShadowsCard
-	FogCard
-	MagicMappingCard
-	SensingCard
-	WallsCard
-	SlowingCard
-	SleepingCard
-	NoiseCard
-	ObstructionCard
-	FireCard
-	ConfusionCard
-	LignificationCard
+	NoMagara magara = iota
+	BlinkMagara
+	DigMagara
+	TeleportMagara
+	TeleportOtherMagara
+	HealWoundsMagara
+	SwiftnessMagara
+	SwappingMagara
+	ShadowsMagara
+	FogMagara
+	WallsMagara
+	SlowingMagara
+	SleepingMagara
+	NoiseMagara
+	ObstructionMagara
+	FireMagara
+	ConfusionMagara
+	LignificationMagara
+	//MagicMagara
+	//DescentMagara
+	//MagicMappingMagara
+	//SensingMagara
 )
 
-func (g *game) DrawCard(n int) {
-	cards := []card{
-		BlinkCard,
-		DigCard,
-		TeleportCard,
-		TeleportOtherCard,
-		HealWoundsCard,
-		MagicCard,
-		DescentCard,
-		SwiftnessCard,
-		SwappingCard, // XXX: swap with random monster?
-		ShadowsCard,
-		FogCard,
-		MagicMappingCard,
-		SensingCard,
-		WallsCard,
-		SlowingCard,
-		SleepingCard,
-		NoiseCard,
-		ObstructionCard,
-		FireCard,
-		ConfusionCard,
-		LignificationCard,
-	}
+const NumMagaras = int(LignificationMagara)
+
+func (g *game) RandomMagara() (mag magara) {
 loop:
 	for {
-		c := cards[RandInt(len(cards))]
-		for _, oc := range g.GeneratedCards {
-			if c == oc && RandInt(5) > 0 {
+		mag = magara(1 + RandInt(NumMagaras))
+		for _, m := range g.Hand {
+			if m == mag {
 				continue loop
 			}
-		}
-		switch c {
-		case MagicMappingCard, SensingCard, DescentCard:
-			// rare cards appear less often
-			if RandInt(2) == 0 {
-				continue loop
-			}
-		}
-		g.Hand[n] = c
-		g.GeneratedCards = append(g.GeneratedCards, c)
-		if len(g.GeneratedCards) > 4 {
-			g.GeneratedCards = g.GeneratedCards[len(g.GeneratedCards)-4:]
 		}
 		break
 	}
+	return mag
 }
 
-func (g *game) UseCard(n int, ev event) (err error) {
+func (g *game) UseMagara(n int, ev event) (err error) {
 	if g.Player.HasStatus(StatusNausea) {
-		return errors.New("You cannot use cards while sick.")
+		return errors.New("You cannot use magaras while sick.")
 	}
-	c := g.Hand[n]
-	if c.MPCost() > g.Player.MP {
+	mag := g.Hand[n]
+	if mag.MPCost() > g.Player.MP {
 		return errors.New("Not enough magic points for using this rod.")
 	}
-	switch c {
-	case BlinkCard:
+	switch mag {
+	case NoMagara:
+		err = errors.New("You cannot evoke an empty slot!")
+	case BlinkMagara:
 		err = g.EvokeBlink(ev)
-	case TeleportCard:
+	case TeleportMagara:
 		err = g.EvokeTeleport(ev)
-	case DigCard:
+	case DigMagara:
 		err = g.EvokeDig(ev)
-	case TeleportOtherCard:
+	case TeleportOtherMagara:
 		err = g.EvokeTeleportOther(ev)
-	case HealWoundsCard:
+	case HealWoundsMagara:
 		err = g.EvokeHealWounds(ev)
-	case MagicCard:
-		err = g.EvokeRefillMagic(ev)
-	case DescentCard:
-		err = g.EvokeDescent(ev)
-	case SwiftnessCard:
+	//case MagicMagara:
+	//err = g.EvokeRefillMagic(ev)
+	case SwiftnessMagara:
 		err = g.EvokeSwiftness(ev)
-	case SwappingCard:
+	case SwappingMagara:
 		err = g.EvokeSwapping(ev)
-	case ShadowsCard:
+	case ShadowsMagara:
 		err = g.EvokeShadows(ev)
-	case FogCard:
+	case FogMagara:
 		err = g.EvokeFog(ev)
-	case MagicMappingCard:
-		err = g.EvokeMagicMapping(ev)
-	case SensingCard:
-		err = g.EvokeSensing(ev)
-	case WallsCard:
+	case WallsMagara:
 		err = g.EvokeWalls(ev)
-	case SlowingCard:
+	case SlowingMagara:
 		err = g.EvokeSlowing(ev)
-	case SleepingCard:
+	case SleepingMagara:
 		err = g.EvokeSleeping(ev)
-	case NoiseCard:
+	case NoiseMagara:
 		err = g.EvokeNoise(ev)
-	case ConfusionCard:
+	case ConfusionMagara:
 		err = g.EvokeConfusion(ev)
-	case ObstructionCard:
+	case ObstructionMagara:
 		err = g.EvokeObstruction(ev)
-	case FireCard:
+	case FireMagara:
 		err = g.EvokeFire(ev)
-	case LignificationCard:
+	case LignificationMagara:
 		err = g.EvokeLignification(ev)
+		//case MagicMappingMagara:
+		//err = g.EvokeMagicMapping(ev)
+		//case SensingMagara:
+		//err = g.EvokeSensing(ev)
+		//case DescentMagara:
+		//err = g.EvokeDescent(ev)
 	}
 	if err != nil {
 		return err
 	}
-	g.Stats.CardsUsed++ // TODO
+	g.Stats.MagarasUsed++ // TODO
 	// TODO: animation
-	g.Player.MP -= c.MPCost()
+	g.Player.MP -= mag.MPCost()
 	g.FunAction()
-	g.StoryPrintf("You evoked your %s.", c)
-	g.DrawCard(n)
+	g.StoryPrintf("You evoked your %s.", mag)
 	ev.Renew(g, 5)
 	return nil
 }
 
-func (c card) String() (desc string) {
-	switch c {
-	case BlinkCard:
-		desc = "card of blinking"
-	case TeleportCard:
-		desc = "card of teleportation"
-	case DigCard:
-		desc = "card of digging"
-	case TeleportOtherCard:
-		desc = "card of teleport other"
-	case HealWoundsCard:
-		desc = "card of heal wounds"
-	case MagicCard:
-		desc = "card of refill magic"
-	case DescentCard:
-		desc = "card of descent"
-	case SwiftnessCard:
-		desc = "card of swiftness"
-	case SwappingCard:
-		desc = "card of swapping"
-	case ShadowsCard:
-		desc = "card of shadows"
-	case FogCard:
-		desc = "card of fog"
-	case MagicMappingCard:
-		desc = "card of magic mapping"
-	case SensingCard:
-		desc = "card of sensing"
-	case WallsCard:
-		desc = "card of walls"
-	case SlowingCard:
-		desc = "card of slowing"
-	case SleepingCard:
-		desc = "card of sleeping"
-	case NoiseCard:
-		desc = "card of noise"
-	case ObstructionCard:
-		desc = "card of obstruction"
-	case ConfusionCard:
-		desc = "card of confusion"
-	case FireCard:
-		desc = "card of fire"
-	case LignificationCard:
-		desc = "card of lignification"
+func (mag magara) String() (desc string) {
+	switch mag {
+	case NoMagara:
+		desc = "empty slot"
+	case BlinkMagara:
+		desc = "magara of blinking"
+	case TeleportMagara:
+		desc = "magara of teleportation"
+	case DigMagara:
+		desc = "magara of digging"
+	case TeleportOtherMagara:
+		desc = "magara of teleport other"
+	case HealWoundsMagara:
+		desc = "magara of heal wounds"
+	//case MagicMagara:
+	//desc = "magara of refill magic"
+	case SwiftnessMagara:
+		desc = "magara of swiftness"
+	case SwappingMagara:
+		desc = "magara of swapping"
+	case ShadowsMagara:
+		desc = "magara of shadows"
+	case FogMagara:
+		desc = "magara of fog"
+	case WallsMagara:
+		desc = "magara of walls"
+	case SlowingMagara:
+		desc = "magara of slowing"
+	case SleepingMagara:
+		desc = "magara of sleeping"
+	case NoiseMagara:
+		desc = "magara of noise"
+	case ObstructionMagara:
+		desc = "magara of obstruction"
+	case ConfusionMagara:
+		desc = "magara of confusion"
+	case FireMagara:
+		desc = "magara of fire"
+	case LignificationMagara:
+		desc = "magara of lignification"
+		//case DescentMagara:
+		//desc = "magara of descent"
+		//case MagicMappingMagara:
+		//desc = "magara of magic mapping"
+		//case SensingMagara:
+		//desc = "magara of sensing"
 	}
 	return desc
 }
 
-func (c card) Desc(g *game) (desc string) {
+func (mag magara) Desc(g *game) (desc string) {
 	// TODO
-	switch c {
-	case BlinkCard:
+	switch mag {
+	case NoMagara:
+		desc = "can be used for a new magara."
+	case BlinkMagara:
 		desc = "makes you blink away within your line of sight. The rod is more susceptible to send you to the cells thar are most far from you."
-	case TeleportCard:
+	case TeleportMagara:
 		desc = "makes you teleport far away."
-	case DigCard:
+	case DigMagara:
 		desc = "makes you dig walls by walking into them like an earth dragon."
-	case TeleportOtherCard:
+	case TeleportOtherMagara:
 		desc = "teleports up to two random monsters in sight."
-	case HealWoundsCard:
+	case HealWoundsMagara:
 		desc = "heals you a good deal."
-	case MagicCard:
-		desc = "replenishes your magical reserves."
-	case DescentCard:
-		desc = "makes you go deeper in the Underground."
-	case SwiftnessCard:
+	//case MagicMagara:
+	//desc = "replenishes your magical reserves."
+	case SwiftnessMagara:
 		desc = "makes you move faster and better at avoiding blows for a short time." // XXX
-	case SwappingCard:
+	case SwappingMagara:
 		desc = "makes you swap positions with the farthest monster in sight. If there is more than one at the same distance, it will be chosen randomly."
-	case ShadowsCard:
+	case ShadowsMagara:
 		desc = "reduces your line of sight range to 1. Because monsters only can see you if you see them, this makes it easier to get out of sight of monsters so that they eventually stop chasing you."
-	case FogCard:
+	case FogMagara:
 		desc = ""
-	case MagicMappingCard:
-		desc = "shows you the map layout and item locations."
-	case SensingCard:
-		desc = "shows you the current position of monsters in the map."
-	case WallsCard:
+	case WallsMagara:
 		desc = "replaces free cells around you with temporary walls."
-	case SlowingCard:
+	case SlowingMagara:
 		desc = "induces slow movement and attack for monsters in sight."
-	case SleepingCard:
+	case SleepingMagara:
 		desc = "induces deep sleeping and exhaustion for up to two random monsters in sight."
-	case NoiseCard:
+	case NoiseMagara:
 		desc = "produces a noisy bang, attracting monsters in a medium-sized area."
-	case ObstructionCard:
+	case ObstructionMagara:
 		desc = "creates temporal walls between you and up to 3 monsters."
-	case ConfusionCard:
+	case ConfusionMagara:
 		desc = "confuses monsters in sight, leaving them unable to attack you."
-	case FireCard:
+	case FireMagara:
 		desc = "produces a small magical fire that will extend to neighbour flammable terrain. The smoke it generates will induce sleep in monsters. As a gawalt monkey, you resist sleepiness, but you will still feel slowed."
-	case LignificationCard:
+	case LignificationMagara:
 		desc = "lignifies up to 2 monsters in view, so that it cannot move. The monster can still fight."
+		//case DescentMagara:
+		//desc = "makes you go deeper in the Underground."
+		//case MagicMappingMagara:
+		//desc = "shows you the map layout and item locations."
+		//case SensingMagara:
+		//desc = "shows you the current position of monsters in the map."
 	}
-	return fmt.Sprintf("The %s %s", c, desc)
+	return fmt.Sprintf("The %s %s", mag, desc)
 }
 
-func (c card) MPCost() int {
-	if c == MagicCard {
-		return 0
+func (mag magara) MPCost() int {
+	switch mag {
+	//case MagicMagara:
+	//return 0
+	//case DescentMagara:
+	//return 3
+	//case SensingMagara:
+	//return 2
+	default:
+		return 1
 	}
-	return 1
 }
 
 func (g *game) EvokeBlink(ev event) error {
@@ -575,7 +555,7 @@ func (g *game) EvokeLignification(ev event) error {
 }
 
 func (g *game) EvokeNoise(ev event) error {
-	g.MakeNoise(CardBangNoise, g.Player.Pos)
+	g.MakeNoise(MagaraBangNoise, g.Player.Pos)
 	g.Print("Baaang!!! You better get out of here.")
 	return nil
 }

@@ -22,7 +22,7 @@ type game struct {
 	Clouds             map[position]cloud
 	TemporalWalls      map[position]terrain
 	GeneratedUniques   map[monsterBand]int
-	GeneratedCards     []card
+	GeneratedMagaras   []magara
 	GenPlan            [MaxDepth + 1]genFlavour
 	TerrainKnowledge   map[position]terrain
 	ExclusionsMap      map[position]bool
@@ -41,7 +41,7 @@ type game struct {
 	DrawBuffer         []UICell
 	drawBackBuffer     []UICell
 	DrawLog            []drawFrame
-	Hand               []card
+	Hand               []magara
 	Log                []logEntry
 	LogIndex           int
 	LogNextTick        int
@@ -218,12 +218,13 @@ func (g *game) InitPlayer() {
 	}
 	g.Player.Statuses = map[status]int{}
 	g.Player.Expire = map[status]int{}
-	g.Hand = []card{
-		HealWoundsCard,
-		BlinkCard,
-		TeleportCard,
-		FogCard,
+	g.Hand = []magara{
+		NoMagara,
+		NoMagara,
+		NoMagara,
 	}
+	g.Hand[0] = g.RandomMagara()
+	g.Hand[1] = g.RandomMagara()
 }
 
 type genFlavour int
@@ -288,6 +289,11 @@ func (g *game) InitLevel() {
 		if ok {
 			g.ApplyAptitude(apt)
 		}
+	}
+
+	// Magara slots
+	if g.Depth == 3 || g.Depth == 6 {
+		g.Hand = append(g.Hand, NoMagara)
 	}
 
 	// Magical Stones

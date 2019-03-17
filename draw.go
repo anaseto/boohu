@@ -529,7 +529,7 @@ func (ui *gameui) KeysHelp() {
 	ui.DrawKeysDescription("Commands", []string{
 		"Move/Jump", "h/j/k/l/y/u/b/n or numpad or mouse left",
 		"Wait a turn", "“.” or 5 or mouse left on @",
-		"Evoke/Zap card", "v or z",
+		"Evoke/Zap magara", "v or z",
 		"Examine", "x or mouse left",
 		"Rest (until status free or regen)", "r",
 		"Descend stairs", "> or D",
@@ -1578,7 +1578,7 @@ func (ui *gameui) ListItemBG(i int) uicolor {
 // 	}
 // }
 //
-func (ui *gameui) CardItem(i, lnum int, c card, fg uicolor) {
+func (ui *gameui) MagaraItem(i, lnum int, c magara, fg uicolor) {
 	//g := ui.g
 	bg := ui.ListItemBG(i)
 	ui.ClearLineWithColor(lnum, bg)
@@ -1589,11 +1589,11 @@ func (ui *gameui) CardItem(i, lnum int, c card, fg uicolor) {
 	ui.DrawColoredTextOnBG(fmt.Sprintf("%c - %s", rune(i+97), c), 0, lnum, fg, bg)
 }
 
-func (ui *gameui) SelectCard(ev event) error {
+func (ui *gameui) SelectMagara(ev event) error {
 	g := ui.g
 	desc := false
 	for {
-		cards := g.Hand
+		magaras := g.Hand
 		ui.ClearLine(0)
 		if !ui.Small() {
 			ui.DrawColoredText(MenuEvoke.String(), MenuCols[MenuEvoke][0], DungeonHeight, ColorCyan)
@@ -1601,31 +1601,31 @@ func (ui *gameui) SelectCard(ev event) error {
 		if desc {
 			ui.DrawColoredText("Describe", 0, 0, ColorBlue)
 			col := utf8.RuneCountInString("Describe")
-			ui.DrawText(" which card? (press ? or click here for evocation menu)", col, 0)
+			ui.DrawText(" which magara? (press ? or click here for evocation menu)", col, 0)
 		} else {
 			ui.DrawColoredText("Evoke", 0, 0, ColorCyan)
 			col := utf8.RuneCountInString("Evoke")
-			ui.DrawText(" which card? (press ? or click here for description menu)", col, 0)
+			ui.DrawText(" which magara? (press ? or click here for description menu)", col, 0)
 		}
-		for i, r := range cards {
-			ui.CardItem(i, i+1, r, ColorFg)
+		for i, r := range magaras {
+			ui.MagaraItem(i, i+1, r, ColorFg)
 		}
-		ui.DrawTextLine(" press esc or space to cancel ", len(cards)+1)
+		ui.DrawTextLine(" press esc or space to cancel ", len(magaras)+1)
 		ui.Flush()
-		index, alt, err := ui.Select(len(cards))
+		index, alt, err := ui.Select(len(magaras))
 		if alt {
 			desc = !desc
 			continue
 		}
 		if err == nil {
-			ui.CardItem(index, index+1, cards[index], ColorYellow)
+			ui.MagaraItem(index, index+1, magaras[index], ColorYellow)
 			ui.Flush()
 			time.Sleep(75 * time.Millisecond)
 			if desc {
-				ui.DrawDescription(cards[index].Desc(g))
+				ui.DrawDescription(magaras[index].Desc(g))
 				continue
 			}
-			err = g.UseCard(index, ev)
+			err = g.UseMagara(index, ev)
 		}
 		return err
 	}

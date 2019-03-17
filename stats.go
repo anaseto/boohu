@@ -10,7 +10,7 @@ type stats struct {
 	ReceivedHits  int
 	Dodges        int
 	Blocks        int
-	CardsUsed     int
+	MagarasUsed   int
 	Evocations    int
 	UsedStones    int
 	Throws        int
