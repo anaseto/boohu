@@ -506,6 +506,7 @@ const (
 	KeyExplore
 	KeyExamine
 	KeyEvoke
+	KeyInteract
 	KeyCharacterInfo
 	KeyLogs
 	KeyDump
@@ -554,6 +555,7 @@ var configurableKeyActions = [...]keyAction{
 	KeyExplore,
 	KeyExamine,
 	KeyEvoke,
+	KeyInteract,
 	KeyCharacterInfo,
 	KeyLogs,
 	KeyDump,
@@ -591,6 +593,7 @@ func (k keyAction) NormalModeKey() bool {
 		KeyExplore,
 		KeyExamine,
 		KeyEvoke,
+		KeyInteract,
 		KeyCharacterInfo,
 		KeyLogs,
 		KeyDump,
@@ -656,6 +659,8 @@ func (k keyAction) NormalModeDescription() (text string) {
 		text = "Examine"
 	case KeyEvoke:
 		text = "Evoke card"
+	case KeyInteract:
+		text = "Interact"
 	case KeyCharacterInfo:
 		text = "View Character and Quest Information"
 	case KeyLogs:
@@ -797,15 +802,13 @@ func ApplyDefaultKeyBindings() {
 		//'N': KeyRunSE,
 		'.': KeyWaitTurn,
 		'5': KeyWaitTurn,
-		'r': KeyRest,
-		'>': KeyDescend,
-		'D': KeyDescend,
 		'G': KeyGoToStairs,
 		'o': KeyExplore,
 		'x': KeyExamine,
 		'v': KeyEvoke,
 		'z': KeyEvoke,
-		'u': KeyEvoke,
+		'e': KeyInteract, // Equip/intEract
+		'i': KeyInteract, // Interact
 		'%': KeyCharacterInfo,
 		'C': KeyCharacterInfo,
 		'm': KeyLogs,
@@ -924,26 +927,6 @@ func (ui *gameui) HandleKey(rka runeKeyAction) (err error, again bool, quit bool
 		err = g.GoToDir(KeyToDir(rka.k), g.Ev)
 	case KeyWaitTurn:
 		g.WaitTurn(g.Ev)
-	case KeyRest:
-		err = g.Rest(g.Ev)
-		ui.MenuSelectedAnimation(MenuRest, err == nil)
-	case KeyDescend:
-		if g.Dungeon.Cell(g.Player.Pos).T == StairCell {
-			ui.MenuSelectedAnimation(MenuInteract, true)
-			strt := g.Objects.Stairs[g.Player.Pos]
-			err = ui.OptionalDescendConfirmation(strt)
-			if err != nil {
-				break
-			}
-			if g.Descend() {
-				ui.Win()
-				quit = true
-				return err, again, quit
-			}
-			ui.DrawDungeonView(NormalMode)
-		} else {
-			err = errors.New("No stairs here.")
-		}
 	case KeyGoToStairs:
 		stairs := g.StairsSlice()
 		sortedStairs := g.SortedNearestTo(stairs, g.Player.Pos)
@@ -963,6 +946,35 @@ func (ui *gameui) HandleKey(rka runeKeyAction) (err error, again bool, quit bool
 			}
 		} else {
 			err = errors.New("You cannot go to any stairs.")
+		}
+	case KeyInteract:
+		c := g.Dungeon.Cell(g.Player.Pos)
+		switch c.T {
+		case StairCell:
+			if g.Dungeon.Cell(g.Player.Pos).T == StairCell {
+				ui.MenuSelectedAnimation(MenuInteract, true)
+				strt := g.Objects.Stairs[g.Player.Pos]
+				err = ui.OptionalDescendConfirmation(strt)
+				if err != nil {
+					break
+				}
+				if g.Descend() {
+					ui.Win()
+					quit = true
+					return err, again, quit
+				}
+				ui.DrawDungeonView(NormalMode)
+			} else {
+				err = errors.New("No stairs here.")
+			}
+		case BarrelCell:
+			err = g.Rest(g.Ev)
+			ui.MenuSelectedAnimation(MenuInteract, err == nil)
+		case MagaraCell:
+			err = ui.EquipMagara(g.Ev)
+			err = ui.CleanError(err)
+		default:
+			err = errors.New("You cannot interact with anything here.")
 		}
 	case KeyEvoke:
 		err = ui.SelectMagara(g.Ev)
@@ -1368,8 +1380,7 @@ loop:
 type menu int
 
 const (
-	MenuRest menu = iota
-	MenuExplore
+	MenuExplore menu = iota
 	MenuEvoke
 	MenuOther
 	MenuInteract
@@ -1377,8 +1388,6 @@ const (
 
 func (m menu) String() (text string) {
 	switch m {
-	case MenuRest:
-		text = "rest"
 	case MenuExplore:
 		text = "explore"
 	case MenuEvoke:
@@ -1393,8 +1402,6 @@ func (m menu) String() (text string) {
 
 func (m menu) Key(g *game) (key keyAction) {
 	switch m {
-	case MenuRest:
-		key = KeyRest
 	case MenuExplore:
 		key = KeyExplore
 	case MenuOther:
@@ -1402,16 +1409,12 @@ func (m menu) Key(g *game) (key keyAction) {
 	case MenuEvoke:
 		key = KeyEvoke
 	case MenuInteract:
-		switch g.Dungeon.Cell(g.Player.Pos).T {
-		case StairCell:
-			key = KeyDescend
-		}
+		key = KeyInteract
 	}
 	return key
 }
 
 var MenuCols = [][2]int{
-	MenuRest:     {0, 0},
 	MenuExplore:  {0, 0},
 	MenuEvoke:    {0, 0},
 	MenuOther:    {0, 0},
@@ -1453,6 +1456,12 @@ func (ui *gameui) UpdateInteractButton() string {
 	switch g.Dungeon.Cell(g.Player.Pos).T {
 	case StairCell:
 		interactMenu = "[descend]"
+		show = true
+	case BarrelCell:
+		interactMenu = "[rest]"
+		show = true
+	case MagaraCell:
+		interactMenu = "[equip]"
 		show = true
 	}
 	if !show {

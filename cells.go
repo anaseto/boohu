@@ -15,6 +15,8 @@ const (
 	BarrelCell
 	StairCell
 	StoneCell
+	MagaraCell
+	BananaCell
 )
 
 func (c cell) IsFree() bool {
@@ -46,7 +48,7 @@ func (c cell) IsGround() bool {
 
 func (c cell) IsNotable() bool {
 	switch c.T {
-	case StairCell, StoneCell, BarrelCell:
+	case StairCell, StoneCell, BarrelCell, MagaraCell, BananaCell:
 		return true
 	default:
 		return false
@@ -69,6 +71,10 @@ func (c cell) ShortDesc(g *game, pos position) (desc string) {
 		desc = g.Objects.Stones[pos].ShortDesc(g)
 	case StairCell:
 		desc = g.Objects.Stairs[pos].ShortDesc(g)
+	case MagaraCell:
+		desc = g.Objects.Magaras[pos].String()
+	case BananaCell:
+		desc = "a banana"
 	}
 	return desc
 }
@@ -89,6 +95,10 @@ func (c cell) Desc(g *game, pos position) (desc string) {
 		desc = g.Objects.Stones[pos].Desc(g)
 	case StairCell:
 		desc = g.Objects.Stairs[pos].Desc(g)
+	case MagaraCell:
+		desc = g.Objects.Magaras[pos].Desc(g)
+	case BananaCell:
+		desc = "A gawalt monkey cannot enter a healthy sleep without eating one of those bananas before."
 	}
 	return desc
 }
@@ -104,12 +114,16 @@ func (c cell) Style(g *game, pos position) (r rune, fg uicolor) {
 	case FungusCell:
 		r, fg = '"', ColorFgLOS
 	case BarrelCell:
-		r, fg = '&', ColorFgCollectable // TODO: change letter and color
+		r, fg = '&', ColorFgCollectable
 	case StoneCell:
 		r, fg = g.Objects.Stones[pos].Style(g)
 	case StairCell:
 		st := g.Objects.Stairs[pos]
 		r, fg = st.Style(g)
+	case MagaraCell:
+		r, fg = '/', ColorFgCollectable
+	case BananaCell:
+		r, fg = ')', ColorFgCollectable
 	}
 	return r, fg
 }

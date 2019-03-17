@@ -672,13 +672,13 @@ func (g *game) GenRoomTunnels() {
 	dg.ClearUnconnected(g)
 	g.Objects.Stairs = map[position]stair{}
 	if g.Depth < MaxDepth {
-		dg.Stairs(g, NormalStair)
+		dg.GenStairs(g, NormalStair)
 	}
 	if g.Depth == WinDepth || g.Depth == MaxDepth {
-		dg.Stairs(g, WinStair)
+		dg.GenStairs(g, WinStair)
 	}
 	for i := 0; i < 4+RandInt(2); i++ {
-		dg.Barrel(g)
+		dg.GenBarrel(g)
 	}
 	dg.GenMonsters(g)
 	dg.AddSpecial(g)
@@ -698,13 +698,6 @@ func (dg *dgen) ClearUnconnected(g *game) {
 func (dg *dgen) AddSpecial(g *game) {
 	// Equipment
 	switch g.GenPlan[g.Depth] {
-	//case GenWeapon:
-	//g.GenWeapon()
-	//case GenArmour:
-	//g.GenArmour()
-	//case GenWpArm:
-	//g.GenWeapon()
-	//g.GenArmour()
 	case GenRod:
 		//g.GenerateRod()
 	case GenExtraCollectables:
@@ -713,12 +706,10 @@ func (dg *dgen) AddSpecial(g *game) {
 		//g.CollectableScore-- // these are extra
 		//}
 	}
-	if g.Depth == 1 {
-		// extra collectable
-		//dg.GenCollectable(g)
-		//g.CollectableScore--
+	for i := 0; i < 2; i++ {
+		dg.GenBanana()
 	}
-
+	dg.GenMagara(g)
 }
 
 func (r *room) RandomPlace(kind placeKind) position {
@@ -740,7 +731,48 @@ func (dg *dgen) PlayerStartCell(g *game) {
 	g.Player.Pos = dg.rooms[len(dg.rooms)-1].RandomPlace(PlacePatrol)
 }
 
-func (dg *dgen) Stairs(g *game, st stair) {
+func (dg *dgen) GenBanana() {
+	count := 0
+	for {
+		count++
+		if count > 1000 {
+			panic("GenBanana")
+		}
+		x := RandInt(DungeonWidth)
+		y := RandInt(DungeonHeight)
+		pos := position{x, y}
+		c := dg.d.Cell(pos)
+		if c.T == GroundCell && !dg.room[pos] {
+			dg.d.SetCell(pos, BananaCell)
+			break
+		}
+	}
+}
+
+func (dg *dgen) GenMagara(g *game) {
+	var ri, pj int
+	best := 0
+	for i, r := range dg.rooms {
+		for j, pl := range r.places {
+			score := RandInt(100)
+			if !pl.used && pl.kind == PlaceItem && score >= best {
+				ri = i
+				pj = j
+				best = score
+			}
+		}
+	}
+	r := dg.rooms[ri]
+	r.places[pj].used = true
+	r.places[pj].used = true
+	pos := r.places[pj].pos
+	g.Dungeon.SetCell(pos, MagaraCell)
+	mag := g.RandomMagara()
+	g.Objects.Magaras[pos] = mag
+	g.GeneratedMagaras = append(g.GeneratedMagaras, mag)
+}
+
+func (dg *dgen) GenStairs(g *game, st stair) {
 	var ri, pj int
 	best := 0
 	for i, r := range dg.rooms {
@@ -760,13 +792,32 @@ func (dg *dgen) Stairs(g *game, st stair) {
 	g.Objects.Stairs[pos] = st
 }
 
-func (dg *dgen) Barrel(g *game) {
+func (dg *dgen) GenBarrel(g *game) {
 	var ri, pj int
 	best := 0
 	for i, r := range dg.rooms {
 		for j, pl := range r.places {
 			n := RandInt(100)
 			if !pl.used && pl.kind == PlaceSpecialStatic && n >= best {
+				ri = i
+				pj = j
+				best = n
+			}
+		}
+	}
+	r := dg.rooms[ri]
+	r.places[pj].used = true
+	r.places[pj].used = true
+	g.Dungeon.SetCell(r.places[pj].pos, BarrelCell)
+}
+
+func (dg *dgen) Magara(g *game) {
+	var ri, pj int
+	best := 0
+	for i, r := range dg.rooms {
+		for j, pl := range r.places {
+			n := RandInt(100)
+			if !pl.used && pl.kind == PlaceItem && n >= best {
 				ri = i
 				pj = j
 				best = n

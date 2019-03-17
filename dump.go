@@ -260,7 +260,7 @@ func (g *game) SimplifedDump(err error) string {
 	} else {
 		fmt.Fprintf(buf, "You are exploring depth %d of Hareka's Underground.\n", g.Depth)
 	}
-	fmt.Fprintf(buf, "You collected %d simellas.\n", g.Player.Simellas)
+	fmt.Fprintf(buf, "You had %d bananas.\n", g.Player.Bananas)
 	fmt.Fprintf(buf, "You killed %d monsters.\n", g.Stats.Killed)
 	fmt.Fprintf(buf, "You spent %.1f turns in the Underground.\n", float64(g.Turn)/10)
 	maxDepth := Max(g.Depth, g.ExploredLevels)

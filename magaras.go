@@ -39,7 +39,7 @@ func (g *game) RandomMagara() (mag magara) {
 loop:
 	for {
 		mag = magara(1 + RandInt(NumMagaras))
-		for _, m := range g.Hand {
+		for _, m := range g.GeneratedMagaras {
 			if m == mag {
 				continue loop
 			}
@@ -49,11 +49,22 @@ loop:
 	return mag
 }
 
+func (g *game) EquipMagara(i int, ev event) (err error) {
+	omagara := g.Player.Magaras[i]
+	g.Player.Magaras[i] = g.Objects.Magaras[g.Player.Pos]
+	g.Objects.Magaras[g.Player.Pos] = omagara
+	g.Printf("You equip %s, leaving %s on the ground.", g.Player.Magaras[i], omagara)
+	g.StoryPrintf("You equip %s, leaving %s.", g.Player.Magaras[i], omagara)
+	g.FunAction()
+	ev.Renew(g, 5)
+	return nil
+}
+
 func (g *game) UseMagara(n int, ev event) (err error) {
 	if g.Player.HasStatus(StatusNausea) {
 		return errors.New("You cannot use magaras while sick.")
 	}
-	mag := g.Hand[n]
+	mag := g.Player.Magaras[n]
 	if mag.MPCost() > g.Player.MP {
 		return errors.New("Not enough magic points for using this rod.")
 	}

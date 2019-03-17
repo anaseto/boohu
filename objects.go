@@ -3,8 +3,9 @@ package main
 import "fmt"
 
 type objects struct {
-	Stairs map[position]stair
-	Stones map[position]stone
+	Stairs  map[position]stair
+	Stones  map[position]stone
+	Magaras map[position]magara
 }
 
 type stair int

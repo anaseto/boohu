@@ -9,7 +9,8 @@ type player struct {
 	HP        int
 	HPbonus   int
 	MP        int
-	Simellas  int
+	Bananas   int
+	Magaras   []magara
 	Dir       direction
 	Aptitudes map[aptitude]bool
 	Statuses  map[status]int
@@ -183,12 +184,13 @@ func (g *game) Rest(ev event) error {
 	if !g.NeedsRegenRest() && !g.StatusRest() {
 		return errors.New("You do not need to rest.")
 	}
+	if g.Player.Bananas <= 0 {
+		return errors.New("You cannot sleep without eating for dinner a banana first.")
+	}
 	g.WaitTurn(ev)
 	g.Resting = true
-	g.RestingTurns = 0
-	if g.StatusRest() {
-		g.RestingTurns = -1 // not true resting, just waiting for status end
-	}
+	g.RestingTurns = RandInt(5) // you do not wake up when you want
+	g.Player.Bananas--
 	g.FunAction()
 	return nil
 }
@@ -235,14 +237,37 @@ func (g *game) Teleportation(ev event) {
 	}
 }
 
+const MaxBananas = 5
+
 func (g *game) CollectGround() {
 	pos := g.Player.Pos
 	c := g.Dungeon.Cell(pos)
 	if c.IsNotable() {
 		g.DijkstraMapRebuild = true
+	switchcell:
 		switch c.T {
 		case BarrelCell:
 			// TODO: move here message
+		case BananaCell:
+			if g.Player.Bananas >= MaxBananas {
+				g.Print("There is a banana, but your pack is already full.")
+			} else {
+				g.Print("You take a banana.")
+				g.Player.Bananas++
+				g.Dungeon.SetCell(pos, GroundCell)
+			}
+		case MagaraCell:
+			for i, mag := range g.Player.Magaras {
+				if mag != NoMagara {
+					continue
+				}
+				g.Player.Magaras[i] = g.Objects.Magaras[pos]
+				delete(g.Objects.Magaras, pos)
+				g.Dungeon.SetCell(pos, GroundCell)
+				g.Printf("You take %s.", Indefinite(g.Player.Magaras[i].String(), false))
+				break switchcell
+			}
+			g.Printf("You stand over %s.", Indefinite(g.Objects.Magaras[pos].String(), false))
 		default:
 			g.Printf("You are standing over %s.", c.ShortDesc(g, pos))
 		}

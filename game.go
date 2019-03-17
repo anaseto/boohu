@@ -41,7 +41,6 @@ type game struct {
 	DrawBuffer         []UICell
 	drawBackBuffer     []UICell
 	DrawLog            []drawFrame
-	Hand               []magara
 	Log                []logEntry
 	LogIndex           int
 	LogNextTick        int
@@ -213,18 +212,23 @@ func (g *game) InitPlayer() {
 	g.Player = &player{
 		HP:        DefaultHealth,
 		MP:        DefaultMPmax,
-		Simellas:  0,
+		Bananas:   2,
 		Aptitudes: map[aptitude]bool{},
 	}
 	g.Player.Statuses = map[status]int{}
 	g.Player.Expire = map[status]int{}
-	g.Hand = []magara{
+	g.Player.Magaras = []magara{
 		NoMagara,
 		NoMagara,
 		NoMagara,
 	}
-	g.Hand[0] = g.RandomMagara()
-	g.Hand[1] = g.RandomMagara()
+	for i := 0; i < 2; i++ {
+		g.Player.Magaras[i] = g.RandomMagara()
+	}
+	g.GeneratedMagaras = []magara{}
+	for i := 0; i < 2; i++ {
+		g.GeneratedMagaras = append(g.GeneratedMagaras, g.Player.Magaras[i])
+	}
 }
 
 type genFlavour int
@@ -238,13 +242,13 @@ const (
 )
 
 func (g *game) InitFirstLevel() {
+	g.Version = Version
 	g.Depth++ // start at 1
 	g.InitPlayer()
 	g.AutoTarget = InvalidPos
 	g.Targeting = InvalidPos
 	g.GeneratedUniques = map[monsterBand]int{}
 	g.Stats.KilledMons = map[monsterKind]int{}
-	g.Version = Version
 	g.GenPlan = [MaxDepth + 1]genFlavour{
 		1:  GenRod,
 		2:  GenArmour,
@@ -279,6 +283,8 @@ func (g *game) InitLevel() {
 	g.ExclusionsMap = map[position]bool{}
 	g.TemporalWalls = map[position]terrain{}
 	g.LastMonsterKnownAt = map[position]*monster{}
+	g.Objects.Magaras = map[position]magara{}
+	g.Clouds = map[position]cloud{}
 
 	// Dungeon terrain
 	g.GenDungeon()
@@ -293,10 +299,11 @@ func (g *game) InitLevel() {
 
 	// Magara slots
 	if g.Depth == 3 || g.Depth == 6 {
-		g.Hand = append(g.Hand, NoMagara)
+		g.Player.Magaras = append(g.Player.Magaras, NoMagara)
 	}
 
 	// Magical Stones
+	// TODO: move into dungeon generation
 	nstones := 1
 	switch RandInt(8) {
 	case 0:
@@ -332,9 +339,6 @@ func (g *game) InitLevel() {
 	}
 	g.ComputeLOS()
 	g.MakeMonstersAware()
-
-	// clouds
-	g.Clouds = map[position]cloud{}
 
 	// Events
 	if g.Depth == 1 {
@@ -412,39 +416,20 @@ func (g *game) ApplyRest() {
 		}
 		mons.HP = mons.HPmax
 	}
-	adjust := 0
-	if g.DepthPlayerTurn < 100+adjust && RandInt(5) > 2 || g.DepthPlayerTurn >= 100+adjust && g.DepthPlayerTurn < 250+adjust && RandInt(2) == 0 ||
-		g.DepthPlayerTurn >= 250+adjust && RandInt(3) > 0 {
-		rmons := []int{}
-		for i, mons := range g.Monsters {
-			if mons.Exists() && mons.State == Resting {
-				rmons = append(rmons, i)
-			}
-		}
-		if len(rmons) > 0 {
-			g.Monsters[rmons[RandInt(len(rmons))]].NaturalAwake(g)
-		}
-	}
 	g.Stats.Rest++
-	g.PrintStyled("You feel fresh again. Some monsters might have awoken.", logStatusEnd)
+	g.PrintStyled("You feel fresh again after eating banana and sleeping.", logStatusEnd)
 }
 
 func (g *game) AutoPlayer(ev event) bool {
 	if g.Resting {
-		const enoughRestTurns = 15
-		sr := g.StatusRest()
-		if (sr || g.NeedsRegenRest() && g.RestingTurns >= 0) && g.RestingTurns < enoughRestTurns {
+		const enoughRestTurns = 25
+		if g.RestingTurns < enoughRestTurns {
 			g.WaitTurn(ev)
-			if !sr && g.RestingTurns >= 0 {
-				g.RestingTurns++
-			}
+			g.RestingTurns++
 			return true
 		}
 		if g.RestingTurns >= enoughRestTurns {
 			g.ApplyRest()
-			//} else if mons != nil {
-			//g.Stats.RestInterrupt++
-			//g.Print("You could not sleep.")
 		}
 		g.Resting = false
 	} else if g.Autoexploring {

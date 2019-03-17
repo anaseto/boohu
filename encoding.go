@@ -10,8 +10,6 @@ func init() {
 	gob.Register(&simpleEvent{})
 	gob.Register(&monsterEvent{})
 	gob.Register(&cloudEvent{})
-	gob.Register(stair(0))
-	gob.Register(stone(0))
 }
 
 func (g *game) GameSave() ([]byte, error) {

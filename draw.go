@@ -181,7 +181,7 @@ var (
 	ColorFgPlace,
 	ColorFgPlayer,
 	ColorFgProjectile,
-	ColorFgSimellas,
+	ColorFgBananas,
 	ColorFgSleepingMonster,
 	ColorFgStatusBad,
 	ColorFgStatusGood,
@@ -220,7 +220,7 @@ func LinkColors() {
 	ColorFgPlace = ColorMagenta
 	ColorFgPlayer = ColorBlue
 	ColorFgProjectile = ColorBlue
-	ColorFgSimellas = ColorYellow
+	ColorFgBananas = ColorYellow
 	ColorFgSleepingMonster = ColorViolet
 	ColorFgStatusBad = ColorRed
 	ColorFgStatusGood = ColorBlue
@@ -402,7 +402,7 @@ func (ui *gameui) DrawWelcomeCommon() int {
 	ui.DrawLOS(".", col+3, line, ColorFgLOS, true)
 	ui.DrawDark("│              │", col+4, line, ColorText, false)
 	ui.DrawDark(".", rcol, line, ColorFgDark, true)
-	ui.DrawDark("♣", rcol+1, line, ColorFgSimellas, true)
+	ui.DrawDark(")", rcol+1, line, ColorFgBananas, true)
 	ui.DrawDark(".#", rcol+2, line, ColorFgDark, true)
 	line++
 	ui.DrawDark("##", col, line, ColorFgDark, true)
@@ -529,10 +529,9 @@ func (ui *gameui) KeysHelp() {
 	ui.DrawKeysDescription("Commands", []string{
 		"Move/Jump", "h/j/k/l/y/u/b/n or numpad or mouse left",
 		"Wait a turn", "“.” or 5 or mouse left on @",
+		"Interact (Equip/Descend/Rest...)", "e or i",
 		"Evoke/Zap magara", "v or z",
 		"Examine", "x or mouse left",
-		"Rest (until status free or regen)", "r",
-		"Descend stairs", "> or D",
 		"Go to nearest stairs", "G",
 		"Autoexplore", "o",
 		"View Character and Quest Information", `% or C`,
@@ -971,12 +970,12 @@ func (ui *gameui) DrawStatusBar(line int) {
 
 	line++
 	line++
-	ui.DrawText(fmt.Sprintf("Simellas: %d", g.Player.Simellas), BarCol, line)
+	ui.DrawText(fmt.Sprintf("Bananas: %d/%d", g.Player.Bananas, MaxBananas), BarCol, line)
 	line++
 	if g.Depth == -1 {
 		ui.DrawText("Depth: Out!", BarCol, line)
 	} else {
-		ui.DrawText(fmt.Sprintf("Depth: %d", g.Depth), BarCol, line)
+		ui.DrawText(fmt.Sprintf("Depth: %d/%d", g.Depth, MaxDepth), BarCol, line)
 	}
 	line++
 	ui.DrawText(fmt.Sprintf("Turns: %.1f", float64(g.Turn)/10), BarCol, line)
@@ -1079,6 +1078,14 @@ func (ui *gameui) DrawStatusLine() {
 	col += g.Player.MP
 	ui.DrawColoredText(strings.Repeat("♥", MPspent), col, line, ColorFg)
 	col += MPspent
+
+	ui.SetMapCell(col, line, ' ', ColorFg, ColorBg)
+	col++
+	ui.SetMapCell(col, line, ')', ColorYellow, ColorBg)
+	col++
+	banana := fmt.Sprintf(":%1d ", g.Player.Bananas)
+	ui.DrawColoredText(banana, col, line, ColorFg)
+	col += utf8.RuneCountInString(banana)
 
 	if len(sts) > 0 {
 		ui.DrawText("| ", col, line)
@@ -1593,7 +1600,7 @@ func (ui *gameui) SelectMagara(ev event) error {
 	g := ui.g
 	desc := false
 	for {
-		magaras := g.Hand
+		magaras := g.Player.Magaras
 		ui.ClearLine(0)
 		if !ui.Small() {
 			ui.DrawColoredText(MenuEvoke.String(), MenuCols[MenuEvoke][0], DungeonHeight, ColorCyan)
@@ -1626,6 +1633,48 @@ func (ui *gameui) SelectMagara(ev event) error {
 				continue
 			}
 			err = g.UseMagara(index, ev)
+		}
+		return err
+	}
+}
+
+func (ui *gameui) EquipMagara(ev event) error {
+	g := ui.g
+	desc := false
+	for {
+		magaras := g.Player.Magaras
+		ui.ClearLine(0)
+		if !ui.Small() {
+			ui.DrawColoredText(MenuInteract.String(), MenuCols[MenuInteract][0], DungeonHeight, ColorCyan)
+		}
+		if desc {
+			ui.DrawColoredText("Describe", 0, 0, ColorBlue)
+			col := utf8.RuneCountInString("Describe")
+			ui.DrawText(" which magara? (press ? or click here for equip menu)", col, 0)
+		} else {
+			ui.DrawColoredText("Equip", 0, 0, ColorCyan)
+			col := utf8.RuneCountInString("Evoke")
+			ui.DrawText(" instead of which magara? (press ? or click here for description menu)", col, 0)
+		}
+		for i, r := range magaras {
+			ui.MagaraItem(i, i+1, r, ColorFg)
+		}
+		ui.DrawTextLine(" press esc or space to cancel ", len(magaras)+1)
+		ui.Flush()
+		index, alt, err := ui.Select(len(magaras))
+		if alt {
+			desc = !desc
+			continue
+		}
+		if err == nil {
+			ui.MagaraItem(index, index+1, magaras[index], ColorYellow)
+			ui.Flush()
+			time.Sleep(75 * time.Millisecond)
+			if desc {
+				ui.DrawDescription(magaras[index].Desc(g))
+				continue
+			}
+			err = g.EquipMagara(index, ev)
 		}
 		return err
 	}
