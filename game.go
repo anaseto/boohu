@@ -222,11 +222,9 @@ func (g *game) InitPlayer() {
 		NoMagara,
 		NoMagara,
 	}
-	for i := 0; i < 2; i++ {
-		g.Player.Magaras[i] = g.RandomMagara()
-	}
 	g.GeneratedMagaras = []magara{}
 	for i := 0; i < 2; i++ {
+		g.Player.Magaras[i] = g.RandomMagara()
 		g.GeneratedMagaras = append(g.GeneratedMagaras, g.Player.Magaras[i])
 	}
 }
