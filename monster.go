@@ -637,9 +637,10 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	if mons.Exists() && len(mons.Path) >= 2 {
 		monstarget = mons.Path[len(mons.Path)-2]
 	}
+	c := g.Dungeon.Cell(target)
 	switch {
 	case !mons.Exists():
-		if m.Kind == MonsEarthDragon && g.Dungeon.Cell(target).T == WallCell {
+		if m.Kind == MonsEarthDragon && !c.IsFree() {
 			g.Dungeon.SetCell(target, GroundCell)
 			g.Stats.Digs++
 			if !g.Player.Sees(target) {
@@ -649,7 +650,11 @@ func (m *monster) HandleTurn(g *game, ev event) {
 			g.Fog(m.Pos, 1, ev)
 			if g.Player.Pos.Distance(target) < 12 {
 				// XXX use dijkstra distance ?
-				g.Printf("%s You hear an earth-splitting noise.", g.CrackSound())
+				if c.T == WallCell {
+					g.Printf("%s You hear an earth-splitting noise.", g.CrackSound())
+				} else if c.T == BarrelCell {
+					g.Printf("%s You hear an wood-splitting noise.", g.CrackSound())
+				}
 				g.StopAuto()
 			}
 			m.MoveTo(g, target)
