@@ -722,15 +722,16 @@ func (m *monster) InvertFoliage(g *game) {
 		return
 	}
 	invert := false
-	if g.Dungeon.Cell(m.Pos).T == GroundCell {
+	c := g.Dungeon.Cell(m.Pos)
+	if c.T == GroundCell {
 		g.Dungeon.SetCell(m.Pos, FungusCell)
 		invert = true
-	} else if g.Dungeon.Cell(m.Pos).T == FungusCell {
+	} else if c.T == FungusCell {
 		g.Dungeon.SetCell(m.Pos, GroundCell)
 		invert = true
 	}
 	if !g.Player.Sees(m.Pos) && invert {
-		g.TerrainKnowledge[m.Pos] = g.Dungeon.Cell(m.Pos).T
+		g.TerrainKnowledge[m.Pos] = c.T
 	} else if invert {
 		g.ComputeLOS()
 	}
