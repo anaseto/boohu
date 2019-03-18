@@ -54,7 +54,6 @@ func (g *game) EquipMagara(i int, ev event) (err error) {
 	g.Objects.Magaras[g.Player.Pos] = omagara
 	g.Printf("You equip %s, leaving %s on the ground.", g.Player.Magaras[i], omagara)
 	g.StoryPrintf("You equip %s, leaving %s.", g.Player.Magaras[i], omagara)
-	g.FunAction()
 	ev.Renew(g, 5)
 	return nil
 }
@@ -119,7 +118,6 @@ func (g *game) UseMagara(n int, ev event) (err error) {
 	g.Stats.MagarasUsed++ // TODO
 	// TODO: animation
 	g.Player.MP -= mag.MPCost()
-	g.FunAction()
 	g.StoryPrintf("You evoked your %s.", mag)
 	ev.Renew(g, 5)
 	return nil

@@ -216,7 +216,6 @@ func (g *game) SeePosition(pos position) {
 			g.Printf("You %s %s.", see, c.ShortDesc(g, pos))
 			g.StopAuto()
 		}
-		g.FunAction()
 		g.Dungeon.SetExplored(pos)
 		g.DijkstraMapRebuild = true
 	} else {

@@ -19,7 +19,6 @@ type player struct {
 	Target    position
 	LOS       map[position]bool
 	Rays      rayMap
-	Bored     int
 }
 
 const DefaultHealth = 4
@@ -29,7 +28,6 @@ func (p *player) HPMax() int {
 	if p.Aptitudes[AptHealthy] {
 		hpmax += 1
 	}
-	hpmax -= p.Bored
 	if hpmax < 2 {
 		hpmax = 2
 	}
@@ -120,11 +118,6 @@ func (g *game) MoveToTarget(ev event) bool {
 }
 
 func (g *game) WaitTurn(ev event) {
-	grade := 1
-	if len(g.Noise) > 0 || g.StatusRest() {
-		grade = 1
-	}
-	g.BoredomAction(ev, grade)
 	delay := 10
 	if g.Player.HasStatus(StatusSwift) {
 		delay = 5
@@ -139,43 +132,6 @@ func (g *game) MonsterCount() (count int) {
 		}
 	}
 	return count
-}
-
-func (g *game) BoredomAction(ev event, grade int) {
-	obor := g.Boredom
-	if g.MonsterInLOS() == nil {
-		g.Boredom += grade
-	} else {
-		g.Boredom--
-		if g.Boredom < 0 {
-			g.Boredom = 0
-			g.Player.Bored = 0
-		}
-		return
-	}
-	if g.MonsterCount() <= 4 {
-		return
-	}
-	if g.Boredom >= 500 && obor < 500 {
-		g.PrintStyled("You feel a little bored, your health may decline.", logCritic)
-		g.StopAuto()
-	}
-	if g.Boredom >= 510 && (obor/10 != g.Boredom/10) {
-		g.Player.Bored++
-		g.PrintStyled("You feel unhealthy.", logCritic)
-		g.StopAuto()
-		if g.Player.HP > g.Player.HPMax() {
-			g.Player.HP--
-		}
-	}
-}
-
-func (g *game) FunAction() {
-	g.Boredom -= 15
-	if g.Boredom < 0 {
-		g.Boredom = 0
-		g.Player.Bored = 0
-	}
 }
 
 func (g *game) Rest(ev event) error {
@@ -195,7 +151,6 @@ func (g *game) Rest(ev event) error {
 	g.Resting = true
 	g.RestingTurns = RandInt(5) // you do not wake up when you want
 	g.Player.Bananas--
-	g.FunAction()
 	return nil
 }
 
@@ -330,9 +285,6 @@ func (g *game) MovePlayer(pos position, ev event) error {
 		//}
 		g.Stats.Moves++
 		g.PlacePlayerAt(pos)
-		if !g.Autoexploring {
-			g.BoredomAction(ev, 1)
-		}
 	} else if err := g.Jump(mons, ev); err != nil {
 		return err
 	}
