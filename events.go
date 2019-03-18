@@ -340,7 +340,7 @@ func (cev *cloudEvent) Action(g *game) {
 }
 
 func (g *game) NightFog(at position, radius int, ev event) {
-	dij := &normalPath{game: g}
+	dij := &noisePath{game: g}
 	nm := Dijkstra(dij, []position{at}, radius)
 	for pos := range nm {
 		_, ok := g.Clouds[pos]

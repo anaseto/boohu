@@ -39,7 +39,7 @@ func (g *game) MakeMonstersAware() {
 }
 
 func (g *game) MakeNoise(noise int, at position) {
-	dij := &normalPath{game: g}
+	dij := &noisePath{game: g}
 	nm := Dijkstra(dij, []position{at}, noise)
 	for _, m := range g.Monsters {
 		if !m.Exists() {

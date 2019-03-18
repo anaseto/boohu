@@ -365,7 +365,7 @@ func (g *game) MPRegen(ev event) {
 }
 
 func (g *game) Smoke(ev event) {
-	dij := &normalPath{game: g}
+	dij := &noisePath{game: g}
 	nm := Dijkstra(dij, []position{g.Player.Pos}, 2)
 	for pos := range nm {
 		_, ok := g.Clouds[pos]

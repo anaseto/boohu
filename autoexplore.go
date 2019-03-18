@@ -29,7 +29,7 @@ func (g *game) Autoexplore(ev event) error {
 }
 
 func (g *game) AllExplored() bool {
-	np := &normalPath{game: g}
+	np := &noisePath{game: g}
 	for i, c := range g.Dungeon.Cells {
 		pos := idxtopos(i)
 		if c.T == WallCell {
@@ -49,7 +49,7 @@ func (g *game) AllExplored() bool {
 
 func (g *game) AutoexploreSources() []int {
 	sources := []int{}
-	np := &normalPath{game: g}
+	np := &noisePath{game: g}
 	for i, c := range g.Dungeon.Cells {
 		pos := idxtopos(i)
 		if c.T == WallCell {

@@ -215,7 +215,7 @@ func (g *game) ActivateStone() (err error) {
 		g.UseStone(g.Player.Pos)
 	case QueenStone:
 		g.MakeNoise(QueenStoneNoise, g.Player.Pos)
-		dij := &normalPath{game: g}
+		dij := &noisePath{game: g}
 		nm := Dijkstra(dij, []position{g.Player.Pos}, QueenStoneDistance)
 		for _, m := range g.Monsters {
 			if !m.Exists() {
