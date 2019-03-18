@@ -99,55 +99,6 @@ func (g *game) FreeCellForPlayer() position {
 	return bestpos
 }
 
-func (g *game) FreeCellForStair(dist int) position {
-	iters := 0
-	bestpos := g.Player.Pos
-	for {
-		pos := g.FreeCellForStatic()
-		adjust := 0
-		for i := 0; i < 4; i++ {
-			adjust += RandInt(dist)
-		}
-		adjust /= 4
-		if pos.Distance(g.Player.Pos) <= 6+adjust {
-			continue
-		}
-		iters++
-		if pos.Distance(g.Player.Pos) > bestpos.Distance(g.Player.Pos) {
-			bestpos = pos
-		}
-		if iters == 2 {
-			return bestpos
-		}
-	}
-}
-
-func (g *game) FreeCellForStatic() position {
-	d := g.Dungeon
-	count := 0
-	for {
-		count++
-		if count > 1000 {
-			panic("FreeCellForStatic")
-		}
-		x := RandInt(DungeonWidth)
-		y := RandInt(DungeonHeight)
-		pos := position{x, y}
-		c := d.Cell(pos)
-		if !c.IsGround() {
-			continue
-		}
-		if g.Player != nil && g.Player.Pos == pos {
-			continue
-		}
-		mons := g.MonsterAt(pos)
-		if mons.Exists() {
-			continue
-		}
-		return pos
-	}
-}
-
 func (g *game) FreeCellForMonster() position {
 	d := g.Dungeon
 	count := 0
@@ -298,31 +249,6 @@ func (g *game) InitLevel() {
 	// Magara slots
 	if g.Depth == 3 || g.Depth == 6 {
 		g.Player.Magaras = append(g.Player.Magaras, NoMagara)
-	}
-
-	// Magical Stones
-	// TODO: move into dungeon generation
-	nstones := 1
-	switch RandInt(8) {
-	case 0:
-		nstones = 0
-	case 1, 2, 3:
-		nstones = 2
-	case 4, 5, 6:
-		nstones = 3
-	}
-	ustone := stone(0)
-	g.Objects.Stones = map[position]stone{}
-	for i := 0; i < nstones; i++ {
-		pos := g.FreeCellForStatic()
-		var st stone
-		if ustone != stone(0) {
-			st = ustone
-		} else {
-			st = stone(1 + RandInt(NumStones-1))
-		}
-		g.Objects.Stones[pos] = st
-		g.Dungeon.SetCell(pos, StoneCell)
 	}
 
 	// initialize LOS

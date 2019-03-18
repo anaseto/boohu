@@ -711,12 +711,13 @@ func (dg *dgen) AddSpecial(g *game) {
 		dg.GenBanana()
 	}
 	dg.GenMagara(g)
+	dg.GenStones(g)
 }
 
 func (r *room) RandomPlace(kind placeKind) position {
 	var p []int
 	for i, pl := range r.places {
-		if pl.kind == kind && (!pl.used || RandInt(4) == 0) {
+		if pl.kind == kind && !pl.used {
 			p = append(p, i)
 		}
 	}
@@ -751,22 +752,10 @@ func (dg *dgen) GenBanana() {
 }
 
 func (dg *dgen) GenMagara(g *game) {
-	var ri, pj int
-	best := 0
-	for i, r := range dg.rooms {
-		for j, pl := range r.places {
-			score := RandInt(100)
-			if !pl.used && pl.kind == PlaceItem && score >= best {
-				ri = i
-				pj = j
-				best = score
-			}
-		}
+	pos := InvalidPos
+	for pos == InvalidPos {
+		pos = dg.rooms[RandInt(len(dg.rooms))].RandomPlace(PlaceItem)
 	}
-	r := dg.rooms[ri]
-	r.places[pj].used = true
-	r.places[pj].used = true
-	pos := r.places[pj].pos
 	g.Dungeon.SetCell(pos, MagaraCell)
 	mag := g.RandomMagara()
 	g.Objects.Magaras[pos] = mag
@@ -778,7 +767,8 @@ func (dg *dgen) GenStairs(g *game, st stair) {
 	best := 0
 	for i, r := range dg.rooms {
 		for j, pl := range r.places {
-			if !pl.used && pl.kind == PlaceSpecialStatic && pl.pos.Distance(g.Player.Pos) > best && (RandInt(3) == 0 || best == 0) {
+			score := pl.pos.Distance(g.Player.Pos) + RandInt(20)
+			if !pl.used && pl.kind == PlaceSpecialStatic && score > best {
 				ri = i
 				pj = j
 				best = pl.pos.Distance(g.Player.Pos)
@@ -794,42 +784,55 @@ func (dg *dgen) GenStairs(g *game, st stair) {
 }
 
 func (dg *dgen) GenBarrel(g *game) {
-	var ri, pj int
-	best := 0
-	for i, r := range dg.rooms {
-		for j, pl := range r.places {
-			n := RandInt(100)
-			if !pl.used && pl.kind == PlaceSpecialStatic && n >= best {
-				ri = i
-				pj = j
-				best = n
-			}
-		}
+	pos := InvalidPos
+	for pos == InvalidPos {
+		pos = dg.rooms[RandInt(len(dg.rooms))].RandomPlace(PlaceSpecialStatic)
 	}
-	r := dg.rooms[ri]
-	r.places[pj].used = true
-	r.places[pj].used = true
-	g.Dungeon.SetCell(r.places[pj].pos, BarrelCell)
-	g.Objects.Barrels[r.places[pj].pos] = true
+	g.Dungeon.SetCell(pos, BarrelCell)
+	g.Objects.Barrels[pos] = true
 }
 
-func (dg *dgen) Magara(g *game) {
-	var ri, pj int
-	best := 0
-	for i, r := range dg.rooms {
-		for j, pl := range r.places {
-			n := RandInt(100)
-			if !pl.used && pl.kind == PlaceItem && n >= best {
-				ri = i
-				pj = j
-				best = n
-			}
+func (dg *dgen) CaveGroundCell(g *game) position {
+	count := 0
+	for {
+		count++
+		if count > 1000 {
+			panic("CaveGroundCell")
+		}
+		x := RandInt(DungeonWidth)
+		y := RandInt(DungeonHeight)
+		pos := position{x, y}
+		c := dg.d.Cell(pos)
+		if c.T == GroundCell && !dg.room[pos] {
+			return pos
 		}
 	}
-	r := dg.rooms[ri]
-	r.places[pj].used = true
-	r.places[pj].used = true
-	g.Dungeon.SetCell(r.places[pj].pos, BarrelCell)
+}
+
+func (dg *dgen) GenStones(g *game) {
+	// Magical Stones
+	// TODO: move into dungeon generation
+	nstones := 2
+	switch RandInt(8) {
+	case 1, 2, 3, 4, 5:
+		nstones = 3
+	case 6, 7:
+		nstones = 4
+	}
+	g.Objects.Stones = map[position]stone{}
+	for i := 0; i < nstones; i++ {
+		pos := InvalidPos
+		if i == 0 {
+			for pos == InvalidPos {
+				pos = dg.rooms[RandInt(len(dg.rooms))].RandomPlace(PlaceStatic)
+			}
+		} else {
+			pos = dg.CaveGroundCell(g)
+		}
+		st := stone(1 + RandInt(NumStones-1))
+		g.Objects.Stones[pos] = st
+		g.Dungeon.SetCell(pos, StoneCell)
+	}
 }
 
 type vegetation int
