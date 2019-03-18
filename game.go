@@ -55,12 +55,6 @@ type game struct {
 	ui *gameui
 }
 
-//type startOpts struct {
-//Alternate     monsterKind
-//StoneLevel    int
-//UnstableLevel int
-//}
-
 func (g *game) FreeCell() position {
 	d := g.Dungeon
 	count := 0
@@ -156,7 +150,12 @@ const (
 )
 
 func (g *game) GenDungeon() {
-	g.GenRoomTunnels()
+	ml := AutomataCave
+	switch g.Depth {
+	case 2, 5:
+		ml = RandomWalkCave
+	}
+	g.GenRoomTunnels(ml)
 }
 
 func (g *game) InitPlayer() {

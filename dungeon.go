@@ -653,7 +653,14 @@ func (dg *dgen) ConnectRooms() {
 	}
 }
 
-func (g *game) GenRoomTunnels() {
+type maplayout int
+
+const (
+	AutomataCave maplayout = iota
+	RandomWalkCave
+)
+
+func (g *game) GenRoomTunnels(ml maplayout) {
 	dg := dgen{}
 	d := &dungeon{}
 	d.Cells = make([]cell, DungeonNCells)
@@ -662,7 +669,12 @@ func (g *game) GenRoomTunnels() {
 	dg.room = make(map[position]bool)
 	dg.rooms = []*room{}
 	dg.fungus = make(map[position]vegetation)
-	dg.GenCellularAutomataCaveMap()
+	switch ml {
+	case AutomataCave:
+		dg.GenCellularAutomataCaveMap()
+	case RandomWalkCave:
+		dg.GenCaveMap()
+	}
 	dg.GenRooms(roomSpecialTemplates, 3)
 	dg.GenRooms(roomNormalTemplates, 7)
 	dg.ConnectRooms()
@@ -753,7 +765,12 @@ func (dg *dgen) GenBanana() {
 
 func (dg *dgen) GenMagara(g *game) {
 	pos := InvalidPos
+	count := 0
 	for pos == InvalidPos {
+		count++
+		if count > 1000 {
+			panic("GenMagara")
+		}
 		pos = dg.rooms[RandInt(len(dg.rooms))].RandomPlace(PlaceItem)
 	}
 	g.Dungeon.SetCell(pos, MagaraCell)
@@ -785,7 +802,12 @@ func (dg *dgen) GenStairs(g *game, st stair) {
 
 func (dg *dgen) GenBarrel(g *game) {
 	pos := InvalidPos
+	count := 0
 	for pos == InvalidPos {
+		count++
+		if count > 500 {
+			return
+		}
 		pos = dg.rooms[RandInt(len(dg.rooms))].RandomPlace(PlaceSpecialStatic)
 	}
 	g.Dungeon.SetCell(pos, BarrelCell)
@@ -823,7 +845,12 @@ func (dg *dgen) GenStones(g *game) {
 	for i := 0; i < nstones; i++ {
 		pos := InvalidPos
 		if i == 0 {
+			count := 0
 			for pos == InvalidPos {
+				count++
+				if count > 1000 {
+					panic("GenStones")
+				}
 				pos = dg.rooms[RandInt(len(dg.rooms))].RandomPlace(PlaceStatic)
 			}
 		} else {
@@ -940,4 +967,40 @@ func (dg *dgen) Foliage() {
 			dg.d.SetCell(idxtopos(i), FungusCell)
 		}
 	}
+}
+
+func (dg *dgen) GenCaveMap() {
+	d := dg.d
+	for i := range d.Cells {
+		pos := idxtopos(i)
+		d.SetCell(pos, WallCell)
+	}
+	pos := position{40, 10}
+	max := 21 * 40
+	d.SetCell(pos, GroundCell)
+	cells := 1
+	notValid := 0
+	lastValid := pos
+	for cells < max {
+		npos := pos.RandomNeighbor(false)
+		if !pos.valid() && npos.valid() && d.Cell(npos).T == WallCell {
+			pos = lastValid
+			continue
+		}
+		pos = npos
+		if pos.valid() {
+			if d.Cell(pos).T != GroundCell {
+				d.SetCell(pos, GroundCell)
+				cells++
+			}
+			lastValid = pos
+		} else {
+			notValid++
+		}
+		if notValid > 200 {
+			notValid = 0
+			pos = lastValid
+		}
+	}
+	dg.Foliage()
 }

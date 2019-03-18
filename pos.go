@@ -244,7 +244,7 @@ func (pos position) RandomNeighborCardinal() position {
 	var r int
 	switch RandInt(4) {
 	case 0, 1, 2:
-		r = RandInt(len(neighbors[0:4]))
+		r = RandInt(len(neighbors[0:2]))
 	default:
 		r = RandInt(len(neighbors))
 	}
