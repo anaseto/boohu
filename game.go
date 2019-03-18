@@ -249,6 +249,7 @@ func (g *game) InitLevel() {
 	// Magara slots
 	if g.Depth == 3 || g.Depth == 6 {
 		g.Player.Magaras = append(g.Player.Magaras, NoMagara)
+		g.PrintStyled("You have a new empty slot for a magara.", logSpecial)
 	}
 
 	// initialize LOS
