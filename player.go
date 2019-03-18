@@ -125,7 +125,11 @@ func (g *game) WaitTurn(ev event) {
 		grade = 1
 	}
 	g.BoredomAction(ev, grade)
-	ev.Renew(g, 10)
+	delay := 10
+	if g.Player.HasStatus(StatusSwift) {
+		delay = 5
+	}
+	ev.Renew(g, delay)
 }
 
 func (g *game) MonsterCount() (count int) {
