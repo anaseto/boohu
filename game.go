@@ -152,8 +152,10 @@ const (
 func (g *game) GenDungeon() {
 	ml := AutomataCave
 	switch g.Depth {
-	case 2, 5:
+	case 2, 6, 7:
 		ml = RandomWalkCave
+	case 4, 10, 11:
+		ml = RandomWalkTreeCave
 	}
 	g.GenRoomTunnels(ml)
 }

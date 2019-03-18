@@ -658,6 +658,7 @@ type maplayout int
 const (
 	AutomataCave maplayout = iota
 	RandomWalkCave
+	RandomWalkTreeCave
 )
 
 func (g *game) GenRoomTunnels(ml maplayout) {
@@ -674,6 +675,8 @@ func (g *game) GenRoomTunnels(ml maplayout) {
 		dg.GenCellularAutomataCaveMap()
 	case RandomWalkCave:
 		dg.GenCaveMap()
+	case RandomWalkTreeCave:
+		dg.GenTreeCaveMap()
 	}
 	dg.GenRooms(roomSpecialTemplates, 3)
 	dg.GenRooms(roomNormalTemplates, 7)
@@ -1000,6 +1003,58 @@ func (dg *dgen) GenCaveMap() {
 		if notValid > 200 {
 			notValid = 0
 			pos = lastValid
+		}
+	}
+	dg.Foliage()
+}
+
+func (d *dungeon) DigBlock(block []position) []position {
+	pos := d.WallCell()
+	block = block[:0]
+	for {
+		block = append(block, pos)
+		if d.HasFreeNeighbor(pos) {
+			break
+		}
+		pos = pos.RandomNeighbor(false)
+		if !pos.valid() {
+			block = block[:0]
+			pos = d.WallCell()
+			continue
+		}
+		if !pos.valid() {
+			return nil
+		}
+	}
+	return block
+}
+
+func (dg *dgen) GenTreeCaveMap() {
+	d := dg.d
+	center := position{40, 10}
+	d.SetCell(center, GroundCell)
+	d.SetCell(center.E(), GroundCell)
+	d.SetCell(center.NE(), GroundCell)
+	d.SetCell(center.S(), GroundCell)
+	d.SetCell(center.SE(), GroundCell)
+	d.SetCell(center.N(), GroundCell)
+	d.SetCell(center.NW(), GroundCell)
+	d.SetCell(center.W(), GroundCell)
+	d.SetCell(center.SW(), GroundCell)
+	max := 21 * 20
+	cells := 1
+	block := make([]position, 0, 64)
+loop:
+	for cells < max {
+		block = d.DigBlock(block)
+		if len(block) == 0 {
+			continue loop
+		}
+		for _, pos := range block {
+			if d.Cell(pos).T != GroundCell {
+				d.SetCell(pos, GroundCell)
+				cells++
+			}
 		}
 	}
 	dg.Foliage()
