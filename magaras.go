@@ -450,7 +450,7 @@ func (g *game) Fog(at position, radius int, ev event) {
 	g.ComputeLOS()
 }
 
-func (g *game) EvokeMagicMapping(ev event) error {
+func (g *game) EvokeMagicMapping(ev event, maxdist int) error {
 	dp := &dungeonPath{dungeon: g.Dungeon}
 	g.AutoExploreDijkstra(dp, []int{g.Player.Pos.idx()})
 	cdists := make(map[int][]int)
@@ -464,6 +464,9 @@ func (g *game) EvokeMagicMapping(ev event) error {
 	sort.Ints(dists)
 	g.ui.DrawDungeonView(NormalMode)
 	for _, d := range dists {
+		if maxdist > 0 && d > maxdist {
+			continue
+		}
 		draw := false
 		for _, i := range cdists[d] {
 			pos := idxtopos(i)
@@ -483,7 +486,7 @@ func (g *game) EvokeMagicMapping(ev event) error {
 
 func (g *game) EvokeSensing(ev event) error {
 	for _, mons := range g.Monsters {
-		if mons.Exists() && !g.Player.Sees(mons.Pos) {
+		if mons.Exists() && !g.Player.Sees(mons.Pos) && mons.Pos.Distance(g.Player.Pos) <= MappingDistance {
 			mons.UpdateKnowledge(g, mons.Pos)
 		}
 	}

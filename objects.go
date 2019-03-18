@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"sort"
 )
 
 type objects struct {
@@ -62,16 +63,18 @@ const (
 	QueenStone
 	TreeStone
 	ObstructionStone
+	MappingStone
+	SensingStone
 )
 
-const NumStones = int(ObstructionStone) + 1
+const NumStones = int(SensingStone) + 1
 
 func (stn stone) String() (text string) {
 	switch stn {
 	case InertStone:
 		text = "inert stone"
 	case BarrelStone:
-		text = "teleport stone"
+		text = "barrel stone"
 	case FogStone:
 		text = "fog stone"
 	case QueenStone:
@@ -80,6 +83,10 @@ func (stn stone) String() (text string) {
 		text = "tree stone"
 	case ObstructionStone:
 		text = "obstruction stone"
+	case MappingStone:
+		text = "mapping stone"
+	case SensingStone:
+		text = "sensing stone"
 	}
 	return text
 }
@@ -98,6 +105,10 @@ func (stn stone) Desc(g *game) (text string) {
 		text = "Activating this stone will lignify monsters in sight."
 	case ObstructionStone:
 		text = "Activating this stone will create temporal walls around all monsters in sight."
+	case MappingStone:
+		text = "Activating this stone shows you the map layout and item locations in a wide area."
+	case SensingStone:
+		text = "Activating this stone shows you the current position of monsters in a wide area."
 	}
 	return text
 }
@@ -126,6 +137,7 @@ func (g *game) UseStone(pos position) {
 const (
 	FogStoneDistance   = 4
 	QueenStoneDistance = 12
+	MappingDistance    = 25
 )
 
 func (g *game) TeleportToBarrel() {
@@ -138,6 +150,50 @@ func (g *game) TeleportToBarrel() {
 	g.Print("You teleport away.")
 	g.ui.TeleportAnimation(opos, pos, true)
 	g.PlacePlayerAt(pos)
+}
+
+func (g *game) MagicMapping(ev event, maxdist int) error {
+	dp := &dungeonPath{dungeon: g.Dungeon}
+	g.AutoExploreDijkstra(dp, []int{g.Player.Pos.idx()})
+	cdists := make(map[int][]int)
+	for i, dist := range DijkstraMapCache {
+		cdists[dist] = append(cdists[dist], i)
+	}
+	var dists []int
+	for dist, _ := range cdists {
+		dists = append(dists, dist)
+	}
+	sort.Ints(dists)
+	g.ui.DrawDungeonView(NormalMode)
+	for _, d := range dists {
+		if maxdist > 0 && d > maxdist {
+			continue
+		}
+		draw := false
+		for _, i := range cdists[d] {
+			pos := idxtopos(i)
+			c := g.Dungeon.Cell(pos)
+			if (c.IsFree() || g.Dungeon.HasFreeNeighbor(pos)) && !c.Explored {
+				g.Dungeon.SetExplored(pos)
+				draw = true
+			}
+		}
+		if draw {
+			g.ui.MagicMappingAnimation(cdists[d])
+		}
+	}
+	g.Printf("You feel aware of your surroundings..")
+	return nil
+}
+
+func (g *game) Sensing(ev event) error {
+	for _, mons := range g.Monsters {
+		if mons.Exists() && !g.Player.Sees(mons.Pos) && mons.Pos.Distance(g.Player.Pos) <= MappingDistance {
+			mons.UpdateKnowledge(g, mons.Pos)
+		}
+	}
+	g.Printf("You briefly sense monsters around.")
+	return nil
 }
 
 func (g *game) ActivateStone() (err error) {
@@ -212,6 +268,10 @@ func (g *game) ActivateStone() (err error) {
 			g.Print("Walls appear around your foes.")
 			g.UseStone(g.Player.Pos)
 		}
+	case MappingStone:
+		err = g.MagicMapping(g.Ev, MappingDistance)
+	case SensingStone:
+		err = g.Sensing(g.Ev)
 	}
 	if err != nil {
 		return err
