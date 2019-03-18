@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"sort"
 )
 
 type magara int
@@ -448,50 +447,6 @@ func (g *game) Fog(at position, radius int, ev event) {
 		}
 	}
 	g.ComputeLOS()
-}
-
-func (g *game) EvokeMagicMapping(ev event, maxdist int) error {
-	dp := &dungeonPath{dungeon: g.Dungeon}
-	g.AutoExploreDijkstra(dp, []int{g.Player.Pos.idx()})
-	cdists := make(map[int][]int)
-	for i, dist := range DijkstraMapCache {
-		cdists[dist] = append(cdists[dist], i)
-	}
-	var dists []int
-	for dist, _ := range cdists {
-		dists = append(dists, dist)
-	}
-	sort.Ints(dists)
-	g.ui.DrawDungeonView(NormalMode)
-	for _, d := range dists {
-		if maxdist > 0 && d > maxdist {
-			continue
-		}
-		draw := false
-		for _, i := range cdists[d] {
-			pos := idxtopos(i)
-			c := g.Dungeon.Cell(pos)
-			if (c.IsFree() || g.Dungeon.HasFreeNeighbor(pos)) && !c.Explored {
-				g.Dungeon.SetExplored(pos)
-				draw = true
-			}
-		}
-		if draw {
-			g.ui.MagicMappingAnimation(cdists[d])
-		}
-	}
-	g.Printf("You feel aware of your surroundings..")
-	return nil
-}
-
-func (g *game) EvokeSensing(ev event) error {
-	for _, mons := range g.Monsters {
-		if mons.Exists() && !g.Player.Sees(mons.Pos) && mons.Pos.Distance(g.Player.Pos) <= MappingDistance {
-			mons.UpdateKnowledge(g, mons.Pos)
-		}
-	}
-	g.Printf("You briefly sense monsters around.")
-	return nil
 }
 
 func (g *game) EvokeWalls(ev event) error {
