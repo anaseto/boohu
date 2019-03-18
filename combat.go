@@ -22,58 +22,6 @@ func (m *monster) InflictDamage(g *game, damage, max int) {
 		g.StoryPrintf("Critical HP: %d (hit by %s)", g.Player.HP, m.Kind.Indefinite(false))
 		g.ui.CriticalHPWarning()
 	}
-	if g.Player.HP <= 0 {
-		return
-	}
-	stn, ok := g.Objects.Stones[g.Player.Pos]
-	if !ok {
-		return
-	}
-	switch stn {
-	case TeleStone:
-		g.UseStone(g.Player.Pos)
-		g.Teleportation(g.Ev)
-	case FogStone:
-		g.Fog(g.Player.Pos, 3, g.Ev)
-		g.UseStone(g.Player.Pos)
-	case QueenStone:
-		g.MakeNoise(QueenStoneNoise, g.Player.Pos)
-		dij := &normalPath{game: g}
-		nm := Dijkstra(dij, []position{g.Player.Pos}, 2)
-		for _, m := range g.Monsters {
-			if !m.Exists() {
-				continue
-			}
-			if m.State == Resting {
-				continue
-			}
-			_, ok := nm[m.Pos]
-			if !ok {
-				continue
-			}
-			m.EnterConfusion(g, g.Ev)
-		}
-		//g.Confusion(g.Ev)
-		g.UseStone(g.Player.Pos)
-	case TreeStone:
-		if !g.Player.HasStatus(StatusLignification) {
-			g.UseStone(g.Player.Pos)
-			g.EnterLignification(g.Ev)
-			g.Print("You feel rooted to the ground.")
-		}
-	case ObstructionStone:
-		neighbors := g.Dungeon.FreeNeighbors(g.Player.Pos)
-		for _, pos := range neighbors {
-			mons := g.MonsterAt(pos)
-			if mons.Exists() {
-				continue
-			}
-			g.CreateTemporalWallAt(pos, g.Ev)
-		}
-		g.Printf("You see walls appear out of thin air around the stone.")
-		g.UseStone(g.Player.Pos)
-		g.ComputeLOS()
-	}
 }
 
 func (g *game) MakeMonstersAware() {
@@ -230,68 +178,6 @@ const (
 	DmgNormal = 1
 	DmgExtra  = 2
 )
-
-func (g *game) HandleStone(mons *monster) {
-	stn, ok := g.Objects.Stones[mons.Pos]
-	if !ok {
-		return
-	}
-	switch stn {
-	case TeleStone:
-		if mons.Exists() {
-			g.UseStone(mons.Pos)
-			mons.TeleportAway(g)
-		}
-	case FogStone:
-		g.Fog(mons.Pos, 3, g.Ev)
-		g.UseStone(mons.Pos)
-	case QueenStone:
-		g.MakeNoise(QueenStoneNoise, mons.Pos)
-		dij := &normalPath{game: g}
-		nm := Dijkstra(dij, []position{mons.Pos}, 2)
-		for _, m := range g.Monsters {
-			if !m.Exists() {
-				continue
-			}
-			if m.State == Resting {
-				continue
-			}
-			_, ok := nm[m.Pos]
-			if !ok {
-				continue
-			}
-			m.EnterConfusion(g, g.Ev)
-		}
-		// _, ok := nm[g.Player.Pos]
-		// if ok {
-		// 	g.Confusion(g.Ev)
-		// }
-		g.UseStone(mons.Pos)
-	case TreeStone:
-		if mons.Exists() {
-			g.UseStone(mons.Pos)
-			mons.EnterLignification(g, g.Ev)
-		}
-	case ObstructionStone:
-		if !mons.Exists() {
-			g.CreateTemporalWallAt(mons.Pos, g.Ev)
-		}
-		neighbors := g.Dungeon.FreeNeighbors(mons.Pos)
-		for _, pos := range neighbors {
-			if pos == g.Player.Pos {
-				continue
-			}
-			m := g.MonsterAt(pos)
-			if m.Exists() {
-				continue
-			}
-			g.CreateTemporalWallAt(pos, g.Ev)
-		}
-		g.Printf("You see walls appear out of thin air around the stone.")
-		g.UseStone(mons.Pos)
-		g.ComputeLOS()
-	}
-}
 
 func (g *game) HandleKill(mons *monster, ev event) {
 	g.Stats.Killed++

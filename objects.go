@@ -1,11 +1,15 @@
 package main
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 type objects struct {
 	Stairs  map[position]stair
 	Stones  map[position]stone
 	Magaras map[position]magara
+	Barrels map[position]bool
 }
 
 type stair int
@@ -53,7 +57,7 @@ type stone int
 
 const (
 	InertStone stone = iota
-	TeleStone
+	BarrelStone
 	FogStone
 	QueenStone
 	TreeStone
@@ -66,7 +70,7 @@ func (stn stone) String() (text string) {
 	switch stn {
 	case InertStone:
 		text = "inert stone"
-	case TeleStone:
+	case BarrelStone:
 		text = "teleport stone"
 	case FogStone:
 		text = "fog stone"
@@ -84,16 +88,16 @@ func (stn stone) Desc(g *game) (text string) {
 	switch stn {
 	case InertStone:
 		text = "This stone has been depleted of magical energies."
-	case TeleStone:
-		text = "Any creature standing on the teleport stone will teleport away when hit in combat."
+	case BarrelStone:
+		text = "Activating this stone will teleport you away to a random barrel."
 	case FogStone:
-		text = "Fog will appear if a creature is hurt while standing on the fog stone."
+		text = "Activating this stone will produce fog in a 4-radius area."
 	case QueenStone:
-		text = "If a creature is hurt while standing on queenstone, a loud boom will resonate, leaving nearby monsters in a 2-range distance confused. You know how to avoid the effect yourself."
+		text = "Activating this stone will produce a sound confusing enemies in a quite large area. This can also attract monsters."
 	case TreeStone:
-		text = "Any creature hurt while standing on a tree stone will be lignified."
+		text = "Activating this stone will lignify monsters in sight."
 	case ObstructionStone:
-		text = "When a creature is hurt while standing on the obstruction stone, temporal walls appear around it."
+		text = "Activating this stone will create temporal walls around all monsters in sight."
 	}
 	return text
 }
@@ -117,4 +121,101 @@ func (g *game) UseStone(pos position) {
 	g.Objects.Stones[pos] = InertStone
 	g.Stats.UsedStones++
 	g.Print("The stone becomes inert.")
+}
+
+const (
+	FogStoneDistance   = 4
+	QueenStoneDistance = 12
+)
+
+func (g *game) TeleportToBarrel() {
+	barrels := []position{}
+	for pos, _ := range g.Objects.Barrels {
+		barrels = append(barrels, pos)
+	}
+	pos := barrels[RandInt(len(barrels))]
+	opos := g.Player.Pos
+	g.Print("You teleport away.")
+	g.ui.TeleportAnimation(opos, pos, true)
+	g.PlacePlayerAt(pos)
+}
+
+func (g *game) ActivateStone() (err error) {
+	stn, ok := g.Objects.Stones[g.Player.Pos]
+	if !ok {
+		return errors.New("No stone to activate here.")
+	}
+	switch stn {
+	case InertStone:
+		err = errors.New("Stone is inert.")
+	case BarrelStone:
+		oppos := g.Player.Pos
+		g.Print("You teleport away.")
+		g.TeleportToBarrel()
+		g.UseStone(oppos)
+	case FogStone:
+		g.Fog(g.Player.Pos, FogStoneDistance, g.Ev)
+		g.Print("You are surrounded by fog.")
+		g.UseStone(g.Player.Pos)
+	case QueenStone:
+		g.MakeNoise(QueenStoneNoise, g.Player.Pos)
+		dij := &normalPath{game: g}
+		nm := Dijkstra(dij, []position{g.Player.Pos}, QueenStoneDistance)
+		for _, m := range g.Monsters {
+			if !m.Exists() {
+				continue
+			}
+			if m.State == Resting {
+				continue
+			}
+			_, ok := nm[m.Pos]
+			if !ok {
+				continue
+			}
+			m.EnterConfusion(g, g.Ev)
+		}
+		g.Print("The stone releases a confusing sound.")
+		g.UseStone(g.Player.Pos)
+	case TreeStone:
+		count := 0
+		for _, mons := range g.Monsters {
+			if !mons.Exists() || !g.Player.Sees(mons.Pos) {
+				continue
+			}
+			mons.EnterLignification(g, g.Ev)
+			count++
+		}
+		if count == 0 {
+			err = errors.New("There are no monsters to confuse around.")
+		} else {
+			g.UseStone(g.Player.Pos)
+		}
+	case ObstructionStone:
+		count := 0
+		for _, mons := range g.Monsters {
+			if !mons.Exists() || !g.Player.Sees(mons.Pos) {
+				continue
+			}
+			neighbors := g.Dungeon.FreeNeighbors(mons.Pos)
+			for _, pos := range neighbors {
+				m := g.MonsterAt(pos)
+				if m.Exists() || pos == g.Player.Pos {
+					continue
+				}
+				g.CreateTemporalWallAt(pos, g.Ev)
+				count++
+			}
+		}
+		if count == 0 {
+			err = errors.New("There are no monsters to be surrounded by walls.")
+		} else {
+			g.Print("Walls appear around your foes.")
+			g.UseStone(g.Player.Pos)
+		}
+	}
+	if err != nil {
+		return err
+	}
+	g.Ev.Renew(g, 5)
+	return nil
 }

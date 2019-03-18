@@ -968,11 +968,20 @@ func (ui *gameui) HandleKey(rka runeKeyAction) (err error, again bool, quit bool
 				err = errors.New("No stairs here.")
 			}
 		case BarrelCell:
+			ui.MenuSelectedAnimation(MenuInteract, true)
 			err = g.Rest(g.Ev)
-			ui.MenuSelectedAnimation(MenuInteract, err == nil)
+			if err != nil {
+				ui.MenuSelectedAnimation(MenuInteract, false)
+			}
 		case MagaraCell:
 			err = ui.EquipMagara(g.Ev)
 			err = ui.CleanError(err)
+		case StoneCell:
+			ui.MenuSelectedAnimation(MenuInteract, true)
+			err = g.ActivateStone()
+			if err != nil {
+				ui.MenuSelectedAnimation(MenuInteract, false)
+			}
 		default:
 			err = errors.New("You cannot interact with anything here.")
 		}
@@ -980,8 +989,11 @@ func (ui *gameui) HandleKey(rka runeKeyAction) (err error, again bool, quit bool
 		err = ui.SelectMagara(g.Ev)
 		err = ui.CleanError(err)
 	case KeyExplore:
+		ui.MenuSelectedAnimation(MenuExplore, true)
 		err = g.Autoexplore(g.Ev)
-		ui.MenuSelectedAnimation(MenuExplore, err == nil)
+		if err != nil {
+			ui.MenuSelectedAnimation(MenuExplore, false)
+		}
 	case KeyExamine:
 		err, again, quit = ui.Examine(nil)
 	case KeyHelp, KeyMenuCommandHelp:
@@ -1462,6 +1474,9 @@ func (ui *gameui) UpdateInteractButton() string {
 		show = true
 	case MagaraCell:
 		interactMenu = "[equip]"
+		show = true
+	case StoneCell:
+		interactMenu = "[activate]"
 		show = true
 	}
 	if !show {

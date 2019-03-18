@@ -385,7 +385,11 @@ func (ui *gameui) MenuSelectedAnimation(m menu, ok bool) {
 			ui.DrawColoredText(message, MenuCols[m][0], DungeonHeight, ColorMagenta)
 		}
 		ui.Flush()
-		time.Sleep(25 * time.Millisecond)
+		var t time.Duration = 25
+		if !ok {
+			t += 25
+		}
+		time.Sleep(t * time.Millisecond)
 		ui.DrawColoredText(m.String(), MenuCols[m][0], DungeonHeight, ColorViolet)
 	}
 }

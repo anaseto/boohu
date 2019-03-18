@@ -500,7 +500,7 @@ func (g *game) EvokeWalls(ev event) error {
 		}
 		g.CreateTemporalWallAt(pos, ev)
 	}
-	g.Printf("You feel surrounded by temporary walls.")
+	g.Print("You feel surrounded by temporary walls.")
 	g.ComputeLOS()
 	return nil
 }

@@ -677,6 +677,7 @@ func (g *game) GenRoomTunnels() {
 	if g.Depth == WinDepth || g.Depth == MaxDepth {
 		dg.GenStairs(g, WinStair)
 	}
+	g.Objects.Barrels = map[position]bool{}
 	for i := 0; i < 4+RandInt(2); i++ {
 		dg.GenBarrel(g)
 	}
@@ -809,6 +810,7 @@ func (dg *dgen) GenBarrel(g *game) {
 	r.places[pj].used = true
 	r.places[pj].used = true
 	g.Dungeon.SetCell(r.places[pj].pos, BarrelCell)
+	g.Objects.Barrels[r.places[pj].pos] = true
 }
 
 func (dg *dgen) Magara(g *game) {
