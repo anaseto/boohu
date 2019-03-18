@@ -36,7 +36,7 @@ func main() {
 	if *optReplay != "" {
 		err := Replay(*optReplay)
 		if err != nil {
-			log.Printf("boohu: replay: %v\n", err)
+			log.Printf("harmonist: replay: %v\n", err)
 			os.Exit(1)
 		}
 		os.Exit(0)
@@ -53,7 +53,7 @@ func main() {
 	ui.g = g
 	err := ui.Init()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "boohu: %v\n", err)
+		fmt.Fprintf(os.Stderr, "harmonist: %v\n", err)
 		os.Exit(1)
 	}
 	defer ui.Close()
