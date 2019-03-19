@@ -57,3 +57,11 @@ func (d *dungeon) CardinalFreeNeighbors(pos position) []position {
 	nb = pos.CardinalNeighbors(nb, d.IsFreeCell)
 	return nb
 }
+
+func (d *dungeon) CardinalNonWallNeighbors(pos position) []position {
+	nb := make([]position, 0, 4)
+	nb = pos.CardinalNeighbors(nb, func(npos position) bool {
+		return npos.valid() && d.Cell(npos).T != WallCell
+	})
+	return nb
+}

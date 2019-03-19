@@ -820,7 +820,7 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 			return
 		}
 		if c.T == WallCell {
-			if len(g.Dungeon.CardinalFreeNeighbors(pos)) == 0 {
+			if len(g.Dungeon.CardinalNonWallNeighbors(pos)) == 0 {
 				r = ' '
 				return
 			}
