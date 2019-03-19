@@ -199,7 +199,7 @@ const (
 	ExplosionHitNoise   = 12
 	ExplosionNoise      = 15
 	MagicHitNoise       = 12
-	BarkNoise           = 12
+	BarkNoise           = 13
 	MagicExplosionNoise = 15
 	MagicCastNoise      = 9
 	BaseHitNoise        = 9

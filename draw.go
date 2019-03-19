@@ -884,10 +884,10 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 					fgColor = ColorFgSlowedMonster
 				} else if m.State == Resting {
 					fgColor = ColorFgSleepingMonster
-				} else if m.State == Wandering {
-					fgColor = ColorFgWanderingMonster
-				} else {
+				} else if m.State == Hunting {
 					fgColor = ColorFgMonster
+				} else {
+					fgColor = ColorFgWanderingMonster
 				}
 			}
 		} else if !g.Wizard && g.Noise[pos] {

@@ -9,6 +9,7 @@ const (
 	Hunting
 	Wandering
 	Watching
+	Waiting
 )
 
 func (m monsterState) String() string {
@@ -22,6 +23,8 @@ func (m monsterState) String() string {
 		st = "hunting"
 	case Watching:
 		st = "watching"
+	case Waiting:
+		st = "waiting"
 	}
 	return st
 }
@@ -330,8 +333,10 @@ func (m *monster) Init() {
 	m.Pos = InvalidPos
 	m.LastKnownPos = InvalidPos
 	switch m.Kind {
-	case MonsMarevorHelith, MonsSatowalgaPlant:
+	case MonsMarevorHelith:
 		m.State = Wandering
+	case MonsSatowalgaPlant:
+		m.State = Watching
 	}
 }
 
@@ -567,7 +572,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	}
 	switch m.Kind {
 	case MonsSatowalgaPlant:
-		if RandInt(2) == 0 {
+		if RandInt(4) > 0 {
 			m.Dir = m.Dir.Alternate()
 		}
 		ev.Renew(g, movedelay)
@@ -592,6 +597,32 @@ func (m *monster) HandleTurn(g *game, ev event) {
 			return
 		}
 	}
+	switch m.State {
+	case Watching:
+		if RandInt(5) > 0 {
+			m.Dir = m.Dir.Alternate()
+		} else {
+			// pick a random cell: more escape strategies for the player
+			if m.Kind == MonsHound && m.Pos.Distance(g.Player.Pos) <= 6 {
+				m.Target = g.Player.Pos
+			} else {
+				m.Target = m.NextTarget(g)
+			}
+			m.State = Wandering
+			m.GatherBand(g)
+		}
+		ev.Renew(g, movedelay)
+		return
+	case Waiting:
+		if RandInt(2) == 0 {
+			m.Dir = m.Dir.Alternate()
+		} else if RandInt(4) == 0 {
+			m.Target = m.NextTarget(g)
+			m.State = Wandering
+		}
+		ev.Renew(g, movedelay)
+		return
+	}
 	if !(len(m.Path) > 0 && m.Path[0] == m.Target && m.Path[len(m.Path)-1] == mpos) {
 		m.Path = m.APath(g, mpos, m.Target)
 		if len(m.Path) == 0 && !m.Status(MonsConfused) {
@@ -608,21 +639,8 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	if len(m.Path) < 2 {
 		switch m.State {
 		case Wandering:
-			m.Target = m.NextTarget(g)
-			m.GatherBand(g)
-		case Watching:
-			if RandInt(4) > 0 {
-				m.Dir = m.Dir.Alternate()
-			} else {
-				// pick a random cell: more escape strategies for the player
-				if m.Kind == MonsHound && m.Pos.Distance(g.Player.Pos) <= 6 {
-					m.Target = g.Player.Pos
-				} else {
-					m.Target = m.NextTarget(g)
-				}
-				m.State = Wandering
-				m.GatherBand(g)
-			}
+			m.State = Waiting
+			m.Dir = m.Dir.Alternate()
 		case Hunting:
 			m.State = Watching
 			m.Dir = m.Dir.Alternate()
@@ -1223,18 +1241,6 @@ func (m *monster) MakeHuntIfHurt(g *game) {
 	}
 }
 
-func (m *monster) MakeAwareIfHurt(g *game) {
-	if m.SeesPlayer(g) && m.State != Hunting {
-		m.MakeHuntIfHurt(g)
-		return
-	}
-	if m.State != Resting {
-		return
-	}
-	m.State = Wandering
-	m.Target = m.NextTarget(g)
-}
-
 func (m *monster) MakeAware(g *game) {
 	if !m.SeesPlayer(g) {
 		return
@@ -1247,7 +1253,7 @@ func (m *monster) MakeAware(g *game) {
 	}
 	if m.State == Resting {
 		g.Printf("%s awakens.", m.Kind.Definite(true))
-	} else if m.State == Wandering {
+	} else if m.State == Wandering || m.State == Watching {
 		g.Printf("%s notices you.", m.Kind.Definite(true))
 	}
 	if m.State != Hunting && m.Kind == MonsHound {
@@ -1382,7 +1388,7 @@ func (dg *dgen) PutMonsterBand(g *game, band monsterBand) bool {
 		bdinf = dg.BandInfoPatrol(g, band)
 	}
 	g.Bands = append(g.Bands, bdinf)
-	awake := RandInt(3) > 0
+	awake := RandInt(4) > 0
 	var pos position
 	if len(bdinf.Path) == 0 {
 		// should not happen now
