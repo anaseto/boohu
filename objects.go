@@ -137,7 +137,7 @@ func (g *game) UseStone(pos position) {
 const (
 	FogStoneDistance   = 4
 	QueenStoneDistance = 12
-	MappingDistance    = 25
+	MappingDistance    = 35
 )
 
 func (g *game) TeleportToBarrel() {
