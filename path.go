@@ -165,7 +165,11 @@ func (mp *monPath) Neighbors(pos position) []position {
 	nb := mp.neighbors[:0]
 	d := mp.game.Dungeon
 	keep := func(npos position) bool {
-		return npos.valid() && (d.Cell(npos).IsFree() || mp.wall)
+		if !npos.valid() {
+			return false
+		}
+		c := d.Cell(npos)
+		return (c.IsFree() || mp.wall) && (c.T != DoorCell || mp.monster.Kind.CanOpenDoors())
 	}
 	ret := pos.CardinalNeighbors(nb, keep)
 	// shuffle so that monster movement is not unnaturally predictable

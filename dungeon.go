@@ -766,6 +766,90 @@ func (dg *dgen) GenBanana() {
 	}
 }
 
+func (dg *dgen) OutsideGroundCell(g *game) position {
+	count := 0
+	for {
+		count++
+		if count > 1000 {
+			panic("OutsideGroundCell")
+		}
+		x := RandInt(DungeonWidth)
+		y := RandInt(DungeonHeight)
+		pos := position{x, y}
+		mons := g.MonsterAt(pos)
+		if mons.Exists() {
+			continue
+		}
+		c := dg.d.Cell(pos)
+		if c.T == GroundCell && !dg.room[pos] {
+			return pos
+		}
+	}
+}
+
+func (dg *dgen) FoliageCell(g *game) position {
+	count := 0
+	for {
+		count++
+		if count > 1000 {
+			panic("FoliageCell")
+		}
+		x := RandInt(DungeonWidth)
+		y := RandInt(DungeonHeight)
+		pos := position{x, y}
+		mons := g.MonsterAt(pos)
+		if mons.Exists() {
+			continue
+		}
+		c := dg.d.Cell(pos)
+		if c.T == FungusCell {
+			return pos
+		}
+	}
+}
+
+func (dg *dgen) OutsideCell(g *game) position {
+	count := 0
+	for {
+		count++
+		if count > 1000 {
+			panic("OutsideCell")
+		}
+		x := RandInt(DungeonWidth)
+		y := RandInt(DungeonHeight)
+		pos := position{x, y}
+		mons := g.MonsterAt(pos)
+		if mons.Exists() {
+			continue
+		}
+		c := dg.d.Cell(pos)
+		if !dg.room[pos] && (c.T == FungusCell || c.T == GroundCell) {
+			return pos
+		}
+	}
+}
+
+func (dg *dgen) InsideCell(g *game) position {
+	count := 0
+	for {
+		count++
+		if count > 1000 {
+			panic("InsideCell")
+		}
+		x := RandInt(DungeonWidth)
+		y := RandInt(DungeonHeight)
+		pos := position{x, y}
+		mons := g.MonsterAt(pos)
+		if mons.Exists() {
+			continue
+		}
+		c := dg.d.Cell(pos)
+		if dg.room[pos] && (c.T == FungusCell || c.T == GroundCell) {
+			return pos
+		}
+	}
+}
+
 func (dg *dgen) GenMagara(g *game) {
 	pos := InvalidPos
 	count := 0

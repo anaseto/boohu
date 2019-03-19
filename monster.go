@@ -127,6 +127,15 @@ func (mk monsterKind) Smiting() bool {
 	}
 }
 
+func (mk monsterKind) CanOpenDoors() bool {
+	switch mk {
+	case MonsGuard, MonsMadNixe, MonsCyclop, MonsLich, MonsVampire, MonsWingedMilfid, MonsMarevorHelith:
+		return true
+	default:
+		return false
+	}
+}
+
 func (mk monsterKind) Desc() string {
 	return monsDesc[mk]
 }
@@ -261,6 +270,7 @@ const (
 	LoneMirrorSpecter
 	LoneHound
 	LoneWingedMilfid
+	LoneMadNixe
 	LoneTreeMushroom
 	LoneEarthDragon
 	LoneMarevorHelith
@@ -283,6 +293,7 @@ var MonsBands = []monsterBandData{
 	LoneMirrorSpecter:  {Monster: MonsMirrorSpecter},
 	LoneHound:          {Monster: MonsHound},
 	LoneWingedMilfid:   {Monster: MonsWingedMilfid},
+	LoneMadNixe:        {Monster: MonsMadNixe},
 	LoneTreeMushroom:   {Monster: MonsTreeMushroom},
 	LoneEarthDragon:    {Monster: MonsEarthDragon},
 	LoneMarevorHelith:  {Monster: MonsMarevorHelith},
@@ -315,7 +326,8 @@ func (m *monster) Init() {
 	m.HP = m.HPmax
 	m.Pos = InvalidPos
 	m.LastKnownPos = InvalidPos
-	if m.Kind == MonsMarevorHelith {
+	switch m.Kind {
+	case MonsMarevorHelith, MonsSatowalgaPlant:
 		m.State = Wandering
 	}
 }
@@ -455,6 +467,12 @@ func (m *monster) PlaceAt(g *game, pos position) {
 		m.Pos = pos
 		g.MonstersPosCache[m.Pos.idx()] = m.Index + 1
 		m.ComputeLOS(g)
+		npos := m.RandomFreeNeighbor(g)
+		if npos != m.Pos {
+			m.Dir = npos.Dir(m.Pos)
+		} else {
+			m.Dir = E
+		}
 		return
 	}
 	if pos == m.Pos {
@@ -516,13 +534,35 @@ func (m *monster) NaturalAwake(g *game) {
 	m.GatherBand(g)
 }
 
+func (m *monster) RandomFreeNeighbor(g *game) position {
+	pos := m.Pos
+	neighbors := [4]position{pos.E(), pos.W(), pos.N(), pos.S()}
+	fnb := []position{}
+	for _, nbpos := range neighbors {
+		if !nbpos.valid() {
+			continue
+		}
+		c := g.Dungeon.Cell(nbpos)
+		if c.IsFree() {
+			fnb = append(fnb, nbpos)
+		}
+	}
+	if len(fnb) == 0 {
+		return m.Pos
+	}
+	return fnb[RandInt(len(fnb))]
+}
+
 func (m *monster) NextTarget(g *game) position {
-	// TODO: improve this to handle more varied cases
 	band := g.Bands[m.Band]
 	if len(band.Path) == 0 {
-		return g.FreeCell()
+		return m.RandomFreeNeighbor(g)
 	} else if len(band.Path) == 1 {
-		return band.Path[0]
+		if m.Pos.Distance(band.Path[0]) < 7+RandInt(7) {
+			return m.RandomFreeNeighbor(g)
+		} else {
+			return band.Path[0]
+		}
 	}
 	if band.Path[0] == m.Target {
 		return band.Path[1]
@@ -558,30 +598,18 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	}
 	switch m.Kind {
 	case MonsSatowalgaPlant:
+		if RandInt(2) == 0 {
+			m.Dir = m.Dir.Alternate()
+		}
 		ev.Renew(g, movedelay)
 		// oklob plants are static ranged-only
 		return
-		//case MonsMindCelmist:
-		//if m.State == Hunting && !m.SeesPlayer(g) && m.Pos.Distance(g.Player.Pos) <= 2 {
-		//// “smart” wait at short distance
-		//ev.Renew(g, movedelay)
-		//return
-		//}
 	}
 	if mpos.Distance(ppos) == 1 && g.Dungeon.Cell(ppos).T != BarrelCell {
 		if m.Status(MonsConfused) {
 			ev.Renew(g, 10) // wait
 			return
 		}
-		//} else if m.Kind == MonsMindCelmist {
-		//// we try to avoid melee
-		//safepos := m.SafePlacement(g)
-		//if safepos != nil {
-		//attack = false
-		//m.Path = nil
-		//m.Target = *safepos
-		//}
-		//}
 		m.AttackAction(g, ev)
 		return
 	}
@@ -1322,18 +1350,15 @@ func (g *game) GenBand(band monsterBand) []monsterKind {
 	return bandMonsters
 }
 
-func (dg *dgen) PutMonsterBand(g *game, band monsterBand) bool {
-	monsters := g.GenBand(band)
-	if monsters == nil {
-		return false
-	}
+func (dg *dgen) BandInfoPatrol(g *game, band monsterBand) bandInfo {
 	bandinfo := bandInfo{Kind: monsterBand(band)}
 	pos := InvalidPos
 	count := 0
 	for pos == InvalidPos {
 		count++
-		if count > 1000 {
-			panic("PutMonsterBand: pos")
+		if count > 5000 {
+			pos = dg.InsideCell(g)
+			break
 		}
 		pos = dg.rooms[RandInt(len(dg.rooms)-1)].RandomPlace(PlacePatrol)
 	}
@@ -1342,15 +1367,64 @@ func (dg *dgen) PutMonsterBand(g *game, band monsterBand) bool {
 	for target == InvalidPos {
 		// TODO: only find place in other room?
 		count++
-		if count > 1000 {
-			panic("PutMonsterBand: target")
+		if count > 5000 {
+			pos = dg.InsideCell(g)
+			break
 		}
 		target = dg.rooms[RandInt(len(dg.rooms)-1)].RandomPlace(PlacePatrol)
 	}
 	bandinfo.Path = append(bandinfo.Path, pos)
-	bandinfo.Path = append(bandinfo.Path, g.FreeCellForMonster())
-	g.Bands = append(g.Bands, bandinfo)
+	bandinfo.Path = append(bandinfo.Path, target)
+	return bandinfo
+}
+
+func (dg *dgen) BandInfoOutsideGround(g *game, band monsterBand) bandInfo {
+	bandinfo := bandInfo{Kind: monsterBand(band)}
+	bandinfo.Path = append(bandinfo.Path, dg.OutsideGroundCell(g))
+	return bandinfo
+}
+
+func (dg *dgen) BandInfoOutside(g *game, band monsterBand) bandInfo {
+	bandinfo := bandInfo{Kind: monsterBand(band)}
+	bandinfo.Path = append(bandinfo.Path, dg.OutsideCell(g))
+	return bandinfo
+}
+
+func (dg *dgen) BandInfoFoliage(g *game, band monsterBand) bandInfo {
+	bandinfo := bandInfo{Kind: monsterBand(band)}
+	bandinfo.Path = append(bandinfo.Path, dg.FoliageCell(g))
+	return bandinfo
+}
+
+func (dg *dgen) PutMonsterBand(g *game, band monsterBand) bool {
+	monsters := g.GenBand(band)
+	if monsters == nil {
+		return false
+	}
+	var bdinf bandInfo
+	switch band {
+	case LoneYack, LoneWorm:
+		bdinf = dg.BandInfoFoliage(g, band)
+	case LoneHound, LoneEarthDragon:
+		bdinf = dg.BandInfoOutsideGround(g, band)
+	case LoneBlinkingFrog, LoneMirrorSpecter:
+		bdinf = dg.BandInfoOutside(g, band)
+	case LoneTreeMushroom:
+		bdinf = dg.BandInfoOutside(g, band)
+	case LoneSatowalgaPlant:
+		bdinf = dg.BandInfoOutsideGround(g, band)
+	default:
+		bdinf = dg.BandInfoPatrol(g, band)
+	}
+	g.Bands = append(g.Bands, bdinf)
 	awake := RandInt(3) > 0
+	var pos position
+	if len(bdinf.Path) == 0 {
+		// should not happen now
+		pos = g.FreeCellForMonster()
+	} else {
+		pos = bdinf.Path[0]
+	}
 	for _, mk := range monsters {
 		mons := &monster{Kind: mk}
 		if awake {
@@ -1377,7 +1451,7 @@ func (dg *dgen) GenMonsters(g *game) {
 	bandsL1 := []monsterBand{LoneGuard}
 	bandsL2 := []monsterBand{LoneYack, LoneWorm, LoneHound}
 	bandsL3 := []monsterBand{LoneCyclop, LoneSatowalgaPlant, LoneBlinkingFrog, LoneMirrorSpecter, LoneWingedMilfid}
-	bandsL4 := []monsterBand{LoneTreeMushroom, LoneEarthDragon}
+	bandsL4 := []monsterBand{LoneTreeMushroom, LoneEarthDragon, LoneMadNixe}
 	mlevel := 1 + RandInt(MaxDepth)
 	for i := 0; i < 5; i++ {
 		if !dg.PutRandomBand(g, bandsL1) {
@@ -1407,18 +1481,17 @@ func (dg *dgen) GenMonsters(g *game) {
 		dg.PutRandomBand(g, bandsL2)
 	}
 	if g.Depth > 8 {
-		dg.PutRandomBand(g, bandsL2)
 		dg.PutRandomBand(g, bandsL3)
 	}
 	if g.Depth > 9 {
 		dg.PutRandomBand(g, bandsL2)
-		dg.PutRandomBand(g, bandsL3)
 	}
 	if g.Depth > 10 {
 		dg.PutRandomBand(g, bandsL4)
 		dg.PutRandomBand(g, bandsL3)
 	}
 	if mlevel == g.Depth {
+		// XXX should really Marevor appear in more than one level?
 		dg.PutMonsterBand(g, LoneMarevorHelith)
 	}
 }
