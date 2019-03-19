@@ -169,7 +169,7 @@ func (mp *monPath) Neighbors(pos position) []position {
 			return false
 		}
 		c := d.Cell(npos)
-		return (c.IsFree() || mp.wall) && (c.T != DoorCell || mp.monster.Kind.CanOpenDoors())
+		return (c.IsFree() || c.T == WallCell && mp.wall) && (c.T != DoorCell || mp.monster.Kind.CanOpenDoors())
 	}
 	ret := pos.CardinalNeighbors(nb, keep)
 	// shuffle so that monster movement is not unnaturally predictable

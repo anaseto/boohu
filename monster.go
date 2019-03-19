@@ -668,7 +668,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	c := g.Dungeon.Cell(target)
 	switch {
 	case !mons.Exists():
-		if m.Kind == MonsEarthDragon && !c.IsFree() {
+		if m.Kind == MonsEarthDragon && c.T == WallCell {
 			g.Dungeon.SetCell(target, GroundCell)
 			g.Stats.Digs++
 			if !g.Player.Sees(target) {
