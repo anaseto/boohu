@@ -243,7 +243,7 @@ func (pos position) RandomNeighborCardinal() position {
 	neighbors := [4]position{pos.E(), pos.W(), pos.N(), pos.S()}
 	var r int
 	switch RandInt(4) {
-	case 0, 1, 2:
+	case 0, 1:
 		r = RandInt(len(neighbors[0:2]))
 	default:
 		r = RandInt(len(neighbors))

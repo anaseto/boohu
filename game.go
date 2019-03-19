@@ -150,7 +150,8 @@ const (
 )
 
 func (g *game) GenDungeon() {
-	ml := AutomataCave
+	//ml := AutomataCave
+	ml := RandomWalkTreeCave
 	switch g.Depth {
 	case 2, 6, 7:
 		ml = RandomWalkCave
@@ -222,12 +223,7 @@ func (g *game) InitFirstLevel() {
 	}
 }
 
-func (g *game) InitLevel() {
-	// Starting data
-	if g.Depth == 0 {
-		g.InitFirstLevel()
-	}
-
+func (g *game) InitLevelStructures() {
 	g.MonstersPosCache = make([]int, DungeonNCells)
 	g.TerrainKnowledge = map[position]terrain{}
 	g.ExclusionsMap = map[position]bool{}
@@ -235,6 +231,15 @@ func (g *game) InitLevel() {
 	g.LastMonsterKnownAt = map[position]*monster{}
 	g.Objects.Magaras = map[position]magara{}
 	g.Clouds = map[position]cloud{}
+}
+
+func (g *game) InitLevel() {
+	// Starting data
+	if g.Depth == 0 {
+		g.InitFirstLevel()
+	}
+
+	g.InitLevelStructures()
 
 	// Dungeon terrain
 	g.GenDungeon()

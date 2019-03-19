@@ -349,9 +349,9 @@ const (
 	RoomBigGarden = `
 ?####?#++#?####?
 #""""##..##""""#
-#""""""!!""""""#
+#""""""!P""""""#
 #""""""P>""""""#
-#""""""!!""""""#
+#""""""!P""""""#
 #""""##..##""""#
 ?####?#++#?####?`
 	RoomBigRooms = `
@@ -423,7 +423,7 @@ const (
 ?????""""?????
 ???""""""""???
 ??"""###."""??
-?"""#>!|P."""?
+?"""#>!|PP"""?
 -""""###.""""-
 ??""""""""""??
 ????"""""?????
@@ -451,11 +451,11 @@ const (
 +.P..............P.+
 ####################`
 	RoomGardenHall = `
-?##################?
-#"""""".>!>."""""""#
-+....P........P....+
-#"""""".>!>."""""""#
-?##################?`
+?#################?
+#"""""".>!>.""""""#
++....P...P...P....+
+#"""""".>!>.""""""#
+?#################?`
 )
 
 var roomSpecialTemplates = []string{RoomBigColumns, RoomBigGarden, RoomColumns, RoomRoundColumns, RoomRoundGarden, RoomLongHall,
@@ -1011,7 +1011,12 @@ func (dg *dgen) GenCaveMap() {
 func (d *dungeon) DigBlock(block []position) []position {
 	pos := d.WallCell()
 	block = block[:0]
+	count := 0
 	for {
+		count++
+		if count > 10000 {
+			panic("DigBlock")
+		}
 		block = append(block, pos)
 		if d.HasFreeNeighbor(pos) {
 			break
@@ -1041,7 +1046,7 @@ func (dg *dgen) GenTreeCaveMap() {
 	d.SetCell(center.NW(), GroundCell)
 	d.SetCell(center.W(), GroundCell)
 	d.SetCell(center.SW(), GroundCell)
-	max := 21 * 20
+	max := 21 * 19
 	cells := 1
 	block := make([]position, 0, 64)
 loop:

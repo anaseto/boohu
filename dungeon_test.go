@@ -23,10 +23,36 @@ func (d *dungeon) String() string {
 	return b.String()
 }
 
-func TestRoomMap(t *testing.T) {
+func TestAutomataCave(t *testing.T) {
 	for i := 0; i < Rounds; i++ {
 		g := &game{}
-		g.GenRoomTunnels()
+		g.InitFirstLevel()
+		g.InitLevelStructures()
+		g.GenRoomTunnels(AutomataCave)
+		if !g.Dungeon.connex() {
+			t.Errorf("Not connex:\n%s\n", g.Dungeon.String())
+		}
+	}
+}
+
+func TestRandomWalkCave(t *testing.T) {
+	for i := 0; i < Rounds; i++ {
+		g := &game{}
+		g.InitFirstLevel()
+		g.InitLevelStructures()
+		g.GenRoomTunnels(RandomWalkCave)
+		if !g.Dungeon.connex() {
+			t.Errorf("Not connex:\n%s\n", g.Dungeon.String())
+		}
+	}
+}
+
+func TestRandomWalkTreeCave(t *testing.T) {
+	for i := 0; i < Rounds; i++ {
+		g := &game{}
+		g.InitFirstLevel()
+		g.InitLevelStructures()
+		g.GenRoomTunnels(RandomWalkTreeCave)
 		if !g.Dungeon.connex() {
 			t.Errorf("Not connex:\n%s\n", g.Dungeon.String())
 		}

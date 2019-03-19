@@ -1329,11 +1329,22 @@ func (dg *dgen) PutMonsterBand(g *game, band monsterBand) bool {
 	}
 	bandinfo := bandInfo{Kind: monsterBand(band)}
 	pos := InvalidPos
+	count := 0
 	for pos == InvalidPos {
+		count++
+		if count > 1000 {
+			panic("PutMonsterBand: pos")
+		}
 		pos = dg.rooms[RandInt(len(dg.rooms)-1)].RandomPlace(PlacePatrol)
 	}
 	target := InvalidPos
-	for target == InvalidPos || target.Distance(pos) < 10 {
+	count = 0
+	for target == InvalidPos {
+		// TODO: only find place in other room?
+		count++
+		if count > 1000 {
+			panic("PutMonsterBand: target")
+		}
 		target = dg.rooms[RandInt(len(dg.rooms)-1)].RandomPlace(PlacePatrol)
 	}
 	bandinfo.Path = append(bandinfo.Path, pos)
