@@ -646,8 +646,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 				m.Dir = m.Dir.Alternate()
 			} else {
 				// pick a random cell: more escape strategies for the player
-				if m.Kind == MonsHound && m.Pos.Distance(g.Player.Pos) <= 6 &&
-					!(g.Player.Aptitudes[AptStealthyMovement] && RandInt(2) == 0) {
+				if m.Kind == MonsHound && m.Pos.Distance(g.Player.Pos) <= 6 {
 					m.Target = g.Player.Pos
 				} else {
 					m.Target = m.NextTarget(g)
