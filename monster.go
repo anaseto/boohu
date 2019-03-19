@@ -573,9 +573,11 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	case MonsSatowalgaPlant:
 		switch m.State {
 		case Hunting:
-			m.Dir = m.Dir.Alternate()
-			if RandInt(5) == 0 {
-				m.State = Watching
+			if !m.SeesPlayer(g) {
+				m.Dir = m.Dir.Alternate()
+				if RandInt(5) == 0 {
+					m.State = Watching
+				}
 			}
 		default:
 			if RandInt(4) > 0 {
