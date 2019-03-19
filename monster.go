@@ -398,8 +398,7 @@ func (m *monster) TeleportAway(g *game) {
 
 	switch m.State {
 	case Hunting:
-		m.State = Wandering
-		// TODO: change the target?
+		// TODO: change the target or state?
 	case Resting, Wandering:
 		m.State = Wandering
 		m.Target = m.Pos
@@ -572,11 +571,19 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	}
 	switch m.Kind {
 	case MonsSatowalgaPlant:
-		if RandInt(4) > 0 {
+		switch m.State {
+		case Hunting:
 			m.Dir = m.Dir.Alternate()
+			if RandInt(5) == 0 {
+				m.State = Watching
+			}
+		default:
+			if RandInt(4) > 0 {
+				m.Dir = m.Dir.Alternate()
+			}
 		}
-		ev.Renew(g, movedelay)
 		// oklob plants are static ranged-only
+		ev.Renew(g, movedelay)
 		return
 	}
 	if mpos.Distance(ppos) == 1 && g.Dungeon.Cell(ppos).T != BarrelCell {
@@ -614,6 +621,12 @@ func (m *monster) HandleTurn(g *game, ev event) {
 		ev.Renew(g, movedelay)
 		return
 	case Waiting:
+		if len(m.Path) < 2 {
+			m.Target = m.NextTarget(g)
+			m.State = Wandering
+			ev.Renew(g, movedelay)
+			return
+		}
 		if RandInt(2) == 0 {
 			m.Dir = m.Dir.Alternate()
 		} else if RandInt(4) == 0 {

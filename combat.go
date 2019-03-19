@@ -67,7 +67,11 @@ func (g *game) MakeNoise(noise int, at position) {
 			m.MakeHunt(g)
 		} else {
 			m.Target = at
-			m.State = Wandering
+			if m.Kind == MonsSatowalgaPlant {
+				m.State = Hunting
+			} else {
+				m.State = Wandering
+			}
 		}
 		m.GatherBand(g)
 	}
