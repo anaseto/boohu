@@ -758,7 +758,10 @@ func (m *monster) InvertFoliage(g *game) {
 		invert = true
 	}
 	if !g.Player.Sees(m.Pos) && invert {
-		g.TerrainKnowledge[m.Pos] = c.T
+		_, ok := g.TerrainKnowledge[m.Pos]
+		if !ok {
+			g.TerrainKnowledge[m.Pos] = c.T
+		}
 	} else if invert {
 		g.ComputeLOS()
 	}
