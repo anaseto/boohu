@@ -8,6 +8,7 @@ const (
 	Resting monsterState = iota
 	Hunting
 	Wandering
+	Watching
 )
 
 func (m monsterState) String() string {
@@ -19,6 +20,8 @@ func (m monsterState) String() string {
 		st = "wandering"
 	case Hunting:
 		st = "hunting"
+	case Watching:
+		st = "watching"
 	}
 	return st
 }
@@ -360,40 +363,6 @@ func (m *monster) AlternateConfusedPlacement(g *game) *position {
 	return nil
 }
 
-//func (m *monster) SafePlacement(g *game) *position {
-//var neighbors []position
-//neighbors = g.Dungeon.CardinalFreeNeighbors(m.Pos)
-//spos := InvalidPos
-//sbest := 9
-//area := make([]position, 9)
-//for _, pos := range neighbors {
-//if pos.Distance(g.Player.Pos) <= 1 {
-//continue
-//}
-//mons := g.MonsterAt(pos)
-//if mons.Exists() {
-//continue
-//}
-//// simple heuristic
-//nsbest := g.Dungeon.WallAreaCount(area, pos, 1)
-//if nsbest < sbest {
-//sbest = nsbest
-//spos = pos
-//} else if nsbest == sbest {
-//switch pos.Dir(g.Player.Pos) {
-//case N, W, E, S:
-//default:
-//sbest = nsbest
-//spos = pos
-//}
-//}
-//}
-//if spos.valid() {
-//return &spos
-//}
-//return nil
-//}
-
 func (m *monster) TeleportPlayer(g *game, ev event) {
 	if RandInt(2) == 0 {
 		g.Print("Marevor pushes you through a monolith.")
@@ -641,7 +610,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 		case Wandering:
 			m.Target = m.NextTarget(g)
 			m.GatherBand(g)
-		case Hunting:
+		case Watching:
 			if RandInt(4) > 0 {
 				m.Dir = m.Dir.Alternate()
 			} else {
@@ -654,6 +623,9 @@ func (m *monster) HandleTurn(g *game, ev event) {
 				m.State = Wandering
 				m.GatherBand(g)
 			}
+		case Hunting:
+			m.State = Watching
+			m.Dir = m.Dir.Alternate()
 		}
 		ev.Renew(g, movedelay)
 		return
@@ -726,15 +698,6 @@ func (m *monster) HandleTurn(g *game, ev event) {
 			mons.Target = m.NextTarget(g)
 			mons.State = Wandering
 			mons.GatherBand(g)
-		} else {
-			m.Path = m.APath(g, mpos, m.Target)
-		}
-	case mons.Pos.Distance(g.Player.Pos) == 1:
-		m.Path = m.APath(g, mpos, m.Target)
-	case mons.State == Hunting && m.State == Hunting || !g.Player.LOS[m.Target]:
-		if RandInt(4) == 0 {
-			m.Target = mons.Target
-			m.Path = m.APath(g, mpos, m.Target)
 		} else {
 			m.Path = m.APath(g, mpos, m.Target)
 		}
