@@ -150,8 +150,8 @@ const (
 )
 
 func (g *game) GenDungeon() {
-	//ml := AutomataCave
-	ml := RandomWalkTreeCave
+	ml := AutomataCave
+	//ml := RandomWalkTreeCave
 	switch g.Depth {
 	case 2, 6, 7:
 		ml = RandomWalkCave
