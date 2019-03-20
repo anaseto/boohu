@@ -205,7 +205,7 @@ func (mag magara) Desc(g *game) (desc string) {
 	case SleepingMagara:
 		desc = "induces deep sleeping and exhaustion for up to two random monsters in sight."
 	case NoiseMagara:
-		desc = "produces a noisy bang, attracting monsters in a medium-sized area."
+		desc = "tricks monsters in sight with sounds, making them go away from you for a few turns. It only works on monsters that are not already chasing you."
 	case ObstructionMagara:
 		desc = "creates temporal walls between you and up to 3 monsters."
 	case ConfusionMagara:
@@ -522,8 +522,36 @@ func (g *game) EvokeLignification(ev event) error {
 }
 
 func (g *game) EvokeNoise(ev event) error {
-	g.MakeNoise(MagaraBangNoise, g.Player.Pos)
-	g.Print("Baaang!!! You better get out of here.")
+	dij := &noisePath{game: g}
+	nm := Dijkstra(dij, []position{g.Player.Pos}, 25)
+	for _, mons := range g.Monsters {
+		if !mons.Exists() || !g.Player.Sees(mons.Pos) || mons.State == Hunting || mons.Kind == MonsSatowalgaPlant {
+			continue
+		}
+		mp := &monPath{game: g, monster: mons}
+		target := mons.Pos
+		best := nm[target].Cost
+		for {
+			ncost := best
+			for _, pos := range mp.Neighbors(target) {
+				node, ok := nm[pos]
+				if !ok {
+					continue
+				}
+				ncost := node.Cost
+				if ncost > best {
+					target = pos
+					best = ncost
+				}
+			}
+			if ncost == best {
+				break
+			}
+		}
+		mons.State = Wandering
+		mons.Target = target
+	}
+	g.Print("Monsters are tricked by magical sounds.")
 	return nil
 }
 
