@@ -131,6 +131,29 @@ func (ui *gameui) ExplosionAnimation(es explosionStyle, pos position) {
 	time.Sleep(20 * time.Millisecond)
 }
 
+func (ui *gameui) WaveAnimation() {
+	// TODO
+	g := ui.g
+	if DisableAnimations {
+		return
+	}
+	ui.DrawDungeonView(NormalMode)
+	time.Sleep(20 * time.Millisecond)
+	colors := [3]uicolor{ColorFgExplosionStart, ColorFgExplosionEnd, ColorFgMagicPlace}
+	for i := 0; i < 3; i++ {
+		for npos, b := range g.Player.LOS {
+			if !b {
+				continue
+			}
+			fg := colors[RandInt(3)]
+			ui.ExplosionAnimationAt(npos, fg)
+		}
+		ui.Flush()
+		time.Sleep(100 * time.Millisecond)
+	}
+	time.Sleep(20 * time.Millisecond)
+}
+
 func (ui *gameui) TormentExplosionAnimation() {
 	g := ui.g
 	if DisableAnimations {
@@ -165,6 +188,37 @@ func (ui *gameui) WallExplosionAnimation(pos position) {
 		ui.Flush()
 		time.Sleep(25 * time.Millisecond)
 	}
+}
+
+func (ui *gameui) BeamsAnimation(ray []position) {
+	g := ui.g
+	if DisableAnimations {
+		return
+	}
+	ui.DrawDungeonView(NormalMode)
+	time.Sleep(25 * time.Millisecond)
+	// change colors depending on effect
+	colors := [2]uicolor{ColorFgSleepingMonster, ColorFgSlowedMonster}
+	for j := 0; j < 3; j++ {
+		for i := len(ray) - 1; i >= 0; i-- {
+			fg := colors[RandInt(2)]
+			pos := ray[i]
+			_, _, bgColor := ui.PositionDrawing(pos)
+			mons := g.MonsterAt(pos)
+			r := '*'
+			if RandInt(2) == 0 {
+				r = '×'
+			}
+			if mons.Exists() {
+				r = '√'
+			}
+			//ui.DrawAtPosition(pos, true, r, fg, bgColor)
+			ui.DrawAtPosition(pos, true, r, bgColor, fg)
+		}
+		ui.Flush()
+		time.Sleep(100 * time.Millisecond)
+	}
+	time.Sleep(25 * time.Millisecond)
 }
 
 func (ui *gameui) FireBoltAnimation(ray []position) {
@@ -334,7 +388,7 @@ func (ui *gameui) WoundedAnimation() {
 	}
 }
 
-func (ui *gameui) DrinkingPotionAnimation() {
+func (ui *gameui) PlayerGoodEffectAnimation() {
 	g := ui.g
 	if DisableAnimations {
 		return

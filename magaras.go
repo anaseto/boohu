@@ -305,6 +305,7 @@ func (g *game) EvokeDig(ev event) error {
 	g.PushEvent(&simpleEvent{ERank: end, EAction: DigEnd})
 	g.Player.Expire[StatusDig] = end
 	g.Print("You feel like an earth dragon.")
+	g.ui.PlayerGoodEffectAnimation()
 	return nil
 }
 
@@ -342,28 +343,30 @@ func (g *game) EvokeTeleportOther(ev event) error {
 func (g *game) EvokeHealWounds(ev event) error {
 	g.Player.HP = g.Player.HPMax()
 	g.Print("Your feel healthy again.")
+	g.ui.PlayerGoodEffectAnimation()
 	return nil
 }
 
 func (g *game) EvokeRefillMagic(ev event) error {
 	g.Player.MP = g.Player.MPMax()
 	g.Print("Your magic forces return.")
+	g.ui.PlayerGoodEffectAnimation()
 	return nil
 }
 
-func (g *game) EvokeDescent(ev event) error {
-	if g.Depth >= MaxDepth {
-		return errors.New("You cannot descend any deeper!")
-	}
-	g.Printf("You fall through the ground.")
-	g.LevelStats()
-	g.StoryPrint("You descended deeper into the dungeon.")
-	g.Depth++
-	g.DepthPlayerTurn = 0
-	g.InitLevel()
-	g.Save()
-	return nil
-}
+//func (g *game) EvokeDescent(ev event) error {
+//if g.Depth >= MaxDepth {
+//return errors.New("You cannot descend any deeper!")
+//}
+//g.Printf("You fall through the ground.")
+//g.LevelStats()
+//g.StoryPrint("You descended deeper into the dungeon.")
+//g.Depth++
+//g.DepthPlayerTurn = 0
+//g.InitLevel()
+//g.Save()
+//return nil
+//}
 
 func (g *game) EvokeSwiftness(ev event) error {
 	g.Player.Statuses[StatusSwift]++
@@ -371,6 +374,7 @@ func (g *game) EvokeSwiftness(ev event) error {
 	g.PushEvent(&simpleEvent{ERank: end, EAction: HasteEnd})
 	g.Player.Expire[StatusSwift] = end
 	g.Printf("You feel speedy and agile.")
+	g.ui.PlayerGoodEffectAnimation()
 	// XXX do something with agile?
 	return nil
 }
@@ -416,6 +420,7 @@ func (g *game) EvokeShadows(ev event) error {
 	g.PushEvent(&simpleEvent{ERank: end, EAction: ShadowsEnd})
 	g.Player.Expire[StatusShadows] = end
 	g.Printf("You feel surrounded by shadows.")
+	g.ui.PlayerGoodEffectAnimation()
 	g.ComputeLOS()
 	return nil
 }
@@ -457,20 +462,23 @@ func (g *game) EvokeWalls(ev event) error {
 		g.CreateTemporalWallAt(pos, ev)
 	}
 	g.Print("You feel surrounded by temporary walls.")
+	g.ui.PlayerGoodEffectAnimation()
 	g.ComputeLOS()
 	return nil
 }
 
 func (g *game) EvokeSlowing(ev event) error {
-	g.Print("Whoosh! A slowing luminous wave emerges.")
-	// TODO: animation
+	targets := []position{}
 	for _, mons := range g.Monsters {
 		if !mons.Exists() || !g.Player.Sees(mons.Pos) {
 			continue
 		}
 		mons.Statuses[MonsSlow]++
 		g.PushEvent(&monsterEvent{ERank: g.Ev.Rank() + DurationSlow, NMons: mons.Index, EAction: MonsSlowEnd})
+		targets = append(targets, g.Ray(mons.Pos)...)
 	}
+	g.Print("Whoosh! A slowing luminous wave emerges.")
+	g.ui.BeamsAnimation(targets) // TODO: a wave
 
 	ev.Renew(g, DurationThrowItem)
 	return nil
@@ -485,8 +493,7 @@ func (g *game) EvokeSleeping(ev event) error {
 	if max > len(ms) {
 		max = len(ms)
 	}
-	g.Print("Two beams of sleeping emerge.")
-	// TODO: animation
+	targets := []position{}
 	// XXX: maybe use noise distance instead of LOS?
 	for i := 0; i < max; i++ {
 		mons := ms[i]
@@ -496,7 +503,15 @@ func (g *game) EvokeSleeping(ev event) error {
 		mons.State = Resting
 		mons.Dir = NoDir
 		mons.ExhaustTime(g, 40+RandInt(10))
+		targets = append(targets, g.Ray(mons.Pos)...)
 	}
+	if max == 1 {
+		g.Print("A beam of sleeping emerges.")
+	} else {
+		g.Print("Two beams of sleeping emerge.")
+	}
+	g.ui.BeamsAnimation(targets)
+
 	return nil
 }
 
@@ -509,15 +524,21 @@ func (g *game) EvokeLignification(ev event) error {
 	if max > len(ms) {
 		max = len(ms)
 	}
-	g.Print("Two beams of lignification emerge.")
-	// TODO: animation
+	targets := []position{}
 	for i := 0; i < max; i++ {
 		mons := ms[i]
 		if mons.Status(MonsLignified) {
 			continue
 		}
 		mons.EnterLignification(g, ev)
+		targets = append(targets, g.Ray(mons.Pos)...)
 	}
+	if max == 1 {
+		g.Print("A beam of lignification emerges.")
+	} else {
+		g.Print("Two beams of lignification emerge.")
+	}
+	g.ui.BeamsAnimation(targets)
 	return nil
 }
 
@@ -551,12 +572,13 @@ func (g *game) EvokeNoise(ev event) error {
 		mons.State = Wandering
 		mons.Target = target
 	}
+	// TODO: add animation
 	g.Print("Monsters are tricked by magical sounds.")
 	return nil
 }
 
 func (g *game) EvokeConfusion(ev event) error {
-	g.Print("Whoosh! A slowing luminous wave emerges.")
+	g.Print("Whoosh! A confusing luminous wave emerges.")
 	// TODO: animation
 	for _, mons := range g.Monsters {
 		if !mons.Exists() || !g.Player.Sees(mons.Pos) {

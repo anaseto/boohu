@@ -182,6 +182,7 @@ func (g *game) InitPlayer() {
 	}
 	// Testing
 	//g.Player.Magaras[2] = NoiseMagara
+	//g.Player.Magaras[2] = SlowingMagara
 }
 
 type genFlavour int
