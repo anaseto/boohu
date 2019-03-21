@@ -9,7 +9,6 @@ const (
 	StatusSwift
 	StatusLignification
 	StatusConfusion
-	StatusTele
 	StatusNausea
 	StatusDisabledShield
 	StatusCorrosion
@@ -53,8 +52,6 @@ func (st status) String() string {
 		return "Lignified"
 	case StatusConfusion:
 		return "Confused"
-	case StatusTele:
-		return "Tele"
 	case StatusNausea:
 		return "Nausea"
 	case StatusDisabledShield:
@@ -93,8 +90,6 @@ func (st status) Short() string {
 		return "Li"
 	case StatusConfusion:
 		return "Co"
-	case StatusTele:
-		return "Te"
 	case StatusNausea:
 		return "Na"
 	case StatusDisabledShield:
