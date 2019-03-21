@@ -1,6 +1,9 @@
 package main
 
-import "time"
+import (
+	"sort"
+	"time"
+)
 
 func (ui *gameui) SwappingAnimation(mpos, ppos position) {
 	if DisableAnimations {
@@ -75,7 +78,7 @@ func (ui *gameui) MonsterProjectileAnimation(ray []position, r rune, fg uicolor)
 	}
 }
 
-func (ui *gameui) ExplosionAnimationAt(pos position, fg uicolor) {
+func (ui *gameui) ExplosionDrawAt(pos position, fg uicolor) {
 	g := ui.g
 	_, _, bgColor := ui.PositionDrawing(pos)
 	mons := g.MonsterAt(pos)
@@ -123,7 +126,7 @@ func (ui *gameui) ExplosionAnimation(es explosionStyle, pos position) {
 			if !g.Player.LOS[npos] {
 				continue
 			}
-			ui.ExplosionAnimationAt(npos, fg)
+			ui.ExplosionDrawAt(npos, fg)
 		}
 		ui.Flush()
 		time.Sleep(100 * time.Millisecond)
@@ -131,27 +134,59 @@ func (ui *gameui) ExplosionAnimation(es explosionStyle, pos position) {
 	time.Sleep(20 * time.Millisecond)
 }
 
-func (ui *gameui) WaveAnimation() {
-	// TODO
-	g := ui.g
+func (g *game) Waves(maxCost int) (dists []int, cdists map[int][]int) {
+	dij := &noisePath{game: g}
+	nm := Dijkstra(dij, []position{g.Player.Pos}, maxCost)
+	cdists = make(map[int][]int)
+	for pos, n := range nm {
+		cdists[n.Cost] = append(cdists[n.Cost], pos.idx())
+	}
+	for dist, _ := range cdists {
+		dists = append(dists, dist)
+	}
+	sort.Ints(dists)
+	return dists, cdists
+}
+
+func (ui *gameui) LOSWavesAnimation(r int, ws wavestyle) {
+	dists, cdists := ui.g.Waves(r)
+	for _, d := range dists {
+		wave := cdists[d]
+		if len(wave) == 0 {
+			break
+		}
+		ui.WaveAnimation(wave, ws)
+	}
+}
+
+type wavestyle int
+
+const (
+	WaveLOS wavestyle = iota
+	WaveNoise
+)
+
+func (ui *gameui) WaveAnimation(wave []int, ws wavestyle) {
 	if DisableAnimations {
 		return
 	}
 	ui.DrawDungeonView(NormalMode)
-	time.Sleep(20 * time.Millisecond)
-	colors := [3]uicolor{ColorFgExplosionStart, ColorFgExplosionEnd, ColorFgMagicPlace}
-	for i := 0; i < 3; i++ {
-		for npos, b := range g.Player.LOS {
-			if !b {
-				continue
+	colors := [2]uicolor{ColorFgMagicPlace, ColorFgSleepingMonster}
+	for _, i := range wave {
+		pos := idxtopos(i)
+		switch ws {
+		case WaveLOS:
+			fg := colors[RandInt(2)]
+			if ui.g.Player.Sees(pos) {
+				ui.ExplosionDrawAt(pos, fg)
 			}
-			fg := colors[RandInt(3)]
-			ui.ExplosionAnimationAt(npos, fg)
+		case WaveNoise:
+			fg := colors[RandInt(2)]
+			ui.ExplosionDrawAt(pos, fg)
 		}
-		ui.Flush()
-		time.Sleep(100 * time.Millisecond)
 	}
-	time.Sleep(20 * time.Millisecond)
+	ui.Flush()
+	time.Sleep(25 * time.Millisecond)
 }
 
 func (ui *gameui) TormentExplosionAnimation() {
@@ -168,7 +203,7 @@ func (ui *gameui) TormentExplosionAnimation() {
 				continue
 			}
 			fg := colors[RandInt(3)]
-			ui.ExplosionAnimationAt(npos, fg)
+			ui.ExplosionDrawAt(npos, fg)
 		}
 		ui.Flush()
 		time.Sleep(100 * time.Millisecond)

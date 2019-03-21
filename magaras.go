@@ -468,17 +468,15 @@ func (g *game) EvokeWalls(ev event) error {
 }
 
 func (g *game) EvokeSlowing(ev event) error {
-	targets := []position{}
 	for _, mons := range g.Monsters {
 		if !mons.Exists() || !g.Player.Sees(mons.Pos) {
 			continue
 		}
 		mons.Statuses[MonsSlow]++
 		g.PushEvent(&monsterEvent{ERank: g.Ev.Rank() + DurationSlow, NMons: mons.Index, EAction: MonsSlowEnd})
-		targets = append(targets, g.Ray(mons.Pos)...)
 	}
 	g.Print("Whoosh! A slowing luminous wave emerges.")
-	g.ui.BeamsAnimation(targets) // TODO: a wave
+	g.ui.LOSWavesAnimation(DefaultLOSRange, WaveLOS)
 
 	ev.Renew(g, DurationThrowItem)
 	return nil
@@ -579,7 +577,6 @@ func (g *game) EvokeNoise(ev event) error {
 
 func (g *game) EvokeConfusion(ev event) error {
 	g.Print("Whoosh! A confusing luminous wave emerges.")
-	// TODO: animation
 	for _, mons := range g.Monsters {
 		if !mons.Exists() || !g.Player.Sees(mons.Pos) {
 			continue
@@ -587,6 +584,7 @@ func (g *game) EvokeConfusion(ev event) error {
 		mons.Statuses[MonsConfused]++
 		g.PushEvent(&monsterEvent{ERank: g.Ev.Rank() + DurationConfusion, NMons: mons.Index, EAction: MonsConfusionEnd})
 	}
+	g.ui.LOSWavesAnimation(DefaultLOSRange, WaveLOS)
 
 	ev.Renew(g, DurationThrowItem)
 	return nil
@@ -610,6 +608,7 @@ func (g *game) EvokeObstruction(ev event) error {
 	if max > len(ms) {
 		max = len(ms)
 	}
+	targets := []position{}
 	for i := 0; i < max; i++ {
 		ray := g.Ray(ms[i].Pos)
 		for _, pos := range ray[1:] {
@@ -621,10 +620,14 @@ func (g *game) EvokeObstruction(ev event) error {
 				continue
 			}
 			g.TemporalWallAt(pos, ev)
+			ray := g.Ray(mons.Pos)
+			ray = ray[:len(ray)-1]
+			targets = append(targets, ray...)
 			break
 		}
 	}
 	g.Print("Magical walls emerged.")
+	g.ui.BeamsAnimation(targets)
 	return nil
 }
 
