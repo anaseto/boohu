@@ -138,7 +138,7 @@ func (g *game) UseStone(pos position) {
 const (
 	FogStoneDistance   = 4
 	QueenStoneDistance = 12
-	MappingDistance    = 35
+	MappingDistance    = 32
 )
 
 func (g *game) TeleportToBarrel() {
@@ -154,11 +154,11 @@ func (g *game) TeleportToBarrel() {
 }
 
 func (g *game) MagicMapping(ev event, maxdist int) error {
-	dp := &dungeonPath{dungeon: g.Dungeon}
-	g.AutoExploreDijkstra(dp, []int{g.Player.Pos.idx()})
+	dp := &mappingPath{game: g}
+	nm := Dijkstra(dp, []position{g.Player.Pos}, maxdist)
 	cdists := make(map[int][]int)
-	for i, dist := range DijkstraMapCache {
-		cdists[dist] = append(cdists[dist], i)
+	for pos, n := range nm {
+		cdists[n.Cost] = append(cdists[n.Cost], pos.idx())
 	}
 	var dists []int
 	for dist, _ := range cdists {
@@ -174,7 +174,7 @@ func (g *game) MagicMapping(ev event, maxdist int) error {
 		for _, i := range cdists[d] {
 			pos := idxtopos(i)
 			c := g.Dungeon.Cell(pos)
-			if (c.IsFree() || g.Dungeon.HasFreeNeighbor(pos)) && !c.Explored {
+			if !c.Explored {
 				g.Dungeon.SetExplored(pos)
 				draw = true
 			}
