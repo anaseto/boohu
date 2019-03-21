@@ -14,6 +14,8 @@ const (
 	StatusDisabledShield
 	StatusCorrosion
 	StatusFlames // fake status
+	StatusHidden
+	StatusUnhidden
 	StatusDig
 	StatusSwap
 	StatusShadows
@@ -21,7 +23,7 @@ const (
 
 func (st status) Good() bool {
 	switch st {
-	case StatusBerserk, StatusSwift, StatusDig, StatusSwap, StatusShadows:
+	case StatusBerserk, StatusSwift, StatusDig, StatusSwap, StatusShadows, StatusHidden:
 		return true
 	default:
 		return false
@@ -30,7 +32,7 @@ func (st status) Good() bool {
 
 func (st status) Bad() bool {
 	switch st {
-	case StatusSlow, StatusConfusion, StatusNausea, StatusDisabledShield, StatusFlames, StatusCorrosion:
+	case StatusSlow, StatusConfusion, StatusNausea, StatusDisabledShield, StatusFlames, StatusCorrosion, StatusUnhidden:
 		return true
 	default:
 		return false
@@ -61,6 +63,10 @@ func (st status) String() string {
 		return "Corroded"
 	case StatusFlames:
 		return "Flames"
+	case StatusHidden:
+		return "Hidden"
+	case StatusUnhidden:
+		return "Unhidden"
 	case StatusDig:
 		return "Dig"
 	case StatusSwap:

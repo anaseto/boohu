@@ -370,6 +370,13 @@ func (g *game) ComputeMonsterLOS() {
 		//}
 		//}
 	}
+	if g.MonsterLOS[g.Player.Pos] {
+		g.Player.Statuses[StatusUnhidden] = 1
+		g.Player.Statuses[StatusHidden] = 0
+	} else {
+		g.Player.Statuses[StatusUnhidden] = 0
+		g.Player.Statuses[StatusHidden] = 1
+	}
 }
 
 func (m *monster) UpdateKnowledge(g *game, pos position) {
