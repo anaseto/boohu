@@ -32,7 +32,7 @@ func (st status) Good() bool {
 
 func (st status) Bad() bool {
 	switch st {
-	case StatusSlow, StatusConfusion, StatusNausea, StatusDisabledShield, StatusFlames, StatusCorrosion, StatusUnhidden:
+	case StatusSlow, StatusConfusion, StatusNausea, StatusDisabledShield, StatusCorrosion, StatusUnhidden:
 		return true
 	default:
 		return false
