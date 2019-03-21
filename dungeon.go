@@ -686,13 +686,14 @@ func (g *game) GenRoomTunnels(ml maplayout) {
 	dg.PlayerStartCell(g)
 	dg.ClearUnconnected(g)
 	g.Objects.Stairs = map[position]stair{}
+	g.Objects.Bananas = map[position]bool{}
+	g.Objects.Barrels = map[position]bool{}
 	if g.Depth < MaxDepth {
 		dg.GenStairs(g, NormalStair)
 	}
 	if g.Depth == WinDepth || g.Depth == MaxDepth {
 		dg.GenStairs(g, WinStair)
 	}
-	g.Objects.Barrels = map[position]bool{}
 	for i := 0; i < 4+RandInt(2); i++ {
 		dg.GenBarrel(g)
 	}
@@ -723,7 +724,7 @@ func (dg *dgen) AddSpecial(g *game) {
 		//}
 	}
 	for i := 0; i < 2; i++ {
-		dg.GenBanana()
+		dg.GenBanana(g)
 	}
 	dg.GenMagara(g)
 	dg.GenStones(g)
@@ -748,7 +749,7 @@ func (dg *dgen) PlayerStartCell(g *game) {
 	g.Player.Pos = dg.rooms[len(dg.rooms)-1].RandomPlace(PlacePatrol)
 }
 
-func (dg *dgen) GenBanana() {
+func (dg *dgen) GenBanana(g *game) {
 	count := 0
 	for {
 		count++
@@ -761,6 +762,7 @@ func (dg *dgen) GenBanana() {
 		c := dg.d.Cell(pos)
 		if c.T == GroundCell && !dg.room[pos] {
 			dg.d.SetCell(pos, BananaCell)
+			g.Objects.Bananas[pos] = true
 			break
 		}
 	}

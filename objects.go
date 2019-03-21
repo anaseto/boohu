@@ -11,6 +11,7 @@ type objects struct {
 	Stones  map[position]stone
 	Magaras map[position]magara
 	Barrels map[position]bool
+	Bananas map[position]bool
 }
 
 type stair int

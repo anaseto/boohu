@@ -215,6 +215,7 @@ func (g *game) CollectGround() {
 				g.Print("You take a banana.")
 				g.Player.Bananas++
 				g.Dungeon.SetCell(pos, GroundCell)
+				delete(g.Objects.Bananas, pos)
 			}
 		case MagaraCell:
 			for i, mag := range g.Player.Magaras {
