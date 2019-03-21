@@ -993,7 +993,8 @@ func (ui *gameui) DrawStatusBar(line int) {
 			if g.Player.Statuses[StatusSlow] > 0 {
 				t += 3
 			}
-			if g.Player.Expire[st] >= g.Ev.Rank() && g.Player.Expire[st]-g.Ev.Rank() <= t {
+			exp, ok := g.Player.Expire[st]
+			if ok && exp >= g.Ev.Rank() && exp-g.Ev.Rank() <= t {
 				fg = ColorFgStatusExpire
 			}
 		} else if st.Bad() {
