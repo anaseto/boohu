@@ -667,6 +667,9 @@ func (ui *gameui) DescribePosition(pos position, targ Targeter) {
 		desc = ui.AddComma(see, desc)
 		desc += fmt.Sprintf("%s", g.Dungeon.Cell(pos).ShortDesc(g, pos))
 	}
+	if g.MonsterLOS[pos] {
+		desc += " (unhidden)"
+	}
 	g.InfoEntry = desc + "."
 }
 
@@ -860,7 +863,6 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 		if fgTerrain != ColorFgLOS {
 			fgColor = fgTerrain
 		}
-		//if g.MonsterLOS[pos] && (g.Player.Sees(pos) || g.Wizard) {
 		if g.MonsterLOS[pos] {
 			fgColor = ColorFgWanderingMonster // TODO: other color?
 		}
@@ -1494,105 +1496,9 @@ func (ui *gameui) ListItemBG(i int) uicolor {
 	return bg
 }
 
-// func (ui *gameui) ConsumableItem(i, lnum int, c consumable, fg uicolor) {
-// 	g := ui.g
-// 	bg := ui.ListItemBG(i)
-// 	ui.ClearLineWithColor(lnum, bg)
-// 	ui.DrawColoredTextOnBG(fmt.Sprintf("%c - %s (%d available)", rune(i+97), c, g.Player.Consumables[c]), 0, lnum, fg, bg)
-// }
-//
-// func (ui *gameui) SelectProjectile(ev event) error {
-// 	g := ui.g
-// 	desc := false
-// 	for {
-// 		cs := g.SortedProjectiles()
-// 		ui.ClearLine(0)
-// 		if !ui.Small() {
-// 			ui.DrawColoredText(MenuThrow.String(), MenuCols[MenuThrow][0], DungeonHeight, ColorCyan)
-// 		}
-// 		if desc {
-// 			ui.DrawColoredText("Describe", 0, 0, ColorBlue)
-// 			col := utf8.RuneCountInString("Describe")
-// 			ui.DrawText(" which projectile? (press ? or click here for throwing menu)", col, 0)
-// 		} else {
-// 			ui.DrawColoredText("Throw", 0, 0, ColorOrange)
-// 			col := utf8.RuneCountInString("Throw")
-// 			ui.DrawText(" which projectile? (press ? or click here for describe menu)", col, 0)
-// 		}
-// 		for i, c := range cs {
-// 			ui.ConsumableItem(i, i+1, c, ColorFg)
-// 		}
-// 		ui.DrawTextLine(" press esc or space to cancel ", len(cs)+1)
-// 		ui.Flush()
-// 		index, alt, err := ui.Select(len(cs))
-// 		if alt {
-// 			desc = !desc
-// 			continue
-// 		}
-// 		if err == nil {
-// 			ui.ConsumableItem(index, index+1, cs[index], ColorYellow)
-// 			ui.Flush()
-// 			time.Sleep(75 * time.Millisecond)
-// 			if desc {
-// 				ui.DrawDescription(cs[index].Desc(g))
-// 				continue
-// 			}
-// 			err = cs[index].Use(g, ev)
-// 		}
-// 		return err
-// 	}
-// }
-//
-// func (ui *gameui) SelectPotion(ev event) error {
-// 	g := ui.g
-// 	desc := false
-// 	for {
-// 		cs := g.SortedPotions()
-// 		ui.ClearLine(0)
-// 		if !ui.Small() {
-// 			ui.DrawColoredText(MenuDrink.String(), MenuCols[MenuDrink][0], DungeonHeight, ColorCyan)
-// 		}
-// 		if desc {
-// 			ui.DrawColoredText("Describe", 0, 0, ColorBlue)
-// 			col := utf8.RuneCountInString("Describe")
-// 			ui.DrawText(" which potion? (press ? or click here for quaff menu)", col, 0)
-// 		} else {
-// 			ui.DrawColoredText("Drink", 0, 0, ColorGreen)
-// 			col := utf8.RuneCountInString("Drink")
-// 			ui.DrawText(" which potion? (press ? or click here for description menu)", col, 0)
-// 		}
-// 		for i, c := range cs {
-// 			ui.ConsumableItem(i, i+1, c, ColorFg)
-// 		}
-// 		ui.DrawTextLine(" press esc or space to cancel ", len(cs)+1)
-// 		ui.Flush()
-// 		index, alt, err := ui.Select(len(cs))
-// 		if alt {
-// 			desc = !desc
-// 			continue
-// 		}
-// 		if err == nil {
-// 			ui.ConsumableItem(index, index+1, cs[index], ColorYellow)
-// 			ui.Flush()
-// 			time.Sleep(75 * time.Millisecond)
-// 			if desc {
-// 				ui.DrawDescription(cs[index].Desc(g))
-// 				continue
-// 			}
-// 			err = cs[index].Use(g, ev)
-// 		}
-// 		return err
-// 	}
-// }
-//
 func (ui *gameui) MagaraItem(i, lnum int, c magara, fg uicolor) {
-	//g := ui.g
 	bg := ui.ListItemBG(i)
 	ui.ClearLineWithColor(lnum, bg)
-	//mc := c.MaxCharge()
-	//if g.Player.Armour == CelmistRobe {
-	//mc += 2
-	//}
 	ui.DrawColoredTextOnBG(fmt.Sprintf("%c - %s", rune(i+97), c), 0, lnum, fg, bg)
 }
 
