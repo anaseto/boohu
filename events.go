@@ -413,13 +413,14 @@ const (
 	DurationShortSwiftness         = 20
 	DurationDigging                = 80
 	DurationShadows                = 120
-	DurationSlow                   = 100
+	DurationSlow                   = 120
 	DurationSleepSlow              = 40
 	DurationCloudProgression       = 10
 	DurationFog                    = 150
 	DurationExhaustion             = 100
 	DurationConfusion              = 100
-	DurationLignification          = 150
+	DurationLignification          = 100
+	DurationLignificationPlayer    = 30
 	DurationTemporalWall           = 150
 	DurationObstructionProgression = 200
 	DurationSmokingScalesFog       = 20

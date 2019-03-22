@@ -360,6 +360,6 @@ func (g *game) PlacePlayerAt(pos position) {
 
 func (g *game) EnterLignification(ev event) {
 	g.Player.Statuses[StatusLignification]++
-	g.PushEvent(&simpleEvent{ERank: ev.Rank() + DurationLignification + RandInt(DurationLignification/2), EAction: LignificationEnd})
+	g.PushEvent(&simpleEvent{ERank: ev.Rank() + DurationLignificationPlayer, EAction: LignificationEnd})
 	g.Player.HPbonus += 4
 }
