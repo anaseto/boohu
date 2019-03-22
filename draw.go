@@ -987,9 +987,6 @@ func (ui *gameui) DrawStatusBar(line int) {
 		if st.Good() {
 			fg = ColorFgStatusGood
 			t := 13
-			if g.Player.Statuses[StatusBerserk] > 0 {
-				t -= 3
-			}
 			if g.Player.Statuses[StatusSlow] > 0 {
 				t += 3
 			}
@@ -1099,9 +1096,6 @@ func (ui *gameui) DrawStatusLine() {
 		if st.Good() {
 			fg = ColorFgStatusGood
 			t := 13
-			if g.Player.Statuses[StatusBerserk] > 0 {
-				t -= 3
-			}
 			if g.Player.Statuses[StatusSlow] > 0 {
 				t += 3
 			}

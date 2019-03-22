@@ -45,7 +45,6 @@ type simpleAction int
 
 const (
 	PlayerTurn simpleAction = iota
-	BerserkEnd
 	SlowEnd
 	ExhaustionEnd
 	HasteEnd
@@ -110,18 +109,6 @@ func (sev *simpleEvent) Action(g *game) {
 			return
 		}
 		g.TurnStats()
-	case BerserkEnd:
-		g.Player.Statuses[StatusBerserk] = 0
-		g.Player.Statuses[StatusSlow]++
-		g.Player.Statuses[StatusExhausted] = 1
-		g.Player.HPbonus -= 2
-		if g.Player.HPbonus < 0 {
-			g.Player.HPbonus = 0
-		}
-		g.PrintStyled("You are no longer berserk.", logStatusEnd)
-		g.PushEvent(&simpleEvent{ERank: sev.Rank() + DurationSlow, EAction: SlowEnd})
-		g.PushEvent(&simpleEvent{ERank: sev.Rank() + DurationExhaustion, EAction: ExhaustionEnd})
-		g.ui.StatusEndAnimation()
 	case SlowEnd:
 		g.Player.Statuses[StatusSlow]--
 		if g.Player.Statuses[StatusSlow] <= 0 {
@@ -420,9 +407,7 @@ func (cev *cloudEvent) Renew(g *game, delay int) {
 }
 
 const (
-	DurationBerserk                = 40
 	DurationSick                   = 50
-	DurationShortBerserk           = 30
 	DurationTeleportationDelay     = 30
 	DurationThrowItem              = 10
 	DurationEvokeRod               = 10
