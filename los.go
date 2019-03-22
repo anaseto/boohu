@@ -240,6 +240,7 @@ func (g *game) SeePosition(pos position) {
 		delete(g.LastMonsterKnownAt, pos)
 		mons.LastKnownPos = InvalidPos
 	}
+	delete(g.NoiseIllusion, pos)
 }
 
 func (g *game) ComputeExclusion(pos position, toggle bool) {

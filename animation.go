@@ -1,5 +1,7 @@
 package main
 
+// TODO: many animations are obsolete so remove them
+
 import (
 	"sort"
 	"time"
@@ -102,6 +104,26 @@ func (ui *gameui) ExplosionDrawAt(pos position, fg uicolor) {
 	}
 	//ui.DrawAtPosition(pos, true, r, fg, bgColor)
 	ui.DrawAtPosition(pos, true, r, bgColor, fg)
+}
+
+func (ui *gameui) NoiseAnimation(noises []position) {
+	if DisableAnimations {
+		return
+	}
+	ui.LOSWavesAnimation(DefaultLOSRange, WaveNoise)
+	colors := []uicolor{ColorFgSleepingMonster, ColorFgMagicPlace}
+	for i := 0; i < 2; i++ {
+		for _, pos := range noises {
+			r := '♫'
+			_, _, bgColor := ui.PositionDrawing(pos)
+			ui.DrawAtPosition(pos, false, r, bgColor, colors[i])
+		}
+		_, _, bgColor := ui.PositionDrawing(ui.g.Player.Pos)
+		ui.DrawAtPosition(ui.g.Player.Pos, false, '@', bgColor, colors[i])
+		ui.Flush()
+		time.Sleep(50 * time.Millisecond)
+	}
+
 }
 
 func (ui *gameui) ExplosionAnimation(es explosionStyle, pos position) {

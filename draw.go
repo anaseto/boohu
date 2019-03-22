@@ -812,6 +812,9 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 		if g.Noise[pos] {
 			r = '♫'
 			fgColor = ColorFgWanderingMonster
+		} else if g.NoiseIllusion[pos] {
+			r = '♫'
+			fgColor = ColorFgMagicPlace
 		}
 		return
 	}
@@ -892,9 +895,6 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 					fgColor = ColorFgWanderingMonster
 				}
 			}
-		} else if !g.Wizard && g.Noise[pos] {
-			r = '♫'
-			fgColor = ColorFgWanderingMonster
 		} else if mons, ok := g.LastMonsterKnownAt[pos]; !g.Wizard && ok {
 			if !mons.Seen {
 				// potion of dreams
@@ -912,6 +912,12 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 					fgColor = ColorFgWanderingMonster
 				}
 			}
+		} else if !g.Wizard && g.Noise[pos] {
+			r = '♫'
+			fgColor = ColorFgWanderingMonster
+		} else if g.NoiseIllusion[pos] {
+			r = '♫'
+			fgColor = ColorFgMagicPlace
 		}
 	}
 	return

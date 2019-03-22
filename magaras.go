@@ -205,7 +205,7 @@ func (mag magara) Desc(g *game) (desc string) {
 	case SleepingMagara:
 		desc = "induces deep sleeping and exhaustion for up to two random monsters in sight."
 	case NoiseMagara:
-		desc = "tricks monsters in sight with sounds, making them go away from you for a few turns. It only works on monsters that are not already chasing you."
+		desc = "tricks monsters in a 10-range area with sounds, making them go away from you for a few turns. It only works on monsters that are not already seeing you."
 	case ObstructionMagara:
 		desc = "creates temporal walls between you and up to 3 monsters."
 	case ConfusionMagara:
@@ -535,9 +535,19 @@ func (g *game) EvokeLignification(ev event) error {
 
 func (g *game) EvokeNoise(ev event) error {
 	dij := &noisePath{game: g}
-	nm := Dijkstra(dij, []position{g.Player.Pos}, 25)
+	nm := Dijkstra(dij, []position{g.Player.Pos}, 23)
+	nmlosr := Dijkstra(dij, []position{g.Player.Pos}, DefaultLOSRange)
+	noises := []position{}
+	g.NoiseIllusion = map[position]bool{}
 	for _, mons := range g.Monsters {
-		if !mons.Exists() || !g.Player.Sees(mons.Pos) || mons.State == Hunting || mons.Kind == MonsSatowalgaPlant {
+		if !mons.Exists() {
+			continue
+		}
+		_, ok := nmlosr[mons.Pos]
+		if !ok {
+			continue
+		}
+		if mons.SeesPlayer(g) || mons.Kind == MonsSatowalgaPlant {
 			continue
 		}
 		mp := &monPath{game: g, monster: mons}
@@ -560,10 +570,14 @@ func (g *game) EvokeNoise(ev event) error {
 				break
 			}
 		}
-		mons.State = Wandering
+		if mons.State != Hunting {
+			mons.State = Wandering
+		}
 		mons.Target = target
+		noises = append(noises, target)
+		g.NoiseIllusion[target] = true
 	}
-	// TODO: add animation
+	g.ui.NoiseAnimation(noises)
 	g.Print("Monsters are tricked by magical sounds.")
 	return nil
 }

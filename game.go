@@ -27,6 +27,7 @@ type game struct {
 	TerrainKnowledge   map[position]terrain
 	ExclusionsMap      map[position]bool
 	Noise              map[position]bool
+	NoiseIllusion      map[position]bool
 	LastMonsterKnownAt map[position]*monster
 	MonsterLOS         map[position]bool
 	Resting            bool
