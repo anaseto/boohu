@@ -225,10 +225,15 @@ func (mag magara) Desc(g *game) (desc string) {
 }
 
 func (mag magara) MPCost(g *game) int {
-	if g.Player.HasStatus(StatusConfusion) {
-		return 2
+	cost := 1
+	switch mag {
+	case HealWoundsMagara:
+		cost = 2
 	}
-	return 1
+	if g.Player.HasStatus(StatusConfusion) {
+		cost++
+	}
+	return cost
 }
 
 func (g *game) EvokeBlink(ev event) error {
