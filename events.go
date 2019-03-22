@@ -54,7 +54,6 @@ const (
 	ConfusionEnd
 	NauseaEnd
 	DisabledShieldEnd
-	CorrosionEnd
 	DigEnd
 	SwapEnd
 	ShadowsEnd
@@ -161,12 +160,6 @@ func (sev *simpleEvent) Action(g *game) {
 		g.PrintStyled("You manage to dislodge the projectile from your shield.", logStatusEnd)
 		g.Player.Statuses[StatusDisabledShield] = 0
 		g.ui.StatusEndAnimation()
-	case CorrosionEnd:
-		g.Player.Statuses[StatusCorrosion]--
-		if g.Player.Statuses[StatusCorrosion] == 0 {
-			g.PrintStyled("Your equipment is now free from acid.", logStatusEnd)
-			g.ui.StatusEndAnimation()
-		}
 	case DigEnd:
 		g.Player.Statuses[StatusDig]--
 		if g.Player.Statuses[StatusDig] == 0 {

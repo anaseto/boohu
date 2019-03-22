@@ -339,12 +339,6 @@ func (g *game) Smoke(ev event) {
 	g.Print("You feel an energy burst and smoke comes out from you.")
 }
 
-func (g *game) Corrosion(ev event) {
-	g.Player.Statuses[StatusCorrosion]++
-	g.PushEvent(&simpleEvent{ERank: ev.Rank() + 80 + RandInt(40), EAction: CorrosionEnd})
-	g.Print("Your equipment gets corroded.")
-}
-
 func (g *game) Confusion(ev event) {
 	if !g.Player.HasStatus(StatusConfusion) {
 		g.Player.Statuses[StatusConfusion]++

@@ -865,8 +865,6 @@ func (m *monster) HitSideEffects(g *game, ev event) {
 		if RandInt(2) == 0 {
 			g.Blink(ev)
 		}
-	//case MonsAcidMound:
-	//g.Corrosion(ev)
 	case MonsYack:
 		if RandInt(2) == 0 && m.PushPlayer(g) {
 			g.Print("The yack pushes you.")
@@ -1100,10 +1098,7 @@ func (m *monster) ThrowAcid(g *game, ev event) bool {
 		g.ui.MonsterProjectileAnimation(g.Ray(m.Pos), '*', ColorGreen)
 		m.InflictDamage(g, dmg, dmg)
 		if RandInt(2) == 0 {
-			g.Corrosion(ev)
-			if RandInt(2) == 0 {
-				g.Confusion(ev)
-			}
+			g.Confusion(ev)
 		}
 	} else {
 		g.Stats.Dodges++
