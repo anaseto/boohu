@@ -253,13 +253,6 @@ func (g *game) MovePlayer(pos position, ev event) error {
 	} else if c.T == BarrelCell && g.MonsterLOS[g.Player.Pos] {
 		return errors.New("You cannot enter a barrel while seen.")
 	}
-	if g.Player.HasStatus(StatusConfusion) {
-		switch pos.Dir(g.Player.Pos) {
-		case E, N, W, S:
-		default:
-			return errors.New("You cannot use diagonal movements while confused.")
-		}
-	}
 	delay := 10
 	mons := g.MonsterAt(pos)
 	if !mons.Exists() {

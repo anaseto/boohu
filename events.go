@@ -409,13 +409,9 @@ func (cev *cloudEvent) Renew(g *game, delay int) {
 const (
 	DurationSick                   = 50
 	DurationTeleportationDelay     = 30
-	DurationThrowItem              = 10
-	DurationEvokeRod               = 10
-	DurationDrinkPotion            = 5
 	DurationSwiftness              = 50
 	DurationShortSwiftness         = 20
 	DurationDigging                = 80
-	DurationSwap                   = 140
 	DurationShadows                = 120
 	DurationSlow                   = 100
 	DurationSleepSlow              = 40

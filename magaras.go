@@ -63,7 +63,7 @@ func (g *game) UseMagara(n int, ev event) (err error) {
 		return errors.New("You cannot use magaras while sick.")
 	}
 	mag := g.Player.Magaras[n]
-	if mag.MPCost() > g.Player.MP {
+	if mag.MPCost(g) > g.Player.MP {
 		return errors.New("Not enough magic points for using this rod.")
 	}
 	switch mag {
@@ -117,7 +117,7 @@ func (g *game) UseMagara(n int, ev event) (err error) {
 	}
 	g.Stats.MagarasUsed++ // TODO
 	// TODO: animation
-	g.Player.MP -= mag.MPCost()
+	g.Player.MP -= mag.MPCost(g)
 	g.StoryPrintf("You evoked your %s.", mag)
 	ev.Renew(g, 5)
 	return nil
@@ -224,17 +224,11 @@ func (mag magara) Desc(g *game) (desc string) {
 	return fmt.Sprintf("The %s %s", mag, desc)
 }
 
-func (mag magara) MPCost() int {
-	switch mag {
-	//case MagicMagara:
-	//return 0
-	//case DescentMagara:
-	//return 3
-	//case SensingMagara:
-	//return 2
-	default:
-		return 1
+func (mag magara) MPCost(g *game) int {
+	if g.Player.HasStatus(StatusConfusion) {
+		return 2
 	}
+	return 1
 }
 
 func (g *game) EvokeBlink(ev event) error {
@@ -478,7 +472,6 @@ func (g *game) EvokeSlowing(ev event) error {
 	g.Print("Whoosh! A slowing luminous wave emerges.")
 	g.ui.LOSWavesAnimation(DefaultLOSRange, WaveLOS)
 
-	ev.Renew(g, DurationThrowItem)
 	return nil
 }
 
@@ -585,8 +578,6 @@ func (g *game) EvokeConfusion(ev event) error {
 		g.PushEvent(&monsterEvent{ERank: g.Ev.Rank() + DurationConfusion, NMons: mons.Index, EAction: MonsConfusionEnd})
 	}
 	g.ui.LOSWavesAnimation(DefaultLOSRange, WaveLOS)
-
-	ev.Renew(g, DurationThrowItem)
 	return nil
 }
 
