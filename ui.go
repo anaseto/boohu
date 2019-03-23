@@ -515,6 +515,7 @@ const (
 	KeyQuit
 	KeyWizard
 	KeyWizardInfo
+	KeyWizardDescend
 
 	KeyPreviousMonster
 	KeyNextMonster
@@ -818,6 +819,7 @@ func ApplyDefaultKeyBindings() {
 		'Q': KeyQuit,
 		'W': KeyWizard,
 		'@': KeyWizardInfo,
+		'>': KeyWizardDescend,
 		'=': KeyConfigure,
 	}
 	gameConfig.RuneTargetModeKeys = map[rune]keyAction{
@@ -1034,6 +1036,16 @@ func (ui *gameui) HandleKey(rka runeKeyAction) (err error, again bool, quit bool
 		if g.Wizard {
 			err = ui.HandleWizardAction()
 			again = true
+		} else {
+			err = errors.New("Unknown key. Type ? for help.")
+		}
+	case KeyWizardDescend:
+		if g.Wizard && g.Depth < MaxDepth {
+			if g.Descend() {
+				ui.Win()
+				quit = true
+				return err, again, quit
+			}
 		} else {
 			err = errors.New("Unknown key. Type ? for help.")
 		}
