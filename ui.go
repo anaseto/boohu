@@ -1158,7 +1158,6 @@ func (ui *gameui) NextObject(pos position, data *examineData) {
 		for p := range g.Objects.Bananas {
 			data.objects = append(data.objects, p)
 		}
-		// TODO: add barrels
 		data.objects = g.SortedNearestTo(data.objects, g.Player.Pos)
 	}
 	for i := 0; i < len(data.objects); i++ {

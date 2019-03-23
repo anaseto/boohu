@@ -523,6 +523,16 @@ func (m *monster) RandomFreeNeighbor(g *game) position {
 	if len(fnb) == 0 {
 		return m.Pos
 	}
+	samedir := fnb[RandInt(len(fnb))]
+	for _, pos := range fnb {
+		if m.Dir.InViewCone(m.Pos, pos.To(pos.Dir(m.Pos))) {
+			samedir = pos
+			break
+		}
+	}
+	if RandInt(4) > 0 {
+		return samedir
+	}
 	return fnb[RandInt(len(fnb))]
 }
 
@@ -531,7 +541,7 @@ func (m *monster) NextTarget(g *game) position {
 	if len(band.Path) == 0 {
 		return m.RandomFreeNeighbor(g)
 	} else if len(band.Path) == 1 {
-		if m.Pos.Distance(band.Path[0]) < 7+RandInt(7) {
+		if m.Pos.Distance(band.Path[0]) < 8+RandInt(8) {
 			return m.RandomFreeNeighbor(g)
 		} else {
 			return band.Path[0]
