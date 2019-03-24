@@ -1377,6 +1377,12 @@ loop:
 		opos = pos
 		targ.ComputeHighlight(g, pos)
 		ui.SetCursor(pos)
+		m := g.MonsterAt(pos)
+		if m.Exists() && g.Player.Sees(pos) {
+			g.ComputeMonsterCone(m)
+		} else {
+			g.MonsterTargLOS = nil
+		}
 		ui.DrawDungeonView(TargetingMode)
 		ui.DrawInfoLine(g.InfoEntry)
 		if !ui.Small() {
@@ -1405,6 +1411,7 @@ loop:
 		}
 	}
 	g.Highlight = nil
+	g.MonsterTargLOS = nil
 	ui.HideCursor()
 	return err, again, quit
 }

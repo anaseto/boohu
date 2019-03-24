@@ -866,8 +866,12 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 		if fgTerrain != ColorFgLOS {
 			fgColor = fgTerrain
 		}
-		if g.MonsterLOS[pos] {
-			fgColor = ColorFgWanderingMonster // TODO: other color?
+		if g.MonsterTargLOS != nil {
+			if g.MonsterTargLOS[pos] {
+				fgColor = ColorFgWanderingMonster
+			}
+		} else if g.MonsterLOS[pos] {
+			fgColor = ColorFgWanderingMonster
 		}
 		if cld, ok := g.Clouds[pos]; ok && g.Player.Sees(pos) {
 			r = '§'

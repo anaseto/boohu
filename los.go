@@ -392,6 +392,18 @@ func (g *game) ComputeMonsterLOS() {
 	}
 }
 
+func (g *game) ComputeMonsterCone(m *monster) {
+	g.MonsterTargLOS = make(map[position]bool)
+	for pos, _ := range g.Player.LOS {
+		if !g.Player.Sees(pos) {
+			continue
+		}
+		if m.Sees(g, pos) {
+			g.MonsterTargLOS[pos] = true
+		}
+	}
+}
+
 func (m *monster) UpdateKnowledge(g *game, pos position) {
 	if mons, ok := g.LastMonsterKnownAt[pos]; ok {
 		mons.LastKnownPos = InvalidPos

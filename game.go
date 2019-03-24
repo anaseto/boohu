@@ -30,6 +30,7 @@ type game struct {
 	NoiseIllusion      map[position]bool
 	LastMonsterKnownAt map[position]*monster
 	MonsterLOS         map[position]bool
+	MonsterTargLOS     map[position]bool
 	Resting            bool
 	RestingTurns       int
 	Autoexploring      bool
