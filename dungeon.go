@@ -307,6 +307,14 @@ const (
 +..!P!..+
 #_..!.._#
 ?###+###?`
+	RoomRoundSimple = `
+??#+#??
+?#!.!#?
+#_.P._#
++.P_P.+
+#_.P._#
+?#!.!#?
+??#+#??`
 	RoomLittle = `
 ?#+#?
 #_._#
@@ -335,7 +343,7 @@ const (
 ???##+##???`
 )
 
-var roomNormalTemplates = []string{RoomSquare, RoomLittle, RoomLittleDiamond, RoomLittleColumnDiamond, RoomRound}
+var roomNormalTemplates = []string{RoomSquare, RoomRoundSimple, RoomLittle, RoomLittleDiamond, RoomLittleColumnDiamond, RoomRound}
 
 const (
 	RoomBigColumns = `
@@ -436,6 +444,53 @@ const (
 ##!.#P#.!##
 ??#_..._#??
 ???##+##???`
+	RoomTriangle = `
+?????#?????
+????#>#????
+???#!.!#???
+??#_..._#??
+##!.....!##
++..P...P..+
+##_..P.._##
+??###+###??`
+	RoomRevTriangle = `
+??###+###??
+##_..P.._##
++..P...P..+
+##!.....!##
+??#_..._#??
+???#!.!#???
+????#>#????
+?????#?????`
+	RoomSpiraling = `
+?#####+#
+#!.P...+
+#.>#####
+#!.P..!#
+#####>.#
++...P.!#
+#+#####?`
+	RoomCircleDouble = `
+???####+####???
+??#""..P..""#??
+?#""..#|#..""#?
+#"""!#!P!#!"""#
+#"._#.....#_."#
+#..#..>#>..#..#
++.P|P.###.P|P.+
+#..#..>#>..#..#
+#"._#.....#_."#
+#"""!#!P!#!"""#
+?#""..#|#..""#?
+??#""..P..""#??
+???####+####???`
+	RoomAltar = `
+#+#??#######??#+#
++P_##>..!..>##_P+
+#...#..#>#..#...#
+?##.#!..P..!#.##?
+??#..P.....P..#??
+???#####+#####???`
 	RoomRoundGarden = `
 ???##+##???
 ??#>.P.>#??
@@ -459,7 +514,7 @@ const (
 )
 
 var roomSpecialTemplates = []string{RoomBigColumns, RoomBigGarden, RoomColumns, RoomRoundColumns, RoomRoundGarden, RoomLongHall,
-	RoomGardenHall, RoomHome1, RoomHome2, RoomHome3, RoomHome4, RoomHome5, RoomBigRooms, RoomCaban}
+	RoomGardenHall, RoomHome1, RoomHome2, RoomHome3, RoomHome4, RoomHome5, RoomTriangle, RoomRevTriangle, RoomSpiraling, RoomAltar, RoomCircleDouble, RoomBigRooms, RoomCaban}
 
 func (r *room) ComputeDimensions() {
 	x := 0
