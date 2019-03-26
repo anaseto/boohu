@@ -78,7 +78,7 @@ const (
 	MonsLich
 	MonsEarthDragon
 	//MonsAcidMound
-	//MonsExplosiveNadre
+	MonsExplosiveNadre
 	//MonsMindCelmist
 	MonsVampire
 	MonsTreeMushroom
@@ -215,12 +215,12 @@ var MonsData = []monsterData{
 	//MonsHydra:           {10, 1, 10, 4, 'H', "hydra", 10},
 	//MonsSkeletonWarrior: {10, 1, 10, 3, 'S', "skeleton warrior", 6},
 	//MonsSpider:          {10, 1, 10, 2, 's', "spider", 6},
-	MonsWingedMilfid:  {10, 1, 10, 2, 'W', "winged milfid", 6},
-	MonsBlinkingFrog:  {10, 1, 10, 2, 'F', "blinking frog", 6},
-	MonsLich:          {10, 1, 10, 2, 'L', "lich", 15},
-	MonsEarthDragon:   {10, 2, 10, 4, 'D', "earth dragon", 20},
-	MonsMirrorSpecter: {10, 1, 10, 2, 'm', "mirror specter", 11},
-	//MonsExplosiveNadre:  {10, 1, 10, 1, 'n', "explosive nadre", 6},
+	MonsWingedMilfid:   {10, 1, 10, 2, 'W', "winged milfid", 6},
+	MonsBlinkingFrog:   {10, 1, 10, 2, 'F', "blinking frog", 6},
+	MonsLich:           {10, 1, 10, 2, 'L', "lich", 15},
+	MonsEarthDragon:    {10, 2, 10, 4, 'D', "earth dragon", 20},
+	MonsMirrorSpecter:  {10, 1, 10, 2, 'm', "mirror specter", 11},
+	MonsExplosiveNadre: {10, 1, 10, 1, 'n', "explosive nadre", 8},
 	MonsSatowalgaPlant: {10, 1, 10, 3, 'P', "satowalga plant", 7},
 	MonsMadNixe:        {10, 1, 10, 2, 'N', "mad nixe", 14},
 	//MonsMindCelmist:     {10, 1, 20, 2, 'c', "mind celmist", 12},
@@ -244,12 +244,12 @@ var monsDesc = []string{
 	//MonsHydra:           "Hydras are enormous creatures with four heads that can hit you each at once.",
 	//MonsSkeletonWarrior: "Skeleton warriors are good fighters, clad in chain mail.",
 	//MonsSpider:          "Spiders are fast moving fragile creatures, whose bite can confuse you.",
-	MonsWingedMilfid:  "Winged milfids are fast moving humanoids that can fly over you and make you swap positions. They tend to be very agressive creatures.",
-	MonsBlinkingFrog:  "Blinking frogs are big frog-like creatures, whose bite can make you blink away.",
-	MonsLich:          "Liches are non-living mages wearing a leather armour. They can throw a bolt of torment at you, halving your HP.",
-	MonsEarthDragon:   "Earth dragons are big and hardy creatures that wander in the Underground. It is said they can be credited for many of the tunnels.",
-	MonsMirrorSpecter: "Mirror specters are very insubstantial creatures, which can absorb your mana.",
-	//MonsExplosiveNadre:  "Explosive nadres are very frail creatures that explode upon dying, halving HP of any adjacent creatures and occasionally destroying walls.",
+	MonsWingedMilfid:   "Winged milfids are fast moving humanoids that can fly over you and make you swap positions. They tend to be very agressive creatures.",
+	MonsBlinkingFrog:   "Blinking frogs are big frog-like creatures, whose bite can make you blink away.",
+	MonsLich:           "Liches are non-living mages wearing a leather armour. They can throw a bolt of torment at you, halving your HP.",
+	MonsEarthDragon:    "Earth dragons are big and hardy creatures that wander in the Underground. It is said they can be credited for many of the tunnels.",
+	MonsMirrorSpecter:  "Mirror specters are very insubstantial creatures, which can absorb your mana.",
+	MonsExplosiveNadre: "Explosive nadres are tiny creatures that explode upon attacking, confusing any adjacent creatures and occasionally destroying walls.",
 	MonsSatowalgaPlant: "Satowalga Plants are immobile bushes that throw acidic projectiles at you, sometimes corroding and confusing you.",
 	MonsMadNixe:        "Mad nixes are magical humanoids that can attract you to them.",
 	//MonsMindCelmist:     "Mind celmists are mages that use magical smitting mind attacks that bypass armour. They can occasionally confuse or slow you. They try to avoid melee.",
@@ -275,6 +275,7 @@ const (
 	LoneWorm
 	LoneMirrorSpecter
 	LoneHound
+	LoneExplosiveNadre
 	LoneWingedMilfid
 	LoneMadNixe
 	LoneTreeMushroom
@@ -298,6 +299,7 @@ var MonsBands = []monsterBandData{
 	LoneWorm:           {Monster: MonsWorm},
 	LoneMirrorSpecter:  {Monster: MonsMirrorSpecter},
 	LoneHound:          {Monster: MonsHound},
+	LoneExplosiveNadre: {Monster: MonsExplosiveNadre},
 	LoneWingedMilfid:   {Monster: MonsWingedMilfid},
 	LoneMadNixe:        {Monster: MonsMadNixe},
 	LoneTreeMushroom:   {Monster: MonsTreeMushroom},
@@ -489,9 +491,13 @@ func (m *monster) TeleportMonsterAway(g *game) bool {
 
 func (m *monster) AttackAction(g *game, ev event) {
 	m.Dir = g.Player.Pos.Dir(m.Pos)
-	if m.Kind == MonsMarevorHelith {
+	switch m.Kind {
+	case MonsMarevorHelith:
 		m.TeleportPlayer(g, ev)
-	} else {
+	case MonsExplosiveNadre:
+		m.Explode(g, ev)
+		return
+	default:
 		m.HitPlayer(g, ev)
 	}
 	adelay := m.Kind.AttackDelay()
@@ -499,6 +505,39 @@ func (m *monster) AttackAction(g *game, ev event) {
 		adelay += 10
 	}
 	ev.Renew(g, adelay)
+}
+
+func (m *monster) Explode(g *game, ev event) {
+	m.HP = 0
+	neighbors := m.Pos.ValidCardinalNeighbors()
+	g.MakeNoise(WallNoise, m.Pos)
+	g.Printf("%s %s explodes with a loud boom.", g.ExplosionSound(), m.Kind.Definite(true))
+	g.ui.ExplosionAnimation(FireExplosion, m.Pos)
+	for _, pos := range append(neighbors, m.Pos) {
+		c := g.Dungeon.Cell(pos)
+		if c.Flammable() {
+			g.Burn(pos, ev)
+		}
+		mons := g.MonsterAt(pos)
+		if mons.Exists() && !mons.Status(MonsConfused) {
+			mons.EnterConfusion(g, ev)
+			if mons.State != Hunting {
+				mons.State = Watching
+			}
+		} else if g.Player.Pos == pos {
+			m.InflictDamage(g, 1, 1)
+		} else if c.T == WallCell && RandInt(3) > 0 {
+			g.Dungeon.SetCell(pos, GroundCell)
+			g.Stats.Digs++
+			if !g.Player.LOS[pos] {
+				g.TerrainKnowledge[pos] = c.T
+			} else {
+				g.ui.WallExplosionAnimation(pos)
+			}
+			g.MakeNoise(WallNoise, pos)
+			g.Fog(pos, 1, ev)
+		}
+	}
 }
 
 func (m *monster) NaturalAwake(g *game) {
@@ -1197,41 +1236,6 @@ func (m *monster) MindAttack(g *game, ev event) bool {
 	return true
 }
 
-func (m *monster) Explode(g *game, ev event) {
-	neighbors := m.Pos.ValidNeighbors()
-	g.MakeNoise(WallNoise, m.Pos)
-	g.Printf("%s %s explodes with a loud boom.", g.ExplosionSound(), m.Kind.Definite(true))
-	g.ui.ExplosionAnimation(FireExplosion, m.Pos)
-	for _, pos := range append(neighbors, m.Pos) {
-		c := g.Dungeon.Cell(pos)
-		if c.IsFree() {
-			g.Burn(pos, ev)
-		}
-		mons := g.MonsterAt(pos)
-		if mons.Exists() {
-			mons.HP /= 2
-			if mons.HP == 0 {
-				mons.HP = 1
-			}
-			g.MakeNoise(ExplosionHitNoise, mons.Pos)
-			mons.MakeHuntIfHurt(g)
-		} else if g.Player.Pos == pos {
-			dmg := g.Player.HP / 2
-			m.InflictDamage(g, dmg, 2)
-		} else if c.T == WallCell && RandInt(2) == 0 {
-			g.Dungeon.SetCell(pos, GroundCell)
-			g.Stats.Digs++
-			if !g.Player.Sees(pos) {
-				g.TerrainKnowledge[m.Pos] = WallCell
-			} else {
-				g.ui.WallExplosionAnimation(pos)
-			}
-			g.MakeNoise(WallNoise, pos)
-			g.Fog(pos, 1, ev)
-		}
-	}
-}
-
 func (m *monster) Blink(g *game) {
 	npos := g.BlinkPos()
 	if !npos.valid() || npos == g.Player.Pos || npos == m.Pos {
@@ -1398,7 +1402,7 @@ func (dg *dgen) PutMonsterBand(g *game, band monsterBand) bool {
 		bdinf = dg.BandInfoFoliage(g, band)
 	case LoneHound, LoneEarthDragon:
 		bdinf = dg.BandInfoOutsideGround(g, band)
-	case LoneBlinkingFrog, LoneMirrorSpecter:
+	case LoneBlinkingFrog, LoneMirrorSpecter, LoneExplosiveNadre:
 		bdinf = dg.BandInfoOutside(g, band)
 	case LoneTreeMushroom:
 		bdinf = dg.BandInfoOutside(g, band)
@@ -1440,7 +1444,7 @@ func (dg *dgen) GenMonsters(g *game) {
 	g.Bands = []bandInfo{}
 	// TODO, just for testing now
 	bandsL1 := []monsterBand{LoneGuard}
-	bandsL2 := []monsterBand{LoneYack, LoneWorm, LoneHound}
+	bandsL2 := []monsterBand{LoneYack, LoneWorm, LoneHound, LoneExplosiveNadre}
 	bandsL3 := []monsterBand{LoneCyclop, LoneSatowalgaPlant, LoneBlinkingFrog, LoneMirrorSpecter, LoneWingedMilfid}
 	bandsL4 := []monsterBand{LoneTreeMushroom, LoneEarthDragon, LoneMadNixe}
 	mlevel := 1 + RandInt(MaxDepth)
