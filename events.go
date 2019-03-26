@@ -388,7 +388,7 @@ func (g *game) Burn(pos position, ev event) {
 	g.Stats.Burns++
 	switch c.T {
 	case DoorCell:
-		g.Print("The door vanishes in flames.")
+		g.Print("The door vanishes in magical flames.")
 	}
 	g.Dungeon.SetCell(pos, GroundCell)
 	g.Clouds[pos] = CloudFire
