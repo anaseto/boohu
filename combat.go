@@ -53,14 +53,7 @@ func (g *game) MakeNoise(noise int, at position) {
 			continue
 		}
 		d := n.Cost
-		v := noise - d
-		if m.State == Resting {
-			v -= 3
-		}
-		if m.Status(MonsExhausted) {
-			v -= 3
-		}
-		if v <= 0 || v <= 5 && RandInt(2) == 0 || v <= 10 && RandInt(4) == 0 {
+		if m.State == Resting && d > noise/2 || m.Status(MonsExhausted) && m.State == Resting && d > noise/3 {
 			continue
 		}
 		if m.SeesPlayer(g) {
@@ -198,17 +191,17 @@ func (g *game) HandleKill(mons *monster, ev event) {
 }
 
 const (
-	WallNoise           = 12
-	TemporalWallNoise   = 9
+	WallNoise           = 9
+	TemporalWallNoise   = 5
 	ExplosionHitNoise   = 12
-	ExplosionNoise      = 15
-	MagicHitNoise       = 12
-	BarkNoise           = 13
-	MagicExplosionNoise = 15
-	MagicCastNoise      = 9
-	BaseHitNoise        = 9
-	QueenStoneNoise     = 15
-	MagaraBangNoise     = 50
+	ExplosionNoise      = 12
+	MagicHitNoise       = 5
+	BarkNoise           = 9
+	MagicExplosionNoise = 12
+	MagicCastNoise      = 5
+	BaseHitNoise        = 2
+	QueenStoneNoise     = 9
+	MagaraBangNoise     = 35
 )
 
 func (g *game) ArmourClang() (sclang string) {

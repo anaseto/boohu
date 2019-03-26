@@ -973,7 +973,7 @@ func (m *monster) TormentBolt(g *game, ev event) bool {
 	if blocked {
 		return false
 	}
-	g.MakeNoise(9, m.Pos)
+	g.MakeNoise(MagicCastNoise, m.Pos)
 	if RandInt(3) > 0 {
 		g.MakeNoise(MagicHitNoise, g.Player.Pos)
 		damage := g.Player.HP / 2
@@ -1124,7 +1124,7 @@ func (m *monster) NixeAttraction(g *game, ev event) bool {
 	if blocked {
 		return false
 	}
-	g.MakeNoise(9, m.Pos)
+	g.MakeNoise(MagicCastNoise, m.Pos)
 	g.PrintfStyled("%s lures you to her.", logMonsterHit, m.Kind.Definite(true))
 	ray := g.Ray(m.Pos)
 	g.ui.MonsterProjectileAnimation(ray, 'θ', ColorCyan) // TODO: improve
