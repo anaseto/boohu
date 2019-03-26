@@ -621,7 +621,7 @@ func (g *game) EvokeObstruction(ev event) error {
 	targets := []position{}
 	for i := 0; i < max; i++ {
 		ray := g.Ray(ms[i].Pos)
-		for _, pos := range ray[1:] {
+		for i, pos := range ray[1:] {
 			if pos == g.Player.Pos {
 				break
 			}
@@ -630,8 +630,10 @@ func (g *game) EvokeObstruction(ev event) error {
 				continue
 			}
 			g.TemporalWallAt(pos, ev)
-			ray := g.Ray(mons.Pos)
-			ray = ray[:len(ray)-1]
+			if len(ray) == 0 {
+				break
+			}
+			ray = ray[i+1:]
 			targets = append(targets, ray...)
 			break
 		}
