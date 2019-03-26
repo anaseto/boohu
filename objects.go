@@ -202,18 +202,16 @@ func (g *game) ActivateStone() (err error) {
 	if !ok {
 		return errors.New("No stone to activate here.")
 	}
+	oppos := g.Player.Pos
 	switch stn {
 	case InertStone:
 		err = errors.New("Stone is inert.")
 	case BarrelStone:
-		oppos := g.Player.Pos
 		g.Print("You teleport away.")
 		g.TeleportToBarrel()
-		g.UseStone(oppos)
 	case FogStone:
 		g.Fog(g.Player.Pos, FogStoneDistance, g.Ev)
 		g.Print("You are surrounded by fog.")
-		g.UseStone(g.Player.Pos)
 	case QueenStone:
 		g.MakeNoise(QueenStoneNoise, g.Player.Pos)
 		dij := &noisePath{game: g}
@@ -232,7 +230,6 @@ func (g *game) ActivateStone() (err error) {
 			m.EnterConfusion(g, g.Ev)
 		}
 		g.Print("The stone releases a confusing sound.")
-		g.UseStone(g.Player.Pos)
 	case TreeStone:
 		count := 0
 		for _, mons := range g.Monsters {
@@ -244,8 +241,6 @@ func (g *game) ActivateStone() (err error) {
 		}
 		if count == 0 {
 			err = errors.New("There are no monsters to confuse around.")
-		} else {
-			g.UseStone(g.Player.Pos)
 		}
 	case ObstructionStone:
 		count := 0
@@ -267,7 +262,6 @@ func (g *game) ActivateStone() (err error) {
 			err = errors.New("There are no monsters to be surrounded by walls.")
 		} else {
 			g.Print("Walls appear around your foes.")
-			g.UseStone(g.Player.Pos)
 		}
 	case MappingStone:
 		err = g.MagicMapping(g.Ev, MappingDistance)
@@ -277,6 +271,7 @@ func (g *game) ActivateStone() (err error) {
 	if err != nil {
 		return err
 	}
+	g.UseStone(oppos)
 	g.Ev.Renew(g, 5)
 	return nil
 }
