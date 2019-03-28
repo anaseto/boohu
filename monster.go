@@ -993,7 +993,7 @@ func (m *monster) RangeBlocked(g *game) bool {
 	ray := g.Ray(m.Pos)
 	if len(ray) < 2 {
 		// XXX see why this can happen
-		return false
+		return true
 	}
 	blocked := false
 	for _, pos := range ray[1:] {
