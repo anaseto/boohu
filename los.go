@@ -128,8 +128,8 @@ func (g *game) buildRayMap(from position, distance int) rayMap {
 	return rm
 }
 
-const DefaultLOSRange = 10
-const DefaultMonsterLOSRange = 7
+const DefaultLOSRange = 12
+const DefaultMonsterLOSRange = 12
 
 func (g *game) LosRange() int {
 	losRange := DefaultLOSRange
@@ -190,6 +190,7 @@ func (g *game) ComputeLOS() {
 			g.StopAuto()
 		}
 	}
+	g.ComputeLights()
 }
 
 func (m *monster) ComputeLOS(g *game) {
@@ -205,6 +206,7 @@ func (m *monster) ComputeLOS(g *game) {
 		}
 	}
 	m.LOS = mlos
+	//g.ComputeLights() // XXX maybe we can get without this for monsters, it shouldn't be very player-visible
 }
 
 func (g *game) SeePosition(pos position) {
@@ -356,7 +358,14 @@ func (m *monster) SeesPlayer(g *game) bool {
 }
 
 func (m *monster) Sees(g *game, pos position) bool {
-	return m.LOS[pos] && m.Dir.InViewCone(m.Pos, pos)
+	const darkRange = 4
+	if !(m.LOS[pos] && m.Dir.InViewCone(m.Pos, pos)) {
+		return false
+	}
+	if !g.Illuminated[pos] && m.Pos.Distance(pos) > darkRange {
+		return false
+	}
+	return true
 }
 
 func (g *game) ComputeMonsterLOS() {
@@ -389,6 +398,25 @@ func (g *game) ComputeMonsterLOS() {
 	} else {
 		g.Player.Statuses[StatusUnhidden] = 0
 		g.Player.Statuses[StatusHidden] = 1
+	}
+	if g.Illuminated[g.Player.Pos] {
+		g.Player.Statuses[StatusLight] = 1
+	} else {
+		g.Player.Statuses[StatusLight] = 0
+	}
+}
+
+func (g *game) ComputeLights() {
+	// XXX: could be optimized to avoid unnecessary recalculations
+	g.Illuminated = map[position]bool{}
+	const lightrange = 6
+	for lpos, _ := range g.Objects.Lights {
+		rays := g.buildRayMap(lpos, lightrange)
+		for pos, n := range rays {
+			if n.Cost < lightrange {
+				g.Illuminated[pos] = true
+			}
+		}
 	}
 }
 

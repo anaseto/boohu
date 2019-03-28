@@ -31,6 +31,7 @@ type game struct {
 	LastMonsterKnownAt map[position]*monster
 	MonsterLOS         map[position]bool
 	MonsterTargLOS     map[position]bool
+	Illuminated        map[position]bool
 	Resting            bool
 	RestingTurns       int
 	Autoexploring      bool

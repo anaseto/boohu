@@ -241,7 +241,7 @@ func (ui *gameui) WallExplosionAnimation(pos position) {
 	for _, fg := range colors {
 		_, _, bgColor := ui.PositionDrawing(pos)
 		//ui.DrawAtPosition(pos, true, '☼', fg, bgColor)
-		ui.DrawAtPosition(pos, true, '☼', bgColor, fg)
+		ui.DrawAtPosition(pos, true, '%', bgColor, fg)
 		ui.Flush()
 		time.Sleep(25 * time.Millisecond)
 	}

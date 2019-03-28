@@ -127,7 +127,6 @@ var MapNames = map[rune]string{
 	':':  "colon",
 	'\\': "backslash",
 	'~':  "tilde",
-	'☼':  "sun",
 	'*':  "asterisc",
 	'—':  "hbar",
 	'/':  "slash",
@@ -143,6 +142,7 @@ var MapNames = map[rune]string{
 	';':  "semicolon",
 	'_':  "stone",
 	'&':  "barrel",
+	'☼':  "light",
 }
 
 var LetterNames = map[rune]string{
@@ -191,7 +191,6 @@ var LetterNames = map[rune]string{
 	'§':  "fog",
 	'●':  "rock",
 	'~':  "tilde",
-	'☼':  "sun",
 	'*':  "asterisc",
 	'∞':  "kill",
 	'☻':  "dreaming",
@@ -199,6 +198,7 @@ var LetterNames = map[rune]string{
 	'_':  "stone",
 	'♥':  "heart",
 	'&':  "barrel",
+	'☼':  "light",
 }
 
 func (ui *gameui) Interrupt() {

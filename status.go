@@ -13,6 +13,7 @@ const (
 	StatusFlames // fake status
 	StatusHidden
 	StatusUnhidden
+	StatusLight
 	StatusDig
 	StatusSwap
 	StatusShadows
@@ -64,6 +65,8 @@ func (st status) String() string {
 		return "Swap"
 	case StatusShadows:
 		return "Shadows"
+	case StatusLight:
+		return "Light"
 	default:
 		// should not happen
 		return "unknown"
@@ -79,7 +82,7 @@ func (st status) Short() string {
 	case StatusSwift:
 		return "Sw"
 	case StatusLignification:
-		return "Li"
+		return "Lg"
 	case StatusConfusion:
 		return "Co"
 	case StatusNausea:
@@ -98,6 +101,8 @@ func (st status) Short() string {
 		return "Sw"
 	case StatusShadows:
 		return "Sh"
+	case StatusLight:
+		return "Li"
 	default:
 		// should not happen
 		return "?"

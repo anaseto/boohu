@@ -12,6 +12,7 @@ type objects struct {
 	Magaras map[position]magara
 	Barrels map[position]bool
 	Bananas map[position]bool
+	Lights  map[position]bool
 }
 
 type stair int

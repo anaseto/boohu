@@ -817,6 +817,31 @@ func (dg *dgen) AddSpecial(g *game) {
 	}
 	dg.GenMagara(g)
 	dg.GenStones(g)
+	dg.GenLight(g)
+}
+
+func (dg *dgen) GenLight(g *game) {
+	lights := []position{}
+	for i := 0; i < 4+RandInt(3); i++ {
+		pos := dg.OutsideGroundCell(g)
+		g.Dungeon.SetCell(pos, LightCell)
+		lights = append(lights, pos)
+	}
+	for i := 0; i < 8+RandInt(4); i++ {
+		pos := dg.rooms[RandInt(len(dg.rooms))].RandomPlace(PlaceSpecialStatic)
+		if pos == InvalidPos {
+			pos = dg.rooms[RandInt(len(dg.rooms))].RandomPlace(PlaceStatic)
+		}
+		if pos != InvalidPos {
+			g.Dungeon.SetCell(pos, LightCell)
+			lights = append(lights, pos)
+		}
+	}
+	g.Objects.Lights = map[position]bool{}
+	for _, pos := range lights {
+		g.Objects.Lights[pos] = true
+	}
+	g.ComputeLights()
 }
 
 func (r *room) RandomPlace(kind placeKind) position {

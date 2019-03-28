@@ -173,6 +173,7 @@ var (
 	ColorFgHPok,
 	ColorFgHPwounded,
 	ColorFgLOS,
+	ColorFgLOSLight,
 	ColorFgMPcritical,
 	ColorFgMPok,
 	ColorFgMPpartial,
@@ -199,6 +200,7 @@ func LinkColors() {
 	ColorFg = ColorBase0
 	ColorFgDark = ColorBase01
 	ColorFgLOS = ColorBase0
+	ColorFgLOSLight = ColorBase1
 	ColorFgAnimationHit = ColorMagenta
 	ColorFgCollectable = ColorYellow
 	ColorFgConfusedMonster = ColorGreen
@@ -239,8 +241,11 @@ func ApplyDarkLOS() {
 	ColorFg = ColorBase0
 	if Only8Colors {
 		ColorFgLOS = ColorGreen
+		ColorFgLOSLight = ColorYellow
 	} else {
 		ColorFgLOS = ColorBase0
+		//ColorFgLOSLight = ColorBase1
+		ColorFgLOSLight = ColorYellow
 	}
 }
 
@@ -622,6 +627,7 @@ func (ui *gameui) AddComma(see, s string) string {
 	}
 	return fmt.Sprintf("You %s %s", see, s)
 }
+
 func (ui *gameui) DescribePosition(pos position, targ Targeter) {
 	g := ui.g
 	var desc string
@@ -669,6 +675,8 @@ func (ui *gameui) DescribePosition(pos position, targ Targeter) {
 	}
 	if g.MonsterLOS[pos] {
 		desc += " (unhidden)"
+	} else if g.Illuminated[pos] {
+		desc += " (lighted)"
 	}
 	g.InfoEntry = desc + "."
 }
@@ -922,6 +930,9 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 		} else if g.NoiseIllusion[pos] {
 			r = '♫'
 			fgColor = ColorFgMagicPlace
+		}
+		if fgColor == ColorFgLOS && g.Illuminated[pos] {
+			fgColor = ColorFgLOSLight
 		}
 	}
 	return

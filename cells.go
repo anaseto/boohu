@@ -17,6 +17,7 @@ const (
 	StoneCell
 	MagaraCell
 	BananaCell
+	LightCell
 )
 
 func (c cell) IsFree() bool {
@@ -75,6 +76,8 @@ func (c cell) ShortDesc(g *game, pos position) (desc string) {
 		desc = g.Objects.Magaras[pos].String()
 	case BananaCell:
 		desc = "a banana"
+	case LightCell:
+		desc = "a light"
 	}
 	return desc
 }
@@ -99,6 +102,8 @@ func (c cell) Desc(g *game, pos position) (desc string) {
 		desc = g.Objects.Magaras[pos].Desc(g)
 	case BananaCell:
 		desc = "A gawalt monkey cannot enter a healthy sleep without eating one of those bananas before."
+	case LightCell:
+		desc = "A light illuminates surrounding cells. Monsters can spot you in illuminated cells from a greater range."
 	}
 	return desc
 }
@@ -124,6 +129,8 @@ func (c cell) Style(g *game, pos position) (r rune, fg uicolor) {
 		r, fg = '/', ColorFgCollectable
 	case BananaCell:
 		r, fg = ')', ColorFgCollectable
+	case LightCell:
+		r, fg = '☼', ColorFgCollectable
 	}
 	return r, fg
 }
