@@ -103,6 +103,17 @@ func (d *dungeon) HasFreeNeighbor(pos position) bool {
 	return false
 }
 
+func (d *dungeon) HasTooManyWallNeighbors(pos position) bool {
+	neighbors := pos.ValidNeighbors()
+	count := 0
+	for _, pos := range neighbors {
+		if !d.Cell(pos).IsFree() {
+			count++
+		}
+	}
+	return count > 1
+}
+
 func (g *game) HasFreeExploredNeighbor(pos position) bool {
 	d := g.Dungeon
 	neighbors := pos.ValidCardinalNeighbors()
@@ -767,8 +778,17 @@ func (g *game) GenRoomTunnels(ml maplayout) {
 	case RandomWalkTreeCave:
 		dg.GenTreeCaveMap()
 	}
-	dg.GenRooms(roomSpecialTemplates, 3)
-	dg.GenRooms(roomNormalTemplates, 7)
+	switch ml {
+	case RandomWalkCave:
+		dg.GenRooms(roomSpecialTemplates, 4)
+		dg.GenRooms(roomNormalTemplates, 5)
+	case RandomWalkTreeCave:
+		dg.GenRooms(roomSpecialTemplates, 4)
+		dg.GenRooms(roomNormalTemplates, 7)
+	default:
+		dg.GenRooms(roomSpecialTemplates, 3)
+		dg.GenRooms(roomNormalTemplates, 7)
+	}
 	dg.ConnectRooms()
 	g.Dungeon = d
 	dg.PutDoors(g)
@@ -898,6 +918,27 @@ func (dg *dgen) OutsideGroundCell(g *game) position {
 		}
 		c := dg.d.Cell(pos)
 		if c.T == GroundCell && !dg.room[pos] {
+			return pos
+		}
+	}
+}
+
+func (dg *dgen) OutsideGroundMiddleCell(g *game) position {
+	count := 0
+	for {
+		count++
+		if count > 2000 {
+			panic("OutsideGroundMiddleCell")
+		}
+		x := RandInt(DungeonWidth)
+		y := RandInt(DungeonHeight)
+		pos := position{x, y}
+		mons := g.MonsterAt(pos)
+		if mons.Exists() {
+			continue
+		}
+		c := dg.d.Cell(pos)
+		if c.T == GroundCell && !dg.room[pos] && !dg.d.HasTooManyWallNeighbors(pos) {
 			return pos
 		}
 	}

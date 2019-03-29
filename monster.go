@@ -1444,6 +1444,13 @@ func (dg *dgen) BandInfoOutsideGround(g *game, band monsterBand) bandInfo {
 	return bandinfo
 }
 
+func (dg *dgen) BandInfoOutsideGroundMiddle(g *game, band monsterBand) bandInfo {
+	bandinfo := bandInfo{Kind: monsterBand(band)}
+	bandinfo.Path = append(bandinfo.Path, dg.OutsideGroundMiddleCell(g))
+	bandinfo.Beh = BehWander
+	return bandinfo
+}
+
 func (dg *dgen) BandInfoOutside(g *game, band monsterBand) bandInfo {
 	bandinfo := bandInfo{Kind: monsterBand(band)}
 	bandinfo.Path = append(bandinfo.Path, dg.OutsideCell(g))
@@ -1487,7 +1494,7 @@ func (dg *dgen) PutMonsterBand(g *game, band monsterBand) bool {
 	case LoneHighGuard:
 		bdinf = dg.BandInfoGuard(g, band)
 	case LoneSatowalgaPlant:
-		bdinf = dg.BandInfoOutsideGround(g, band)
+		bdinf = dg.BandInfoOutsideGroundMiddle(g, band)
 	default:
 		bdinf = dg.BandInfoPatrol(g, band)
 	}
@@ -1509,6 +1516,7 @@ func (dg *dgen) PutMonsterBand(g *game, band monsterBand) bool {
 		mons.Index = len(g.Monsters)
 		mons.Band = len(g.Bands) - 1
 		mons.PlaceAt(g, pos)
+		mons.Target = mons.NextTarget(g)
 		g.Monsters = append(g.Monsters, mons)
 		pos = g.FreeCellForBandMonster(pos)
 	}
@@ -1519,55 +1527,158 @@ func (dg *dgen) PutRandomBand(g *game, bands []monsterBand) bool {
 	return dg.PutMonsterBand(g, bands[RandInt(len(bands))])
 }
 
+func (dg *dgen) PutRandomBandN(g *game, bands []monsterBand, n int) {
+	for i := 0; i < n; i++ {
+		dg.PutMonsterBand(g, bands[RandInt(len(bands))])
+	}
+}
+
 func (dg *dgen) GenMonsters(g *game) {
 	g.Monsters = []*monster{}
 	g.Bands = []bandInfo{}
 	// TODO, just for testing now
-	bandsL1 := []monsterBand{LoneGuard}
-	bandsL2 := []monsterBand{LoneYack, LoneWorm, LoneHound, LoneExplosiveNadre, LoneHighGuard}
-	bandsL3 := []monsterBand{LoneCyclop, LoneSatowalgaPlant, LoneBlinkingFrog, LoneMirrorSpecter, LoneWingedMilfid}
-	bandsL4 := []monsterBand{LoneTreeMushroom, LoneEarthDragon, LoneMadNixe}
+	bandsGuard := []monsterBand{LoneGuard}
+	bandsHighGuard := []monsterBand{LoneHighGuard}
+	bandsAnimals := []monsterBand{LoneYack, LoneWorm, LoneHound, LoneBlinkingFrog, LoneExplosiveNadre}
+	bandsPlants := []monsterBand{LoneSatowalgaPlant}
+	bandsBipeds := []monsterBand{LoneCyclop, LoneMirrorSpecter, LoneWingedMilfid, LoneMadNixe}
+	bandsBig := []monsterBand{LoneTreeMushroom, LoneEarthDragon}
 	mlevel := 1 + RandInt(MaxDepth)
-	for i := 0; i < 5; i++ {
-		if !dg.PutRandomBand(g, bandsL1) {
-			i--
-		}
-	}
-	dg.PutRandomBand(g, bandsL2)
-	if g.Depth > 1 {
-		dg.PutRandomBand(g, bandsL2)
-	}
-	if g.Depth > 2 {
-		dg.PutRandomBand(g, bandsL3)
-	}
-	if g.Depth > 3 {
-		dg.PutRandomBand(g, bandsL2)
-	}
-	if g.Depth > 4 {
-		dg.PutRandomBand(g, bandsL3)
-	}
-	if g.Depth > 5 {
-		dg.PutRandomBand(g, bandsL2)
-	}
-	if g.Depth > 6 {
-		dg.PutRandomBand(g, bandsL4)
-	}
-	if g.Depth > 7 {
-		dg.PutRandomBand(g, bandsL2)
-	}
-	if g.Depth > 8 {
-		dg.PutRandomBand(g, bandsL3)
-	}
-	if g.Depth > 9 {
-		dg.PutRandomBand(g, bandsL2)
-	}
-	if g.Depth > 10 {
-		dg.PutRandomBand(g, bandsL4)
-		dg.PutRandomBand(g, bandsL3)
-	}
 	if mlevel == g.Depth {
 		// XXX should really Marevor appear in more than one level?
 		dg.PutMonsterBand(g, LoneMarevorHelith)
+	}
+	switch g.Depth {
+	case 1:
+		dg.PutRandomBandN(g, bandsGuard, 5)
+		dg.PutRandomBandN(g, bandsAnimals, 3)
+	case 2:
+		dg.PutRandomBandN(g, bandsGuard, 3)
+		if RandInt(2) == 0 {
+			dg.PutRandomBandN(g, bandsBipeds, 3)
+			dg.PutRandomBandN(g, bandsAnimals, 1)
+			dg.PutRandomBandN(g, bandsPlants, 1)
+		} else {
+			dg.PutRandomBandN(g, bandsAnimals, 4)
+			dg.PutRandomBandN(g, bandsPlants, 2)
+		}
+	case 3:
+		dg.PutRandomBandN(g, bandsHighGuard, 2)
+		dg.PutRandomBandN(g, bandsGuard, 4)
+		if RandInt(2) == 0 {
+			dg.PutRandomBandN(g, bandsAnimals, 3)
+			dg.PutRandomBandN(g, bandsPlants, 2)
+		} else {
+			dg.PutRandomBandN(g, bandsAnimals, 1)
+			dg.PutRandomBandN(g, bandsPlants, 1)
+			dg.PutRandomBandN(g, bandsBipeds, 2)
+		}
+	case 4:
+		dg.PutRandomBandN(g, bandsHighGuard, 2)
+		if RandInt(2) == 0 {
+			dg.PutRandomBandN(g, bandsGuard, 4)
+			dg.PutRandomBandN(g, bandsBig, 2)
+			dg.PutRandomBandN(g, bandsBipeds, 1)
+			dg.PutRandomBandN(g, bandsPlants, 1)
+		} else {
+			dg.PutRandomBandN(g, bandsGuard, 8)
+			dg.PutRandomBandN(g, bandsAnimals, 1)
+			dg.PutRandomBandN(g, bandsPlants, 1)
+		}
+	case 5:
+		dg.PutRandomBandN(g, bandsHighGuard, 2)
+		if RandInt(2) == 0 {
+			dg.PutRandomBandN(g, bandsGuard, 4)
+			dg.PutRandomBandN(g, bandsBig, 2)
+			dg.PutRandomBandN(g, bandsBipeds, 1)
+			dg.PutRandomBandN(g, bandsPlants, 1)
+		} else {
+			dg.PutRandomBandN(g, bandsGuard, 2)
+			dg.PutRandomBandN(g, bandsAnimals, 3)
+			dg.PutRandomBandN(g, bandsBipeds, 2)
+			dg.PutRandomBandN(g, bandsBig, 1)
+			dg.PutRandomBandN(g, bandsPlants, 1)
+		}
+	case 6:
+		dg.PutRandomBandN(g, bandsHighGuard, 1)
+		if RandInt(2) == 0 {
+			dg.PutRandomBandN(g, bandsGuard, 4)
+			dg.PutRandomBandN(g, bandsAnimals, 2)
+			dg.PutRandomBandN(g, bandsBig, 2)
+			dg.PutRandomBandN(g, bandsBipeds, 1)
+			dg.PutRandomBandN(g, bandsPlants, 3)
+		} else {
+			dg.PutRandomBandN(g, bandsGuard, 2)
+			dg.PutRandomBandN(g, bandsAnimals, 8)
+			dg.PutRandomBandN(g, bandsPlants, 5)
+		}
+	case 7:
+		dg.PutRandomBandN(g, bandsHighGuard, 1)
+		if RandInt(2) == 0 {
+			dg.PutRandomBandN(g, bandsGuard, 4)
+			dg.PutRandomBandN(g, bandsAnimals, 6)
+			dg.PutRandomBandN(g, bandsBig, 1)
+			dg.PutRandomBandN(g, bandsBipeds, 4)
+			dg.PutRandomBandN(g, bandsPlants, 2)
+		} else {
+			dg.PutRandomBandN(g, bandsGuard, 1)
+			dg.PutRandomBandN(g, bandsBig, 2)
+			dg.PutRandomBandN(g, bandsAnimals, 8)
+			dg.PutRandomBandN(g, bandsPlants, 5)
+		}
+	case 8:
+		dg.PutRandomBandN(g, bandsHighGuard, 4)
+		if RandInt(2) == 0 {
+			dg.PutRandomBandN(g, bandsGuard, 5)
+			dg.PutRandomBandN(g, bandsBig, 1)
+			dg.PutRandomBandN(g, bandsBipeds, 8)
+		} else {
+			dg.PutRandomBandN(g, bandsGuard, 5)
+			dg.PutRandomBandN(g, bandsAnimals, 2)
+			dg.PutRandomBandN(g, bandsBig, 2)
+			dg.PutRandomBandN(g, bandsBipeds, 4)
+			dg.PutRandomBandN(g, bandsPlants, 1)
+		}
+	case 9:
+		dg.PutRandomBandN(g, bandsHighGuard, 2)
+		if RandInt(2) == 0 {
+			dg.PutRandomBandN(g, bandsGuard, 2)
+			dg.PutRandomBandN(g, bandsBig, 6)
+			dg.PutRandomBandN(g, bandsBipeds, 3)
+			dg.PutRandomBandN(g, bandsPlants, 1)
+		} else {
+			dg.PutRandomBandN(g, bandsGuard, 2)
+			dg.PutRandomBandN(g, bandsAnimals, 10)
+			dg.PutRandomBandN(g, bandsBig, 2)
+			dg.PutRandomBandN(g, bandsPlants, 5)
+		}
+	case 10:
+		dg.PutRandomBandN(g, bandsHighGuard, 2)
+		if RandInt(2) == 0 {
+			dg.PutRandomBandN(g, bandsGuard, 9)
+			dg.PutRandomBandN(g, bandsBig, 1)
+			dg.PutRandomBandN(g, bandsBipeds, 8)
+		} else {
+			dg.PutRandomBandN(g, bandsGuard, 8)
+			dg.PutRandomBandN(g, bandsAnimals, 2)
+			dg.PutRandomBandN(g, bandsBig, 2)
+			dg.PutRandomBandN(g, bandsBipeds, 4)
+			dg.PutRandomBandN(g, bandsPlants, 1)
+		}
+	case 11:
+		dg.PutRandomBandN(g, bandsHighGuard, 5)
+		if RandInt(2) == 0 {
+			dg.PutRandomBandN(g, bandsGuard, 5)
+			dg.PutRandomBandN(g, bandsBig, 2)
+			dg.PutRandomBandN(g, bandsBipeds, 12)
+			dg.PutRandomBandN(g, bandsAnimals, 2)
+		} else {
+			dg.PutRandomBandN(g, bandsGuard, 7)
+			dg.PutRandomBandN(g, bandsBig, 2)
+			dg.PutRandomBandN(g, bandsBipeds, 7)
+			dg.PutRandomBandN(g, bandsAnimals, 1)
+			dg.PutRandomBandN(g, bandsPlants, 1)
+		}
 	}
 }
 
