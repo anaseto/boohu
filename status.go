@@ -19,6 +19,14 @@ const (
 	StatusShadows
 )
 
+func (st status) Info() bool {
+	switch st {
+	case StatusFlames, StatusHidden, StatusUnhidden, StatusLight:
+		return true
+	}
+	return false
+}
+
 func (st status) Good() bool {
 	switch st {
 	case StatusSwift, StatusDig, StatusSwap, StatusShadows, StatusHidden:

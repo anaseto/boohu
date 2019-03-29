@@ -155,7 +155,10 @@ func (g *game) Rest(ev event) error {
 }
 
 func (g *game) StatusRest() bool {
-	for _, q := range g.Player.Statuses {
+	for st, q := range g.Player.Statuses {
+		if st.Info() {
+			continue
+		}
 		if q > 0 {
 			return true
 		}
