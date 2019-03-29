@@ -221,6 +221,9 @@ func (mag magara) Desc(g *game) (desc string) {
 }
 
 func (mag magara) MPCost(g *game) int {
+	if mag == NoMagara {
+		return 0
+	}
 	cost := 1
 	switch mag {
 	case HealWoundsMagara:
