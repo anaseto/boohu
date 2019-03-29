@@ -9,7 +9,6 @@ const (
 	Hunting
 	Wandering
 	Watching
-	Waiting
 )
 
 func (m monsterState) String() string {
@@ -23,8 +22,6 @@ func (m monsterState) String() string {
 		st = "hunting"
 	case Watching:
 		st = "watching"
-	case Waiting:
-		st = "waiting"
 	}
 	return st
 }
@@ -70,7 +67,7 @@ const (
 	//MonsBrizzia
 	MonsHound
 	//MonsGiantBee
-	//MonsGoblinWarrior
+	MonsHighGuard
 	//MonsHydra
 	//MonsSkeletonWarrior
 	//MonsSpider
@@ -115,8 +112,8 @@ func (mk monsterKind) Dangerousness() int {
 
 func (mk monsterKind) Ranged() bool {
 	switch mk {
-	//case MonsLich, MonsCyclop, MonsGoblinWarrior, MonsSatowalgaPlant, MonsMadNixe, MonsVampire, MonsTreeMushroom:
-	case MonsLich, MonsCyclop, MonsSatowalgaPlant, MonsMadNixe, MonsVampire, MonsTreeMushroom:
+	//case MonsLich, MonsCyclop, MonsHighGuard, MonsSatowalgaPlant, MonsMadNixe, MonsVampire, MonsTreeMushroom:
+	case MonsLich, MonsHighGuard, MonsCyclop, MonsSatowalgaPlant, MonsMadNixe, MonsVampire, MonsTreeMushroom:
 		return true
 	default:
 		return false
@@ -135,7 +132,7 @@ func (mk monsterKind) Smiting() bool {
 
 func (mk monsterKind) CanOpenDoors() bool {
 	switch mk {
-	case MonsGuard, MonsMadNixe, MonsCyclop, MonsLich, MonsVampire, MonsWingedMilfid, MonsMarevorHelith:
+	case MonsGuard, MonsHighGuard, MonsMadNixe, MonsCyclop, MonsLich, MonsVampire, MonsWingedMilfid, MonsMarevorHelith:
 		return true
 	default:
 		return false
@@ -211,7 +208,7 @@ var MonsData = []monsterData{
 	MonsHound: {10, 1, 10, 2, 'h', "hound", 5},
 	MonsYack:  {10, 1, 10, 2, 'y', "yack", 5},
 	//MonsGiantBee:        {5, 1, 10, 1, 'B', "giant bee", 6},
-	//MonsGoblinWarrior:   {10, 1, 10, 2, 'G', "goblin warrior", 5},
+	MonsHighGuard: {10, 1, 10, 2, 'G', "high guard", 5},
 	//MonsHydra:           {10, 1, 10, 4, 'H', "hydra", 10},
 	//MonsSkeletonWarrior: {10, 1, 10, 3, 'S', "skeleton warrior", 6},
 	//MonsSpider:          {10, 1, 10, 2, 's', "spider", 6},
@@ -230,17 +227,17 @@ var MonsData = []monsterData{
 }
 
 var monsDesc = []string{
-	MonsGuard: "Goblins are little humanoid creatures. They often appear in a group.",
+	MonsGuard: "Guards patrol between buildings.",
 	//MonsTinyHarpy:       "Tiny harpies are little humanoid flying creatures. They blink away when hurt. They often appear in a group.",
 	//MonsOgre:            "Ogres are big clunky humanoids that can hit really hard.",
 	MonsCyclop: "Cyclopes are very similar to ogres, but they also like to throw rocks at their foes (2 damage). The rocks can block your way for a while.",
-	MonsWorm:   "Farmer worms are ugly slow moving creatures, but surprisingly hardy at times, and they furrow as they move, helping new foliage to grow.",
+	MonsWorm:   "Farmer worms are ugly slow moving creatures. They furrow as they move, helping new foliage to grow.",
 	//MonsBrizzia:         "Brizzias are big slow moving biped creatures. They are quite hardy, and when hurt they can cause nausea, impeding the use of potions.",
 	//MonsAcidMound:       "Acid mounds are acidic creatures. They can temporarily corrode your equipment.",
 	MonsHound: "Hounds are fast moving carnivore quadrupeds. They can bark, and smell you.",
 	MonsYack:  "Yacks are quite large herbivorous quadrupeds. They tend to form large groups, and can push you one cell away.",
 	//MonsGiantBee:        "Giant bees are fragile but extremely fast moving creatures. Their bite can sometimes enrage you.",
-	//MonsGoblinWarrior:   "Goblin warriors are goblins that learned to fight, and got equipped with leather armour. They can throw javelins.",
+	MonsHighGuard: "High guards watch over a particular location. They can throw javelins.",
 	//MonsHydra:           "Hydras are enormous creatures with four heads that can hit you each at once.",
 	//MonsSkeletonWarrior: "Skeleton warriors are good fighters, clad in chain mail.",
 	//MonsSpider:          "Spiders are fast moving fragile creatures, whose bite can confuse you.",
@@ -262,12 +259,14 @@ type bandInfo struct {
 	Path []position
 	I    int
 	Kind monsterBand
+	Beh  mbehaviour
 }
 
 type monsterBand int
 
 const (
 	LoneGuard monsterBand = iota
+	LoneHighGuard
 	LoneYack
 	LoneCyclop
 	LoneSatowalgaPlant
@@ -292,6 +291,7 @@ type monsterBandData struct {
 
 var MonsBands = []monsterBandData{
 	LoneGuard:          {Monster: MonsGuard},
+	LoneHighGuard:      {Monster: MonsHighGuard},
 	LoneYack:           {Monster: MonsYack},
 	LoneCyclop:         {Monster: MonsCyclop},
 	LoneSatowalgaPlant: {Monster: MonsSatowalgaPlant},
@@ -542,7 +542,12 @@ func (m *monster) Explode(g *game, ev event) {
 
 func (m *monster) NaturalAwake(g *game) {
 	m.Target = m.NextTarget(g)
-	m.State = Wandering
+	switch g.Bands[m.Band].Beh {
+	case BehGuard:
+		m.State = Watching
+	default:
+		m.State = Wandering
+	}
 	m.GatherBand(g)
 }
 
@@ -575,49 +580,47 @@ func (m *monster) RandomFreeNeighbor(g *game) position {
 	return fnb[RandInt(len(fnb))]
 }
 
-func (m *monster) NextTarget(g *game) position {
+type mbehaviour int
+
+const (
+	BehPatrol mbehaviour = iota
+	BehGuard
+	BehWander
+	BehExplore
+)
+
+func (m *monster) NextTarget(g *game) (pos position) {
 	band := g.Bands[m.Band]
-	if len(band.Path) == 0 {
-		return m.RandomFreeNeighbor(g)
-	} else if len(band.Path) == 1 {
+	switch band.Beh {
+	case BehWander:
 		if m.Pos.Distance(band.Path[0]) < 8+RandInt(8) {
-			return m.RandomFreeNeighbor(g)
-		} else {
-			return band.Path[0]
+			pos = m.RandomFreeNeighbor(g)
+			break
 		}
+		pos = band.Path[0]
+	case BehExplore:
+		pos = band.Path[RandInt(len(band.Path))]
+	case BehGuard:
+		pos = band.Path[0]
+	case BehPatrol:
+		if band.Path[0] == m.Target {
+			pos = band.Path[1]
+			break
+		}
+		pos = band.Path[0]
 	}
-	if band.Path[0] == m.Target {
-		return band.Path[1]
-	}
-	return band.Path[0]
+	return pos
 }
 
-func (m *monster) HandleTurn(g *game, ev event) {
-	if m.Swapped {
-		m.Swapped = false
-		ev.Renew(g, m.Kind.MovementDelay())
-		return
-	}
-	ppos := g.Player.Pos
-	mpos := m.Pos
-	m.MakeAware(g)
+func (m *monster) MoveDelay(g *game) int {
 	movedelay := m.Kind.MovementDelay()
 	if m.Status(MonsSlow) {
 		movedelay += 3
 	}
-	if m.State == Resting {
-		if RandInt(3000) == 0 {
-			m.NaturalAwake(g)
-		}
-		ev.Renew(g, m.Kind.MovementDelay())
-		return
-	}
-	if m.State == Hunting && m.RangedAttack(g, ev) {
-		return
-	}
-	if m.State == Hunting && m.SmitingAttack(g, ev) {
-		return
-	}
+	return movedelay
+}
+
+func (m *monster) HandleMonsSpecifics(g *game) (done bool) {
 	switch m.Kind {
 	case MonsSatowalgaPlant:
 		switch m.State {
@@ -634,7 +637,158 @@ func (m *monster) HandleTurn(g *game, ev event) {
 			}
 		}
 		// oklob plants are static ranged-only
-		ev.Renew(g, movedelay)
+		g.Ev.Renew(g, m.MoveDelay(g))
+		return true
+	}
+	return false
+}
+
+func (m *monster) HandleWatching(g *game) {
+	if RandInt(5) > 0 {
+		m.Dir = m.Dir.Alternate()
+	} else {
+		// pick a random cell: more escape strategies for the player
+		if m.Kind == MonsHound && m.Pos.Distance(g.Player.Pos) <= 6 {
+			m.Target = g.Player.Pos
+		} else {
+			m.Target = m.NextTarget(g)
+		}
+		switch g.Bands[m.Band].Beh {
+		case BehGuard:
+			m.Dir = m.Dir.Alternate()
+			if m.Pos != m.Target {
+				m.State = Wandering
+				m.GatherBand(g)
+			}
+		default:
+			m.State = Wandering
+			m.GatherBand(g)
+		}
+	}
+	g.Ev.Renew(g, m.MoveDelay(g))
+	return
+}
+
+func (m *monster) ComputePath(g *game) {
+
+	if !(len(m.Path) > 0 && m.Path[0] == m.Target && m.Path[len(m.Path)-1] == m.Pos) {
+		m.Path = m.APath(g, m.Pos, m.Target)
+		if len(m.Path) == 0 && !m.Status(MonsConfused) {
+			// if target is not accessible, try free neighbor cells
+			for _, npos := range g.Dungeon.FreeNeighbors(m.Target) {
+				m.Path = m.APath(g, m.Pos, npos)
+				if len(m.Path) > 0 {
+					m.Target = npos
+					break
+				}
+			}
+		}
+	}
+}
+
+func (m *monster) HandleEndPath(g *game) {
+	switch m.State {
+	case Wandering, Hunting:
+		m.State = Watching
+		m.Dir = m.Dir.Alternate()
+	}
+	g.Ev.Renew(g, m.MoveDelay(g))
+}
+
+func (m *monster) HandleMove(g *game) {
+	target := m.Path[len(m.Path)-2]
+	mons := g.MonsterAt(target)
+	monstarget := InvalidPos
+	if mons.Exists() && len(mons.Path) >= 2 {
+		monstarget = mons.Path[len(mons.Path)-2]
+	}
+	c := g.Dungeon.Cell(target)
+	switch {
+	case !mons.Exists():
+		if m.Kind == MonsEarthDragon && c.T == WallCell {
+			g.Dungeon.SetCell(target, GroundCell)
+			g.Stats.Digs++
+			if !g.Player.Sees(target) {
+				g.TerrainKnowledge[m.Pos] = WallCell
+			}
+			g.MakeNoise(WallNoise, m.Pos)
+			g.Fog(m.Pos, 1, g.Ev)
+			if g.Player.Pos.Distance(target) < 12 {
+				// XXX use dijkstra distance ?
+				if c.T == WallCell {
+					g.Printf("%s You hear an earth-splitting noise.", g.CrackSound())
+				} else if c.T == BarrelCell {
+					g.Printf("%s You hear an wood-splitting noise.", g.CrackSound())
+				}
+				g.StopAuto()
+			}
+			m.MoveTo(g, target)
+			m.Path = m.Path[:len(m.Path)-1]
+		} else if g.Dungeon.Cell(target).T == WallCell {
+			m.Path = m.APath(g, m.Pos, m.Target)
+		} else {
+			m.InvertFoliage(g)
+			m.MoveTo(g, target)
+			if (m.Kind.Ranged() || m.Kind.Smiting()) && !m.FireReady && m.SeesPlayer(g) {
+				m.FireReady = true
+			}
+			m.Path = m.Path[:len(m.Path)-1]
+		}
+	case mons.Pos == target && m.Pos == monstarget:
+		m.MoveTo(g, target)
+		m.Path = m.Path[:len(m.Path)-1]
+		mons.MoveTo(g, monstarget)
+		mons.Path = mons.Path[:len(mons.Path)-1]
+		g.MonstersPosCache[m.Pos.idx()] = m.Index + 1
+		mons.Swapped = true
+		// XXX this is perhaps not the optimal to handle that case.
+	case m.State == Hunting && mons.State != Hunting:
+		r := RandInt(5)
+		if r == 0 {
+			mons.Target = m.Target
+			mons.State = Hunting
+			mons.GatherBand(g)
+		} else {
+			m.Path = m.APath(g, m.Pos, m.Target)
+		}
+	case !mons.SeesPlayer(g) && mons.State != Hunting:
+		r := RandInt(4)
+		if r == 0 && mons.Kind != MonsSatowalgaPlant {
+			mons.Target = mons.RandomFreeNeighbor(g)
+			mons.State = Wandering
+		} else {
+			m.Path = m.APath(g, m.Pos, m.Target)
+		}
+	default:
+		m.Path = m.APath(g, m.Pos, m.Target)
+	}
+	g.Ev.Renew(g, m.MoveDelay(g))
+}
+
+func (m *monster) HandleTurn(g *game, ev event) {
+	if m.Swapped {
+		m.Swapped = false
+		ev.Renew(g, m.MoveDelay(g))
+		return
+	}
+	ppos := g.Player.Pos
+	mpos := m.Pos
+	m.MakeAware(g)
+	movedelay := m.MoveDelay(g)
+	if m.State == Resting {
+		if RandInt(3000) == 0 {
+			m.NaturalAwake(g)
+		}
+		ev.Renew(g, m.MoveDelay(g))
+		return
+	}
+	if m.State == Hunting && m.RangedAttack(g, ev) {
+		return
+	}
+	if m.State == Hunting && m.SmitingAttack(g, ev) {
+		return
+	}
+	if m.HandleMonsSpecifics(g) {
 		return
 	}
 	if mpos.Distance(ppos) == 1 && g.Dungeon.Cell(ppos).T != BarrelCell {
@@ -657,136 +811,15 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	}
 	switch m.State {
 	case Watching:
-		if RandInt(5) > 0 {
-			m.Dir = m.Dir.Alternate()
-		} else {
-			// pick a random cell: more escape strategies for the player
-			if m.Kind == MonsHound && m.Pos.Distance(g.Player.Pos) <= 6 {
-				m.Target = g.Player.Pos
-			} else {
-				m.Target = m.NextTarget(g)
-			}
-			m.State = Wandering
-			m.GatherBand(g)
-		}
-		ev.Renew(g, movedelay)
-		return
-	case Waiting:
-		if len(m.Path) < 2 {
-			m.Target = m.NextTarget(g)
-			m.State = Wandering
-			ev.Renew(g, movedelay)
-			return
-		}
-		if RandInt(2) == 0 {
-			m.Dir = m.Dir.Alternate()
-		} else if RandInt(4) == 0 {
-			m.Target = m.NextTarget(g)
-			m.State = Wandering
-		}
-		ev.Renew(g, movedelay)
+		m.HandleWatching(g)
 		return
 	}
-	if !(len(m.Path) > 0 && m.Path[0] == m.Target && m.Path[len(m.Path)-1] == mpos) {
-		m.Path = m.APath(g, mpos, m.Target)
-		if len(m.Path) == 0 && !m.Status(MonsConfused) {
-			// if target is not accessible, try free neighbor cells
-			for _, npos := range g.Dungeon.FreeNeighbors(m.Target) {
-				m.Path = m.APath(g, mpos, npos)
-				if len(m.Path) > 0 {
-					m.Target = npos
-					break
-				}
-			}
-		}
-	}
+	m.ComputePath(g)
 	if len(m.Path) < 2 {
-		switch m.State {
-		case Wandering:
-			m.State = Waiting
-			m.Dir = m.Dir.Alternate()
-		case Hunting:
-			m.State = Watching
-			m.Dir = m.Dir.Alternate()
-		}
-		ev.Renew(g, movedelay)
+		m.HandleEndPath(g)
 		return
 	}
-	target := m.Path[len(m.Path)-2]
-	mons := g.MonsterAt(target)
-	monstarget := InvalidPos
-	if mons.Exists() && len(mons.Path) >= 2 {
-		monstarget = mons.Path[len(mons.Path)-2]
-	}
-	c := g.Dungeon.Cell(target)
-	switch {
-	case !mons.Exists():
-		if m.Kind == MonsEarthDragon && c.T == WallCell {
-			g.Dungeon.SetCell(target, GroundCell)
-			g.Stats.Digs++
-			if !g.Player.Sees(target) {
-				g.TerrainKnowledge[m.Pos] = WallCell
-			}
-			g.MakeNoise(WallNoise, m.Pos)
-			g.Fog(m.Pos, 1, ev)
-			if g.Player.Pos.Distance(target) < 12 {
-				// XXX use dijkstra distance ?
-				if c.T == WallCell {
-					g.Printf("%s You hear an earth-splitting noise.", g.CrackSound())
-				} else if c.T == BarrelCell {
-					g.Printf("%s You hear an wood-splitting noise.", g.CrackSound())
-				}
-				g.StopAuto()
-			}
-			m.MoveTo(g, target)
-			m.Path = m.Path[:len(m.Path)-1]
-		} else if g.Dungeon.Cell(target).T == WallCell {
-			m.Path = m.APath(g, mpos, m.Target)
-		} else {
-			m.InvertFoliage(g)
-			m.MoveTo(g, target)
-			if (m.Kind.Ranged() || m.Kind.Smiting()) && !m.FireReady && m.SeesPlayer(g) {
-				m.FireReady = true
-			}
-			m.Path = m.Path[:len(m.Path)-1]
-		}
-	case mons.Pos == target && m.Pos == monstarget:
-		m.MoveTo(g, target)
-		m.Path = m.Path[:len(m.Path)-1]
-		mons.MoveTo(g, monstarget)
-		mons.Path = mons.Path[:len(mons.Path)-1]
-		g.MonstersPosCache[m.Pos.idx()] = m.Index + 1
-		mons.Swapped = true
-		// XXX this is perhaps not the optimal to handle that case.
-	case m.State == Hunting && mons.State != Hunting:
-		r := RandInt(5)
-		if r == 0 {
-			mons.Target = m.Target
-			mons.State = Wandering
-			mons.GatherBand(g)
-		} else if (r == 1 || r == 2) && g.Player.Pos.Distance(mons.Target) > 2 {
-			mons.Target = mons.NextTarget(g)
-			mons.State = Wandering
-			mons.GatherBand(g)
-		} else {
-			m.Path = m.APath(g, mpos, m.Target)
-		}
-	case !mons.SeesPlayer(g) && g.Player.Pos.Distance(mons.Target) > 2 && mons.State != Hunting:
-		r := RandInt(5)
-		if r == 0 {
-			m.Target = m.NextTarget(g)
-			m.GatherBand(g)
-		} else if (r == 1 || r == 2) && mons.State == Resting {
-			mons.Target = m.NextTarget(g)
-			mons.State = Wandering
-			mons.GatherBand(g)
-		} else {
-			m.Path = m.APath(g, mpos, m.Target)
-		}
-	default:
-		m.Path = m.APath(g, mpos, m.Target)
-	}
-	ev.Renew(g, movedelay)
+	m.HandleMove(g)
 }
 
 func (m *monster) InvertFoliage(g *game) {
@@ -975,8 +1008,8 @@ func (m *monster) RangedAttack(g *game, ev event) bool {
 		return m.TormentBolt(g, ev)
 	case MonsCyclop:
 		return m.ThrowRock(g, ev)
-	//case MonsGoblinWarrior:
-	//return m.ThrowJavelin(g, ev)
+	case MonsHighGuard:
+		return m.ThrowJavelin(g, ev)
 	case MonsSatowalgaPlant:
 		return m.ThrowAcid(g, ev)
 	case MonsMadNixe:
@@ -1345,6 +1378,36 @@ func (g *game) GenBand(band monsterBand) []monsterKind {
 	return bandMonsters
 }
 
+func (dg *dgen) BandInfoGuard(g *game, band monsterBand) bandInfo {
+	bandinfo := bandInfo{Kind: monsterBand(band)}
+	pos := InvalidPos
+	count := 0
+loop:
+	for pos == InvalidPos {
+		count++
+		if count > 3000 {
+			pos = dg.InsideCell(g)
+			break
+		}
+		for i := 0; i < 10; i++ {
+			r := dg.rooms[RandInt(len(dg.rooms)-1)]
+			for _, e := range r.places {
+				if e.kind == PlaceSpecialStatic {
+					pos = r.RandomPlace(PlacePatrol)
+					if pos != InvalidPos {
+						break loop
+					}
+				}
+			}
+		}
+		r := dg.rooms[RandInt(len(dg.rooms)-1)]
+		pos = r.RandomPlace(PlacePatrol)
+	}
+	bandinfo.Path = append(bandinfo.Path, pos)
+	bandinfo.Beh = BehGuard
+	return bandinfo
+}
+
 func (dg *dgen) BandInfoPatrol(g *game, band monsterBand) bandInfo {
 	bandinfo := bandInfo{Kind: monsterBand(band)}
 	pos := InvalidPos
@@ -1370,24 +1433,37 @@ func (dg *dgen) BandInfoPatrol(g *game, band monsterBand) bandInfo {
 	}
 	bandinfo.Path = append(bandinfo.Path, pos)
 	bandinfo.Path = append(bandinfo.Path, target)
+	bandinfo.Beh = BehPatrol
 	return bandinfo
 }
 
 func (dg *dgen) BandInfoOutsideGround(g *game, band monsterBand) bandInfo {
 	bandinfo := bandInfo{Kind: monsterBand(band)}
 	bandinfo.Path = append(bandinfo.Path, dg.OutsideGroundCell(g))
+	bandinfo.Beh = BehWander
 	return bandinfo
 }
 
 func (dg *dgen) BandInfoOutside(g *game, band monsterBand) bandInfo {
 	bandinfo := bandInfo{Kind: monsterBand(band)}
 	bandinfo.Path = append(bandinfo.Path, dg.OutsideCell(g))
+	bandinfo.Beh = BehWander
+	return bandinfo
+}
+
+func (dg *dgen) BandInfoOutsideExplore(g *game, band monsterBand) bandInfo {
+	bandinfo := bandInfo{Kind: monsterBand(band)}
+	for i := 0; i < 5; i++ {
+		bandinfo.Path = append(bandinfo.Path, dg.OutsideCell(g))
+	}
+	bandinfo.Beh = BehExplore
 	return bandinfo
 }
 
 func (dg *dgen) BandInfoFoliage(g *game, band monsterBand) bandInfo {
 	bandinfo := bandInfo{Kind: monsterBand(band)}
 	bandinfo.Path = append(bandinfo.Path, dg.FoliageCell(g))
+	bandinfo.Beh = BehWander
 	return bandinfo
 }
 
@@ -1402,10 +1478,14 @@ func (dg *dgen) PutMonsterBand(g *game, band monsterBand) bool {
 		bdinf = dg.BandInfoFoliage(g, band)
 	case LoneHound, LoneEarthDragon:
 		bdinf = dg.BandInfoOutsideGround(g, band)
-	case LoneBlinkingFrog, LoneMirrorSpecter, LoneExplosiveNadre:
+	case LoneBlinkingFrog, LoneExplosiveNadre:
 		bdinf = dg.BandInfoOutside(g, band)
+	case LoneMirrorSpecter, LoneMarevorHelith, LoneWingedMilfid:
+		bdinf = dg.BandInfoOutsideExplore(g, band)
 	case LoneTreeMushroom:
 		bdinf = dg.BandInfoOutside(g, band)
+	case LoneHighGuard:
+		bdinf = dg.BandInfoGuard(g, band)
 	case LoneSatowalgaPlant:
 		bdinf = dg.BandInfoOutsideGround(g, band)
 	default:
@@ -1444,7 +1524,7 @@ func (dg *dgen) GenMonsters(g *game) {
 	g.Bands = []bandInfo{}
 	// TODO, just for testing now
 	bandsL1 := []monsterBand{LoneGuard}
-	bandsL2 := []monsterBand{LoneYack, LoneWorm, LoneHound, LoneExplosiveNadre}
+	bandsL2 := []monsterBand{LoneYack, LoneWorm, LoneHound, LoneExplosiveNadre, LoneHighGuard}
 	bandsL3 := []monsterBand{LoneCyclop, LoneSatowalgaPlant, LoneBlinkingFrog, LoneMirrorSpecter, LoneWingedMilfid}
 	bandsL4 := []monsterBand{LoneTreeMushroom, LoneEarthDragon, LoneMadNixe}
 	mlevel := 1 + RandInt(MaxDepth)
