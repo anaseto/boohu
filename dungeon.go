@@ -1078,17 +1078,17 @@ func (dg *dgen) CaveGroundCell(g *game) position {
 func (dg *dgen) GenStones(g *game) {
 	// Magical Stones
 	// TODO: move into dungeon generation
-	nstones := 2
+	nstones := 3
 	switch RandInt(8) {
 	case 1, 2, 3, 4, 5:
-		nstones = 3
+		nstones++
 	case 6, 7:
-		nstones = 4
+		nstones += 2
 	}
 	g.Objects.Stones = map[position]stone{}
 	for i := 0; i < nstones; i++ {
 		pos := InvalidPos
-		if i == 0 {
+		if i <= 1 {
 			count := 0
 			for pos == InvalidPos {
 				count++
