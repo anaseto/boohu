@@ -519,9 +519,13 @@ func (ui *gameui) DrawKeysDescription(title string, actions []string) {
 		ui.DrawStyledTextLine(fmt.Sprintf(" %s ", title), 0, HeaderLine)
 	}
 	for i := 0; i < len(actions)-1; i += 2 {
-		bg := ui.ListItemBG(i / 2)
-		ui.ClearLineWithColor(i/2+1, bg)
-		ui.DrawColoredTextOnBG(fmt.Sprintf(" %-36s %s", actions[i], actions[i+1]), 0, i/2+1, ColorFg, bg)
+		if actions[i+1] != "" {
+			bg := ui.ListItemBG(i / 2)
+			ui.ClearLineWithColor(i/2+1, bg)
+			ui.DrawColoredTextOnBG(fmt.Sprintf(" %-36s %s", actions[i], actions[i+1]), 0, i/2+1, ColorFg, bg)
+		} else {
+			ui.DrawStyledTextLine(fmt.Sprintf(" %s ", actions[i]), i/2+1, HeaderLine)
+		}
 	}
 	lines := 1 + len(actions)/2
 	ui.DrawTextLine(" press esc or space to continue ", lines)
@@ -531,18 +535,19 @@ func (ui *gameui) DrawKeysDescription(title string, actions []string) {
 }
 
 func (ui *gameui) KeysHelp() {
-	ui.DrawKeysDescription("Commands", []string{
-		"Move/Jump", "h/j/k/l/y/u/b/n or numpad or mouse left",
+	ui.DrawKeysDescription("Basic Commands", []string{
+		"Move/Jump", "arrows or wasd or hjkl or mouse left",
 		"Wait a turn", "“.” or 5 or mouse left on @",
 		"Interact (Equip/Descend/Rest...)", "e or i",
 		"Evoke/Zap magara", "v or z",
-		"Examine", "x or mouse left",
+		"Examine", "x or mouse hover",
+		"Save and Quit", "S",
+		"Advanced Commands", "",
 		"Go to nearest stairs", "G",
-		"Autoexplore", "o",
-		"View Character and Quest Information", `% or C`,
+		"Autoexplore (use with caution)", "o",
+		"View Character Information", `% or C`,
 		"View previous messages", "m",
 		"Write game statistics to file", "#",
-		"Save and Quit", "S",
 		"Quit without saving", "Q",
 		"Change settings and key bindings", "=",
 	})
@@ -550,12 +555,12 @@ func (ui *gameui) KeysHelp() {
 
 func (ui *gameui) ExamineHelp() {
 	ui.DrawKeysDescription("Examine/Travel Commands", []string{
-		"Move cursor", "h/j/k/l/y/u/b/n or numpad or mouse left",
+		"Move cursor", "arrows or wasd or hjkl or mouse hover",
+		"Go to/select target", "“.” or enter or mouse left",
+		"View target description", "v or d or mouse right",
 		"Cycle through monsters", "+",
 		"Cycle through stairs", ">",
 		"Cycle through objects", "o",
-		"Go to/select target", "“.” or enter or mouse left",
-		"View target description", "v or d or mouse right",
 		"Toggle exclude area from auto-travel", "e or mouse middle",
 	})
 }
@@ -1482,7 +1487,11 @@ func (ui *gameui) DrawStyledTextLine(text string, lnum int, st linestyle) {
 	}
 	switch st {
 	case HeaderLine:
-		ui.SetCell(DungeonWidth, lnum, '┐', ColorFg, ColorBg)
+		if lnum == 0 {
+			ui.SetCell(DungeonWidth, lnum, '┐', ColorFg, ColorBg)
+		} else {
+			ui.SetCell(DungeonWidth, lnum, '┤', ColorFg, ColorBg)
+		}
 	case FooterLine:
 		ui.SetCell(DungeonWidth, lnum, '┘', ColorFg, ColorBg)
 	default:
