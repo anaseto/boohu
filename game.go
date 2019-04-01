@@ -70,7 +70,7 @@ func (g *game) FreeCell() position {
 		y := RandInt(DungeonHeight)
 		pos := position{x, y}
 		c := d.Cell(pos)
-		if !c.IsFree() {
+		if !c.IsPassable() {
 			continue
 		}
 		if g.Player != nil && g.Player.Pos == pos {
@@ -108,7 +108,7 @@ func (g *game) FreeCellForMonster() position {
 		y := RandInt(DungeonHeight)
 		pos := position{x, y}
 		c := d.Cell(pos)
-		if !c.IsFree() {
+		if !c.IsPassable() {
 			continue
 		}
 		if g.Player != nil && g.Player.Pos.Distance(pos) < 8 {

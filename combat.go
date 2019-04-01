@@ -70,19 +70,6 @@ func (g *game) MakeNoise(noise int, at position) {
 	}
 }
 
-func (g *game) InOpenMons(mons *monster) bool {
-	neighbors := g.Dungeon.FreeNeighbors(g.Player.Pos)
-	for _, pos := range neighbors {
-		if pos.Distance(mons.Pos) > 1 {
-			continue
-		}
-		if g.Dungeon.Cell(pos).T == WallCell {
-			return false
-		}
-	}
-	return true
-}
-
 func (g *game) AttractMonster(pos position) *monster {
 	dir := pos.Dir(g.Player.Pos)
 	for cpos := pos.To(dir); g.Player.LOS[cpos]; cpos = cpos.To(dir) {
@@ -96,49 +83,12 @@ func (g *game) AttractMonster(pos position) *monster {
 	return nil
 }
 
-// func (g *game) HarKarAttack(mons *monster, ev event) {
-// 	dir := mons.Pos.Dir(g.Player.Pos)
-// 	pos := g.Player.Pos
-// 	for {
-// 		pos = pos.To(dir)
-// 		if !pos.valid() || g.Dungeon.Cell(pos).IsFree() {
-// 			break
-// 		}
-// 		m := g.MonsterAt(pos)
-// 		if !m.Exists() {
-// 			break
-// 		}
-// 	}
-// 	if pos.valid() && g.Dungeon.Cell(pos).IsFree() && !g.Player.HasStatus(StatusLignification) {
-// 		pos = g.Player.Pos
-// 		for {
-// 			pos = pos.To(dir)
-// 			if !pos.valid() || !g.Dungeon.Cell(pos).IsFree() {
-// 				break
-// 			}
-// 			m := g.MonsterAt(pos)
-// 			if !m.Exists() {
-// 				break
-// 			}
-// 			g.HitMonster(m, DmgNormal)
-// 		}
-// 		g.PlacePlayerAt(pos)
-// 		behind := pos.To(dir)
-// 		m := g.MonsterAt(behind)
-// 		if m.Exists() {
-// 			g.HitMonster(m, DmgNormal)
-// 		}
-// 	} else {
-// 		g.HitMonster(mons, DmgNormal)
-// 	}
-// }
-
 func (g *game) Jump(mons *monster, ev event) error {
 	dir := mons.Pos.Dir(g.Player.Pos)
 	pos := g.Player.Pos
 	for {
 		pos = pos.To(dir)
-		if !pos.valid() || !g.Dungeon.Cell(pos).IsFree() {
+		if !pos.valid() || !g.Dungeon.Cell(pos).IsPassable() {
 			break
 		}
 		m := g.MonsterAt(pos)
@@ -146,7 +96,7 @@ func (g *game) Jump(mons *monster, ev event) error {
 			break
 		}
 	}
-	if !pos.valid() || !g.Dungeon.Cell(pos).IsFree() {
+	if !pos.valid() || !g.Dungeon.Cell(pos).IsPassable() {
 		return errors.New("You cannot jump in that direction.")
 	}
 	if g.Player.HasStatus(StatusSlow) {
@@ -179,9 +129,6 @@ const (
 func (g *game) HandleKill(mons *monster, ev event) {
 	g.Stats.Killed++
 	g.Stats.KilledMons[mons.Kind]++
-	//if mons.Kind == MonsExplosiveNadre {
-	//mons.Explode(g, ev)
-	//}
 	if g.Dungeon.Cell(mons.Pos).T == DoorCell {
 		g.ComputeLOS()
 	}

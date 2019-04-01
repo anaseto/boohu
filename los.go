@@ -221,6 +221,7 @@ func (g *game) SeePosition(pos position) {
 		g.Dungeon.SetExplored(pos)
 		g.DijkstraMapRebuild = true
 	} else {
+		// XXX this can be improved to handle more terrain types changes
 		if okT && t == WallCell && c.T != WallCell {
 			g.Printf("There is no longer a wall there.")
 			g.StopAuto()
@@ -234,7 +235,7 @@ func (g *game) SeePosition(pos position) {
 	}
 	if okT {
 		delete(g.TerrainKnowledge, pos)
-		if c.IsFree() {
+		if c.IsPassable() {
 			delete(g.TemporalWalls, pos)
 		}
 	}

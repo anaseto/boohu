@@ -32,7 +32,7 @@ func (g *game) AllExplored() bool {
 	np := &noisePath{game: g}
 	for i, c := range g.Dungeon.Cells {
 		pos := idxtopos(i)
-		if c.T == WallCell {
+		if c.IsWall() {
 			if len(np.Neighbors(pos)) == 0 {
 				continue
 			}
@@ -52,7 +52,7 @@ func (g *game) AutoexploreSources() []int {
 	np := &noisePath{game: g}
 	for i, c := range g.Dungeon.Cells {
 		pos := idxtopos(i)
-		if c.T == WallCell {
+		if c.IsWall() {
 			if len(np.Neighbors(pos)) == 0 {
 				continue
 			}

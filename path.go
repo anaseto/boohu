@@ -71,7 +71,7 @@ func (tp *tunnelPath) Cost(from, to position) int {
 		return 50
 	}
 	wc := tp.dg.WallAreaCount(tp.area[:0], from, 1)
-	if tp.dg.d.Cell(from).IsFree() {
+	if tp.dg.d.Cell(from).IsPassable() {
 		return 1
 	}
 	return 10 - wc
@@ -139,7 +139,7 @@ func (np *normalPath) Neighbors(pos position) []position {
 	nb := np.neighbors[:0]
 	d := np.game.Dungeon
 	keep := func(npos position) bool {
-		return npos.valid() && d.Cell(npos).IsFree()
+		return npos.valid() && d.Cell(npos).IsPassable()
 	}
 	return pos.CardinalNeighbors(nb, keep)
 }
@@ -165,7 +165,7 @@ func (ap *autoexplorePath) Neighbors(pos position) []position {
 			// XXX little info leak
 			return false
 		}
-		return npos.valid() && (d.Cell(npos).IsFree() && (!okT || t != WallCell)) &&
+		return npos.valid() && (d.Cell(npos).IsPassable() && (!okT || t != WallCell)) &&
 			!ap.game.ExclusionsMap[npos]
 	}
 	//if ap.game.Player.HasStatus(StatusConfusion) {
@@ -183,7 +183,7 @@ func (ap *autoexplorePath) Cost(from, to position) int {
 type monPath struct {
 	game      *game
 	monster   *monster
-	wall      bool
+	destruct  bool
 	neighbors [8]position
 }
 
@@ -195,7 +195,7 @@ func (mp *monPath) Neighbors(pos position) []position {
 			return false
 		}
 		c := d.Cell(npos)
-		return (c.IsFree() || c.T == WallCell && mp.wall) && (c.T != DoorCell || mp.monster.Kind.CanOpenDoors())
+		return (c.IsPassable() || c.IsDestructible() && mp.destruct) && (c.T != DoorCell || mp.monster.Kind.CanOpenDoors() || mp.destruct)
 	}
 	ret := pos.CardinalNeighbors(nb, keep)
 	// shuffle so that monster movement is not unnaturally predictable
@@ -210,7 +210,8 @@ func (mp *monPath) Cost(from, to position) int {
 	g := mp.game
 	mons := g.MonsterAt(to)
 	if !mons.Exists() {
-		if mp.wall && !g.Dungeon.Cell(to).IsFree() && mp.monster.State != Hunting {
+		c := g.Dungeon.Cell(to)
+		if mp.destruct && (!c.IsPassable() || c.T == DoorCell) && mp.monster.State != Hunting {
 			return 6
 		}
 		return 1
@@ -228,7 +229,7 @@ func (mp *monPath) Estimation(from, to position) int {
 func (m *monster) APath(g *game, from, to position) []position {
 	mp := &monPath{game: g, monster: m}
 	if m.Kind == MonsEarthDragon {
-		mp.wall = true
+		mp.destruct = true
 	}
 	path, _, found := AstarPath(mp, from, to)
 	if !found {

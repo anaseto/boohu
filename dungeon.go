@@ -70,7 +70,7 @@ func (d *dungeon) FreeCell() position {
 		y := RandInt(DungeonHeight)
 		pos := position{x, y}
 		c := d.Cell(pos)
-		if c.IsFree() {
+		if c.IsPassable() {
 			return pos
 		}
 	}
@@ -96,7 +96,7 @@ func (d *dungeon) WallCell() position {
 func (d *dungeon) HasFreeNeighbor(pos position) bool {
 	neighbors := pos.ValidCardinalNeighbors()
 	for _, pos := range neighbors {
-		if d.Cell(pos).IsFree() {
+		if d.Cell(pos).IsPassable() {
 			return true
 		}
 	}
@@ -107,7 +107,7 @@ func (d *dungeon) HasTooManyWallNeighbors(pos position) bool {
 	neighbors := pos.ValidNeighbors()
 	count := 0
 	for _, pos := range neighbors {
-		if !d.Cell(pos).IsFree() {
+		if !d.Cell(pos).IsPassable() {
 			count++
 		}
 	}
@@ -122,7 +122,7 @@ func (g *game) HasFreeExploredNeighbor(pos position) bool {
 		if t, ok := g.TerrainKnowledge[pos]; ok {
 			c.T = t
 		}
-		if c.IsFree() && c.Explored {
+		if c.IsPassable() && c.Explored {
 			return true
 		}
 	}
@@ -154,7 +154,7 @@ func (d *dungeon) connex() bool {
 	pos := d.FreeCell()
 	conn, _ := d.Connected(pos, d.IsFreeCell)
 	for i, c := range d.Cells {
-		if c.IsFree() && !conn[idxtopos(i)] {
+		if c.IsPassable() && !conn[idxtopos(i)] {
 			return false
 		}
 	}
@@ -165,7 +165,7 @@ func (d *dungeon) IsAreaFree(pos position, h, w int) bool {
 	for i := pos.X; i < pos.X+w; i++ {
 		for j := pos.Y; j < pos.Y+h; j++ {
 			rpos := position{i, j}
-			if !rpos.valid() || d.Cell(rpos).IsFree() {
+			if !rpos.valid() || d.Cell(rpos).IsPassable() {
 				return false
 			}
 		}
@@ -698,25 +698,25 @@ func (dg *dgen) PutDoors(g *game) {
 
 func (g *game) DoorCandidate(pos position) bool {
 	d := g.Dungeon
-	if !pos.valid() || d.Cell(pos).IsFree() {
+	if !pos.valid() || d.Cell(pos).IsPassable() {
 		return false
 	}
 	return pos.W().valid() && pos.E().valid() &&
 		d.Cell(pos.W()).IsGround() && d.Cell(pos.E()).IsGround() &&
 		(!pos.N().valid() || d.Cell(pos.N()).T == WallCell) &&
 		(!pos.S().valid() || d.Cell(pos.S()).T == WallCell) &&
-		((pos.NW().valid() && d.Cell(pos.NW()).IsFree()) ||
-			(pos.SW().valid() && d.Cell(pos.SW()).IsFree()) ||
-			(pos.NE().valid() && d.Cell(pos.NE()).IsFree()) ||
-			(pos.SE().valid() && d.Cell(pos.SE()).IsFree())) ||
+		((pos.NW().valid() && d.Cell(pos.NW()).IsPassable()) ||
+			(pos.SW().valid() && d.Cell(pos.SW()).IsPassable()) ||
+			(pos.NE().valid() && d.Cell(pos.NE()).IsPassable()) ||
+			(pos.SE().valid() && d.Cell(pos.SE()).IsPassable())) ||
 		pos.N().valid() && pos.S().valid() &&
 			d.Cell(pos.N()).IsGround() && d.Cell(pos.S()).IsGround() &&
 			(!pos.E().valid() || d.Cell(pos.E()).T == WallCell) &&
 			(!pos.W().valid() || d.Cell(pos.W()).T == WallCell) &&
-			((pos.NW().valid() && d.Cell(pos.NW()).IsFree()) ||
-				(pos.SW().valid() && d.Cell(pos.SW()).IsFree()) ||
-				(pos.NE().valid() && d.Cell(pos.NE()).IsFree()) ||
-				(pos.SE().valid() && d.Cell(pos.SE()).IsFree()))
+			((pos.NW().valid() && d.Cell(pos.NW()).IsPassable()) ||
+				(pos.SW().valid() && d.Cell(pos.SW()).IsPassable()) ||
+				(pos.NE().valid() && d.Cell(pos.NE()).IsPassable()) ||
+				(pos.SE().valid() && d.Cell(pos.SE()).IsPassable()))
 }
 
 func (dg *dgen) GenRooms(templates []string, n int) {
@@ -815,7 +815,7 @@ func (dg *dgen) ClearUnconnected(g *game) {
 	conn, _ := d.Connected(g.Player.Pos, d.IsFreeCell)
 	for i, c := range d.Cells {
 		pos := idxtopos(i)
-		if c.IsFree() && !conn[pos] {
+		if c.IsPassable() && !conn[pos] {
 			d.SetCell(pos, WallCell)
 		}
 	}

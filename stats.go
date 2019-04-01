@@ -48,7 +48,7 @@ func (g *game) LevelStats() {
 	free := 0
 	exp := 0
 	for _, c := range g.Dungeon.Cells {
-		if !c.IsFree() {
+		if !c.IsPassable() {
 			continue
 		}
 		free++

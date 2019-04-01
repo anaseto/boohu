@@ -526,7 +526,7 @@ func (m *monster) Explode(g *game, ev event) {
 			}
 		} else if g.Player.Pos == pos {
 			m.InflictDamage(g, 1, 1)
-		} else if c.T == WallCell && RandInt(3) > 0 {
+		} else if c.IsDestructible() && RandInt(3) > 0 {
 			g.Dungeon.SetCell(pos, GroundCell)
 			g.Stats.Digs++
 			if !g.Player.LOS[pos] {
@@ -560,7 +560,7 @@ func (m *monster) RandomFreeNeighbor(g *game) position {
 			continue
 		}
 		c := g.Dungeon.Cell(nbpos)
-		if c.IsFree() {
+		if c.IsPassable() {
 			fnb = append(fnb, nbpos)
 		}
 	}
@@ -705,17 +705,17 @@ func (m *monster) HandleMove(g *game) {
 	c := g.Dungeon.Cell(target)
 	switch {
 	case !mons.Exists():
-		if m.Kind == MonsEarthDragon && c.T == WallCell {
+		if m.Kind == MonsEarthDragon && c.IsDestructible() {
 			g.Dungeon.SetCell(target, GroundCell)
 			g.Stats.Digs++
 			if !g.Player.Sees(target) {
-				g.TerrainKnowledge[m.Pos] = WallCell
+				g.TerrainKnowledge[m.Pos] = c.T
 			}
 			g.MakeNoise(WallNoise, m.Pos)
 			g.Fog(m.Pos, 1, g.Ev)
 			if g.Player.Pos.Distance(target) < 12 {
 				// XXX use dijkstra distance ?
-				if c.T == WallCell {
+				if c.IsWall() {
 					g.Printf("%s You hear an earth-splitting noise.", g.CrackSound())
 				} else if c.T == BarrelCell {
 					g.Printf("%s You hear an wood-splitting noise.", g.CrackSound())
@@ -724,7 +724,7 @@ func (m *monster) HandleMove(g *game) {
 			}
 			m.MoveTo(g, target)
 			m.Path = m.Path[:len(m.Path)-1]
-		} else if g.Dungeon.Cell(target).T == WallCell {
+		} else if g.Dungeon.Cell(target).IsWall() {
 			m.Path = m.APath(g, m.Pos, m.Target)
 		} else {
 			m.InvertFoliage(g)
@@ -967,7 +967,7 @@ func (m *monster) PushPlayer(g *game) (pushed bool) {
 	dir := g.Player.Pos.Dir(m.Pos)
 	pos := g.Player.Pos.To(dir)
 	if !g.Player.HasStatus(StatusLignification) &&
-		pos.valid() && g.Dungeon.Cell(pos).IsFree() {
+		pos.valid() && g.Dungeon.Cell(pos).IsPassable() {
 		mons := g.MonsterAt(pos)
 		if !mons.Exists() {
 			g.PlacePlayerAt(pos)

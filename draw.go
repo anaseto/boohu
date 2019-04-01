@@ -852,7 +852,7 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 		fgColor = ColorFgDark
 		bgColor = ColorBgDark
 	}
-	if g.ExclusionsMap[pos] && c.T != WallCell {
+	if g.ExclusionsMap[pos] && c.IsPassable() { // XXX IsPassable
 		fgColor = ColorFgExcluded
 	}
 	if trkn, okTrkn := g.TerrainKnowledge[pos]; okTrkn && !g.Wizard {
@@ -860,7 +860,7 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 	}
 	var fgTerrain uicolor
 	switch {
-	case !c.IsFree():
+	case !c.IsPassable():
 		r, fgTerrain = c.Style(g, pos)
 		if pos == g.Player.Pos {
 			fgColor = ColorFgPlayer

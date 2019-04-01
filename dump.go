@@ -211,6 +211,7 @@ func (g *game) DumpDungeon() string {
 			continue
 		}
 		var r rune
+		// XXX this can be simplified
 		switch c.T {
 		case WallCell:
 			r = '#'

@@ -266,7 +266,7 @@ func (g *game) BlinkPos() position {
 		if !b {
 			continue
 		}
-		if !g.Dungeon.Cell(pos).IsFree() {
+		if !g.Dungeon.Cell(pos).IsPassable() {
 			continue
 		}
 		mons := g.MonsterAt(pos)

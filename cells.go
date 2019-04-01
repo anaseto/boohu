@@ -20,12 +20,30 @@ const (
 	LightCell
 )
 
-func (c cell) IsFree() bool {
+func (c cell) IsPassable() bool {
 	switch c.T {
 	case WallCell, BarrelCell:
 		return false
 	default:
 		return true
+	}
+}
+
+func (c cell) IsDestructible() bool {
+	switch c.T {
+	case WallCell, BarrelCell, DoorCell:
+		return true
+	default:
+		return false
+	}
+}
+
+func (c cell) IsWall() bool {
+	switch c.T {
+	case WallCell:
+		return true
+	default:
+		return false
 	}
 }
 
