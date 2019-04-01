@@ -214,6 +214,9 @@ func (mp *monPath) Cost(from, to position) int {
 		if mp.destruct && (!c.IsPassable() || c.T == DoorCell) && mp.monster.State != Hunting {
 			return 6
 		}
+		if to == g.Player.Pos && mp.monster.Kind.Peaceful() {
+			return 4
+		}
 		return 1
 	}
 	if mons.Status(MonsLignified) {
