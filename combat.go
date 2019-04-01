@@ -26,7 +26,7 @@ func (m *monster) InflictDamage(g *game, damage, max int) {
 
 func (g *game) MakeMonstersAware() {
 	for _, m := range g.Monsters {
-		if m.HP <= 0 {
+		if m.Dead {
 			continue
 		}
 		if g.Player.LOS[m.Pos] {
@@ -133,7 +133,7 @@ func (g *game) HandleKill(mons *monster, ev event) {
 		g.ComputeLOS()
 	}
 	if mons.Kind.Dangerousness() > 10 {
-		g.StoryPrintf("You killed %s.", mons.Kind.Indefinite(false))
+		g.StoryPrintf("%s died.", mons.Kind.Indefinite(true))
 	}
 }
 

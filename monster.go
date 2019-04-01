@@ -80,6 +80,7 @@ const (
 	MonsVampire
 	MonsTreeMushroom
 	MonsMarevorHelith
+	MonsButterfly
 )
 
 func (mk monsterKind) String() string {
@@ -95,15 +96,11 @@ func (mk monsterKind) Letter() rune {
 }
 
 func (mk monsterKind) AttackDelay() int {
-	return MonsData[mk].attackDelay
+	return 10
 }
 
 func (mk monsterKind) BaseAttack() int {
-	return MonsData[mk].baseAttack
-}
-
-func (mk monsterKind) MaxHP() int {
-	return MonsData[mk].maxHP
+	return 1
 }
 
 func (mk monsterKind) Dangerousness() int {
@@ -124,6 +121,15 @@ func (mk monsterKind) Smiting() bool {
 	switch mk {
 	//case MonsMirrorSpecter, MonsMindCelmist:
 	case MonsMirrorSpecter:
+		return true
+	default:
+		return false
+	}
+}
+
+func (mk monsterKind) Peaceful() bool {
+	switch mk {
+	case MonsButterfly:
 		return true
 	default:
 		return false
@@ -187,43 +193,66 @@ func (mk monsterKind) Living() bool {
 	}
 }
 
+func (mk monsterKind) Size() monsize {
+	return MonsData[mk].size
+}
+
+type monsize int
+
+const (
+	MonsSmall monsize = iota
+	MonsMedium
+	MonsLarge
+)
+
+func (ms monsize) String() (text string) {
+	switch ms {
+	case MonsSmall:
+		text = "small"
+	case MonsMedium:
+		text = "average"
+	case MonsLarge:
+		text = "large"
+	}
+	return text
+}
+
 type monsterData struct {
 	movementDelay int
-	baseAttack    int
-	attackDelay   int
-	maxHP         int
+	size          monsize
 	letter        rune
 	name          string
 	dangerousness int
 }
 
 var MonsData = []monsterData{
-	MonsGuard: {10, 1, 10, 2, 'g', "goblin", 3},
+	MonsGuard: {10, MonsMedium, 'g', "guard", 3},
 	//MonsTinyHarpy:       {10, 1, 10, 2, 't', "tiny harpy", 4},
 	//MonsOgre:            {10, 2, 20, 3, 'O', "ogre", 7},
-	MonsCyclop: {10, 2, 20, 3, 'C', "cyclops", 9},
-	MonsWorm:   {15, 1, 10, 3, 'w', "farmer worm", 4},
+	MonsCyclop: {10, MonsLarge, 'C', "cyclops", 9},
+	MonsWorm:   {15, MonsSmall, 'w', "farmer worm", 4},
 	//MonsBrizzia:         {15, 1, 10, 3, 'z', "brizzia", 6},
 	//MonsAcidMound:       {10, 1, 10, 2, 'a', "acid mound", 6},
-	MonsHound: {10, 1, 10, 2, 'h', "hound", 5},
-	MonsYack:  {10, 1, 10, 2, 'y', "yack", 5},
+	MonsHound: {10, MonsMedium, 'h', "hound", 5},
+	MonsYack:  {10, MonsMedium, 'y', "yack", 5},
 	//MonsGiantBee:        {5, 1, 10, 1, 'B', "giant bee", 6},
-	MonsHighGuard: {10, 1, 10, 2, 'G', "high guard", 5},
+	MonsHighGuard: {10, MonsMedium, 'G', "high guard", 5},
 	//MonsHydra:           {10, 1, 10, 4, 'H', "hydra", 10},
 	//MonsSkeletonWarrior: {10, 1, 10, 3, 'S', "skeleton warrior", 6},
 	//MonsSpider:          {10, 1, 10, 2, 's', "spider", 6},
-	MonsWingedMilfid:   {10, 1, 10, 2, 'W', "winged milfid", 6},
-	MonsBlinkingFrog:   {10, 1, 10, 2, 'F', "blinking frog", 6},
-	MonsLich:           {10, 1, 10, 2, 'L', "lich", 15},
-	MonsEarthDragon:    {10, 2, 10, 4, 'D', "earth dragon", 20},
-	MonsMirrorSpecter:  {10, 1, 10, 2, 'm', "mirror specter", 11},
-	MonsExplosiveNadre: {10, 1, 10, 1, 'n', "explosive nadre", 8},
-	MonsSatowalgaPlant: {10, 1, 10, 3, 'P', "satowalga plant", 7},
-	MonsMadNixe:        {10, 1, 10, 2, 'N', "mad nixe", 14},
+	MonsWingedMilfid:   {10, MonsMedium, 'W', "winged milfid", 6},
+	MonsBlinkingFrog:   {10, MonsMedium, 'F', "blinking frog", 6},
+	MonsLich:           {10, MonsMedium, 'L', "lich", 15},
+	MonsEarthDragon:    {10, MonsLarge, 'D', "earth dragon", 20},
+	MonsMirrorSpecter:  {10, MonsMedium, 'm', "mirror specter", 11},
+	MonsExplosiveNadre: {10, MonsMedium, 'n', "explosive nadre", 8},
+	MonsSatowalgaPlant: {10, MonsLarge, 'P', "satowalga plant", 7},
+	MonsMadNixe:        {10, MonsMedium, 'N', "mad nixe", 14},
 	//MonsMindCelmist:     {10, 1, 20, 2, 'c', "mind celmist", 12},
-	MonsVampire:       {10, 1, 10, 2, 'V', "vampire", 13},
-	MonsTreeMushroom:  {20, 1, 20, 4, 'T', "tree mushroom", 16},
-	MonsMarevorHelith: {10, 0, 10, 10, 'M', "Marevor Helith", 18},
+	MonsVampire:       {10, MonsMedium, 'V', "vampire", 13},
+	MonsTreeMushroom:  {20, MonsLarge, 'T', "tree mushroom", 16},
+	MonsMarevorHelith: {10, MonsMedium, 'M', "Marevor Helith", 18},
+	MonsButterfly:     {10, MonsSmall, 'b', "butterfly", 2},
 }
 
 var monsDesc = []string{
@@ -253,6 +282,7 @@ var monsDesc = []string{
 	MonsVampire:       "Vampires are humanoids that drink blood to survive. Their spitting can cause nausea, impeding the use of potions.",
 	MonsTreeMushroom:  "Tree mushrooms are big clunky slow-moving creatures. They can throw lignifying spores at you.",
 	MonsMarevorHelith: "Marevor Helith is an ancient undead nakrus very fond of teleporting people away. He is a well-known expert in the field of magaras - items that many people simply call magical objects. His current research focus is monolith creation. Marevor, a repentant necromancer, is now searching for his old disciple Jaixel in the Underground to help him overcome the past.",
+	MonsButterfly:     "Underground's butterflies wander around, illuminating their surroundings.",
 }
 
 type bandInfo struct {
@@ -280,6 +310,7 @@ const (
 	LoneTreeMushroom
 	LoneEarthDragon
 	LoneMarevorHelith
+	LoneButterfly
 )
 
 type monsterBandData struct {
@@ -305,6 +336,7 @@ var MonsBands = []monsterBandData{
 	LoneTreeMushroom:   {Monster: MonsTreeMushroom},
 	LoneEarthDragon:    {Monster: MonsEarthDragon},
 	LoneMarevorHelith:  {Monster: MonsMarevorHelith},
+	LoneButterfly:      {Monster: MonsButterfly},
 }
 
 type monster struct {
@@ -313,8 +345,7 @@ type monster struct {
 	Index         int
 	Dir           direction
 	Attack        int
-	HPmax         int
-	HP            int
+	Dead          bool
 	State         monsterState
 	Statuses      [NMonsStatus]int
 	Pos           position
@@ -329,13 +360,11 @@ type monster struct {
 }
 
 func (m *monster) Init() {
-	m.HPmax = MonsData[m.Kind].maxHP
-	m.Attack = MonsData[m.Kind].baseAttack
-	m.HP = m.HPmax
+	m.Attack = m.Kind.BaseAttack()
 	m.Pos = InvalidPos
 	m.LastKnownPos = InvalidPos
 	switch m.Kind {
-	case MonsMarevorHelith:
+	case MonsMarevorHelith, MonsButterfly:
 		m.State = Wandering
 	case MonsSatowalgaPlant:
 		m.State = Watching
@@ -347,7 +376,7 @@ func (m *monster) Status(st monsterStatus) bool {
 }
 
 func (m *monster) Exists() bool {
-	return m != nil && m.HP > 0
+	return m != nil && !m.Dead
 }
 
 func (m *monster) AlternateConfusedPlacement(g *game) *position {
@@ -508,7 +537,7 @@ func (m *monster) AttackAction(g *game, ev event) {
 }
 
 func (m *monster) Explode(g *game, ev event) {
-	m.HP = 0
+	m.Dead = true
 	neighbors := m.Pos.ValidCardinalNeighbors()
 	g.MakeNoise(WallNoise, m.Pos)
 	g.Printf("%s %s explodes with a loud boom.", g.ExplosionSound(), m.Kind.Definite(true))
@@ -689,8 +718,12 @@ func (m *monster) ComputePath(g *game) {
 func (m *monster) HandleEndPath(g *game) {
 	switch m.State {
 	case Wandering, Hunting:
-		m.State = Watching
-		m.Dir = m.Dir.Alternate()
+		if !m.Kind.Peaceful() {
+			m.State = Watching
+			m.Dir = m.Dir.Alternate()
+		} else {
+			m.Target = m.NextTarget(g)
+		}
 	}
 	g.Ev.Renew(g, m.MoveDelay(g))
 }
@@ -704,6 +737,8 @@ func (m *monster) HandleMove(g *game) {
 	}
 	c := g.Dungeon.Cell(target)
 	switch {
+	case m.Kind.Peaceful() && target == g.Player.Pos:
+		m.Path = m.APath(g, m.Pos, m.Target)
 	case !mons.Exists():
 		if m.Kind == MonsEarthDragon && c.IsDestructible() {
 			g.Dungeon.SetCell(target, GroundCell)
@@ -745,9 +780,13 @@ func (m *monster) HandleMove(g *game) {
 	case m.State == Hunting && mons.State != Hunting:
 		r := RandInt(5)
 		if r == 0 {
-			mons.Target = m.Target
-			mons.State = Hunting
-			mons.GatherBand(g)
+			if mons.Kind.Peaceful() {
+				mons.State = Wandering
+			} else {
+				mons.Target = m.Target
+				mons.State = Hunting
+				mons.GatherBand(g)
+			}
 		} else {
 			m.Path = m.APath(g, m.Pos, m.Target)
 		}
@@ -791,7 +830,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	if m.HandleMonsSpecifics(g) {
 		return
 	}
-	if mpos.Distance(ppos) == 1 && g.Dungeon.Cell(ppos).T != BarrelCell {
+	if mpos.Distance(ppos) == 1 && g.Dungeon.Cell(ppos).T != BarrelCell && !m.Kind.Peaceful() {
 		if m.Status(MonsConfused) {
 			ev.Renew(g, 10) // wait
 			return
@@ -872,12 +911,6 @@ func (m *monster) HitPlayer(g *game, ev event) {
 	}
 	g.PrintfStyled("%s hits you (%d dmg).%s", logMonsterHit, m.Kind.Definite(true), dmg, sclang)
 	m.InflictDamage(g, dmg, m.Attack)
-	if m.Kind == MonsVampire {
-		m.HP += 1
-		if m.HP > m.HPmax {
-			m.HP = m.HPmax
-		}
-	}
 	if g.Player.HP <= 0 {
 		return
 	}
@@ -1097,8 +1130,8 @@ func (m *monster) ThrowRock(g *game, ev event) bool {
 		if pos.valid() {
 			mons := g.MonsterAt(pos)
 			if mons.Exists() {
-				mons.HP -= RandInt(15)
-				if mons.HP <= 0 {
+				if mons.Kind.Size() == MonsSmall {
+					mons.Dead = true
 					g.HandleKill(mons, ev)
 				} else {
 					mons.Blink(g)
@@ -1308,6 +1341,13 @@ func (m *monster) MakeAware(g *game) {
 			return
 		}
 	}
+	if m.Kind.Peaceful() {
+		if m.State == Resting {
+			g.Printf("%s awakens.", m.Kind.Definite(true))
+			m.State = Wandering
+		}
+		return
+	}
 	if m.State == Resting {
 		g.Printf("%s awakens.", m.Kind.Definite(true))
 	} else if m.State == Wandering || m.State == Watching {
@@ -1318,13 +1358,6 @@ func (m *monster) MakeAware(g *game) {
 		g.MakeNoise(BarkNoise, m.Pos)
 	}
 	m.MakeHunt(g)
-}
-
-func (m *monster) Heal(g *game, ev event) {
-	if m.HP < m.HPmax {
-		m.HP++
-	}
-	ev.Renew(g, 50)
 }
 
 func (m *monster) GatherBand(g *game) {
@@ -1467,6 +1500,15 @@ func (dg *dgen) BandInfoOutsideExplore(g *game, band monsterBand) bandInfo {
 	return bandinfo
 }
 
+func (dg *dgen) BandInfoOutsideExploreButterfly(g *game, band monsterBand) bandInfo {
+	bandinfo := bandInfo{Kind: monsterBand(band)}
+	for i := 0; i < 10; i++ {
+		bandinfo.Path = append(bandinfo.Path, dg.OutsideCell(g))
+	}
+	bandinfo.Beh = BehExplore
+	return bandinfo
+}
+
 func (dg *dgen) BandInfoFoliage(g *game, band monsterBand) bandInfo {
 	bandinfo := bandInfo{Kind: monsterBand(band)}
 	bandinfo.Path = append(bandinfo.Path, dg.FoliageCell(g))
@@ -1489,6 +1531,8 @@ func (dg *dgen) PutMonsterBand(g *game, band monsterBand) bool {
 		bdinf = dg.BandInfoOutside(g, band)
 	case LoneMirrorSpecter, LoneMarevorHelith, LoneWingedMilfid:
 		bdinf = dg.BandInfoOutsideExplore(g, band)
+	case LoneButterfly:
+		bdinf = dg.BandInfoOutsideExploreButterfly(g, band)
 	case LoneTreeMushroom:
 		bdinf = dg.BandInfoOutside(g, band)
 	case LoneHighGuard:
@@ -1538,6 +1582,7 @@ func (dg *dgen) GenMonsters(g *game) {
 	g.Bands = []bandInfo{}
 	// TODO, just for testing now
 	bandsGuard := []monsterBand{LoneGuard}
+	bandsButterfly := []monsterBand{LoneButterfly}
 	bandsHighGuard := []monsterBand{LoneHighGuard}
 	bandsAnimals := []monsterBand{LoneYack, LoneWorm, LoneHound, LoneBlinkingFrog, LoneExplosiveNadre}
 	bandsPlants := []monsterBand{LoneSatowalgaPlant}
@@ -1548,6 +1593,7 @@ func (dg *dgen) GenMonsters(g *game) {
 		// XXX should really Marevor appear in more than one level?
 		dg.PutMonsterBand(g, LoneMarevorHelith)
 	}
+	dg.PutRandomBandN(g, bandsButterfly, 2)
 	switch g.Depth {
 	case 1:
 		dg.PutRandomBandN(g, bandsGuard, 5)
@@ -1560,6 +1606,7 @@ func (dg *dgen) GenMonsters(g *game) {
 			dg.PutRandomBandN(g, bandsPlants, 1)
 		} else {
 			dg.PutRandomBandN(g, bandsAnimals, 4)
+			dg.PutRandomBandN(g, bandsButterfly, 1)
 			dg.PutRandomBandN(g, bandsPlants, 2)
 		}
 	case 3:
@@ -1610,6 +1657,7 @@ func (dg *dgen) GenMonsters(g *game) {
 		} else {
 			dg.PutRandomBandN(g, bandsGuard, 2)
 			dg.PutRandomBandN(g, bandsAnimals, 8)
+			dg.PutRandomBandN(g, bandsButterfly, 1)
 			dg.PutRandomBandN(g, bandsPlants, 5)
 		}
 	case 7:
@@ -1617,12 +1665,14 @@ func (dg *dgen) GenMonsters(g *game) {
 		if RandInt(2) == 0 {
 			dg.PutRandomBandN(g, bandsGuard, 4)
 			dg.PutRandomBandN(g, bandsAnimals, 6)
+			dg.PutRandomBandN(g, bandsButterfly, 1)
 			dg.PutRandomBandN(g, bandsBig, 1)
 			dg.PutRandomBandN(g, bandsBipeds, 4)
 			dg.PutRandomBandN(g, bandsPlants, 2)
 		} else {
 			dg.PutRandomBandN(g, bandsGuard, 1)
 			dg.PutRandomBandN(g, bandsBig, 2)
+			dg.PutRandomBandN(g, bandsButterfly, 1)
 			dg.PutRandomBandN(g, bandsAnimals, 8)
 			dg.PutRandomBandN(g, bandsPlants, 5)
 		}
@@ -1642,11 +1692,12 @@ func (dg *dgen) GenMonsters(g *game) {
 	case 9:
 		dg.PutRandomBandN(g, bandsHighGuard, 2)
 		if RandInt(2) == 0 {
-			dg.PutRandomBandN(g, bandsGuard, 2)
+			dg.PutRandomBandN(g, bandsGuard, 3)
 			dg.PutRandomBandN(g, bandsBig, 6)
 			dg.PutRandomBandN(g, bandsBipeds, 3)
 			dg.PutRandomBandN(g, bandsPlants, 1)
 		} else {
+			dg.PutRandomBandN(g, bandsButterfly, 2)
 			dg.PutRandomBandN(g, bandsGuard, 2)
 			dg.PutRandomBandN(g, bandsAnimals, 10)
 			dg.PutRandomBandN(g, bandsBig, 2)

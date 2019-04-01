@@ -714,8 +714,6 @@ func (ui *gameui) MonsterInfo(m *monster) string {
 			infos = append(infos, monsterStatus(st).String())
 		}
 	}
-	health := fmt.Sprintf("%d HP", m.HP)
-	infos = append(infos, health)
 	return strings.Join(infos, ", ")
 }
 
@@ -908,6 +906,8 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 					fgColor = ColorFgSleepingMonster
 				} else if m.State == Hunting {
 					fgColor = ColorFgMonster
+				} else if m.Kind.Peaceful() {
+					fgColor = ColorFgPlayer
 				} else {
 					fgColor = ColorFgWanderingMonster
 				}
@@ -1401,8 +1401,23 @@ loop:
 
 func (ui *gameui) DrawMonsterDescription(mons *monster) {
 	s := mons.Kind.Desc()
-	s += " " + fmt.Sprintf("They deal %d damage.", mons.Kind.BaseAttack())
-	s += " " + fmt.Sprintf("They have %d HP.", mons.Kind.MaxHP())
+	s += " " + fmt.Sprintf("Their size is %s.", mons.Kind.Size())
+	if mons.Kind.Peaceful() {
+		s += " " + fmt.Sprint("They are peaceful.")
+	}
+	if mons.Kind.CanOpenDoors() {
+		s += " " + fmt.Sprint("They can open doors.")
+	}
+	md := mons.Kind.MovementDelay()
+	switch { // XXX this can be improved
+	case md == 10:
+	case md >= 20:
+		s += " " + fmt.Sprint("They move very slowly.")
+	case md > 10:
+		s += " " + fmt.Sprint("They move slowly.")
+	case md < 10:
+		s += " " + fmt.Sprint("They move fast.")
+	}
 	ui.DrawDescription(s)
 }
 

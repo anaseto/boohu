@@ -195,6 +195,10 @@ func (g *game) ComputeLOS() {
 
 func (m *monster) ComputeLOS(g *game) {
 	mlos := map[position]bool{}
+	if m.Kind.Peaceful() {
+		m.LOS = mlos
+		return
+	}
 	losRange := DefaultMonsterLOSRange
 	if losRange < 1 {
 		losRange = 1
@@ -309,7 +313,7 @@ func (g *game) ComputeNoise() {
 		mons := g.MonsterAt(pos)
 		if mons.Exists() && mons.State != Resting && RandInt(rmax) > 0 {
 			switch mons.Kind {
-			case MonsMirrorSpecter, MonsSatowalgaPlant:
+			case MonsMirrorSpecter, MonsSatowalgaPlant, MonsButterfly:
 				// no footsteps
 				//case MonsTinyHarpy, MonsWingedMilfid, MonsGiantBee:
 				//noise[pos] = true
@@ -413,6 +417,17 @@ func (g *game) ComputeLights() {
 	const lightrange = 6
 	for lpos, _ := range g.Objects.Lights {
 		rays := g.buildRayMap(lpos, lightrange)
+		for pos, n := range rays {
+			if n.Cost < lightrange {
+				g.Illuminated[pos] = true
+			}
+		}
+	}
+	for _, mons := range g.Monsters {
+		if !mons.Exists() || mons.Kind != MonsButterfly {
+			continue
+		}
+		rays := g.buildRayMap(mons.Pos, lightrange)
 		for pos, n := range rays {
 			if n.Cost < lightrange {
 				g.Illuminated[pos] = true

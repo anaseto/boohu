@@ -842,7 +842,7 @@ func (dg *dgen) AddSpecial(g *game) {
 
 func (dg *dgen) GenLight(g *game) {
 	lights := []position{}
-	for i := 0; i < 4+RandInt(3); i++ {
+	for i := 0; i < 2+RandInt(2); i++ {
 		pos := dg.OutsideGroundCell(g)
 		g.Dungeon.SetCell(pos, LightCell)
 		lights = append(lights, pos)
