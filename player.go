@@ -264,6 +264,8 @@ func (g *game) MovePlayer(pos position, ev event) error {
 		}
 		if c.T == BarrelCell {
 			g.Print("You hide yourself inside the barrel.")
+		} else if c.T == TableCell {
+			g.Print("You hide yourself under the table.")
 		}
 		if c.T == WallCell {
 			g.Dungeon.SetCell(pos, GroundCell)

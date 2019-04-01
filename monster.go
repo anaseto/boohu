@@ -752,7 +752,7 @@ func (m *monster) HandleMove(g *game) {
 				// XXX use dijkstra distance ?
 				if c.IsWall() {
 					g.Printf("%s You hear an earth-splitting noise.", g.CrackSound())
-				} else if c.T == BarrelCell {
+				} else if c.T == BarrelCell || c.T == DoorCell || c.T == TableCell {
 					g.Printf("%s You hear an wood-splitting noise.", g.CrackSound())
 				}
 				g.StopAuto()

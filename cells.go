@@ -18,20 +18,29 @@ const (
 	MagaraCell
 	BananaCell
 	LightCell
+	TableCell
 )
 
 func (c cell) IsPassable() bool {
 	switch c.T {
-	case WallCell, BarrelCell:
+	case WallCell, BarrelCell, TableCell:
 		return false
 	default:
 		return true
 	}
 }
 
+func (c cell) IsIlluminable() bool {
+	switch c.T {
+	case WallCell, BarrelCell, TableCell:
+		return false
+	}
+	return true
+}
+
 func (c cell) IsDestructible() bool {
 	switch c.T {
-	case WallCell, BarrelCell, DoorCell:
+	case WallCell, BarrelCell, DoorCell, TableCell:
 		return true
 	default:
 		return false
@@ -49,7 +58,7 @@ func (c cell) IsWall() bool {
 
 func (c cell) Flammable() bool {
 	switch c.T {
-	case FungusCell, DoorCell, BarrelCell:
+	case FungusCell, DoorCell, BarrelCell, TableCell:
 		return true
 	default:
 		return false
@@ -96,6 +105,8 @@ func (c cell) ShortDesc(g *game, pos position) (desc string) {
 		desc = "a banana"
 	case LightCell:
 		desc = "a light"
+	case TableCell:
+		desc = "a table"
 	}
 	return desc
 }
@@ -122,6 +133,8 @@ func (c cell) Desc(g *game, pos position) (desc string) {
 		desc = "A gawalt monkey cannot enter a healthy sleep without eating one of those bananas before."
 	case LightCell:
 		desc = "A light illuminates surrounding cells. Monsters can spot you in illuminated cells from a greater range."
+	case TableCell:
+		desc = "You can hide under the table, reducing the range at which monsters can see you. Most monsters cannot walk accross the table."
 	}
 	return desc
 }
@@ -149,6 +162,8 @@ func (c cell) Style(g *game, pos position) (r rune, fg uicolor) {
 		r, fg = ')', ColorFgCollectable
 	case LightCell:
 		r, fg = '☼', ColorFgCollectable
+	case TableCell:
+		r, fg = 'π', ColorFgCollectable
 	}
 	return r, fg
 }

@@ -340,9 +340,9 @@ const (
 ??#+#??`
 	RoomLittleColumnDiamond = `
 ??#+#??
-##_._##
+##_.!##
 +.P#P.+
-##_._##
+##!.!##
 ??#+#??`
 	RoomRound = `
 ???##+##???
@@ -838,6 +838,9 @@ func (dg *dgen) AddSpecial(g *game) {
 	dg.GenMagara(g)
 	dg.GenStones(g)
 	dg.GenLight(g)
+	for i := 0; i < 2+RandInt(2); i++ {
+		dg.GenTable(g)
+	}
 }
 
 func (dg *dgen) GenLight(g *game) {
@@ -1056,6 +1059,22 @@ func (dg *dgen) GenBarrel(g *game) {
 	}
 	g.Dungeon.SetCell(pos, BarrelCell)
 	g.Objects.Barrels[pos] = true
+}
+
+func (dg *dgen) GenTable(g *game) {
+	pos := InvalidPos
+	count := 0
+	for pos == InvalidPos {
+		count++
+		if count > 500 {
+			return
+		}
+		pos = dg.rooms[RandInt(len(dg.rooms))].RandomPlace(PlaceSpecialStatic)
+		if pos == InvalidPos {
+			pos = dg.rooms[RandInt(len(dg.rooms))].RandomPlace(PlaceStatic)
+		}
+	}
+	g.Dungeon.SetCell(pos, TableCell)
 }
 
 func (dg *dgen) CaveGroundCell(g *game) position {

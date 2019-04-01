@@ -364,10 +364,14 @@ func (m *monster) SeesPlayer(g *game) bool {
 
 func (m *monster) Sees(g *game, pos position) bool {
 	const darkRange = 4
+	const tableRange = 1
 	if !(m.LOS[pos] && m.Dir.InViewCone(m.Pos, pos)) {
 		return false
 	}
 	if !g.Illuminated[pos] && m.Pos.Distance(pos) > darkRange {
+		return false
+	}
+	if g.Dungeon.Cell(pos).T == TableCell && m.Pos.Distance(pos) > tableRange {
 		return false
 	}
 	return true
@@ -418,7 +422,8 @@ func (g *game) ComputeLights() {
 	for lpos, _ := range g.Objects.Lights {
 		rays := g.buildRayMap(lpos, lightrange)
 		for pos, n := range rays {
-			if n.Cost < lightrange {
+			c := g.Dungeon.Cell(pos)
+			if n.Cost < lightrange && c.IsIlluminable() {
 				g.Illuminated[pos] = true
 			}
 		}
@@ -429,7 +434,8 @@ func (g *game) ComputeLights() {
 		}
 		rays := g.buildRayMap(mons.Pos, lightrange)
 		for pos, n := range rays {
-			if n.Cost < lightrange {
+			c := g.Dungeon.Cell(pos)
+			if n.Cost < lightrange && c.IsIlluminable() {
 				g.Illuminated[pos] = true
 			}
 		}
