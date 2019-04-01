@@ -184,8 +184,6 @@ func (mag magara) Desc(g *game) (desc string) {
 		desc = "teleports up to two random monsters in sight."
 	case HealWoundsMagara:
 		desc = "heals you a good deal."
-	//case MagicMagara:
-	//desc = "replenishes your magical reserves."
 	case SwiftnessMagara:
 		desc = "makes you move faster and better at avoiding blows for a short time." // XXX
 	case SwappingMagara:
@@ -373,7 +371,6 @@ func (g *game) EvokeSwiftness(ev event) error {
 	g.Player.Expire[StatusSwift] = end
 	g.Printf("You feel speedy and agile.")
 	g.ui.PlayerGoodEffectAnimation()
-	// XXX do something with agile?
 	return nil
 }
 
