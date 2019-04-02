@@ -16,7 +16,6 @@ const (
 	HealWoundsMagara
 	SwiftnessMagara
 	SwappingMagara
-	ShadowsMagara
 	FogMagara
 	WallsMagara
 	SlowingMagara
@@ -81,8 +80,6 @@ func (g *game) UseMagara(n int, ev event) (err error) {
 		err = g.EvokeSwiftness(ev)
 	case SwappingMagara:
 		err = g.EvokeSwapping(ev)
-	case ShadowsMagara:
-		err = g.EvokeShadows(ev)
 	case FogMagara:
 		err = g.EvokeFog(ev)
 	case WallsMagara:
@@ -139,8 +136,6 @@ func (mag magara) String() (desc string) {
 		desc = "magara of swiftness"
 	case SwappingMagara:
 		desc = "magara of swapping"
-	case ShadowsMagara:
-		desc = "magara of shadows"
 	case FogMagara:
 		desc = "magara of fog"
 	case WallsMagara:
@@ -188,8 +183,6 @@ func (mag magara) Desc(g *game) (desc string) {
 		desc = "makes you move faster and better at avoiding blows for a short time." // XXX
 	case SwappingMagara:
 		desc = "makes you swap positions with the farthest monster in sight. If there is more than one at the same distance, it will be chosen randomly."
-	case ShadowsMagara:
-		desc = "reduces your line of sight range to 1. Because monsters only can see you if you see them, this makes it easier to get out of sight of monsters so that they eventually stop chasing you."
 	case FogMagara:
 		desc = ""
 	case WallsMagara:
@@ -406,19 +399,19 @@ func (g *game) SwapWithMonster(mons *monster) {
 	mons.MakeAware(g)
 }
 
-func (g *game) EvokeShadows(ev event) error {
-	if g.Player.HasStatus(StatusShadows) {
-		return errors.New("You are already surrounded by shadows.")
-	}
-	g.Player.Statuses[StatusShadows] = 1
-	end := ev.Rank() + DurationShadows
-	g.PushEvent(&simpleEvent{ERank: end, EAction: ShadowsEnd})
-	g.Player.Expire[StatusShadows] = end
-	g.Printf("You feel surrounded by shadows.")
-	g.ui.PlayerGoodEffectAnimation()
-	g.ComputeLOS()
-	return nil
-}
+//func (g *game) EvokeShadows(ev event) error {
+//if g.Player.HasStatus(StatusShadows) {
+//return errors.New("You are already surrounded by shadows.")
+//}
+//g.Player.Statuses[StatusShadows] = 1
+//end := ev.Rank() + DurationShadows
+//g.PushEvent(&simpleEvent{ERank: end, EAction: ShadowsEnd})
+//g.Player.Expire[StatusShadows] = end
+//g.Printf("You feel surrounded by shadows.")
+//g.ui.PlayerGoodEffectAnimation()
+//g.ComputeLOS()
+//return nil
+//}
 
 type cloud int
 

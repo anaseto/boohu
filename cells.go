@@ -19,11 +19,12 @@ const (
 	BananaCell
 	LightCell
 	TableCell
+	TreeCell
 )
 
 func (c cell) IsPassable() bool {
 	switch c.T {
-	case WallCell, BarrelCell, TableCell:
+	case WallCell, BarrelCell, TableCell, TreeCell:
 		return false
 	default:
 		return true
@@ -32,7 +33,7 @@ func (c cell) IsPassable() bool {
 
 func (c cell) IsIlluminable() bool {
 	switch c.T {
-	case WallCell, BarrelCell, TableCell:
+	case WallCell, BarrelCell, TableCell, TreeCell:
 		return false
 	}
 	return true
@@ -40,7 +41,7 @@ func (c cell) IsIlluminable() bool {
 
 func (c cell) IsDestructible() bool {
 	switch c.T {
-	case WallCell, BarrelCell, DoorCell, TableCell:
+	case WallCell, BarrelCell, DoorCell, TableCell, TreeCell:
 		return true
 	default:
 		return false
@@ -58,7 +59,7 @@ func (c cell) IsWall() bool {
 
 func (c cell) Flammable() bool {
 	switch c.T {
-	case FungusCell, DoorCell, BarrelCell, TableCell:
+	case FungusCell, DoorCell, BarrelCell, TableCell, TreeCell:
 		return true
 	default:
 		return false
@@ -107,6 +108,8 @@ func (c cell) ShortDesc(g *game, pos position) (desc string) {
 		desc = "a light"
 	case TableCell:
 		desc = "a table"
+	case TreeCell:
+		desc = "a tree"
 	}
 	return desc
 }
@@ -135,6 +138,8 @@ func (c cell) Desc(g *game, pos position) (desc string) {
 		desc = "A light illuminates surrounding cells. Monsters can spot you in illuminated cells from a greater range."
 	case TableCell:
 		desc = "You can hide under the table, reducing the range at which monsters can see you. Most monsters cannot walk accross the table."
+	case TreeCell:
+		desc = "You can climb to see farther. Moreover, many monsters will not be able to attack you while you stand on a tree."
 	}
 	return desc
 }
@@ -150,20 +155,22 @@ func (c cell) Style(g *game, pos position) (r rune, fg uicolor) {
 	case FungusCell:
 		r, fg = '"', ColorFgLOS
 	case BarrelCell:
-		r, fg = '&', ColorFgCollectable
+		r, fg = '&', ColorFgObject
 	case StoneCell:
 		r, fg = g.Objects.Stones[pos].Style(g)
 	case StairCell:
 		st := g.Objects.Stairs[pos]
 		r, fg = st.Style(g)
 	case MagaraCell:
-		r, fg = '/', ColorFgCollectable
+		r, fg = '/', ColorFgObject
 	case BananaCell:
-		r, fg = ')', ColorFgCollectable
+		r, fg = ')', ColorFgObject
 	case LightCell:
-		r, fg = '☼', ColorFgCollectable
+		r, fg = '☼', ColorFgObject
 	case TableCell:
-		r, fg = 'π', ColorFgCollectable
+		r, fg = 'π', ColorFgObject
+	case TreeCell:
+		r, fg = '♣', ColorFgConfusedMonster
 	}
 	return r, fg
 }

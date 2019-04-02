@@ -806,8 +806,8 @@ func (g *game) GenRoomTunnels(ml maplayout) {
 	for i := 0; i < 4+RandInt(2); i++ {
 		dg.GenBarrel(g)
 	}
+	dg.AddSpecial(g, ml)
 	dg.GenMonsters(g)
-	dg.AddSpecial(g)
 }
 
 func (dg *dgen) ClearUnconnected(g *game) {
@@ -821,25 +821,65 @@ func (dg *dgen) ClearUnconnected(g *game) {
 	}
 }
 
-func (dg *dgen) AddSpecial(g *game) {
+func (dg *dgen) AddSpecial(g *game, ml maplayout) {
 	// Equipment
-	switch g.GenPlan[g.Depth] {
-	case GenRod:
-		//g.GenerateRod()
-	case GenExtraCollectables:
-		//for i := 0; i < 2; i++ {
-		//dg.GenCollectable(g)
-		//g.CollectableScore-- // these are extra
-		//}
-	}
+	//switch g.GenPlan[g.Depth] {
+	//case GenRod:
+	////g.GenerateRod()
+	//case GenExtraCollectables:
+	////for i := 0; i < 2; i++ {
+	////dg.GenCollectable(g)
+	////g.CollectableScore-- // these are extra
+	////}
+	//}
 	for i := 0; i < 2; i++ {
 		dg.GenBanana(g)
 	}
 	dg.GenMagara(g)
 	dg.GenStones(g)
 	dg.GenLight(g)
+	ntables := 2
+	switch ml {
+	case AutomataCave, RandomWalkCave:
+		if RandInt(3) == 0 {
+			ntables++
+		} else if RandInt(10) == 0 {
+			ntables--
+		}
+	case RandomWalkTreeCave:
+		if RandInt(4) > 0 {
+			ntables++
+		}
+		if RandInt(4) > 0 {
+			ntables++
+		}
+	}
 	for i := 0; i < 2+RandInt(2); i++ {
 		dg.GenTable(g)
+	}
+	ntrees := 1
+	switch ml {
+	case AutomataCave:
+		if RandInt(4) == 0 {
+			ntrees++
+		} else if RandInt(8) == 0 {
+			ntrees--
+		}
+	case RandomWalkCave:
+		if RandInt(4) > 0 {
+			ntrees++
+		}
+		if RandInt(8) == 0 {
+			ntrees++
+		}
+	case RandomWalkTreeCave:
+		if RandInt(2) == 0 {
+			ntrees--
+		}
+		dg.GenTreeCaveMap()
+	}
+	for i := 0; i < ntrees; i++ {
+		dg.GenTree(g)
 	}
 }
 
@@ -1075,6 +1115,11 @@ func (dg *dgen) GenTable(g *game) {
 		}
 	}
 	g.Dungeon.SetCell(pos, TableCell)
+}
+
+func (dg *dgen) GenTree(g *game) {
+	pos := dg.OutsideGroundMiddleCell(g)
+	g.Dungeon.SetCell(pos, TreeCell)
 }
 
 func (dg *dgen) CaveGroundCell(g *game) position {

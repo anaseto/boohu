@@ -16,7 +16,6 @@ const (
 	StatusLight
 	StatusDig
 	StatusSwap
-	StatusShadows
 )
 
 func (st status) Info() bool {
@@ -29,7 +28,7 @@ func (st status) Info() bool {
 
 func (st status) Good() bool {
 	switch st {
-	case StatusSwift, StatusDig, StatusSwap, StatusShadows, StatusHidden:
+	case StatusSwift, StatusDig, StatusSwap, StatusHidden:
 		return true
 	default:
 		return false
@@ -71,8 +70,6 @@ func (st status) String() string {
 		return "Dig"
 	case StatusSwap:
 		return "Swap"
-	case StatusShadows:
-		return "Shadows"
 	case StatusLight:
 		return "Light"
 	default:
@@ -107,8 +104,6 @@ func (st status) Short() string {
 		return "Di"
 	case StatusSwap:
 		return "Sw"
-	case StatusShadows:
-		return "Sh"
 	case StatusLight:
 		return "Li"
 	default:

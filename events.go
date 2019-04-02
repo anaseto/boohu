@@ -97,6 +97,7 @@ func (sev *simpleEvent) Action(g *game) {
 	switch sev.EAction {
 	case PlayerTurn:
 		g.ComputeNoise()
+		g.ComputeLOS() // TODO: optimize? most of the time almost redundant (unless on a tree)
 		g.ComputeMonsterLOS()
 		g.LogNextTick = g.LogIndex
 		g.AutoNext = g.AutoPlayer(sev)
@@ -158,14 +159,6 @@ func (sev *simpleEvent) Action(g *game) {
 		if g.Player.Statuses[StatusSwap] == 0 {
 			g.PrintStyled("You no longer feel light-footed.", logStatusEnd)
 			g.ui.StatusEndAnimation()
-		}
-	case ShadowsEnd:
-		g.Player.Statuses[StatusShadows]--
-		if g.Player.Statuses[StatusShadows] == 0 {
-			g.PrintStyled("The shadows leave you.", logStatusEnd)
-			g.ui.StatusEndAnimation()
-			g.ComputeLOS()
-			g.MakeMonstersAware()
 		}
 	}
 }

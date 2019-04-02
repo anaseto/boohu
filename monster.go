@@ -145,6 +145,15 @@ func (mk monsterKind) CanOpenDoors() bool {
 	}
 }
 
+func (mk monsterKind) CanAttackOnTree() bool {
+	switch mk {
+	case MonsMirrorSpecter, MonsWingedMilfid, MonsEarthDragon, MonsExplosiveNadre, MonsBlinkingFrog:
+		return true
+	default:
+		return false
+	}
+}
+
 func (mk monsterKind) Desc() string {
 	return monsDesc[mk]
 }
@@ -831,7 +840,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 		return
 	}
 	if mpos.Distance(ppos) == 1 && g.Dungeon.Cell(ppos).T != BarrelCell && !m.Kind.Peaceful() {
-		if m.Status(MonsConfused) {
+		if m.Status(MonsConfused) || g.Dungeon.Cell(ppos).T == TreeCell && !m.Kind.CanAttackOnTree() {
 			ev.Renew(g, 10) // wait
 			return
 		}

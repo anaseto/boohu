@@ -159,7 +159,8 @@ var (
 	ColorBgLOS,
 	ColorFg,
 	ColorFgAnimationHit,
-	ColorFgCollectable,
+	ColorFgObject,
+	ColorFgTree,
 	ColorFgConfusedMonster,
 	ColorFgLignifiedMonster,
 	ColorFgSlowedMonster,
@@ -202,7 +203,8 @@ func LinkColors() {
 	ColorFgLOS = ColorBase0
 	ColorFgLOSLight = ColorBase1
 	ColorFgAnimationHit = ColorMagenta
-	ColorFgCollectable = ColorYellow
+	ColorFgObject = ColorYellow
+	ColorFgTree = ColorGreen
 	ColorFgConfusedMonster = ColorGreen
 	ColorFgLignifiedMonster = ColorYellow
 	ColorFgSlowedMonster = ColorCyan
@@ -411,7 +413,7 @@ func (ui *gameui) DrawWelcomeCommon() int {
 	ui.DrawDark(".#", rcol+2, line, ColorFgDark, true)
 	line++
 	ui.DrawDark("##", col, line, ColorFgDark, true)
-	ui.DrawLOS("!", col+2, line, ColorFgCollectable, true)
+	ui.DrawLOS("!", col+2, line, ColorFgObject, true)
 	ui.DrawLOS(".", col+3, line, ColorFgLOS, true)
 	ui.DrawDark("│              │", col+4, line, ColorText, false)
 	ui.DrawDark("│              │", col+4, line, ColorText, false)
@@ -447,7 +449,7 @@ func (ui *gameui) DrawWelcomeCommon() int {
 	ui.DrawDark("#", rcol+3, line, ColorFgDark, true)
 	line++
 	ui.DrawLOS("#", col, line, ColorFgLOS, true)
-	ui.DrawLOS("[", col+1, line, ColorFgCollectable, true)
+	ui.DrawLOS("[", col+1, line, ColorFgObject, true)
 	ui.DrawLOS(".", col+2, line, ColorFgLOS, true)
 	ui.DrawDark("##", col+3, line, ColorFgDark, true)
 	ui.DrawDark("│              │", col+4, line, ColorFgHPok, false)
