@@ -908,7 +908,6 @@ func (dg *dgen) AddSpecial(g *game, ml maplayout) {
 		if RandInt(2) == 0 {
 			ntrees--
 		}
-		dg.GenTreeCaveMap()
 	}
 	for i := 0; i < ntrees; i++ {
 		dg.GenTree(g)
