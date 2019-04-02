@@ -64,7 +64,7 @@ func (g *game) DiagonalDifficult(from, to position) bool {
 			continue
 		}
 		switch g.Dungeon.Cell(pos).T {
-		case WallCell, FungusCell:
+		case WallCell, FungusCell, HoledWallCell:
 			count++
 		}
 	}
@@ -105,7 +105,7 @@ func (g *game) losCost(from, pos, to position, rs raystyle) int {
 			}
 		}
 	}
-	if c.T == FungusCell {
+	if c.T == FungusCell || c.T == HoledWallCell {
 		switch rs {
 		case TreePlayerRay:
 		default:

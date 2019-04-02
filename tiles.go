@@ -144,6 +144,7 @@ var MapNames = map[rune]string{
 	'&':  "barrel",
 	'☼':  "light",
 	'π':  "table",
+	'Π':  "holedwall",
 }
 
 var LetterNames = map[rune]string{
@@ -201,6 +202,7 @@ var LetterNames = map[rune]string{
 	'&':  "barrel",
 	'☼':  "light",
 	'π':  "table",
+	'Π':  "holedwall",
 }
 
 func (ui *gameui) Interrupt() {

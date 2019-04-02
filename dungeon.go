@@ -719,6 +719,38 @@ func (g *game) DoorCandidate(pos position) bool {
 				(pos.SE().valid() && d.Cell(pos.SE()).IsPassable()))
 }
 
+func (dg *dgen) PutHoledWalls(g *game, n int) {
+	candidates := []position{}
+	for i, _ := range g.Dungeon.Cells {
+		pos := idxtopos(i)
+		if dg.room[pos] && g.HoledWallCandidate(pos) {
+			candidates = append(candidates, pos)
+		}
+	}
+	if len(candidates) == 0 {
+		return
+	}
+	for i := 0; i < n; i++ {
+		pos := candidates[RandInt(len(candidates))]
+		g.Dungeon.SetCell(pos, HoledWallCell)
+	}
+}
+
+func (g *game) HoledWallCandidate(pos position) bool {
+	d := g.Dungeon
+	if !pos.valid() || !d.Cell(pos).IsWall() {
+		return false
+	}
+	return pos.W().valid() && pos.E().valid() &&
+		d.Cell(pos.W()).IsWall() && d.Cell(pos.E()).IsWall() &&
+		pos.N().valid() && d.Cell(pos.N()).IsPassable() &&
+		pos.S().valid() && d.Cell(pos.S()).IsPassable() ||
+		(pos.W().valid() && pos.E().valid() &&
+			d.Cell(pos.W()).IsPassable() && d.Cell(pos.E()).IsPassable() &&
+			pos.N().valid() && d.Cell(pos.N()).IsWall() &&
+			pos.S().valid() && d.Cell(pos.S()).IsWall())
+}
+
 func (dg *dgen) GenRooms(templates []string, n int) {
 	for i := 0; i < n; i++ {
 		var r *room
@@ -881,6 +913,7 @@ func (dg *dgen) AddSpecial(g *game, ml maplayout) {
 	for i := 0; i < ntrees; i++ {
 		dg.GenTree(g)
 	}
+	dg.PutHoledWalls(g, 1+RandInt(2))
 }
 
 func (dg *dgen) GenLight(g *game) {

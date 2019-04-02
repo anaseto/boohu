@@ -20,11 +20,12 @@ const (
 	LightCell
 	TableCell
 	TreeCell
+	HoledWallCell
 )
 
 func (c cell) IsPassable() bool {
 	switch c.T {
-	case WallCell, BarrelCell, TableCell, TreeCell:
+	case WallCell, BarrelCell, TableCell, TreeCell, HoledWallCell:
 		return false
 	default:
 		return true
@@ -33,7 +34,7 @@ func (c cell) IsPassable() bool {
 
 func (c cell) IsIlluminable() bool {
 	switch c.T {
-	case WallCell, BarrelCell, TableCell, TreeCell:
+	case WallCell, BarrelCell, TableCell, TreeCell, HoledWallCell:
 		return false
 	}
 	return true
@@ -41,7 +42,7 @@ func (c cell) IsIlluminable() bool {
 
 func (c cell) IsDestructible() bool {
 	switch c.T {
-	case WallCell, BarrelCell, DoorCell, TableCell, TreeCell:
+	case WallCell, BarrelCell, DoorCell, TableCell, TreeCell, HoledWallCell:
 		return true
 	default:
 		return false
@@ -110,6 +111,8 @@ func (c cell) ShortDesc(g *game, pos position) (desc string) {
 		desc = "a table"
 	case TreeCell:
 		desc = "a tree"
+	case HoledWallCell:
+		desc = "a holed wall"
 	}
 	return desc
 }
@@ -137,9 +140,11 @@ func (c cell) Desc(g *game, pos position) (desc string) {
 	case LightCell:
 		desc = "A light illuminates surrounding cells. Monsters can spot you in illuminated cells from a greater range."
 	case TableCell:
-		desc = "You can hide under the table, reducing the range at which monsters can see you. Most monsters cannot walk accross the table."
+		desc = "You can hide under the table so that only adjacent monsters can see you. Most monsters cannot walk accross the table."
 	case TreeCell:
-		desc = "You can climb to see farther. Moreover, many monsters will not be able to attack you while you stand on a tree."
+		desc = "You can climb to see farther. Moreover, many monsters will not be able to attack you while you stand on a tree. The top is never illuminated."
+	case HoledWallCell:
+		desc = "Only very small creatures can pass there. It is difficult to see through."
 	}
 	return desc
 }
@@ -171,6 +176,8 @@ func (c cell) Style(g *game, pos position) (r rune, fg uicolor) {
 		r, fg = 'π', ColorFgObject
 	case TreeCell:
 		r, fg = '♣', ColorFgConfusedMonster
+	case HoledWallCell:
+		r, fg = 'Π', ColorFgPlace
 	}
 	return r, fg
 }
