@@ -119,7 +119,7 @@ func (g *game) DetailedStatistics(w io.Writer) {
 	fmt.Fprintf(w, "Statistics:\n")
 	fmt.Fprintf(w, "You evoked magaras %d times, and moved %d times.\n",
 		g.Stats.MagarasUsed, g.Stats.Moves)
-	fmt.Fprintf(w, "You got hit %d times, blocked %d times, and dodged %d times.\n", g.Stats.ReceivedHits, g.Stats.Blocks, g.Stats.Dodges)
+	fmt.Fprintf(w, "You got hit %d times, and dodged %d times.\n", g.Stats.ReceivedHits, g.Stats.Dodges)
 	fmt.Fprintf(w, "You endured %d damage.\n", g.Stats.Damage)
 	fmt.Fprintf(w, "You activated %d stones.\n", g.Stats.UsedStones)
 	fmt.Fprintf(w, "There were %d fires.\n", g.Stats.Burns)

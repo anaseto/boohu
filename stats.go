@@ -5,16 +5,11 @@ type stats struct {
 	Killed        int
 	KilledMons    map[monsterKind]int
 	Moves         int
-	Hits          int
-	Misses        int
 	ReceivedHits  int
 	Dodges        int
-	Blocks        int
 	MagarasUsed   int
 	Evocations    int
 	UsedStones    int
-	Throws        int
-	TimesLucky    int
 	Damage        int
 	DExplPerc     [MaxDepth + 1]int
 	DSleepingPerc [MaxDepth + 1]int
@@ -23,7 +18,6 @@ type stats struct {
 	Burns         int
 	Digs          int
 	Rest          int
-	RestInterrupt int
 	Turns         int
 	TWounded      int
 	TMWounded     int
