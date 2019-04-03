@@ -183,6 +183,8 @@ func (c cell) Style(g *game, pos position) (r rune, fg uicolor) {
 		r, fg = '♣', ColorFgConfusedMonster
 	case HoledWallCell:
 		r, fg = 'Π', ColorFgPlace
+	case ScrollCell:
+		r, fg = '?', ColorFgMagicPlace
 	}
 	return r, fg
 }

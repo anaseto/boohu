@@ -1667,42 +1667,47 @@ func (ui *gameui) ReadScroll() error {
 	}
 	switch sc {
 	case ScrollBasics:
+		ui.DrawScrollBasics()
 	default:
-		ui.DrawDescription("Description: todo")
+		ui.DrawDescription(sc.Text(ui.g))
 	}
 	return errors.New(DoNothing)
 }
 
 func (ui *gameui) DrawScrollBasics() {
 	ui.DrawDungeonView(NoFlushMode)
-	const margin = 6
+	const margin = 5
 	l := 0
 	ui.ClearLine(l)
-	ui.DrawColoredText("Basics:", 2, l, ColorYellow)
+	ui.DrawColoredText("Tutorial scroll: Basic commands", 1, l, ColorYellow)
 	l++
 	ui.ClearLine(l)
 	l++
 	ui.ClearLine(l)
-	ui.SetCell(3, l, '↑', ColorFgPlayer, ColorBg)
+	ui.SetCell(2, l, '↑', ColorFgPlayer, ColorBg)
 	l++
 	ui.ClearLine(l)
-	ui.DrawColoredText("←↓→", 2, l, ColorFgPlayer)
-	ui.DrawText("Use the arrows to move around or jump over a monster.", margin, 1)
+	ui.DrawColoredText("←↓→", 1, l, ColorFgPlayer)
+	ui.DrawText("Use the arrows to move around or jump over a monster.", margin, l-1)
 	l++
 	ui.ClearLine(l)
-	ui.DrawText("Jumping leaves you exhausted, unable to jump again for a few turns.", margin, 1)
+	ui.DrawText("Jumping leaves you exhausted, unable to jump again for a few turns.", margin, l-1)
 	l += 2
 	ui.ClearLine(l - 1)
 	ui.ClearLine(l)
-	ui.SetCell(2, l, 'e', ColorFgPlayer, ColorBg)
-	ui.DrawText("You can interact with an object in your cell using the “e” key.", margin, 2)
+	ui.SetCell(1, l, 'e', ColorFgPlayer, ColorBg)
+	ui.DrawText("You can interact with an object in your cell using the “e” key.", margin, l)
 	l++
 	ui.ClearLine(l)
-	ui.DrawText("Examples: read scroll, descend stairs, rest in barrel, ...", margin, 2)
+	ui.DrawText("Examples: read scroll, descend stairs, rest in barrel, ...", margin, l)
 	l++
 	ui.ClearLine(l)
-	ui.SetCell(2, l, '?', ColorFgPlayer, ColorBg)
-	ui.DrawText("You can see the key bindings for other actions by pressing “?”.", margin, 3)
+	ui.SetCell(1, l, 'v', ColorFgPlayer, ColorBg)
+	ui.DrawText("Evoke a magical magaras with “v”.", margin, l)
+	l++
+	ui.ClearLine(l)
+	ui.SetCell(1, l, '?', ColorFgPlayer, ColorBg)
+	ui.DrawText("You can see the key bindings for other actions by pressing “?”.", margin, l)
 
 	ui.DrawTextLine(" press esc or space to continue ", l+2)
 	ui.Flush()

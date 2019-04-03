@@ -824,6 +824,7 @@ func (g *game) GenRoomTunnels(ml maplayout) {
 	dg.ConnectRooms()
 	g.Dungeon = d
 	dg.PutDoors(g)
+	g.Objects.Scrolls = map[position]scroll{}
 	dg.PlayerStartCell(g)
 	dg.ClearUnconnected(g)
 	g.Objects.Stairs = map[position]stair{}
@@ -955,7 +956,21 @@ func (r *room) RandomPlace(kind placeKind) position {
 }
 
 func (dg *dgen) PlayerStartCell(g *game) {
-	g.Player.Pos = dg.rooms[len(dg.rooms)-1].RandomPlace(PlacePatrol)
+	r := dg.rooms[len(dg.rooms)-1]
+	g.Player.Pos = r.RandomPlace(PlacePatrol)
+	itpos := r.RandomPlace(PlaceItem)
+	// TODO: make the player only start in rooms with enough places
+	if itpos == InvalidPos {
+		itpos = r.RandomPlace(PlaceStatic)
+		if itpos == InvalidPos {
+			itpos = r.RandomPlace(PlaceSpecialStatic)
+		}
+		if itpos == InvalidPos {
+			panic("no item")
+		}
+	}
+	g.Dungeon.SetCell(itpos, ScrollCell)
+	g.Objects.Scrolls[itpos] = ScrollStory
 }
 
 func (dg *dgen) GenBanana(g *game) {

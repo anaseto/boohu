@@ -145,6 +145,7 @@ var MapNames = map[rune]string{
 	'☼':  "light",
 	'π':  "table",
 	'Π':  "holedwall",
+	'?':  "scroll",
 }
 
 var LetterNames = map[rune]string{

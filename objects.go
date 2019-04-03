@@ -282,12 +282,27 @@ type scroll int
 
 const (
 	ScrollBasics scroll = iota
+	ScrollStory
 )
 
 func (sc scroll) ShortDesc(g *game) (desc string) {
 	switch sc {
 	case ScrollBasics:
 		desc = "the basics scroll"
+	case ScrollStory:
+		desc = "a story scroll"
+	default:
+		desc = "a scroll"
+	}
+	return desc
+}
+
+func (sc scroll) Text(g *game) (desc string) {
+	switch sc {
+	case ScrollBasics:
+		desc = "the basics scroll"
+	case ScrollStory:
+		desc = "Your friend Shaedra got captured by some other saijits. Saijits problems really are a pain and, as a gawalt monkey, you don't understand much about them nor actually want to. But one thing is clear: you have to rescue your friend, somewhere in the eighth floor of this Underground area, if the rumours are true. You are small and have good night vision, so you hope the infiltration will go smoothly..."
 	default:
 		desc = "a scroll"
 	}

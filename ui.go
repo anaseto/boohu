@@ -1509,6 +1509,9 @@ func (ui *gameui) UpdateInteractButton() string {
 	case StoneCell:
 		interactMenu = "[activate]"
 		show = true
+	case ScrollCell:
+		interactMenu = "[read]"
+		show = true
 	}
 	if !show {
 		return ""
