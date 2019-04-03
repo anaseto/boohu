@@ -809,10 +809,11 @@ func ApplyDefaultKeyBindings() {
 		'v': KeyEvoke,
 		'z': KeyEvoke,
 		'e': KeyInteract, // Equip/intEract
-		'i': KeyInteract, // Interact
+		'i': KeyInteract, // Interact XXX may become inventory
 		'%': KeyCharacterInfo,
 		'C': KeyCharacterInfo,
 		'm': KeyLogs,
+		'M': KeyMenu,
 		'#': KeyDump,
 		'?': KeyHelp,
 		'S': KeySave,
@@ -984,6 +985,9 @@ func (ui *gameui) HandleKey(rka runeKeyAction) (err error, again bool, quit bool
 			if err != nil {
 				ui.MenuSelectedAnimation(MenuInteract, false)
 			}
+		case ScrollCell:
+			err = ui.ReadScroll()
+			err = ui.CleanError(err)
 		default:
 			err = errors.New("You cannot interact with anything here.")
 		}
@@ -991,10 +995,10 @@ func (ui *gameui) HandleKey(rka runeKeyAction) (err error, again bool, quit bool
 		err = ui.SelectMagara(g.Ev)
 		err = ui.CleanError(err)
 	case KeyExplore:
-		ui.MenuSelectedAnimation(MenuExplore, true)
+		//ui.MenuSelectedAnimation(MenuExplore, true)
 		err = g.Autoexplore(g.Ev)
 		if err != nil {
-			ui.MenuSelectedAnimation(MenuExplore, false)
+			//ui.MenuSelectedAnimation(MenuExplore, false)
 		}
 	case KeyExamine:
 		err, again, quit = ui.Examine(nil)
@@ -1386,9 +1390,9 @@ loop:
 		ui.DrawDungeonView(TargetingMode)
 		ui.DrawInfoLine(g.InfoEntry)
 		if !ui.Small() {
-			st := " Examine/Travel (? for help) "
+			st := " Examine/Travel mode "
 			if _, ok := targ.(*examiner); !ok {
-				st = " Targeting (? for help) "
+				st = " Targeting mode "
 			}
 			ui.DrawStyledTextLine(st, DungeonHeight+2, FooterLine)
 		}
@@ -1419,16 +1423,16 @@ loop:
 type menu int
 
 const (
-	MenuExplore menu = iota
+	//MenuExplore menu = iota
+	MenuOther menu = iota
 	MenuEvoke
-	MenuOther
 	MenuInteract
 )
 
 func (m menu) String() (text string) {
 	switch m {
-	case MenuExplore:
-		text = "explore"
+	//case MenuExplore:
+	//text = "explore"
 	case MenuEvoke:
 		text = "evoke"
 	case MenuOther:
@@ -1441,8 +1445,8 @@ func (m menu) String() (text string) {
 
 func (m menu) Key(g *game) (key keyAction) {
 	switch m {
-	case MenuExplore:
-		key = KeyExplore
+	//case MenuExplore:
+	//key = KeyExplore
 	case MenuOther:
 		key = KeyMenu
 	case MenuEvoke:
@@ -1454,16 +1458,16 @@ func (m menu) Key(g *game) (key keyAction) {
 }
 
 var MenuCols = [][2]int{
-	MenuExplore:  {0, 0},
-	MenuEvoke:    {0, 0},
+	//MenuExplore:  {0, 0},
 	MenuOther:    {0, 0},
+	MenuEvoke:    {0, 0},
 	MenuInteract: {0, 0}}
 
 func init() {
 	for i := range MenuCols {
 		runes := utf8.RuneCountInString(menu(i).String())
 		if i == 0 {
-			MenuCols[0] = [2]int{7, 7 + runes}
+			MenuCols[0] = [2]int{25, 25 + runes}
 			continue
 		}
 		MenuCols[i] = [2]int{MenuCols[i-1][1] + 2, MenuCols[i-1][1] + 2 + runes}
@@ -1477,7 +1481,7 @@ func (ui *gameui) WhichButton(col int) (menu, bool) {
 	}
 	end := len(MenuCols) - 1
 	switch g.Dungeon.Cell(g.Player.Pos).T {
-	case StairCell:
+	case StairCell, BarrelCell, ScrollCell, MagaraCell, StoneCell:
 		end++
 	}
 	for i, cols := range MenuCols[0:end] {

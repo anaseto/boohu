@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"runtime"
 	"sort"
@@ -815,16 +816,18 @@ func (ui *gameui) DrawKeysBasics(m uiMode) {
 		const margin = 6
 		ui.DrawText("move cursor", DungeonWidth+margin, DungeonHeight+1)
 		ui.DrawText("view info", DungeonWidth+margin, DungeonHeight+2)
-		ui.DrawText("help", DungeonWidth+margin, DungeonHeight+3)
+		ui.DrawText("examine help", DungeonWidth+margin, DungeonHeight+3)
 	} else if m == NormalMode {
 		ui.SetCell(DungeonWidth+3, DungeonHeight, '↑', ColorFgPlayer, ColorBg)
 		ui.DrawColoredText("←↓→", DungeonWidth+2, DungeonHeight+1, ColorFgPlayer)
-		ui.SetCell(DungeonWidth+2, DungeonHeight+2, 'e', ColorFgPlayer, ColorBg)
-		ui.SetCell(DungeonWidth+2, DungeonHeight+3, '?', ColorFgPlayer, ColorBg)
+		ui.SetCell(DungeonWidth+2, DungeonHeight+2, 'v', ColorFgPlayer, ColorBg)
+		ui.SetCell(DungeonWidth+2, DungeonHeight+3, 'e', ColorFgPlayer, ColorBg)
+		ui.SetCell(DungeonWidth+2, DungeonHeight+4, '?', ColorFgPlayer, ColorBg)
 		const margin = 6
 		ui.DrawText("move/jump", DungeonWidth+margin, DungeonHeight+1)
-		ui.DrawText("interact", DungeonWidth+margin, DungeonHeight+2)
-		ui.DrawText("help", DungeonWidth+margin, DungeonHeight+3)
+		ui.DrawText("evoke", DungeonWidth+margin, DungeonHeight+2)
+		ui.DrawText("interact", DungeonWidth+margin, DungeonHeight+3)
+		ui.DrawText("command help", DungeonWidth+margin, DungeonHeight+4)
 	}
 }
 
@@ -1655,6 +1658,56 @@ func (ui *gameui) EquipMagara(ev event) error {
 		}
 		return err
 	}
+}
+
+func (ui *gameui) ReadScroll() error {
+	sc, ok := ui.g.Objects.Scrolls[ui.g.Player.Pos]
+	if !ok {
+		return errors.New("Internal error: no scroll found")
+	}
+	switch sc {
+	case ScrollBasics:
+	default:
+		ui.DrawDescription("Description: todo")
+	}
+	return errors.New(DoNothing)
+}
+
+func (ui *gameui) DrawScrollBasics() {
+	ui.DrawDungeonView(NoFlushMode)
+	const margin = 6
+	l := 0
+	ui.ClearLine(l)
+	ui.DrawColoredText("Basics:", 2, l, ColorYellow)
+	l++
+	ui.ClearLine(l)
+	l++
+	ui.ClearLine(l)
+	ui.SetCell(3, l, '↑', ColorFgPlayer, ColorBg)
+	l++
+	ui.ClearLine(l)
+	ui.DrawColoredText("←↓→", 2, l, ColorFgPlayer)
+	ui.DrawText("Use the arrows to move around or jump over a monster.", margin, 1)
+	l++
+	ui.ClearLine(l)
+	ui.DrawText("Jumping leaves you exhausted, unable to jump again for a few turns.", margin, 1)
+	l += 2
+	ui.ClearLine(l - 1)
+	ui.ClearLine(l)
+	ui.SetCell(2, l, 'e', ColorFgPlayer, ColorBg)
+	ui.DrawText("You can interact with an object in your cell using the “e” key.", margin, 2)
+	l++
+	ui.ClearLine(l)
+	ui.DrawText("Examples: read scroll, descend stairs, rest in barrel, ...", margin, 2)
+	l++
+	ui.ClearLine(l)
+	ui.SetCell(2, l, '?', ColorFgPlayer, ColorBg)
+	ui.DrawText("You can see the key bindings for other actions by pressing “?”.", margin, 3)
+
+	ui.DrawTextLine(" press esc or space to continue ", l+2)
+	ui.Flush()
+	ui.WaitForContinue(l + 2)
+	ui.DrawDungeonView(NoFlushMode)
 }
 
 func (ui *gameui) ActionItem(i, lnum int, ka keyAction, fg uicolor) {
