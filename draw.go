@@ -1574,6 +1574,7 @@ func (ui *gameui) MagaraItem(i, lnum int, c magara, fg uicolor) {
 func (ui *gameui) SelectMagara(ev event) error {
 	g := ui.g
 	desc := false
+	ui.DrawDungeonView(NoFlushMode)
 	for {
 		magaras := g.Player.Magaras
 		ui.ClearLine(0)
@@ -1616,6 +1617,7 @@ func (ui *gameui) SelectMagara(ev event) error {
 func (ui *gameui) EquipMagara(ev event) error {
 	g := ui.g
 	desc := false
+	ui.DrawDungeonView(NoFlushMode)
 	for {
 		magaras := g.Player.Magaras
 		ui.ClearLine(0)
@@ -1676,6 +1678,7 @@ var menuActions = []keyAction{
 }
 
 func (ui *gameui) SelectAction(actions []keyAction, ev event) (keyAction, error) {
+	ui.DrawDungeonView(NoFlushMode)
 	for {
 		ui.ClearLine(0)
 		if !ui.Small() {
