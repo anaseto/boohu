@@ -13,6 +13,7 @@ type objects struct {
 	Barrels map[position]bool
 	Bananas map[position]bool
 	Lights  map[position]bool
+	Scrolls map[position]scroll
 }
 
 type stair int
@@ -275,4 +276,31 @@ func (g *game) ActivateStone() (err error) {
 	g.UseStone(oppos)
 	g.Ev.Renew(g, 5)
 	return nil
+}
+
+type scroll int
+
+const (
+	ScrollBasics scroll = iota
+)
+
+func (sc scroll) ShortDesc(g *game) (desc string) {
+	switch sc {
+	case ScrollBasics:
+		desc = "the basics scroll"
+	default:
+		desc = "a scroll"
+	}
+	return desc
+}
+
+func (sc scroll) Desc(g *game) (desc string) {
+	desc = "Scrolls can be read by using the interact key (by default “e”). Some explain tutorial material, and some others tell story elements."
+	return desc
+}
+
+func (sc scroll) Style(g *game) (r rune, fg uicolor) {
+	r = '?'
+	fg = ColorFgMagicPlace
+	return r, fg
 }

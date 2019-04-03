@@ -21,6 +21,7 @@ const (
 	TableCell
 	TreeCell
 	HoledWallCell
+	ScrollCell
 )
 
 func (c cell) IsPassable() bool {
@@ -78,7 +79,7 @@ func (c cell) IsGround() bool {
 
 func (c cell) IsNotable() bool {
 	switch c.T {
-	case StairCell, StoneCell, BarrelCell, MagaraCell, BananaCell:
+	case StairCell, StoneCell, BarrelCell, MagaraCell, BananaCell, ScrollCell:
 		return true
 	default:
 		return false
@@ -113,6 +114,8 @@ func (c cell) ShortDesc(g *game, pos position) (desc string) {
 		desc = "a tree"
 	case HoledWallCell:
 		desc = "a holed wall"
+	case ScrollCell:
+		desc = g.Objects.Scrolls[pos].ShortDesc(g)
 	}
 	return desc
 }
@@ -145,6 +148,8 @@ func (c cell) Desc(g *game, pos position) (desc string) {
 		desc = "You can climb to see farther. Moreover, many monsters will not be able to attack you while you stand on a tree. The top is never illuminated."
 	case HoledWallCell:
 		desc = "Only very small creatures can pass there. It is difficult to see through."
+	case ScrollCell:
+		desc = g.Objects.Scrolls[pos].Desc(g)
 	}
 	return desc
 }
