@@ -816,7 +816,7 @@ func (ui *gameui) DrawKeysBasics(m uiMode) {
 		ui.DrawText("move cursor", DungeonWidth+margin, DungeonHeight+1)
 		ui.DrawText("view info", DungeonWidth+margin, DungeonHeight+2)
 		ui.DrawText("help", DungeonWidth+margin, DungeonHeight+3)
-	} else {
+	} else if m == NormalMode {
 		ui.SetCell(DungeonWidth+3, DungeonHeight, '↑', ColorFgPlayer, ColorBg)
 		ui.DrawColoredText("←↓→", DungeonWidth+2, DungeonHeight+1, ColorFgPlayer)
 		ui.SetCell(DungeonWidth+2, DungeonHeight+2, 'e', ColorFgPlayer, ColorBg)
