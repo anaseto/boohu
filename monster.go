@@ -566,6 +566,9 @@ func (m *monster) Explode(g *game, ev event) {
 			m.InflictDamage(g, 1, 1)
 		} else if c.IsDestructible() && RandInt(3) > 0 {
 			g.Dungeon.SetCell(pos, GroundCell)
+			if c.T == BarrelCell {
+				delete(g.Objects.Barrels, pos)
+			}
 			g.Stats.Digs++
 			if !g.Player.LOS[pos] {
 				g.TerrainKnowledge[pos] = c.T
@@ -751,6 +754,9 @@ func (m *monster) HandleMove(g *game) {
 	case !mons.Exists():
 		if m.Kind == MonsEarthDragon && c.IsDestructible() {
 			g.Dungeon.SetCell(target, GroundCell)
+			if c.T == BarrelCell {
+				delete(g.Objects.Barrels, target)
+			}
 			g.Stats.Digs++
 			if !g.Player.Sees(target) {
 				g.TerrainKnowledge[m.Pos] = c.T

@@ -382,6 +382,13 @@ func (g *game) Burn(pos position, ev event) {
 	switch c.T {
 	case DoorCell:
 		g.Print("The door vanishes in magical flames.")
+	case TableCell:
+		g.Print("The table vanishes in magical flames.")
+	case BarrelCell:
+		g.Print("The barrel vanishes in magical flames.")
+		delete(g.Objects.Barrels, pos)
+	case TreeCell:
+		g.Print("The tree vanishes in magical flames.")
 	}
 	g.Dungeon.SetCell(pos, GroundCell)
 	g.Clouds[pos] = CloudFire
