@@ -958,6 +958,9 @@ func (r *room) RandomPlace(kind placeKind) position {
 func (dg *dgen) PlayerStartCell(g *game) {
 	r := dg.rooms[len(dg.rooms)-1]
 	g.Player.Pos = r.RandomPlace(PlacePatrol)
+	if g.Depth > 1 {
+		return
+	}
 	itpos := r.RandomPlace(PlaceItem)
 	// TODO: make the player only start in rooms with enough places
 	if itpos == InvalidPos {
