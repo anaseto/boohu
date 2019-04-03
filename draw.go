@@ -799,6 +799,14 @@ func (ui *gameui) DrawDungeonView(m uiMode) {
 		ui.DrawLog(2)
 	} else {
 		ui.DrawLog(4)
+		ui.SetCell(DungeonWidth+3, DungeonHeight, '↑', ColorFgPlayer, ColorBg)
+		ui.DrawColoredText("←↓→", DungeonWidth+2, DungeonHeight+1, ColorFgPlayer)
+		ui.SetCell(DungeonWidth+2, DungeonHeight+2, 'e', ColorFgPlayer, ColorBg)
+		ui.SetCell(DungeonWidth+2, DungeonHeight+3, '?', ColorFgPlayer, ColorBg)
+		const margin = 6
+		ui.DrawText("move/jump", DungeonWidth+margin, DungeonHeight+1)
+		ui.DrawText("interact", DungeonWidth+margin, DungeonHeight+2)
+		ui.DrawText("help", DungeonWidth+margin, DungeonHeight+3)
 	}
 	if m != TargetingMode && m != NoFlushMode {
 		ui.Flush()

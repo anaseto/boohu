@@ -203,6 +203,10 @@ var LetterNames = map[rune]string{
 	'☼':  "light",
 	'π':  "table",
 	'Π':  "holedwall",
+	'←':  "larrow",
+	'↓':  "darrow",
+	'→':  "rarrow",
+	'↑':  "uarrow",
 }
 
 func (ui *gameui) Interrupt() {
