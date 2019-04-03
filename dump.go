@@ -84,7 +84,7 @@ func (g *game) Dump() string {
 	fmt.Fprintf(buf, g.DumpStatuses())
 	fmt.Fprintf(buf, "\n\n")
 	fmt.Fprintf(buf, "Miscellaneous:\n")
-	fmt.Fprintf(buf, "You killed %d monsters.\n", g.Stats.Killed)
+	fmt.Fprintf(buf, "%d monsters died.\n", g.Stats.Killed)
 	fmt.Fprintf(buf, "You spent %.1f turns in the Underground.\n", float64(g.Turn)/10)
 	maxDepth := Max(g.Depth, g.ExploredLevels)
 	s := "s"
