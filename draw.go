@@ -1744,6 +1744,7 @@ func (ui *gameui) ConfItem(i, lnum int, s setting, fg uicolor) {
 }
 
 func (ui *gameui) SelectConfigure(actions []setting) (setting, error) {
+	ui.DrawDungeonView(NoFlushMode)
 	for {
 		ui.ClearLine(0)
 		ui.DrawColoredText("Perform", 0, 0, ColorCyan)
