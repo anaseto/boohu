@@ -189,7 +189,11 @@ func (g *game) ComputeLOS() {
 	g.ComputeLights()
 	m := map[position]bool{}
 	c := g.Dungeon.Cell(g.Player.Pos)
-	g.Player.Rays = g.buildRayMap(g.Player.Pos, TreePlayerRay)
+	rs := NormalPlayerRay
+	if c.T == TreeCell {
+		rs = TreePlayerRay
+	}
+	g.Player.Rays = g.buildRayMap(g.Player.Pos, rs)
 	for pos, n := range g.Player.Rays {
 		if c.T == TreeCell && g.Illuminated[pos] && (n.Cost < TreeRange) || n.Cost < g.LosRange() {
 			m[pos] = true
