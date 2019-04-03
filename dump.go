@@ -117,17 +117,14 @@ func (g *game) Dump() string {
 func (g *game) DetailedStatistics(w io.Writer) {
 	fmt.Fprintf(w, "\n")
 	fmt.Fprintf(w, "Statistics:\n")
-	fmt.Fprintf(w, "You had %d hits (%.1f per 100 turns), %d misses (%.1f), and %d moves (%.1f).\n",
-		g.Stats.Hits, float64(g.Stats.Hits)*100/float64(g.Stats.Turns+1),
-		g.Stats.Misses, float64(g.Stats.Misses)*100/float64(g.Stats.Turns+1),
-		g.Stats.Moves, float64(g.Stats.Moves)*100/float64(g.Stats.Turns+1))
+	fmt.Fprintf(w, "You evoked magaras %d times, and moved %d times.\n",
+		g.Stats.MagarasUsed, g.Stats.Moves)
 	fmt.Fprintf(w, "You got hit %d times, blocked %d times, and dodged %d times.\n", g.Stats.ReceivedHits, g.Stats.Blocks, g.Stats.Dodges)
 	fmt.Fprintf(w, "You endured %d damage.\n", g.Stats.Damage)
-	fmt.Fprintf(w, "You were lucky %d times.\n", g.Stats.TimesLucky)
 	fmt.Fprintf(w, "You activated %d stones.\n", g.Stats.UsedStones)
 	fmt.Fprintf(w, "There were %d fires.\n", g.Stats.Burns)
 	fmt.Fprintf(w, "There were %d destroyed walls.\n", g.Stats.Digs)
-	fmt.Fprintf(w, "You rested %d times (%d interruptions).\n", g.Stats.Rest, g.Stats.RestInterrupt)
+	fmt.Fprintf(w, "You rested %d times.\n", g.Stats.Rest)
 	fmt.Fprintf(w, "You spent %.1f%% turns wounded.\n", float64(g.Stats.TWounded)*100/float64(g.Stats.Turns+1))
 	fmt.Fprintf(w, "You spent %.1f%% turns with monsters in sight.\n", float64(g.Stats.TMonsLOS)*100/float64(g.Stats.Turns+1))
 	fmt.Fprintf(w, "You spent %.1f%% turns wounded with monsters in sight.\n", float64(g.Stats.TMWounded)*100/float64(g.Stats.Turns+1))
