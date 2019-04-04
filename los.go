@@ -108,6 +108,10 @@ func (g *game) losCost(from, pos, to position, rs raystyle) int {
 	if c.T == FungusCell || c.T == HoledWallCell {
 		switch rs {
 		case TreePlayerRay:
+			if c.T == FungusCell {
+				break
+			}
+			fallthrough
 		default:
 			return wallcost + to.Distance(pos) - 2
 		}
