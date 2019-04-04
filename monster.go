@@ -261,7 +261,7 @@ var MonsData = []monsterData{
 	MonsVampire:       {10, MonsMedium, 'V', "vampire", 13},
 	MonsTreeMushroom:  {20, MonsLarge, 'T', "tree mushroom", 16},
 	MonsMarevorHelith: {10, MonsMedium, 'M', "Marevor Helith", 18},
-	MonsButterfly:     {10, MonsSmall, 'b', "butterfly", 2},
+	MonsButterfly:     {10, MonsSmall, 'b', "kerejat", 2},
 }
 
 var monsDesc = []string{
@@ -291,7 +291,7 @@ var monsDesc = []string{
 	MonsVampire:       "Vampires are humanoids that drink blood to survive. Their spitting can cause nausea, impeding the use of potions.",
 	MonsTreeMushroom:  "Tree mushrooms are big clunky slow-moving creatures. They can throw lignifying spores at you.",
 	MonsMarevorHelith: "Marevor Helith is an ancient undead nakrus very fond of teleporting people away. He is a well-known expert in the field of magaras - items that many people simply call magical objects. His current research focus is monolith creation. Marevor, a repentant necromancer, is now searching for his old disciple Jaixel in the Underground to help him overcome the past.",
-	MonsButterfly:     "Underground's butterflies wander around, illuminating their surroundings.",
+	MonsButterfly:     "Underground's butterflies, called kerejats, wander around, illuminating their surroundings.",
 }
 
 type bandInfo struct {
