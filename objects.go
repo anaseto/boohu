@@ -25,7 +25,7 @@ const (
 
 func (st stair) ShortDesc(g *game) (desc string) {
 	if st == WinStair {
-		desc = fmt.Sprintf("glowing stairs")
+		desc = fmt.Sprintf("a portal monolith")
 	} else {
 		desc = fmt.Sprintf("stairs downwards")
 	}
@@ -34,14 +34,14 @@ func (st stair) ShortDesc(g *game) (desc string) {
 
 func (st stair) Desc(g *game) (desc string) {
 	if st == WinStair {
-		desc = "These shiny-looking stairs are in fact a magical monolith. It is said they were made some centuries ago by Marevor Helith. They will lead you back to your village."
+		desc = "Going through this portal will make you escape from this place, going back to the Surface."
 		if g.Depth < MaxDepth {
-			desc += " Note that this is not the last floor, so you may want to find a normal stair and continue collecting simellas, if you're courageous enough."
+			desc += " If you're courageous enough, you may skip this portal and continue going deeper in the dungeon, to find Marevor's magara, finishing Shaedra's failed mission."
 		}
 	} else {
 		desc = "Stairs lead to the next level of the Underground. There's no way back. Monsters do not follow you."
 		if g.Depth == WinDepth {
-			desc += " If you're afraid, you could instead just win by taking the magical stairs somewhere in the same map."
+			desc += " You may want to take those after freeing Shaedra from her cell."
 		}
 	}
 	return desc
