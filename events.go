@@ -57,6 +57,7 @@ const (
 	SwapEnd
 	ShadowsEnd
 	AccurateEnd
+	ShaedraAnimation
 )
 
 func (g *game) PushEvent(ev event) {
@@ -110,6 +111,9 @@ func (sev *simpleEvent) Action(g *game) {
 			return
 		}
 		g.TurnStats()
+	case ShaedraAnimation:
+		g.ComputeLOS() // TODO: optimize? most of the time almost redundant (unless on a tree)
+		g.ui.FreeingShaedraAnimation()
 	case SlowEnd:
 		g.Player.Statuses[StatusSlow]--
 		if g.Player.Statuses[StatusSlow] <= 0 {

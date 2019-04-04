@@ -14,6 +14,7 @@ type objects struct {
 	Bananas map[position]bool
 	Lights  map[position]bool
 	Scrolls map[position]scroll
+	Story   map[position]story
 }
 
 type stair int
@@ -25,7 +26,7 @@ const (
 
 func (st stair) ShortDesc(g *game) (desc string) {
 	if st == WinStair {
-		desc = fmt.Sprintf("a portal monolith")
+		desc = fmt.Sprintf("a monolith portal")
 	} else {
 		desc = fmt.Sprintf("stairs downwards")
 	}
@@ -51,6 +52,7 @@ func (st stair) Style(g *game) (r rune, fg uicolor) {
 	r = '>'
 	if st == WinStair {
 		fg = ColorFgMagicPlace
+		r = 'Δ'
 	} else {
 		fg = ColorFgPlace
 	}
@@ -283,16 +285,17 @@ type scroll int
 const (
 	ScrollBasics scroll = iota
 	ScrollStory
+	ScrollExtended
 )
 
 func (sc scroll) ShortDesc(g *game) (desc string) {
 	switch sc {
 	case ScrollBasics:
 		desc = "the basics scroll"
-	case ScrollStory:
-		desc = "a story scroll"
+	case ScrollStory, ScrollExtended:
+		desc = "a story message"
 	default:
-		desc = "a scroll"
+		desc = "a message"
 	}
 	return desc
 }
@@ -302,20 +305,60 @@ func (sc scroll) Text(g *game) (desc string) {
 	case ScrollBasics:
 		desc = "the basics scroll"
 	case ScrollStory:
-		desc = "Your friend Shaedra got captured by some other saijits. Saijits problems really are a pain and, as a gawalt monkey, you don't understand much about them nor actually want to. But one thing is clear: you have to rescue your friend, somewhere in the eighth floor of this Underground area, if the rumours are true. You are small and have good night vision, so you hope the infiltration will go smoothly..."
+		desc = "Your friend Shaedra got captured by some nasty people while she was trying to retrieve a powerful magara artifact that was stolen from the great magara-specialist Marevor Helith. As a gawalt monkey, you don't understand much why people complicate so much their lives caring about artifacts and the like, but one thing is clear: you have to rescue your friend, somewhere to be found in the eighth floor of this Underground area, if the rumours are true. Marevor did give to you the twin sister of the stolen artifact, saying that he'll be able to create a portal for you to flee once you find Shaedra, though he hopes you'll find the stolen artifact too. Until then, everything is up to you. You are small and have good night vision, so you hope the infiltration will go smoothly..."
+	case ScrollExtended:
+		desc = "Now that Shaedra's back to safety, you can either follow her advice, and get away from here too using the monolith portal, or you can finish the original mission: going deeper to find Marevor's powerful magara, before those mad people do bad things with it. You honestly didn't understand why it was dangerous, but Shaedra and Marevor had seemed truly concerned. Marevor said that he'll be able to create a new portal for you when you activate the artifact upon finding it."
 	default:
-		desc = "a scroll"
+		desc = "a message"
 	}
 	return desc
 }
 
 func (sc scroll) Desc(g *game) (desc string) {
-	desc = "Scrolls can be read by using the interact key (by default “e”). Some explain tutorial material, and some others tell story elements."
+	desc = "Messages can be read by using the interact key (by default “e”). Some explain tutorial material, and some others tell story elements."
 	return desc
 }
 
 func (sc scroll) Style(g *game) (r rune, fg uicolor) {
 	r = '?'
 	fg = ColorFgMagicPlace
+	return r, fg
+}
+
+type story int
+
+const (
+	StoryShaedra story = iota
+	StoryMarevor
+)
+
+func (st story) Desc(g *game) (desc string) {
+	switch st {
+	case StoryShaedra:
+		desc = "Shaedra is the friend you came here to rescue, a human-like creature with claws, a ternian. Many other human-like creatures consider them as savages."
+	case StoryMarevor:
+		desc = "Marevor Helith is an ancient undead nakrus very fond of teleporting people away. He is a well-known expert in the field of magaras - items that many people simply call magical objects. His current research focus is monolith creation. Marevor, a repentant necromancer, is now searching for his old disciple Jaixel in the Underground to help him overcome the past."
+	}
+	return desc
+}
+
+func (st story) ShortDesc(g *game) (desc string) {
+	switch st {
+	case StoryShaedra:
+		desc = "Shaedra"
+	case StoryMarevor:
+		desc = "Marevor"
+	}
+	return desc
+}
+
+func (st story) Style(g *game) (r rune, fg uicolor) {
+	switch st {
+	case StoryShaedra:
+		r = 'H'
+	case StoryMarevor:
+		r = 'M'
+	}
+	fg = ColorFgPlayer
 	return r, fg
 }

@@ -22,6 +22,7 @@ const (
 	TreeCell
 	HoledWallCell
 	ScrollCell
+	StoryCell
 )
 
 func (c cell) IsPassable() bool {
@@ -116,6 +117,8 @@ func (c cell) ShortDesc(g *game, pos position) (desc string) {
 		desc = "a holed wall"
 	case ScrollCell:
 		desc = g.Objects.Scrolls[pos].ShortDesc(g)
+	case StoryCell:
+		desc = g.Objects.Story[pos].ShortDesc(g)
 	}
 	return desc
 }
@@ -150,6 +153,8 @@ func (c cell) Desc(g *game, pos position) (desc string) {
 		desc = "Only very small creatures can pass there. It is difficult to see through."
 	case ScrollCell:
 		desc = g.Objects.Scrolls[pos].Desc(g)
+	case StoryCell:
+		desc = g.Objects.Story[pos].Desc(g)
 	}
 	return desc
 }
@@ -185,6 +190,8 @@ func (c cell) Style(g *game, pos position) (r rune, fg uicolor) {
 		r, fg = 'Π', ColorFgPlace
 	case ScrollCell:
 		r, fg = '?', ColorFgMagicPlace
+	case StoryCell:
+		r, fg = g.Objects.Story[pos].Style(g)
 	}
 	return r, fg
 }

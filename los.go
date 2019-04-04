@@ -253,6 +253,11 @@ func (g *game) SeePosition(pos position) {
 			g.StopAuto()
 		}
 		g.Dungeon.SetExplored(pos)
+		if c.T == StoryCell {
+			if g.Objects.Story[pos] == StoryShaedra {
+				g.PushEvent(&simpleEvent{ERank: g.Ev.Rank(), EAction: ShaedraAnimation})
+			}
+		}
 		g.DijkstraMapRebuild = true
 	} else {
 		// XXX this can be improved to handle more terrain types changes

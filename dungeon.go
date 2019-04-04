@@ -199,6 +199,9 @@ const (
 	PlaceStatic
 	PlaceSpecialStatic
 	PlaceItem
+	PlaceShaedra
+	PlaceMonolith
+	PlaceMarevor
 )
 
 type place struct {
@@ -243,6 +246,7 @@ type dgen struct {
 	room   map[position]bool
 	rooms  []*room
 	fungus map[position]vegetation
+	spl    places
 }
 
 func (dg *dgen) WallAreaCount(area []position, pos position, radius int) int {
@@ -561,6 +565,31 @@ const (
 var roomSpecialTemplates = []string{RoomBigColumns, RoomBigGarden, RoomColumns, RoomRoundColumns, RoomRoundGarden, RoomLongHall,
 	RoomGardenHall, RoomHome1, RoomHome2, RoomHome3, RoomHome4, RoomHome5, RoomTriangle, RoomRevTriangle, RoomSpiraling, RoomAltar, RoomCircleDouble, RoomBigRooms, RoomCaban, RoomDolmen, RoomRuins, RoomPillars}
 
+const (
+	CellShaedra1 = `
+#########
+#HMΔ#_!>#
+##|###|##
++.P...P.+
+##|###|##
+#_!>#>!_#
+#########
+`
+	CellShaedra2 = `
+#########
+#_!>#>!_#
+##|###|##
++.P...P.+
+##|###|##
+#_!>#HMΔ#
+#########
+`
+)
+
+// TODO: add indestructible walls?
+
+var roomCellTemplates = []string{CellShaedra1, CellShaedra2}
+
 func (r *room) ComputeDimensions() {
 	x := 0
 	y := 0
@@ -640,6 +669,18 @@ func (r *room) Dig(dg *dgen) {
 			if pos.valid() {
 				dg.d.SetCell(pos, FungusCell)
 			}
+		case 'H':
+			r.places = append(r.places, place{pos: pos, kind: PlaceShaedra})
+			dg.spl.Shaedra = pos
+			dg.d.SetCell(pos, StoryCell)
+		case 'M':
+			r.places = append(r.places, place{pos: pos, kind: PlaceMarevor})
+			dg.spl.Marevor = pos
+			dg.d.SetCell(pos, GroundCell)
+		case 'Δ':
+			r.places = append(r.places, place{pos: pos, kind: PlaceMonolith})
+			dg.spl.Monolith = pos
+			dg.d.SetCell(pos, GroundCell)
 		}
 		if c != '"' {
 			delete(dg.fungus, pos)
@@ -751,18 +792,22 @@ func (g *game) HoledWallCandidate(pos position) bool {
 			pos.S().valid() && d.Cell(pos.S()).IsWall())
 }
 
-func (dg *dgen) GenRooms(templates []string, n int) {
+func (dg *dgen) GenRooms(templates []string, n int) bool {
+	ok := true
 	for i := 0; i < n; i++ {
 		var r *room
-		count := 100
+		count := 200
 		for r == nil && count > 0 {
 			count--
 			r = dg.NewRoom(position{RandInt(DungeonWidth - 1), RandInt(DungeonHeight - 1)}, templates[RandInt(len(templates))])
 		}
 		if r != nil {
 			dg.rooms = append(dg.rooms, r)
+		} else {
+			ok = false
 		}
 	}
+	return ok
 }
 
 func (dg *dgen) ConnectRooms() {
@@ -818,8 +863,22 @@ func (g *game) GenRoomTunnels(ml maplayout) {
 		dg.GenRooms(roomSpecialTemplates, 4)
 		dg.GenRooms(roomNormalTemplates, 7)
 	default:
-		dg.GenRooms(roomSpecialTemplates, 3)
-		dg.GenRooms(roomNormalTemplates, 7)
+		if g.Depth == WinDepth {
+			ok := dg.GenRooms(roomCellTemplates, 1)
+			if !ok {
+				panic("lol")
+			}
+			g.Objects.Story = map[position]story{}
+			g.Places.Shaedra = dg.spl.Shaedra
+			g.Objects.Story[g.Places.Shaedra] = StoryShaedra
+			g.Places.Monolith = dg.spl.Monolith
+			g.Places.Marevor = dg.spl.Marevor
+			dg.GenRooms(roomSpecialTemplates, 3)
+			dg.GenRooms(roomNormalTemplates, 6)
+		} else {
+			dg.GenRooms(roomSpecialTemplates, 3)
+			dg.GenRooms(roomNormalTemplates, 7)
+		}
 	}
 	dg.ConnectRooms()
 	g.Dungeon = d
@@ -833,7 +892,8 @@ func (g *game) GenRoomTunnels(ml maplayout) {
 	if g.Depth < MaxDepth {
 		dg.GenStairs(g, NormalStair)
 	}
-	if g.Depth == WinDepth || g.Depth == MaxDepth {
+	//if g.Depth == WinDepth || g.Depth == MaxDepth {
+	if g.Depth == MaxDepth {
 		dg.GenStairs(g, WinStair)
 	}
 	for i := 0; i < 4+RandInt(2); i++ {

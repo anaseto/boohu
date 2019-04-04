@@ -54,8 +54,15 @@ type game struct {
 	Wizard             bool
 	WizardMap          bool
 	Version            string
+	Places             places
 	//Opts                startOpts
 	ui *gameui
+}
+
+type places struct {
+	Shaedra  position
+	Monolith position
+	Marevor  position
 }
 
 func (g *game) FreeCell() position {

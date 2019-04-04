@@ -517,3 +517,47 @@ func (ui *gameui) MagicMappingAnimation(border []int) {
 	ui.Flush()
 	time.Sleep(12 * time.Millisecond)
 }
+
+func (ui *gameui) FreeingShaedraAnimation() {
+	g := ui.g
+	if DisableAnimations {
+		return
+	}
+	g.Print("You see Shaedra. She is wounded!")
+	g.PrintStyled("Shaedra: “By Ruyale, thank you Syu! Let's flee with Marevor's magara!”", logSpecial)
+	g.Print("[esc|space]...")
+	ui.DrawDungeonView(NoFlushMode)
+	ui.Flush()
+	ui.WaitForContinue(-1)
+	_, _, bg := ui.PositionDrawing(g.Places.Monolith)
+	ui.DrawAtPosition(g.Places.Monolith, false, 'Φ', ColorFgMagicPlace, bg)
+	ui.Flush()
+	time.Sleep(400 * time.Millisecond)
+	g.Objects.Stairs[g.Places.Monolith] = WinStair
+	g.Dungeon.SetCell(g.Places.Monolith, StairCell)
+	ui.DrawDungeonView(NoFlushMode)
+	ui.Flush()
+	time.Sleep(400 * time.Millisecond)
+	_, _, bg = ui.PositionDrawing(g.Places.Marevor)
+	ui.DrawAtPosition(g.Places.Marevor, false, 'Φ', ColorFgMagicPlace, bg)
+	ui.Flush()
+	time.Sleep(400 * time.Millisecond)
+	g.Dungeon.SetCell(g.Places.Marevor, StoryCell)
+	g.Objects.Story[g.Places.Marevor] = StoryMarevor
+	g.PrintStyled("Marevor: “And what about the mission?”", logSpecial)
+	g.PrintStyled("Shaedra: “Pff, don't be reckless!”", logSpecial)
+	g.Print("[esc/space]...")
+	ui.DrawDungeonView(NoFlushMode)
+	ui.Flush()
+	ui.WaitForContinue(-1)
+	ui.DrawAtPosition(g.Places.Marevor, false, 'Φ', ColorFgMagicPlace, bg)
+	ui.DrawAtPosition(g.Places.Shaedra, false, 'Φ', ColorFgMagicPlace, bg)
+	time.Sleep(400 * time.Millisecond)
+	ui.Flush()
+	g.Dungeon.SetCell(g.Places.Shaedra, GroundCell)
+	g.Dungeon.SetCell(g.Places.Marevor, ScrollCell)
+	g.Objects.Scrolls[g.Places.Marevor] = ScrollExtended
+	ui.DrawDungeonView(NoFlushMode)
+	ui.Flush()
+	time.Sleep(12 * time.Millisecond)
+}
