@@ -63,7 +63,7 @@ const (
 	MonsMirrorSpecter
 	//MonsTinyHarpy
 	//MonsOgre
-	MonsCyclop
+	MonsOricCelmist
 	//MonsBrizzia
 	MonsHound
 	//MonsGiantBee
@@ -110,7 +110,7 @@ func (mk monsterKind) Dangerousness() int {
 func (mk monsterKind) Ranged() bool {
 	switch mk {
 	//case MonsLich, MonsCyclop, MonsHighGuard, MonsSatowalgaPlant, MonsMadNixe, MonsVampire, MonsTreeMushroom:
-	case MonsLich, MonsHighGuard, MonsCyclop, MonsSatowalgaPlant, MonsMadNixe, MonsVampire, MonsTreeMushroom:
+	case MonsLich, MonsHighGuard, MonsSatowalgaPlant, MonsMadNixe, MonsVampire, MonsTreeMushroom:
 		return true
 	default:
 		return false
@@ -120,7 +120,7 @@ func (mk monsterKind) Ranged() bool {
 func (mk monsterKind) Smiting() bool {
 	switch mk {
 	//case MonsMirrorSpecter, MonsMindCelmist:
-	case MonsMirrorSpecter:
+	case MonsMirrorSpecter, MonsOricCelmist:
 		return true
 	default:
 		return false
@@ -138,7 +138,7 @@ func (mk monsterKind) Peaceful() bool {
 
 func (mk monsterKind) CanOpenDoors() bool {
 	switch mk {
-	case MonsGuard, MonsHighGuard, MonsMadNixe, MonsCyclop, MonsLich, MonsVampire, MonsWingedMilfid:
+	case MonsGuard, MonsHighGuard, MonsMadNixe, MonsOricCelmist, MonsLich, MonsVampire, MonsWingedMilfid:
 		return true
 	default:
 		return false
@@ -238,8 +238,8 @@ var MonsData = []monsterData{
 	MonsGuard: {10, MonsMedium, 'g', "guard", 3},
 	//MonsTinyHarpy:       {10, 1, 10, 2, 't', "tiny harpy", 4},
 	//MonsOgre:            {10, 2, 20, 3, 'O', "ogre", 7},
-	MonsCyclop: {10, MonsLarge, 'C', "cyclops", 9},
-	MonsWorm:   {15, MonsSmall, 'w', "farmer worm", 4},
+	MonsOricCelmist: {10, MonsMedium, 'c', "oric celmist", 9},
+	MonsWorm:        {15, MonsSmall, 'w', "farmer worm", 4},
 	//MonsBrizzia:         {15, 1, 10, 3, 'z', "brizzia", 6},
 	//MonsAcidMound:       {10, 1, 10, 2, 'a', "acid mound", 6},
 	MonsHound: {10, MonsMedium, 'h', "hound", 5},
@@ -268,8 +268,8 @@ var monsDesc = []string{
 	MonsGuard: "Guards patrol between buildings.",
 	//MonsTinyHarpy:       "Tiny harpies are little humanoid flying creatures. They blink away when hurt. They often appear in a group.",
 	//MonsOgre:            "Ogres are big clunky humanoids that can hit really hard.",
-	MonsCyclop: "Cyclopes are very similar to ogres, but they also like to throw rocks at their foes (2 damage). The rocks can block your way for a while.",
-	MonsWorm:   "Farmer worms are ugly slow moving creatures. They furrow as they move, helping new foliage to grow.",
+	MonsOricCelmist: "Oric celmists are mages that can create magical barriers in cells adjacent to you, complicating your escape.",
+	MonsWorm:        "Farmer worms are ugly slow moving creatures. They furrow as they move, helping new foliage to grow.",
 	//MonsBrizzia:         "Brizzias are big slow moving biped creatures. They are quite hardy, and when hurt they can cause nausea, impeding the use of potions.",
 	//MonsAcidMound:       "Acid mounds are acidic creatures. They can temporarily corrode your equipment.",
 	MonsHound: "Hounds are fast moving carnivore quadrupeds. They can bark, and smell you.",
@@ -333,7 +333,7 @@ var MonsBands = []monsterBandData{
 	LoneGuard:          {Monster: MonsGuard},
 	LoneHighGuard:      {Monster: MonsHighGuard},
 	LoneYack:           {Monster: MonsYack},
-	LoneCyclop:         {Monster: MonsCyclop},
+	LoneCyclop:         {Monster: MonsOricCelmist},
 	LoneSatowalgaPlant: {Monster: MonsSatowalgaPlant},
 	LoneBlinkingFrog:   {Monster: MonsBlinkingFrog},
 	LoneWorm:           {Monster: MonsWorm},
@@ -1053,8 +1053,6 @@ func (m *monster) RangedAttack(g *game, ev event) bool {
 	switch m.Kind {
 	case MonsLich:
 		return m.TormentBolt(g, ev)
-	case MonsCyclop:
-		return m.ThrowRock(g, ev)
 	case MonsHighGuard:
 		return m.ThrowJavelin(g, ev)
 	case MonsSatowalgaPlant:
@@ -1109,56 +1107,63 @@ func (m *monster) TormentBolt(g *game, ev event) bool {
 	return true
 }
 
-func (m *monster) ThrowRock(g *game, ev event) bool {
-	blocked := m.RangeBlocked(g)
-	if blocked {
+func (g *game) BarrierCandidates(pos position, todir direction) []position {
+	candidates := pos.ValidCardinalNeighbors()
+	bestpos := pos.To(todir)
+	if bestpos.Distance(pos) > 1 {
+		j := 0
+		for i := 0; i < len(candidates); i++ {
+			if candidates[i].Distance(bestpos) == 1 {
+				candidates[j] = candidates[i]
+				j++
+			}
+		}
+		if len(candidates) > 2 {
+			candidates = candidates[0:2]
+		}
+		return candidates
+	}
+	worstpos := pos.To(pos.Dir(bestpos))
+	for i := 1; i < len(candidates); i++ {
+		if candidates[i] == bestpos {
+			candidates[0], candidates[i] = candidates[i], candidates[0]
+		}
+	}
+	for i := 1; i < len(candidates)-1; i++ {
+		if candidates[i] == worstpos {
+			candidates[len(candidates)-1], candidates[i] = candidates[i], candidates[len(candidates)-1]
+		}
+	}
+	if len(candidates) == 4 && RandInt(2) == 0 {
+		candidates[1], candidates[2] = candidates[2], candidates[1]
+	}
+	if len(candidates) == 4 {
+		candidates = candidates[0:3]
+	}
+	return candidates
+}
+
+func (m *monster) CreateBarrier(g *game, ev event) bool {
+	// TODO: add noise?
+	dir := g.Player.Pos.Dir(m.Pos)
+	candidates := g.BarrierCandidates(g.Player.Pos, dir)
+	wall := false
+	for _, pos := range candidates {
+		c := g.Dungeon.Cell(pos)
+		mons := g.MonsterAt(pos)
+		if mons.Exists() || c.IsWall() {
+			continue
+		}
+		g.TemporalWallAt(pos, ev)
+		wall = true
+		g.Printf("The oric celmist creates a barrier.", m.Kind.Indefinite(false))
+		break
+	}
+	if !wall {
 		return false
 	}
-	dmg := DmgExtra
-	clang := RandInt(3) == 0
-	if RandInt(2) == 0 {
-		noise := g.HitNoise(clang)
-		g.MakeNoise(noise, g.Player.Pos)
-		var sclang string
-		if clang {
-			sclang = g.ArmourClang()
-		}
-		g.PrintfStyled("%s throws a rock at you (%d dmg).%s", logMonsterHit, m.Kind.Definite(true), dmg, sclang)
-		g.ui.MonsterProjectileAnimation(g.Ray(m.Pos), '●', ColorMagenta)
-		oppos := g.Player.Pos
-		if m.PushPlayer(g) {
-			g.TemporalWallAt(oppos, ev)
-		} else {
-			ray := g.Ray(m.Pos)
-			if len(ray) > 0 {
-				g.TemporalWallAt(ray[len(ray)-1], ev)
-			}
-		}
-		m.InflictDamage(g, dmg, dmg)
-	} else {
-		g.Stats.Dodges++
-		g.Printf("You dodge %s's rock.", m.Kind.Indefinite(false))
-		g.ui.MonsterProjectileAnimation(g.Ray(m.Pos), '●', ColorMagenta)
-		dir := g.Player.Pos.Dir(m.Pos)
-		pos := g.Player.Pos.To(dir)
-		if pos.valid() {
-			mons := g.MonsterAt(pos)
-			if mons.Exists() {
-				if mons.Kind.Size() == MonsSmall {
-					mons.Dead = true
-					g.HandleKill(mons, ev)
-				} else {
-					mons.Blink(g)
-					if mons.Pos != pos {
-						g.TemporalWallAt(pos, ev)
-					}
-				}
-			} else {
-				g.TemporalWallAt(pos, ev)
-			}
-		}
-	}
-	ev.Renew(g, 2*m.Kind.AttackDelay())
+	ev.Renew(g, m.Kind.AttackDelay())
+	m.Exhaust(g)
 	return true
 }
 
@@ -1283,6 +1288,8 @@ func (m *monster) SmitingAttack(g *game, ev event) bool {
 	switch m.Kind {
 	case MonsMirrorSpecter:
 		return m.AbsorbMana(g, ev)
+	case MonsOricCelmist:
+		return m.CreateBarrier(g, ev)
 		//case MonsMindCelmist:
 		//return m.MindAttack(g, ev)
 	}
