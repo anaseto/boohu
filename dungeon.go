@@ -866,7 +866,7 @@ func (g *game) GenRoomTunnels(ml maplayout) {
 		if g.Depth == WinDepth {
 			ok := dg.GenRooms(roomCellTemplates, 1)
 			if !ok {
-				panic("lol")
+				panic("Shaedra Cell")
 			}
 			g.Objects.Story = map[position]story{}
 			g.Places.Shaedra = dg.spl.Shaedra
@@ -974,6 +974,37 @@ func (dg *dgen) AddSpecial(g *game, ml maplayout) {
 		dg.GenTree(g)
 	}
 	dg.PutHoledWalls(g, 1+RandInt(2))
+	if g.Params.Lore[g.Depth] {
+		dg.PutLore(g)
+	}
+}
+
+func (dg *dgen) PutLore(g *game) {
+	pos := InvalidPos
+	count := 0
+	for pos == InvalidPos {
+		count++
+		if count > 2000 {
+			panic("PutLore1")
+		}
+		pos = dg.rooms[RandInt(len(dg.rooms))].RandomPlace(PlaceItem)
+	}
+	count = 0
+	for {
+		count++
+		if count > 1000 {
+			panic("PutLore2")
+		}
+		i := RandInt(len(LoreMessages))
+		if g.GeneratedLore[i] {
+			continue
+		}
+		g.GeneratedLore[i] = true
+		g.Objects.Lore[pos] = i
+		g.Objects.Scrolls[pos] = ScrollLore
+		g.Dungeon.SetCell(pos, ScrollCell)
+		break
+	}
 }
 
 func (dg *dgen) GenLight(g *game) {

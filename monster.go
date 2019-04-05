@@ -138,7 +138,7 @@ func (mk monsterKind) Peaceful() bool {
 
 func (mk monsterKind) CanOpenDoors() bool {
 	switch mk {
-	case MonsGuard, MonsHighGuard, MonsMadNixe, MonsCyclop, MonsLich, MonsVampire, MonsWingedMilfid, MonsMarevorHelith:
+	case MonsGuard, MonsHighGuard, MonsMadNixe, MonsCyclop, MonsLich, MonsVampire, MonsWingedMilfid:
 		return true
 	default:
 		return false
@@ -160,8 +160,8 @@ func (mk monsterKind) Desc() string {
 
 func (mk monsterKind) SeenStoryText() (text string) {
 	switch mk {
-	case MonsMarevorHelith:
-		text = "You saw Marevor."
+	//case MonsMarevorHelith:
+	//text = "You saw Marevor."
 	default:
 		text = fmt.Sprintf("You saw %s.", Indefinite(mk.String(), false))
 	}
@@ -170,8 +170,8 @@ func (mk monsterKind) SeenStoryText() (text string) {
 
 func (mk monsterKind) Indefinite(capital bool) (text string) {
 	switch mk {
-	case MonsMarevorHelith:
-		text = mk.String()
+	//case MonsMarevorHelith:
+	//text = mk.String()
 	default:
 		text = Indefinite(mk.String(), capital)
 	}
@@ -180,8 +180,8 @@ func (mk monsterKind) Indefinite(capital bool) (text string) {
 
 func (mk monsterKind) Definite(capital bool) (text string) {
 	switch mk {
-	case MonsMarevorHelith:
-		text = mk.String()
+	//case MonsMarevorHelith:
+	//text = mk.String()
 	default:
 		if capital {
 			text = fmt.Sprintf("The %s", mk.String())
@@ -258,10 +258,10 @@ var MonsData = []monsterData{
 	MonsSatowalgaPlant: {10, MonsLarge, 'P', "satowalga plant", 7},
 	MonsMadNixe:        {10, MonsMedium, 'N', "mad nixe", 14},
 	//MonsMindCelmist:     {10, 1, 20, 2, 'c', "mind celmist", 12},
-	MonsVampire:       {10, MonsMedium, 'V', "vampire", 13},
-	MonsTreeMushroom:  {20, MonsLarge, 'T', "tree mushroom", 16},
-	MonsMarevorHelith: {10, MonsMedium, 'M', "Marevor Helith", 18},
-	MonsButterfly:     {10, MonsSmall, 'b', "kerejat", 2},
+	MonsVampire:      {10, MonsMedium, 'V', "vampire", 13},
+	MonsTreeMushroom: {20, MonsLarge, 'T', "tree mushroom", 16},
+	//MonsMarevorHelith: {10, MonsMedium, 'M', "Marevor Helith", 18},
+	MonsButterfly: {10, MonsSmall, 'b', "kerejat", 2},
 }
 
 var monsDesc = []string{
@@ -288,10 +288,10 @@ var monsDesc = []string{
 	MonsSatowalgaPlant: "Satowalga Plants are immobile bushes that throw acidic projectiles at you, sometimes confusing you.",
 	MonsMadNixe:        "Nixes are magical humanoids. Usually, they specialize in illusion harmonic magic, but the so called mad nixes are a perverted variant who learned the oric arts to create a spell that can attract their foes to them, so that they can kill them without pursuing them.",
 	//MonsMindCelmist:     "Mind celmists are mages that use magical smitting mind attacks that bypass armour. They can occasionally confuse or slow you. They try to avoid melee.",
-	MonsVampire:       "Vampires are humanoids that drink blood to survive. Their spitting can cause nausea, impeding the use of potions.",
-	MonsTreeMushroom:  "Tree mushrooms are big clunky slow-moving creatures. They can throw lignifying spores at you, leaving you unable to move for a few turns, though the spores will also provide some protection against harm.",
-	MonsMarevorHelith: "Marevor Helith is an ancient undead nakrus very fond of teleporting people away. He is a well-known expert in the field of magaras - items that many people simply call magical objects. His current research focus is monolith creation. Marevor, a repentant necromancer, is now searching for his old disciple Jaixel in the Underground to help him overcome the past.",
-	MonsButterfly:     "Underground's butterflies, called kerejats, wander peacefully around, illuminating their surroundings.",
+	MonsVampire:      "Vampires are humanoids that drink blood to survive. Their spitting can cause nausea, impeding the use of potions.",
+	MonsTreeMushroom: "Tree mushrooms are big clunky slow-moving creatures. They can throw lignifying spores at you, leaving you unable to move for a few turns, though the spores will also provide some protection against harm.",
+	//MonsMarevorHelith: "Marevor Helith is an ancient undead nakrus very fond of teleporting people away. He is a well-known expert in the field of magaras - items that many people simply call magical objects. His current research focus is monolith creation. Marevor, a repentant necromancer, is now searching for his old disciple Jaixel in the Underground to help him overcome the past.",
+	MonsButterfly: "Underground's butterflies, called kerejats, wander peacefully around, illuminating their surroundings.",
 }
 
 type bandInfo struct {
@@ -318,7 +318,7 @@ const (
 	LoneMadNixe
 	LoneTreeMushroom
 	LoneEarthDragon
-	LoneMarevorHelith
+	//LoneMarevorHelith
 	LoneButterfly
 )
 
@@ -344,8 +344,8 @@ var MonsBands = []monsterBandData{
 	LoneMadNixe:        {Monster: MonsMadNixe},
 	LoneTreeMushroom:   {Monster: MonsTreeMushroom},
 	LoneEarthDragon:    {Monster: MonsEarthDragon},
-	LoneMarevorHelith:  {Monster: MonsMarevorHelith},
-	LoneButterfly:      {Monster: MonsButterfly},
+	//LoneMarevorHelith:  {Monster: MonsMarevorHelith},
+	LoneButterfly: {Monster: MonsButterfly},
 }
 
 type monster struct {
@@ -373,7 +373,7 @@ func (m *monster) Init() {
 	m.Pos = InvalidPos
 	m.LastKnownPos = InvalidPos
 	switch m.Kind {
-	case MonsMarevorHelith, MonsButterfly:
+	case MonsButterfly:
 		m.State = Wandering
 	case MonsSatowalgaPlant:
 		m.State = Watching
@@ -530,8 +530,8 @@ func (m *monster) TeleportMonsterAway(g *game) bool {
 func (m *monster) AttackAction(g *game, ev event) {
 	m.Dir = g.Player.Pos.Dir(m.Pos)
 	switch m.Kind {
-	case MonsMarevorHelith:
-		m.TeleportPlayer(g, ev)
+	//case MonsMarevorHelith:
+	//m.TeleportPlayer(g, ev)
 	case MonsExplosiveNadre:
 		m.Explode(g, ev)
 		return
@@ -828,7 +828,6 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	ppos := g.Player.Pos
 	mpos := m.Pos
 	m.MakeAware(g)
-	movedelay := m.MoveDelay(g)
 	if m.State == Resting {
 		if RandInt(3000) == 0 {
 			m.NaturalAwake(g)
@@ -857,12 +856,12 @@ func (m *monster) HandleTurn(g *game, ev event) {
 		ev.Renew(g, 10) // wait
 		return
 	}
-	if m.Kind == MonsMarevorHelith {
-		if m.TeleportMonsterAway(g) {
-			ev.Renew(g, movedelay)
-			return
-		}
-	}
+	//if m.Kind == MonsMarevorHelith {
+	//if m.TeleportMonsterAway(g) {
+	//ev.Renew(g, movedelay)
+	//return
+	//}
+	//}
 	switch m.State {
 	case Watching:
 		m.HandleWatching(g)
@@ -1544,7 +1543,7 @@ func (dg *dgen) PutMonsterBand(g *game, band monsterBand) bool {
 		bdinf = dg.BandInfoOutsideGround(g, band)
 	case LoneBlinkingFrog, LoneExplosiveNadre:
 		bdinf = dg.BandInfoOutside(g, band)
-	case LoneMirrorSpecter, LoneMarevorHelith, LoneWingedMilfid:
+	case LoneMirrorSpecter, LoneWingedMilfid:
 		bdinf = dg.BandInfoOutsideExplore(g, band)
 	case LoneButterfly:
 		bdinf = dg.BandInfoOutsideExploreButterfly(g, band)
@@ -1603,11 +1602,11 @@ func (dg *dgen) GenMonsters(g *game) {
 	bandsPlants := []monsterBand{LoneSatowalgaPlant}
 	bandsBipeds := []monsterBand{LoneCyclop, LoneMirrorSpecter, LoneWingedMilfid, LoneMadNixe}
 	bandsBig := []monsterBand{LoneTreeMushroom, LoneEarthDragon}
-	mlevel := 1 + RandInt(MaxDepth)
-	if mlevel == g.Depth {
-		// XXX should really Marevor appear in more than one level?
-		dg.PutMonsterBand(g, LoneMarevorHelith)
-	}
+	//mlevel := 1 + RandInt(MaxDepth)
+	//if mlevel == g.Depth {
+	// XXX should really Marevor appear in more than one level?
+	//dg.PutMonsterBand(g, LoneMarevorHelith)
+	//}
 	dg.PutRandomBandN(g, bandsButterfly, 2)
 	switch g.Depth {
 	case 1:

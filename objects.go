@@ -15,6 +15,7 @@ type objects struct {
 	Lights  map[position]bool
 	Scrolls map[position]scroll
 	Story   map[position]story
+	Lore    map[position]int
 }
 
 type stair int
@@ -286,6 +287,7 @@ const (
 	ScrollBasics scroll = iota
 	ScrollStory
 	ScrollExtended
+	ScrollLore
 )
 
 func (sc scroll) ShortDesc(g *game) (desc string) {
@@ -308,6 +310,16 @@ func (sc scroll) Text(g *game) (desc string) {
 		desc = "Your friend Shaedra got captured by some nasty people while she was trying to retrieve a powerful magara artifact that was stolen from the great magara-specialist Marevor Helith. As a gawalt monkey, you don't understand much why people complicate so much their lives caring about artifacts and the like, but one thing is clear: you have to rescue your friend, somewhere to be found in the eighth floor of this Underground area, if the rumours are true. Marevor did give to you the twin sister of the stolen artifact, saying that he'll be able to create a portal for you to flee once you find Shaedra, though he hopes you'll find the stolen artifact too. Until then, everything is up to you. You are small and have good night vision, so you hope the infiltration will go smoothly..."
 	case ScrollExtended:
 		desc = "Now that Shaedra's back to safety, you can either follow her advice, and get away from here too using the monolith portal, or you can finish the original mission: going deeper to find Marevor's powerful magara, before those mad people do bad things with it. You honestly didn't understand why it was dangerous, but Shaedra and Marevor had seemed truly concerned. Marevor said that he'll be able to create a new portal for you when you activate the artifact upon finding it."
+	case ScrollLore:
+		i, ok := g.Objects.Lore[g.Player.Pos]
+		if !ok {
+			// should not happen
+			desc = "Some unintelligible notes."
+			break
+		}
+		if i < len(LoreMessages) {
+			desc = LoreMessages[i]
+		}
 	default:
 		desc = "a message"
 	}
@@ -315,13 +327,16 @@ func (sc scroll) Text(g *game) (desc string) {
 }
 
 func (sc scroll) Desc(g *game) (desc string) {
-	desc = "Messages can be read by using the interact key (by default “e”). Some explain tutorial material, and some others tell story elements."
+	desc = "A message. It can be read by using the interact key (by default “e”)."
 	return desc
 }
 
 func (sc scroll) Style(g *game) (r rune, fg uicolor) {
 	r = '?'
 	fg = ColorFgMagicPlace
+	if sc == ScrollLore {
+		fg = ColorViolet
+	}
 	return r, fg
 }
 

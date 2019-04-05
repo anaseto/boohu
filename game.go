@@ -22,6 +22,7 @@ type game struct {
 	Clouds             map[position]cloud
 	TemporalWalls      map[position]terrain
 	GeneratedUniques   map[monsterBand]int
+	GeneratedLore      map[int]bool
 	GeneratedMagaras   []magara
 	GenPlan            [MaxDepth + 1]genFlavour
 	TerrainKnowledge   map[position]terrain
@@ -55,8 +56,13 @@ type game struct {
 	WizardMap          bool
 	Version            string
 	Places             places
+	Params             startParams
 	//Opts                startOpts
 	ui *gameui
+}
+
+type startParams struct {
+	Lore map[int]bool
 }
 
 type places struct {
@@ -213,8 +219,9 @@ func (g *game) InitFirstLevel() {
 	g.AutoTarget = InvalidPos
 	g.Targeting = InvalidPos
 	g.GeneratedUniques = map[monsterBand]int{}
+	g.GeneratedLore = map[int]bool{}
 	g.Stats.KilledMons = map[monsterKind]int{}
-	g.GenPlan = [MaxDepth + 1]genFlavour{
+	g.GenPlan = [MaxDepth + 1]genFlavour{ // XXX this is obsolete
 		1:  GenRod,
 		2:  GenArmour,
 		3:  GenExtraCollectables,
@@ -226,6 +233,10 @@ func (g *game) InitFirstLevel() {
 		9:  GenRod,
 		10: GenExtraCollectables,
 		11: GenExtraCollectables,
+	}
+	g.Params.Lore = map[int]bool{}
+	for i := 0; i < 4; i++ {
+		g.Params.Lore[RandInt(MaxDepth)] = true
 	}
 	permi := RandInt(7)
 	switch permi {
@@ -244,6 +255,7 @@ func (g *game) InitLevelStructures() {
 	g.TemporalWalls = map[position]terrain{}
 	g.LastMonsterKnownAt = map[position]*monster{}
 	g.Objects.Magaras = map[position]magara{}
+	g.Objects.Lore = map[position]int{}
 	g.Clouds = map[position]cloud{}
 }
 

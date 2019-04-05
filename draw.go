@@ -1463,6 +1463,35 @@ func (ui *gameui) DrawDescription(desc string) {
 	ui.DrawDungeonView(NoFlushMode)
 }
 
+func (ui *gameui) DrawLore(desc string) {
+	ui.DrawDungeonView(NoFlushMode)
+	desc = strings.TrimSpace(desc)
+	slines := strings.Split(desc, "\n")
+	lines := 0
+	indent := false
+	for j, s := range slines {
+		if j == 0 && len(s) > 0 && strings.HasPrefix(s, "“") {
+			indent = true
+		}
+		s = strings.Replace(s, "\n", "", -1)
+		s = formatText(s, TextWidth)
+		if indent && len(s) > 0 && s[0] != '\n' && !strings.HasPrefix(s, "“") && s[0] != '[' {
+			s = " " + s
+		}
+		l := strings.Count(s, "\n") + 1
+		for i := lines; i <= lines+l; i++ {
+			ui.ClearLine(i)
+		}
+		ui.DrawText(s, 0, lines)
+		lines += l
+	}
+	ui.ClearLine(lines + 1)
+	ui.DrawTextLine(" press esc or space to continue ", lines+1)
+	ui.Flush()
+	ui.WaitForContinue(lines + 1)
+	ui.DrawDungeonView(NoFlushMode)
+}
+
 func (ui *gameui) DrawText(text string, x, y int) {
 	ui.DrawColoredText(text, x, y, ColorFg)
 }
@@ -1668,6 +1697,8 @@ func (ui *gameui) ReadScroll() error {
 	switch sc {
 	case ScrollBasics:
 		ui.DrawScrollBasics()
+	case ScrollLore:
+		ui.DrawLore(sc.Text(ui.g))
 	default:
 		ui.DrawDescription(sc.Text(ui.g))
 	}

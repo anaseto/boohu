@@ -189,7 +189,7 @@ func (c cell) Style(g *game, pos position) (r rune, fg uicolor) {
 	case HoledWallCell:
 		r, fg = 'Π', ColorFgPlace
 	case ScrollCell:
-		r, fg = '?', ColorFgMagicPlace
+		r, fg = g.Objects.Scrolls[pos].Style(g)
 	case StoryCell:
 		r, fg = g.Objects.Story[pos].Style(g)
 	}
