@@ -63,5 +63,6 @@ func (g *game) ApplyAptitude(ap aptitude) {
 		return
 	}
 	g.Player.Aptitudes[ap] = true
-	g.PrintStyled("You feel different. "+ap.String(), logSpecial)
+	g.PrintStyled("You feel different.", logSpecial)
+	g.PrintStyled(ap.String(), logSpecial)
 }
