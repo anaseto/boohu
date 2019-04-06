@@ -930,14 +930,16 @@ func (m *monster) HitPlayer(g *game, ev event) {
 	}
 	m.HitSideEffects(g, ev)
 	const HeavyWoundHP = 2
-	if g.Player.Aptitudes[AptConfusingGas] && g.Player.HP < HeavyWoundHP {
+	if g.Player.HP >= HeavyWoundHP {
+		return
+	}
+	switch g.Player.Inventory.Neck {
+	case AmuletConfusion:
 		m.EnterConfusion(g, ev)
 		g.Printf("You release some confusing gas against the %s.", m.Kind)
-	}
-	if g.Player.Aptitudes[AptSmoke] && g.Player.HP < HeavyWoundHP {
-		g.Smoke(ev)
-	}
-	if g.Player.Aptitudes[AptObstruction] && g.Player.HP <= HeavyWoundHP {
+	case AmuletFog:
+		g.SwiftFog(ev)
+	case AmuletObstruction:
 		opos := m.Pos
 		m.Blink(g)
 		if opos != m.Pos {
@@ -945,11 +947,9 @@ func (m *monster) HitPlayer(g *game, ev event) {
 			g.Print("A temporal wall emerges.")
 			m.Exhaust(g)
 		}
-	}
-	if g.Player.Aptitudes[AptTeleport] && g.Player.HP < HeavyWoundHP {
+	case AmuletTeleport:
 		m.TeleportAway(g)
-	}
-	if g.Player.Aptitudes[AptLignification] && g.Player.HP < HeavyWoundHP {
+	case AmuletLignification:
 		m.EnterLignification(g, ev)
 	}
 }

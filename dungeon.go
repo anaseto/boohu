@@ -883,12 +883,8 @@ func (g *game) GenRoomTunnels(ml maplayout) {
 	dg.ConnectRooms()
 	g.Dungeon = d
 	dg.PutDoors(g)
-	g.Objects.Scrolls = map[position]scroll{}
 	dg.PlayerStartCell(g)
 	dg.ClearUnconnected(g)
-	g.Objects.Stairs = map[position]stair{}
-	g.Objects.Bananas = map[position]bool{}
-	g.Objects.Barrels = map[position]bool{}
 	if g.Depth < MaxDepth {
 		dg.GenStairs(g, NormalStair)
 	}
@@ -929,6 +925,7 @@ func (dg *dgen) AddSpecial(g *game, ml maplayout) {
 		dg.GenBanana(g)
 	}
 	dg.GenMagara(g)
+	dg.GenItem(g)
 	dg.GenStones(g)
 	dg.GenLight(g)
 	ntables := 2
@@ -1024,7 +1021,6 @@ func (dg *dgen) GenLight(g *game) {
 			lights = append(lights, pos)
 		}
 	}
-	g.Objects.Lights = map[position]bool{}
 	for _, pos := range lights {
 		g.Objects.Lights[pos] = true
 	}
@@ -1189,6 +1185,33 @@ func (dg *dgen) InsideCell(g *game) position {
 			return pos
 		}
 	}
+}
+
+func (dg *dgen) GenItem(g *game) {
+	plan := g.GenPlan[g.Depth]
+	if plan != GenAmulet && plan != GenCloak {
+		return
+	}
+	pos := InvalidPos
+	count := 0
+	for pos == InvalidPos {
+		count++
+		if count > 1000 {
+			panic("GenItem")
+		}
+		pos = dg.rooms[RandInt(len(dg.rooms))].RandomPlace(PlaceItem)
+	}
+	g.Dungeon.SetCell(pos, ItemCell)
+	var it item
+	switch plan {
+	case GenCloak:
+		it = g.RandomCloak()
+		g.GeneratedCloaks = append(g.GeneratedCloaks, it)
+	case GenAmulet:
+		it = g.RandomAmulet()
+		g.GeneratedAmulets = append(g.GeneratedAmulets, it)
+	}
+	g.Objects.Items[pos] = it
 }
 
 func (dg *dgen) GenMagara(g *game) {

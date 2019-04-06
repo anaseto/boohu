@@ -331,16 +331,18 @@ func (g *game) ComputeRayHighlight(pos position) {
 func (g *game) ComputeNoise() {
 	dij := &noisePath{game: g}
 	rg := DefaultLOSRange
-	if g.Player.Aptitudes[AptHear] {
+	if g.Player.Inventory.Body == CloakHear {
 		rg++
 	}
 	nm := Dijkstra(dij, []position{g.Player.Pos}, rg)
 	count := 0
 	noise := map[position]bool{}
 	rmax := 2
-	if g.Player.Aptitudes[AptHear] {
+	if g.Player.Inventory.Body == CloakHear {
 		rmax += 2
 	}
+	// TODO: make it so that you only hear when monsters actually move (standing doesn't count)
+	// maybe if they're close enough you could hear them breathe too, or something like that.
 	for pos := range nm {
 		if g.Player.Sees(pos) {
 			continue
@@ -398,7 +400,10 @@ func (m *monster) SeesPlayer(g *game) bool {
 }
 
 func (m *monster) Sees(g *game, pos position) bool {
-	const darkRange = 4
+	var darkRange = 4
+	if g.Player.Inventory.Body == CloakShadows {
+		darkRange = 3
+	}
 	const tableRange = 1
 	if !(m.LOS[pos] && m.Dir.InViewCone(m.Pos, pos)) {
 		return false

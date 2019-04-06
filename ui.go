@@ -983,6 +983,8 @@ func (ui *gameui) HandleKey(rka runeKeyAction) (err error, again bool, quit bool
 		case ScrollCell:
 			err = ui.ReadScroll()
 			err = ui.CleanError(err)
+		case ItemCell:
+			err = ui.g.EquipItem()
 		default:
 			err = errors.New("You cannot interact with anything here.")
 		}
@@ -1506,6 +1508,9 @@ func (ui *gameui) UpdateInteractButton() string {
 		show = true
 	case ScrollCell:
 		interactMenu = "[read]"
+		show = true
+	case ItemCell:
+		interactMenu = "[equip]"
 		show = true
 	}
 	if !show {

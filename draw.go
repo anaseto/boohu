@@ -577,7 +577,6 @@ func (ui *gameui) CharacterInfo() {
 	b := bytes.Buffer{}
 	b.WriteString(formatText("Every year, the elders send someone to collect medicinal simella plants in the Underground.  This year, the honor fell upon you, and so here you are.  According to the elders, deep in the Underground, magical stairs will lead you back to your village.", TextWidth))
 	b.WriteString("\n\n")
-	b.WriteString(ui.AptitudesText())
 
 	desc := b.String()
 	lines := strings.Count(desc, "\n")
@@ -609,24 +608,6 @@ func (ui *gameui) WizardInfo() {
 	ui.DrawText(b.String(), 0, 0)
 	ui.Flush()
 	ui.WaitForContinue(-1)
-}
-
-func (ui *gameui) AptitudesText() string {
-	g := ui.g
-	apts := []string{}
-	for apt, b := range g.Player.Aptitudes {
-		if b {
-			apts = append(apts, apt.String())
-		}
-	}
-	sort.Strings(apts)
-	var text string
-	if len(apts) > 0 {
-		text = "Aptitudes:\n" + strings.Join(apts, "\n")
-	} else {
-		text = "You do not have any special aptitudes."
-	}
-	return text
 }
 
 func (ui *gameui) AddComma(see, s string) string {

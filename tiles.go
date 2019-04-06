@@ -230,14 +230,18 @@ func (ui *gameui) ColorLine(y int, fg uicolor) {
 
 func getImage(cell UICell) *image.RGBA {
 	var pngImg []byte
+	hastile := false
 	if cell.InMap && gameConfig.Tiles {
 		pngImg = TileImgs["map-notile"]
 		if im, ok := TileImgs["map-"+string(cell.R)]; ok {
 			pngImg = im
+			hastile = true
 		} else if im, ok := TileImgs["map-"+MapNames[cell.R]]; ok {
 			pngImg = im
+			hastile = true
 		}
-	} else {
+	}
+	if !hastile {
 		pngImg = TileImgs["map-notile"]
 		if im, ok := TileImgs["letter-"+string(cell.R)]; ok {
 			pngImg = im

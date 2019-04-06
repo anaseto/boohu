@@ -23,6 +23,7 @@ const (
 	HoledWallCell
 	ScrollCell
 	StoryCell
+	ItemCell
 )
 
 func (c cell) IsPassable() bool {
@@ -80,7 +81,7 @@ func (c cell) IsGround() bool {
 
 func (c cell) IsNotable() bool {
 	switch c.T {
-	case StairCell, StoneCell, BarrelCell, MagaraCell, BananaCell, ScrollCell:
+	case StairCell, StoneCell, BarrelCell, MagaraCell, BananaCell, ScrollCell, ItemCell:
 		return true
 	default:
 		return false
@@ -119,6 +120,8 @@ func (c cell) ShortDesc(g *game, pos position) (desc string) {
 		desc = g.Objects.Scrolls[pos].ShortDesc(g)
 	case StoryCell:
 		desc = g.Objects.Story[pos].ShortDesc(g)
+	case ItemCell:
+		desc = g.Objects.Items[pos].ShortDesc(g)
 	}
 	return desc
 }
@@ -155,6 +158,8 @@ func (c cell) Desc(g *game, pos position) (desc string) {
 		desc = g.Objects.Scrolls[pos].Desc(g)
 	case StoryCell:
 		desc = g.Objects.Story[pos].Desc(g)
+	case ItemCell:
+		desc = g.Objects.Items[pos].Desc(g)
 	}
 	return desc
 }
@@ -192,6 +197,8 @@ func (c cell) Style(g *game, pos position) (r rune, fg uicolor) {
 		r, fg = g.Objects.Scrolls[pos].Style(g)
 	case StoryCell:
 		r, fg = g.Objects.Story[pos].Style(g)
+	case ItemCell:
+		r, fg = g.Objects.Items[pos].Style(g)
 	}
 	return r, fg
 }

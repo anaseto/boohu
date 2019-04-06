@@ -7,15 +7,16 @@ import (
 )
 
 type objects struct {
-	Stairs  map[position]stair
+	Stairs  map[position]stair // TODO simplify? (there's never more than one)
 	Stones  map[position]stone
-	Magaras map[position]magara
+	Magaras map[position]magara // TODO simplify? (there's never more than one)
 	Barrels map[position]bool
 	Bananas map[position]bool
 	Lights  map[position]bool
 	Scrolls map[position]scroll
 	Story   map[position]story
-	Lore    map[position]int
+	Lore    map[position]int // TODO simplify? (there's never more than one)
+	Items   map[position]item
 }
 
 type stair int
@@ -376,4 +377,182 @@ func (st story) Style(g *game) (r rune, fg uicolor) {
 	}
 	fg = ColorFgPlayer
 	return r, fg
+}
+
+type item int
+
+const (
+	NoItem item = iota
+	CloakMagic
+	CloakHear
+	CloakVitality
+	CloakAcrobat // no exhaustion between jumps?
+	CloakShadows // reduce monster los?
+	CloakSmoke
+	AmuletTeleport
+	AmuletConfusion
+	AmuletFog
+	AmuletLignification
+	AmuletObstruction
+	MarevorMagara
+)
+
+func (it item) IsCloak() bool {
+	switch it {
+	case CloakMagic,
+		CloakHear,
+		CloakVitality,
+		CloakAcrobat,
+		CloakSmoke,
+		CloakShadows:
+		return true
+	}
+	return false
+}
+
+func (it item) IsAmulet() bool {
+	switch it {
+	case AmuletTeleport,
+		AmuletConfusion,
+		AmuletFog,
+		AmuletLignification,
+		AmuletObstruction:
+		return true
+	}
+	return false
+}
+
+func (it item) ShortDesc(g *game) (desc string) {
+	switch it {
+	case CloakMagic:
+		desc = "cloak of magic"
+	case CloakHear:
+		desc = "cloak of hearing"
+	case CloakVitality:
+		desc = "cloak of vitality"
+	case CloakAcrobat:
+		desc = "cloak of acrobatics"
+	case CloakShadows:
+		desc = "cloak of shadows"
+	case CloakSmoke:
+		desc = "cloak of smoking"
+	case AmuletTeleport:
+		desc = "amulet of teleport"
+	case AmuletConfusion:
+		desc = "amulet of confusion"
+	case AmuletFog:
+		desc = "amulet of fog"
+	case AmuletLignification:
+		desc = "amulet of lignification"
+	case AmuletObstruction:
+		desc = "amulet of obstruction"
+	case MarevorMagara:
+		desc = "Moon Portal Artifact"
+	}
+	return desc
+}
+
+func (it item) Desc(g *game) (desc string) {
+	switch it {
+	case CloakMagic:
+		desc = "increases your magical reserves."
+	case CloakHear:
+		desc = "improves your hearing skills."
+	case CloakVitality:
+		desc = "improves your health."
+	case CloakAcrobat:
+		desc = "removes exhaustion from jumps."
+	case CloakShadows:
+		desc = "reduces the range at which foes see you in the dark."
+	case CloakSmoke:
+		desc = "leaves smoke behind as you move, making you difficult to spot."
+	case AmuletTeleport:
+		desc = "teleports away foes that hit you."
+	case AmuletConfusion:
+		desc = "confuses foes that hit you."
+	case AmuletFog:
+		desc = "releases fog and makes you swift when hurt."
+	case AmuletLignification:
+		desc = "lignifies foes that hit you."
+	case AmuletObstruction:
+		desc = "uses a magical barrier to blow away monsters that hit you."
+	case MarevorMagara:
+		desc = "magara was given to you by Marevor Helith so that he can create an escape portal when you reach Shaedra. Its sister magara, the Gem Portal Artifact, also crafted by Marevor, is the artifact that was stolen and that Shaedra was trying to retrieve before being captured. This magara needs a lot of time to recharge, so you'll only be able to use it once."
+	}
+	return "The " + it.ShortDesc(g) + " " + desc
+}
+
+func (it item) Style(g *game) (r rune, fg uicolor) {
+	fg = ColorFgObject
+	if it.IsAmulet() {
+		r = '='
+	} else if it.IsCloak() {
+		r = '['
+	}
+	return r, fg
+}
+
+func (g *game) EquipItem() error {
+	it, ok := g.Objects.Items[g.Player.Pos]
+	if !ok {
+		return errors.New("Nothing to equip here.")
+	}
+	var oitem item
+	switch {
+	case it.IsAmulet():
+		oitem = g.Player.Inventory.Body
+		g.Player.Inventory.Body = it
+	case it.IsCloak():
+		oitem = g.Player.Inventory.Neck
+		g.Player.Inventory.Neck = it
+	}
+	if oitem != NoItem {
+		g.Objects.Items[g.Player.Pos] = oitem
+		g.Printf("You equip %s, leaving %s on the ground.", it.ShortDesc(g), oitem.ShortDesc(g))
+		g.StoryPrintf("You equip %s, leaving %s.", it.ShortDesc(g), oitem.ShortDesc(g))
+	} else {
+		g.Printf("You equip %s.", it.ShortDesc(g))
+		g.StoryPrintf("You equip %s.", it.ShortDesc(g))
+	}
+	g.Ev.Renew(g, 5)
+	return nil
+}
+
+func (g *game) RandomCloak() (it item) {
+	cloaks := []item{CloakMagic,
+		CloakHear,
+		CloakVitality,
+		CloakAcrobat,
+		CloakSmoke,
+		CloakShadows}
+loop:
+	for {
+		it = cloaks[RandInt(len(cloaks))]
+		for _, cl := range g.GeneratedCloaks {
+			if cl == it {
+				continue loop
+			}
+		}
+		break
+	}
+	return it
+}
+
+func (g *game) RandomAmulet() (it item) {
+	amulets := []item{AmuletTeleport,
+		AmuletConfusion,
+		AmuletFog,
+		AmuletLignification,
+		AmuletObstruction}
+loop:
+	for {
+		it = amulets[RandInt(len(amulets))]
+		for _, cl := range g.GeneratedAmulets {
+			if cl == it {
+				continue loop
+			}
+		}
+		break
+	}
+	return it
 }

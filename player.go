@@ -6,27 +6,34 @@ import (
 )
 
 type player struct {
-	HP        int
-	HPbonus   int
-	MP        int
-	Bananas   int
-	Magaras   []magara
-	Dir       direction
-	Aptitudes map[aptitude]bool
+	HP      int
+	HPbonus int
+	MP      int
+	Bananas int
+	Magaras []magara
+	Dir     direction
+	//Aptitudes map[aptitude]bool
 	Statuses  map[status]int
 	Expire    map[status]int
 	Pos       position
 	Target    position
 	LOS       map[position]bool
 	Rays      rayMap
+	Inventory inventory
+}
+
+type inventory struct {
+	Body item
+	Neck item
+	Misc item
 }
 
 const DefaultHealth = 4
 
 func (p *player) HPMax() int {
 	hpmax := DefaultHealth
-	if p.Aptitudes[AptHealthy] {
-		hpmax += 1
+	if p.Inventory.Body == CloakVitality {
+		hpmax += 2
 	}
 	if hpmax < 2 {
 		hpmax = 2
@@ -38,7 +45,7 @@ const DefaultMPmax = 5
 
 func (p *player) MPMax() int {
 	mpmax := DefaultMPmax
-	if p.Aptitudes[AptMagic] {
+	if p.Inventory.Body == CloakMagic {
 		mpmax += 2
 	}
 	return mpmax
@@ -46,16 +53,6 @@ func (p *player) MPMax() int {
 
 func (p *player) HasStatus(st status) bool {
 	return p.Statuses[st] > 0
-}
-
-func (p *player) AptitudeCount() int {
-	count := 0
-	for _, b := range p.Aptitudes {
-		if b {
-			count++
-		}
-	}
-	return count
 }
 
 func (g *game) AutoToDir(ev event) bool {
@@ -229,6 +226,7 @@ func (g *game) CollectGround() {
 				delete(g.Objects.Magaras, pos)
 				g.Dungeon.SetCell(pos, GroundCell)
 				g.Printf("You take %s.", Indefinite(g.Player.Magaras[i].String(), false))
+				g.StoryPrintf("You took %s.", Indefinite(g.Player.Magaras[i].String(), false))
 				break switchcell
 			}
 			g.Printf("You stand over %s.", Indefinite(g.Objects.Magaras[pos].String(), false))
@@ -268,6 +266,8 @@ func (g *game) MovePlayer(pos position, ev event) error {
 			g.Print("You hide yourself under the table.")
 		} else if c.T == TreeCell {
 			g.Print("You climb to the top.")
+		} else if c.T == HoledWallCell {
+			g.Print("You crawl under the wall.")
 		}
 		if c.T == WallCell {
 			g.Dungeon.SetCell(pos, GroundCell)
@@ -276,13 +276,13 @@ func (g *game) MovePlayer(pos position, ev event) error {
 			g.Fog(pos, 1, ev)
 			g.Stats.Digs++
 		}
-		//switch g.Player.Armour {
-		//case SmokingScales:
-		//_, ok := g.Clouds[g.Player.Pos]
-		//if !ok {
-		//g.Clouds[g.Player.Pos] = CloudFog
-		//g.PushEvent(&cloudEvent{ERank: ev.Rank() + DurationSmokingScalesFog, EAction: CloudEnd, Pos: g.Player.Pos})
-		//}
+		if g.Player.Inventory.Body == CloakSmoke {
+			_, ok := g.Clouds[g.Player.Pos]
+			if !ok {
+				g.Clouds[g.Player.Pos] = CloudFog
+				g.PushEvent(&cloudEvent{ERank: ev.Rank() + DurationSmokingCloakFog, EAction: CloudEnd, Pos: g.Player.Pos})
+			}
+		}
 		//}
 		g.Stats.Moves++
 		g.PlacePlayerAt(pos)
@@ -321,7 +321,7 @@ func (g *game) MPRegen(ev event) {
 	ev.Renew(g, delay)
 }
 
-func (g *game) Smoke(ev event) {
+func (g *game) SwiftFog(ev event) {
 	dij := &noisePath{game: g}
 	nm := Dijkstra(dij, []position{g.Player.Pos}, 2)
 	for pos := range nm {

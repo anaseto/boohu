@@ -23,20 +23,6 @@ func (ms monsSlice) Less(i, j int) bool {
 	return ms[i].Dangerousness() > ms[j].Dangerousness()
 }
 
-func (g *game) DumpAptitudes() string {
-	apts := []string{}
-	for apt, b := range g.Player.Aptitudes {
-		if b {
-			apts = append(apts, apt.String())
-		}
-	}
-	sort.Strings(apts)
-	if len(apts) == 0 {
-		return "You do not have any special aptitudes."
-	}
-	return "Aptitudes:\n" + strings.Join(apts, "\n")
-}
-
 func (g *game) DumpStatuses() string {
 	sts := sort.StringSlice{}
 	for st, c := range g.Player.Statuses {
@@ -79,8 +65,6 @@ func (g *game) Dump() string {
 	fmt.Fprintf(buf, "\n")
 	fmt.Fprintf(buf, "You have %d/%d HP, and %d/%d MP.\n", g.Player.HP, g.Player.HPMax(), g.Player.MP, g.Player.MPMax())
 	fmt.Fprintf(buf, "\n")
-	fmt.Fprintf(buf, g.DumpAptitudes())
-	fmt.Fprintf(buf, "\n\n")
 	fmt.Fprintf(buf, g.DumpStatuses())
 	fmt.Fprintf(buf, "\n\n")
 	fmt.Fprintf(buf, "Miscellaneous:\n")

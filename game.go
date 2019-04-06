@@ -24,6 +24,8 @@ type game struct {
 	GeneratedUniques   map[monsterBand]int
 	GeneratedLore      map[int]bool
 	GeneratedMagaras   []magara
+	GeneratedCloaks    []item
+	GeneratedAmulets   []item
 	GenPlan            [MaxDepth + 1]genFlavour
 	TerrainKnowledge   map[position]terrain
 	ExclusionsMap      map[position]bool
@@ -179,10 +181,9 @@ func (g *game) GenDungeon() {
 
 func (g *game) InitPlayer() {
 	g.Player = &player{
-		HP:        DefaultHealth,
-		MP:        DefaultMPmax,
-		Bananas:   2,
-		Aptitudes: map[aptitude]bool{},
+		HP:      DefaultHealth,
+		MP:      DefaultMPmax,
+		Bananas: 2,
 	}
 	g.Player.Statuses = map[status]int{}
 	g.Player.Expire = map[status]int{}
@@ -205,11 +206,10 @@ func (g *game) InitPlayer() {
 type genFlavour int
 
 const (
-	GenRod genFlavour = iota
+	GenNothing genFlavour = iota
 	//GenWeapon
-	GenArmour
-	GenWpArm
-	GenExtraCollectables
+	GenAmulet
+	GenCloak
 )
 
 func (g *game) InitFirstLevel() {
@@ -222,17 +222,17 @@ func (g *game) InitFirstLevel() {
 	g.GeneratedLore = map[int]bool{}
 	g.Stats.KilledMons = map[monsterKind]int{}
 	g.GenPlan = [MaxDepth + 1]genFlavour{ // XXX this is obsolete
-		1:  GenRod,
-		2:  GenArmour,
-		3:  GenExtraCollectables,
-		4:  GenRod,
-		5:  GenExtraCollectables,
-		6:  GenRod,
-		7:  GenExtraCollectables,
-		8:  GenExtraCollectables,
-		9:  GenRod,
-		10: GenExtraCollectables,
-		11: GenExtraCollectables,
+		1:  GenNothing,
+		2:  GenCloak,
+		3:  GenNothing,
+		4:  GenAmulet,
+		5:  GenNothing,
+		6:  GenCloak,
+		7:  GenNothing,
+		8:  GenAmulet,
+		9:  GenNothing,
+		10: GenCloak,
+		11: GenNothing,
 	}
 	g.Params.Lore = map[int]bool{}
 	for i := 0; i < 4; i++ {
@@ -246,6 +246,9 @@ func (g *game) InitFirstLevel() {
 	if RandInt(4) == 0 {
 		g.GenPlan[6], g.GenPlan[7] = g.GenPlan[7], g.GenPlan[6]
 	}
+	if RandInt(4) == 0 {
+		g.GenPlan[10], g.GenPlan[11] = g.GenPlan[11], g.GenPlan[10]
+	}
 }
 
 func (g *game) InitLevelStructures() {
@@ -256,6 +259,12 @@ func (g *game) InitLevelStructures() {
 	g.LastMonsterKnownAt = map[position]*monster{}
 	g.Objects.Magaras = map[position]magara{}
 	g.Objects.Lore = map[position]int{}
+	g.Objects.Items = map[position]item{}
+	g.Objects.Scrolls = map[position]scroll{}
+	g.Objects.Stairs = map[position]stair{}
+	g.Objects.Bananas = make(map[position]bool, 2)
+	g.Objects.Barrels = map[position]bool{}
+	g.Objects.Lights = map[position]bool{}
 	g.Clouds = map[position]cloud{}
 }
 
@@ -269,14 +278,6 @@ func (g *game) InitLevel() {
 
 	// Dungeon terrain
 	g.GenDungeon()
-
-	// Aptitudes/Mutations
-	if g.Depth == 2 || g.Depth == 5 {
-		apt, ok := g.RandomApt()
-		if ok {
-			g.ApplyAptitude(apt)
-		}
-	}
 
 	// Magara slots
 	if g.Depth == 3 || g.Depth == 6 {
