@@ -907,13 +907,8 @@ func (ui *gameui) HandleKeyAction(rka runeKeyAction) (err error, again bool, qui
 
 func (ui *gameui) OptionalDescendConfirmation(st stair) (err error) {
 	g := ui.g
-	if g.Depth == WinDepth && st == NormalStair {
-		g.Print("Do you really want to dive into optional depths? [y/N]")
-		ui.DrawDungeonView(NormalMode)
-		dive := ui.PromptConfirmation()
-		if !dive {
-			err = errors.New("Keep going in the current level, then.")
-		}
+	if g.Depth == WinDepth && st == NormalStair && g.Dungeon.Cell(g.Places.Shaedra).T == StoryCell {
+		err = errors.New("You have to rescue Shaedra first!")
 	}
 	return err
 
