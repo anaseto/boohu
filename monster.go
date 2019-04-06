@@ -1156,7 +1156,7 @@ func (m *monster) CreateBarrier(g *game, ev event) bool {
 		}
 		g.TemporalWallAt(pos, ev)
 		wall = true
-		g.Printf("The oric celmist creates a barrier.", m.Kind.Indefinite(false))
+		g.Print("The oric celmist creates a barrier.")
 		break
 	}
 	if !wall {
