@@ -552,8 +552,9 @@ func (ui *gameui) FreeingShaedraAnimation() {
 	ui.WaitForContinue(-1)
 	ui.DrawAtPosition(g.Places.Marevor, false, 'Φ', ColorFgMagicPlace, bg)
 	ui.DrawAtPosition(g.Places.Shaedra, false, 'Φ', ColorFgMagicPlace, bg)
-	time.Sleep(400 * time.Millisecond)
+	ui.DrawDungeonView(NoFlushMode)
 	ui.Flush()
+	time.Sleep(400 * time.Millisecond)
 	g.Dungeon.SetCell(g.Places.Shaedra, GroundCell)
 	g.Dungeon.SetCell(g.Places.Marevor, ScrollCell)
 	g.Objects.Scrolls[g.Places.Marevor] = ScrollExtended
