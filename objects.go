@@ -511,6 +511,8 @@ func (g *game) EquipItem() error {
 		g.Printf("You equip %s, leaving %s on the ground.", it.ShortDesc(g), oitem.ShortDesc(g))
 		g.StoryPrintf("You equip %s, leaving %s.", it.ShortDesc(g), oitem.ShortDesc(g))
 	} else {
+		delete(g.Objects.Items, g.Player.Pos)
+		g.Dungeon.SetCell(g.Player.Pos, GroundCell)
 		g.Printf("You equip %s.", it.ShortDesc(g))
 		g.StoryPrintf("You equip %s.", it.ShortDesc(g))
 	}
