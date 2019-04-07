@@ -47,7 +47,7 @@ loop:
 		in := ui.PollEvent()
 		r := ui.KeyToRuneKeyAction(in)
 		switch r {
-		case '\x1b', ' ':
+		case '\x1b', ' ', 'x':
 			break loop
 		}
 		if in.mouse && in.button == -1 {
