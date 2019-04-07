@@ -688,7 +688,7 @@ func (k keyAction) TargetingModeDescription() (text string) {
 	case KeyDescription:
 		text = "View target description"
 	case KeyTarget:
-		text = "Go to/select target"
+		text = "Go to"
 	case KeyExclude:
 		text = "Toggle exclude area from auto-travel"
 	case KeyEscape:
@@ -787,9 +787,8 @@ func ApplyDefaultKeyBindings() {
 		'=':    KeyNextObject,
 		'v':    KeyDescription,
 		'.':    KeyTarget,
-		'z':    KeyTarget,
 		't':    KeyTarget,
-		'f':    KeyTarget,
+		'g':    KeyTarget,
 		'e':    KeyExclude,
 		' ':    KeyEscape,
 		'\x1b': KeyEscape,
