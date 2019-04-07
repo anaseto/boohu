@@ -487,18 +487,10 @@ const (
 	KeyS
 	KeyN
 	KeyE
-	KeyNW
-	KeyNE
-	KeySW
-	KeySE
 	KeyRunW
 	KeyRunS
 	KeyRunN
 	KeyRunE
-	KeyRunNW
-	KeyRunNE
-	KeyRunSW
-	KeyRunSE
 	KeyRest
 	KeyWaitTurn
 	KeyDescend
@@ -537,18 +529,10 @@ var configurableKeyActions = [...]keyAction{
 	KeyS,
 	KeyN,
 	KeyE,
-	KeyNW,
-	KeyNE,
-	KeySW,
-	KeySE,
 	KeyRunW,
 	KeyRunS,
 	KeyRunN,
 	KeyRunE,
-	KeyRunNW,
-	KeyRunNE,
-	KeyRunSW,
-	KeyRunSE,
 	KeyRest,
 	KeyWaitTurn,
 	KeyDescend,
@@ -1166,9 +1150,9 @@ func (ui *gameui) CursorKeyAction(targ Targeter, rka runeKeyAction, data *examin
 		}
 	}
 	switch rka.k {
-	case KeyW, KeyS, KeyN, KeyE, KeyNW, KeyNE, KeySW, KeySE:
+	case KeyW, KeyS, KeyN, KeyE:
 		data.npos = pos.To(KeyToDir(rka.k))
-	case KeyRunW, KeyRunS, KeyRunN, KeyRunE, KeyRunNW, KeyRunNE, KeyRunSW, KeyRunSE:
+	case KeyRunW, KeyRunS, KeyRunN, KeyRunE:
 		for i := 0; i < 5; i++ {
 			p := data.npos.To(KeyToDir(rka.k))
 			if !p.valid() {

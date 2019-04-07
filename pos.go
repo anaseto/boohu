@@ -91,14 +91,6 @@ func KeyToDir(k keyAction) (dir direction) {
 		dir = S
 	case KeyN, KeyRunN:
 		dir = N
-	case KeyNW, KeyRunNW:
-		dir = NW
-	case KeySW, KeyRunSW:
-		dir = SW
-	case KeyNE, KeyRunNE:
-		dir = NE
-	case KeySE, KeyRunSE:
-		dir = SE
 	}
 	return dir
 }
