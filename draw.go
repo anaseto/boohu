@@ -1684,8 +1684,7 @@ func (ui *gameui) SelectItem(ev event) error {
 	for {
 		ui.ClearLine(0)
 		if !ui.Small() {
-			//ui.DrawColoredText(MenuEvoke.String(), MenuCols[MenuEvoke][0], DungeonHeight, ColorCyan)
-			// XXX inventory menu button
+			ui.DrawColoredText(MenuInventory.String(), MenuCols[MenuInventory][0], DungeonHeight, ColorCyan)
 		}
 		ui.DrawColoredText("Inventory", 0, 0, ColorCyan)
 		col := utf8.RuneCountInString("Inventory")
