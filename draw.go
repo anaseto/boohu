@@ -1679,8 +1679,8 @@ func (ui *gameui) InventoryItem(i, lnum int, it item, fg uicolor, part string) {
 func (ui *gameui) SelectItem(ev event) error {
 	g := ui.g
 	ui.DrawDungeonView(NoFlushMode)
-	items := []item{g.Player.Inventory.Body, g.Player.Inventory.Neck}
-	parts := []string{"body", "neck"}
+	items := []item{g.Player.Inventory.Body, g.Player.Inventory.Neck, g.Player.Inventory.Misc}
+	parts := []string{"body", "neck", "wrist"}
 	for {
 		ui.ClearLine(0)
 		if !ui.Small() {
@@ -1695,7 +1695,7 @@ func (ui *gameui) SelectItem(ev event) error {
 		ui.DrawTextLine(" press (x) to cancel ", len(items)+1)
 		ui.DrawSelectBasics()
 		ui.Flush()
-		index, alt, err := ui.Select(2)
+		index, alt, err := ui.Select(len(items))
 		if alt {
 			continue
 		}
