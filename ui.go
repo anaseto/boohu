@@ -507,7 +507,7 @@ const (
 	KeyExamine
 	KeyEvoke
 	KeyInteract
-	KeyCharacterInfo
+	KeyInventory
 	KeyLogs
 	KeyDump
 	KeyHelp
@@ -557,7 +557,7 @@ var configurableKeyActions = [...]keyAction{
 	KeyExamine,
 	KeyEvoke,
 	KeyInteract,
-	KeyCharacterInfo,
+	KeyInventory,
 	KeyLogs,
 	KeyDump,
 	KeySave,
@@ -595,7 +595,7 @@ func (k keyAction) NormalModeKey() bool {
 		KeyExamine,
 		KeyEvoke,
 		KeyInteract,
-		KeyCharacterInfo,
+		KeyInventory,
 		KeyLogs,
 		KeyDump,
 		KeyHelp,
@@ -662,8 +662,8 @@ func (k keyAction) NormalModeDescription() (text string) {
 		text = "Evoke card"
 	case KeyInteract:
 		text = "Interact"
-	case KeyCharacterInfo:
-		text = "View Character and Quest Information"
+	case KeyInventory:
+		text = "Inventory"
 	case KeyLogs:
 		text = "View previous messages"
 	case KeyDump:
@@ -808,10 +808,8 @@ func ApplyDefaultKeyBindings() {
 		'x': KeyExamine,
 		'v': KeyEvoke,
 		'z': KeyEvoke,
-		'e': KeyInteract, // Equip/intEract
-		'i': KeyInteract, // Interact XXX may become inventory
-		'%': KeyCharacterInfo,
-		'C': KeyCharacterInfo,
+		'e': KeyInteract, // intEract
+		'i': KeyInventory,
 		'm': KeyLogs,
 		'M': KeyMenu,
 		'#': KeyDump,
@@ -991,6 +989,9 @@ func (ui *gameui) HandleKey(rka runeKeyAction) (err error, again bool, quit bool
 	case KeyEvoke:
 		err = ui.SelectMagara(g.Ev)
 		err = ui.CleanError(err)
+	case KeyInventory:
+		err = ui.SelectItem(g.Ev)
+		err = ui.CleanError(err)
 	case KeyExplore:
 		//ui.MenuSelectedAnimation(MenuExplore, true)
 		err = g.Autoexplore(g.Ev)
@@ -1004,9 +1005,6 @@ func (ui *gameui) HandleKey(rka runeKeyAction) (err error, again bool, quit bool
 		again = true
 	case KeyMenuTargetingHelp:
 		ui.ExamineHelp()
-		again = true
-	case KeyCharacterInfo:
-		ui.CharacterInfo()
 		again = true
 	case KeyLogs:
 		ui.DrawPreviousLogs()
@@ -1292,7 +1290,8 @@ func (ui *gameui) CursorKeyAction(targ Targeter, rka runeKeyAction, data *examin
 		g.Targeting = InvalidPos
 		notarg = true
 		err = errors.New(DoNothing)
-	case KeyExplore, KeyRest, KeyLogs, KeyEvoke, KeyCharacterInfo:
+	case KeyExplore, KeyRest, KeyLogs, KeyEvoke, KeyInventory:
+		// XXX: hm, this is only useful with mouse in terminal, rarely tested.
 		if _, ok := targ.(*examiner); !ok {
 			break
 		}
@@ -1422,6 +1421,7 @@ type menu int
 const (
 	//MenuExplore menu = iota
 	MenuOther menu = iota
+	MenuInventory
 	MenuEvoke
 	MenuInteract
 )
@@ -1432,6 +1432,8 @@ func (m menu) String() (text string) {
 	//text = "explore"
 	case MenuEvoke:
 		text = "evoke"
+	case MenuInventory:
+		text = "inventory"
 	case MenuOther:
 		text = "menu"
 	case MenuInteract:
@@ -1446,6 +1448,8 @@ func (m menu) Key(g *game) (key keyAction) {
 	//key = KeyExplore
 	case MenuOther:
 		key = KeyMenu
+	case MenuInventory:
+		key = KeyInventory
 	case MenuEvoke:
 		key = KeyEvoke
 	case MenuInteract:
@@ -1456,9 +1460,10 @@ func (m menu) Key(g *game) (key keyAction) {
 
 var MenuCols = [][2]int{
 	//MenuExplore:  {0, 0},
-	MenuOther:    {0, 0},
-	MenuEvoke:    {0, 0},
-	MenuInteract: {0, 0}}
+	MenuOther:     {0, 0},
+	MenuInventory: {0, 0},
+	MenuEvoke:     {0, 0},
+	MenuInteract:  {0, 0}}
 
 func init() {
 	for i := range MenuCols {

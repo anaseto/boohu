@@ -1670,6 +1670,46 @@ func (ui *gameui) EquipMagara(ev event) error {
 	}
 }
 
+func (ui *gameui) InventoryItem(i, lnum int, it item, fg uicolor, part string) {
+	bg := ui.ListItemBG(i)
+	ui.ClearLineWithColor(lnum, bg)
+	ui.DrawColoredTextOnBG(fmt.Sprintf("%c - %s (%s)", rune(i+97), it.ShortDesc(ui.g), part), 0, lnum, fg, bg)
+}
+
+func (ui *gameui) SelectItem(ev event) error {
+	g := ui.g
+	ui.DrawDungeonView(NoFlushMode)
+	items := []item{g.Player.Inventory.Body, g.Player.Inventory.Neck}
+	parts := []string{"body", "neck"}
+	for {
+		ui.ClearLine(0)
+		if !ui.Small() {
+			//ui.DrawColoredText(MenuEvoke.String(), MenuCols[MenuEvoke][0], DungeonHeight, ColorCyan)
+			// XXX inventory menu button
+		}
+		ui.DrawColoredText("Inventory", 0, 0, ColorCyan)
+		col := utf8.RuneCountInString("Inventory")
+		ui.DrawText(" (select to see description)", col, 0)
+		for i := 0; i < len(items); i++ {
+			ui.InventoryItem(i, i+1, items[i], ColorFg, parts[i])
+		}
+		ui.DrawTextLine(" press esc or space to cancel ", len(items)+1)
+		ui.Flush()
+		index, alt, err := ui.Select(2)
+		if alt {
+			continue
+		}
+		if err == nil {
+			ui.InventoryItem(index, index+1, items[index], ColorYellow, parts[index])
+			ui.Flush()
+			time.Sleep(75 * time.Millisecond)
+			ui.DrawDescription(items[index].Desc(g))
+			continue
+		}
+		return err
+	}
+}
+
 func (ui *gameui) ReadScroll() error {
 	sc, ok := ui.g.Objects.Scrolls[ui.g.Player.Pos]
 	if !ok {
@@ -1683,10 +1723,12 @@ func (ui *gameui) ReadScroll() error {
 	default:
 		ui.DrawDescription(sc.Text(ui.g))
 	}
+	ui.g.Print("You read the message.")
 	return errors.New(DoNothing)
 }
 
 func (ui *gameui) DrawScrollBasics() {
+	// XXX remove?
 	ui.DrawDungeonView(NoFlushMode)
 	const margin = 5
 	l := 0
@@ -1738,7 +1780,6 @@ func (ui *gameui) ActionItem(i, lnum int, ka keyAction, fg uicolor) {
 }
 
 var menuActions = []keyAction{
-	KeyCharacterInfo,
 	KeyLogs,
 	KeyMenuCommandHelp,
 	KeyMenuTargetingHelp,

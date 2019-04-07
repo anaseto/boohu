@@ -424,6 +424,8 @@ func (it item) IsAmulet() bool {
 
 func (it item) ShortDesc(g *game) (desc string) {
 	switch it {
+	case NoItem:
+		desc = "empty slot"
 	case CloakMagic:
 		desc = "cloak of magic"
 	case CloakHear:
@@ -454,6 +456,8 @@ func (it item) ShortDesc(g *game) (desc string) {
 
 func (it item) Desc(g *game) (desc string) {
 	switch it {
+	case NoItem:
+		return "You do not have an item equipped on this lot."
 	case CloakMagic:
 		desc = "increases your magical reserves."
 	case CloakHear:
@@ -499,10 +503,10 @@ func (g *game) EquipItem() error {
 	}
 	var oitem item
 	switch {
-	case it.IsAmulet():
+	case it.IsCloak():
 		oitem = g.Player.Inventory.Body
 		g.Player.Inventory.Body = it
-	case it.IsCloak():
+	case it.IsAmulet():
 		oitem = g.Player.Inventory.Neck
 		g.Player.Inventory.Neck = it
 	}
