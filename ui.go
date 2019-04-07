@@ -221,7 +221,7 @@ func (ui *gameui) PlayerTurnEvent(ev event) (err error, again, quit bool) {
 func (ui *gameui) Scroll(n int) (m int, quit bool) {
 	in := ui.PollEvent()
 	switch in.key {
-	case "Escape", "\x1b", " ":
+	case "Escape", "\x1b", " ", "x":
 		quit = true
 	case "u", "9", "b":
 		n -= 12
@@ -264,7 +264,7 @@ func (ui *gameui) Select(l int) (index int, alternate bool, err error) {
 		in := ui.PollEvent()
 		r := ui.ReadKey(in.key)
 		switch {
-		case in.key == "\x1b" || in.key == "Escape" || in.key == " ":
+		case in.key == "\x1b" || in.key == "Escape" || in.key == " " || in.key == "x":
 			return -1, false, errors.New(DoNothing)
 		case in.key == "?":
 			return -1, true, nil
@@ -355,7 +355,7 @@ func (ui *gameui) TargetModeEvent(targ Targeter, data *examineData) (err error, 
 	again = true
 	in := ui.PollEvent()
 	switch in.key {
-	case "\x1b", "Escape", " ":
+	case "\x1b", "Escape", " ", "x":
 		g.Targeting = InvalidPos
 		notarg = true
 	case "":
@@ -584,9 +584,7 @@ func FixedRuneKey(r rune) bool {
 func (k keyAction) NormalModeKey() bool {
 	switch k {
 	case KeyW, KeyS, KeyN, KeyE,
-		KeyNW, KeyNE, KeySW, KeySE,
 		KeyRunW, KeyRunS, KeyRunN, KeyRunE,
-		KeyRunNW, KeyRunNE, KeyRunSW, KeyRunSE,
 		KeyRest,
 		KeyWaitTurn,
 		KeyDescend,
@@ -622,14 +620,6 @@ func (k keyAction) NormalModeDescription() (text string) {
 		text = "Move north"
 	case KeyE:
 		text = "Move east"
-	case KeyNW:
-		text = "Move north west"
-	case KeyNE:
-		text = "Move north east"
-	case KeySW:
-		text = "Move south west"
-	case KeySE:
-		text = "Move south east"
 	case KeyRunW:
 		text = "Travel west"
 	case KeyRunS:
@@ -638,14 +628,6 @@ func (k keyAction) NormalModeDescription() (text string) {
 		text = "Travel north"
 	case KeyRunE:
 		text = "Travel east"
-	case KeyRunNW:
-		text = "Travel north west"
-	case KeyRunNE:
-		text = "Travel north east"
-	case KeyRunSW:
-		text = "Travel south west"
-	case KeyRunSE:
-		text = "Travel south east"
 	case KeyRest:
 		text = "Rest (until status free or regen)"
 	case KeyWaitTurn:
@@ -700,14 +682,6 @@ func (k keyAction) TargetingModeDescription() (text string) {
 		text = "Move cursor north"
 	case KeyE:
 		text = "Move cursor east"
-	case KeyNW:
-		text = "Move cursor north west"
-	case KeyNE:
-		text = "Move cursor north east"
-	case KeySW:
-		text = "Move cursor south west"
-	case KeySE:
-		text = "Move cursor south east"
 	case KeyRunW:
 		text = "Big move cursor west"
 	case KeyRunS:
@@ -716,14 +690,6 @@ func (k keyAction) TargetingModeDescription() (text string) {
 		text = "Big move north"
 	case KeyRunE:
 		text = "Big move east"
-	case KeyRunNW:
-		text = "Big move north west"
-	case KeyRunNE:
-		text = "Big move north east"
-	case KeyRunSW:
-		text = "Big move south west"
-	case KeyRunSE:
-		text = "Big move south east"
 	case KeyDescend:
 		text = "Target next stair"
 	case KeyPreviousMonster:
@@ -751,9 +717,7 @@ func (k keyAction) TargetingModeDescription() (text string) {
 func (k keyAction) TargetingModeKey() bool {
 	switch k {
 	case KeyW, KeyS, KeyN, KeyE,
-		KeyNW, KeyNE, KeySW, KeySE,
 		KeyRunW, KeyRunS, KeyRunN, KeyRunE,
-		KeyRunNW, KeyRunNE, KeyRunSW, KeyRunSE,
 		KeyDescend,
 		KeyPreviousMonster,
 		KeyNextMonster,
@@ -781,26 +745,14 @@ func ApplyDefaultKeyBindings() {
 		's': KeyS,
 		'w': KeyN,
 		'd': KeyE,
-		//'y': KeyNW,
-		//'u': KeyNE,
-		//'b': KeySW,
-		//'n': KeySE,
 		'4': KeyW,
 		'2': KeyS,
 		'8': KeyN,
 		'6': KeyE,
-		//'7': KeyNW,
-		//'9': KeyNE,
-		//'1': KeySW,
-		//'3': KeySE,
 		'H': KeyRunW,
 		'J': KeyRunS,
 		'K': KeyRunN,
 		'L': KeyRunE,
-		//'Y': KeyRunNW,
-		//'U': KeyRunNE,
-		//'B': KeyRunSW,
-		//'N': KeyRunSE,
 		'.': KeyWaitTurn,
 		'5': KeyWaitTurn,
 		'G': KeyGoToStairs,
@@ -822,45 +774,33 @@ func ApplyDefaultKeyBindings() {
 		'=': KeyConfigure,
 	}
 	gameConfig.RuneTargetModeKeys = map[rune]keyAction{
-		'h': KeyW,
-		'j': KeyS,
-		'k': KeyN,
-		'l': KeyE,
-		'a': KeyW,
-		's': KeyS,
-		'w': KeyN,
-		'd': KeyE,
-		//'y':    KeyNW,
-		//'u':    KeyNE,
-		//'b':    KeySW,
-		//'n':    KeySE,
-		'4': KeyW,
-		'2': KeyS,
-		'8': KeyN,
-		'6': KeyE,
-		//'7':    KeyNW,
-		//'9':    KeyNE,
-		//'1':    KeySW,
-		//'3':    KeySE,
-		'H': KeyRunW,
-		'J': KeyRunS,
-		'K': KeyRunN,
-		'L': KeyRunE,
-		//'Y':    KeyRunNW,
-		//'U':    KeyRunNE,
-		//'B':    KeyRunSW,
-		//'N':    KeyRunSE,
-		'>': KeyNextStairs,
-		'-': KeyPreviousMonster,
-		'+': KeyNextMonster,
-		'o': KeyNextObject,
-		']': KeyNextObject,
-		')': KeyNextObject,
-		'(': KeyNextObject,
-		'[': KeyNextObject,
-		'_': KeyNextObject,
-		'v': KeyDescription,
-		//'d':    KeyDescription,
+		'h':    KeyW,
+		'j':    KeyS,
+		'k':    KeyN,
+		'l':    KeyE,
+		'a':    KeyW,
+		's':    KeyS,
+		'w':    KeyN,
+		'd':    KeyE,
+		'4':    KeyW,
+		'2':    KeyS,
+		'8':    KeyN,
+		'6':    KeyE,
+		'H':    KeyRunW,
+		'J':    KeyRunS,
+		'K':    KeyRunN,
+		'L':    KeyRunE,
+		'>':    KeyNextStairs,
+		'-':    KeyPreviousMonster,
+		'+':    KeyNextMonster,
+		'o':    KeyNextObject,
+		']':    KeyNextObject,
+		')':    KeyNextObject,
+		'(':    KeyNextObject,
+		'[':    KeyNextObject,
+		'_':    KeyNextObject,
+		'=':    KeyNextObject,
+		'v':    KeyDescription,
 		'.':    KeyTarget,
 		'z':    KeyTarget,
 		't':    KeyTarget,
@@ -868,6 +808,7 @@ func ApplyDefaultKeyBindings() {
 		'e':    KeyExclude,
 		' ':    KeyEscape,
 		'\x1b': KeyEscape,
+		'x':    KeyEscape,
 		'?':    KeyHelp,
 	}
 	CustomKeys = false
@@ -887,6 +828,8 @@ func (ui *gameui) HandleKeyAction(rka runeKeyAction) (err error, again bool, qui
 			switch rka.r {
 			case 's':
 				err = errors.New("Unknown key. Did you mean capital S for save and quit?")
+			case 'q':
+				err = errors.New("Unknown key. Did you mean capital Q for quit without saving?")
 			default:
 				err = fmt.Errorf("Unknown key '%c'. Type ? for help.", rka.r)
 			}
@@ -915,10 +858,8 @@ func (ui *gameui) OptionalDescendConfirmation(st stair) (err error) {
 func (ui *gameui) HandleKey(rka runeKeyAction) (err error, again bool, quit bool) {
 	g := ui.g
 	switch rka.k {
-	//case KeyW, KeyS, KeyN, KeyE, KeyNW, KeyNE, KeySW, KeySE:
 	case KeyW, KeyS, KeyN, KeyE:
 		err = g.MovePlayer(g.Player.Pos.To(KeyToDir(rka.k)), g.Ev)
-		//case KeyRunW, KeyRunS, KeyRunN, KeyRunE, KeyRunNW, KeyRunNE, KeyRunSW, KeyRunSE:
 	case KeyRunW, KeyRunS, KeyRunN, KeyRunE:
 		err = g.GoToDir(KeyToDir(rka.k), g.Ev)
 	case KeyWaitTurn:
@@ -1567,7 +1508,7 @@ func (ui *gameui) HandleWizardAction() error {
 
 func (ui *gameui) Death() {
 	g := ui.g
-	g.Print("You die... --press esc or space to continue--")
+	g.Print("You die... [(x) to continue]")
 	ui.DrawDungeonView(NormalMode)
 	ui.WaitForContinue(-1)
 	err := g.WriteDump()
@@ -1582,9 +1523,9 @@ func (ui *gameui) Win() {
 		g.PrintfStyled("Error removing save file: %v", logError, err)
 	}
 	if g.Wizard {
-		g.Print("You escape by the magic stairs! **WIZARD** --press esc or space to continue--")
+		g.Print("You escape by the magic stairs! **WIZARD** [(x) to continue]")
 	} else {
-		g.Print("You escape by the magic stairs! You win. --press esc or space to continue--")
+		g.Print("You escape by the magic stairs! You win. [(x) to continue]")
 	}
 	ui.DrawDungeonView(NormalMode)
 	ui.WaitForContinue(-1)
@@ -1602,7 +1543,7 @@ func (ui *gameui) Dump(err error) {
 
 func (ui *gameui) CriticalHPWarning() {
 	g := ui.g
-	g.PrintStyled("*** CRITICAL HP WARNING *** --press esc or space to continue--", logCritic)
+	g.PrintStyled("*** CRITICAL HP WARNING *** [(x) to continue]", logCritic)
 	ui.DrawDungeonView(NormalMode)
 	ui.WaitForContinue(DungeonHeight)
 	g.Print("Ok. Be careful, then.")

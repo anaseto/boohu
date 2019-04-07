@@ -525,7 +525,7 @@ func (ui *gameui) FreeingShaedraAnimation() {
 	}
 	g.Print("You see Shaedra. She is wounded!")
 	g.PrintStyled("Shaedra: “By Ruyale, thank you Syu! Let's flee with Marevor's magara!”", logSpecial)
-	g.Print("[esc|space]...")
+	g.Print("[(x) to continue]")
 	ui.DrawDungeonView(NoFlushMode)
 	ui.Flush()
 	ui.WaitForContinue(-1)
@@ -546,7 +546,7 @@ func (ui *gameui) FreeingShaedraAnimation() {
 	g.Objects.Story[g.Places.Marevor] = StoryMarevor
 	g.PrintStyled("Marevor: “And what about the mission?”", logSpecial)
 	g.PrintStyled("Shaedra: “Pff, don't be reckless!”", logSpecial)
-	g.Print("[esc/space]...")
+	g.Print("[(x) to continue]")
 	ui.DrawDungeonView(NoFlushMode)
 	ui.Flush()
 	ui.WaitForContinue(-1)

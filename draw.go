@@ -531,7 +531,7 @@ func (ui *gameui) DrawKeysDescription(title string, actions []string) {
 		}
 	}
 	lines := 1 + len(actions)/2
-	ui.DrawTextLine(" press esc or space to continue ", lines)
+	ui.DrawTextLine(" press (x) to continue ", lines)
 	ui.Flush()
 
 	ui.WaitForContinue(lines)
@@ -541,14 +541,14 @@ func (ui *gameui) KeysHelp() {
 	ui.DrawKeysDescription("Basic Commands", []string{
 		"Move/Jump", "arrows or wasd or hjkl or mouse left",
 		"Wait a turn", "“.” or 5 or mouse left on @",
-		"Interact (Equip/Descend/Rest...)", "e or i",
+		"Interact (Equip/Descend/Rest...)", "e",
 		"Evoke/Zap magara", "v or z",
+		"Inventory", "i",
 		"Examine", "x or mouse hover",
 		"Save and Quit", "S",
 		"Advanced Commands", "",
 		"Go to nearest stairs", "G",
 		"Autoexplore (use with caution)", "o",
-		"View Character Information", `% or C`,
 		"View previous messages", "m",
 		"Write game statistics to file", "#",
 		"Quit without saving", "Q",
@@ -560,7 +560,7 @@ func (ui *gameui) ExamineHelp() {
 	ui.DrawKeysDescription("Examine/Travel Commands", []string{
 		"Move cursor", "arrows or wasd or hjkl or mouse hover",
 		"Go to/select target", "“.” or enter or mouse left",
-		"View target description", "v or d or mouse right",
+		"View target description", "v or mouse right",
 		"Cycle through monsters", "+",
 		"Cycle through stairs", ">",
 		"Cycle through objects", "o",
@@ -569,35 +569,6 @@ func (ui *gameui) ExamineHelp() {
 }
 
 const TextWidth = DungeonWidth - 2
-
-func (ui *gameui) CharacterInfo() {
-	//g := ui.g
-	ui.DrawDungeonView(NoFlushMode)
-
-	b := bytes.Buffer{}
-	b.WriteString(formatText("Every year, the elders send someone to collect medicinal simella plants in the Underground.  This year, the honor fell upon you, and so here you are.  According to the elders, deep in the Underground, magical stairs will lead you back to your village.", TextWidth))
-	b.WriteString("\n\n")
-
-	desc := b.String()
-	lines := strings.Count(desc, "\n")
-	for i := 0; i <= lines+2; i++ {
-		if i >= DungeonWidth {
-			ui.SetCell(DungeonWidth, i, '│', ColorFg, ColorBg)
-		}
-		ui.ClearLine(i)
-	}
-	ui.DrawText(desc, 0, 0)
-	escspace := " press esc or space to continue "
-	if lines+2 >= DungeonHeight {
-		ui.DrawTextLine(escspace, lines+2)
-		ui.SetCell(DungeonWidth, lines+2, '┘', ColorFg, ColorBg)
-	} else {
-		ui.DrawTextLine(escspace, lines+2)
-	}
-
-	ui.Flush()
-	ui.WaitForContinue(lines + 2)
-}
 
 func (ui *gameui) WizardInfo() {
 	//g := ui.g
@@ -789,26 +760,31 @@ func (ui *gameui) DrawDungeonView(m uiMode) {
 }
 
 func (ui *gameui) DrawKeysBasics(m uiMode) {
+	line := DungeonHeight - 2
 	if m == TargetingMode {
-		ui.SetCell(DungeonWidth+3, DungeonHeight, '↑', ColorFgPlayer, ColorBg)
-		ui.DrawColoredText("←↓→", DungeonWidth+2, DungeonHeight+1, ColorFgPlayer)
-		ui.SetCell(DungeonWidth+2, DungeonHeight+2, 'v', ColorFgPlayer, ColorBg)
-		ui.SetCell(DungeonWidth+2, DungeonHeight+3, '?', ColorFgPlayer, ColorBg)
+		ui.SetCell(DungeonWidth+3, line, '↑', ColorFgPlayer, ColorBg)
+		ui.DrawColoredText("←↓→", DungeonWidth+2, line+1, ColorFgPlayer)
+		ui.SetCell(DungeonWidth+2, line+2, 'v', ColorFgPlayer, ColorBg)
+		ui.SetCell(DungeonWidth+2, line+3, '?', ColorFgPlayer, ColorBg)
 		const margin = 6
-		ui.DrawText("move cursor", DungeonWidth+margin, DungeonHeight+1)
-		ui.DrawText("view info", DungeonWidth+margin, DungeonHeight+2)
-		ui.DrawText("examine help", DungeonWidth+margin, DungeonHeight+3)
+		ui.DrawText("move cursor", DungeonWidth+margin, line+1)
+		ui.DrawText("view info", DungeonWidth+margin, line+2)
+		ui.DrawText("examine help", DungeonWidth+margin, line+3)
 	} else if m == NormalMode {
-		ui.SetCell(DungeonWidth+3, DungeonHeight, '↑', ColorFgPlayer, ColorBg)
-		ui.DrawColoredText("←↓→", DungeonWidth+2, DungeonHeight+1, ColorFgPlayer)
-		ui.SetCell(DungeonWidth+2, DungeonHeight+2, 'v', ColorFgPlayer, ColorBg)
-		ui.SetCell(DungeonWidth+2, DungeonHeight+3, 'e', ColorFgPlayer, ColorBg)
-		ui.SetCell(DungeonWidth+2, DungeonHeight+4, '?', ColorFgPlayer, ColorBg)
+		ui.SetCell(DungeonWidth+3, line, '↑', ColorFgPlayer, ColorBg)
+		ui.DrawColoredText("←↓→", DungeonWidth+2, line+1, ColorFgPlayer)
+		ui.SetCell(DungeonWidth+2, line+2, 'v', ColorFgPlayer, ColorBg)
+		ui.SetCell(DungeonWidth+2, line+3, 'e', ColorFgPlayer, ColorBg)
+		ui.SetCell(DungeonWidth+2, line+4, 'i', ColorFgPlayer, ColorBg)
+		ui.SetCell(DungeonWidth+2, line+5, 'x', ColorFgPlayer, ColorBg)
+		ui.SetCell(DungeonWidth+2, line+6, '?', ColorFgPlayer, ColorBg)
 		const margin = 6
-		ui.DrawText("move/jump", DungeonWidth+margin, DungeonHeight+1)
-		ui.DrawText("evoke", DungeonWidth+margin, DungeonHeight+2)
-		ui.DrawText("interact", DungeonWidth+margin, DungeonHeight+3)
-		ui.DrawText("command help", DungeonWidth+margin, DungeonHeight+4)
+		ui.DrawText("move/jump", DungeonWidth+margin, line+1)
+		ui.DrawText("evoke", DungeonWidth+margin, line+2)
+		ui.DrawText("interact", DungeonWidth+margin, line+3)
+		ui.DrawText("inventory", DungeonWidth+margin, line+4)
+		ui.DrawText("examine", DungeonWidth+margin, line+5)
+		ui.DrawText("command help", DungeonWidth+margin, line+6)
 	}
 }
 
@@ -1290,7 +1266,7 @@ loop:
 			}
 		}
 		ui.ClearLine(lines)
-		ui.DrawStyledTextLine(" add key (a) up/down (arrows/u/d) reset (R) quit (esc or space) ", lines, FooterLine)
+		ui.DrawStyledTextLine(" add key (a) up/down (arrows/u/d) reset (R) quit (x) ", lines, FooterLine)
 		ui.Flush()
 
 		var action keyConfigAction
@@ -1397,7 +1373,7 @@ loop:
 			ui.ClearLine(i - n)
 		}
 		ui.ClearLine(lines)
-		s := fmt.Sprintf(" half-page up/down (u/d) quit (esc or space) — (%d/%d) \n", len(g.Log)-to, len(g.Log))
+		s := fmt.Sprintf(" half-page up/down (u/d) quit (x) — (%d/%d) \n", len(g.Log)-to, len(g.Log))
 		ui.DrawStyledTextLine(s, lines, FooterLine)
 		ui.Flush()
 		var quit bool
@@ -1438,7 +1414,7 @@ func (ui *gameui) DrawDescription(desc string) {
 		ui.ClearLine(i)
 	}
 	ui.DrawText(desc, 0, 0)
-	ui.DrawTextLine(" press esc or space to continue ", lines+2)
+	ui.DrawTextLine(" press (x) to continue ", lines+2)
 	ui.Flush()
 	ui.WaitForContinue(lines + 2)
 	ui.DrawDungeonView(NoFlushMode)
@@ -1467,7 +1443,7 @@ func (ui *gameui) DrawLore(desc string) {
 		lines += l
 	}
 	ui.ClearLine(lines + 1)
-	ui.DrawTextLine(" press esc or space to continue ", lines+1)
+	ui.DrawTextLine(" press (x) to continue ", lines+1)
 	ui.Flush()
 	ui.WaitForContinue(lines + 1)
 	ui.DrawDungeonView(NoFlushMode)
@@ -1606,7 +1582,7 @@ func (ui *gameui) SelectMagara(ev event) error {
 		for i, r := range magaras {
 			ui.MagaraItem(i, i+1, r, ColorFg)
 		}
-		ui.DrawTextLine(" press esc or space to cancel ", len(magaras)+1)
+		ui.DrawTextLine(" press (x) to cancel ", len(magaras)+1)
 		ui.Flush()
 		index, alt, err := ui.Select(len(magaras))
 		if alt {
@@ -1649,7 +1625,7 @@ func (ui *gameui) EquipMagara(ev event) error {
 		for i, r := range magaras {
 			ui.MagaraItem(i, i+1, r, ColorFg)
 		}
-		ui.DrawTextLine(" press esc or space to cancel ", len(magaras)+1)
+		ui.DrawTextLine(" press (x) to cancel ", len(magaras)+1)
 		ui.Flush()
 		index, alt, err := ui.Select(len(magaras))
 		if alt {
@@ -1692,7 +1668,7 @@ func (ui *gameui) SelectItem(ev event) error {
 		for i := 0; i < len(items); i++ {
 			ui.InventoryItem(i, i+1, items[i], ColorFg, parts[i])
 		}
-		ui.DrawTextLine(" press esc or space to cancel ", len(items)+1)
+		ui.DrawTextLine(" press (x) to cancel ", len(items)+1)
 		ui.Flush()
 		index, alt, err := ui.Select(2)
 		if alt {
@@ -1762,7 +1738,7 @@ func (ui *gameui) DrawScrollBasics() {
 	ui.SetCell(1, l, '?', ColorFgPlayer, ColorBg)
 	ui.DrawText("You can see the key bindings for other actions by pressing “?”.", margin, l)
 
-	ui.DrawTextLine(" press esc or space to continue ", l+2)
+	ui.DrawTextLine(" press (x) to continue ", l+2)
 	ui.Flush()
 	ui.WaitForContinue(l + 2)
 	ui.DrawDungeonView(NoFlushMode)
@@ -1800,7 +1776,7 @@ func (ui *gameui) SelectAction(actions []keyAction, ev event) (keyAction, error)
 		for i, r := range actions {
 			ui.ActionItem(i, i+1, r, ColorFg)
 		}
-		ui.DrawTextLine(" press esc or space to cancel ", len(actions)+1)
+		ui.DrawTextLine(" press (x) to cancel ", len(actions)+1)
 		ui.Flush()
 		index, alt, err := ui.Select(len(actions))
 		if alt {
@@ -1863,7 +1839,7 @@ func (ui *gameui) SelectConfigure(actions []setting) (setting, error) {
 		for i, r := range actions {
 			ui.ConfItem(i, i+1, r, ColorFg)
 		}
-		ui.DrawTextLine(" press esc or space to cancel ", len(actions)+1)
+		ui.DrawTextLine(" press (x) to cancel ", len(actions)+1)
 		ui.Flush()
 		index, alt, err := ui.Select(len(actions))
 		if alt {
@@ -1932,7 +1908,7 @@ func (ui *gameui) SelectWizardMagic(actions []wizardAction) (wizardAction, error
 		for i, r := range actions {
 			ui.WizardItem(i, i+1, r, ColorFg)
 		}
-		ui.DrawTextLine(" press esc or space to cancel ", len(actions)+1)
+		ui.DrawTextLine(" press (x) to cancel ", len(actions)+1)
 		ui.Flush()
 		index, alt, err := ui.Select(len(actions))
 		if alt {
