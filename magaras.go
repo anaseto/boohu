@@ -109,6 +109,7 @@ func (g *game) UseMagara(n int, ev event) (err error) {
 		return err
 	}
 	g.Stats.MagarasUsed++
+	g.Stats.UsedMagaras[mag]++
 	// TODO: animation
 	g.Player.MP -= mag.MPCost(g)
 	g.StoryPrintf("You evoked your %s.", mag)

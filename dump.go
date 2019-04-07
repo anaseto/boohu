@@ -67,6 +67,21 @@ func (g *game) Dump() string {
 	fmt.Fprintf(buf, "\n")
 	fmt.Fprintf(buf, g.DumpStatuses())
 	fmt.Fprintf(buf, "\n\n")
+	fmt.Fprintf(buf, "Magaras:\n")
+	for _, mag := range g.Player.Magaras {
+		if mag != NoMagara {
+			fmt.Fprintf(buf, "- %s (used %d times)\n", mag, g.Stats.UsedMagaras[mag])
+		}
+	}
+	fmt.Fprintf(buf, "\n\n")
+	fmt.Fprintf(buf, "Inventory:\n")
+	if g.Player.Inventory.Body != NoItem {
+		fmt.Fprintf(buf, "- %s (body)\n", g.Player.Inventory.Body.ShortDesc(g))
+	}
+	if g.Player.Inventory.Neck != NoItem {
+		fmt.Fprintf(buf, "- %s (neck)\n", g.Player.Inventory.Neck.ShortDesc(g))
+	}
+	fmt.Fprintf(buf, "\n\n")
 	fmt.Fprintf(buf, "Miscellaneous:\n")
 	fmt.Fprintf(buf, "%d monsters died.\n", g.Stats.Killed)
 	fmt.Fprintf(buf, "You spent %.1f turns in the Underground.\n", float64(g.Turn)/10)
@@ -243,7 +258,6 @@ func (g *game) SimplifedDump(err error) string {
 		fmt.Fprintf(buf, "You are exploring depth %d of Hareka's Underground.\n", g.Depth)
 	}
 	fmt.Fprintf(buf, "You had %d bananas.\n", g.Player.Bananas)
-	fmt.Fprintf(buf, "You killed %d monsters.\n", g.Stats.Killed)
 	fmt.Fprintf(buf, "You spent %.1f turns in the Underground.\n", float64(g.Turn)/10)
 	maxDepth := Max(g.Depth, g.ExploredLevels)
 	s := "s"
