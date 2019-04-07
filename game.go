@@ -237,7 +237,7 @@ func (g *game) InitFirstLevel() {
 		11: GenNothing,
 	}
 	g.Params.Lore = map[int]bool{}
-	for i := 0; i < 4; i++ {
+	for i := 0; i < 5; i++ {
 		g.Params.Lore[RandInt(MaxDepth)] = true
 	}
 	permi := RandInt(7)
