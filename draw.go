@@ -765,11 +765,13 @@ func (ui *gameui) DrawKeysBasics(m uiMode) {
 		ui.SetCell(DungeonWidth+3, line, '↑', ColorFgPlayer, ColorBg)
 		ui.DrawColoredText("←↓→", DungeonWidth+2, line+1, ColorFgPlayer)
 		ui.SetCell(DungeonWidth+2, line+2, 'v', ColorFgPlayer, ColorBg)
-		ui.SetCell(DungeonWidth+2, line+3, '?', ColorFgPlayer, ColorBg)
+		ui.SetCell(DungeonWidth+2, line+3, 'x', ColorFgPlayer, ColorBg)
+		ui.SetCell(DungeonWidth+2, line+4, '?', ColorFgPlayer, ColorBg)
 		const margin = 6
 		ui.DrawText("move cursor", DungeonWidth+margin, line+1)
 		ui.DrawText("view info", DungeonWidth+margin, line+2)
-		ui.DrawText("examine help", DungeonWidth+margin, line+3)
+		ui.DrawText("close mode", DungeonWidth+margin, line+3)
+		ui.DrawText("examine help", DungeonWidth+margin, line+4)
 	} else if m == NormalMode {
 		ui.SetCell(DungeonWidth+3, line, '↑', ColorFgPlayer, ColorBg)
 		ui.DrawColoredText("←↓→", DungeonWidth+2, line+1, ColorFgPlayer)
@@ -786,6 +788,26 @@ func (ui *gameui) DrawKeysBasics(m uiMode) {
 		ui.DrawText("examine", DungeonWidth+margin, line+5)
 		ui.DrawText("command help", DungeonWidth+margin, line+6)
 	}
+}
+
+func (ui *gameui) DrawSelectDescBasics() {
+	line := DungeonHeight - 2
+	ui.DrawColoredText("[a-z]", DungeonWidth+2, line+1, ColorFgPlayer)
+	ui.SetCell(DungeonWidth+2, line+2, '?', ColorFgPlayer, ColorBg)
+	ui.SetCell(DungeonWidth+2, line+3, 'x', ColorFgPlayer, ColorBg)
+	const margin = 7
+	ui.DrawText("select", DungeonWidth+margin, line+1)
+	ui.DrawText("use/desc", DungeonWidth+margin, line+2)
+	ui.DrawText("close", DungeonWidth+margin, line+3)
+}
+
+func (ui *gameui) DrawSelectBasics() {
+	line := DungeonHeight - 2
+	ui.DrawColoredText("[a-z]", DungeonWidth+2, line+1, ColorFgPlayer)
+	ui.SetCell(DungeonWidth+2, line+2, 'x', ColorFgPlayer, ColorBg)
+	const margin = 7
+	ui.DrawText("select", DungeonWidth+margin, line+1)
+	ui.DrawText("close", DungeonWidth+margin, line+2)
 }
 
 func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolor) {
@@ -1583,6 +1605,7 @@ func (ui *gameui) SelectMagara(ev event) error {
 			ui.MagaraItem(i, i+1, r, ColorFg)
 		}
 		ui.DrawTextLine(" press (x) to cancel ", len(magaras)+1)
+		ui.DrawSelectDescBasics()
 		ui.Flush()
 		index, alt, err := ui.Select(len(magaras))
 		if alt {
@@ -1626,6 +1649,7 @@ func (ui *gameui) EquipMagara(ev event) error {
 			ui.MagaraItem(i, i+1, r, ColorFg)
 		}
 		ui.DrawTextLine(" press (x) to cancel ", len(magaras)+1)
+		ui.DrawSelectDescBasics()
 		ui.Flush()
 		index, alt, err := ui.Select(len(magaras))
 		if alt {
@@ -1669,6 +1693,7 @@ func (ui *gameui) SelectItem(ev event) error {
 			ui.InventoryItem(i, i+1, items[i], ColorFg, parts[i])
 		}
 		ui.DrawTextLine(" press (x) to cancel ", len(items)+1)
+		ui.DrawSelectBasics()
 		ui.Flush()
 		index, alt, err := ui.Select(2)
 		if alt {
@@ -1777,6 +1802,7 @@ func (ui *gameui) SelectAction(actions []keyAction, ev event) (keyAction, error)
 			ui.ActionItem(i, i+1, r, ColorFg)
 		}
 		ui.DrawTextLine(" press (x) to cancel ", len(actions)+1)
+		ui.DrawSelectBasics()
 		ui.Flush()
 		index, alt, err := ui.Select(len(actions))
 		if alt {
@@ -1840,6 +1866,7 @@ func (ui *gameui) SelectConfigure(actions []setting) (setting, error) {
 			ui.ConfItem(i, i+1, r, ColorFg)
 		}
 		ui.DrawTextLine(" press (x) to cancel ", len(actions)+1)
+		ui.DrawSelectBasics()
 		ui.Flush()
 		index, alt, err := ui.Select(len(actions))
 		if alt {
@@ -1909,6 +1936,7 @@ func (ui *gameui) SelectWizardMagic(actions []wizardAction) (wizardAction, error
 			ui.WizardItem(i, i+1, r, ColorFg)
 		}
 		ui.DrawTextLine(" press (x) to cancel ", len(actions)+1)
+		ui.DrawSelectBasics()
 		ui.Flush()
 		index, alt, err := ui.Select(len(actions))
 		if alt {
