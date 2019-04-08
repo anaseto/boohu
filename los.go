@@ -281,7 +281,8 @@ func (g *game) SeePosition(pos position) {
 	// TODO: this has some limitations if you happen to see
 	// her from afar because of a window or because of some
 	// broken wall.
-	if g.Objects.Story[pos] == StoryShaedra {
+	if g.Objects.Story[pos] == StoryShaedra && g.Player.Pos.Distance(pos) <= 2 && g.Player.Pos != g.Places.Marevor &&
+		g.Player.Pos != g.Places.Monolith {
 		g.PushEvent(&simpleEvent{ERank: g.Ev.Rank(), EAction: ShaedraAnimation})
 	}
 }
