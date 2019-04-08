@@ -288,7 +288,7 @@ var monsDesc = []string{
 	MonsSatowalgaPlant: "Satowalga Plants are immobile bushes that throw acidic projectiles at you, sometimes confusing you.",
 	MonsMadNixe:        "Nixes are magical humanoids. Usually, they specialize in illusion harmonic magic, but the so called mad nixes are a perverted variant who learned the oric arts to create a spell that can attract their foes to them, so that they can kill them without pursuing them.",
 	//MonsMindCelmist:     "Mind celmists are mages that use magical smitting mind attacks that bypass armour. They can occasionally confuse or slow you. They try to avoid melee.",
-	MonsVampire:      "Vampires are humanoids that drink blood to survive. Their spitting can cause nausea, impeding the use of potions.",
+	MonsVampire:      "Vampires are humanoids that drink blood to survive. Their nauseous spitting can cause confusion, impeding the use of potions.",
 	MonsTreeMushroom: "Tree mushrooms are big clunky slow-moving creatures. They can throw lignifying spores at you, leaving you unable to move for a few turns, though the spores will also provide some protection against harm.",
 	//MonsMarevorHelith: "Marevor Helith is an ancient undead nakrus very fond of teleporting people away. He is a well-known expert in the field of magaras - items that many people simply call magical objects. His current research focus is monolith creation. Marevor, a repentant necromancer, is now searching for his old disciple Jaixel in the Underground to help him overcome the past.",
 	MonsButterfly: "Underground's butterflies, called kerejats, wander peacefully around, illuminating their surroundings.",
@@ -307,7 +307,7 @@ const (
 	LoneGuard monsterBand = iota
 	LoneHighGuard
 	LoneYack
-	LoneCyclop
+	LoneOricCelmist
 	LoneSatowalgaPlant
 	LoneBlinkingFrog
 	LoneWorm
@@ -320,6 +320,7 @@ const (
 	LoneEarthDragon
 	//LoneMarevorHelith
 	LoneButterfly
+	LoneVampire
 )
 
 type monsterBandData struct {
@@ -333,7 +334,7 @@ var MonsBands = []monsterBandData{
 	LoneGuard:          {Monster: MonsGuard},
 	LoneHighGuard:      {Monster: MonsHighGuard},
 	LoneYack:           {Monster: MonsYack},
-	LoneCyclop:         {Monster: MonsOricCelmist},
+	LoneOricCelmist:    {Monster: MonsOricCelmist},
 	LoneSatowalgaPlant: {Monster: MonsSatowalgaPlant},
 	LoneBlinkingFrog:   {Monster: MonsBlinkingFrog},
 	LoneWorm:           {Monster: MonsWorm},
@@ -346,6 +347,7 @@ var MonsBands = []monsterBandData{
 	LoneEarthDragon:    {Monster: MonsEarthDragon},
 	//LoneMarevorHelith:  {Monster: MonsMarevorHelith},
 	LoneButterfly: {Monster: MonsButterfly},
+	LoneVampire:   {Monster: MonsVampire},
 }
 
 type monster struct {
@@ -1180,12 +1182,12 @@ func (m *monster) CreateBarrier(g *game, ev event) bool {
 
 func (m *monster) VampireSpit(g *game, ev event) bool {
 	blocked := m.RangeBlocked(g)
-	if blocked || g.Player.HasStatus(StatusNausea) {
+	if blocked || g.Player.HasStatus(StatusConfusion) {
 		return false
 	}
-	g.Player.Statuses[StatusNausea]++
-	g.PushEvent(&simpleEvent{ERank: ev.Rank() + DurationSick, EAction: NauseaEnd})
-	g.Print("The vampire spits at you. You feel sick.")
+	g.Player.Statuses[StatusConfusion]++
+	g.PushEvent(&simpleEvent{ERank: ev.Rank() + DurationSick, EAction: ConfusionEnd})
+	g.Print("The vampire spits at you. You feel confused.")
 	m.Exhaust(g)
 	ev.Renew(g, m.Kind.AttackDelay())
 	return true
@@ -1562,7 +1564,7 @@ func (dg *dgen) PutMonsterBand(g *game, band monsterBand) bool {
 		bdinf = dg.BandInfoOutsideGround(g, band)
 	case LoneBlinkingFrog, LoneExplosiveNadre:
 		bdinf = dg.BandInfoOutside(g, band)
-	case LoneMirrorSpecter, LoneWingedMilfid:
+	case LoneMirrorSpecter, LoneWingedMilfid, LoneVampire:
 		bdinf = dg.BandInfoOutsideExplore(g, band)
 	case LoneButterfly:
 		bdinf = dg.BandInfoOutsideExploreButterfly(g, band)
@@ -1619,7 +1621,7 @@ func (dg *dgen) GenMonsters(g *game) {
 	bandsHighGuard := []monsterBand{LoneHighGuard}
 	bandsAnimals := []monsterBand{LoneYack, LoneWorm, LoneHound, LoneBlinkingFrog, LoneExplosiveNadre}
 	bandsPlants := []monsterBand{LoneSatowalgaPlant}
-	bandsBipeds := []monsterBand{LoneCyclop, LoneMirrorSpecter, LoneWingedMilfid, LoneMadNixe}
+	bandsBipeds := []monsterBand{LoneOricCelmist, LoneMirrorSpecter, LoneWingedMilfid, LoneMadNixe, LoneVampire}
 	bandsBig := []monsterBand{LoneTreeMushroom, LoneEarthDragon}
 	//mlevel := 1 + RandInt(MaxDepth)
 	//if mlevel == g.Depth {
