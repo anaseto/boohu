@@ -584,11 +584,29 @@ const (
 #_!>#HMΔ#
 #########
 `
+	CellShaedra3 = `
+#########
+#_!>#>!_#
+##|###|##
++.P...P.+
+##|###|##
+#HMΔ#_!>#
+#########
+`
+	CellShaedra4 = `
+#########
+#_!>#HMΔ#
+##|###|##
++.P...P.+
+##|###|##
+#_!>#>!_#
+#########
+`
 )
 
 // TODO: add indestructible walls?
 
-var roomCellTemplates = []string{CellShaedra1, CellShaedra2}
+var roomCellTemplates = []string{CellShaedra1, CellShaedra2, CellShaedra3, CellShaedra4}
 
 func (r *room) ComputeDimensions() {
 	x := 0

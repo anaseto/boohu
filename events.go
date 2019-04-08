@@ -112,7 +112,7 @@ func (sev *simpleEvent) Action(g *game) {
 		}
 		g.TurnStats()
 	case ShaedraAnimation:
-		g.ComputeLOS() // TODO: optimize? most of the time almost redundant (unless on a tree)
+		g.ComputeLOS()
 		g.ui.FreeingShaedraAnimation()
 	case SlowEnd:
 		g.Player.Statuses[StatusSlow]--
