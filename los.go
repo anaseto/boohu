@@ -254,6 +254,9 @@ func (g *game) SeePosition(pos position) {
 		}
 		g.Dungeon.SetExplored(pos)
 		if c.T == StoryCell {
+			// TODO: this has some limitations if you happen to see
+			// her from afar because of a window or because of some
+			// broken wall.
 			if g.Objects.Story[pos] == StoryShaedra {
 				g.PushEvent(&simpleEvent{ERank: g.Ev.Rank(), EAction: ShaedraAnimation})
 			}
