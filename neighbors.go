@@ -46,6 +46,10 @@ func (d *dungeon) IsFreeCell(pos position) bool {
 	return pos.valid() && d.Cell(pos).IsPassable()
 }
 
+func (d *dungeon) NotWallCell(pos position) bool {
+	return pos.valid() && !d.Cell(pos).IsWall()
+}
+
 func (d *dungeon) FreeNeighbors(pos position) []position {
 	nb := make([]position, 0, 8)
 	nb = pos.Neighbors(nb, d.IsFreeCell)

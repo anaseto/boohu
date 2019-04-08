@@ -152,7 +152,7 @@ func (d *dungeon) Connected(pos position, nf func(position) bool) (map[position]
 
 func (d *dungeon) connex() bool {
 	pos := d.FreeCell()
-	conn, _ := d.Connected(pos, d.IsFreeCell)
+	conn, _ := d.Connected(pos, d.NotWallCell)
 	for i, c := range d.Cells {
 		if c.IsPassable() && !conn[idxtopos(i)] {
 			return false
