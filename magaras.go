@@ -56,6 +56,9 @@ func (g *game) UseMagara(n int, ev event) (err error) {
 	if g.Player.HasStatus(StatusNausea) {
 		return errors.New("You cannot use magaras while sick.")
 	}
+	if g.Player.HasStatus(StatusConfusion) {
+		return errors.New("You cannot use magaras while confused.")
+	}
 	mag := g.Player.Magaras[n]
 	if mag.MPCost(g) > g.Player.MP {
 		return errors.New("Not enough magic points for using this rod.")
@@ -210,9 +213,6 @@ func (mag magara) MPCost(g *game) int {
 		return 0
 	}
 	cost := 1
-	if g.Player.HasStatus(StatusConfusion) {
-		cost++
-	}
 	return cost
 }
 

@@ -423,6 +423,7 @@ const (
 	DurationFog                    = 150
 	DurationExhaustion             = 100
 	DurationConfusion              = 100
+	DurationConfusionPlayer        = 50
 	DurationLignification          = 100
 	DurationLignificationPlayer    = 30
 	DurationMagicalBarrier         = 150
