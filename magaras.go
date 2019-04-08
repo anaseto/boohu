@@ -175,7 +175,7 @@ func (mag magara) Desc(g *game) (desc string) {
 	case TeleportMagara:
 		desc = "makes you teleport far away."
 	case DigMagara:
-		desc = "makes you dig walls by walking into them like an earth dragon."
+		desc = "makes you dig walls by walking into them like an earth dragon thanks to destructive oric magic."
 	case TeleportOtherMagara:
 		desc = "teleports up to two random monsters in sight."
 	case HealWoundsMagara:
