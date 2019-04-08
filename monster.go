@@ -696,7 +696,7 @@ func (m *monster) HandleMonsSpecifics(g *game) (done bool) {
 				} else {
 					g.TerrainKnowledge[m.Pos] = ExtinguishedLightCell
 				}
-				return
+				return true
 			} else if !on && m.Sees(g, pos) {
 				m.Target = pos
 			}
