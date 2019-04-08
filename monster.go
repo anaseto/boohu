@@ -943,7 +943,7 @@ func (m *monster) HitPlayer(g *game, ev event) {
 		opos := m.Pos
 		m.Blink(g)
 		if opos != m.Pos {
-			g.TemporalWallAt(opos, ev)
+			g.MagicalBarrierAt(opos, ev)
 			g.Print("A temporal wall emerges.")
 			m.Exhaust(g)
 		}
@@ -1154,7 +1154,7 @@ func (m *monster) CreateBarrier(g *game, ev event) bool {
 		if mons.Exists() || c.IsWall() {
 			continue
 		}
-		g.TemporalWallAt(pos, ev)
+		g.MagicalBarrierAt(pos, ev)
 		wall = true
 		g.Print("The oric celmist creates a barrier.")
 		break

@@ -24,11 +24,12 @@ const (
 	ScrollCell
 	StoryCell
 	ItemCell
+	BarrierCell
 )
 
 func (c cell) IsPassable() bool {
 	switch c.T {
-	case WallCell, BarrelCell, TableCell, TreeCell, HoledWallCell:
+	case WallCell, BarrelCell, TableCell, TreeCell, HoledWallCell, BarrierCell:
 		return false
 	default:
 		return true
@@ -37,7 +38,7 @@ func (c cell) IsPassable() bool {
 
 func (c cell) IsIlluminable() bool {
 	switch c.T {
-	case WallCell, BarrelCell, TableCell, TreeCell, HoledWallCell:
+	case WallCell, BarrelCell, TableCell, TreeCell, HoledWallCell, BarrierCell:
 		return false
 	}
 	return true
@@ -122,6 +123,8 @@ func (c cell) ShortDesc(g *game, pos position) (desc string) {
 		desc = g.Objects.Story[pos].ShortDesc(g)
 	case ItemCell:
 		desc = g.Objects.Items[pos].ShortDesc(g)
+	case BarrierCell:
+		desc = "a temporal magical barrier"
 	}
 	return desc
 }
@@ -160,6 +163,8 @@ func (c cell) Desc(g *game, pos position) (desc string) {
 		desc = g.Objects.Story[pos].Desc(g)
 	case ItemCell:
 		desc = g.Objects.Items[pos].Desc(g)
+	case BarrierCell:
+		desc = "A temporal magical barrier."
 	}
 	return desc
 }
@@ -199,6 +204,8 @@ func (c cell) Style(g *game, pos position) (r rune, fg uicolor) {
 		r, fg = g.Objects.Story[pos].Style(g)
 	case ItemCell:
 		r, fg = g.Objects.Items[pos].Style(g)
+	case BarrierCell:
+		r, fg = 'Ξ', ColorFgMagicPlace
 	}
 	return r, fg
 }

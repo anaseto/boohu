@@ -251,6 +251,8 @@ func (g *game) MovePlayer(pos position, ev event) error {
 	c := g.Dungeon.Cell(pos)
 	if c.T == WallCell && !g.Player.HasStatus(StatusDig) {
 		return errors.New("You cannot move into a wall.")
+	} else if c.T == BarrierCell {
+		return errors.New("You cannot move into a magical barrier.")
 	} else if c.T == BarrelCell && g.MonsterLOS[g.Player.Pos] {
 		return errors.New("You cannot enter a barrel while seen.")
 	}

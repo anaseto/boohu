@@ -275,7 +275,7 @@ func (g *game) SeePosition(pos position) {
 	if okT {
 		delete(g.TerrainKnowledge, pos)
 		if c.IsPassable() {
-			delete(g.TemporalWalls, pos)
+			delete(g.MagicalBarriers, pos)
 		}
 	}
 	if mons, ok := g.LastMonsterKnownAt[pos]; ok && (mons.Pos != pos || !mons.Exists()) {

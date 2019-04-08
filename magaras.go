@@ -17,7 +17,7 @@ const (
 	SwiftnessMagara
 	SwappingMagara
 	FogMagara
-	WallsMagara
+	BarrierMagara
 	SlowingMagara
 	SleepingMagara
 	NoiseMagara
@@ -82,8 +82,8 @@ func (g *game) UseMagara(n int, ev event) (err error) {
 		err = g.EvokeSwapping(ev)
 	case FogMagara:
 		err = g.EvokeFog(ev)
-	case WallsMagara:
-		err = g.EvokeWalls(ev)
+	case BarrierMagara:
+		err = g.EvokeBarriers(ev)
 	case SlowingMagara:
 		err = g.EvokeSlowing(ev)
 	case SleepingMagara:
@@ -139,8 +139,8 @@ func (mag magara) String() (desc string) {
 		desc = "magara of swapping"
 	case FogMagara:
 		desc = "magara of fog"
-	case WallsMagara:
-		desc = "magara of walls"
+	case BarrierMagara:
+		desc = "magara of magical barrier"
 	case SlowingMagara:
 		desc = "magara of slowing"
 	case SleepingMagara:
@@ -186,8 +186,8 @@ func (mag magara) Desc(g *game) (desc string) {
 		desc = "makes you swap positions with the farthest monster in sight. If there is more than one at the same distance, it will be chosen randomly."
 	case FogMagara:
 		desc = ""
-	case WallsMagara:
-		desc = "replaces free cells around you with temporary walls."
+	case BarrierMagara:
+		desc = "replaces free cells around you with temporary magical barriers by making use of oric energies."
 	case SlowingMagara:
 		desc = "induces slow movement and attack for monsters in sight."
 	case SleepingMagara:
@@ -195,7 +195,7 @@ func (mag magara) Desc(g *game) (desc string) {
 	case NoiseMagara:
 		desc = "tricks monsters in a 10-range area with sounds, making them go away from you for a few turns. It only works on monsters that are not already seeing you."
 	case ObstructionMagara:
-		desc = "creates temporal walls between you and up to 3 monsters."
+		desc = "creates temporal magical barriers between you and up to 3 monsters."
 	case ConfusionMagara:
 		desc = "confuses monsters in sight, leaving them unable to attack you."
 	case FireMagara:
@@ -441,16 +441,16 @@ func (g *game) Fog(at position, radius int, ev event) {
 	g.ComputeLOS()
 }
 
-func (g *game) EvokeWalls(ev event) error {
+func (g *game) EvokeBarriers(ev event) error {
 	neighbors := g.Dungeon.FreeNeighbors(g.Player.Pos)
 	for _, pos := range neighbors {
 		mons := g.MonsterAt(pos)
 		if mons.Exists() {
 			continue
 		}
-		g.CreateTemporalWallAt(pos, ev)
+		g.CreateMagicalBarrierAt(pos, ev)
 	}
-	g.Print("You feel surrounded by temporary walls.")
+	g.Print("You feel surrounded by a magical barrier.")
 	g.ui.PlayerGoodEffectAnimation()
 	g.ComputeLOS()
 	return nil
@@ -619,7 +619,7 @@ func (g *game) EvokeObstruction(ev event) error {
 			if mons.Exists() {
 				continue
 			}
-			g.TemporalWallAt(pos, ev)
+			g.MagicalBarrierAt(pos, ev)
 			if len(ray) == 0 {
 				break
 			}
@@ -628,26 +628,26 @@ func (g *game) EvokeObstruction(ev event) error {
 			break
 		}
 	}
-	g.Print("Magical walls emerged.")
+	g.Print("Magical barriers emerged.")
 	g.ui.BeamsAnimation(targets)
 	return nil
 }
 
-func (g *game) TemporalWallAt(pos position, ev event) {
-	if g.Dungeon.Cell(pos).T == WallCell {
+func (g *game) MagicalBarrierAt(pos position, ev event) {
+	if g.Dungeon.Cell(pos).T == WallCell || g.Dungeon.Cell(pos).T == BarrierCell {
 		return
 	}
 	if !g.Player.Sees(pos) {
 		g.TerrainKnowledge[pos] = g.Dungeon.Cell(pos).T
 	}
-	g.CreateTemporalWallAt(pos, ev)
+	g.CreateMagicalBarrierAt(pos, ev)
 	g.ComputeLOS()
 }
 
-func (g *game) CreateTemporalWallAt(pos position, ev event) {
+func (g *game) CreateMagicalBarrierAt(pos position, ev event) {
 	t := g.Dungeon.Cell(pos).T
-	g.Dungeon.SetCell(pos, WallCell)
+	g.Dungeon.SetCell(pos, BarrierCell)
 	delete(g.Clouds, pos)
-	g.TemporalWalls[pos] = t
-	g.PushEvent(&cloudEvent{ERank: ev.Rank() + DurationTemporalWall + RandInt(DurationTemporalWall/2), Pos: pos, EAction: ObstructionEnd})
+	g.MagicalBarriers[pos] = t
+	g.PushEvent(&cloudEvent{ERank: ev.Rank() + DurationMagicalBarrier + RandInt(DurationMagicalBarrier/2), Pos: pos, EAction: ObstructionEnd})
 }

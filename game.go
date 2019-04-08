@@ -20,7 +20,7 @@ type game struct {
 	Highlight          map[position]bool // highlighted positions (e.g. targeted ray)
 	Objects            objects
 	Clouds             map[position]cloud
-	TemporalWalls      map[position]terrain
+	MagicalBarriers    map[position]terrain
 	GeneratedUniques   map[monsterBand]int
 	GeneratedLore      map[int]bool
 	GeneratedMagaras   []magara
@@ -257,7 +257,7 @@ func (g *game) InitLevelStructures() {
 	g.MonstersPosCache = make([]int, DungeonNCells)
 	g.TerrainKnowledge = map[position]terrain{}
 	g.ExclusionsMap = map[position]bool{}
-	g.TemporalWalls = map[position]terrain{}
+	g.MagicalBarriers = map[position]terrain{}
 	g.LastMonsterKnownAt = map[position]*monster{}
 	g.Objects.Magaras = map[position]magara{}
 	g.Objects.Lore = map[position]int{}

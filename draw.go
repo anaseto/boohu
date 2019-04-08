@@ -872,7 +872,7 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 		} else if fgTerrain != ColorFgLOS {
 			fgColor = fgTerrain
 		}
-		if _, ok := g.TemporalWalls[pos]; ok {
+		if _, ok := g.MagicalBarriers[pos]; ok {
 			fgColor = ColorFgMagicPlace
 		}
 	case pos == g.Player.Pos && !g.WizardMap:

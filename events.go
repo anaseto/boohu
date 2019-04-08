@@ -263,16 +263,16 @@ func (cev *cloudEvent) Action(g *game) {
 		delete(g.Clouds, cev.Pos)
 		g.ComputeLOS()
 	case ObstructionEnd:
-		t := g.TemporalWalls[cev.Pos]
-		if !g.Player.Sees(cev.Pos) && g.Dungeon.Cell(cev.Pos).T == WallCell {
+		t := g.MagicalBarriers[cev.Pos]
+		if !g.Player.Sees(cev.Pos) && g.Dungeon.Cell(cev.Pos).T == BarrierCell {
 			// XXX does not handle all cases
-			g.TerrainKnowledge[cev.Pos] = WallCell
+			g.TerrainKnowledge[cev.Pos] = BarrierCell
 		} else {
-			delete(g.TemporalWalls, cev.Pos)
+			delete(g.MagicalBarriers, cev.Pos)
 			delete(g.TerrainKnowledge, cev.Pos)
 		}
 		// TODO: rework temporal walls so that they preserve doors and foliage
-		if g.Dungeon.Cell(cev.Pos).T != WallCell {
+		if g.Dungeon.Cell(cev.Pos).T != BarrierCell {
 			break
 		}
 		g.Dungeon.SetCell(cev.Pos, t)
@@ -281,7 +281,7 @@ func (cev *cloudEvent) Action(g *game) {
 		g.ComputeLOS()
 	case ObstructionProgression:
 		pos := g.FreeCell()
-		g.TemporalWallAt(pos, cev)
+		g.MagicalBarrierAt(pos, cev)
 		if g.Player.Sees(pos) {
 			g.Printf("You see a wall appear out of thin air.")
 			g.StopAuto()
@@ -425,7 +425,7 @@ const (
 	DurationConfusion              = 100
 	DurationLignification          = 100
 	DurationLignificationPlayer    = 30
-	DurationTemporalWall           = 150
+	DurationMagicalBarrier         = 150
 	DurationObstructionProgression = 200
 	DurationSmokingCloakFog        = 20
 	DurationMonsterExhaustion      = 100

@@ -260,7 +260,7 @@ func (g *game) ActivateStone() (err error) {
 				if m.Exists() || pos == g.Player.Pos {
 					continue
 				}
-				g.CreateTemporalWallAt(pos, g.Ev)
+				g.CreateMagicalBarrierAt(pos, g.Ev)
 				count++
 			}
 		}
