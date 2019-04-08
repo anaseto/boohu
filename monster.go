@@ -550,7 +550,7 @@ func (m *monster) AttackAction(g *game, ev event) {
 func (m *monster) Explode(g *game, ev event) {
 	m.Dead = true
 	neighbors := m.Pos.ValidCardinalNeighbors()
-	g.MakeNoise(WallNoise, m.Pos)
+	g.MakeNoise(ExplosionNoise, m.Pos)
 	g.Printf("%s %s explodes with a loud boom.", g.ExplosionSound(), m.Kind.Definite(true))
 	g.ui.ExplosionAnimation(FireExplosion, m.Pos)
 	for _, pos := range append(neighbors, m.Pos) {
