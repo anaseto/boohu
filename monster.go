@@ -809,7 +809,7 @@ func (m *monster) HandleMove(g *game) {
 			}
 			m.Path = m.Path[:len(m.Path)-1]
 		}
-	case mons.Pos == target && m.Pos == monstarget:
+	case mons.Pos == target && m.Pos == monstarget && !mons.Status(MonsLignified):
 		m.MoveTo(g, target)
 		m.Path = m.Path[:len(m.Path)-1]
 		mons.MoveTo(g, monstarget)
