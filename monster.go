@@ -1186,7 +1186,7 @@ func (m *monster) VampireSpit(g *game, ev event) bool {
 		return false
 	}
 	g.Player.Statuses[StatusConfusion]++
-	g.PushEvent(&simpleEvent{ERank: ev.Rank() + DurationSick, EAction: ConfusionEnd})
+	g.PushEvent(&simpleEvent{ERank: ev.Rank() + DurationConfusionPlayer, EAction: ConfusionEnd})
 	g.Print("The vampire spits at you. You feel confused.")
 	m.Exhaust(g)
 	ev.Renew(g, m.Kind.AttackDelay())
