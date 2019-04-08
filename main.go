@@ -60,6 +60,7 @@ func main() {
 
 	LinkColors()
 	gameConfig.DarkLOS = true
+	gameConfig.Version = Version
 
 	load, err := g.LoadConfig()
 	if load && err != nil {

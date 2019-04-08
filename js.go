@@ -22,6 +22,7 @@ func main() {
 	}
 	defer ui.Close()
 	gameConfig.Tiles = true
+	gameConfig.Version = Version
 	LinkColors()
 	gameConfig.DarkLOS = true
 	ApplyDarkLOS()
@@ -275,6 +276,9 @@ func (g *game) LoadConfig() (bool, error) {
 	c, err := g.DecodeConfigSave(s)
 	if err != nil {
 		return true, err
+	}
+	if c.Version != gameConfig.Version {
+		return true, errors.New("Version mismatch, could not load old custom configuration.")
 	}
 	gameConfig = *c
 	return true, nil
