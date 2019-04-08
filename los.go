@@ -253,12 +253,6 @@ func (g *game) SeePosition(pos position) {
 			g.StopAuto()
 		}
 		g.Dungeon.SetExplored(pos)
-		// TODO: this has some limitations if you happen to see
-		// her from afar because of a window or because of some
-		// broken wall.
-		if g.Objects.Story[pos] == StoryShaedra {
-			g.PushEvent(&simpleEvent{ERank: g.Ev.Rank(), EAction: ShaedraAnimation})
-		}
 		g.DijkstraMapRebuild = true
 	} else {
 		// XXX this can be improved to handle more terrain types changes
@@ -284,6 +278,12 @@ func (g *game) SeePosition(pos position) {
 		mons.LastKnownPos = InvalidPos
 	}
 	delete(g.NoiseIllusion, pos)
+	// TODO: this has some limitations if you happen to see
+	// her from afar because of a window or because of some
+	// broken wall.
+	if g.Objects.Story[pos] == StoryShaedra {
+		g.PushEvent(&simpleEvent{ERank: g.Ev.Rank(), EAction: ShaedraAnimation})
+	}
 }
 
 func (g *game) ComputeExclusion(pos position, toggle bool) {
