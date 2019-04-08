@@ -845,7 +845,13 @@ func (m *monster) HandleTurn(g *game, ev event) {
 		return
 	}
 	if mpos.Distance(ppos) == 1 && g.Dungeon.Cell(ppos).T != BarrelCell && !m.Kind.Peaceful() {
-		if m.Status(MonsConfused) || g.Dungeon.Cell(ppos).T == TreeCell && !m.Kind.CanAttackOnTree() {
+		if m.Status(MonsConfused) {
+			g.Printf("%s appears too confused to attack.", m.Kind.Definite(true))
+			ev.Renew(g, 10) // wait
+			return
+		}
+		if g.Dungeon.Cell(ppos).T == TreeCell && !m.Kind.CanAttackOnTree() {
+			g.Printf("%s watches you from below.", m.Kind.Definite(true))
 			ev.Renew(g, 10) // wait
 			return
 		}
@@ -1029,6 +1035,7 @@ func (m *monster) RangedAttack(g *game, ev event) bool {
 		return false
 	}
 	if m.Status(MonsConfused) {
+		g.Printf("%s appears too confused to attack.", m.Kind.Definite(true))
 		return false
 	}
 	if m.Pos.Distance(g.Player.Pos) <= 1 && m.Kind != MonsSatowalgaPlant {
@@ -1271,6 +1278,7 @@ func (m *monster) SmitingAttack(g *game, ev event) bool {
 		return false
 	}
 	if m.Status(MonsConfused) {
+		g.Printf("%s appears too confused to attack.", m.Kind.Definite(true))
 		return false
 	}
 	if !m.SeesPlayer(g) {
