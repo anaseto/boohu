@@ -13,7 +13,6 @@ const (
 	DigMagara
 	TeleportMagara
 	TeleportOtherMagara
-	HealWoundsMagara
 	SwiftnessMagara
 	SwappingMagara
 	FogMagara
@@ -72,8 +71,6 @@ func (g *game) UseMagara(n int, ev event) (err error) {
 		err = g.EvokeDig(ev)
 	case TeleportOtherMagara:
 		err = g.EvokeTeleportOther(ev)
-	case HealWoundsMagara:
-		err = g.EvokeHealWounds(ev)
 	//case MagicMagara:
 	//err = g.EvokeRefillMagic(ev)
 	case SwiftnessMagara:
@@ -129,8 +126,6 @@ func (mag magara) String() (desc string) {
 		desc = "magara of digging"
 	case TeleportOtherMagara:
 		desc = "magara of teleport other"
-	case HealWoundsMagara:
-		desc = "magara of heal wounds"
 	//case MagicMagara:
 	//desc = "magara of refill magic"
 	case SwiftnessMagara:
@@ -178,8 +173,6 @@ func (mag magara) Desc(g *game) (desc string) {
 		desc = "makes you dig walls by walking into them like an earth dragon thanks to destructive oric magic."
 	case TeleportOtherMagara:
 		desc = "teleports up to two random monsters in sight."
-	case HealWoundsMagara:
-		desc = "heals you a good deal."
 	case SwiftnessMagara:
 		desc = "makes you move faster and better at avoiding blows for a short time." // XXX
 	case SwappingMagara:
@@ -217,10 +210,6 @@ func (mag magara) MPCost(g *game) int {
 		return 0
 	}
 	cost := 1
-	switch mag {
-	case HealWoundsMagara:
-		cost = 2
-	}
 	if g.Player.HasStatus(StatusConfusion) {
 		cost++
 	}
