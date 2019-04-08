@@ -344,7 +344,8 @@ func (sc scroll) Style(g *game) (r rune, fg uicolor) {
 type story int
 
 const (
-	StoryShaedra story = iota
+	NoStory story = iota
+	StoryShaedra
 	StoryMarevor
 )
 

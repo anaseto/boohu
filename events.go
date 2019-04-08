@@ -52,9 +52,7 @@ const (
 	LignificationEnd
 	ConfusionEnd
 	NauseaEnd
-	DisabledShieldEnd
 	DigEnd
-	SwapEnd
 	ShadowsEnd
 	AccurateEnd
 	ShaedraAnimation
@@ -94,6 +92,38 @@ func (sev *simpleEvent) Renew(g *game, delay int) {
 	}
 }
 
+const DurationStatusStep = 10
+
+var endmsgs = [...]string{
+	SlowEnd:          "You no longer feel slow.",
+	ExhaustionEnd:    "You no longer feel exhausted.",
+	HasteEnd:         "You no longer feel speedy.",
+	LignificationEnd: "You no longer feel attached to the ground.",
+	ConfusionEnd:     "You no longer feel confused.",
+	NauseaEnd:        "You no longer feel sick.",
+	DigEnd:           "You no longer feel like an earth dragon.",
+}
+
+var endstatuses = [...]status{
+	SlowEnd:          StatusSlow,
+	ExhaustionEnd:    StatusExhausted,
+	HasteEnd:         StatusSwift,
+	LignificationEnd: StatusLignification,
+	ConfusionEnd:     StatusConfusion,
+	NauseaEnd:        StatusNausea,
+	DigEnd:           StatusDig,
+}
+
+var statusEndActions = [...]simpleAction{
+	StatusSlow:          SlowEnd,
+	StatusExhausted:     ExhaustionEnd,
+	StatusSwift:         HasteEnd,
+	StatusLignification: LignificationEnd,
+	StatusConfusion:     ConfusionEnd,
+	StatusNausea:        NauseaEnd,
+	StatusDig:           DigEnd,
+}
+
 func (sev *simpleEvent) Action(g *game) {
 	switch sev.EAction {
 	case PlayerTurn:
@@ -114,55 +144,14 @@ func (sev *simpleEvent) Action(g *game) {
 	case ShaedraAnimation:
 		g.ComputeLOS()
 		g.ui.FreeingShaedraAnimation()
-	case SlowEnd:
-		g.Player.Statuses[StatusSlow]--
-		if g.Player.Statuses[StatusSlow] <= 0 {
-			g.PrintStyled("You no longer feel slow.", logStatusEnd)
+	case SlowEnd, ExhaustionEnd, HasteEnd, LignificationEnd, ConfusionEnd, NauseaEnd, DigEnd:
+		g.Player.Statuses[endstatuses[sev.EAction]] -= DurationStatusStep
+		if g.Player.Statuses[endstatuses[sev.EAction]] <= 0 {
+			g.Player.Statuses[endstatuses[sev.EAction]] = 0
+			g.PrintStyled(endmsgs[sev.EAction], logStatusEnd)
 			g.ui.StatusEndAnimation()
-		}
-	case ExhaustionEnd:
-		g.PrintStyled("You no longer feel exhausted.", logStatusEnd)
-		g.Player.Statuses[StatusExhausted] = 0
-		g.ui.StatusEndAnimation()
-	case HasteEnd:
-		g.Player.Statuses[StatusSwift]--
-		if g.Player.Statuses[StatusSwift] == 0 {
-			g.PrintStyled("You no longer feel speedy.", logStatusEnd)
-			g.ui.StatusEndAnimation()
-		}
-	case LignificationEnd:
-		g.Player.Statuses[StatusLignification]--
-		g.Player.HPbonus -= 4
-		if g.Player.HPbonus < 0 {
-			g.Player.HPbonus = 0
-		}
-		if g.Player.Statuses[StatusLignification] == 0 {
-			g.PrintStyled("You no longer feel attached to the ground.", logStatusEnd)
-			g.ui.StatusEndAnimation()
-		}
-	case ConfusionEnd:
-		g.PrintStyled("You no longer feel confused.", logStatusEnd)
-		g.Player.Statuses[StatusConfusion] = 0
-		g.ui.StatusEndAnimation()
-	case NauseaEnd:
-		g.PrintStyled("You no longer feel sick.", logStatusEnd)
-		g.Player.Statuses[StatusNausea] = 0
-		g.ui.StatusEndAnimation()
-	case DisabledShieldEnd:
-		g.PrintStyled("You manage to dislodge the projectile from your shield.", logStatusEnd)
-		g.Player.Statuses[StatusDisabledShield] = 0
-		g.ui.StatusEndAnimation()
-	case DigEnd:
-		g.Player.Statuses[StatusDig]--
-		if g.Player.Statuses[StatusDig] == 0 {
-			g.PrintStyled("You no longer feel like an earth dragon.", logStatusEnd)
-			g.ui.StatusEndAnimation()
-		}
-	case SwapEnd:
-		g.Player.Statuses[StatusSwap]--
-		if g.Player.Statuses[StatusSwap] == 0 {
-			g.PrintStyled("You no longer feel light-footed.", logStatusEnd)
-			g.ui.StatusEndAnimation()
+		} else {
+			g.PushEvent(&simpleEvent{ERank: sev.Rank() + DurationStatusStep, EAction: sev.EAction})
 		}
 	}
 }
@@ -332,8 +321,7 @@ func (g *game) NightFog(at position, radius int, ev event) {
 
 func (g *game) MakeCreatureSleep(pos position, ev event) {
 	if pos == g.Player.Pos {
-		g.Player.Statuses[StatusSlow]++
-		g.PushEvent(&simpleEvent{ERank: ev.Rank() + DurationSleepSlow, EAction: SlowEnd})
+		g.PutStatus(StatusSlow, DurationSleepSlow)
 		g.Print("The clouds of night make you sleepy.")
 		return
 	}
@@ -411,8 +399,6 @@ func (cev *cloudEvent) Renew(g *game, delay int) {
 }
 
 const (
-	DurationSick                   = 50
-	DurationTeleportationDelay     = 30
 	DurationSwiftness              = 50
 	DurationShortSwiftness         = 20
 	DurationDigging                = 80

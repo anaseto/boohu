@@ -106,8 +106,7 @@ func (g *game) Jump(mons *monster, ev event) error {
 		return errors.New("You cannot jump while exhausted.")
 	}
 	if !g.Player.HasStatus(StatusSwift) && g.Player.Inventory.Body != CloakAcrobat {
-		g.Player.Statuses[StatusExhausted] = 1
-		g.PushEvent(&simpleEvent{ERank: ev.Rank() + DurationExhaustion, EAction: ExhaustionEnd})
+		g.PutStatus(StatusExhausted, 50)
 	}
 	g.PlacePlayerAt(pos)
 	return nil

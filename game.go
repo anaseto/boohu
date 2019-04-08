@@ -287,6 +287,18 @@ func (g *game) InitLevel() {
 		g.PrintStyled("You have a new empty slot for a magara.", logSpecial)
 	}
 
+	// Events
+	if g.Depth == 1 {
+		g.Events = &eventQueue{}
+		heap.Init(g.Events)
+		g.PushEvent(&simpleEvent{ERank: 0, EAction: PlayerTurn})
+	} else {
+		g.CleanEvents()
+	}
+	for i := range g.Monsters {
+		g.PushEvent(&monsterEvent{ERank: g.Turn + RandInt(10), EAction: MonsterTurn, NMons: i})
+	}
+
 	// initialize LOS
 	if g.Depth == 1 {
 		g.Print("You're in Hareka's Underground searching for medicinal simellas. Good luck!")
@@ -299,18 +311,6 @@ func (g *game) InitLevel() {
 	}
 	g.ComputeLOS()
 	g.MakeMonstersAware()
-
-	// Events
-	if g.Depth == 1 {
-		g.Events = &eventQueue{}
-		heap.Init(g.Events)
-		g.PushEvent(&simpleEvent{ERank: 0, EAction: PlayerTurn})
-	} else {
-		g.CleanEvents()
-	}
-	for i := range g.Monsters {
-		g.PushEvent(&monsterEvent{ERank: g.Turn + RandInt(10), EAction: MonsterTurn, NMons: i})
-	}
 }
 
 func (g *game) CleanEvents() {

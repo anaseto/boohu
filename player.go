@@ -335,18 +335,14 @@ func (g *game) SwiftFog(ev event) {
 			g.PushEvent(&cloudEvent{ERank: ev.Rank() + DurationFog + RandInt(DurationFog/2), EAction: CloudEnd, Pos: pos})
 		}
 	}
-	g.Player.Statuses[StatusSwift]++
-	end := ev.Rank() + DurationShortSwiftness
-	g.PushEvent(&simpleEvent{ERank: end, EAction: HasteEnd})
-	g.Player.Expire[StatusSwift] = end
+	g.PutStatus(StatusSwift, DurationShortSwiftness)
 	g.ComputeLOS()
 	g.Print("You feel an energy burst and smoke comes out from you.")
 }
 
 func (g *game) Confusion(ev event) {
 	if !g.Player.HasStatus(StatusConfusion) {
-		g.Player.Statuses[StatusConfusion]++
-		g.PushEvent(&simpleEvent{ERank: ev.Rank() + DurationConfusion + RandInt(DurationConfusion/2), EAction: ConfusionEnd})
+		g.PutStatus(StatusConfusion, DurationConfusionPlayer)
 		g.Print("You feel confused.")
 	}
 }
@@ -370,8 +366,7 @@ func (g *game) PlacePlayerAt(pos position) {
 }
 
 func (g *game) EnterLignification(ev event) {
-	g.Player.Statuses[StatusLignification]++
-	g.PushEvent(&simpleEvent{ERank: ev.Rank() + DurationLignificationPlayer, EAction: LignificationEnd})
+	g.PutStatus(StatusLignification, DurationLignificationPlayer)
 	g.Player.HPbonus += 4
 }
 
@@ -381,4 +376,15 @@ func (g *game) ExtinguishFire() error {
 	g.Print("You extinguish the fire.")
 	g.Ev.Renew(g, 5)
 	return nil
+}
+
+func (g *game) PutStatus(st status, duration int) {
+	if g.Player.Statuses[st] != 0 {
+		return
+	}
+	g.Player.Statuses[st] += duration
+	g.PushEvent(&simpleEvent{ERank: g.Ev.Rank() + DurationStatusStep, EAction: statusEndActions[st]})
+	if st.Good() {
+		g.Player.Expire[st] = g.Ev.Rank() + duration
+	}
 }

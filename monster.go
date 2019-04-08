@@ -1208,8 +1208,7 @@ func (m *monster) VampireSpit(g *game, ev event) bool {
 	if blocked || g.Player.HasStatus(StatusConfusion) {
 		return false
 	}
-	g.Player.Statuses[StatusConfusion]++
-	g.PushEvent(&simpleEvent{ERank: ev.Rank() + DurationConfusionPlayer, EAction: ConfusionEnd})
+	g.PutStatus(StatusConfusion, DurationConfusionPlayer)
 	g.Print("The vampire spits at you. You feel confused.")
 	m.Exhaust(g)
 	ev.Renew(g, m.Kind.AttackDelay())
@@ -1345,13 +1344,13 @@ func (m *monster) AbsorbMana(g *game, ev event) bool {
 }
 
 func (m *monster) MindAttack(g *game, ev event) bool {
+	// XXX remove?
 	if g.Player.Pos.Distance(m.Pos) == 1 {
 		return false
 	}
 	g.Print("The celmist mage attacks your mind.")
 	if RandInt(2) == 0 {
-		g.Player.Statuses[StatusSlow]++
-		g.PushEvent(&simpleEvent{ERank: ev.Rank() + DurationSleepSlow, EAction: SlowEnd})
+		g.PutStatus(StatusSlow, DurationSleepSlow)
 		g.Print("You feel slow.")
 	} else {
 		g.Confusion(ev)

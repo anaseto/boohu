@@ -1031,7 +1031,7 @@ func (ui *gameui) DrawStatusBar(line int) {
 			fg = ColorFgStatusBad
 		}
 		if g.Player.Statuses[st] > 1 {
-			ui.DrawColoredText(fmt.Sprintf("%s(%d)", st, g.Player.Statuses[st]), BarCol, line, fg)
+			ui.DrawColoredText(fmt.Sprintf("%s(%d)", st, g.Player.Statuses[st]/DurationStatusStep), BarCol, line, fg)
 		} else {
 			ui.DrawColoredText(st.String(), BarCol, line, fg)
 		}
