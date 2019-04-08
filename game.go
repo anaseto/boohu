@@ -60,7 +60,8 @@ type game struct {
 	Places             places
 	Params             startParams
 	//Opts                startOpts
-	ui *gameui
+	ui               *gameui
+	LiberatedShaedra bool
 }
 
 type startParams struct {
