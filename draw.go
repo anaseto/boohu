@@ -1140,7 +1140,7 @@ func (ui *gameui) DrawStatusLine() {
 		}
 		var sttext string
 		if g.Player.Statuses[st] > 1 {
-			sttext = fmt.Sprintf("%s(%d) ", st.Short(), g.Player.Statuses[st])
+			sttext = fmt.Sprintf("%s(%d) ", st.Short(), g.Player.Statuses[st]/DurationStatusStep)
 		} else {
 			sttext = fmt.Sprintf("%s ", st.Short())
 		}
