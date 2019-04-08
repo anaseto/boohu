@@ -408,6 +408,9 @@ func (m *monster) Sees(g *game, pos position) bool {
 	if !(m.LOS[pos] && m.Dir.InViewCone(m.Pos, pos)) {
 		return false
 	}
+	if m.State == Resting && m.Pos.Distance(pos) > 1 {
+		return false
+	}
 	if !g.Illuminated[pos] && m.Pos.Distance(pos) > darkRange {
 		return false
 	}
