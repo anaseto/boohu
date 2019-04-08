@@ -17,7 +17,6 @@ const (
 	SwiftnessMagara
 	SwappingMagara
 	FogMagara
-	BarrierMagara
 	SlowingMagara
 	SleepingMagara
 	NoiseMagara
@@ -25,6 +24,7 @@ const (
 	FireMagara
 	ConfusionMagara
 	LignificationMagara
+	//BarrierMagara
 )
 
 const NumMagaras = int(LignificationMagara)
@@ -82,8 +82,8 @@ func (g *game) UseMagara(n int, ev event) (err error) {
 		err = g.EvokeSwapping(ev)
 	case FogMagara:
 		err = g.EvokeFog(ev)
-	case BarrierMagara:
-		err = g.EvokeBarriers(ev)
+	//case BarrierMagara:
+	//err = g.EvokeBarriers(ev)
 	case SlowingMagara:
 		err = g.EvokeSlowing(ev)
 	case SleepingMagara:
@@ -139,8 +139,8 @@ func (mag magara) String() (desc string) {
 		desc = "magara of swapping"
 	case FogMagara:
 		desc = "magara of fog"
-	case BarrierMagara:
-		desc = "magara of magical barrier"
+	//case BarrierMagara:
+	//desc = "magara of magical barrier"
 	case SlowingMagara:
 		desc = "magara of slowing"
 	case SleepingMagara:
@@ -186,8 +186,8 @@ func (mag magara) Desc(g *game) (desc string) {
 		desc = "makes you swap positions with the farthest monster in sight. If there is more than one at the same distance, it will be chosen randomly."
 	case FogMagara:
 		desc = ""
-	case BarrierMagara:
-		desc = "replaces free cells around you with temporary magical barriers by making use of oric energies."
+	//case BarrierMagara:
+	//desc = "replaces free cells around you with temporary magical barriers by making use of oric energies."
 	case SlowingMagara:
 		desc = "induces slow movement and attack for monsters in sight."
 	case SleepingMagara:
@@ -441,20 +441,20 @@ func (g *game) Fog(at position, radius int, ev event) {
 	g.ComputeLOS()
 }
 
-func (g *game) EvokeBarriers(ev event) error {
-	neighbors := g.Dungeon.FreeNeighbors(g.Player.Pos)
-	for _, pos := range neighbors {
-		mons := g.MonsterAt(pos)
-		if mons.Exists() {
-			continue
-		}
-		g.CreateMagicalBarrierAt(pos, ev)
-	}
-	g.Print("You feel surrounded by a magical barrier.")
-	g.ui.PlayerGoodEffectAnimation()
-	g.ComputeLOS()
-	return nil
-}
+//func (g *game) EvokeBarriers(ev event) error {
+//neighbors := g.Dungeon.FreeNeighbors(g.Player.Pos)
+//for _, pos := range neighbors {
+//mons := g.MonsterAt(pos)
+//if mons.Exists() {
+//continue
+//}
+//g.CreateMagicalBarrierAt(pos, ev)
+//}
+//g.Print("You feel surrounded by a magical barrier.")
+//g.ui.PlayerGoodEffectAnimation()
+//g.ComputeLOS()
+//return nil
+//}
 
 func (g *game) EvokeSlowing(ev event) error {
 	for _, mons := range g.Monsters {
