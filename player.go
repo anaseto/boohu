@@ -374,3 +374,11 @@ func (g *game) EnterLignification(ev event) {
 	g.PushEvent(&simpleEvent{ERank: ev.Rank() + DurationLignificationPlayer, EAction: LignificationEnd})
 	g.Player.HPbonus += 4
 }
+
+func (g *game) ExtinguishFire() error {
+	g.Dungeon.SetCell(g.Player.Pos, ExtinguishedLightCell)
+	g.Objects.Lights[g.Player.Pos] = false
+	g.Print("You extinguish the fire.")
+	g.Ev.Renew(g, 5)
+	return nil
+}

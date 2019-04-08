@@ -465,7 +465,10 @@ func (g *game) ComputeLights() {
 	// XXX: could be optimized to avoid unnecessary recalculations
 	g.Illuminated = map[position]bool{}
 	const lightrange = 6
-	for lpos, _ := range g.Objects.Lights {
+	for lpos, on := range g.Objects.Lights {
+		if !on {
+			continue
+		}
 		rays := g.buildRayMap(lpos, lightrange)
 		for pos, n := range rays {
 			c := g.Dungeon.Cell(pos)

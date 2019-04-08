@@ -18,6 +18,7 @@ const (
 	MagaraCell
 	BananaCell
 	LightCell
+	ExtinguishedLightCell
 	TableCell
 	TreeCell
 	HoledWallCell
@@ -138,7 +139,9 @@ func (c cell) ShortDesc(g *game, pos position) (desc string) {
 	case BananaCell:
 		desc = "a banana"
 	case LightCell:
-		desc = "a light"
+		desc = "a campfire"
+	case ExtinguishedLightCell:
+		desc = "an extinguished campfire"
 	case TableCell:
 		desc = "a table"
 	case TreeCell:
@@ -166,11 +169,11 @@ func (c cell) Desc(g *game, pos position) (desc string) {
 	case GroundCell:
 		desc = "This is just plain ground."
 	case DoorCell:
-		desc = "A closed door blocks your line of sight. Doors open automatically when you or a monster stand on them. Doors are flammable."
+		desc = "A closed door blocks your line of sight. Doors open automatically when you or a creature stand on them. Doors are flammable."
 	case FungusCell:
 		desc = "Blue dense foliage grows in the Underground. It is difficult to see through, and is flammable."
 	case BarrelCell:
-		desc = "A barrel. You can hide yourself inside it when no monsters see you. It is a safe place for resting and recovering."
+		desc = "A barrel. You can hide yourself inside it when no creatures see you. It is a safe place for resting and recovering."
 	case StoneCell:
 		desc = g.Objects.Stones[pos].Desc(g)
 	case StairCell:
@@ -180,11 +183,13 @@ func (c cell) Desc(g *game, pos position) (desc string) {
 	case BananaCell:
 		desc = "A gawalt monkey cannot enter a healthy sleep without eating one of those bananas before."
 	case LightCell:
-		desc = "A light illuminates surrounding cells. Monsters can spot you in illuminated cells from a greater range."
+		desc = "A campfire illuminates surrounding cells. Creatures can spot you in illuminated cells from a greater range."
+	case ExtinguishedLightCell:
+		desc = "An extinguished campfire can be lighted again by some creatures."
 	case TableCell:
-		desc = "You can hide under the table so that only adjacent monsters can see you. Most monsters cannot walk accross the table."
+		desc = "You can hide under the table so that only adjacent creatures can see you. Most creatures cannot walk accross the table."
 	case TreeCell:
-		desc = "You can climb to see farther. Moreover, many monsters will not be able to attack you while you stand on a tree. The top is never illuminated."
+		desc = "You can climb to see farther. Moreover, many creatures will not be able to attack you while you stand on a tree. The top is never illuminated."
 	case HoledWallCell:
 		desc = "Only very small creatures can pass there. It is difficult to see through."
 	case ScrollCell:
@@ -224,6 +229,8 @@ func (c cell) Style(g *game, pos position) (r rune, fg uicolor) {
 		r, fg = ')', ColorFgObject
 	case LightCell:
 		r, fg = '☼', ColorFgObject
+	case ExtinguishedLightCell:
+		r, fg = '☼', ColorFgLOS
 	case TableCell:
 		r, fg = 'π', ColorFgObject
 	case TreeCell:

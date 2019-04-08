@@ -682,6 +682,25 @@ func (m *monster) HandleMonsSpecifics(g *game) (done bool) {
 		// oklob plants are static ranged-only
 		g.Ev.Renew(g, m.MoveDelay(g))
 		return true
+	case MonsGuard, MonsHighGuard:
+		if m.State != Wandering && m.State != Watching {
+			break
+		}
+		for pos, on := range g.Objects.Lights {
+			if !on && pos == m.Pos {
+				g.Dungeon.SetCell(m.Pos, LightCell)
+				g.Objects.Lights[m.Pos] = true
+				g.Ev.Renew(g, m.MoveDelay(g))
+				if g.Player.Sees(m.Pos) {
+					g.Printf("%s makes a new fire.", m.Kind.Definite(true))
+				} else {
+					g.TerrainKnowledge[m.Pos] = ExtinguishedLightCell
+				}
+				return
+			} else if !on && m.Sees(g, pos) {
+				m.Target = pos
+			}
+		}
 	}
 	return false
 }

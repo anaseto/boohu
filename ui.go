@@ -908,6 +908,8 @@ func (ui *gameui) HandleKey(rka runeKeyAction) (err error, again bool, quit bool
 			err = ui.CleanError(err)
 		case ItemCell:
 			err = ui.g.EquipItem()
+		case LightCell:
+			err = g.ExtinguishFire()
 		default:
 			err = errors.New("You cannot interact with anything here.")
 		}
@@ -1441,6 +1443,9 @@ func (ui *gameui) UpdateInteractButton() string {
 		show = true
 	case ItemCell:
 		interactMenu = "[equip]"
+		show = true
+	case LightCell:
+		interactMenu = "[extinguish]"
 		show = true
 	}
 	if !show {

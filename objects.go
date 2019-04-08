@@ -12,7 +12,7 @@ type objects struct {
 	Magaras map[position]magara // TODO simplify? (there's never more than one)
 	Barrels map[position]bool
 	Bananas map[position]bool
-	Lights  map[position]bool
+	Lights  map[position]bool // true: on, false: off
 	Scrolls map[position]scroll
 	Story   map[position]story
 	Lore    map[position]int // TODO simplify? (there's never more than one)
