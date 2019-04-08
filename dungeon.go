@@ -777,6 +777,23 @@ func (dg *dgen) PutHoledWalls(g *game, n int) {
 	}
 }
 
+func (dg *dgen) PutWindows(g *game, n int) {
+	candidates := []position{}
+	for i, _ := range g.Dungeon.Cells {
+		pos := idxtopos(i)
+		if dg.room[pos] && g.HoledWallCandidate(pos) {
+			candidates = append(candidates, pos)
+		}
+	}
+	if len(candidates) == 0 {
+		return
+	}
+	for i := 0; i < n; i++ {
+		pos := candidates[RandInt(len(candidates))]
+		g.Dungeon.SetCell(pos, WindowCell)
+	}
+}
+
 func (g *game) HoledWallCandidate(pos position) bool {
 	d := g.Dungeon
 	if !pos.valid() || !d.Cell(pos).IsWall() {
@@ -974,7 +991,13 @@ func (dg *dgen) AddSpecial(g *game, ml maplayout) {
 	for i := 0; i < ntrees; i++ {
 		dg.GenTree(g)
 	}
-	dg.PutHoledWalls(g, 1+RandInt(2))
+	nhw := 1 + RandInt(2)
+	dg.PutHoledWalls(g, nhw)
+	nwin := 1
+	if nhw == 1 {
+		nwin++
+	}
+	dg.PutWindows(g, nwin)
 	if g.Params.Lore[g.Depth] {
 		dg.PutLore(g)
 	}

@@ -94,8 +94,9 @@ func (pp *playerPath) Neighbors(pos position) []position {
 		if cld, ok := pp.game.Clouds[npos]; ok && cld == CloudFire && (!okT || t != FungusCell && t != DoorCell) {
 			return false
 		}
-		return npos.valid() && (d.Cell(npos).T != WallCell && (!okT || t != WallCell) || pp.game.Player.HasStatus(StatusDig)) &&
-			d.Cell(npos).Explored
+		return npos.valid() && d.Cell(npos).Explored && (d.Cell(npos).T.IsPlayerPassable() && !okT ||
+			okT && t.IsPlayerPassable() ||
+			pp.game.Player.HasStatus(StatusDig) && (d.Cell(npos).T.IsDiggable() && !okT || (okT && t.IsDiggable())))
 	}
 	nb = pos.CardinalNeighbors(nb, keep)
 	return nb

@@ -25,11 +25,30 @@ const (
 	StoryCell
 	ItemCell
 	BarrierCell
+	WindowCell
 )
 
 func (c cell) IsPassable() bool {
 	switch c.T {
-	case WallCell, BarrelCell, TableCell, TreeCell, HoledWallCell, BarrierCell:
+	case WallCell, BarrelCell, TableCell, TreeCell, HoledWallCell, BarrierCell, WindowCell:
+		return false
+	default:
+		return true
+	}
+}
+
+func (t terrain) IsPlayerPassable() bool {
+	switch t {
+	case WallCell, BarrierCell, WindowCell:
+		return false
+	default:
+		return true
+	}
+}
+
+func (t terrain) IsDiggable() bool {
+	switch t {
+	case WallCell, WindowCell:
 		return false
 	default:
 		return true
@@ -38,7 +57,7 @@ func (c cell) IsPassable() bool {
 
 func (c cell) BlocksRange() bool {
 	switch c.T {
-	case WallCell, BarrelCell, TableCell, TreeCell, BarrierCell:
+	case WallCell, BarrelCell, TableCell, TreeCell, BarrierCell, WindowCell:
 		return true
 	default:
 		return false
@@ -47,7 +66,7 @@ func (c cell) BlocksRange() bool {
 
 func (c cell) IsIlluminable() bool {
 	switch c.T {
-	case WallCell, BarrelCell, TableCell, TreeCell, HoledWallCell, BarrierCell:
+	case WallCell, BarrelCell, TableCell, TreeCell, HoledWallCell, BarrierCell, WindowCell:
 		return false
 	}
 	return true
@@ -55,7 +74,7 @@ func (c cell) IsIlluminable() bool {
 
 func (c cell) IsDestructible() bool {
 	switch c.T {
-	case WallCell, BarrelCell, DoorCell, TableCell, TreeCell, HoledWallCell:
+	case WallCell, BarrelCell, DoorCell, TableCell, TreeCell, HoledWallCell, WindowCell:
 		return true
 	default:
 		return false
@@ -73,7 +92,7 @@ func (c cell) IsWall() bool {
 
 func (c cell) Flammable() bool {
 	switch c.T {
-	case FungusCell, DoorCell, BarrelCell, TableCell, TreeCell:
+	case FungusCell, DoorCell, BarrelCell, TableCell, TreeCell, WindowCell:
 		return true
 	default:
 		return false
@@ -134,6 +153,8 @@ func (c cell) ShortDesc(g *game, pos position) (desc string) {
 		desc = g.Objects.Items[pos].ShortDesc(g)
 	case BarrierCell:
 		desc = "a temporal magical barrier"
+	case WindowCell:
+		desc = "a window"
 	}
 	return desc
 }
@@ -174,6 +195,8 @@ func (c cell) Desc(g *game, pos position) (desc string) {
 		desc = g.Objects.Items[pos].Desc(g)
 	case BarrierCell:
 		desc = "A temporal magical barrier."
+	case WindowCell:
+		desc = "A transparent window in the wall."
 	}
 	return desc
 }
@@ -206,7 +229,7 @@ func (c cell) Style(g *game, pos position) (r rune, fg uicolor) {
 	case TreeCell:
 		r, fg = '♣', ColorFgConfusedMonster
 	case HoledWallCell:
-		r, fg = 'Π', ColorFgPlace
+		r, fg = 'Π', ColorViolet
 	case ScrollCell:
 		r, fg = g.Objects.Scrolls[pos].Style(g)
 	case StoryCell:
@@ -215,6 +238,8 @@ func (c cell) Style(g *game, pos position) (r rune, fg uicolor) {
 		r, fg = g.Objects.Items[pos].Style(g)
 	case BarrierCell:
 		r, fg = 'Ξ', ColorFgMagicPlace
+	case WindowCell:
+		r, fg = 'Θ', ColorViolet
 	}
 	return r, fg
 }
