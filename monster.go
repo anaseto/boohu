@@ -648,9 +648,13 @@ func (m *monster) NextTarget(g *game) (pos position) {
 	case BehPatrol:
 		if band.Path[0] == m.Target {
 			pos = band.Path[1]
-			break
+		} else if band.Path[1] == m.Target {
+			pos = band.Path[0]
+		} else if band.Path[0].Distance(m.Pos) < band.Path[1].Distance(m.Pos) {
+			pos = band.Path[0]
+		} else {
+			pos = band.Path[1]
 		}
-		pos = band.Path[0]
 	}
 	return pos
 }
