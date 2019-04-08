@@ -1075,6 +1075,10 @@ func (m *monster) RangeBlocked(g *game) bool {
 	}
 	blocked := false
 	for _, pos := range ray[1:] {
+		c := g.Dungeon.Cell(pos)
+		if c.BlocksRange() {
+			continue
+		}
 		mons := g.MonsterAt(pos)
 		if mons == nil {
 			continue

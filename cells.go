@@ -36,6 +36,15 @@ func (c cell) IsPassable() bool {
 	}
 }
 
+func (c cell) BlocksRange() bool {
+	switch c.T {
+	case WallCell, BarrelCell, TableCell, TreeCell, BarrierCell:
+		return true
+	default:
+		return false
+	}
+}
+
 func (c cell) IsIlluminable() bool {
 	switch c.T {
 	case WallCell, BarrelCell, TableCell, TreeCell, HoledWallCell, BarrierCell:
