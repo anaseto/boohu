@@ -520,11 +520,12 @@ func (ui *gameui) MagicMappingAnimation(border []int) {
 
 func (ui *gameui) FreeingShaedraAnimation() {
 	g := ui.g
-	if DisableAnimations {
-		return
-	}
+	//if DisableAnimations {
+	// TODO this animation cannot be disabled as-is, because code is mixed with it...
+	//return
+	//}
 	g.Print("You see Shaedra. She is wounded!")
-	g.PrintStyled("Shaedra: “By Ruyale, thank you Syu! Let's flee with Marevor's magara!”", logSpecial)
+	g.PrintStyled("Shaedra: “Oh, it's you, Syu! Let's flee with Marevor's magara!”", logSpecial)
 	g.Print("[(x) to continue]")
 	ui.DrawDungeonView(NoFlushMode)
 	ui.Flush()

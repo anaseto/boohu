@@ -31,7 +31,7 @@ const (
 
 func (c cell) IsPassable() bool {
 	switch c.T {
-	case WallCell, BarrelCell, TableCell, TreeCell, HoledWallCell, BarrierCell, WindowCell:
+	case WallCell, BarrelCell, TableCell, TreeCell, HoledWallCell, BarrierCell, WindowCell, StoryCell:
 		return false
 	default:
 		return true
@@ -58,7 +58,7 @@ func (t terrain) IsDiggable() bool {
 
 func (c cell) BlocksRange() bool {
 	switch c.T {
-	case WallCell, BarrelCell, TableCell, TreeCell, BarrierCell, WindowCell:
+	case WallCell, BarrelCell, TableCell, TreeCell, BarrierCell, WindowCell, StoryCell:
 		return true
 	default:
 		return false
