@@ -925,7 +925,7 @@ func (dg *dgen) AddSpecial(g *game, ml maplayout) {
 	if ml == RandomWalkTreeCave && g.Depth < MaxDepth {
 		bananas--
 	}
-	for i := 0; i < 2; i++ {
+	for i := 0; i < bananas; i++ {
 		dg.GenBanana(g)
 	}
 	dg.GenMagara(g)
