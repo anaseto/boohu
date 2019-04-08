@@ -921,6 +921,10 @@ func (dg *dgen) AddSpecial(g *game, ml maplayout) {
 	////g.CollectableScore-- // these are extra
 	////}
 	//}
+	bananas := 2
+	if ml == RandomWalkTreeCave && g.Depth < MaxDepth {
+		bananas--
+	}
 	for i := 0; i < 2; i++ {
 		dg.GenBanana(g)
 	}
