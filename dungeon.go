@@ -568,38 +568,38 @@ var roomSpecialTemplates = []string{RoomBigColumns, RoomBigGarden, RoomColumns, 
 const (
 	CellShaedra1 = `
 #########
-#HMΔ#_!>#
+#HMΔ#_!_#
 ##|###|##
 +.P...P.+
 ##|###|##
-#_!>#>!_#
+#_!_#_!_#
 #########
 `
 	CellShaedra2 = `
 #########
-#_!>#>!_#
+#_!_#_!_#
 ##|###|##
 +.P...P.+
 ##|###|##
-#_!>#HMΔ#
+#_!_#HMΔ#
 #########
 `
 	CellShaedra3 = `
 #########
-#_!>#>!_#
+#_!_#_!_#
 ##|###|##
 +.P...P.+
 ##|###|##
-#HMΔ#_!>#
+#HMΔ#_!_#
 #########
 `
 	CellShaedra4 = `
 #########
-#_!>#HMΔ#
+#_!_#HMΔ#
 ##|###|##
 +.P...P.+
 ##|###|##
-#_!>#>!_#
+#_!_#_!_#
 #########
 `
 )
@@ -827,22 +827,44 @@ func (g *game) HoledWallCandidate(pos position) bool {
 			pos.S().valid() && d.Cell(pos.S()).IsWall())
 }
 
-func (dg *dgen) GenRooms(templates []string, n int) bool {
-	ok := true
+type placement int
+
+const (
+	PlacementRandom placement = iota
+	PlacementCenter
+	PlacementEdge
+)
+
+func (dg *dgen) GenRooms(templates []string, n int, pl placement) (ok bool, ps []position) {
+	ok = true
 	for i := 0; i < n; i++ {
 		var r *room
 		count := 200
+		var pos position
 		for r == nil && count > 0 {
 			count--
-			r = dg.NewRoom(position{RandInt(DungeonWidth - 1), RandInt(DungeonHeight - 1)}, templates[RandInt(len(templates))])
+			switch pl {
+			case PlacementRandom:
+				pos = position{RandInt(DungeonWidth - 1), RandInt(DungeonHeight - 1)}
+			case PlacementCenter:
+				pos = position{DungeonWidth/2 - 4 + RandInt(5), DungeonHeight/2 - 3 + RandInt(4)}
+			case PlacementEdge:
+				if RandInt(2) == 0 {
+					pos = position{RandInt(DungeonWidth / 4), RandInt(DungeonHeight - 1)}
+				} else {
+					pos = position{3*DungeonWidth/4 + RandInt(DungeonWidth/4) - 1, RandInt(DungeonHeight - 1)}
+				}
+			}
+			r = dg.NewRoom(pos, templates[RandInt(len(templates))])
 		}
 		if r != nil {
 			dg.rooms = append(dg.rooms, r)
+			ps = append(ps, pos)
 		} else {
 			ok = false
 		}
 	}
-	return ok
+	return ok, ps
 }
 
 func (dg *dgen) ConnectRooms() {
@@ -890,16 +912,22 @@ func (g *game) GenRoomTunnels(ml maplayout) {
 	case RandomWalkTreeCave:
 		dg.GenTreeCaveMap()
 	}
+	var places []position
 	switch ml {
 	case RandomWalkCave:
-		dg.GenRooms(roomSpecialTemplates, 4)
-		dg.GenRooms(roomNormalTemplates, 5)
+		dg.GenRooms(roomSpecialTemplates, 4, PlacementRandom)
+		dg.GenRooms(roomNormalTemplates, 5, PlacementRandom)
 	case RandomWalkTreeCave:
-		dg.GenRooms(roomSpecialTemplates, 4)
-		dg.GenRooms(roomNormalTemplates, 7)
+		dg.GenRooms(roomSpecialTemplates, 4, PlacementRandom)
+		dg.GenRooms(roomNormalTemplates, 7, PlacementRandom)
 	default:
 		if g.Depth == WinDepth {
-			ok := dg.GenRooms(roomCellTemplates, 1)
+			var ok bool
+			if RandInt(3) > 0 {
+				ok, places = dg.GenRooms(roomCellTemplates, 1, PlacementEdge)
+			} else {
+				ok, places = dg.GenRooms(roomCellTemplates, 1, PlacementCenter)
+			}
 			if !ok {
 				panic("Shaedra Cell")
 			}
@@ -908,17 +936,17 @@ func (g *game) GenRoomTunnels(ml maplayout) {
 			g.Objects.Story[g.Places.Shaedra] = StoryShaedra
 			g.Places.Monolith = dg.spl.Monolith
 			g.Places.Marevor = dg.spl.Marevor
-			dg.GenRooms(roomSpecialTemplates, 3)
-			dg.GenRooms(roomNormalTemplates, 6)
+			dg.GenRooms(roomSpecialTemplates, 3, PlacementRandom)
+			dg.GenRooms(roomNormalTemplates, 6, PlacementRandom)
 		} else {
-			dg.GenRooms(roomSpecialTemplates, 3)
-			dg.GenRooms(roomNormalTemplates, 7)
+			dg.GenRooms(roomSpecialTemplates, 3, PlacementRandom)
+			dg.GenRooms(roomNormalTemplates, 7, PlacementRandom)
 		}
 	}
 	dg.ConnectRooms()
 	g.Dungeon = d
 	dg.PutDoors(g)
-	dg.PlayerStartCell(g)
+	dg.PlayerStartCell(g, places)
 	dg.ClearUnconnected(g)
 	if g.Depth < MaxDepth {
 		dg.GenStairs(g, NormalStair)
@@ -1087,8 +1115,18 @@ func (r *room) RandomPlace(kind placeKind) position {
 	return r.places[j].pos
 }
 
-func (dg *dgen) PlayerStartCell(g *game) {
+func (dg *dgen) PlayerStartCell(g *game, places []position) {
+	const far = 30
 	r := dg.rooms[len(dg.rooms)-1]
+loop:
+	for i := len(dg.rooms) - 2; i >= 0; i-- {
+		for _, pos := range places {
+			if r.pos.Distance(pos) < far && dg.rooms[i].pos.Distance(pos) >= far {
+				r = dg.rooms[i]
+				break loop
+			}
+		}
+	}
 	g.Player.Pos = r.RandomPlace(PlacePatrol)
 	if g.Depth > 1 {
 		return
