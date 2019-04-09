@@ -865,7 +865,7 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 	}
 	var fgTerrain uicolor
 	switch {
-	case !c.CoversPlayer():
+	case c.CoversPlayer():
 		r, fgTerrain = c.Style(g, pos)
 		if pos == g.Player.Pos {
 			fgColor = ColorFgPlayer
