@@ -60,18 +60,21 @@ type game struct {
 	Places             places
 	Params             startParams
 	//Opts                startOpts
-	ui               *gameui
-	LiberatedShaedra bool
+	ui                *gameui
+	LiberatedShaedra  bool
+	LiberatedArtifact bool
 }
 
 type startParams struct {
-	Lore map[int]bool
+	Lore    map[int]bool
+	Blocked map[int]bool
 }
 
 type places struct {
 	Shaedra  position
 	Monolith position
 	Marevor  position
+	Artifact position
 }
 
 func (g *game) FreeCell() position {
@@ -240,6 +243,14 @@ func (g *game) InitFirstLevel() {
 	g.Params.Lore = map[int]bool{}
 	for i := 0; i < 5; i++ {
 		g.Params.Lore[RandInt(MaxDepth)] = true
+	}
+	g.Params.Blocked = map[int]bool{}
+	if RandInt(10) > 0 {
+		g.Params.Blocked[2+RandInt(6)] = true
+	}
+	if RandInt(10) == 0 {
+		// a second one sometimes!
+		g.Params.Blocked[2+RandInt(6)] = true
 	}
 	permi := RandInt(7)
 	switch permi {

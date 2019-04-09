@@ -56,6 +56,7 @@ const (
 	ShadowsEnd
 	AccurateEnd
 	ShaedraAnimation
+	ArtifactAnimation
 )
 
 func (g *game) PushEvent(ev event) {
@@ -144,6 +145,9 @@ func (sev *simpleEvent) Action(g *game) {
 	case ShaedraAnimation:
 		g.ComputeLOS()
 		g.ui.FreeingShaedraAnimation()
+	case ArtifactAnimation:
+		g.ComputeLOS()
+		g.ui.TakingArtifactAnimation()
 	case SlowEnd, ExhaustionEnd, HasteEnd, LignificationEnd, ConfusionEnd, NauseaEnd, DigEnd:
 		g.Player.Statuses[endstatuses[sev.EAction]] -= DurationStatusStep
 		if g.Player.Statuses[endstatuses[sev.EAction]] <= 0 {

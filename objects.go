@@ -24,39 +24,49 @@ type stair int
 const (
 	NormalStair stair = iota
 	WinStair
+	BlockedStair
 )
 
 func (st stair) ShortDesc(g *game) (desc string) {
-	if st == WinStair {
-		desc = fmt.Sprintf("a monolith portal")
-	} else {
+	switch st {
+	case NormalStair:
 		desc = fmt.Sprintf("stairs downwards")
+	case WinStair:
+		desc = fmt.Sprintf("a monolith portal")
+	case BlockedStair:
+		desc = fmt.Sprintf("blocked stairs downwards")
 	}
 	return desc
 }
 
 func (st stair) Desc(g *game) (desc string) {
-	if st == WinStair {
+	switch st {
+	case WinStair:
 		desc = "Going through this portal will make you escape from this place, going back to the Surface."
 		if g.Depth < MaxDepth {
 			desc += " If you're courageous enough, you may skip this portal and continue going deeper in the dungeon, to find Marevor's magara, finishing Shaedra's failed mission."
 		}
-	} else {
+	case NormalStair:
 		desc = "Stairs lead to the next level of the Underground. There's no way back. Monsters do not follow you."
 		if g.Depth == WinDepth {
 			desc += " You may want to take those after freeing Shaedra from her cell."
 		}
+	case BlockedStair:
+		desc = "Stairs lead to the next level of the Underground. There's no way back. Monsters do not follow you. These are blocked by a magical barrier that you have to disable by activating a corresponding stone of barrier."
 	}
 	return desc
 }
 
 func (st stair) Style(g *game) (r rune, fg uicolor) {
 	r = '>'
-	if st == WinStair {
+	switch st {
+	case WinStair:
 		fg = ColorFgMagicPlace
 		r = 'Δ'
-	} else {
+	case NormalStair:
 		fg = ColorFgPlace
+	case BlockedStair:
+		fg = ColorFgMagicPlace
 	}
 	return r, fg
 }
@@ -72,6 +82,8 @@ const (
 	ObstructionStone
 	MappingStone
 	SensingStone
+	// special
+	BarrierStone
 )
 
 const NumStones = int(SensingStone) + 1
@@ -94,6 +106,8 @@ func (stn stone) String() (text string) {
 		text = "mapping stone"
 	case SensingStone:
 		text = "sensing stone"
+	case BarrierStone:
+		text = "barrier stone"
 	}
 	return text
 }
@@ -116,6 +130,8 @@ func (stn stone) Desc(g *game) (text string) {
 		text = "Activating this stone shows you the map layout and item locations in a wide area."
 	case SensingStone:
 		text = "Activating this stone shows you the current position of monsters in a wide area."
+	case BarrierStone:
+		text = "Activating this stone will disable a magical barrier (usually one blocking stairs)."
 	}
 	return text
 }
@@ -128,6 +144,8 @@ func (stn stone) Style(g *game) (r rune, fg uicolor) {
 	r = '_'
 	if stn == InertStone {
 		fg = ColorFgPlace
+	} else if stn == BarrierStone {
+		fg = ColorFgPlayer
 	} else {
 		fg = ColorFgMagicPlace
 	}
@@ -203,6 +221,22 @@ func (g *game) Sensing(ev event) error {
 	return nil
 }
 
+func (g *game) BarrierStone(ev event) error {
+	if g.Depth == MaxDepth {
+		g.Objects.Story[g.Places.Artifact] = StoryArtifact
+		g.Print("You feel oric energies dissipating.")
+		return nil
+	}
+	for pos, st := range g.Objects.Stairs {
+		// actually there is at most only such stair
+		if st == BlockedStair {
+			g.Objects.Stairs[pos] = NormalStair
+		}
+	}
+	g.Print("You feel oric energies dissipating.")
+	return nil
+}
+
 func (g *game) ActivateStone() (err error) {
 	stn, ok := g.Objects.Stones[g.Player.Pos]
 	if !ok {
@@ -273,6 +307,8 @@ func (g *game) ActivateStone() (err error) {
 		err = g.MagicMapping(g.Ev, MappingDistance)
 	case SensingStone:
 		err = g.Sensing(g.Ev)
+	case BarrierStone:
+		err = g.BarrierStone(g.Ev)
 	}
 	if err != nil {
 		return err
@@ -347,6 +383,8 @@ const (
 	NoStory story = iota
 	StoryShaedra
 	StoryMarevor
+	StoryArtifact
+	StoryArtifactSealed
 )
 
 func (st story) Desc(g *game) (desc string) {
@@ -355,6 +393,10 @@ func (st story) Desc(g *game) (desc string) {
 		desc = "Shaedra is the friend you came here to rescue, a human-like creature with claws, a ternian. Many other human-like creatures consider them as savages."
 	case StoryMarevor:
 		desc = "Marevor Helith is an ancient undead nakrus very fond of teleporting people away. He is a well-known expert in the field of magaras - items that many people simply call magical objects. His current research focus is monolith creation. Marevor, a repentant necromancer, is now searching for his old disciple Jaixel in the Underground to help him overcome the past."
+	case StoryArtifact:
+		desc = "This is the magara that you have to retrieve: the Gem Portal Artifact that was stolen to Marevor Helith."
+	case StoryArtifactSealed:
+		desc = "This is the magara that you have to retrieve: the Gem Portal Artifact that was stolen to Marevor Helith. Before taking it, you have to release the magical barrier that protects it activating the corresponding protective barrier magical stone."
 	}
 	return desc
 }
@@ -365,18 +407,27 @@ func (st story) ShortDesc(g *game) (desc string) {
 		desc = "Shaedra"
 	case StoryMarevor:
 		desc = "Marevor"
+	case StoryArtifact:
+		desc = "Gem Portal Artifact"
+	case StoryArtifactSealed:
+		desc = "Gem Portal Artifact (sealed)"
 	}
 	return desc
 }
 
 func (st story) Style(g *game) (r rune, fg uicolor) {
+	fg = ColorFgPlayer
 	switch st {
 	case StoryShaedra:
 		r = 'H'
 	case StoryMarevor:
 		r = 'M'
+	case StoryArtifact:
+		r = '='
+	case StoryArtifactSealed:
+		r = '='
+		fg = ColorFgMagicPlace
 	}
-	fg = ColorFgPlayer
 	return r, fg
 }
 

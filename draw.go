@@ -865,7 +865,7 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 	}
 	var fgTerrain uicolor
 	switch {
-	case !c.IsPassable():
+	case !c.CoversPlayer():
 		r, fgTerrain = c.Style(g, pos)
 		if pos == g.Player.Pos {
 			fgColor = ColorFgPlayer
@@ -1680,7 +1680,7 @@ func (ui *gameui) SelectItem(ev event) error {
 	g := ui.g
 	ui.DrawDungeonView(NoFlushMode)
 	items := []item{g.Player.Inventory.Body, g.Player.Inventory.Neck, g.Player.Inventory.Misc}
-	parts := []string{"body", "neck", "wrist"}
+	parts := []string{"body", "neck", "backpack"}
 	for {
 		ui.ClearLine(0)
 		if !ui.Small() {

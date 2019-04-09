@@ -38,6 +38,15 @@ func (c cell) IsPassable() bool {
 	}
 }
 
+func (c cell) CoversPlayer() bool {
+	switch c.T {
+	case WallCell, BarrelCell, TableCell, TreeCell, HoledWallCell, BarrierCell, WindowCell:
+		return true
+	default:
+		return false
+	}
+}
+
 func (t terrain) IsPlayerPassable() bool {
 	switch t {
 	case WallCell, BarrierCell, WindowCell:

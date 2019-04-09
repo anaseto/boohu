@@ -533,16 +533,16 @@ func (ui *gameui) FreeingShaedraAnimation() {
 	_, _, bg := ui.PositionDrawing(g.Places.Monolith)
 	ui.DrawAtPosition(g.Places.Monolith, false, 'Φ', ColorFgMagicPlace, bg)
 	ui.Flush()
-	time.Sleep(400 * time.Millisecond)
+	time.Sleep(300 * time.Millisecond)
 	g.Objects.Stairs[g.Places.Monolith] = WinStair
 	g.Dungeon.SetCell(g.Places.Monolith, StairCell)
 	ui.DrawDungeonView(NoFlushMode)
 	ui.Flush()
-	time.Sleep(400 * time.Millisecond)
+	time.Sleep(300 * time.Millisecond)
 	_, _, bg = ui.PositionDrawing(g.Places.Marevor)
 	ui.DrawAtPosition(g.Places.Marevor, false, 'Φ', ColorFgMagicPlace, bg)
 	ui.Flush()
-	time.Sleep(400 * time.Millisecond)
+	time.Sleep(300 * time.Millisecond)
 	g.Dungeon.SetCell(g.Places.Marevor, StoryCell)
 	g.Objects.Story[g.Places.Marevor] = StoryMarevor
 	g.PrintStyled("Marevor: “And what about the mission?”", logSpecial)
@@ -551,14 +551,53 @@ func (ui *gameui) FreeingShaedraAnimation() {
 	ui.DrawDungeonView(NoFlushMode)
 	ui.Flush()
 	ui.WaitForContinue(-1)
+	ui.DrawDungeonView(NoFlushMode)
 	ui.DrawAtPosition(g.Places.Marevor, false, 'Φ', ColorFgMagicPlace, bg)
 	ui.DrawAtPosition(g.Places.Shaedra, false, 'Φ', ColorFgMagicPlace, bg)
-	ui.DrawDungeonView(NoFlushMode)
 	ui.Flush()
 	time.Sleep(400 * time.Millisecond)
 	g.Dungeon.SetCell(g.Places.Shaedra, GroundCell)
 	g.Dungeon.SetCell(g.Places.Marevor, ScrollCell)
 	g.Objects.Scrolls[g.Places.Marevor] = ScrollExtended
+	ui.DrawDungeonView(NoFlushMode)
+	ui.Flush()
+	time.Sleep(12 * time.Millisecond)
+}
+
+func (ui *gameui) TakingArtifactAnimation() {
+	g := ui.g
+	//if DisableAnimations {
+	// TODO this animation cannot be disabled as-is, because code is mixed with it...
+	//return
+	//}
+	g.Print("You take and use the artifact.")
+	g.Dungeon.SetCell(g.Places.Artifact, GroundCell)
+	_, _, bg := ui.PositionDrawing(g.Places.Monolith)
+	ui.DrawAtPosition(g.Places.Monolith, false, 'Φ', ColorFgMagicPlace, bg)
+	ui.Flush()
+	time.Sleep(300 * time.Millisecond)
+	g.Objects.Stairs[g.Places.Monolith] = WinStair
+	g.Dungeon.SetCell(g.Places.Monolith, StairCell)
+	ui.DrawDungeonView(NoFlushMode)
+	ui.Flush()
+	time.Sleep(300 * time.Millisecond)
+	_, _, bg = ui.PositionDrawing(g.Places.Marevor)
+	ui.DrawAtPosition(g.Places.Marevor, false, 'Φ', ColorFgMagicPlace, bg)
+	ui.Flush()
+	time.Sleep(300 * time.Millisecond)
+	g.Dungeon.SetCell(g.Places.Marevor, StoryCell)
+	g.Objects.Story[g.Places.Marevor] = StoryMarevor
+	g.PrintStyled("Marevor: “Great! Let's escape and find some bones to celebrate!”", logSpecial)
+	g.PrintStyled("Syu: “Sorry, but I prefer bananas!”", logSpecial)
+	g.Print("[(x) to continue]")
+	ui.DrawDungeonView(NoFlushMode)
+	ui.Flush()
+	ui.WaitForContinue(-1)
+	ui.DrawDungeonView(NoFlushMode)
+	ui.DrawAtPosition(g.Places.Marevor, false, 'Φ', ColorFgMagicPlace, bg)
+	ui.Flush()
+	time.Sleep(400 * time.Millisecond)
+	g.Dungeon.SetCell(g.Places.Marevor, GroundCell)
 	ui.DrawDungeonView(NoFlushMode)
 	ui.Flush()
 	time.Sleep(12 * time.Millisecond)

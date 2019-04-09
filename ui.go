@@ -872,7 +872,7 @@ func (ui *gameui) HandleKey(rka runeKeyAction) (err error, again bool, quit bool
 		c := g.Dungeon.Cell(g.Player.Pos)
 		switch c.T {
 		case StairCell:
-			if g.Dungeon.Cell(g.Player.Pos).T == StairCell {
+			if g.Dungeon.Cell(g.Player.Pos).T == StairCell && g.Objects.Stairs[g.Player.Pos] != BlockedStair {
 				ui.MenuSelectedAnimation(MenuInteract, true)
 				strt := g.Objects.Stairs[g.Player.Pos]
 				err = ui.OptionalDescendConfirmation(strt)
@@ -885,6 +885,8 @@ func (ui *gameui) HandleKey(rka runeKeyAction) (err error, again bool, quit bool
 					return err, again, quit
 				}
 				ui.DrawDungeonView(NormalMode)
+			} else if g.Dungeon.Cell(g.Player.Pos).T == StairCell && g.Objects.Stairs[g.Player.Pos] == BlockedStair {
+				err = errors.New("The stairs are blocked by a magical stone barrier energies.")
 			} else {
 				err = errors.New("No stairs here.")
 			}
@@ -910,6 +912,16 @@ func (ui *gameui) HandleKey(rka runeKeyAction) (err error, again bool, quit bool
 			err = ui.g.EquipItem()
 		case LightCell:
 			err = g.ExtinguishFire()
+		case StoryCell:
+			if g.Objects.Story[g.Player.Pos] == StoryArtifact && !g.LiberatedArtifact {
+				g.PushEvent(&simpleEvent{ERank: g.Ev.Rank(), EAction: ArtifactAnimation})
+				g.LiberatedArtifact = true
+				g.WaitTurn(g.Ev)
+			} else if g.Objects.Story[g.Player.Pos] == StoryArtifactSealed {
+				err = errors.New("The artifact is protected by a magical stone barrier.")
+			} else {
+				err = errors.New("You cannot interact with anything here.")
+			}
 		default:
 			err = errors.New("You cannot interact with anything here.")
 		}
@@ -1084,6 +1096,12 @@ func (ui *gameui) NextObject(pos position, data *examineData) {
 		for p := range g.Objects.Bananas {
 			data.objects = append(data.objects, p)
 		}
+		for p := range g.Objects.Items {
+			data.objects = append(data.objects, p)
+		}
+		for p := range g.Objects.Scrolls {
+			data.objects = append(data.objects, p)
+		}
 		data.objects = g.SortedNearestTo(data.objects, g.Player.Pos)
 	}
 	for i := 0; i < len(data.objects); i++ {
@@ -1165,7 +1183,7 @@ func (ui *gameui) CursorKeyAction(targ Targeter, rka runeKeyAction, data *examin
 	case KeyNextStairs:
 		ui.NextStair(data)
 	case KeyDescend:
-		if g.Dungeon.Cell(g.Player.Pos).T == StairCell {
+		if g.Dungeon.Cell(g.Player.Pos).T == StairCell && g.Objects.Stairs[g.Player.Pos] != BlockedStair {
 			ui.MenuSelectedAnimation(MenuInteract, true)
 			strt := g.Objects.Stairs[g.Player.Pos]
 			err = ui.OptionalDescendConfirmation(strt)
@@ -1180,6 +1198,8 @@ func (ui *gameui) CursorKeyAction(targ Targeter, rka runeKeyAction, data *examin
 				quit = true
 				return err, again, quit, notarg
 			}
+		} else if g.Dungeon.Cell(g.Player.Pos).T == StairCell && g.Objects.Stairs[g.Player.Pos] == BlockedStair {
+			err = errors.New("The stairs are blocked by a magical stone barrier energies.")
 		} else {
 			err = errors.New("No stairs here.")
 		}
@@ -1290,7 +1310,7 @@ func (ui *gameui) CursorAction(targ Targeter, start *position) (err error, again
 		if !data.npos.valid() {
 			ui.NextStair(data)
 		}
-		if data.npos.valid() {
+		if data.npos.valid() && pos.Distance(data.npos) < DefaultLOSRange+5 {
 			pos = data.npos
 		}
 	}
@@ -1447,6 +1467,11 @@ func (ui *gameui) UpdateInteractButton() string {
 	case LightCell:
 		interactMenu = "[extinguish]"
 		show = true
+	case StoryCell:
+		if g.Objects.Story[g.Player.Pos] == StoryArtifactSealed || g.Objects.Story[g.Player.Pos] == StoryArtifact {
+			interactMenu = "[take]"
+			show = true
+		}
 	}
 	if !show {
 		return ""
@@ -1512,9 +1537,9 @@ func (ui *gameui) Win() {
 		g.PrintfStyled("Error removing save file: %v", logError, err)
 	}
 	if g.Wizard {
-		g.Print("You escape by the magic stairs! **WIZARD** [(x) to continue]")
+		g.Print("You escape by the magic portal! **WIZARD** [(x) to continue]")
 	} else {
-		g.Print("You escape by the magic stairs! You win. [(x) to continue]")
+		g.Print("You escape by the magic portal! You win. [(x) to continue]")
 	}
 	ui.DrawDungeonView(NormalMode)
 	ui.WaitForContinue(-1)

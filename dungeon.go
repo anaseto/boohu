@@ -201,6 +201,7 @@ const (
 	PlaceItem
 	PlaceShaedra
 	PlaceMonolith
+	PlaceArtifact
 	PlaceMarevor
 )
 
@@ -608,6 +609,21 @@ const (
 
 var roomCellTemplates = []string{CellShaedra1, CellShaedra2, CellShaedra3, CellShaedra4}
 
+const (
+	RoomArtifact = `
+????#????
+???#A#???
+??#.MΔ#??
+?###|###?
+#!_#.#_!#
++.P...P.+
+#>..P..>#
+?###+###?
+`
+)
+
+var roomArtifactTemplates = []string{RoomArtifact}
+
 func (r *room) ComputeDimensions() {
 	x := 0
 	y := 0
@@ -653,7 +669,7 @@ func (r *room) Dig(dg *dgen) {
 			dg.room[pos] = true
 		}
 		switch c {
-		case '.', '>', '!', 'P', '_', '|':
+		case '.', '>', '!', 'P', '_', '|', 'M', 'Δ':
 			if pos.valid() {
 				dg.d.SetCell(pos, GroundCell)
 			}
@@ -694,11 +710,13 @@ func (r *room) Dig(dg *dgen) {
 		case 'M':
 			r.places = append(r.places, place{pos: pos, kind: PlaceMarevor})
 			dg.spl.Marevor = pos
-			dg.d.SetCell(pos, GroundCell)
 		case 'Δ':
 			r.places = append(r.places, place{pos: pos, kind: PlaceMonolith})
 			dg.spl.Monolith = pos
-			dg.d.SetCell(pos, GroundCell)
+		case 'A':
+			r.places = append(r.places, place{pos: pos, kind: PlaceArtifact})
+			dg.spl.Artifact = pos
+			dg.d.SetCell(pos, StoryCell)
 		}
 		if c != '"' {
 			delete(dg.fungus, pos)
@@ -918,8 +936,27 @@ func (g *game) GenRoomTunnels(ml maplayout) {
 		dg.GenRooms(roomSpecialTemplates, 4, PlacementRandom)
 		dg.GenRooms(roomNormalTemplates, 5, PlacementRandom)
 	case RandomWalkTreeCave:
-		dg.GenRooms(roomSpecialTemplates, 4, PlacementRandom)
-		dg.GenRooms(roomNormalTemplates, 7, PlacementRandom)
+		if g.Depth == MaxDepth {
+			var ok bool
+			if RandInt(3) > 0 {
+				ok, places = dg.GenRooms(roomArtifactTemplates, 1, PlacementEdge)
+			} else {
+				ok, places = dg.GenRooms(roomArtifactTemplates, 1, PlacementCenter)
+			}
+			if !ok {
+				panic("Artifact Room")
+			}
+			g.Objects.Story = map[position]story{}
+			g.Places.Artifact = dg.spl.Artifact
+			g.Objects.Story[g.Places.Artifact] = StoryArtifactSealed
+			g.Places.Monolith = dg.spl.Monolith
+			g.Places.Marevor = dg.spl.Marevor
+			dg.GenRooms(roomSpecialTemplates, 4, PlacementRandom)
+			dg.GenRooms(roomNormalTemplates, 6, PlacementRandom)
+		} else {
+			dg.GenRooms(roomSpecialTemplates, 4, PlacementRandom)
+			dg.GenRooms(roomNormalTemplates, 7, PlacementRandom)
+		}
 	default:
 		if g.Depth == WinDepth {
 			var ok bool
@@ -949,11 +986,11 @@ func (g *game) GenRoomTunnels(ml maplayout) {
 	dg.PlayerStartCell(g, places)
 	dg.ClearUnconnected(g)
 	if g.Depth < MaxDepth {
-		dg.GenStairs(g, NormalStair)
-	}
-	//if g.Depth == WinDepth || g.Depth == MaxDepth {
-	if g.Depth == MaxDepth {
-		dg.GenStairs(g, WinStair)
+		if g.Params.Blocked[g.Depth] {
+			dg.GenStairs(g, BlockedStair)
+		} else {
+			dg.GenStairs(g, NormalStair)
+		}
 	}
 	for i := 0; i < 4+RandInt(2); i++ {
 		dg.GenBarrel(g)
@@ -984,6 +1021,10 @@ func (dg *dgen) AddSpecial(g *game, ml maplayout) {
 	////g.CollectableScore-- // these are extra
 	////}
 	//}
+	g.Objects.Stones = map[position]stone{}
+	if g.Params.Blocked[g.Depth] || g.Depth == MaxDepth {
+		dg.GenBarrierStone(g)
+	}
 	bananas := 2
 	if ml == RandomWalkTreeCave && g.Depth < MaxDepth {
 		bananas--
@@ -1297,6 +1338,23 @@ func (dg *dgen) GenItem(g *game) {
 	g.Objects.Items[pos] = it
 }
 
+func (dg *dgen) GenBarrierStone(g *game) {
+	pos := InvalidPos
+	count := 0
+	for pos == InvalidPos {
+		count++
+		if count > 1000 {
+			panic("GenBarrierStone")
+		}
+		pos = dg.rooms[RandInt(len(dg.rooms))].RandomPlace(PlaceSpecialStatic)
+		if pos == InvalidPos {
+			pos = dg.rooms[RandInt(len(dg.rooms))].RandomPlace(PlaceStatic)
+		}
+	}
+	g.Dungeon.SetCell(pos, StoneCell)
+	g.Objects.Stones[pos] = BarrierStone
+}
+
 func (dg *dgen) GenMagara(g *game) {
 	pos := InvalidPos
 	count := 0
@@ -1396,7 +1454,6 @@ func (dg *dgen) GenStones(g *game) {
 	case 6, 7:
 		nstones += 2
 	}
-	g.Objects.Stones = map[position]stone{}
 	for i := 0; i < nstones; i++ {
 		pos := InvalidPos
 		if i <= 1 {
