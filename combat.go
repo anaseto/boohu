@@ -84,6 +84,13 @@ func (g *game) AttractMonster(pos position) *monster {
 }
 
 func (g *game) Jump(mons *monster, ev event) error {
+	if mons.Kind.Peaceful() {
+		ompos := mons.Pos
+		mons.MoveTo(g, g.Player.Pos)
+		mons.Swapped = true
+		g.PlacePlayerAt(ompos)
+		return nil
+	}
 	dir := mons.Pos.Dir(g.Player.Pos)
 	pos := g.Player.Pos
 	for {
