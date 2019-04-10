@@ -325,8 +325,9 @@ func (g *game) NightFog(at position, radius int, ev event) {
 
 func (g *game) MakeCreatureSleep(pos position, ev event) {
 	if pos == g.Player.Pos {
-		g.PutStatus(StatusSlow, DurationSleepSlow)
-		g.Print("The clouds of night make you sleepy.")
+		if g.PutStatus(StatusSlow, DurationSleepSlow) {
+			g.Print("The clouds of night make you sleepy.")
+		}
 		return
 	}
 	mons := g.MonsterAt(pos)

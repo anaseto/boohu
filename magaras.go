@@ -279,7 +279,9 @@ func (g *game) EvokeTeleport(ev event) error {
 }
 
 func (g *game) EvokeDig(ev event) error {
-	g.PutStatus(StatusDig, DurationDigging)
+	if !g.PutStatus(StatusDig, DurationDigging) {
+		return errors.New("You are already digging.")
+	}
 	g.Print("You feel like an earth dragon.")
 	g.ui.PlayerGoodEffectAnimation()
 	return nil
@@ -345,8 +347,10 @@ func (g *game) EvokeRefillMagic(ev event) error {
 //}
 
 func (g *game) EvokeSwiftness(ev event) error {
-	g.PutStatus(StatusSwift, DurationSwiftness)
-	g.Printf("You feel speedy and agile.")
+	if !g.PutStatus(StatusSwift, DurationSwiftness) {
+		return errors.New("You are already swift.")
+	}
+	g.Printf("You feel speedy.")
 	g.ui.PlayerGoodEffectAnimation()
 	return nil
 }

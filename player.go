@@ -341,8 +341,7 @@ func (g *game) SwiftFog(ev event) {
 }
 
 func (g *game) Confusion(ev event) {
-	if !g.Player.HasStatus(StatusConfusion) {
-		g.PutStatus(StatusConfusion, DurationConfusionPlayer)
+	if g.PutStatus(StatusConfusion, DurationConfusionPlayer) {
 		g.Print("You feel confused.")
 	}
 }
@@ -366,8 +365,10 @@ func (g *game) PlacePlayerAt(pos position) {
 }
 
 func (g *game) EnterLignification(ev event) {
-	g.PutStatus(StatusLignification, DurationLignificationPlayer)
-	g.Player.HPbonus += 4
+	if g.PutStatus(StatusLignification, DurationLignificationPlayer) {
+		g.Print("You feel rooted to the ground.")
+		g.Player.HPbonus += 4
+	}
 }
 
 func (g *game) ExtinguishFire() error {
@@ -378,13 +379,14 @@ func (g *game) ExtinguishFire() error {
 	return nil
 }
 
-func (g *game) PutStatus(st status, duration int) {
+func (g *game) PutStatus(st status, duration int) bool {
 	if g.Player.Statuses[st] != 0 {
-		return
+		return false
 	}
 	g.Player.Statuses[st] += duration
 	g.PushEvent(&simpleEvent{ERank: g.Ev.Rank() + DurationStatusStep, EAction: statusEndActions[st]})
 	if st.Good() {
 		g.Player.Expire[st] = g.Ev.Rank() + duration
 	}
+	return true
 }

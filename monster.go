@@ -1208,8 +1208,8 @@ func (m *monster) VampireSpit(g *game, ev event) bool {
 	if blocked || g.Player.HasStatus(StatusConfusion) {
 		return false
 	}
-	g.PutStatus(StatusConfusion, DurationConfusionPlayer)
-	g.Print("The vampire spits at you. You feel confused.")
+	g.Print("The vampire spits at you.")
+	g.Confusion(ev)
 	m.Exhaust(g)
 	ev.Renew(g, m.Kind.AttackDelay())
 	return true
@@ -1220,8 +1220,8 @@ func (m *monster) ThrowSpores(g *game, ev event) bool {
 	if blocked || g.Player.HasStatus(StatusLignification) {
 		return false
 	}
+	g.Print("The tree mushroom releases spores.")
 	g.EnterLignification(ev)
-	g.Print("The tree mushroom releases spores. You feel rooted to the ground.")
 	m.Exhaust(g)
 	ev.Renew(g, m.Kind.AttackDelay())
 	return true
@@ -1265,7 +1265,9 @@ func (m *monster) ThrowAcid(g *game, ev event) bool {
 	g.Printf("%s throws acid at you (%d dmg).", m.Kind.Definite(true), dmg)
 	g.ui.MonsterProjectileAnimation(g.Ray(m.Pos), '*', ColorGreen)
 	m.InflictDamage(g, dmg, dmg)
-	g.PutStatus(StatusSlow, DurationSleepSlow)
+	if g.PutStatus(StatusSlow, DurationSleepSlow) {
+		g.Print("The viscous substance slows you.")
+	}
 	ev.Renew(g, m.Kind.AttackDelay()*2)
 	return true
 }
@@ -1331,22 +1333,6 @@ func (m *monster) AbsorbMana(g *game, ev event) bool {
 	g.Player.MP -= 1
 	g.Printf("%s absorbs your mana.", m.Kind.Definite(true))
 	m.ExhaustTime(g, 10+RandInt(10))
-	ev.Renew(g, m.Kind.AttackDelay())
-	return true
-}
-
-func (m *monster) MindAttack(g *game, ev event) bool {
-	// XXX remove?
-	if g.Player.Pos.Distance(m.Pos) == 1 {
-		return false
-	}
-	g.Print("The celmist mage attacks your mind.")
-	if RandInt(2) == 0 {
-		g.PutStatus(StatusSlow, DurationSleepSlow)
-		g.Print("You feel slow.")
-	} else {
-		g.Confusion(ev)
-	}
 	ev.Renew(g, m.Kind.AttackDelay())
 	return true
 }
