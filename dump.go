@@ -71,7 +71,7 @@ func (g *game) Dump() string {
 		fmt.Fprint(buf, "You recovered the Gem Portal Artifact.\n")
 	}
 	fmt.Fprintf(buf, "\n")
-	fmt.Fprintf(buf, "You have %d/%d HP, and %d/%d MP.\n", g.Player.HP, g.Player.HPMax(), g.Player.MP, g.Player.MPMax())
+	fmt.Fprintf(buf, "You have %d/%d HP, %d/%d MP and %d/%d bananas.\n", g.Player.HP, g.Player.HPMax(), g.Player.MP, g.Player.MPMax(), g.Player.Bananas, MaxBananas)
 	fmt.Fprintf(buf, "\n")
 	fmt.Fprintf(buf, g.DumpStatuses())
 	fmt.Fprintf(buf, "\n\n")
