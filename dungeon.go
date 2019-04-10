@@ -246,6 +246,7 @@ type dgen struct {
 	fungus  map[position]vegetation
 	spl     places
 	special monspecial
+	layout  maplayout
 }
 
 func (dg *dgen) WallAreaCount(area []position, pos position, radius int) int {
@@ -913,6 +914,7 @@ const (
 
 func (g *game) GenRoomTunnels(ml maplayout) {
 	dg := dgen{}
+	dg.layout = ml
 	d := &dungeon{}
 	d.Cells = make([]cell, DungeonNCells)
 	dg.d = d
@@ -1870,6 +1872,7 @@ const (
 	MonsSpecialNixes
 	MonsSpecialVampires
 	MonsSpecialOricCelmists
+	MonsSpecialWingedMilfid
 )
 
 func (dg *dgen) GenMonsters(g *game) {
@@ -1883,6 +1886,62 @@ func (dg *dgen) GenMonsters(g *game) {
 	bandsPlants := []monsterBand{LoneSatowalgaPlant}
 	bandsBipeds := []monsterBand{LoneOricCelmist, LoneMirrorSpecter, LoneWingedMilfid, LoneMadNixe, LoneVampire}
 	bandsBig := []monsterBand{LoneTreeMushroom, LoneEarthDragon}
+	if g.Params.Special[g.Depth] {
+		switch dg.layout {
+		case AutomataCave:
+			specials := []monspecial{
+				MonsSpecialFrogs,
+				MonsSpecialPlants,
+				MonsSpecialButterflies,
+				MonsSpecialWorms,
+				MonsSpecialNadres,
+				MonsSpecialNixes,
+				MonsSpecialVampires,
+				MonsSpecialOricCelmists,
+				MonsSpecialWingedMilfid,
+			}
+			dg.special = specials[RandInt(len(specials))]
+		case RandomWalkCave:
+			specialsCave := []monspecial{
+				MonsSpecialFrogs,
+				MonsSpecialPlants,
+				MonsSpecialButterflies,
+				MonsSpecialWorms,
+				MonsSpecialNadres,
+			}
+			dg.special = specialsCave[RandInt(len(specialsCave))]
+		case RandomWalkTreeCave:
+			specialsTreeCave := []monspecial{
+				MonsSpecialNixes,
+				MonsSpecialVampires,
+				MonsSpecialOricCelmists,
+				MonsSpecialWingedMilfid,
+			}
+			dg.special = specialsTreeCave[RandInt(len(specialsTreeCave))]
+		}
+	}
+	switch dg.special {
+	case MonsSpecialFrogs:
+		bandsAnimals = []monsterBand{LoneBlinkingFrog}
+	case MonsSpecialPlants:
+		if RandInt(2) == 0 {
+			bandsBipeds = []monsterBand{LoneSatowalgaPlant}
+		} else {
+			bandsAnimals = []monsterBand{LoneSatowalgaPlant}
+		}
+	case MonsSpecialButterflies:
+		dg.PutRandomBandN(g, bandsButterfly, 3)
+	case MonsSpecialWorms:
+		bandsAnimals = []monsterBand{LoneWorm}
+	case MonsSpecialNadres:
+		bandsAnimals = []monsterBand{LoneExplosiveNadre}
+	case MonsSpecialNixes:
+		bandsBipeds = []monsterBand{LoneMadNixe}
+	case MonsSpecialVampires:
+		bandsBipeds = []monsterBand{LoneVampire}
+	case MonsSpecialOricCelmists:
+		bandsBipeds = []monsterBand{LoneOricCelmist}
+	}
 	//mlevel := 1 + RandInt(MaxDepth)
 	//if mlevel == g.Depth {
 	// XXX should really Marevor appear in more than one level?
@@ -1891,73 +1950,92 @@ func (dg *dgen) GenMonsters(g *game) {
 	dg.PutRandomBandN(g, bandsButterfly, 2)
 	switch g.Depth {
 	case 1:
+		// 8
 		dg.PutRandomBandN(g, bandsGuard, 5)
 		dg.PutRandomBandN(g, bandsAnimals, 3)
 	case 2:
+		// 8-10
 		dg.PutRandomBandN(g, bandsGuard, 3)
 		if RandInt(2) == 0 {
+			// 5
 			dg.PutRandomBandN(g, bandsBipeds, 3)
 			dg.PutRandomBandN(g, bandsAnimals, 1)
 			dg.PutRandomBandN(g, bandsPlants, 1)
 		} else {
+			// 7
 			dg.PutRandomBandN(g, bandsAnimals, 4)
 			dg.PutRandomBandN(g, bandsButterfly, 1)
 			dg.PutRandomBandN(g, bandsPlants, 2)
 		}
 	case 3:
+		// 10-11
 		dg.PutRandomBandN(g, bandsHighGuard, 2)
 		dg.PutRandomBandN(g, bandsGuard, 4)
 		if RandInt(2) == 0 {
+			// 5
 			dg.PutRandomBandN(g, bandsAnimals, 3)
 			dg.PutRandomBandN(g, bandsPlants, 2)
 		} else {
+			// 4
 			dg.PutRandomBandN(g, bandsAnimals, 1)
 			dg.PutRandomBandN(g, bandsPlants, 1)
 			dg.PutRandomBandN(g, bandsBipeds, 2)
 		}
 	case 4:
+		// 10-12
 		dg.PutRandomBandN(g, bandsHighGuard, 2)
 		if RandInt(2) == 0 {
+			// 8
 			dg.PutRandomBandN(g, bandsGuard, 4)
 			dg.PutRandomBandN(g, bandsBig, 2)
 			dg.PutRandomBandN(g, bandsBipeds, 1)
 			dg.PutRandomBandN(g, bandsPlants, 1)
 		} else {
+			// 10
 			dg.PutRandomBandN(g, bandsGuard, 8)
 			dg.PutRandomBandN(g, bandsAnimals, 1)
 			dg.PutRandomBandN(g, bandsPlants, 1)
 		}
 	case 5:
+		// 12
 		dg.PutRandomBandN(g, bandsHighGuard, 2)
 		if RandInt(2) == 0 {
+			// 10
 			dg.PutRandomBandN(g, bandsGuard, 4)
+			dg.PutRandomBandN(g, bandsAnimals, 1)
 			dg.PutRandomBandN(g, bandsBig, 2)
-			dg.PutRandomBandN(g, bandsBipeds, 1)
+			dg.PutRandomBandN(g, bandsBipeds, 2)
 			dg.PutRandomBandN(g, bandsPlants, 1)
 		} else {
+			// 10
 			dg.PutRandomBandN(g, bandsGuard, 2)
 			dg.PutRandomBandN(g, bandsAnimals, 3)
 			dg.PutRandomBandN(g, bandsBipeds, 2)
 			dg.PutRandomBandN(g, bandsBig, 1)
-			dg.PutRandomBandN(g, bandsPlants, 1)
+			dg.PutRandomBandN(g, bandsPlants, 2)
 		}
 	case 6:
+		// 13-17
 		dg.PutRandomBandN(g, bandsHighGuard, 1)
 		if RandInt(2) == 0 {
+			// 12
 			dg.PutRandomBandN(g, bandsGuard, 4)
 			dg.PutRandomBandN(g, bandsAnimals, 2)
 			dg.PutRandomBandN(g, bandsBig, 2)
 			dg.PutRandomBandN(g, bandsBipeds, 1)
 			dg.PutRandomBandN(g, bandsPlants, 3)
 		} else {
+			// 16
 			dg.PutRandomBandN(g, bandsGuard, 2)
 			dg.PutRandomBandN(g, bandsAnimals, 8)
 			dg.PutRandomBandN(g, bandsButterfly, 1)
 			dg.PutRandomBandN(g, bandsPlants, 5)
 		}
 	case 7:
+		// 18-19
 		dg.PutRandomBandN(g, bandsHighGuard, 1)
 		if RandInt(2) == 0 {
+			// 18
 			dg.PutRandomBandN(g, bandsGuard, 4)
 			dg.PutRandomBandN(g, bandsAnimals, 6)
 			dg.PutRandomBandN(g, bandsButterfly, 1)
@@ -1965,6 +2043,7 @@ func (dg *dgen) GenMonsters(g *game) {
 			dg.PutRandomBandN(g, bandsBipeds, 4)
 			dg.PutRandomBandN(g, bandsPlants, 2)
 		} else {
+			// 17
 			dg.PutRandomBandN(g, bandsGuard, 1)
 			dg.PutRandomBandN(g, bandsBig, 2)
 			dg.PutRandomBandN(g, bandsButterfly, 1)
@@ -1972,12 +2051,15 @@ func (dg *dgen) GenMonsters(g *game) {
 			dg.PutRandomBandN(g, bandsPlants, 5)
 		}
 	case 8:
+		// 18
 		dg.PutRandomBandN(g, bandsHighGuard, 4)
 		if RandInt(2) == 0 {
+			// 14
 			dg.PutRandomBandN(g, bandsGuard, 5)
 			dg.PutRandomBandN(g, bandsBig, 1)
 			dg.PutRandomBandN(g, bandsBipeds, 8)
 		} else {
+			// 14
 			dg.PutRandomBandN(g, bandsGuard, 5)
 			dg.PutRandomBandN(g, bandsAnimals, 2)
 			dg.PutRandomBandN(g, bandsBig, 2)
@@ -1985,13 +2067,16 @@ func (dg *dgen) GenMonsters(g *game) {
 			dg.PutRandomBandN(g, bandsPlants, 1)
 		}
 	case 9:
+		// 15-23
 		dg.PutRandomBandN(g, bandsHighGuard, 2)
 		if RandInt(2) == 0 {
+			// 13
 			dg.PutRandomBandN(g, bandsGuard, 3)
 			dg.PutRandomBandN(g, bandsBig, 6)
 			dg.PutRandomBandN(g, bandsBipeds, 3)
 			dg.PutRandomBandN(g, bandsPlants, 1)
 		} else {
+			// 21
 			dg.PutRandomBandN(g, bandsButterfly, 2)
 			dg.PutRandomBandN(g, bandsGuard, 2)
 			dg.PutRandomBandN(g, bandsAnimals, 10)
@@ -1999,12 +2084,15 @@ func (dg *dgen) GenMonsters(g *game) {
 			dg.PutRandomBandN(g, bandsPlants, 5)
 		}
 	case 10:
+		// 19-20
 		dg.PutRandomBandN(g, bandsHighGuard, 2)
 		if RandInt(2) == 0 {
+			// 18
 			dg.PutRandomBandN(g, bandsGuard, 9)
 			dg.PutRandomBandN(g, bandsBig, 1)
 			dg.PutRandomBandN(g, bandsBipeds, 8)
 		} else {
+			// 17
 			dg.PutRandomBandN(g, bandsGuard, 8)
 			dg.PutRandomBandN(g, bandsAnimals, 2)
 			dg.PutRandomBandN(g, bandsBig, 2)
@@ -2012,13 +2100,16 @@ func (dg *dgen) GenMonsters(g *game) {
 			dg.PutRandomBandN(g, bandsPlants, 1)
 		}
 	case 11:
+		// 23-26
 		dg.PutRandomBandN(g, bandsHighGuard, 5)
 		if RandInt(2) == 0 {
+			// 21
 			dg.PutRandomBandN(g, bandsGuard, 5)
 			dg.PutRandomBandN(g, bandsBig, 2)
 			dg.PutRandomBandN(g, bandsBipeds, 12)
 			dg.PutRandomBandN(g, bandsAnimals, 2)
 		} else {
+			// 18
 			dg.PutRandomBandN(g, bandsGuard, 7)
 			dg.PutRandomBandN(g, bandsBig, 2)
 			dg.PutRandomBandN(g, bandsBipeds, 7)
