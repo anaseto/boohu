@@ -1123,10 +1123,7 @@ func (dg *dgen) GenLight(g *game) {
 		lights = append(lights, pos)
 	}
 	for i := 0; i < 8+RandInt(4); i++ {
-		pos := dg.rooms[RandInt(len(dg.rooms))].RandomPlace(PlaceSpecialStatic)
-		if pos == InvalidPos {
-			pos = dg.rooms[RandInt(len(dg.rooms))].RandomPlace(PlaceStatic)
-		}
+		pos := dg.rooms[RandInt(len(dg.rooms))].RandomPlaces(PlaceSpecialOrStatic)
 		if pos != InvalidPos {
 			g.Dungeon.SetCell(pos, LightCell)
 			lights = append(lights, pos)
@@ -1153,6 +1150,19 @@ func (r *room) RandomPlace(kind placeKind) position {
 	return r.places[j].pos
 }
 
+var PlaceSpecialOrStatic = []placeKind{PlaceSpecialStatic, PlaceStatic}
+
+func (r *room) RandomPlaces(kinds []placeKind) position {
+	pos := InvalidPos
+	for _, kind := range kinds {
+		pos = r.RandomPlace(kind)
+		if pos != InvalidPos {
+			break
+		}
+	}
+	return pos
+}
+
 func (dg *dgen) PlayerStartCell(g *game, places []position) {
 	const far = 30
 	r := dg.rooms[len(dg.rooms)-1]
@@ -1172,10 +1182,7 @@ loop:
 	itpos := r.RandomPlace(PlaceItem)
 	// TODO: make the player only start in rooms with enough places
 	if itpos == InvalidPos {
-		itpos = r.RandomPlace(PlaceStatic)
-		if itpos == InvalidPos {
-			itpos = r.RandomPlace(PlaceSpecialStatic)
-		}
+		itpos = r.RandomPlaces(PlaceSpecialOrStatic)
 		if itpos == InvalidPos {
 			panic("no item")
 		}
@@ -1343,10 +1350,7 @@ func (dg *dgen) GenBarrierStone(g *game) {
 		if count > 1000 {
 			panic("GenBarrierStone")
 		}
-		pos = dg.rooms[RandInt(len(dg.rooms))].RandomPlace(PlaceSpecialStatic)
-		if pos == InvalidPos {
-			pos = dg.rooms[RandInt(len(dg.rooms))].RandomPlace(PlaceStatic)
-		}
+		pos = dg.rooms[RandInt(len(dg.rooms))].RandomPlaces(PlaceSpecialOrStatic)
 	}
 	g.Dungeon.SetCell(pos, StoneCell)
 	g.Objects.Stones[pos] = BarrierStone
@@ -1411,10 +1415,7 @@ func (dg *dgen) GenTable(g *game) {
 		if count > 500 {
 			return
 		}
-		pos = dg.rooms[RandInt(len(dg.rooms))].RandomPlace(PlaceSpecialStatic)
-		if pos == InvalidPos {
-			pos = dg.rooms[RandInt(len(dg.rooms))].RandomPlace(PlaceStatic)
-		}
+		pos = dg.rooms[RandInt(len(dg.rooms))].RandomPlaces(PlaceSpecialOrStatic)
 	}
 	g.Dungeon.SetCell(pos, TableCell)
 }
