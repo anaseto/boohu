@@ -1234,22 +1234,16 @@ func (m *monster) ThrowJavelin(g *game, ev event) bool {
 	}
 	dmg := DmgNormal
 	clang := RandInt(4) == 0
-	if RandInt(2) == 0 {
-		noise := g.HitNoise(clang)
-		g.MakeNoise(noise, g.Player.Pos)
-		var sclang string
-		if clang {
-			sclang = g.ArmourClang()
-		}
-		g.Printf("%s throws %s at you (%d dmg).%s", m.Kind.Definite(true), Indefinite("javelin", false), dmg, sclang)
-		g.ui.MonsterJavelinAnimation(g.Ray(m.Pos), true)
-		m.InflictDamage(g, dmg, dmg)
-	} else {
-		g.Stats.Dodges++
-		g.Printf("You dodge %s's %s.", m.Kind.Indefinite(false), "javelin")
-		g.ui.MonsterJavelinAnimation(g.Ray(m.Pos), false)
+	noise := g.HitNoise(clang)
+	g.MakeNoise(noise, g.Player.Pos)
+	var sclang string
+	if clang {
+		sclang = g.ArmourClang()
 	}
-	m.ExhaustTime(g, 50+RandInt(50))
+	g.Printf("%s throws %s at you (%d dmg).%s", m.Kind.Definite(true), Indefinite("javelin", false), dmg, sclang)
+	g.ui.MonsterJavelinAnimation(g.Ray(m.Pos), true)
+	m.InflictDamage(g, dmg, dmg)
+	m.ExhaustTime(g, 100+RandInt(50))
 	ev.Renew(g, m.Kind.AttackDelay())
 	return true
 }
