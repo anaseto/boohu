@@ -68,6 +68,7 @@ type game struct {
 type startParams struct {
 	Lore    map[int]bool
 	Blocked map[int]bool
+	Special map[int]bool
 }
 
 type places struct {
@@ -246,13 +247,20 @@ func (g *game) InitFirstLevel() {
 	}
 	g.Params.Blocked = map[int]bool{}
 	if RandInt(10) > 0 {
-		g.Params.Blocked[2+RandInt(6)] = true
+		g.Params.Blocked[2+RandInt(WinDepth-2)] = true
 	}
 	if RandInt(10) == 0 {
 		// a second one sometimes!
-		g.Params.Blocked[2+RandInt(6)] = true
+		g.Params.Blocked[2+RandInt(WinDepth-2)] = true
 	}
-	permi := RandInt(7)
+	g.Params.Special = map[int]bool{}
+	if RandInt(WinDepth-2) > 0 {
+		g.Params.Special[3+RandInt(WinDepth-3)] = true
+	}
+	if RandInt(3) > 0 {
+		g.Params.Special[WinDepth+1+RandInt(MaxDepth-WinDepth-1)] = true
+	}
+	permi := RandInt(WinDepth - 1)
 	switch permi {
 	case 0, 1, 2, 3:
 		g.GenPlan[permi+1], g.GenPlan[permi+2] = g.GenPlan[permi+2], g.GenPlan[permi+1]
@@ -261,7 +269,7 @@ func (g *game) InitFirstLevel() {
 		g.GenPlan[6], g.GenPlan[7] = g.GenPlan[7], g.GenPlan[6]
 	}
 	if RandInt(4) == 0 {
-		g.GenPlan[10], g.GenPlan[11] = g.GenPlan[11], g.GenPlan[10]
+		g.GenPlan[MaxDepth-1], g.GenPlan[MaxDepth] = g.GenPlan[MaxDepth], g.GenPlan[MaxDepth-1]
 	}
 }
 

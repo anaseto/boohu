@@ -239,12 +239,13 @@ func (rs roomSlice) Less(i, j int) bool {
 }
 
 type dgen struct {
-	d      *dungeon
-	tunnel map[position]bool
-	room   map[position]bool
-	rooms  []*room
-	fungus map[position]vegetation
-	spl    places
+	d       *dungeon
+	tunnel  map[position]bool
+	room    map[position]bool
+	rooms   []*room
+	fungus  map[position]vegetation
+	spl     places
+	special monspecial
 }
 
 func (dg *dgen) WallAreaCount(area []position, pos position, radius int) int {
@@ -1856,6 +1857,20 @@ func (dg *dgen) PutRandomBandN(g *game, bands []monsterBand, n int) {
 		dg.PutMonsterBand(g, bands[RandInt(len(bands))])
 	}
 }
+
+type monspecial int
+
+const (
+	MonsNormal monspecial = iota
+	MonsSpecialFrogs
+	MonsSpecialPlants
+	MonsSpecialButterflies
+	MonsSpecialWorms
+	MonsSpecialNadres
+	MonsSpecialNixes
+	MonsSpecialVampires
+	MonsSpecialOricCelmists
+)
 
 func (dg *dgen) GenMonsters(g *game) {
 	g.Monsters = []*monster{}
