@@ -62,6 +62,14 @@ func (g *game) Dump() string {
 	} else {
 		fmt.Fprintf(buf, "You are exploring depth %d of Hareka's Underground.\n", g.Depth)
 	}
+	if g.LiberatedShaedra {
+		fmt.Fprint(buf, "\n")
+		fmt.Fprint(buf, "You rescued Shaedra.\n")
+	}
+	if g.LiberatedArtifact {
+		fmt.Fprint(buf, "\n")
+		fmt.Fprint(buf, "You recovered the Gem Portal Artifact.\n")
+	}
 	fmt.Fprintf(buf, "\n")
 	fmt.Fprintf(buf, "You have %d/%d HP, and %d/%d MP.\n", g.Player.HP, g.Player.HPMax(), g.Player.MP, g.Player.MPMax())
 	fmt.Fprintf(buf, "\n")
@@ -164,17 +172,17 @@ func (g *game) DetailedStatistics(w io.Writer) {
 		fmt.Fprintf(w, " %3d", n)
 	}
 	fmt.Fprintf(w, "\n")
-	fmt.Fprintf(w, hfmt, "Dead monsters (%)")
-	for i, n := range g.Stats.DKilledPerc {
-		if i == 0 {
-			continue
-		}
-		if i > maxDepth {
-			break
-		}
-		fmt.Fprintf(w, " %3d", n)
-	}
-	fmt.Fprintf(w, "\n")
+	//fmt.Fprintf(w, hfmt, "Dead monsters (%)")
+	//for i, n := range g.Stats.DKilledPerc {
+	//if i == 0 {
+	//continue
+	//}
+	//if i > maxDepth {
+	//break
+	//}
+	//fmt.Fprintf(w, " %3d", n)
+	//}
+	//fmt.Fprintf(w, "\n")
 	//fmt.Fprintf(w, "Legend:")
 	//for i, c := range []dungen{GenCaveMap, GenRoomMap, GenCellularAutomataCaveMap, GenCaveMapTree, GenRuinsMap, GenBSPMap} {
 	//if i == 4 {
