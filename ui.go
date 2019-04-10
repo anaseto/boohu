@@ -491,7 +491,6 @@ const (
 	KeyRunS
 	KeyRunN
 	KeyRunE
-	KeyRest
 	KeyWaitTurn
 	KeyDescend
 	KeyGoToStairs
@@ -534,7 +533,6 @@ var configurableKeyActions = [...]keyAction{
 	KeyRunN,
 	KeyRunE,
 	KeyWaitTurn,
-	KeyRest,
 	KeyEvoke,
 	KeyInteract,
 	KeyInventory,
@@ -569,7 +567,6 @@ func (k keyAction) NormalModeKey() bool {
 	switch k {
 	case KeyW, KeyS, KeyN, KeyE,
 		KeyRunW, KeyRunS, KeyRunN, KeyRunE,
-		KeyRest,
 		KeyWaitTurn,
 		KeyDescend,
 		KeyGoToStairs,
@@ -613,8 +610,6 @@ func (k keyAction) NormalModeDescription() (text string) {
 		text = "Travel north"
 	case KeyRunE:
 		text = "Travel east"
-	case KeyRest:
-		text = "Rest (until status free or regen)"
 	case KeyWaitTurn:
 		text = "Wait a turn"
 	case KeyDescend:
@@ -1237,7 +1232,7 @@ func (ui *gameui) CursorKeyAction(targ Targeter, rka runeKeyAction, data *examin
 		g.Targeting = InvalidPos
 		notarg = true
 		err = errors.New(DoNothing)
-	case KeyExplore, KeyRest, KeyLogs, KeyEvoke, KeyInventory:
+	case KeyExplore, KeyLogs, KeyEvoke, KeyInventory:
 		// XXX: hm, this is only useful with mouse in terminal, rarely tested.
 		if _, ok := targ.(*examiner); !ok {
 			break
