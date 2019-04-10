@@ -292,6 +292,7 @@ func (g *game) InitLevelStructures() {
 	g.Objects.Bananas = make(map[position]bool, 2)
 	g.Objects.Barrels = map[position]bool{}
 	g.Objects.Lights = map[position]bool{}
+	g.NoiseIllusion = map[position]bool{}
 	g.Clouds = map[position]cloud{}
 }
 
