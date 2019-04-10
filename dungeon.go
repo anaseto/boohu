@@ -1920,6 +1920,9 @@ func (dg *dgen) GenMonsters(g *game) {
 			dg.special = specialsTreeCave[RandInt(len(specialsTreeCave))]
 		}
 	}
+	// TODO: replace this approximate stuff with more specific stuff for
+	// each level (a little less random and more cleary recognizable, maybe
+	// accompany each special level with a special room).
 	switch dg.special {
 	case MonsSpecialFrogs:
 		bandsAnimals = []monsterBand{LoneBlinkingFrog}
@@ -1942,11 +1945,6 @@ func (dg *dgen) GenMonsters(g *game) {
 	case MonsSpecialOricCelmists:
 		bandsBipeds = []monsterBand{LoneOricCelmist}
 	}
-	//mlevel := 1 + RandInt(MaxDepth)
-	//if mlevel == g.Depth {
-	// XXX should really Marevor appear in more than one level?
-	//dg.PutMonsterBand(g, LoneMarevorHelith)
-	//}
 	dg.PutRandomBandN(g, bandsButterfly, 2)
 	switch g.Depth {
 	case 1:
