@@ -199,10 +199,7 @@ const (
 	PlaceStatic
 	PlaceSpecialStatic
 	PlaceItem
-	PlaceShaedra
-	PlaceMonolith
-	PlaceArtifact
-	PlaceMarevor
+	PlaceStory
 )
 
 type place struct {
@@ -704,17 +701,17 @@ func (r *room) Dig(dg *dgen) {
 				dg.d.SetCell(pos, FungusCell)
 			}
 		case 'H':
-			r.places = append(r.places, place{pos: pos, kind: PlaceShaedra})
+			r.places = append(r.places, place{pos: pos, kind: PlaceStory})
 			dg.spl.Shaedra = pos
 			dg.d.SetCell(pos, StoryCell)
 		case 'M':
-			r.places = append(r.places, place{pos: pos, kind: PlaceMarevor})
+			r.places = append(r.places, place{pos: pos, kind: PlaceStory})
 			dg.spl.Marevor = pos
 		case 'Δ':
-			r.places = append(r.places, place{pos: pos, kind: PlaceMonolith})
+			r.places = append(r.places, place{pos: pos, kind: PlaceStory})
 			dg.spl.Monolith = pos
 		case 'A':
-			r.places = append(r.places, place{pos: pos, kind: PlaceArtifact})
+			r.places = append(r.places, place{pos: pos, kind: PlaceStory})
 			dg.spl.Artifact = pos
 			dg.d.SetCell(pos, StoryCell)
 		}
