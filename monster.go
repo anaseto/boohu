@@ -285,7 +285,7 @@ var monsDesc = []string{
 	MonsEarthDragon:    "Earth dragons are big and hardy creatures that wander in the Underground. It is said they can be credited for many of the tunnels.",
 	MonsMirrorSpecter:  "Mirror specters are very insubstantial creatures, which can absorb your mana.",
 	MonsExplosiveNadre: "Nadres are dragon-like biped creatures that are famous for exploding upon dying. Explosive nadres are a tiny nadre race that explodes upon attacking. The explosion confuses any adjacent creatures and occasionally destroys walls.",
-	MonsSatowalgaPlant: "Satowalga Plants are immobile bushes that throw acidic projectiles at you, sometimes confusing you, leaving you unable to use magaras for a few turns.",
+	MonsSatowalgaPlant: "Satowalga Plants are immobile bushes that throw slowing viscous acidic projectiles at you, halving the speed of your movements. They attack at half normal speed.",
 	MonsMadNixe:        "Nixes are magical humanoids. Usually, they specialize in illusion harmonic magic, but the so called mad nixes are a perverted variant who learned the oric arts to create a spell that can attract their foes to them, so that they can kill them without pursuing them.",
 	//MonsMindCelmist:     "Mind celmists are mages that use magical smitting mind attacks that bypass armour. They can occasionally confuse or slow you. They try to avoid melee.",
 	MonsVampire:      "Vampires are humanoids that drink blood to survive. Their nauseous spitting can cause confusion, impeding the use of magaras for a few turns.",
@@ -1260,21 +1260,13 @@ func (m *monster) ThrowAcid(g *game, ev event) bool {
 		return false
 	}
 	dmg := DmgNormal
-	if RandInt(2) == 0 {
-		noise := g.HitNoise(false) // no clang with acid projectiles
-		g.MakeNoise(noise, g.Player.Pos)
-		g.Printf("%s throws acid at you (%d dmg).", m.Kind.Definite(true), dmg)
-		g.ui.MonsterProjectileAnimation(g.Ray(m.Pos), '*', ColorGreen)
-		m.InflictDamage(g, dmg, dmg)
-		if RandInt(2) == 0 {
-			g.Confusion(ev)
-		}
-	} else {
-		g.Stats.Dodges++
-		g.Printf("You dodge %s's acid projectile.", m.Kind.Indefinite(false))
-		g.ui.MonsterProjectileAnimation(g.Ray(m.Pos), '*', ColorGreen)
-	}
-	ev.Renew(g, m.Kind.AttackDelay())
+	noise := g.HitNoise(false) // no clang with acid projectiles
+	g.MakeNoise(noise, g.Player.Pos)
+	g.Printf("%s throws acid at you (%d dmg).", m.Kind.Definite(true), dmg)
+	g.ui.MonsterProjectileAnimation(g.Ray(m.Pos), '*', ColorGreen)
+	m.InflictDamage(g, dmg, dmg)
+	g.PutStatus(StatusSlow, DurationSleepSlow)
+	ev.Renew(g, m.Kind.AttackDelay()*2)
 	return true
 }
 
