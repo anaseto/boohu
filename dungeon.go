@@ -1673,3 +1673,344 @@ loop:
 	}
 	dg.Foliage()
 }
+
+// monster generation
+
+func (g *game) GenBand(band monsterBand) []monsterKind {
+	mbd := MonsBands[band]
+	if g.GeneratedUniques[band] > 0 && mbd.Unique {
+		return nil
+	}
+	if !mbd.Band {
+		return []monsterKind{mbd.Monster}
+	}
+	bandMonsters := []monsterKind{}
+	for m, n := range mbd.Distribution {
+		for i := 0; i < n; i++ {
+			bandMonsters = append(bandMonsters, m)
+		}
+	}
+	return bandMonsters
+}
+
+func (dg *dgen) BandInfoGuard(g *game, band monsterBand) bandInfo {
+	bandinfo := bandInfo{Kind: monsterBand(band)}
+	pos := InvalidPos
+	count := 0
+loop:
+	for pos == InvalidPos {
+		count++
+		if count > 3000 {
+			pos = dg.InsideCell(g)
+			break
+		}
+		for i := 0; i < 10; i++ {
+			r := dg.rooms[RandInt(len(dg.rooms)-1)]
+			for _, e := range r.places {
+				if e.kind == PlaceSpecialStatic {
+					pos = r.RandomPlace(PlacePatrol)
+					if pos != InvalidPos {
+						break loop
+					}
+				}
+			}
+		}
+		r := dg.rooms[RandInt(len(dg.rooms)-1)]
+		pos = r.RandomPlace(PlacePatrol)
+	}
+	bandinfo.Path = append(bandinfo.Path, pos)
+	bandinfo.Beh = BehGuard
+	return bandinfo
+}
+
+func (dg *dgen) BandInfoPatrol(g *game, band monsterBand) bandInfo {
+	bandinfo := bandInfo{Kind: monsterBand(band)}
+	pos := InvalidPos
+	count := 0
+	for pos == InvalidPos {
+		count++
+		if count > 5000 {
+			pos = dg.InsideCell(g)
+			break
+		}
+		pos = dg.rooms[RandInt(len(dg.rooms)-1)].RandomPlace(PlacePatrol)
+	}
+	target := InvalidPos
+	count = 0
+	for target == InvalidPos {
+		// TODO: only find place in other room?
+		count++
+		if count > 5000 {
+			pos = dg.InsideCell(g)
+			break
+		}
+		target = dg.rooms[RandInt(len(dg.rooms)-1)].RandomPlace(PlacePatrol)
+	}
+	bandinfo.Path = append(bandinfo.Path, pos)
+	bandinfo.Path = append(bandinfo.Path, target)
+	bandinfo.Beh = BehPatrol
+	return bandinfo
+}
+
+func (dg *dgen) BandInfoOutsideGround(g *game, band monsterBand) bandInfo {
+	bandinfo := bandInfo{Kind: monsterBand(band)}
+	bandinfo.Path = append(bandinfo.Path, dg.OutsideGroundCell(g))
+	bandinfo.Beh = BehWander
+	return bandinfo
+}
+
+func (dg *dgen) BandInfoOutsideGroundMiddle(g *game, band monsterBand) bandInfo {
+	bandinfo := bandInfo{Kind: monsterBand(band)}
+	bandinfo.Path = append(bandinfo.Path, dg.OutsideGroundMiddleCell(g))
+	bandinfo.Beh = BehWander
+	return bandinfo
+}
+
+func (dg *dgen) BandInfoOutside(g *game, band monsterBand) bandInfo {
+	bandinfo := bandInfo{Kind: monsterBand(band)}
+	bandinfo.Path = append(bandinfo.Path, dg.OutsideCell(g))
+	bandinfo.Beh = BehWander
+	return bandinfo
+}
+
+func (dg *dgen) BandInfoOutsideExplore(g *game, band monsterBand) bandInfo {
+	bandinfo := bandInfo{Kind: monsterBand(band)}
+	for i := 0; i < 5; i++ {
+		bandinfo.Path = append(bandinfo.Path, dg.OutsideCell(g))
+	}
+	bandinfo.Beh = BehExplore
+	return bandinfo
+}
+
+func (dg *dgen) BandInfoOutsideExploreButterfly(g *game, band monsterBand) bandInfo {
+	bandinfo := bandInfo{Kind: monsterBand(band)}
+	for i := 0; i < 10; i++ {
+		bandinfo.Path = append(bandinfo.Path, dg.OutsideCell(g))
+	}
+	bandinfo.Beh = BehExplore
+	return bandinfo
+}
+
+func (dg *dgen) BandInfoFoliage(g *game, band monsterBand) bandInfo {
+	bandinfo := bandInfo{Kind: monsterBand(band)}
+	bandinfo.Path = append(bandinfo.Path, dg.FoliageCell(g))
+	bandinfo.Beh = BehWander
+	return bandinfo
+}
+
+func (dg *dgen) PutMonsterBand(g *game, band monsterBand) bool {
+	monsters := g.GenBand(band)
+	if monsters == nil {
+		return false
+	}
+	var bdinf bandInfo
+	switch band {
+	case LoneYack, LoneWorm:
+		bdinf = dg.BandInfoFoliage(g, band)
+	case LoneHound, LoneEarthDragon:
+		bdinf = dg.BandInfoOutsideGround(g, band)
+	case LoneBlinkingFrog, LoneExplosiveNadre:
+		bdinf = dg.BandInfoOutside(g, band)
+	case LoneMirrorSpecter, LoneWingedMilfid, LoneVampire:
+		bdinf = dg.BandInfoOutsideExplore(g, band)
+	case LoneButterfly:
+		bdinf = dg.BandInfoOutsideExploreButterfly(g, band)
+	case LoneTreeMushroom:
+		bdinf = dg.BandInfoOutside(g, band)
+	case LoneHighGuard:
+		bdinf = dg.BandInfoGuard(g, band)
+	case LoneSatowalgaPlant:
+		bdinf = dg.BandInfoOutsideGroundMiddle(g, band)
+	default:
+		bdinf = dg.BandInfoPatrol(g, band)
+	}
+	g.Bands = append(g.Bands, bdinf)
+	awake := RandInt(4) > 0
+	var pos position
+	if len(bdinf.Path) == 0 {
+		// should not happen now
+		pos = g.FreeCellForMonster()
+	} else {
+		pos = bdinf.Path[0]
+	}
+	for _, mk := range monsters {
+		mons := &monster{Kind: mk}
+		if awake {
+			mons.State = Wandering
+		}
+		mons.Init()
+		mons.Index = len(g.Monsters)
+		mons.Band = len(g.Bands) - 1
+		mons.PlaceAt(g, pos)
+		mons.Target = mons.NextTarget(g)
+		g.Monsters = append(g.Monsters, mons)
+		pos = g.FreeCellForBandMonster(pos)
+	}
+	return true
+}
+
+func (dg *dgen) PutRandomBand(g *game, bands []monsterBand) bool {
+	return dg.PutMonsterBand(g, bands[RandInt(len(bands))])
+}
+
+func (dg *dgen) PutRandomBandN(g *game, bands []monsterBand, n int) {
+	for i := 0; i < n; i++ {
+		dg.PutMonsterBand(g, bands[RandInt(len(bands))])
+	}
+}
+
+func (dg *dgen) GenMonsters(g *game) {
+	g.Monsters = []*monster{}
+	g.Bands = []bandInfo{}
+	// TODO, just for testing now
+	bandsGuard := []monsterBand{LoneGuard}
+	bandsButterfly := []monsterBand{LoneButterfly}
+	bandsHighGuard := []monsterBand{LoneHighGuard}
+	bandsAnimals := []monsterBand{LoneYack, LoneWorm, LoneHound, LoneBlinkingFrog, LoneExplosiveNadre}
+	bandsPlants := []monsterBand{LoneSatowalgaPlant}
+	bandsBipeds := []monsterBand{LoneOricCelmist, LoneMirrorSpecter, LoneWingedMilfid, LoneMadNixe, LoneVampire}
+	bandsBig := []monsterBand{LoneTreeMushroom, LoneEarthDragon}
+	//mlevel := 1 + RandInt(MaxDepth)
+	//if mlevel == g.Depth {
+	// XXX should really Marevor appear in more than one level?
+	//dg.PutMonsterBand(g, LoneMarevorHelith)
+	//}
+	dg.PutRandomBandN(g, bandsButterfly, 2)
+	switch g.Depth {
+	case 1:
+		dg.PutRandomBandN(g, bandsGuard, 5)
+		dg.PutRandomBandN(g, bandsAnimals, 3)
+	case 2:
+		dg.PutRandomBandN(g, bandsGuard, 3)
+		if RandInt(2) == 0 {
+			dg.PutRandomBandN(g, bandsBipeds, 3)
+			dg.PutRandomBandN(g, bandsAnimals, 1)
+			dg.PutRandomBandN(g, bandsPlants, 1)
+		} else {
+			dg.PutRandomBandN(g, bandsAnimals, 4)
+			dg.PutRandomBandN(g, bandsButterfly, 1)
+			dg.PutRandomBandN(g, bandsPlants, 2)
+		}
+	case 3:
+		dg.PutRandomBandN(g, bandsHighGuard, 2)
+		dg.PutRandomBandN(g, bandsGuard, 4)
+		if RandInt(2) == 0 {
+			dg.PutRandomBandN(g, bandsAnimals, 3)
+			dg.PutRandomBandN(g, bandsPlants, 2)
+		} else {
+			dg.PutRandomBandN(g, bandsAnimals, 1)
+			dg.PutRandomBandN(g, bandsPlants, 1)
+			dg.PutRandomBandN(g, bandsBipeds, 2)
+		}
+	case 4:
+		dg.PutRandomBandN(g, bandsHighGuard, 2)
+		if RandInt(2) == 0 {
+			dg.PutRandomBandN(g, bandsGuard, 4)
+			dg.PutRandomBandN(g, bandsBig, 2)
+			dg.PutRandomBandN(g, bandsBipeds, 1)
+			dg.PutRandomBandN(g, bandsPlants, 1)
+		} else {
+			dg.PutRandomBandN(g, bandsGuard, 8)
+			dg.PutRandomBandN(g, bandsAnimals, 1)
+			dg.PutRandomBandN(g, bandsPlants, 1)
+		}
+	case 5:
+		dg.PutRandomBandN(g, bandsHighGuard, 2)
+		if RandInt(2) == 0 {
+			dg.PutRandomBandN(g, bandsGuard, 4)
+			dg.PutRandomBandN(g, bandsBig, 2)
+			dg.PutRandomBandN(g, bandsBipeds, 1)
+			dg.PutRandomBandN(g, bandsPlants, 1)
+		} else {
+			dg.PutRandomBandN(g, bandsGuard, 2)
+			dg.PutRandomBandN(g, bandsAnimals, 3)
+			dg.PutRandomBandN(g, bandsBipeds, 2)
+			dg.PutRandomBandN(g, bandsBig, 1)
+			dg.PutRandomBandN(g, bandsPlants, 1)
+		}
+	case 6:
+		dg.PutRandomBandN(g, bandsHighGuard, 1)
+		if RandInt(2) == 0 {
+			dg.PutRandomBandN(g, bandsGuard, 4)
+			dg.PutRandomBandN(g, bandsAnimals, 2)
+			dg.PutRandomBandN(g, bandsBig, 2)
+			dg.PutRandomBandN(g, bandsBipeds, 1)
+			dg.PutRandomBandN(g, bandsPlants, 3)
+		} else {
+			dg.PutRandomBandN(g, bandsGuard, 2)
+			dg.PutRandomBandN(g, bandsAnimals, 8)
+			dg.PutRandomBandN(g, bandsButterfly, 1)
+			dg.PutRandomBandN(g, bandsPlants, 5)
+		}
+	case 7:
+		dg.PutRandomBandN(g, bandsHighGuard, 1)
+		if RandInt(2) == 0 {
+			dg.PutRandomBandN(g, bandsGuard, 4)
+			dg.PutRandomBandN(g, bandsAnimals, 6)
+			dg.PutRandomBandN(g, bandsButterfly, 1)
+			dg.PutRandomBandN(g, bandsBig, 1)
+			dg.PutRandomBandN(g, bandsBipeds, 4)
+			dg.PutRandomBandN(g, bandsPlants, 2)
+		} else {
+			dg.PutRandomBandN(g, bandsGuard, 1)
+			dg.PutRandomBandN(g, bandsBig, 2)
+			dg.PutRandomBandN(g, bandsButterfly, 1)
+			dg.PutRandomBandN(g, bandsAnimals, 8)
+			dg.PutRandomBandN(g, bandsPlants, 5)
+		}
+	case 8:
+		dg.PutRandomBandN(g, bandsHighGuard, 4)
+		if RandInt(2) == 0 {
+			dg.PutRandomBandN(g, bandsGuard, 5)
+			dg.PutRandomBandN(g, bandsBig, 1)
+			dg.PutRandomBandN(g, bandsBipeds, 8)
+		} else {
+			dg.PutRandomBandN(g, bandsGuard, 5)
+			dg.PutRandomBandN(g, bandsAnimals, 2)
+			dg.PutRandomBandN(g, bandsBig, 2)
+			dg.PutRandomBandN(g, bandsBipeds, 4)
+			dg.PutRandomBandN(g, bandsPlants, 1)
+		}
+	case 9:
+		dg.PutRandomBandN(g, bandsHighGuard, 2)
+		if RandInt(2) == 0 {
+			dg.PutRandomBandN(g, bandsGuard, 3)
+			dg.PutRandomBandN(g, bandsBig, 6)
+			dg.PutRandomBandN(g, bandsBipeds, 3)
+			dg.PutRandomBandN(g, bandsPlants, 1)
+		} else {
+			dg.PutRandomBandN(g, bandsButterfly, 2)
+			dg.PutRandomBandN(g, bandsGuard, 2)
+			dg.PutRandomBandN(g, bandsAnimals, 10)
+			dg.PutRandomBandN(g, bandsBig, 2)
+			dg.PutRandomBandN(g, bandsPlants, 5)
+		}
+	case 10:
+		dg.PutRandomBandN(g, bandsHighGuard, 2)
+		if RandInt(2) == 0 {
+			dg.PutRandomBandN(g, bandsGuard, 9)
+			dg.PutRandomBandN(g, bandsBig, 1)
+			dg.PutRandomBandN(g, bandsBipeds, 8)
+		} else {
+			dg.PutRandomBandN(g, bandsGuard, 8)
+			dg.PutRandomBandN(g, bandsAnimals, 2)
+			dg.PutRandomBandN(g, bandsBig, 2)
+			dg.PutRandomBandN(g, bandsBipeds, 4)
+			dg.PutRandomBandN(g, bandsPlants, 1)
+		}
+	case 11:
+		dg.PutRandomBandN(g, bandsHighGuard, 5)
+		if RandInt(2) == 0 {
+			dg.PutRandomBandN(g, bandsGuard, 5)
+			dg.PutRandomBandN(g, bandsBig, 2)
+			dg.PutRandomBandN(g, bandsBipeds, 12)
+			dg.PutRandomBandN(g, bandsAnimals, 2)
+		} else {
+			dg.PutRandomBandN(g, bandsGuard, 7)
+			dg.PutRandomBandN(g, bandsBig, 2)
+			dg.PutRandomBandN(g, bandsBipeds, 7)
+			dg.PutRandomBandN(g, bandsAnimals, 1)
+			dg.PutRandomBandN(g, bandsPlants, 1)
+		}
+	}
+}
