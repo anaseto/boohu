@@ -269,9 +269,6 @@ func (cev *cloudEvent) Action(g *game) {
 			break
 		}
 		g.Dungeon.SetCell(cev.Pos, t)
-		g.MakeNoise(TemporalWallNoise, cev.Pos)
-		g.Fog(cev.Pos, 1, &simpleEvent{ERank: cev.Rank()})
-		g.ComputeLOS()
 	case ObstructionProgression:
 		pos := g.FreeCell()
 		g.MagicalBarrierAt(pos, cev)
@@ -407,7 +404,6 @@ const (
 	DurationSwiftness              = 50
 	DurationShortSwiftness         = 20
 	DurationDigging                = 80
-	DurationShadows                = 120
 	DurationSlow                   = 120
 	DurationSleepSlow              = 40
 	DurationCloudProgression       = 10
