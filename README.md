@@ -1,18 +1,18 @@
-**This branch is an experiment for a stealth focused variant of Boohu. In case
-it actually becomes something, it would be a different game.**
+**This sealth branch is an experiment for a stealth focused variant of Boohu.
+In case it actually becomes something, it would be a different game
+(Harmonist).**
 
-Break Out Of Hareka's Underground (Boohu) is a roguelike game mainly inspired
-from DCSS and its tavern, with some ideas from Brogue, but aiming for very
-short games, almost no character building, and a simplified inventory.
+Harmonist is a stealth coffee-break roguelike game.
 
-*Every year, the elders send someone to collect medicinal simella plants in the
-Underground.  This year, the honor fell upon you, and so here you are.
-According to the elders, deep in the Underground, magical stairs will lead you
-back to your village.  Along the way, you will collect simellas, as well as
-various items that will help you deal with monsters, which you may
-fight or flee...*
+*Your friend Shaedra got captured by some nasty people while she was trying to
+retrieve a powerful magara artifact that was stolen from the great
+magara-specialist Marevor Helith. As a gawalt monkey, you don't understand much
+why people complicate so much their lives caring about artifacts and the like,
+but one thing is clear: you have to rescue your friend, somewhere to be found
+in the eighth floor of this Underground area, if what you heard the guards say
+is true.*
 
-![Boohu introduction screen](https://download.tuxfamily.org/boohu/intro-screen-tiles.png)
+TODO: update the rest of the README.md when there is a website for the new game.
 
 Screenshot and Website
 ----------------------
