@@ -601,4 +601,7 @@ func (ui *gameui) TakingArtifactAnimation() {
 	ui.DrawDungeonView(NoFlushMode)
 	ui.Flush()
 	time.Sleep(12 * time.Millisecond)
+	g.Player.Magaras = append(g.Player.Magaras, NoMagara)
+	g.Player.Inventory.Misc = NoItem
+	g.PrintStyled("You have a new empty slot for a magara.", logSpecial)
 }

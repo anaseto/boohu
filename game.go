@@ -196,6 +196,7 @@ func (g *game) InitPlayer() {
 		NoMagara,
 		NoMagara,
 		NoMagara,
+		NoMagara,
 	}
 	g.GeneratedMagaras = []magara{}
 	for i := 0; i < 2; i++ {
@@ -306,12 +307,6 @@ func (g *game) InitLevel() {
 
 	// Dungeon terrain
 	g.GenDungeon()
-
-	// Magara slots
-	if g.Depth == 3 || g.Depth == 6 {
-		g.Player.Magaras = append(g.Player.Magaras, NoMagara)
-		g.PrintStyled("You have a new empty slot for a magara.", logSpecial)
-	}
 
 	// Events
 	if g.Depth == 1 {
