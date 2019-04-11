@@ -146,7 +146,6 @@ func (g *game) HandleKill(mons *monster, ev event) {
 const (
 	WallNoise           = 9
 	TemporalWallNoise   = 5
-	ExplosionHitNoise   = 12
 	ExplosionNoise      = 12
 	MagicHitNoise       = 5
 	BarkNoise           = 9
@@ -154,7 +153,6 @@ const (
 	MagicCastNoise      = 5
 	BaseHitNoise        = 2
 	QueenStoneNoise     = 9
-	MagaraBangNoise     = 35
 )
 
 func (g *game) ArmourClang() (sclang string) {
