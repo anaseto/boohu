@@ -390,6 +390,7 @@ type monster struct {
 	LOS           map[position]bool
 	LastSeenState monsterState
 	Swapped       bool
+	Watching      int
 }
 
 func (m *monster) Init() {
@@ -400,8 +401,13 @@ func (m *monster) Init() {
 	case MonsButterfly:
 		m.State = Wandering
 	case MonsSatowalgaPlant:
-		m.State = Watching
+		m.StartWatching()
 	}
+}
+
+func (m *monster) StartWatching() {
+	m.State = Watching
+	m.Watching = 0
 }
 
 func (m *monster) Status(st monsterStatus) bool {
@@ -583,8 +589,8 @@ func (m *monster) Explode(g *game, ev event) {
 		mons := g.MonsterAt(pos)
 		if mons.Exists() && !mons.Status(MonsConfused) {
 			mons.EnterConfusion(g, ev)
-			if mons.State != Hunting {
-				mons.State = Watching
+			if mons.State != Hunting && mons.State != Watching {
+				mons.StartWatching()
 			}
 		} else if g.Player.Pos == pos {
 			m.InflictDamage(g, 1, 1)
@@ -609,7 +615,7 @@ func (m *monster) NaturalAwake(g *game) {
 	m.Target = m.NextTarget(g)
 	switch g.Bands[m.Band].Beh {
 	case BehGuard:
-		m.State = Watching
+		m.StartWatching()
 	default:
 		m.State = Wandering
 	}
@@ -697,7 +703,7 @@ func (m *monster) HandleMonsSpecifics(g *game) (done bool) {
 			if !m.SeesPlayer(g) {
 				m.Dir = m.Dir.Alternate()
 				if RandInt(5) == 0 {
-					m.State = Watching
+					m.StartWatching()
 				}
 			}
 		default:
@@ -732,8 +738,9 @@ func (m *monster) HandleMonsSpecifics(g *game) (done bool) {
 }
 
 func (m *monster) HandleWatching(g *game) {
-	if RandInt(5) > 0 {
+	if m.Watching+RandInt(2) < 4 {
 		m.Dir = m.Dir.Alternate()
+		m.Watching++
 	} else {
 		// pick a random cell: more escape strategies for the player
 		if m.Kind == MonsHound && m.Pos.Distance(g.Player.Pos) <= 6 {
@@ -778,7 +785,7 @@ func (m *monster) HandleEndPath(g *game) {
 	switch m.State {
 	case Wandering, Hunting:
 		if !m.Kind.Peaceful() {
-			m.State = Watching
+			m.StartWatching()
 			m.Dir = m.Dir.Alternate()
 		} else {
 			m.Target = m.NextTarget(g)
