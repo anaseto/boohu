@@ -768,13 +768,17 @@ func (m *monster) HandleWatching(g *game) {
 	if m.Watching+RandInt(2) < 4 {
 		m.Alternate()
 		m.Watching++
+		if m.Kind == MonsHound {
+			dij := &monPath{game: g, monster: m}
+			nm := Dijkstra(dij, []position{m.Pos}, 5)
+			if _, ok := nm[g.Player.Pos]; ok {
+				m.Target = g.Player.Pos
+				m.State = Wandering
+			}
+		}
 	} else {
 		// pick a random cell: more escape strategies for the player
-		if m.Kind == MonsHound && m.Pos.Distance(g.Player.Pos) <= 6 {
-			m.Target = g.Player.Pos
-		} else {
-			m.Target = m.NextTarget(g)
-		}
+		m.Target = m.NextTarget(g)
 		switch g.Bands[m.Band].Beh {
 		case BehGuard:
 			m.Alternate()
