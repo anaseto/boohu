@@ -188,7 +188,7 @@ func (g *game) InitPlayer() {
 	g.Player = &player{
 		HP:      DefaultHealth,
 		MP:      DefaultMPmax,
-		Bananas: 2,
+		Bananas: 1,
 	}
 	g.Player.Statuses = map[status]int{}
 	g.Player.Expire = map[status]int{}

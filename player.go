@@ -197,7 +197,7 @@ func (g *game) Teleportation(ev event) {
 	}
 }
 
-const MaxBananas = 5
+const MaxBananas = 4
 
 func (g *game) CollectGround() {
 	pos := g.Player.Pos
