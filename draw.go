@@ -660,8 +660,9 @@ func (ui *gameui) ViewPositionDescription(pos position) {
 func (ui *gameui) MonsterInfo(m *monster) string {
 	infos := []string{}
 	state := m.State.String()
-	if m.Kind == MonsSatowalgaPlant && m.State == Wandering {
-		state = "awaken"
+	switch m.State {
+	case Watching, Hunting, Wandering:
+		state += " " + m.Dir.String()
 	}
 	infos = append(infos, state)
 	for st, i := range m.Statuses {
