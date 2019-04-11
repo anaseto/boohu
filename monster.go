@@ -392,6 +392,7 @@ type monster struct {
 	Swapped       bool
 	Watching      int
 	Left          bool
+	Noticed       bool
 }
 
 func (m *monster) Init() {
@@ -1403,11 +1404,21 @@ func (m *monster) Blink(g *game) {
 }
 
 func (m *monster) MakeHunt(g *game) {
-	m.State = Hunting
+	if m.State != Hunting {
+		m.State = Hunting
+		g.Stats.NSpotted++
+		g.Stats.DSpotted[g.Depth]++
+		if !m.Noticed {
+			g.Stats.NUSpotted++
+			g.Stats.DUSpotted[g.Depth]++
+			m.Noticed = true
+		}
+	}
 	m.Target = g.Player.Pos
 }
 
 func (m *monster) MakeHuntIfHurt(g *game) {
+	// TODO: not used now. Maybe MakeWatchIfHurt?
 	if m.Exists() && m.State != Hunting {
 		m.MakeHunt(g)
 		if m.State == Resting {

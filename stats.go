@@ -23,6 +23,10 @@ type stats struct {
 	TWounded      int
 	TMWounded     int
 	TMonsLOS      int
+	NSpotted      int
+	NUSpotted     int
+	DSpotted      [MaxDepth + 1]int
+	DUSpotted     [MaxDepth + 1]int
 }
 
 func (g *game) TurnStats() {

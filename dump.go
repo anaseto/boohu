@@ -127,6 +127,7 @@ func (g *game) DetailedStatistics(w io.Writer) {
 	fmt.Fprintf(w, "You evoked magaras %d times, and moved %d times.\n",
 		g.Stats.MagarasUsed, g.Stats.Moves)
 	fmt.Fprintf(w, "You got hit %d times.\n", g.Stats.ReceivedHits)
+	fmt.Fprintf(w, "You were spotted by %d monsters, %d times.\n", g.Stats.NUSpotted, g.Stats.NSpotted)
 	fmt.Fprintf(w, "You endured %d damage.\n", g.Stats.Damage)
 	fmt.Fprintf(w, "You activated %d stones.\n", g.Stats.UsedStones)
 	fmt.Fprintf(w, "There were %d fires.\n", g.Stats.Burns)
@@ -163,6 +164,28 @@ func (g *game) DetailedStatistics(w io.Writer) {
 	fmt.Fprintf(w, "\n")
 	fmt.Fprintf(w, hfmt, "Sleeping monsters (%)")
 	for i, n := range g.Stats.DSleepingPerc {
+		if i == 0 {
+			continue
+		}
+		if i > maxDepth {
+			break
+		}
+		fmt.Fprintf(w, " %3d", n)
+	}
+	fmt.Fprintf(w, "\n")
+	fmt.Fprintf(w, hfmt, "Alerted monsters")
+	for i, n := range g.Stats.DUSpotted {
+		if i == 0 {
+			continue
+		}
+		if i > maxDepth {
+			break
+		}
+		fmt.Fprintf(w, " %3d", n)
+	}
+	fmt.Fprintf(w, "\n")
+	fmt.Fprintf(w, hfmt, "Total Alerts")
+	for i, n := range g.Stats.DSpotted {
 		if i == 0 {
 			continue
 		}
