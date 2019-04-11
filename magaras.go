@@ -129,16 +129,12 @@ func (mag magara) String() (desc string) {
 		desc = "magara of digging"
 	case TeleportOtherMagara:
 		desc = "magara of teleport other"
-	//case MagicMagara:
-	//desc = "magara of refill magic"
 	case SwiftnessMagara:
 		desc = "magara of swiftness"
 	case SwappingMagara:
 		desc = "magara of swapping"
 	case FogMagara:
 		desc = "magara of fog"
-	//case BarrierMagara:
-	//desc = "magara of magical barrier"
 	case SlowingMagara:
 		desc = "magara of slowing"
 	case SleepingMagara:
@@ -153,12 +149,6 @@ func (mag magara) String() (desc string) {
 		desc = "magara of fire"
 	case LignificationMagara:
 		desc = "magara of lignification"
-		//case DescentMagara:
-		//desc = "magara of descent"
-		//case MagicMappingMagara:
-		//desc = "magara of magic mapping"
-		//case SensingMagara:
-		//desc = "magara of sensing"
 	}
 	return desc
 }
@@ -181,29 +171,21 @@ func (mag magara) Desc(g *game) (desc string) {
 	case SwappingMagara:
 		desc = "makes you swap positions with the farthest monster in sight. If there is more than one at the same distance, it will be chosen randomly."
 	case FogMagara:
-		desc = ""
-	//case BarrierMagara:
-	//desc = "replaces free cells around you with temporary magical barriers by making use of oric energies."
+		desc = "creates a dense fog in a 2-range radius using harmonic energies."
 	case SlowingMagara:
 		desc = "induces slow movement and attack for monsters in sight."
 	case SleepingMagara:
 		desc = "induces deep sleeping and exhaustion for up to two random monsters in sight."
 	case NoiseMagara:
-		desc = "tricks monsters in a 10-range area with sounds, making them go away from you for a few turns. It only works on monsters that are not already seeing you."
+		desc = "tricks monsters in a 12-range area with harmonic magical sounds, making them go away from you for a few turns. It only works on monsters that are not already seeing you."
 	case ObstructionMagara:
 		desc = "creates temporal magical barriers between you and up to 3 monsters."
 	case ConfusionMagara:
-		desc = "confuses monsters in sight, leaving them unable to attack you."
+		desc = "confuses monsters in sight with harmonic light and sounds, leaving them unable to attack you."
 	case FireMagara:
 		desc = "produces a small magical fire that will extend to neighbour flammable terrain. The smoke it generates will induce sleep in monsters. As a gawalt monkey, you resist sleepiness, but you will still feel slowed."
 	case LignificationMagara:
 		desc = "lignifies up to 2 monsters in view, so that it cannot move. The monster can still fight."
-		//case DescentMagara:
-		//desc = "makes you go deeper in the Underground."
-		//case MagicMappingMagara:
-		//desc = "shows you the map layout and item locations."
-		//case SensingMagara:
-		//desc = "shows you the current position of monsters in the map."
 	}
 	return fmt.Sprintf("The %s %s", mag, desc)
 }

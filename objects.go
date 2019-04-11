@@ -83,7 +83,7 @@ const (
 	MappingStone
 	SensingStone
 	// special
-	BarrierStone
+	SealStone
 )
 
 const NumStones = int(SensingStone) + 1
@@ -106,8 +106,8 @@ func (stn stone) String() (text string) {
 		text = "mapping stone"
 	case SensingStone:
 		text = "sensing stone"
-	case BarrierStone:
-		text = "barrier stone"
+	case SealStone:
+		text = "seal stone"
 	}
 	return text
 }
@@ -117,21 +117,21 @@ func (stn stone) Desc(g *game) (text string) {
 	case InertStone:
 		text = "This stone has been depleted of magical energies."
 	case BarrelStone:
-		text = "Activating this stone will teleport you away to a random barrel."
+		text = "Activating this stone will teleport you away to a barrel in the same level."
 	case FogStone:
-		text = "Activating this stone will produce fog in a 4-radius area."
+		text = "Activating this stone will produce fog in a 4-radius area using harmonic energies."
 	case QueenStone:
-		text = "Activating this stone will produce a sound confusing enemies in a quite large area. This can also attract monsters."
+		text = "Activating this stone will produce an harmonic sound confusing enemies in a quite large area. This can also attract monsters."
 	case TreeStone:
 		text = "Activating this stone will lignify monsters in sight."
 	case ObstructionStone:
-		text = "Activating this stone will create temporal walls around all monsters in sight."
+		text = "Activating this stone will create temporal oric-energy based barriers around all monsters in sight."
 	case MappingStone:
 		text = "Activating this stone shows you the map layout and item locations in a wide area."
 	case SensingStone:
 		text = "Activating this stone shows you the current position of monsters in a wide area."
-	case BarrierStone:
-		text = "Activating this stone will disable a magical barrier (usually one blocking stairs)."
+	case SealStone:
+		text = "Activating this stone will disable a magical barrier somewhere in the same level, usually one blocking stairs."
 	}
 	return text
 }
@@ -144,7 +144,7 @@ func (stn stone) Style(g *game) (r rune, fg uicolor) {
 	r = '_'
 	if stn == InertStone {
 		fg = ColorFgPlace
-	} else if stn == BarrierStone {
+	} else if stn == SealStone {
 		fg = ColorFgPlayer
 	} else {
 		fg = ColorFgMagicPlace
@@ -307,7 +307,7 @@ func (g *game) ActivateStone() (err error) {
 		err = g.MagicMapping(g.Ev, MappingDistance)
 	case SensingStone:
 		err = g.Sensing(g.Ev)
-	case BarrierStone:
+	case SealStone:
 		err = g.BarrierStone(g.Ev)
 	}
 	if err != nil {

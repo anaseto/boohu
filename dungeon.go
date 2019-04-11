@@ -1356,7 +1356,7 @@ func (dg *dgen) GenBarrierStone(g *game) {
 		pos = dg.rooms[RandInt(len(dg.rooms))].RandomPlaces(PlaceSpecialOrStatic)
 	}
 	g.Dungeon.SetCell(pos, StoneCell)
-	g.Objects.Stones[pos] = BarrierStone
+	g.Objects.Stones[pos] = SealStone
 }
 
 func (dg *dgen) GenMagara(g *game) {
