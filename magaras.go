@@ -74,16 +74,12 @@ func (g *game) UseMagara(n int, ev event) (err error) {
 		err = g.EvokeDig(ev)
 	case TeleportOtherMagara:
 		err = g.EvokeTeleportOther(ev)
-	//case MagicMagara:
-	//err = g.EvokeRefillMagic(ev)
 	case SwiftnessMagara:
 		err = g.EvokeSwiftness(ev)
 	case SwappingMagara:
 		err = g.EvokeSwapping(ev)
 	case FogMagara:
 		err = g.EvokeFog(ev)
-	//case BarrierMagara:
-	//err = g.EvokeBarriers(ev)
 	case SlowingMagara:
 		err = g.EvokeSlowing(ev)
 	case SleepingMagara:
@@ -98,12 +94,6 @@ func (g *game) UseMagara(n int, ev event) (err error) {
 		err = g.EvokeFire(ev)
 	case LignificationMagara:
 		err = g.EvokeLignification(ev)
-		//case MagicMappingMagara:
-		//err = g.EvokeMagicMapping(ev)
-		//case SensingMagara:
-		//err = g.EvokeSensing(ev)
-		//case DescentMagara:
-		//err = g.EvokeDescent(ev)
 	}
 	if err != nil {
 		return err
