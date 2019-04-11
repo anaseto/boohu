@@ -318,9 +318,20 @@ const (
 	LoneMadNixe
 	LoneTreeMushroom
 	LoneEarthDragon
-	//LoneMarevorHelith
 	LoneButterfly
 	LoneVampire
+	PairGuard
+	PairYack
+	PairOricCelmist
+	PairVampire
+	PairNixe
+	PairExplosiveNadre
+	PairWingedMilfid
+	SpecialLoneVampire
+	SpecialLoneNixe
+	SpecialLoneMilfid
+	SpecialLoneOricCelmist
+	SpecialLoneHighGuard
 )
 
 type monsterBandData struct {
@@ -331,23 +342,34 @@ type monsterBandData struct {
 }
 
 var MonsBands = []monsterBandData{
-	LoneGuard:          {Monster: MonsGuard},
-	LoneHighGuard:      {Monster: MonsHighGuard},
-	LoneYack:           {Monster: MonsYack},
-	LoneOricCelmist:    {Monster: MonsOricCelmist},
-	LoneSatowalgaPlant: {Monster: MonsSatowalgaPlant},
-	LoneBlinkingFrog:   {Monster: MonsBlinkingFrog},
-	LoneWorm:           {Monster: MonsWorm},
-	LoneMirrorSpecter:  {Monster: MonsMirrorSpecter},
-	LoneHound:          {Monster: MonsHound},
-	LoneExplosiveNadre: {Monster: MonsExplosiveNadre},
-	LoneWingedMilfid:   {Monster: MonsWingedMilfid},
-	LoneMadNixe:        {Monster: MonsMadNixe},
-	LoneTreeMushroom:   {Monster: MonsTreeMushroom},
-	LoneEarthDragon:    {Monster: MonsEarthDragon},
-	//LoneMarevorHelith:  {Monster: MonsMarevorHelith},
-	LoneButterfly: {Monster: MonsButterfly},
-	LoneVampire:   {Monster: MonsVampire},
+	LoneGuard:              {Monster: MonsGuard},
+	LoneHighGuard:          {Monster: MonsHighGuard},
+	LoneYack:               {Monster: MonsYack},
+	LoneOricCelmist:        {Monster: MonsOricCelmist},
+	LoneSatowalgaPlant:     {Monster: MonsSatowalgaPlant},
+	LoneBlinkingFrog:       {Monster: MonsBlinkingFrog},
+	LoneWorm:               {Monster: MonsWorm},
+	LoneMirrorSpecter:      {Monster: MonsMirrorSpecter},
+	LoneHound:              {Monster: MonsHound},
+	LoneExplosiveNadre:     {Monster: MonsExplosiveNadre},
+	LoneWingedMilfid:       {Monster: MonsWingedMilfid},
+	LoneMadNixe:            {Monster: MonsMadNixe},
+	LoneTreeMushroom:       {Monster: MonsTreeMushroom},
+	LoneEarthDragon:        {Monster: MonsEarthDragon},
+	LoneButterfly:          {Monster: MonsButterfly},
+	LoneVampire:            {Monster: MonsVampire},
+	PairGuard:              {Band: true, Distribution: map[monsterKind]int{MonsGuard: 2}},
+	PairYack:               {Band: true, Distribution: map[monsterKind]int{MonsYack: 2}},
+	PairVampire:            {Band: true, Distribution: map[monsterKind]int{MonsVampire: 2}},
+	PairOricCelmist:        {Band: true, Distribution: map[monsterKind]int{MonsOricCelmist: 2}},
+	PairNixe:               {Band: true, Distribution: map[monsterKind]int{MonsMadNixe: 2}},
+	PairExplosiveNadre:     {Band: true, Distribution: map[monsterKind]int{MonsExplosiveNadre: 2}},
+	PairWingedMilfid:       {Band: true, Distribution: map[monsterKind]int{MonsWingedMilfid: 2}},
+	SpecialLoneVampire:     {Monster: MonsVampire},
+	SpecialLoneNixe:        {Monster: MonsMadNixe},
+	SpecialLoneMilfid:      {Monster: MonsWingedMilfid},
+	SpecialLoneOricCelmist: {Monster: MonsOricCelmist},
+	SpecialLoneHighGuard:   {Monster: MonsHighGuard},
 }
 
 type monster struct {
