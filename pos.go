@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+)
 
 type position struct {
 	X int
@@ -80,6 +83,46 @@ const (
 	SE
 	ESE
 )
+
+func (dir direction) String() (s string) {
+	switch dir {
+	case NoDir:
+		s = ""
+	case E:
+		s = "E"
+	case ENE:
+		s = "ENE"
+	case NE:
+		s = "NE"
+	case NNE:
+		s = "NNE"
+	case N:
+		s = "N"
+	case NNW:
+		s = "NNW"
+	case NW:
+		s = "NW"
+	case WNW:
+		s = "WNW"
+	case W:
+		s = "W"
+	case WSW:
+		s = "WSW"
+	case SW:
+		s = "SW"
+	case SSW:
+		s = "SSW"
+	case S:
+		s = "S"
+	case SSE:
+		s = "SSE"
+	case SE:
+		s = "SE"
+	case ESE:
+		s = "ESE"
+	}
+	return s
+}
 
 func KeyToDir(k keyAction) (dir direction) {
 	switch k {
@@ -332,25 +375,50 @@ func (dir direction) InViewCone(from, to position) bool {
 	return false
 }
 
-func (dir direction) Alternate() direction {
-	var directions [2]direction
+func (dir direction) Left() (d direction) {
 	switch dir {
 	case E:
-		directions = [2]direction{NE, SE}
+		d = NE
 	case NE:
-		directions = [2]direction{N, E}
+		d = N
 	case N:
-		directions = [2]direction{NE, NW}
+		d = NW
 	case NW:
-		directions = [2]direction{N, W}
+		d = W
 	case W:
-		directions = [2]direction{NW, SW}
+		d = SW
 	case SW:
-		directions = [2]direction{W, S}
+		d = S
 	case S:
-		directions = [2]direction{SW, SE}
+		d = SE
 	case SE:
-		directions = [2]direction{S, E}
+		d = E
+	default:
+		log.Fatalf("left: %v\n", dir)
 	}
-	return directions[RandInt(2)]
+	return d
+}
+
+func (dir direction) Right() (d direction) {
+	switch dir {
+	case E:
+		d = SE
+	case NE:
+		d = E
+	case N:
+		d = NE
+	case NW:
+		d = N
+	case W:
+		d = NW
+	case SW:
+		d = W
+	case S:
+		d = SW
+	case SE:
+		d = S
+	default:
+		log.Fatalf("right: %v\n", dir)
+	}
+	return d
 }

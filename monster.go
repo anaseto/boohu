@@ -391,12 +391,16 @@ type monster struct {
 	LastSeenState monsterState
 	Swapped       bool
 	Watching      int
+	Left          bool
 }
 
 func (m *monster) Init() {
 	m.Attack = m.Kind.BaseAttack()
 	m.Pos = InvalidPos
 	m.LastKnownPos = InvalidPos
+	if RandInt(2) == 0 {
+		m.Left = true
+	}
 	switch m.Kind {
 	case MonsButterfly:
 		m.State = Wandering
@@ -416,6 +420,24 @@ func (m *monster) Status(st monsterStatus) bool {
 
 func (m *monster) Exists() bool {
 	return m != nil && !m.Dead
+}
+
+func (m *monster) Alternate() {
+	if m.Left {
+		if RandInt(4) > 0 {
+			m.Dir = m.Dir.Left()
+		} else {
+			m.Dir = m.Dir.Right()
+			m.Left = false
+		}
+	} else {
+		if RandInt(3) > 0 {
+			m.Dir = m.Dir.Right()
+		} else {
+			m.Dir = m.Dir.Left()
+			m.Left = true
+		}
+	}
 }
 
 func (m *monster) AlternateConfusedPlacement(g *game) *position {
@@ -523,6 +545,14 @@ func (m *monster) PlaceAt(g *game, pos position) {
 		return
 	}
 	m.Dir = pos.Dir(m.Pos)
+	m.CorrectDir()
+	g.MonstersPosCache[m.Pos.idx()] = 0
+	m.Pos = pos
+	g.MonstersPosCache[m.Pos.idx()] = m.Index + 1
+	m.ComputeLOS(g)
+}
+
+func (m *monster) CorrectDir() {
 	switch m.Dir {
 	case ENE, ESE:
 		m.Dir = E
@@ -533,10 +563,6 @@ func (m *monster) PlaceAt(g *game, pos position) {
 	case SSW, SSE:
 		m.Dir = S
 	}
-	g.MonstersPosCache[m.Pos.idx()] = 0
-	m.Pos = pos
-	g.MonstersPosCache[m.Pos.idx()] = m.Index + 1
-	m.ComputeLOS(g)
 }
 
 func (m *monster) TeleportMonsterAway(g *game) bool {
@@ -559,6 +585,7 @@ func (m *monster) TeleportMonsterAway(g *game) bool {
 
 func (m *monster) AttackAction(g *game, ev event) {
 	m.Dir = g.Player.Pos.Dir(m.Pos)
+	m.CorrectDir()
 	switch m.Kind {
 	//case MonsMarevorHelith:
 	//m.TeleportPlayer(g, ev)
@@ -701,14 +728,14 @@ func (m *monster) HandleMonsSpecifics(g *game) (done bool) {
 		switch m.State {
 		case Hunting:
 			if !m.SeesPlayer(g) {
-				m.Dir = m.Dir.Alternate()
+				m.Alternate()
 				if RandInt(5) == 0 {
 					m.StartWatching()
 				}
 			}
 		default:
 			if RandInt(4) > 0 {
-				m.Dir = m.Dir.Alternate()
+				m.Alternate()
 			}
 		}
 		// oklob plants are static ranged-only
@@ -739,7 +766,7 @@ func (m *monster) HandleMonsSpecifics(g *game) (done bool) {
 
 func (m *monster) HandleWatching(g *game) {
 	if m.Watching+RandInt(2) < 4 {
-		m.Dir = m.Dir.Alternate()
+		m.Alternate()
 		m.Watching++
 	} else {
 		// pick a random cell: more escape strategies for the player
@@ -750,7 +777,7 @@ func (m *monster) HandleWatching(g *game) {
 		}
 		switch g.Bands[m.Band].Beh {
 		case BehGuard:
-			m.Dir = m.Dir.Alternate()
+			m.Alternate()
 			if m.Pos != m.Target {
 				m.State = Wandering
 				m.GatherBand(g)
@@ -786,7 +813,7 @@ func (m *monster) HandleEndPath(g *game) {
 	case Wandering, Hunting:
 		if !m.Kind.Peaceful() {
 			m.StartWatching()
-			m.Dir = m.Dir.Alternate()
+			m.Alternate()
 		} else {
 			m.Target = m.NextTarget(g)
 		}
