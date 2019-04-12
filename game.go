@@ -326,9 +326,9 @@ func (g *game) InitLevel() {
 		g.PrintStyled("► Press ? for help on keys or use the mouse and [buttons].", logSpecial)
 	}
 	if g.Depth == WinDepth {
-		g.PrintStyled("You feel magic in the air. A first way out is close!", logSpecial)
+		g.PrintStyled("Finally! Shaedra should be imprisoned somewhere around.", logSpecial)
 	} else if g.Depth == MaxDepth {
-		g.PrintStyled("If rumors are true, you have reached the bottom!", logSpecial)
+		g.PrintStyled("This the bottom floor, you now have to look for the artifact.", logSpecial)
 	}
 	g.ComputeLOS()
 	g.MakeMonstersAware()
