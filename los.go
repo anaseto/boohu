@@ -341,9 +341,6 @@ func (g *game) ComputeRayHighlight(pos position) {
 func (g *game) ComputeNoise() {
 	dij := &noisePath{game: g}
 	rg := DefaultLOSRange
-	if g.Player.Inventory.Body == CloakHear {
-		rg++
-	}
 	nm := Dijkstra(dij, []position{g.Player.Pos}, rg)
 	count := 0
 	noise := map[position]bool{}
@@ -358,9 +355,14 @@ func (g *game) ComputeNoise() {
 			continue
 		}
 		mons := g.MonsterAt(pos)
-		if mons.Exists() && mons.State != Resting && RandInt(rmax) > 0 {
+		if mons.Exists() && mons.State != Resting && mons.State != Watching && RandInt(rmax) > 0 {
 			switch mons.Kind {
 			case MonsMirrorSpecter, MonsSatowalgaPlant, MonsButterfly:
+				if mons.Kind == MonsMirrorSpecter && g.Player.Inventory.Body == CloakHear {
+					noise[pos] = true
+					g.Print("You hear an imperceptible air movement.")
+					count++
+				}
 				// no footsteps
 				//case MonsTinyHarpy, MonsWingedMilfid, MonsGiantBee:
 				//noise[pos] = true
