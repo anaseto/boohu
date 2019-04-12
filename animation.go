@@ -12,6 +12,7 @@ const (
 	AnimDurShortMedium = 50
 	AnimDurMedium      = 75
 	AnimDurMediumLong  = 100
+	AnimDurLong        = 200
 	AnimDurExtraLong   = 300
 )
 
@@ -535,7 +536,7 @@ func (ui *gameui) FreeingShaedraAnimation() {
 	_, _, bg := ui.PositionDrawing(g.Places.Monolith)
 	ui.DrawAtPosition(g.Places.Monolith, false, 'Φ', ColorFgMagicPlace, bg)
 	ui.Flush()
-	time.Sleep(AnimDurExtraLong)
+	time.Sleep(AnimDurLong)
 	g.Objects.Stairs[g.Places.Monolith] = WinStair
 	g.Dungeon.SetCell(g.Places.Monolith, StairCell)
 	ui.DrawDungeonView(NoFlushMode)
@@ -544,7 +545,7 @@ func (ui *gameui) FreeingShaedraAnimation() {
 	_, _, bg = ui.PositionDrawing(g.Places.Marevor)
 	ui.DrawAtPosition(g.Places.Marevor, false, 'Φ', ColorFgMagicPlace, bg)
 	ui.Flush()
-	time.Sleep(AnimDurExtraLong)
+	time.Sleep(AnimDurLong)
 	g.Dungeon.SetCell(g.Places.Marevor, StoryCell)
 	g.Objects.Story[g.Places.Marevor] = StoryMarevor
 	g.PrintStyled("Marevor: “And what about the mission?”", logSpecial)
@@ -557,7 +558,7 @@ func (ui *gameui) FreeingShaedraAnimation() {
 	ui.DrawAtPosition(g.Places.Marevor, false, 'Φ', ColorFgMagicPlace, bg)
 	ui.DrawAtPosition(g.Places.Shaedra, false, 'Φ', ColorFgMagicPlace, bg)
 	ui.Flush()
-	time.Sleep(AnimDurExtraLong)
+	time.Sleep(AnimDurLong)
 	g.Dungeon.SetCell(g.Places.Shaedra, GroundCell)
 	g.Dungeon.SetCell(g.Places.Marevor, ScrollCell)
 	g.Objects.Scrolls[g.Places.Marevor] = ScrollExtended
@@ -579,7 +580,7 @@ func (ui *gameui) TakingArtifactAnimation() {
 	_, _, bg := ui.PositionDrawing(g.Places.Monolith)
 	ui.DrawAtPosition(g.Places.Monolith, false, 'Φ', ColorFgMagicPlace, bg)
 	ui.Flush()
-	time.Sleep(AnimDurExtraLong)
+	time.Sleep(AnimDurLong)
 	g.Objects.Stairs[g.Places.Monolith] = WinStair
 	g.Dungeon.SetCell(g.Places.Monolith, StairCell)
 	ui.DrawDungeonView(NoFlushMode)
@@ -588,7 +589,7 @@ func (ui *gameui) TakingArtifactAnimation() {
 	_, _, bg = ui.PositionDrawing(g.Places.Marevor)
 	ui.DrawAtPosition(g.Places.Marevor, false, 'Φ', ColorFgMagicPlace, bg)
 	ui.Flush()
-	time.Sleep(AnimDurExtraLong)
+	time.Sleep(AnimDurLong)
 	g.Dungeon.SetCell(g.Places.Marevor, StoryCell)
 	g.Objects.Story[g.Places.Marevor] = StoryMarevor
 	g.PrintStyled("Marevor: “Great! Let's escape and find some bones to celebrate!”", logSpecial)
@@ -600,7 +601,7 @@ func (ui *gameui) TakingArtifactAnimation() {
 	ui.DrawDungeonView(NoFlushMode)
 	ui.DrawAtPosition(g.Places.Marevor, false, 'Φ', ColorFgMagicPlace, bg)
 	ui.Flush()
-	time.Sleep(AnimDurExtraLong)
+	time.Sleep(AnimDurLong)
 	g.Dungeon.SetCell(g.Places.Marevor, GroundCell)
 	ui.DrawDungeonView(NoFlushMode)
 	ui.Flush()
