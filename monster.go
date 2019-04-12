@@ -461,17 +461,6 @@ func (m *monster) AlternateConfusedPlacement(g *game) *position {
 	return nil
 }
 
-func (m *monster) TeleportPlayer(g *game, ev event) {
-	if RandInt(2) == 0 {
-		g.Print("Marevor pushes you through a monolith.")
-		g.StoryPrint("Marevor pushed you through a monolith.")
-		g.Teleportation(ev)
-	} else {
-		g.Print("Marevor inadvertently goes into a monolith.")
-		m.TeleportAway(g)
-	}
-}
-
 func (m *monster) TeleportAway(g *game) {
 	pos := m.Pos
 	i := 0
@@ -588,8 +577,6 @@ func (m *monster) AttackAction(g *game, ev event) {
 	m.Dir = g.Player.Pos.Dir(m.Pos)
 	m.CorrectDir()
 	switch m.Kind {
-	//case MonsMarevorHelith:
-	//m.TeleportPlayer(g, ev)
 	case MonsExplosiveNadre:
 		m.Explode(g, ev)
 		return
