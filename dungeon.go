@@ -1149,7 +1149,7 @@ func (dg *dgen) AddSpecial(g *game, ml maplayout) {
 			ntables++
 		}
 	}
-	for i := 0; i < 2+RandInt(2); i++ {
+	for i := 0; i < 3+RandInt(2); i++ {
 		dg.GenTable(g)
 	}
 	ntrees := 1
