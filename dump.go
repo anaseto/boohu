@@ -81,7 +81,7 @@ func (g *game) Dump() string {
 			fmt.Fprintf(buf, "- %s (used %d times)\n", mag, g.Stats.UsedMagaras[mag])
 		}
 	}
-	fmt.Fprintf(buf, "\n\n")
+	fmt.Fprintf(buf, "\n")
 	fmt.Fprintf(buf, "Inventory:\n")
 	if g.Player.Inventory.Body != NoItem {
 		fmt.Fprintf(buf, "- %s (body)\n", g.Player.Inventory.Body.ShortDesc(g))
@@ -89,7 +89,7 @@ func (g *game) Dump() string {
 	if g.Player.Inventory.Neck != NoItem {
 		fmt.Fprintf(buf, "- %s (neck)\n", g.Player.Inventory.Neck.ShortDesc(g))
 	}
-	fmt.Fprintf(buf, "\n\n")
+	fmt.Fprintf(buf, "\n")
 	fmt.Fprintf(buf, "Miscellaneous:\n")
 	//fmt.Fprintf(buf, "%d monsters died.\n", g.Stats.Killed)
 	fmt.Fprintf(buf, "You spent %.1f turns in the Underground.\n", float64(g.Turn)/10)
