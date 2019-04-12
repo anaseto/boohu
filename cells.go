@@ -218,7 +218,7 @@ func (c cell) Desc(g *game, pos position) (desc string) {
 	if c.BlocksRange() {
 		desc += " It blocks ranged attacks from foes."
 	}
-	if c.IsDiggable() {
+	if c.T.IsDiggable() {
 		desc += " It is diggable by oric destructive magic."
 	}
 	return desc

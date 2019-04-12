@@ -7,22 +7,30 @@ import (
 	"time"
 )
 
+const (
+	AnimDurShort       = 25
+	AnimDurShortMedium = 50
+	AnimDurMedium      = 75
+	AnimDurMediumLong  = 100
+	AnimDurExtraLong   = 300
+)
+
 func (ui *gameui) SwappingAnimation(mpos, ppos position) {
 	if DisableAnimations {
 		return
 	}
 	ui.DrawDungeonView(NormalMode)
-	time.Sleep(25 * time.Millisecond)
+	time.Sleep(AnimDurShort)
 	_, fgm, bgColorm := ui.PositionDrawing(mpos)
 	_, _, bgColorp := ui.PositionDrawing(ppos)
 	ui.DrawAtPosition(mpos, true, 'Φ', fgm, bgColorp)
 	ui.DrawAtPosition(ppos, true, 'Φ', ColorFgPlayer, bgColorm)
 	ui.Flush()
-	time.Sleep(75 * time.Millisecond)
+	time.Sleep(AnimDurMedium)
 	ui.DrawAtPosition(mpos, true, 'Φ', ColorFgPlayer, bgColorp)
 	ui.DrawAtPosition(ppos, true, 'Φ', fgm, bgColorm)
 	ui.Flush()
-	time.Sleep(75 * time.Millisecond)
+	time.Sleep(AnimDurMedium)
 }
 
 func (ui *gameui) TeleportAnimation(from, to position, showto bool) {
@@ -33,12 +41,12 @@ func (ui *gameui) TeleportAnimation(from, to position, showto bool) {
 	_, _, bgColort := ui.PositionDrawing(to)
 	ui.DrawAtPosition(from, true, 'Φ', ColorCyan, bgColorf)
 	ui.Flush()
-	time.Sleep(75 * time.Millisecond)
+	time.Sleep(AnimDurMedium)
 	if showto {
 		ui.DrawAtPosition(from, true, 'Φ', ColorBlue, bgColorf)
 		ui.DrawAtPosition(to, true, 'Φ', ColorCyan, bgColort)
 		ui.Flush()
-		time.Sleep(75 * time.Millisecond)
+		time.Sleep(AnimDurMedium)
 	}
 }
 
@@ -50,32 +58,32 @@ const (
 	AroundWallExplosion
 )
 
-func (ui *gameui) ProjectileTrajectoryAnimation(ray []position, fg uicolor) {
-	if DisableAnimations {
-		return
-	}
-	for i := len(ray) - 1; i >= 0; i-- {
-		pos := ray[i]
-		r, fgColor, bgColor := ui.PositionDrawing(pos)
-		ui.DrawAtPosition(pos, true, '•', fg, bgColor)
-		ui.Flush()
-		time.Sleep(30 * time.Millisecond)
-		ui.DrawAtPosition(pos, true, r, fgColor, bgColor)
-	}
-}
+//func (ui *gameui) ProjectileTrajectoryAnimation(ray []position, fg uicolor) {
+//if DisableAnimations {
+//return
+//}
+//for i := len(ray) - 1; i >= 0; i-- {
+//pos := ray[i]
+//r, fgColor, bgColor := ui.PositionDrawing(pos)
+//ui.DrawAtPosition(pos, true, '•', fg, bgColor)
+//ui.Flush()
+//time.Sleep(30 * time.Millisecond)
+//ui.DrawAtPosition(pos, true, r, fgColor, bgColor)
+//}
+//}
 
 func (ui *gameui) MonsterProjectileAnimation(ray []position, r rune, fg uicolor) {
 	if DisableAnimations {
 		return
 	}
 	ui.DrawDungeonView(NormalMode)
-	time.Sleep(25 * time.Millisecond)
+	time.Sleep(AnimDurShort)
 	for i := 0; i < len(ray); i++ {
 		pos := ray[i]
 		or, fgColor, bgColor := ui.PositionDrawing(pos)
 		ui.DrawAtPosition(pos, true, r, fg, bgColor)
 		ui.Flush()
-		time.Sleep(30 * time.Millisecond)
+		time.Sleep(AnimDurShort)
 		ui.DrawAtPosition(pos, true, or, fgColor, bgColor)
 	}
 }
@@ -121,7 +129,7 @@ func (ui *gameui) NoiseAnimation(noises []position) {
 		_, _, bgColor := ui.PositionDrawing(ui.g.Player.Pos)
 		ui.DrawAtPosition(ui.g.Player.Pos, false, '@', bgColor, colors[i])
 		ui.Flush()
-		time.Sleep(50 * time.Millisecond)
+		time.Sleep(AnimDurShortMedium)
 	}
 
 }
@@ -132,7 +140,7 @@ func (ui *gameui) ExplosionAnimation(es explosionStyle, pos position) {
 		return
 	}
 	ui.DrawDungeonView(NormalMode)
-	time.Sleep(20 * time.Millisecond)
+	time.Sleep(AnimDurShort)
 	colors := [2]uicolor{ColorFgExplosionStart, ColorFgExplosionEnd}
 	if es == WallExplosion || es == AroundWallExplosion {
 		colors[0] = ColorFgExplosionWallStart
@@ -151,9 +159,8 @@ func (ui *gameui) ExplosionAnimation(es explosionStyle, pos position) {
 			ui.ExplosionDrawAt(npos, fg)
 		}
 		ui.Flush()
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(AnimDurMediumLong)
 	}
-	time.Sleep(20 * time.Millisecond)
 }
 
 func (g *game) Waves(maxCost int) (dists []int, cdists map[int][]int) {
@@ -208,30 +215,29 @@ func (ui *gameui) WaveAnimation(wave []int, ws wavestyle) {
 		}
 	}
 	ui.Flush()
-	time.Sleep(25 * time.Millisecond)
+	time.Sleep(AnimDurShort)
 }
 
-func (ui *gameui) TormentExplosionAnimation() {
-	g := ui.g
-	if DisableAnimations {
-		return
-	}
-	ui.DrawDungeonView(NormalMode)
-	time.Sleep(20 * time.Millisecond)
-	colors := [3]uicolor{ColorFgExplosionStart, ColorFgExplosionEnd, ColorFgMagicPlace}
-	for i := 0; i < 3; i++ {
-		for npos, b := range g.Player.LOS {
-			if !b {
-				continue
-			}
-			fg := colors[RandInt(3)]
-			ui.ExplosionDrawAt(npos, fg)
-		}
-		ui.Flush()
-		time.Sleep(100 * time.Millisecond)
-	}
-	time.Sleep(20 * time.Millisecond)
-}
+//func (ui *gameui) TormentExplosionAnimation() {
+//g := ui.g
+//if DisableAnimations {
+//return
+//}
+//ui.DrawDungeonView(NormalMode)
+//time.Sleep(AnimDurShort)
+//colors := [3]uicolor{ColorFgExplosionStart, ColorFgExplosionEnd, ColorFgMagicPlace}
+//for i := 0; i < 3; i++ {
+//for npos, b := range g.Player.LOS {
+//if !b {
+//continue
+//}
+//fg := colors[RandInt(3)]
+//ui.ExplosionDrawAt(npos, fg)
+//}
+//ui.Flush()
+//time.Sleep(AnimDurMediumLong)
+//}
+//}
 
 func (ui *gameui) WallExplosionAnimation(pos position) {
 	if DisableAnimations {
@@ -243,7 +249,7 @@ func (ui *gameui) WallExplosionAnimation(pos position) {
 		//ui.DrawAtPosition(pos, true, '☼', fg, bgColor)
 		ui.DrawAtPosition(pos, true, '%', bgColor, fg)
 		ui.Flush()
-		time.Sleep(25 * time.Millisecond)
+		time.Sleep(AnimDurShort)
 	}
 }
 
@@ -253,7 +259,7 @@ func (ui *gameui) BeamsAnimation(ray []position) {
 		return
 	}
 	ui.DrawDungeonView(NormalMode)
-	time.Sleep(25 * time.Millisecond)
+	time.Sleep(AnimDurShort)
 	// change colors depending on effect
 	colors := [2]uicolor{ColorFgSleepingMonster, ColorFgSlowedMonster}
 	for j := 0; j < 3; j++ {
@@ -273,9 +279,8 @@ func (ui *gameui) BeamsAnimation(ray []position) {
 			ui.DrawAtPosition(pos, true, r, bgColor, fg)
 		}
 		ui.Flush()
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(AnimDurMediumLong)
 	}
-	time.Sleep(25 * time.Millisecond)
 }
 
 func (ui *gameui) FireBoltAnimation(ray []position) {
@@ -284,7 +289,7 @@ func (ui *gameui) FireBoltAnimation(ray []position) {
 		return
 	}
 	ui.DrawDungeonView(NormalMode)
-	time.Sleep(25 * time.Millisecond)
+	time.Sleep(AnimDurShort)
 	colors := [2]uicolor{ColorFgExplosionStart, ColorFgExplosionEnd}
 	for j := 0; j < 3; j++ {
 		for i := len(ray) - 1; i >= 0; i-- {
@@ -303,9 +308,8 @@ func (ui *gameui) FireBoltAnimation(ray []position) {
 			ui.DrawAtPosition(pos, true, r, bgColor, fg)
 		}
 		ui.Flush()
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(AnimDurMediumLong)
 	}
-	time.Sleep(25 * time.Millisecond)
 }
 
 func (ui *gameui) SlowingMagaraAnimation(ray []position) {
@@ -313,7 +317,7 @@ func (ui *gameui) SlowingMagaraAnimation(ray []position) {
 		return
 	}
 	ui.DrawDungeonView(NormalMode)
-	time.Sleep(25 * time.Millisecond)
+	time.Sleep(AnimDurShort)
 	colors := [2]uicolor{ColorFgConfusedMonster, ColorFgMagicPlace}
 	for j := 0; j < 3; j++ {
 		for i := len(ray) - 1; i >= 0; i-- {
@@ -327,9 +331,8 @@ func (ui *gameui) SlowingMagaraAnimation(ray []position) {
 			ui.DrawAtPosition(pos, true, r, bgColor, fg)
 		}
 		ui.Flush()
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(AnimDurMediumLong)
 	}
-	time.Sleep(25 * time.Millisecond)
 }
 
 func (ui *gameui) ProjectileSymbol(dir direction) (r rune) {
@@ -346,27 +349,27 @@ func (ui *gameui) ProjectileSymbol(dir direction) (r rune) {
 	return r
 }
 
-func (ui *gameui) ThrowAnimation(ray []position, hit bool) {
-	g := ui.g
-	if DisableAnimations {
-		return
-	}
-	ui.DrawDungeonView(NormalMode)
-	time.Sleep(25 * time.Millisecond)
-	for i := len(ray) - 1; i >= 0; i-- {
-		pos := ray[i]
-		r, fgColor, bgColor := ui.PositionDrawing(pos)
-		ui.DrawAtPosition(pos, true, ui.ProjectileSymbol(pos.Dir(g.Player.Pos)), ColorFgProjectile, bgColor)
-		ui.Flush()
-		time.Sleep(30 * time.Millisecond)
-		ui.DrawAtPosition(pos, true, r, fgColor, bgColor)
-	}
-	if hit {
-		pos := ray[0]
-		ui.HitAnimation(pos, true)
-	}
-	time.Sleep(30 * time.Millisecond)
-}
+//func (ui *gameui) ThrowAnimation(ray []position, hit bool) {
+//g := ui.g
+//if DisableAnimations {
+//return
+//}
+//ui.DrawDungeonView(NormalMode)
+//time.Sleep(AnimDurShort)
+//for i := len(ray) - 1; i >= 0; i-- {
+//pos := ray[i]
+//r, fgColor, bgColor := ui.PositionDrawing(pos)
+//ui.DrawAtPosition(pos, true, ui.ProjectileSymbol(pos.Dir(g.Player.Pos)), ColorFgProjectile, bgColor)
+//ui.Flush()
+//time.Sleep(30 * time.Millisecond)
+//ui.DrawAtPosition(pos, true, r, fgColor, bgColor)
+//}
+//if hit {
+//pos := ray[0]
+//ui.HitAnimation(pos, true)
+//}
+//time.Sleep(30 * time.Millisecond)
+//}
 
 func (ui *gameui) MonsterJavelinAnimation(ray []position, hit bool) {
 	g := ui.g
@@ -374,16 +377,16 @@ func (ui *gameui) MonsterJavelinAnimation(ray []position, hit bool) {
 		return
 	}
 	ui.DrawDungeonView(NormalMode)
-	time.Sleep(25 * time.Millisecond)
+	time.Sleep(AnimDurShort)
 	for i := 0; i < len(ray); i++ {
 		pos := ray[i]
 		r, fgColor, bgColor := ui.PositionDrawing(pos)
 		ui.DrawAtPosition(pos, true, ui.ProjectileSymbol(pos.Dir(g.Player.Pos)), ColorFgMonster, bgColor)
 		ui.Flush()
-		time.Sleep(30 * time.Millisecond)
+		time.Sleep(AnimDurShort)
 		ui.DrawAtPosition(pos, true, r, fgColor, bgColor)
 	}
-	time.Sleep(30 * time.Millisecond)
+	time.Sleep(AnimDurShort)
 }
 
 func (ui *gameui) HitAnimation(pos position, targeting bool) {
@@ -403,7 +406,7 @@ func (ui *gameui) HitAnimation(pos position, targeting bool) {
 		ui.DrawAtPosition(pos, targeting, '∞', ColorFgAnimationHit, bgColor)
 	}
 	ui.Flush()
-	time.Sleep(50 * time.Millisecond)
+	time.Sleep(AnimDurShortMedium)
 }
 
 func (ui *gameui) LightningHitAnimation(targets []position) {
@@ -412,7 +415,7 @@ func (ui *gameui) LightningHitAnimation(targets []position) {
 		return
 	}
 	ui.DrawDungeonView(NormalMode)
-	time.Sleep(25 * time.Millisecond)
+	time.Sleep(AnimDurShort)
 	colors := [2]uicolor{ColorFgExplosionStart, ColorFgExplosionEnd}
 	for j := 0; j < 2; j++ {
 		for _, pos := range targets {
@@ -425,7 +428,7 @@ func (ui *gameui) LightningHitAnimation(targets []position) {
 			}
 		}
 		ui.Flush()
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(AnimDurMediumLong)
 	}
 }
 
@@ -437,11 +440,11 @@ func (ui *gameui) WoundedAnimation() {
 	r, _, bg := ui.PositionDrawing(g.Player.Pos)
 	ui.DrawAtPosition(g.Player.Pos, false, r, ColorFgHPwounded, bg)
 	ui.Flush()
-	time.Sleep(50 * time.Millisecond)
+	time.Sleep(AnimDurShortMedium)
 	if g.Player.HP <= 15 {
 		ui.DrawAtPosition(g.Player.Pos, false, r, ColorFgHPcritical, bg)
 		ui.Flush()
-		time.Sleep(50 * time.Millisecond)
+		time.Sleep(AnimDurShortMedium)
 	}
 }
 
@@ -451,14 +454,14 @@ func (ui *gameui) PlayerGoodEffectAnimation() {
 		return
 	}
 	ui.DrawDungeonView(NormalMode)
-	time.Sleep(50 * time.Millisecond)
+	time.Sleep(AnimDurShortMedium)
 	r, fg, bg := ui.PositionDrawing(g.Player.Pos)
 	ui.DrawAtPosition(g.Player.Pos, false, r, ColorGreen, bg)
 	ui.Flush()
-	time.Sleep(75 * time.Millisecond)
+	time.Sleep(AnimDurMedium)
 	ui.DrawAtPosition(g.Player.Pos, false, r, ColorYellow, bg)
 	ui.Flush()
-	time.Sleep(75 * time.Millisecond)
+	time.Sleep(AnimDurMedium)
 	ui.DrawAtPosition(g.Player.Pos, false, r, fg, bg)
 	ui.Flush()
 }
@@ -471,7 +474,7 @@ func (ui *gameui) StatusEndAnimation() {
 	r, fg, bg := ui.PositionDrawing(g.Player.Pos)
 	ui.DrawAtPosition(g.Player.Pos, false, r, ColorViolet, bg)
 	ui.Flush()
-	time.Sleep(100 * time.Millisecond)
+	time.Sleep(AnimDurMediumLong)
 	ui.DrawAtPosition(g.Player.Pos, false, r, fg, bg)
 	ui.Flush()
 }
@@ -515,7 +518,6 @@ func (ui *gameui) MagicMappingAnimation(border []int) {
 		ui.DrawAtPosition(pos, false, r, fg, bg)
 	}
 	ui.Flush()
-	time.Sleep(12 * time.Millisecond)
 }
 
 func (ui *gameui) FreeingShaedraAnimation() {
@@ -533,16 +535,16 @@ func (ui *gameui) FreeingShaedraAnimation() {
 	_, _, bg := ui.PositionDrawing(g.Places.Monolith)
 	ui.DrawAtPosition(g.Places.Monolith, false, 'Φ', ColorFgMagicPlace, bg)
 	ui.Flush()
-	time.Sleep(300 * time.Millisecond)
+	time.Sleep(AnimDurExtraLong)
 	g.Objects.Stairs[g.Places.Monolith] = WinStair
 	g.Dungeon.SetCell(g.Places.Monolith, StairCell)
 	ui.DrawDungeonView(NoFlushMode)
 	ui.Flush()
-	time.Sleep(300 * time.Millisecond)
+	time.Sleep(AnimDurExtraLong)
 	_, _, bg = ui.PositionDrawing(g.Places.Marevor)
 	ui.DrawAtPosition(g.Places.Marevor, false, 'Φ', ColorFgMagicPlace, bg)
 	ui.Flush()
-	time.Sleep(300 * time.Millisecond)
+	time.Sleep(AnimDurExtraLong)
 	g.Dungeon.SetCell(g.Places.Marevor, StoryCell)
 	g.Objects.Story[g.Places.Marevor] = StoryMarevor
 	g.PrintStyled("Marevor: “And what about the mission?”", logSpecial)
@@ -555,13 +557,12 @@ func (ui *gameui) FreeingShaedraAnimation() {
 	ui.DrawAtPosition(g.Places.Marevor, false, 'Φ', ColorFgMagicPlace, bg)
 	ui.DrawAtPosition(g.Places.Shaedra, false, 'Φ', ColorFgMagicPlace, bg)
 	ui.Flush()
-	time.Sleep(400 * time.Millisecond)
+	time.Sleep(AnimDurExtraLong)
 	g.Dungeon.SetCell(g.Places.Shaedra, GroundCell)
 	g.Dungeon.SetCell(g.Places.Marevor, ScrollCell)
 	g.Objects.Scrolls[g.Places.Marevor] = ScrollExtended
 	ui.DrawDungeonView(NoFlushMode)
 	ui.Flush()
-	time.Sleep(12 * time.Millisecond)
 	g.Player.Magaras = append(g.Player.Magaras, NoMagara)
 	g.Player.Inventory.Misc = NoItem
 	g.PrintStyled("You have a new empty slot for a magara.", logSpecial)
@@ -578,16 +579,16 @@ func (ui *gameui) TakingArtifactAnimation() {
 	_, _, bg := ui.PositionDrawing(g.Places.Monolith)
 	ui.DrawAtPosition(g.Places.Monolith, false, 'Φ', ColorFgMagicPlace, bg)
 	ui.Flush()
-	time.Sleep(300 * time.Millisecond)
+	time.Sleep(AnimDurExtraLong)
 	g.Objects.Stairs[g.Places.Monolith] = WinStair
 	g.Dungeon.SetCell(g.Places.Monolith, StairCell)
 	ui.DrawDungeonView(NoFlushMode)
 	ui.Flush()
-	time.Sleep(300 * time.Millisecond)
+	time.Sleep(AnimDurExtraLong)
 	_, _, bg = ui.PositionDrawing(g.Places.Marevor)
 	ui.DrawAtPosition(g.Places.Marevor, false, 'Φ', ColorFgMagicPlace, bg)
 	ui.Flush()
-	time.Sleep(300 * time.Millisecond)
+	time.Sleep(AnimDurExtraLong)
 	g.Dungeon.SetCell(g.Places.Marevor, StoryCell)
 	g.Objects.Story[g.Places.Marevor] = StoryMarevor
 	g.PrintStyled("Marevor: “Great! Let's escape and find some bones to celebrate!”", logSpecial)
@@ -599,9 +600,8 @@ func (ui *gameui) TakingArtifactAnimation() {
 	ui.DrawDungeonView(NoFlushMode)
 	ui.DrawAtPosition(g.Places.Marevor, false, 'Φ', ColorFgMagicPlace, bg)
 	ui.Flush()
-	time.Sleep(400 * time.Millisecond)
+	time.Sleep(AnimDurExtraLong)
 	g.Dungeon.SetCell(g.Places.Marevor, GroundCell)
 	ui.DrawDungeonView(NoFlushMode)
 	ui.Flush()
-	time.Sleep(12 * time.Millisecond)
 }
