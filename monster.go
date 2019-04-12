@@ -1153,20 +1153,17 @@ func (m *monster) RangeBlocked(g *game) bool {
 		// XXX see why this can happen
 		return true
 	}
-	blocked := false
 	for _, pos := range ray[1:] {
 		c := g.Dungeon.Cell(pos)
 		if c.BlocksRange() {
-			continue
+			return true
 		}
 		mons := g.MonsterAt(pos)
-		if mons == nil {
-			continue
+		if mons != nil {
+			return true
 		}
-		blocked = true
-		break
 	}
-	return blocked
+	return false
 }
 
 func (m *monster) TormentBolt(g *game, ev event) bool {
