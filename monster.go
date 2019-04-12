@@ -1307,7 +1307,8 @@ func (m *monster) ThrowAcid(g *game, ev event) bool {
 	if g.PutStatus(StatusSlow, DurationSleepSlow) {
 		g.Print("The viscous substance slows you.")
 	}
-	ev.Renew(g, m.Kind.AttackDelay()*4)
+	m.ExhaustTime(g, 40)
+	ev.Renew(g, m.Kind.AttackDelay())
 	return true
 }
 
