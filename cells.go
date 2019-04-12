@@ -59,9 +59,9 @@ func (t terrain) IsPlayerPassable() bool {
 func (t terrain) IsDiggable() bool {
 	switch t {
 	case WallCell, WindowCell:
-		return false
-	default:
 		return true
+	default:
+		return false
 	}
 }
 
@@ -174,13 +174,13 @@ func (c cell) ShortDesc(g *game, pos position) (desc string) {
 func (c cell) Desc(g *game, pos position) (desc string) {
 	switch c.T {
 	case WallCell:
-		desc = "A wall is an impassable pile of rocks. It can be destructed by using some items."
+		desc = "A wall is an impassable pile of rocks."
 	case GroundCell:
 		desc = "This is just plain ground."
 	case DoorCell:
-		desc = "A closed door blocks your line of sight. Doors open automatically when you or a creature stand on them. Doors are flammable."
+		desc = "A closed door blocks your line of sight. Doors open automatically when you or a creature stand on them."
 	case FungusCell:
-		desc = "Blue dense foliage grows in the Underground. It is difficult to see through, and is flammable."
+		desc = "Blue dense foliage grows in the Underground. It is difficult to see through."
 	case BarrelCell:
 		desc = "A barrel. You can hide yourself inside it when no creatures see you. It is a safe place for resting and recovering."
 	case StoneCell:
@@ -211,6 +211,15 @@ func (c cell) Desc(g *game, pos position) (desc string) {
 		desc = "A temporal magical barrier."
 	case WindowCell:
 		desc = "A transparent window in the wall."
+	}
+	if c.Flammable() {
+		desc += " It is flammable."
+	}
+	if c.BlocksRange() {
+		desc += " It blocks ranged attacks from foes."
+	}
+	if c.IsDiggable() {
+		desc += " It is diggable by oric destructive magic."
 	}
 	return desc
 }
