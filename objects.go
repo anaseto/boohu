@@ -523,15 +523,15 @@ func (it item) Desc(g *game) (desc string) {
 	case CloakSmoke:
 		desc = "leaves smoke behind as you move, making you difficult to spot."
 	case AmuletTeleport:
-		desc = "teleports away foes that hit you."
+		desc = "teleports away foes that critically hit you."
 	case AmuletConfusion:
-		desc = "confuses foes that hit you."
+		desc = "confuses foes that critically hit you."
 	case AmuletFog:
-		desc = "releases fog and makes you swift when hurt."
+		desc = "releases fog and makes you swift when critically hurt."
 	case AmuletLignification:
-		desc = "lignifies foes that hit you."
+		desc = "lignifies foes that critically hit you."
 	case AmuletObstruction:
-		desc = "uses a magical barrier to blow away monsters that hit you."
+		desc = "uses a magical barrier to blow away monsters that critically hit you."
 	case MarevorMagara:
 		desc = "magara was given to you by Marevor Helith so that he can create an escape portal when you reach Shaedra. Its sister magara, the Gem Portal Artifact, also crafted by Marevor, is the artifact that was stolen and that Shaedra was trying to retrieve before being captured. This magara needs a lot of time to recharge, so you'll only be able to use it once."
 	}
