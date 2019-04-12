@@ -235,8 +235,15 @@ func (m *monster) ComputeLOS(g *game) {
 	losRange := DefaultMonsterLOSRange
 	rays := g.buildRayMap(m.Pos, MonsterRay)
 	for pos, n := range rays {
-		if n.Cost < losRange && g.Dungeon.Cell(pos).T != BarrelCell {
+		if pos == m.Pos {
 			mlos[pos] = true
+			continue
+		}
+		if n.Cost < losRange && g.Dungeon.Cell(pos).T != BarrelCell {
+			ppos, _ := g.bestParent(rays, m.Pos, pos, MonsterRay)
+			if !g.Dungeon.Cell(ppos).BlocksRange() {
+				mlos[pos] = true
+			}
 		}
 	}
 	m.LOS = mlos
