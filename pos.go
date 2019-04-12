@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 )
 
 type position struct {
@@ -375,6 +374,8 @@ func (dir direction) InViewCone(from, to position) bool {
 	return false
 }
 
+var alternateDirs = []direction{E, NE, N, NW, W, SW, S, SE}
+
 func (dir direction) Left() (d direction) {
 	switch dir {
 	case E:
@@ -394,7 +395,7 @@ func (dir direction) Left() (d direction) {
 	case SE:
 		d = E
 	default:
-		log.Fatalf("left: %v\n", dir)
+		d = alternateDirs[RandInt(len(alternateDirs))]
 	}
 	return d
 }
@@ -418,7 +419,7 @@ func (dir direction) Right() (d direction) {
 	case SE:
 		d = S
 	default:
-		log.Fatalf("right: %v\n", dir)
+		d = alternateDirs[RandInt(len(alternateDirs))]
 	}
 	return d
 }
