@@ -348,8 +348,7 @@ func (g *game) ComputeNoise() {
 	if g.Player.Inventory.Body == CloakHear {
 		rmax += 2
 	}
-	// TODO: make it so that you only hear when monsters actually move (standing doesn't count)
-	// maybe if they're close enough you could hear them breathe too, or something like that.
+	// TODO: maybe if they're close enough you could hear them breathe too, or something like that.
 	for pos := range nm {
 		if g.Player.Sees(pos) {
 			continue
