@@ -84,6 +84,7 @@ func (tp *tunnelPath) Estimation(from, to position) int {
 type playerPath struct {
 	game      *game
 	neighbors [8]position
+	goal      position
 }
 
 func (pp *playerPath) Neighbors(pos position) []position {
@@ -99,6 +100,9 @@ func (pp *playerPath) Neighbors(pos position) []position {
 			pp.game.Player.HasStatus(StatusDig) && (d.Cell(npos).T.IsDiggable() && !okT || (okT && t.IsDiggable())))
 	}
 	nb = pos.CardinalNeighbors(nb, keep)
+	sort.Slice(nb, func(i, j int) bool {
+		return nb[i].MaxCardinalDist(pp.goal) <= nb[j].MaxCardinalDist(pp.goal)
+	})
 	return nb
 }
 
@@ -244,7 +248,7 @@ func (m *monster) APath(g *game, from, to position) []position {
 }
 
 func (g *game) PlayerPath(from, to position) []position {
-	pp := &playerPath{game: g}
+	pp := &playerPath{game: g, goal: to}
 	path, _, found := AstarPath(pp, from, to)
 	if !found {
 		return nil

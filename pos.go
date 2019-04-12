@@ -44,11 +44,16 @@ func (pos position) NW() position {
 func (pos position) Distance(to position) int {
 	deltaX := Abs(to.X - pos.X)
 	deltaY := Abs(to.Y - pos.Y)
-	//if deltaX > deltaY {
-	//return deltaX
-	//}
-	//return deltaY
 	return deltaX + deltaY
+}
+
+func (pos position) MaxCardinalDist(to position) int {
+	deltaX := Abs(to.X - pos.X)
+	deltaY := Abs(to.Y - pos.Y)
+	if deltaX > deltaY {
+		return deltaX
+	}
+	return deltaY
 }
 
 func (pos position) DistanceX(to position) int {
