@@ -12,16 +12,16 @@ const (
 	BlinkMagara
 	DigMagara
 	TeleportMagara
-	TeleportOtherMagara
 	SwiftnessMagara
-	SwappingMagara
+	FireMagara
 	FogMagara
+	NoiseMagara
+	ConfusionMagara
+	TeleportOtherMagara
+	SwappingMagara
 	SlowingMagara
 	SleepingMagara
-	NoiseMagara
 	ObstructionMagara
-	FireMagara
-	ConfusionMagara
 	LignificationMagara
 	//BarrierMagara
 )
