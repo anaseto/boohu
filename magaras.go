@@ -542,8 +542,7 @@ func (g *game) EvokeConfusion(ev event) error {
 		if !mons.Exists() || !g.Player.Sees(mons.Pos) {
 			continue
 		}
-		mons.Statuses[MonsConfused]++
-		g.PushEvent(&monsterEvent{ERank: g.Ev.Rank() + DurationConfusion, NMons: mons.Index, EAction: MonsConfusionEnd})
+		mons.EnterConfusion(g, ev)
 	}
 	g.ui.LOSWavesAnimation(DefaultLOSRange, WaveLOS)
 	return nil
