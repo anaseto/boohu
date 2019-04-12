@@ -211,6 +211,7 @@ func (g *game) ComputeLOS() {
 	}
 	for _, mons := range g.Monsters {
 		if mons.Exists() && g.Player.Sees(mons.Pos) {
+			mons.ComputeLOS(g) // approximation of what the monster will see for player info purposes
 			mons.UpdateKnowledge(g, mons.Pos)
 			if mons.Seen {
 				g.StopAuto()
