@@ -900,6 +900,13 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	}
 	ppos := g.Player.Pos
 	mpos := m.Pos
+	if m.SeesPlayer(g) {
+		// Seems redundant, but it's not actually always redundant if
+		// something happens during their turn delay. It's not even
+		// totally correct to check only when the monster sees the
+		// player, but it should be enough for all practical purposes.
+		m.ComputeLOS(g)
+	}
 	m.MakeAware(g)
 	if m.State == Resting {
 		if RandInt(3000) == 0 {
