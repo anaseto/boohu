@@ -17,10 +17,10 @@ const (
 	FogMagara
 	NoiseMagara
 	ConfusionMagara
+	SleepingMagara
 	TeleportOtherMagara
 	SwappingMagara
 	SlowingMagara
-	SleepingMagara
 	ObstructionMagara
 	LignificationMagara
 	//BarrierMagara
@@ -68,30 +68,30 @@ func (g *game) UseMagara(n int, ev event) (err error) {
 		err = errors.New("You cannot evoke an empty slot!")
 	case BlinkMagara:
 		err = g.EvokeBlink(ev)
-	case TeleportMagara:
-		err = g.EvokeTeleport(ev)
 	case DigMagara:
 		err = g.EvokeDig(ev)
-	case TeleportOtherMagara:
-		err = g.EvokeTeleportOther(ev)
+	case TeleportMagara:
+		err = g.EvokeTeleport(ev)
 	case SwiftnessMagara:
 		err = g.EvokeSwiftness(ev)
-	case SwappingMagara:
-		err = g.EvokeSwapping(ev)
+	case FireMagara:
+		err = g.EvokeFire(ev)
 	case FogMagara:
 		err = g.EvokeFog(ev)
-	case SlowingMagara:
-		err = g.EvokeSlowing(ev)
-	case SleepingMagara:
-		err = g.EvokeSleeping(ev)
 	case NoiseMagara:
 		err = g.EvokeNoise(ev)
 	case ConfusionMagara:
 		err = g.EvokeConfusion(ev)
+	case SlowingMagara:
+		err = g.EvokeSlowing(ev)
+	case SleepingMagara:
+		err = g.EvokeSleeping(ev)
+	case TeleportOtherMagara:
+		err = g.EvokeTeleportOther(ev)
+	case SwappingMagara:
+		err = g.EvokeSwapping(ev)
 	case ObstructionMagara:
 		err = g.EvokeObstruction(ev)
-	case FireMagara:
-		err = g.EvokeFire(ev)
 	case LignificationMagara:
 		err = g.EvokeLignification(ev)
 	}
@@ -113,30 +113,30 @@ func (mag magara) String() (desc string) {
 		desc = "empty slot"
 	case BlinkMagara:
 		desc = "magara of blinking"
-	case TeleportMagara:
-		desc = "magara of teleportation"
 	case DigMagara:
 		desc = "magara of digging"
-	case TeleportOtherMagara:
-		desc = "magara of teleport other"
+	case TeleportMagara:
+		desc = "magara of teleportation"
 	case SwiftnessMagara:
 		desc = "magara of swiftness"
-	case SwappingMagara:
-		desc = "magara of swapping"
-	case FogMagara:
-		desc = "magara of fog"
-	case SlowingMagara:
-		desc = "magara of slowing"
-	case SleepingMagara:
-		desc = "magara of sleeping"
-	case NoiseMagara:
-		desc = "magara of noise"
-	case ObstructionMagara:
-		desc = "magara of obstruction"
-	case ConfusionMagara:
-		desc = "magara of confusion"
 	case FireMagara:
 		desc = "magara of fire"
+	case FogMagara:
+		desc = "magara of fog"
+	case NoiseMagara:
+		desc = "magara of noise"
+	case ConfusionMagara:
+		desc = "magara of confusion"
+	case SleepingMagara:
+		desc = "magara of sleeping"
+	case TeleportOtherMagara:
+		desc = "magara of teleport other"
+	case SwappingMagara:
+		desc = "magara of swapping"
+	case SlowingMagara:
+		desc = "magara of slowing"
+	case ObstructionMagara:
+		desc = "magara of obstruction"
 	case LignificationMagara:
 		desc = "magara of lignification"
 	}
@@ -150,32 +150,32 @@ func (mag magara) Desc(g *game) (desc string) {
 		desc = "can be used for a new magara."
 	case BlinkMagara:
 		desc = "makes you blink away within your line of sight. The rod is more susceptible to send you to the cells thar are most far from you."
-	case TeleportMagara:
-		desc = "makes you teleport far away."
 	case DigMagara:
 		desc = "makes you dig walls by walking into them like an earth dragon thanks to destructive oric magic."
-	case TeleportOtherMagara:
-		desc = "teleports up to two random monsters in sight."
+	case TeleportMagara:
+		desc = "creates an oric energy disturbance, making you teleport far away on the same level."
 	case SwiftnessMagara:
-		desc = "makes you move faster and better at avoiding blows for a short time." // XXX
-	case SwappingMagara:
-		desc = "makes you swap positions with the farthest monster in sight. If there is more than one at the same distance, it will be chosen randomly."
-	case FogMagara:
-		desc = "creates a dense fog in a 2-range radius using harmonic energies."
-	case SlowingMagara:
-		desc = "induces slow movement and attack for monsters in sight."
-	case SleepingMagara:
-		desc = "induces deep sleeping and exhaustion for up to two random monsters in sight."
-	case NoiseMagara:
-		desc = "tricks monsters in a 12-range area with harmonic magical sounds, making them go away from you for a few turns. It only works on monsters that are not already seeing you."
-	case ObstructionMagara:
-		desc = "creates temporal magical barriers between you and up to 3 monsters."
-	case ConfusionMagara:
-		desc = "confuses monsters in sight with harmonic light and sounds, leaving them unable to attack you."
+		desc = "makes you move faster for a short time by filling you with energies."
 	case FireMagara:
 		desc = "produces a small magical fire that will extend to neighbour flammable terrain. The smoke it generates will induce sleep in monsters. As a gawalt monkey, you resist sleepiness, but you will still feel slowed."
+	case FogMagara:
+		desc = "creates a dense fog in a 2-range radius using harmonic energies."
+	case NoiseMagara:
+		desc = "tricks monsters in a 12-range area with harmonic magical sounds, making them go away from you for a few turns. It only works on monsters that are not already seeing you."
+	case ConfusionMagara:
+		desc = "confuses monsters in sight with harmonic light and sounds, leaving them unable to attack you."
+	case SlowingMagara:
+		desc = "induces slow movement and attack for monsters in sight by disturbing their senses with sound and light illusions."
+	case SleepingMagara:
+		desc = "induces deep sleeping and exhaustion for up to two random monsters in sight using hypnotic illusions."
+	case TeleportOtherMagara:
+		desc = "creates oric energy disturbances, teleporting up to two random monsters in sight."
+	case SwappingMagara:
+		desc = "makes you swap positions with the farthest monster in sight. If there is more than one at the same distance, it will be chosen randomly."
+	case ObstructionMagara:
+		desc = "creates temporal barriers with oric energy between you and up to 3 monsters."
 	case LignificationMagara:
-		desc = "lignifies up to 2 monsters in view, so that it cannot move. The monster can still fight."
+		desc = "liberates magical spores that lignify up to 2 monsters in view, so that they cannot move. The monsters can still fight."
 	}
 	return fmt.Sprintf("The %s %s", mag, desc)
 }
