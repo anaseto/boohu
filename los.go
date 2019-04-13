@@ -242,7 +242,7 @@ func (m *monster) ComputeLOS(g *game) {
 		}
 		if n.Cost < losRange && g.Dungeon.Cell(pos).T != BarrelCell {
 			ppos, _ := g.bestParent(rays, m.Pos, pos, MonsterRay)
-			if !g.Dungeon.Cell(ppos).BlocksRange() {
+			if !g.Dungeon.Cell(ppos).Hides() {
 				mlos[pos] = true
 			}
 		}

@@ -74,6 +74,15 @@ func (c cell) BlocksRange() bool {
 	}
 }
 
+func (c cell) Hides() bool {
+	switch c.T {
+	case WallCell, BarrelCell, TableCell, TreeCell, BarrierCell, WindowCell, StoryCell:
+		return true
+	default:
+		return false
+	}
+}
+
 func (c cell) IsIlluminable() bool {
 	switch c.T {
 	case WallCell, BarrelCell, TableCell, TreeCell, HoledWallCell, BarrierCell, WindowCell:
@@ -215,11 +224,14 @@ func (c cell) Desc(g *game, pos position) (desc string) {
 	if c.Flammable() {
 		desc += " It is flammable."
 	}
+	if c.T.IsDiggable() {
+		desc += " It is diggable by oric destructive magic."
+	}
 	if c.BlocksRange() {
 		desc += " It blocks ranged attacks from foes."
 	}
-	if c.T.IsDiggable() {
-		desc += " It is diggable by oric destructive magic."
+	if c.Hides() {
+		desc += " You can hide just behind it."
 	}
 	return desc
 }
