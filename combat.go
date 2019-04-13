@@ -116,6 +116,7 @@ func (g *game) Jump(mons *monster, ev event) error {
 		g.PutStatus(StatusExhausted, 50)
 	}
 	g.PlacePlayerAt(pos)
+	g.Stats.Jumps++
 	return nil
 }
 

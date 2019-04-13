@@ -124,8 +124,8 @@ func (g *game) Dump() string {
 func (g *game) DetailedStatistics(w io.Writer) {
 	fmt.Fprintf(w, "\n")
 	fmt.Fprintf(w, "Statistics:\n")
-	fmt.Fprintf(w, "You evoked magaras %d times, and moved %d times.\n",
-		g.Stats.MagarasUsed, g.Stats.Moves)
+	fmt.Fprintf(w, "You evoked magaras %d times, jumped %d times, and moved %d times.\n",
+		g.Stats.MagarasUsed, g.Stats.Jumps, g.Stats.Moves)
 	fmt.Fprintf(w, "You got hit %d times.\n", g.Stats.ReceivedHits)
 	fmt.Fprintf(w, "You were spotted by %d monsters, %d times.\n", g.Stats.NUSpotted, g.Stats.NSpotted)
 	fmt.Fprintf(w, "You endured %d damage.\n", g.Stats.Damage)
