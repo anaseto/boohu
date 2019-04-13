@@ -67,7 +67,7 @@ func (t terrain) IsDiggable() bool {
 
 func (c cell) BlocksRange() bool {
 	switch c.T {
-	case WallCell, BarrelCell, TableCell, TreeCell, BarrierCell, WindowCell, StoryCell:
+	case WallCell, TreeCell, BarrierCell, WindowCell, StoryCell:
 		return true
 	default:
 		return false
@@ -76,7 +76,7 @@ func (c cell) BlocksRange() bool {
 
 func (c cell) Hides() bool {
 	switch c.T {
-	case WallCell, BarrelCell, TableCell, TreeCell, BarrierCell, WindowCell, StoryCell:
+	case WallCell, BarrelCell, TableCell, TreeCell, WindowCell, StoryCell:
 		return true
 	default:
 		return false
