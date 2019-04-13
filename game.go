@@ -322,7 +322,6 @@ func (g *game) InitLevel() {
 
 	// initialize LOS
 	if g.Depth == 1 {
-		g.Print("You're in Hareka's Underground searching for medicinal simellas. Good luck!")
 		g.PrintStyled("► Press ? for help on keys or use the mouse and [buttons].", logSpecial)
 	}
 	if g.Depth == WinDepth {

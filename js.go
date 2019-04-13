@@ -61,7 +61,7 @@ func newGame(ui *gameui) {
 	g.ui = ui
 	g.EventLoop()
 	ui.Clear()
-	ui.DrawColoredText("Do you want to collect some more simellas today?\n\n───Click or press any key to play again───", 7, 5, ColorFg)
+	ui.DrawColoredText("Do you want to collect some more bananas today?\n\n───Click or press any key to play again───", 7, 5, ColorFg)
 	ui.DrawText(SaveError, 0, 10)
 	ui.Flush()
 	ui.PressAnyKey()
