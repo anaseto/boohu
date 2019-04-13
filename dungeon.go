@@ -1149,6 +1149,9 @@ func (dg *dgen) AddSpecial(g *game, ml maplayout) {
 			ntables++
 		}
 	}
+	if g.Params.Tables[g.Depth] {
+		ntables += 2 + RandInt(2)
+	}
 	for i := 0; i < 3+RandInt(2); i++ {
 		dg.GenTable(g)
 	}
@@ -1172,14 +1175,23 @@ func (dg *dgen) AddSpecial(g *game, ml maplayout) {
 			ntrees--
 		}
 	}
+	if g.Params.Trees[g.Depth] {
+		ntrees += 2 + RandInt(2)
+	}
 	for i := 0; i < ntrees; i++ {
 		dg.GenTree(g)
 	}
 	nhw := 1 + RandInt(2)
+	if g.Params.Holes[g.Depth] {
+		nhw += 3 + RandInt(2)
+	}
 	dg.PutHoledWalls(g, nhw)
 	nwin := 1
 	if nhw == 1 {
 		nwin++
+	}
+	if g.Params.Windows[g.Depth] {
+		nwin += 4 + RandInt(3)
 	}
 	dg.PutWindows(g, nwin)
 	if g.Params.Lore[g.Depth] {
@@ -1552,9 +1564,14 @@ func (dg *dgen) GenStones(g *game) {
 	case 6, 7:
 		nstones += 2
 	}
+	inroom := 2
+	if g.Params.Stones[g.Depth] {
+		nstones += 4 + RandInt(3)
+		inroom += 2
+	}
 	for i := 0; i < nstones; i++ {
 		pos := InvalidPos
-		if i <= 1 {
+		if i < inroom {
 			count := 0
 			for pos == InvalidPos {
 				count++

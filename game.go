@@ -70,6 +70,11 @@ type startParams struct {
 	Blocked  map[int]bool
 	Special  map[int]bool
 	Unstable map[int]bool
+	Windows  map[int]bool
+	Trees    map[int]bool
+	Holes    map[int]bool
+	Stones   map[int]bool
+	Tables   map[int]bool
 }
 
 type places struct {
@@ -272,6 +277,41 @@ func (g *game) InitFirstLevel() {
 		g.Params.Unstable[2+RandInt(MaxDepth-1)] = true
 		if RandInt(MaxDepth) == 0 {
 			g.Params.Unstable[2+RandInt(MaxDepth-1)] = true
+		}
+	}
+	g.Params.Windows = map[int]bool{}
+	if RandInt(MaxDepth) > MaxDepth/2 {
+		g.Params.Windows[2+RandInt(MaxDepth-1)] = true
+		if RandInt(MaxDepth) == 0 {
+			g.Params.Windows[2+RandInt(MaxDepth-1)] = true
+		}
+	}
+	g.Params.Holes = map[int]bool{}
+	if RandInt(MaxDepth) > MaxDepth/2 {
+		g.Params.Holes[2+RandInt(MaxDepth-1)] = true
+		if RandInt(MaxDepth) == 0 {
+			g.Params.Holes[2+RandInt(MaxDepth-1)] = true
+		}
+	}
+	g.Params.Trees = map[int]bool{}
+	if RandInt(MaxDepth) > MaxDepth/2 {
+		g.Params.Trees[2+RandInt(MaxDepth-1)] = true
+		if RandInt(MaxDepth) == 0 {
+			g.Params.Trees[2+RandInt(MaxDepth-1)] = true
+		}
+	}
+	g.Params.Tables = map[int]bool{}
+	if RandInt(MaxDepth) > MaxDepth/2 {
+		g.Params.Tables[2+RandInt(MaxDepth-1)] = true
+		if RandInt(MaxDepth) == 0 {
+			g.Params.Tables[2+RandInt(MaxDepth-1)] = true
+		}
+	}
+	g.Params.Stones = map[int]bool{}
+	if RandInt(MaxDepth) > MaxDepth/2 {
+		g.Params.Stones[2+RandInt(MaxDepth-1)] = true
+		if RandInt(MaxDepth) == 0 {
+			g.Params.Stones[2+RandInt(MaxDepth-1)] = true
 		}
 	}
 	permi := RandInt(WinDepth - 1)
