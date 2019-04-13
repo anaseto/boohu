@@ -66,9 +66,10 @@ type game struct {
 }
 
 type startParams struct {
-	Lore    map[int]bool
-	Blocked map[int]bool
-	Special map[int]bool
+	Lore     map[int]bool
+	Blocked  map[int]bool
+	Special  map[int]bool
+	Unstable map[int]bool
 }
 
 type places struct {
@@ -266,6 +267,13 @@ func (g *game) InitFirstLevel() {
 	if RandInt(3) > 0 {
 		g.Params.Special[WinDepth+1+RandInt(MaxDepth-WinDepth-1)] = true
 	}
+	g.Params.Unstable = map[int]bool{}
+	if RandInt(MaxDepth) > MaxDepth/2 {
+		g.Params.Unstable[2+RandInt(MaxDepth-1)] = true
+		if RandInt(MaxDepth) == 0 {
+			g.Params.Unstable[2+RandInt(MaxDepth-1)] = true
+		}
+	}
 	permi := RandInt(WinDepth - 1)
 	switch permi {
 	case 0, 1, 2, 3:
@@ -318,6 +326,12 @@ func (g *game) InitLevel() {
 	}
 	for i := range g.Monsters {
 		g.PushEvent(&monsterEvent{ERank: g.Turn + RandInt(10), EAction: MonsterTurn, NMons: i})
+	}
+	if g.Params.Unstable[g.Depth] {
+		g.PrintStyled("Uncontrolled oric magic fills the air on this level.", logSpecial)
+		for i := 0; i < 5; i++ {
+			g.PushEvent(&cloudEvent{ERank: g.Turn + 50 + RandInt(100), EAction: ObstructionProgression})
+		}
 	}
 
 	// initialize LOS

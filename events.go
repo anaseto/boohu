@@ -273,7 +273,7 @@ func (cev *cloudEvent) Action(g *game) {
 		pos := g.FreeCell()
 		g.MagicalBarrierAt(pos, cev)
 		if g.Player.Sees(pos) {
-			g.Printf("You see a wall appear out of thin air.")
+			g.Printf("You see an oric barrier appear out of thin air.")
 			g.StopAuto()
 		}
 		g.PushEvent(&cloudEvent{ERank: cev.Rank() + DurationObstructionProgression + RandInt(DurationObstructionProgression/4),
@@ -414,7 +414,7 @@ const (
 	DurationLignification          = 110
 	DurationLignificationPlayer    = 30
 	DurationMagicalBarrier         = 150
-	DurationObstructionProgression = 200
+	DurationObstructionProgression = 150
 	DurationSmokingCloakFog        = 20
 	DurationMonsterExhaustion      = 100
 )
