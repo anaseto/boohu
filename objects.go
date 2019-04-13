@@ -115,23 +115,23 @@ func (stn stone) String() (text string) {
 func (stn stone) Desc(g *game) (text string) {
 	switch stn {
 	case InertStone:
-		text = "This stone has been depleted of magical energies."
+		text = "This magical stone has been depleted of magical energies."
 	case BarrelStone:
-		text = "Activating this stone will teleport you away to a barrel in the same level."
+		text = "Activating this magical stone will teleport you away to a barrel in the same level."
 	case FogStone:
-		text = "Activating this stone will produce fog in a 4-radius area using harmonic energies."
+		text = "Activating this magical stone will produce fog in a 4-radius area using harmonic energies."
 	case QueenStone:
-		text = "Activating this stone will produce an harmonic sound confusing enemies in a quite large area. This can also attract monsters."
+		text = "Activating this magical stone will produce an harmonic sound confusing enemies in a quite large area. This can also attract monsters."
 	case TreeStone:
-		text = "Activating this stone will lignify monsters in sight."
+		text = "Activating this magical stone will lignify monsters in sight."
 	case ObstructionStone:
-		text = "Activating this stone will create temporal oric-energy based barriers around all monsters in sight."
+		text = "Activating this magical stone will create temporal oric-energy based barriers around all monsters in sight."
 	case MappingStone:
-		text = "Activating this stone shows you the map layout and item locations in a wide area."
+		text = "Activating this magical stone shows you the map layout and item locations in a wide area."
 	case SensingStone:
-		text = "Activating this stone shows you the current position of monsters in a wide area."
+		text = "Activating this magical stone shows you the current position of monsters in a wide area."
 	case SealStone:
-		text = "Activating this stone will disable a magical barrier somewhere in the same level, usually one blocking stairs."
+		text = "Activating this magical stone will disable a magical barrier somewhere in the same level, usually one blocking stairs."
 	}
 	return text
 }
