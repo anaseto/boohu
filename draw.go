@@ -796,6 +796,7 @@ func (ui *gameui) DrawLoading() {
 	ui.DrawDungeonView(NoFlushMode)
 	ui.DrawColoredText("Loading...", DungeonWidth+2, line+1, ColorCyan)
 	ui.Flush()
+	time.Sleep(AnimDurShort)
 }
 
 func (ui *gameui) DrawSelectDescBasics() {

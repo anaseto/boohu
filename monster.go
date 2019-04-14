@@ -899,7 +899,11 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	}
 	ppos := g.Player.Pos
 	mpos := m.Pos
-	m.ComputeLOS(g)
+	switch m.Kind {
+	case MonsGuard, MonsHighGuard:
+		// they have to put lights on, could be optimized (TODO)
+		m.ComputeLOS(g)
+	}
 	m.MakeAware(g)
 	if m.State == Resting {
 		if RandInt(3000) == 0 {

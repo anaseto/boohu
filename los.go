@@ -412,7 +412,7 @@ func (p *player) Sees(pos position) bool {
 }
 
 func (m *monster) SeesPlayer(g *game) bool {
-	return m.Sees(g, g.Player.Pos)
+	return m.Sees(g, g.Player.Pos) && g.Player.Sees(m.Pos)
 }
 
 func (m *monster) Sees(g *game, pos position) bool {
