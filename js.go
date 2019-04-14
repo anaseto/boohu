@@ -115,7 +115,10 @@ type gameui struct {
 
 func (ui *gameui) InitElements() error {
 	canvas := js.Global().Get("document").Call("getElementById", "gamecanvas")
-	canvas.Call("addEventListener", "contextmenu", js.NewEventCallback(js.PreventDefault, func(e js.Value) {
+	canvas.Call("addEventListener", "contextmenu", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		e := args[0]
+		e.Call("preventDefault")
+		return nil
 	}), false)
 	canvas.Call("setAttribute", "tabindex", "1")
 	ui.ctx = canvas.Call("getContext", "2d")
@@ -320,32 +323,40 @@ func (g *game) WriteDump() error {
 func (ui *gameui) Init() error {
 	canvas := js.Global().Get("document").Call("getElementById", "gamecanvas")
 	canvas.Call(
-		"addEventListener", "keypress", js.NewEventCallback(0, func(e js.Value) {
+		"addEventListener", "keypress", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			e := args[0]
 			s := e.Get("key").String()
 			if s == "Unidentified" {
 				s = e.Get("code").String()
 			}
 			ch <- uiInput{key: s}
+			return nil
 		}))
 	js.Global().Get("document").Call(
-		"addEventListener", "keypress", js.NewEventCallback(0, func(e js.Value) {
+		"addEventListener", "keypress", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			e := args[0]
 			if !e.Get("ctrlKey").Bool() && !e.Get("metaKey").Bool() && js.Global().Get("Object").Call("is", js.Global().Get("document").Get("activeElement"), canvas).Bool() {
 				e.Call("preventDefault")
 			}
+			return nil
 		}))
 	canvas.Call(
-		"addEventListener", "mousedown", js.NewEventCallback(0, func(e js.Value) {
+		"addEventListener", "mousedown", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			e := args[0]
 			x, y := ui.GetMousePos(e)
 			ch <- uiInput{mouse: true, mouseX: x, mouseY: y, button: e.Get("button").Int()}
+			return nil
 		}))
 	canvas.Call(
-		"addEventListener", "mousemove", js.NewEventCallback(0, func(e js.Value) {
+		"addEventListener", "mousemove", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			e := args[0]
 			x, y := ui.GetMousePos(e)
 			if x != ui.mousepos.X || y != ui.mousepos.Y {
 				ui.mousepos.X = x
 				ui.mousepos.Y = y
 				ch <- uiInput{mouse: true, mouseX: x, mouseY: y, button: -1}
 			}
+			return nil
 		}))
 	ui.menuHover = -1
 	ui.InitElements()
@@ -368,7 +379,8 @@ func (ui *gameui) Close() {
 }
 
 func (ui *gameui) Flush() {
-	js.Global().Get("window").Call("requestAnimationFrame", js.NewEventCallback(0, ui.FlushCallback))
+	js.Global().Get("window").Call("requestAnimationFrame",
+		js.FuncOf(func(this js.Value, args []js.Value) interface{} { ui.FlushCallback(); return nil }))
 }
 
 func (ui *gameui) ApplyToggleLayoutWithClear(clear bool) {
@@ -398,7 +410,7 @@ func (ui *gameui) ApplyToggleLayout() {
 	ui.ApplyToggleLayoutWithClear(true)
 }
 
-func (ui *gameui) FlushCallback(obj js.Value) {
+func (ui *gameui) FlushCallback() {
 	ui.DrawLogFrame()
 	for _, cdraw := range ui.g.DrawLog[len(ui.g.DrawLog)-1].Draws {
 		cell := cdraw.Cell
