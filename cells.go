@@ -38,6 +38,15 @@ func (c cell) IsPassable() bool {
 	}
 }
 
+func (c cell) AllowsFog() bool {
+	switch c.T {
+	case WallCell, HoledWallCell, WindowCell, StoryCell:
+		return false
+	default:
+		return true
+	}
+}
+
 func (c cell) CoversPlayer() bool {
 	switch c.T {
 	case WallCell, BarrelCell, TableCell, TreeCell, HoledWallCell, BarrierCell, WindowCell:

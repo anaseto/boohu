@@ -392,7 +392,7 @@ func (g *game) Fog(at position, radius int, ev event) {
 	nm := Dijkstra(dij, []position{at}, radius)
 	for pos := range nm {
 		_, ok := g.Clouds[pos]
-		if !ok {
+		if !ok && g.Dungeon.Cell(pos).AllowsFog() {
 			g.Clouds[pos] = CloudFog
 			g.PushEvent(&cloudEvent{ERank: ev.Rank() + DurationFog + RandInt(DurationFog/2), EAction: CloudEnd, Pos: pos})
 		}

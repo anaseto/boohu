@@ -282,7 +282,7 @@ func (g *game) MovePlayer(pos position, ev event) error {
 		}
 		if g.Player.Inventory.Body == CloakSmoke {
 			_, ok := g.Clouds[g.Player.Pos]
-			if !ok {
+			if !ok && g.Dungeon.Cell(g.Player.Pos).AllowsFog() {
 				g.Clouds[g.Player.Pos] = CloudFog
 				g.PushEvent(&cloudEvent{ERank: ev.Rank() + DurationSmokingCloakFog, EAction: CloudEnd, Pos: g.Player.Pos})
 			}
@@ -330,7 +330,7 @@ func (g *game) SwiftFog(ev event) {
 	nm := Dijkstra(dij, []position{g.Player.Pos}, 2)
 	for pos := range nm {
 		_, ok := g.Clouds[pos]
-		if !ok {
+		if !ok && g.Dungeon.Cell(pos).AllowsFog() {
 			g.Clouds[pos] = CloudFog
 			g.PushEvent(&cloudEvent{ERank: ev.Rank() + DurationFog + RandInt(DurationFog/2), EAction: CloudEnd, Pos: pos})
 		}
