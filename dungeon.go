@@ -1946,7 +1946,7 @@ func (dg *dgen) PutMonsterBand(g *game, band monsterBand) bool {
 		bdinf = dg.BandInfoPatrol(g, band, PlacePatrol)
 	}
 	g.Bands = append(g.Bands, bdinf)
-	awake := RandInt(4) > 0
+	awake := RandInt(5) > 0
 	var pos position
 	if len(bdinf.Path) == 0 {
 		// should not happen now
