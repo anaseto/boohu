@@ -32,7 +32,7 @@ type game struct {
 	Noise              map[position]bool
 	NoiseIllusion      map[position]bool
 	LastMonsterKnownAt map[position]*monster
-	MonsterLOS         map[position]bool
+	MonsterLOS         []bool
 	MonsterTargLOS     map[position]bool
 	Illuminated        []bool
 	RaysCache          rayMap
@@ -236,6 +236,7 @@ func (g *game) InitFirstLevel() {
 	g.Targeting = InvalidPos
 	g.Illuminated = make([]bool, DungeonNCells)
 	g.RaysCache = rayMap{}
+	g.MonsterLOS = make([]bool, DungeonNCells)
 	g.GeneratedUniques = map[monsterBand]int{}
 	g.GeneratedLore = map[int]bool{}
 	g.Stats.KilledMons = map[monsterKind]int{}

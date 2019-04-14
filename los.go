@@ -437,7 +437,9 @@ func (m *monster) Sees(g *game, pos position) bool {
 }
 
 func (g *game) ComputeMonsterLOS() {
-	g.MonsterLOS = make(map[position]bool)
+	for i := 0; i < DungeonNCells; i++ {
+		g.MonsterLOS[i] = false
+	}
 	for _, mons := range g.Monsters {
 		if !mons.Exists() || !g.Player.Sees(mons.Pos) {
 			continue
@@ -447,7 +449,7 @@ func (g *game) ComputeMonsterLOS() {
 				continue
 			}
 			if mons.Sees(g, pos) {
-				g.MonsterLOS[pos] = true
+				g.MonsterLOS[pos.idx()] = true
 			}
 		}
 		// unoptimized version for testing:
@@ -460,7 +462,7 @@ func (g *game) ComputeMonsterLOS() {
 		//}
 		//}
 	}
-	if g.MonsterLOS[g.Player.Pos] {
+	if g.MonsterLOS[g.Player.Pos.idx()] {
 		g.Player.Statuses[StatusUnhidden] = 1
 		g.Player.Statuses[StatusHidden] = 0
 	} else {

@@ -633,7 +633,7 @@ func (ui *gameui) DescribePosition(pos position, targ Targeter) {
 		desc = ui.AddComma(see, desc)
 		desc += fmt.Sprintf("%s", g.Dungeon.Cell(pos).ShortDesc(g, pos))
 	}
-	if g.MonsterLOS[pos] {
+	if g.MonsterLOS[pos.idx()] {
 		desc += " (unhidden)"
 	} else if g.Illuminated[pos.idx()] {
 		desc += " (lighted)"
@@ -896,7 +896,7 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 			if g.MonsterTargLOS[pos] {
 				fgColor = ColorFgWanderingMonster
 			}
-		} else if g.MonsterLOS[pos] {
+		} else if g.MonsterLOS[pos.idx()] {
 			fgColor = ColorFgWanderingMonster
 		}
 		if cld, ok := g.Clouds[pos]; ok && g.Player.Sees(pos) {
