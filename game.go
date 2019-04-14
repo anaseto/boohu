@@ -349,6 +349,8 @@ func (g *game) InitLevel() {
 	// Starting data
 	if g.Depth == 0 {
 		g.InitFirstLevel()
+	} else {
+		g.ui.DrawLoading()
 	}
 
 	g.InitLevelStructures()

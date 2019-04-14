@@ -791,6 +791,13 @@ func (ui *gameui) DrawKeysBasics(m uiMode) {
 	}
 }
 
+func (ui *gameui) DrawLoading() {
+	line := DungeonHeight - 2
+	ui.DrawDungeonView(NoFlushMode)
+	ui.DrawColoredText("Loading...", DungeonWidth+2, line+1, ColorCyan)
+	ui.Flush()
+}
+
 func (ui *gameui) DrawSelectDescBasics() {
 	line := DungeonHeight - 2
 	ui.DrawColoredText("[a-z]", DungeonWidth+2, line+1, ColorFgPlayer)
