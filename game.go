@@ -34,7 +34,8 @@ type game struct {
 	LastMonsterKnownAt map[position]*monster
 	MonsterLOS         map[position]bool
 	MonsterTargLOS     map[position]bool
-	Illuminated        map[position]bool
+	Illuminated        []bool
+	RaysCache          rayMap
 	Resting            bool
 	RestingTurns       int
 	Autoexploring      bool
@@ -196,6 +197,8 @@ func (g *game) InitPlayer() {
 		MP:      DefaultMPmax,
 		Bananas: 1,
 	}
+	g.Player.Rays = rayMap{}
+	g.Player.LOS = map[position]bool{}
 	g.Player.Statuses = map[status]int{}
 	g.Player.Expire = map[status]int{}
 	g.Player.Magaras = []magara{
@@ -231,6 +234,8 @@ func (g *game) InitFirstLevel() {
 	g.InitPlayer()
 	g.AutoTarget = InvalidPos
 	g.Targeting = InvalidPos
+	g.Illuminated = make([]bool, DungeonNCells)
+	g.RaysCache = rayMap{}
 	g.GeneratedUniques = map[monsterBand]int{}
 	g.GeneratedLore = map[int]bool{}
 	g.Stats.KilledMons = map[monsterKind]int{}
