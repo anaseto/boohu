@@ -424,7 +424,7 @@ func (g *game) EvokeSlowing(ev event) error {
 		g.PushEvent(&monsterEvent{ERank: g.Ev.Rank() + DurationSlow, NMons: mons.Index, EAction: MonsSlowEnd})
 	}
 	g.Print("Whoosh! A slowing luminous wave emerges.")
-	g.ui.LOSWavesAnimation(DefaultLOSRange, WaveLOS)
+	g.ui.LOSWavesAnimation(DefaultLOSRange, WaveSlowing)
 
 	return nil
 }
@@ -544,7 +544,7 @@ func (g *game) EvokeConfusion(ev event) error {
 		}
 		mons.EnterConfusion(g, ev)
 	}
-	g.ui.LOSWavesAnimation(DefaultLOSRange, WaveLOS)
+	g.ui.LOSWavesAnimation(DefaultLOSRange, WaveConfusion)
 	return nil
 }
 

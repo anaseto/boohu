@@ -111,7 +111,6 @@ func (ui *gameui) ExplosionDrawAt(pos position, fg uicolor) {
 	if mons.Exists() || g.Player.Pos == pos {
 		r = '√'
 	}
-	//ui.DrawAtPosition(pos, true, r, fg, bgColor)
 	ui.DrawAtPosition(pos, true, r, bgColor, fg)
 }
 
@@ -119,7 +118,7 @@ func (ui *gameui) NoiseAnimation(noises []position) {
 	if DisableAnimations {
 		return
 	}
-	ui.LOSWavesAnimation(DefaultLOSRange, WaveNoise)
+	ui.LOSWavesAnimation(DefaultLOSRange, WaveMagicNoise)
 	colors := []uicolor{ColorFgSleepingMonster, ColorFgMagicPlace}
 	for i := 0; i < 2; i++ {
 		for _, pos := range noises {
@@ -164,8 +163,14 @@ func (ui *gameui) ExplosionAnimation(es explosionStyle, pos position) {
 	}
 }
 
-func (g *game) Waves(maxCost int) (dists []int, cdists map[int][]int) {
-	dij := &noisePath{game: g}
+func (g *game) Waves(maxCost int, ws wavestyle) (dists []int, cdists map[int][]int) {
+	var dij Dijkstrer
+	switch ws {
+	case WaveMagicNoise:
+		dij = &gridPath{dungeon: g.Dungeon}
+	default:
+		dij = &noisePath{game: g}
+	}
 	nm := Dijkstra(dij, []position{g.Player.Pos}, maxCost)
 	cdists = make(map[int][]int)
 	for pos, n := range nm {
@@ -179,7 +184,7 @@ func (g *game) Waves(maxCost int) (dists []int, cdists map[int][]int) {
 }
 
 func (ui *gameui) LOSWavesAnimation(r int, ws wavestyle) {
-	dists, cdists := ui.g.Waves(r)
+	dists, cdists := ui.g.Waves(r, ws)
 	for _, d := range dists {
 		wave := cdists[d]
 		if len(wave) == 0 {
@@ -192,8 +197,10 @@ func (ui *gameui) LOSWavesAnimation(r int, ws wavestyle) {
 type wavestyle int
 
 const (
-	WaveLOS wavestyle = iota
+	WaveMagicNoise wavestyle = iota
 	WaveNoise
+	WaveConfusion
+	WaveSlowing
 )
 
 func (ui *gameui) WaveAnimation(wave []int, ws wavestyle) {
@@ -201,17 +208,27 @@ func (ui *gameui) WaveAnimation(wave []int, ws wavestyle) {
 		return
 	}
 	ui.DrawDungeonView(NormalMode)
-	colors := [2]uicolor{ColorFgMagicPlace, ColorFgSleepingMonster}
+	//colors := [2]uicolor{ColorFgMagicPlace, ColorFgSleepingMonster}
 	for _, i := range wave {
 		pos := idxtopos(i)
 		switch ws {
-		case WaveLOS:
-			fg := colors[RandInt(2)]
+		case WaveConfusion:
+			fg := ColorFgConfusedMonster
+			if ui.g.Player.Sees(pos) {
+				ui.ExplosionDrawAt(pos, fg)
+			}
+		case WaveSlowing:
+			fg := ColorFgSlowedMonster
 			if ui.g.Player.Sees(pos) {
 				ui.ExplosionDrawAt(pos, fg)
 			}
 		case WaveNoise:
-			fg := colors[RandInt(2)]
+			fg := ColorFgWanderingMonster
+			if ui.g.Player.Sees(pos) {
+				ui.ExplosionDrawAt(pos, fg)
+			}
+		case WaveMagicNoise:
+			fg := ColorFgMagicPlace
 			ui.ExplosionDrawAt(pos, fg)
 		}
 	}

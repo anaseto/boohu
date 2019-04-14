@@ -29,6 +29,24 @@ func (dp *dungeonPath) Estimation(from, to position) int {
 	return from.Distance(to)
 }
 
+type gridPath struct {
+	dungeon   *dungeon
+	neighbors [4]position
+}
+
+func (gp *gridPath) Neighbors(pos position) []position {
+	nb := gp.neighbors[:0]
+	return pos.CardinalNeighbors(nb, func(npos position) bool { return npos.valid() })
+}
+
+func (gp *gridPath) Cost(from, to position) int {
+	return 1
+}
+
+func (gp *gridPath) Estimation(from, to position) int {
+	return from.Distance(to)
+}
+
 type mappingPath struct {
 	game      *game
 	neighbors [8]position
