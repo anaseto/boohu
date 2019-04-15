@@ -144,6 +144,7 @@ func (g *game) Rest(ev event) error {
 	if g.Player.Bananas <= 0 {
 		return errors.New("You cannot sleep without eating for dinner a banana first.")
 	}
+	g.ui.DrawMessage("Resting...")
 	g.WaitTurn(ev)
 	g.Resting = true
 	g.RestingTurns = RandInt(5) // you do not wake up when you want

@@ -792,9 +792,13 @@ func (ui *gameui) DrawKeysBasics(m uiMode) {
 }
 
 func (ui *gameui) DrawLoading() {
-	line := DungeonHeight - 2
+	ui.DrawMessage("Loading...")
+}
+
+func (ui *gameui) DrawMessage(s string) {
 	ui.DrawDungeonView(NoFlushMode)
-	ui.DrawColoredText("Loading...", DungeonWidth+2, line+1, ColorCyan)
+	line := DungeonHeight - 2
+	ui.DrawColoredText(s, DungeonWidth+2, line+1, ColorCyan)
 	ui.Flush()
 	time.Sleep(AnimDurShort)
 }
