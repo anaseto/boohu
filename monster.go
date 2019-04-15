@@ -846,7 +846,7 @@ func (m *monster) HandleMove(g *game) {
 			}
 			m.MoveTo(g, target)
 			m.Path = m.Path[:len(m.Path)-1]
-		} else if g.Dungeon.Cell(target).IsWall() {
+		} else if !g.Dungeon.Cell(target).IsPassable() {
 			m.Path = m.APath(g, m.Pos, m.Target)
 		} else {
 			m.InvertFoliage(g)
