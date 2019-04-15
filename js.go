@@ -448,14 +448,10 @@ func (ui *gameui) PollEvent() (in uiInput) {
 		in.key = "8"
 	case "ArrowDown":
 		in.key = "2"
-	case "Home":
-		in.key = "7"
-	case "End":
-		in.key = "1"
 	case "PageUp":
-		in.key = "9"
+		in.key = "u"
 	case "PageDown":
-		in.key = "3"
+		in.key = "d"
 	case "Numpad5", "Delete":
 		in.key = "5"
 	default:

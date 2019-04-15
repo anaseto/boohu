@@ -91,14 +91,10 @@ func (ui *gameui) PollEvent() (in uiInput) {
 				in.key = "8"
 			case termbox.KeyArrowRight:
 				in.key = "6"
-			case termbox.KeyHome:
-				in.key = "7"
-			case termbox.KeyEnd:
-				in.key = "1"
 			case termbox.KeyPgup:
-				in.key = "9"
+				in.key = "u"
 			case termbox.KeyPgdn:
-				in.key = "3"
+				in.key = "d"
 			case termbox.KeyDelete:
 				in.key = "5"
 			case termbox.KeyEsc, termbox.KeySpace:
