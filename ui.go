@@ -1425,8 +1425,12 @@ func (ui *gameui) WhichButton(col int) (menu, bool) {
 	}
 	end := len(MenuCols) - 1
 	switch g.Dungeon.Cell(g.Player.Pos).T {
-	case StairCell, BarrelCell, ScrollCell, MagaraCell, StoneCell:
+	case StairCell, BarrelCell, ScrollCell, MagaraCell, StoneCell, LightCell:
 		end++
+	case StoryCell:
+		if g.Objects.Story[g.Player.Pos] == StoryArtifactSealed || g.Objects.Story[g.Player.Pos] == StoryArtifact {
+			end++
+		}
 	}
 	for i, cols := range MenuCols[0:end] {
 		if cols[0] >= 0 && col >= cols[0] && col < cols[1] {
