@@ -26,6 +26,11 @@ func main() {
 	LinkColors()
 	gameConfig.DarkLOS = true
 	ApplyDarkLOS()
+	go func() {
+		for {
+			ui.ReqAnimFrame()
+		}
+	}()
 	for {
 		newGame(ui)
 	}
@@ -372,6 +377,8 @@ var interrupt chan bool
 func init() {
 	ch = make(chan uiInput, 100)
 	interrupt = make(chan bool)
+	flushdone = make(chan bool)
+	reqframe = make(chan bool)
 }
 
 func (ui *gameui) Close() {
@@ -379,8 +386,14 @@ func (ui *gameui) Close() {
 }
 
 func (ui *gameui) Flush() {
+	reqframe <- true
+	<-flushdone
+}
+
+func (ui *gameui) ReqAnimFrame() {
+	<-reqframe
 	js.Global().Get("window").Call("requestAnimationFrame",
-		js.FuncOf(func(this js.Value, args []js.Value) interface{} { ui.FlushCallback(); return nil }))
+		js.FuncOf(func(this js.Value, args []js.Value) interface{} { ui.FlushCallback(args[0]); return nil }))
 }
 
 func (ui *gameui) ApplyToggleLayoutWithClear(clear bool) {
@@ -410,12 +423,16 @@ func (ui *gameui) ApplyToggleLayout() {
 	ui.ApplyToggleLayoutWithClear(true)
 }
 
-func (ui *gameui) FlushCallback() {
+var flushdone chan bool
+var reqframe chan bool
+
+func (ui *gameui) FlushCallback(t js.Value) {
 	ui.DrawLogFrame()
 	for _, cdraw := range ui.g.DrawLog[len(ui.g.DrawLog)-1].Draws {
 		cell := cdraw.Cell
 		ui.Draw(cell, cdraw.X, cdraw.Y)
 	}
+	flushdone <- true
 }
 
 func (ui *gameui) PollEvent() (in uiInput) {
