@@ -522,7 +522,7 @@ func (ui *gameui) MenuSelectedAnimation(m menu, ok bool) {
 			t += 25
 		}
 		time.Sleep(t * time.Millisecond)
-		ui.DrawColoredText(m.String(), MenuCols[m][0], DungeonHeight, ColorViolet)
+		ui.DrawColoredText(message, MenuCols[m][0], DungeonHeight, ColorViolet)
 	}
 }
 
