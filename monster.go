@@ -614,9 +614,8 @@ func (m *monster) Explode(g *game, ev event) {
 				delete(g.Objects.Barrels, pos)
 			}
 			g.Stats.Digs++
-			if !g.Player.LOS[pos] {
-				g.TerrainKnowledge[pos] = c.T
-			} else {
+			g.UpdateKnowledge(pos, c.T)
+			if g.Player.Sees(pos) {
 				g.ui.WallExplosionAnimation(pos)
 			}
 			g.MakeNoise(WallNoise, pos)
@@ -740,7 +739,7 @@ func (m *monster) HandleMonsSpecifics(g *game) (done bool) {
 				if g.Player.Sees(m.Pos) {
 					g.Printf("%s makes a new fire.", m.Kind.Definite(true))
 				} else {
-					g.TerrainKnowledge[m.Pos] = ExtinguishedLightCell
+					g.UpdateKnowledge(m.Pos, ExtinguishedLightCell)
 				}
 				return true
 			} else if !on && m.Sees(g, pos) {
@@ -830,9 +829,7 @@ func (m *monster) HandleMove(g *game) {
 				delete(g.Objects.Barrels, target)
 			}
 			g.Stats.Digs++
-			if !g.Player.Sees(target) {
-				g.TerrainKnowledge[m.Pos] = c.T
-			}
+			g.UpdateKnowledge(target, c.T)
 			g.MakeNoise(WallNoise, m.Pos)
 			g.Fog(m.Pos, 1, g.Ev)
 			if g.Player.Pos.Distance(target) < 12 {
@@ -971,13 +968,12 @@ func (m *monster) InvertFoliage(g *game) {
 		g.Dungeon.SetCell(m.Pos, GroundCell)
 		invert = true
 	}
-	if !g.Player.Sees(m.Pos) && invert {
-		_, ok := g.TerrainKnowledge[m.Pos]
-		if !ok {
-			g.TerrainKnowledge[m.Pos] = c.T
+	if invert {
+		if g.Player.Sees(m.Pos) {
+			g.ComputeLOS()
+		} else {
+			g.UpdateKnowledge(m.Pos, c.T)
 		}
-	} else if invert {
-		g.ComputeLOS()
 	}
 }
 

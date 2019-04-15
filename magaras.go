@@ -598,9 +598,7 @@ func (g *game) MagicalBarrierAt(pos position, ev event) {
 	if g.Dungeon.Cell(pos).T == WallCell || g.Dungeon.Cell(pos).T == BarrierCell {
 		return
 	}
-	if !g.Player.Sees(pos) {
-		g.TerrainKnowledge[pos] = g.Dungeon.Cell(pos).T
-	}
+	g.UpdateKnowledge(pos, g.Dungeon.Cell(pos).T)
 	g.CreateMagicalBarrierAt(pos, ev)
 	g.ComputeLOS()
 }

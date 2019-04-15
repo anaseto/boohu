@@ -259,7 +259,7 @@ func (cev *cloudEvent) Action(g *game) {
 		t := g.MagicalBarriers[cev.Pos]
 		if !g.Player.Sees(cev.Pos) && g.Dungeon.Cell(cev.Pos).T == BarrierCell {
 			// XXX does not handle all cases
-			g.TerrainKnowledge[cev.Pos] = BarrierCell
+			g.UpdateKnowledge(cev.Pos, BarrierCell)
 		} else {
 			delete(g.MagicalBarriers, cev.Pos)
 			delete(g.TerrainKnowledge, cev.Pos)

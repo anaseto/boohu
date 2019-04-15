@@ -390,3 +390,13 @@ func (g *game) PutStatus(st status, duration int) bool {
 	}
 	return true
 }
+
+func (g *game) UpdateKnowledge(pos position, t terrain) {
+	if g.Player.Sees(pos) {
+		return
+	}
+	_, ok := g.TerrainKnowledge[pos]
+	if !ok {
+		g.TerrainKnowledge[pos] = t
+	}
+}
