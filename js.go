@@ -327,22 +327,17 @@ func (g *game) WriteDump() error {
 
 func (ui *gameui) Init() error {
 	canvas := js.Global().Get("document").Call("getElementById", "gamecanvas")
-	canvas.Call(
+	js.Global().Get("document").Call(
 		"addEventListener", "keypress", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			e := args[0]
+			if !e.Get("ctrlKey").Bool() && !e.Get("metaKey").Bool() {
+				e.Call("preventDefault")
+			}
 			s := e.Get("key").String()
 			if s == "Unidentified" {
 				s = e.Get("code").String()
 			}
 			ch <- uiInput{key: s}
-			return nil
-		}))
-	js.Global().Get("document").Call(
-		"addEventListener", "keypress", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-			e := args[0]
-			if !e.Get("ctrlKey").Bool() && !e.Get("metaKey").Bool() && js.Global().Get("Object").Call("is", js.Global().Get("document").Get("activeElement"), canvas).Bool() {
-				e.Call("preventDefault")
-			}
 			return nil
 		}))
 	canvas.Call(
