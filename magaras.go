@@ -586,6 +586,9 @@ func (g *game) EvokeObstruction(ev event) error {
 			break
 		}
 	}
+	if len(targets) == 0 {
+		return errors.New("No suitable monsters.")
+	}
 	g.Print("Magical barriers emerged.")
 	g.ui.BeamsAnimation(targets)
 	return nil
