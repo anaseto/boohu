@@ -255,7 +255,7 @@ func (g *game) MovePlayer(pos position, ev event) error {
 		return errors.New("You cannot move into a magical barrier.")
 	} else if c.T == WindowCell && !g.Player.HasStatus(StatusDig) {
 		return errors.New("You cannot pass through the closed window.")
-	} else if c.T == BarrelCell && g.MonsterLOS[g.Player.Pos.idx()] {
+	} else if c.T == BarrelCell && g.MonsterLOS[g.Player.Pos] {
 		return errors.New("You cannot enter a barrel while seen.")
 	}
 	delay := 10

@@ -218,8 +218,7 @@ func (pos position) Dir(from position) direction {
 	}
 }
 
-func (pos position) Parents(from position) []position {
-	p := []position{}
+func (pos position) Parents(from position, p []position) []position {
 	switch pos.Dir(from) {
 	case E:
 		p = append(p, pos.W())

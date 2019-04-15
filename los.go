@@ -7,7 +7,9 @@ type raynode struct {
 type rayMap map[position]raynode
 
 func (g *game) bestParent(rm rayMap, from, pos position, rs raystyle) (position, int) {
-	p := pos.Parents(from)
+	var parents [2]position
+	p := parents[:0]
+	p = pos.Parents(from, p)
 	b := p[0]
 	if len(p) > 1 && rm[p[1]].Cost+g.losCost(from, p[1], pos, rs) < rm[b].Cost+g.losCost(from, b, pos, rs) {
 		b = p[1]
@@ -437,8 +439,8 @@ func (m *monster) Sees(g *game, pos position) bool {
 }
 
 func (g *game) ComputeMonsterLOS() {
-	for i := 0; i < DungeonNCells; i++ {
-		g.MonsterLOS[i] = false
+	for k := range g.MonsterLOS {
+		delete(g.MonsterLOS, k)
 	}
 	for _, mons := range g.Monsters {
 		if !mons.Exists() || !g.Player.Sees(mons.Pos) {
@@ -449,7 +451,7 @@ func (g *game) ComputeMonsterLOS() {
 				continue
 			}
 			if mons.Sees(g, pos) {
-				g.MonsterLOS[pos.idx()] = true
+				g.MonsterLOS[pos] = true
 			}
 		}
 		// unoptimized version for testing:
@@ -462,7 +464,7 @@ func (g *game) ComputeMonsterLOS() {
 		//}
 		//}
 	}
-	if g.MonsterLOS[g.Player.Pos.idx()] {
+	if g.MonsterLOS[g.Player.Pos] {
 		g.Player.Statuses[StatusUnhidden] = 1
 		g.Player.Statuses[StatusHidden] = 0
 	} else {
