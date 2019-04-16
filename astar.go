@@ -48,7 +48,6 @@ var nodeCache nodeMap
 var queueCache priorityQueue
 
 func init() {
-	nodeCache = nodeMap{}
 	nodeCache.Nodes = make([]node, DungeonNCells)
 	queueCache = make(priorityQueue, 0, DungeonNCells)
 }
