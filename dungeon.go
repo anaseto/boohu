@@ -1420,6 +1420,9 @@ func (dg *dgen) InsideCell(g *game) position {
 		if mons.Exists() {
 			continue
 		}
+		if pos.Distance(g.Player.Pos) < DefaultLOSRange {
+			continue
+		}
 		c := dg.d.Cell(pos)
 		if dg.room[pos] && (c.T == FungusCell || c.T == GroundCell) {
 			return pos
