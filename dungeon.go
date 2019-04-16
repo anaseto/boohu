@@ -1611,7 +1611,7 @@ func (dg *dgen) GenCellularAutomataCaveMap() {
 		// refresh cells
 		dg.d.Cells = make([]cell, DungeonNCells)
 	}
-	dg.Foliage()
+	dg.Foliage(false)
 }
 
 func (dg *dgen) RunCellularAutomataCave() bool {
@@ -1649,15 +1649,19 @@ func (dg *dgen) RunCellularAutomataCave() bool {
 	return true
 }
 
-func (dg *dgen) Foliage() {
+func (dg *dgen) Foliage(less bool) {
 	// use same structure as for the dungeon
 	// walls will become foliage
 	d := &dungeon{}
 	d.Cells = make([]cell, DungeonNCells)
+	limit := 43
+	if less {
+		limit = 40
+	}
 	for i := range d.Cells {
 		r := RandInt(100)
 		pos := idxtopos(i)
-		if r >= 43 {
+		if r >= limit {
 			d.SetCell(pos, WallCell)
 		} else {
 			d.SetCell(pos, GroundCell)
@@ -1732,7 +1736,7 @@ func (dg *dgen) GenCaveMap() {
 			pos = lastValid
 		}
 	}
-	dg.Foliage()
+	dg.Foliage(false)
 }
 
 func (d *dungeon) DigBlock(block []position) []position {
@@ -1789,7 +1793,7 @@ loop:
 			}
 		}
 	}
-	dg.Foliage()
+	dg.Foliage(true)
 }
 
 // monster generation
