@@ -173,9 +173,10 @@ func (g *game) Waves(maxCost int, ws wavestyle) (dists []int, cdists map[int][]i
 	}
 	nm := Dijkstra(dij, []position{g.Player.Pos}, maxCost)
 	cdists = make(map[int][]int)
-	for pos, n := range nm {
+	nm.iter(g.Player.Pos, func(n *node) {
+		pos := n.Pos
 		cdists[n.Cost] = append(cdists[n.Cost], pos.idx())
-	}
+	})
 	for dist, _ := range cdists {
 		dists = append(dists, dist)
 	}

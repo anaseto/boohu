@@ -181,9 +181,10 @@ func (g *game) MagicMapping(ev event, maxdist int) error {
 	dp := &mappingPath{game: g}
 	nm := Dijkstra(dp, []position{g.Player.Pos}, maxdist)
 	cdists := make(map[int][]int)
-	for pos, n := range nm {
+	nm.iter(g.Player.Pos, func(n *node) {
+		pos := n.Pos
 		cdists[n.Cost] = append(cdists[n.Cost], pos.idx())
-	}
+	})
 	var dists []int
 	for dist, _ := range cdists {
 		dists = append(dists, dist)
@@ -263,7 +264,7 @@ func (g *game) ActivateStone() (err error) {
 			if m.State == Resting {
 				continue
 			}
-			_, ok := nm[m.Pos]
+			_, ok := nm.at(m.Pos)
 			if !ok {
 				continue
 			}

@@ -350,22 +350,25 @@ func (g *game) ComputeNoise() {
 	rg := DefaultLOSRange
 	nm := Dijkstra(dij, []position{g.Player.Pos}, rg)
 	count := 0
-	noise := map[position]bool{}
+	for k := range g.Noise {
+		delete(g.Noise, k)
+	}
 	rmax := 2
 	if g.Player.Inventory.Body == CloakHear {
 		rmax += 2
 	}
 	// TODO: maybe if they're close enough you could hear them breathe too, or something like that.
-	for pos := range nm {
+	nm.iter(g.Player.Pos, func(n *node) {
+		pos := n.Pos
 		if g.Player.Sees(pos) {
-			continue
+			return
 		}
 		mons := g.MonsterAt(pos)
 		if mons.Exists() && mons.State != Resting && mons.State != Watching && RandInt(rmax) > 0 {
 			switch mons.Kind {
 			case MonsMirrorSpecter, MonsSatowalgaPlant, MonsButterfly:
 				if mons.Kind == MonsMirrorSpecter && g.Player.Inventory.Body == CloakHear {
-					noise[pos] = true
+					g.Noise[pos] = true
 					g.Print("You hear an imperceptible air movement.")
 					count++
 				}
@@ -380,32 +383,31 @@ func (g *game) ComputeNoise() {
 				//count++
 				//case MonsWorm, MonsAcidMound:
 			case MonsWingedMilfid:
-				noise[pos] = true
+				g.Noise[pos] = true
 				g.Print("You hear the flapping of wings.")
 				count++
 			case MonsOricCelmist, MonsEarthDragon, MonsTreeMushroom:
-				noise[pos] = true
+				g.Noise[pos] = true
 				g.Print("You hear heavy footsteps.")
 				count++
 			case MonsWorm:
-				noise[pos] = true
+				g.Noise[pos] = true
 				g.Print("You hear a creep noise.")
 				count++
 			case MonsHound, MonsBlinkingFrog:
-				noise[pos] = true
+				g.Noise[pos] = true
 				g.Print("You hear light footsteps.")
 				count++
 			default:
-				noise[pos] = true
+				g.Noise[pos] = true
 				g.Print("You hear footsteps.")
 				count++
 			}
 		}
-	}
+	})
 	if count > 0 {
 		g.StopAuto()
 	}
-	g.Noise = noise
 }
 
 func (p *player) Sees(pos position) bool {

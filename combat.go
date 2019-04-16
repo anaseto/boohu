@@ -48,7 +48,7 @@ func (g *game) MakeNoise(noise int, at position) {
 		if m.State == Hunting {
 			continue
 		}
-		n, ok := nm[m.Pos]
+		n, ok := nm.at(m.Pos)
 		if !ok {
 			continue
 		}

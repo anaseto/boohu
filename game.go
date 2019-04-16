@@ -334,6 +334,7 @@ func (g *game) InitFirstLevel() {
 
 func (g *game) InitLevelStructures() {
 	g.MonstersPosCache = make([]int, DungeonNCells)
+	g.Noise = map[position]bool{}
 	g.TerrainKnowledge = map[position]terrain{}
 	g.ExclusionsMap = map[position]bool{}
 	g.MagicalBarriers = map[position]terrain{}

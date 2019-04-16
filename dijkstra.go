@@ -10,19 +10,18 @@ type Dijkstrer interface {
 }
 
 func Dijkstra(dij Dijkstrer, sources []position, maxCost int) nodeMap {
-	nodeCache = nodeCache[:0]
-	nm := nodeMap{}
+	nodeCache.Index++
 	nqs := queueCache[:0]
 	nq := &nqs
 	heap.Init(nq)
 	for _, f := range sources {
-		n := nm.get(f)
+		n := nodeCache.get(f)
 		n.Open = true
 		heap.Push(nq, n)
 	}
 	for {
 		if nq.Len() == 0 {
-			return nm
+			return nodeCache
 		}
 		current := heap.Pop(nq).(*node)
 		current.Open = false
@@ -30,7 +29,7 @@ func Dijkstra(dij Dijkstrer, sources []position, maxCost int) nodeMap {
 
 		for _, neighbor := range dij.Neighbors(current.Pos) {
 			cost := current.Cost + dij.Cost(current.Pos, neighbor)
-			neighborNode := nm.get(neighbor)
+			neighborNode := nodeCache.get(neighbor)
 			if cost < neighborNode.Cost {
 				if neighborNode.Open {
 					heap.Remove(nq, neighborNode.Index)

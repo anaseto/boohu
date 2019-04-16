@@ -309,14 +309,15 @@ func (cev *cloudEvent) Action(g *game) {
 func (g *game) NightFog(at position, radius int, ev event) {
 	dij := &noisePath{game: g}
 	nm := Dijkstra(dij, []position{at}, radius)
-	for pos := range nm {
+	nm.iter(at, func(n *node) {
+		pos := n.Pos
 		_, ok := g.Clouds[pos]
 		if !ok {
 			g.Clouds[pos] = CloudNight
 			g.PushEvent(&cloudEvent{ERank: ev.Rank() + DurationCloudProgression, EAction: NightProgression, Pos: pos})
 			g.MakeCreatureSleep(pos, ev)
 		}
-	}
+	})
 	g.ComputeLOS()
 }
 

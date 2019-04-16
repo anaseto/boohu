@@ -757,7 +757,7 @@ func (m *monster) HandleWatching(g *game) {
 		if m.Kind == MonsHound {
 			dij := &monPath{game: g, monster: m}
 			nm := Dijkstra(dij, []position{m.Pos}, 5)
-			if _, ok := nm[g.Player.Pos]; ok {
+			if _, ok := nm.at(g.Player.Pos); ok {
 				m.Target = g.Player.Pos
 				m.State = Wandering
 			}
@@ -1456,7 +1456,7 @@ func (m *monster) GatherBand(g *game) {
 			if mons.State == Hunting && m.State != Hunting {
 				continue
 			}
-			n, ok := nm[mons.Pos]
+			n, ok := nm.at(mons.Pos)
 			if !ok || n.Cost > 4 || mons.State == Resting && mons.Status(MonsExhausted) {
 				continue
 			}

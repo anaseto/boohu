@@ -329,13 +329,14 @@ func (g *game) MPRegen(ev event) {
 func (g *game) SwiftFog(ev event) {
 	dij := &noisePath{game: g}
 	nm := Dijkstra(dij, []position{g.Player.Pos}, 2)
-	for pos := range nm {
+	nm.iter(g.Player.Pos, func(n *node) {
+		pos := n.Pos
 		_, ok := g.Clouds[pos]
 		if !ok && g.Dungeon.Cell(pos).AllowsFog() {
 			g.Clouds[pos] = CloudFog
 			g.PushEvent(&cloudEvent{ERank: ev.Rank() + DurationFog + RandInt(DurationFog/2), EAction: CloudEnd, Pos: pos})
 		}
-	}
+	})
 	g.PutStatus(StatusSwift, DurationShortSwiftness)
 	g.ComputeLOS()
 	g.Print("You feel an energy burst and smoke comes out from you.")

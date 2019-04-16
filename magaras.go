@@ -390,13 +390,14 @@ func (g *game) EvokeFog(ev event) error {
 func (g *game) Fog(at position, radius int, ev event) {
 	dij := &noisePath{game: g}
 	nm := Dijkstra(dij, []position{at}, radius)
-	for pos := range nm {
+	nm.iter(at, func(n *node) {
+		pos := n.Pos
 		_, ok := g.Clouds[pos]
 		if !ok && g.Dungeon.Cell(pos).AllowsFog() {
 			g.Clouds[pos] = CloudFog
 			g.PushEvent(&cloudEvent{ERank: ev.Rank() + DurationFog + RandInt(DurationFog/2), EAction: CloudEnd, Pos: pos})
 		}
-	}
+	})
 	g.ComputeLOS()
 }
 
@@ -490,15 +491,14 @@ func (g *game) EvokeLignification(ev event) error {
 func (g *game) EvokeNoise(ev event) error {
 	dij := &noisePath{game: g}
 	nm := Dijkstra(dij, []position{g.Player.Pos}, 23)
-	nmlosr := Dijkstra(dij, []position{g.Player.Pos}, DefaultLOSRange)
 	noises := []position{}
 	g.NoiseIllusion = map[position]bool{}
 	for _, mons := range g.Monsters {
 		if !mons.Exists() {
 			continue
 		}
-		_, ok := nmlosr[mons.Pos]
-		if !ok {
+		n, ok := nm.at(mons.Pos)
+		if !ok || n.Cost > DefaultLOSRange {
 			continue
 		}
 		if mons.SeesPlayer(g) || mons.Kind == MonsSatowalgaPlant {
@@ -506,11 +506,11 @@ func (g *game) EvokeNoise(ev event) error {
 		}
 		mp := &monPath{game: g, monster: mons}
 		target := mons.Pos
-		best := nm[target].Cost
+		best := n.Cost
 		for {
 			ncost := best
 			for _, pos := range mp.Neighbors(target) {
-				node, ok := nm[pos]
+				node, ok := nm.at(pos)
 				if !ok {
 					continue
 				}

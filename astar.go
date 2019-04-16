@@ -28,34 +28,69 @@ import (
 )
 
 type node struct {
-	Pos    position
-	Cost   int
-	Rank   int
-	Parent *position
-	Open   bool
-	Closed bool
-	Index  int
-	Num    int
+	Pos        position
+	Cost       int
+	Rank       int
+	Parent     *position
+	Open       bool
+	Closed     bool
+	Index      int
+	Num        int
+	CacheIndex int
 }
 
-type nodeMap map[position]*node
+type nodeMap struct {
+	Nodes []node
+	Index int
+}
 
-var nodeCache []node
+var nodeCache nodeMap
 var queueCache priorityQueue
 
 func init() {
-	nodeCache = make([]node, 0, DungeonNCells)
+	nodeCache = nodeMap{}
+	nodeCache.Nodes = make([]node, DungeonNCells)
 	queueCache = make(priorityQueue, 0, DungeonNCells)
 }
 
 func (nm nodeMap) get(p position) *node {
-	n, ok := nm[p]
-	if !ok {
-		nodeCache = append(nodeCache, node{Pos: p})
-		n = &nodeCache[len(nodeCache)-1]
-		nm[p] = n
+	n := &nm.Nodes[p.idx()]
+	if n.CacheIndex != nm.Index {
+		nm.Nodes[p.idx()] = node{Pos: p, CacheIndex: nm.Index}
 	}
 	return n
+}
+
+func (nm nodeMap) at(p position) (*node, bool) {
+	n := &nm.Nodes[p.idx()]
+	if n.CacheIndex != nm.Index {
+		return nil, false
+	}
+	return n, true
+}
+
+var iterVisitedCache [DungeonNCells]int
+var iterQueueCache [DungeonNCells]int
+
+func (nm nodeMap) iter(pos position, f func(*node)) {
+	nb := make([]position, 4)
+	var qstart, qend int
+	iterQueueCache[qend] = pos.idx()
+	qend++
+	for qstart < qend {
+		pos = idxtopos(iterQueueCache[qstart])
+		qstart++
+		nb = pos.CardinalNeighbors(nb, func(npos position) bool { return npos.valid() })
+		for _, npos := range nb {
+			n := &nm.Nodes[npos.idx()]
+			if n.CacheIndex == nm.Index && iterVisitedCache[npos.idx()] != nm.Index {
+				f(n)
+				iterQueueCache[qend] = npos.idx()
+				qend++
+				iterVisitedCache[npos.idx()] = nm.Index
+			}
+		}
+	}
 }
 
 type Astar interface {
@@ -65,12 +100,11 @@ type Astar interface {
 }
 
 func AstarPath(ast Astar, from, to position) (path []position, length int, found bool) {
-	nodeCache = nodeCache[:0]
-	nm := nodeMap{}
+	nodeCache.Index++
 	nqs := queueCache[:0]
 	nq := &nqs
 	heap.Init(nq)
-	fromNode := nm.get(from)
+	fromNode := nodeCache.get(from)
 	fromNode.Open = true
 	num := 0
 	fromNode.Num = num
@@ -93,14 +127,14 @@ func AstarPath(ast Astar, from, to position) (path []position, length int, found
 				if curr.Parent == nil {
 					break
 				}
-				curr = nm[*curr.Parent]
+				curr, _ = nodeCache.at(*curr.Parent)
 			}
 			return p, current.Cost, true
 		}
 
 		for _, neighbor := range ast.Neighbors(current.Pos) {
 			cost := current.Cost + ast.Cost(current.Pos, neighbor)
-			neighborNode := nm.get(neighbor)
+			neighborNode := nodeCache.get(neighbor)
 			if cost < neighborNode.Cost {
 				if neighborNode.Open {
 					heap.Remove(nq, neighborNode.Index)
