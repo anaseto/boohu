@@ -41,9 +41,11 @@ type node struct {
 type nodeMap map[position]*node
 
 var nodeCache []node
+var queueCache priorityQueue
 
 func init() {
 	nodeCache = make([]node, 0, DungeonNCells)
+	queueCache = make(priorityQueue, 0, DungeonNCells)
 }
 
 func (nm nodeMap) get(p position) *node {
@@ -65,7 +67,8 @@ type Astar interface {
 func AstarPath(ast Astar, from, to position) (path []position, length int, found bool) {
 	nodeCache = nodeCache[:0]
 	nm := nodeMap{}
-	nq := &priorityQueue{}
+	nqs := queueCache[:0]
+	nq := &nqs
 	heap.Init(nq)
 	fromNode := nm.get(from)
 	fromNode.Open = true

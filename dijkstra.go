@@ -12,7 +12,8 @@ type Dijkstrer interface {
 func Dijkstra(dij Dijkstrer, sources []position, maxCost int) nodeMap {
 	nodeCache = nodeCache[:0]
 	nm := nodeMap{}
-	nq := &priorityQueue{}
+	nqs := queueCache[:0]
+	nq := &nqs
 	heap.Init(nq)
 	for _, f := range sources {
 		n := nm.get(f)
