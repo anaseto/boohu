@@ -263,7 +263,10 @@ func (g *game) MovePlayer(pos position, ev event) error {
 	mons := g.MonsterAt(pos)
 	if !mons.Exists() {
 		if g.Player.HasStatus(StatusLignification) {
-			return errors.New("You cannot move while lignified")
+			return errors.New("You cannot move while lignified.")
+		}
+		if c.T == ChasmCell {
+			return errors.New("You cannot move into the abyss.")
 		}
 		if c.T == BarrelCell {
 			g.Print("You hide yourself inside the barrel.")

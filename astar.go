@@ -75,6 +75,7 @@ func (nm nodeMap) iter(pos position, f func(*node)) {
 	nb := make([]position, 4)
 	var qstart, qend int
 	iterQueueCache[qend] = pos.idx()
+	iterVisitedCache[qend] = nm.Index
 	qend++
 	for qstart < qend {
 		pos = idxtopos(iterQueueCache[qstart])

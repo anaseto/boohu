@@ -27,11 +27,12 @@ const (
 	ItemCell
 	BarrierCell
 	WindowCell
+	ChasmCell
 )
 
 func (c cell) IsPassable() bool {
 	switch c.T {
-	case WallCell, BarrelCell, TableCell, TreeCell, HoledWallCell, BarrierCell, WindowCell, StoryCell:
+	case WallCell, BarrelCell, TableCell, TreeCell, HoledWallCell, BarrierCell, WindowCell, StoryCell, ChasmCell:
 		return false
 	default:
 		return true
@@ -58,7 +59,7 @@ func (c cell) CoversPlayer() bool {
 
 func (t terrain) IsPlayerPassable() bool {
 	switch t {
-	case WallCell, BarrierCell, WindowCell:
+	case WallCell, BarrierCell, WindowCell, ChasmCell:
 		return false
 	default:
 		return true
@@ -94,7 +95,7 @@ func (c cell) Hides() bool {
 
 func (c cell) IsIlluminable() bool {
 	switch c.T {
-	case WallCell, BarrelCell, TableCell, TreeCell, HoledWallCell, BarrierCell, WindowCell:
+	case WallCell, BarrelCell, TableCell, TreeCell, HoledWallCell, BarrierCell, WindowCell, ChasmCell:
 		return false
 	}
 	return true
@@ -185,6 +186,8 @@ func (c cell) ShortDesc(g *game, pos position) (desc string) {
 		desc = "a temporal magical barrier"
 	case WindowCell:
 		desc = "a window"
+	case ChasmCell:
+		desc = "a chasm"
 	}
 	return desc
 }
@@ -192,7 +195,7 @@ func (c cell) ShortDesc(g *game, pos position) (desc string) {
 func (c cell) Desc(g *game, pos position) (desc string) {
 	switch c.T {
 	case WallCell:
-		desc = "A wall is an impassable pile of rocks."
+		desc = "A wall is a pile of rocks."
 	case GroundCell:
 		desc = "This is just plain ground."
 	case DoorCell:
@@ -229,6 +232,11 @@ func (c cell) Desc(g *game, pos position) (desc string) {
 		desc = "A temporal magical barrier."
 	case WindowCell:
 		desc = "A transparent window in the wall."
+	case ChasmCell:
+		desc = "A chasm."
+	}
+	if c.T.IsPlayerPassable() {
+		desc += " It is impassable."
 	}
 	if c.Flammable() {
 		desc += " It is flammable."
@@ -286,6 +294,8 @@ func (c cell) Style(g *game, pos position) (r rune, fg uicolor) {
 		r, fg = 'Ξ', ColorFgMagicPlace
 	case WindowCell:
 		r, fg = 'Θ', ColorViolet
+	case ChasmCell:
+		r, fg = ':', ColorFgLOS
 	}
 	return r, fg
 }

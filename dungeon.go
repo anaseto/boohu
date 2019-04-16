@@ -306,7 +306,8 @@ func (dg *dgen) ConnectRoomsShortestPath(i, j int) bool {
 		if !pos.valid() {
 			panic(fmt.Sprintf("position %v from %v to %v", pos, e1pos, e2pos))
 		}
-		if dg.d.Cell(pos).T == WallCell {
+		t := dg.d.Cell(pos).T
+		if t == WallCell || t == ChasmCell {
 			dg.d.SetCell(pos, GroundCell)
 			dg.tunnel[pos] = true
 		}
@@ -1082,6 +1083,7 @@ func (g *game) GenRoomTunnels(ml maplayout) {
 	dg.PutDoors(g)
 	dg.PlayerStartCell(g, places)
 	dg.ClearUnconnected(g)
+	dg.GenChasm()
 	if g.Depth < MaxDepth {
 		if g.Params.Blocked[g.Depth] {
 			dg.GenStairs(g, BlockedStair)
@@ -1648,6 +1650,73 @@ func (dg *dgen) RunCellularAutomataCave() bool {
 	}
 	return true
 }
+
+func (dg *dgen) GenChasm() {
+	walls := []position{}
+	for i := 0; i < DungeonNCells; i++ {
+		pos := idxtopos(i)
+		if pos.X < 10 || pos.Y < 5 || pos.X > DungeonWidth-10 || pos.Y > DungeonHeight-5 {
+			continue
+		}
+		c := dg.d.Cell(pos)
+		if c.T == WallCell && !dg.room[pos] {
+			walls = append(walls, pos)
+		}
+	}
+	count := 0
+	var bestpos = walls[RandInt(len(walls))]
+	var bestsize int
+	d := dg.d
+	for {
+		pos := walls[RandInt(len(walls))]
+		_, size := d.Connected(pos, func(npos position) bool {
+			return npos.valid() && dg.d.Cell(npos).T == WallCell && !dg.room[npos] && pos.Distance(npos) < 10+RandInt(10)
+		})
+		count++
+		if Abs(bestsize-90) > Abs(size-90) {
+			bestsize = size
+			bestpos = pos
+		}
+		if count > 15 || Abs(size-90) < 25 {
+			break
+		}
+	}
+	conn, _ := d.Connected(bestpos, func(npos position) bool {
+		return npos.valid() && dg.d.Cell(npos).T == WallCell && !dg.room[npos] && bestpos.Distance(npos) < 10+RandInt(10)
+	})
+	for pos := range conn {
+		d.SetCell(pos, ChasmCell)
+	}
+}
+
+//func (dg *dgen) GenChasm() {
+//pos := position{20 + RandInt(DungeonWidth-21), 7 + RandInt(DungeonHeight-8)}
+//size := 100 + RandInt(100)
+//var queue [DungeonNCells]int
+//var visited [DungeonNCells]bool
+//var qstart, qend int
+//visited[pos.idx()] = true
+//queue[qend] = pos.idx()
+//qend++
+//nb := make([]position, 4)
+//for qstart < qend && size > 0 {
+//cidx := queue[qstart]
+//qstart++
+//cpos := idxtopos(cidx)
+//dg.d.SetCell(cpos, ChasmCell)
+//size--
+//for _, npos := range cpos.CardinalNeighbors(nb, func(p position) bool { return p.valid() }) {
+//nidx := npos.idx()
+//if !visited[nidx] {
+//if RandInt(3) > 0 || size > 50 || qend-qstart < 4 {
+//queue[qend] = nidx
+//qend++
+//}
+//visited[nidx] = true
+//}
+//}
+//}
+//}
 
 func (dg *dgen) Foliage(less bool) {
 	// use same structure as for the dungeon
