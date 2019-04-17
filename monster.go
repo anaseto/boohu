@@ -654,6 +654,16 @@ func (m *monster) NaturalAwake(g *game) {
 	m.GatherBand(g)
 }
 
+func (m *monster) CanPass(g *game, pos position) bool {
+	if !pos.valid() {
+		return false
+	}
+	c := g.Dungeon.Cell(pos)
+	return c.IsPassable() || c.IsLevitatePassable() && m.Kind.CanFly() ||
+		c.IsSwimPassable() && (m.Kind.CanSwim() || m.Kind.CanFly()) ||
+		c.T == HoledWallCell && m.Kind.Size() == MonsSmall
+}
+
 func (m *monster) RandomFreeNeighbor(g *game) position {
 	pos := m.Pos
 	neighbors := [4]position{pos.E(), pos.W(), pos.N(), pos.S()}
@@ -821,8 +831,10 @@ func (m *monster) HandleEndPath(g *game) {
 	switch m.State {
 	case Wandering, Hunting:
 		if !m.Kind.Peaceful() {
-			m.StartWatching()
-			m.Alternate()
+			if !m.SeesPlayer(g) {
+				m.StartWatching()
+				m.Alternate()
+			}
 		} else {
 			m.Target = m.NextTarget(g)
 		}
@@ -862,7 +874,7 @@ func (m *monster) HandleMove(g *game) {
 			}
 			m.MoveTo(g, target)
 			m.Path = m.Path[:len(m.Path)-1]
-		} else if !g.Dungeon.Cell(target).IsPassable() {
+		} else if !m.CanPass(g, target) {
 			m.Path = m.APath(g, m.Pos, m.Target)
 		} else {
 			m.InvertFoliage(g)
