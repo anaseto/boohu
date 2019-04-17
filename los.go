@@ -490,6 +490,9 @@ func (g *game) ComputeLights() {
 		if !on {
 			continue
 		}
+		if lpos.Distance(g.Player.Pos) > DefaultLOSRange+lightrange && g.Dungeon.Cell(g.Player.Pos).T != TreeCell {
+			continue
+		}
 		g.buildRayMap(lpos, lightrange, g.RaysCache)
 		for pos, n := range g.RaysCache {
 			c := g.Dungeon.Cell(pos)
@@ -500,6 +503,9 @@ func (g *game) ComputeLights() {
 	}
 	for _, mons := range g.Monsters {
 		if !mons.Exists() || mons.Kind != MonsButterfly {
+			continue
+		}
+		if mons.Pos.Distance(g.Player.Pos) > DefaultLOSRange+lightrange && g.Dungeon.Cell(g.Player.Pos).T != TreeCell {
 			continue
 		}
 		g.buildRayMap(mons.Pos, lightrange, g.RaysCache)
