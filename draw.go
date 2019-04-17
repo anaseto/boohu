@@ -1129,7 +1129,7 @@ func (ui *gameui) DrawStatusLine() {
 	col++
 	ui.SetMapCell(col, line, ')', ColorYellow, ColorBg)
 	col++
-	banana := fmt.Sprintf(":%1d ", g.Player.Bananas)
+	banana := fmt.Sprintf(":%1d/%1d ", g.Player.Bananas, MaxBananas)
 	ui.DrawColoredText(banana, col, line, ColorFg)
 	col += utf8.RuneCountInString(banana)
 
