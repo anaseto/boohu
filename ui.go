@@ -874,7 +874,7 @@ func (ui *gameui) HandleKey(rka runeKeyAction) (err error, again bool, quit bool
 				if err != nil {
 					break
 				}
-				if g.Descend() {
+				if g.Descend(false) {
 					ui.Win()
 					quit = true
 					return err, again, quit
@@ -973,8 +973,8 @@ func (ui *gameui) HandleKey(rka runeKeyAction) (err error, again bool, quit bool
 			err = errors.New("Unknown key. Type ? for help.")
 		}
 	case KeyWizardDescend:
-		if g.Wizard && g.Depth < MaxDepth {
-			if g.Descend() {
+		if g.Wizard && g.Depth < MaxDepth && g.Depth != WinDepth {
+			if g.Descend(false) {
 				ui.Win()
 				quit = true
 				return err, again, quit
@@ -1188,7 +1188,7 @@ func (ui *gameui) CursorKeyAction(targ Targeter, rka runeKeyAction, data *examin
 			again = false
 			g.Targeting = InvalidPos
 			notarg = true
-			if g.Descend() {
+			if g.Descend(false) {
 				ui.Win()
 				quit = true
 				return err, again, quit, notarg

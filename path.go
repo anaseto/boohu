@@ -218,7 +218,9 @@ func (mp *monPath) Neighbors(pos position) []position {
 			return false
 		}
 		c := d.Cell(npos)
-		return (c.IsPassable() || c.IsDestructible() && mp.destruct || c.T == HoledWallCell && mp.monster.Kind.Size() == MonsSmall) &&
+		return (c.IsPassable() || c.IsDestructible() && mp.destruct ||
+			c.IsLevitatePassable() && mp.monster.Kind.CanFly() ||
+			c.T == HoledWallCell && mp.monster.Kind.Size() == MonsSmall) &&
 			(c.T != DoorCell || mp.monster.Kind.CanOpenDoors() || mp.destruct)
 	}
 	ret := pos.CardinalNeighbors(nb, keep)

@@ -39,6 +39,15 @@ func (c cell) IsPassable() bool {
 	}
 }
 
+func (c cell) IsLevitatePassable() bool {
+	switch c.T {
+	case ChasmCell:
+		return true
+	default:
+		return c.IsPassable()
+	}
+}
+
 func (c cell) AllowsFog() bool {
 	switch c.T {
 	case WallCell, HoledWallCell, WindowCell, StoryCell:
@@ -233,13 +242,16 @@ func (c cell) Desc(g *game, pos position) (desc string) {
 	case WindowCell:
 		desc = "A transparent window in the wall."
 	case ChasmCell:
-		desc = "A chasm."
+		desc = "A chasm. If you jump into it, you'll be seriously injured."
 	}
 	if c.T.IsPlayerPassable() {
 		desc += " It is impassable."
 	}
 	if c.Flammable() {
 		desc += " It is flammable."
+	}
+	if c.IsLevitatePassable() {
+		desc += " It can be traversed with levitation."
 	}
 	if c.T.IsDiggable() {
 		desc += " It is diggable by oric destructive magic."

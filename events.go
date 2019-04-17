@@ -54,7 +54,7 @@ const (
 	NauseaEnd
 	DigEnd
 	ShadowsEnd
-	AccurateEnd
+	LevitationEnd
 	ShaedraAnimation
 	ArtifactAnimation
 )
@@ -103,6 +103,7 @@ var endmsgs = [...]string{
 	ConfusionEnd:     "You no longer feel confused.",
 	NauseaEnd:        "You no longer feel sick.",
 	DigEnd:           "You no longer feel like an earth dragon.",
+	LevitationEnd:    "You no longer levitate.",
 }
 
 var endstatuses = [...]status{
@@ -113,6 +114,7 @@ var endstatuses = [...]status{
 	ConfusionEnd:     StatusConfusion,
 	NauseaEnd:        StatusNausea,
 	DigEnd:           StatusDig,
+	LevitationEnd:    StatusLevitation,
 }
 
 var statusEndActions = [...]simpleAction{
@@ -123,6 +125,7 @@ var statusEndActions = [...]simpleAction{
 	StatusConfusion:     ConfusionEnd,
 	StatusNausea:        NauseaEnd,
 	StatusDig:           DigEnd,
+	StatusLevitation:    LevitationEnd,
 }
 
 func (sev *simpleEvent) Action(g *game) {
@@ -148,12 +151,18 @@ func (sev *simpleEvent) Action(g *game) {
 	case ArtifactAnimation:
 		g.ComputeLOS()
 		g.ui.TakingArtifactAnimation()
-	case SlowEnd, ExhaustionEnd, HasteEnd, LignificationEnd, ConfusionEnd, NauseaEnd, DigEnd:
+	case SlowEnd, ExhaustionEnd, HasteEnd, LignificationEnd, ConfusionEnd, NauseaEnd, DigEnd, LevitationEnd:
 		g.Player.Statuses[endstatuses[sev.EAction]] -= DurationStatusStep
 		if g.Player.Statuses[endstatuses[sev.EAction]] <= 0 {
 			g.Player.Statuses[endstatuses[sev.EAction]] = 0
 			g.PrintStyled(endmsgs[sev.EAction], logStatusEnd)
 			g.ui.StatusEndAnimation()
+			switch sev.EAction {
+			case LevitationEnd:
+				if g.Dungeon.Cell(g.Player.Pos).T == ChasmCell {
+					g.FallAbyss()
+				}
+			}
 		} else {
 			g.PushEvent(&simpleEvent{ERank: sev.Rank() + DurationStatusStep, EAction: sev.EAction})
 		}
@@ -403,6 +412,7 @@ func (cev *cloudEvent) Renew(g *game, delay int) {
 
 const (
 	DurationSwiftness              = 50
+	DurationLevitation             = 180
 	DurationShortSwiftness         = 30
 	DurationDigging                = 80
 	DurationSlow                   = 120

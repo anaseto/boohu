@@ -239,6 +239,21 @@ func (g *game) CollectGround() {
 	}
 }
 
+func (g *game) FallAbyss() {
+	g.Player.HP -= 2
+	if g.Player.HP <= 0 {
+		g.Player.HP = 1
+	}
+	g.Player.MP -= 2
+	if g.Player.MP < 0 {
+		g.Player.MP = 0
+	}
+	if g.Player.Bananas >= 0 {
+		g.Player.Bananas--
+	}
+	g.Descend(true)
+}
+
 func (g *game) MovePlayer(pos position, ev event) error {
 	//if g.Player.Dir != pos.Dir(g.Player.Pos) {
 	//g.Player.Dir = pos.Dir(g.Player.Pos)
@@ -265,8 +280,16 @@ func (g *game) MovePlayer(pos position, ev event) error {
 		if g.Player.HasStatus(StatusLignification) {
 			return errors.New("You cannot move while lignified.")
 		}
-		if c.T == ChasmCell {
-			return errors.New("You cannot move into the abyss.")
+		if c.T == ChasmCell && !g.Player.HasStatus(StatusLevitation) {
+			g.Print("Do you really want to jump into the abyss? (DANGEROUS) [y/N]")
+			g.ui.DrawDungeonView(NoFlushMode)
+			g.ui.Flush()
+			jump := g.ui.PromptConfirmation()
+			if jump {
+				g.FallAbyss()
+				return nil
+			}
+			return errors.New(DoNothing)
 		}
 		if c.T == BarrelCell {
 			g.Print("You hide yourself inside the barrel.")

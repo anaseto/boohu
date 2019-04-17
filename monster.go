@@ -145,6 +145,15 @@ func (mk monsterKind) CanOpenDoors() bool {
 	}
 }
 
+func (mk monsterKind) CanFly() bool {
+	switch mk {
+	case MonsWingedMilfid, MonsMirrorSpecter, MonsButterfly:
+		return true
+	default:
+		return false
+	}
+}
+
 func (mk monsterKind) CanAttackOnTree() bool {
 	switch mk {
 	case MonsMirrorSpecter, MonsWingedMilfid, MonsEarthDragon, MonsExplosiveNadre, MonsBlinkingFrog:

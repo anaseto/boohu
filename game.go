@@ -423,7 +423,7 @@ func (g *game) StairsSlice() []position {
 	return stairs
 }
 
-func (g *game) Descend() bool {
+func (g *game) Descend(jump bool) bool {
 	g.LevelStats()
 	c := g.Dungeon.Cell(g.Player.Pos)
 	if c.T == StairCell && g.Objects.Stairs[g.Player.Pos] == WinStair {
@@ -432,8 +432,14 @@ func (g *game) Descend() bool {
 		g.Depth = -1
 		return true
 	}
-	g.Print("You descend deeper in the dungeon.")
-	g.StoryPrint("You descended deeper in the dungeon.")
+	if jump {
+		// TODO: add animation?
+		g.Print("You fall into the abyss. It hurts!")
+		g.StoryPrint("You fell deeper in the dungeon.")
+	} else {
+		g.Print("You descend deeper in the dungeon.")
+		g.StoryPrint("You descended deeper in the dungeon.")
+	}
 	g.Depth++
 	g.DepthPlayerTurn = 0
 	g.Boredom = 0

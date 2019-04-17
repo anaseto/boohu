@@ -13,6 +13,7 @@ const (
 	DigMagara
 	TeleportMagara
 	SwiftnessMagara
+	LevitationMagara
 	FireMagara
 	FogMagara
 	NoiseMagara
@@ -74,6 +75,8 @@ func (g *game) UseMagara(n int, ev event) (err error) {
 		err = g.EvokeTeleport(ev)
 	case SwiftnessMagara:
 		err = g.EvokeSwiftness(ev)
+	case LevitationMagara:
+		err = g.EvokeLevitation(ev)
 	case FireMagara:
 		err = g.EvokeFire(ev)
 	case FogMagara:
@@ -119,6 +122,8 @@ func (mag magara) String() (desc string) {
 		desc = "magara of teleportation"
 	case SwiftnessMagara:
 		desc = "magara of swiftness"
+	case LevitationMagara:
+		desc = "magara of levitation"
 	case FireMagara:
 		desc = "magara of fire"
 	case FogMagara:
@@ -156,6 +161,8 @@ func (mag magara) Desc(g *game) (desc string) {
 		desc = "creates an oric energy disturbance, making you teleport far away on the same level."
 	case SwiftnessMagara:
 		desc = "makes you move faster for a short time by filling you with energies."
+	case LevitationMagara:
+		desc = "makes you levitate, allowing you to move over chasms."
 	case FireMagara:
 		desc = "produces a small magical fire that will extend to neighbour flammable terrain. The smoke it generates will induce sleep in monsters. As a gawalt monkey, you resist sleepiness, but you will still feel slowed."
 	case FogMagara:
@@ -323,6 +330,15 @@ func (g *game) EvokeSwiftness(ev event) error {
 		return errors.New("You are already swift.")
 	}
 	g.Printf("You feel speedy.")
+	g.ui.PlayerGoodEffectAnimation()
+	return nil
+}
+
+func (g *game) EvokeLevitation(ev event) error {
+	if !g.PutStatus(StatusLevitation, DurationSwiftness) {
+		return errors.New("You are already levitating.")
+	}
+	g.Printf("You feel light.")
 	g.ui.PlayerGoodEffectAnimation()
 	return nil
 }
