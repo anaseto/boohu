@@ -220,6 +220,7 @@ func (mp *monPath) Neighbors(pos position) []position {
 		c := d.Cell(npos)
 		return (c.IsPassable() || c.IsDestructible() && mp.destruct ||
 			c.IsLevitatePassable() && mp.monster.Kind.CanFly() ||
+			c.IsSwimPassable() && (mp.monster.Kind.CanSwim() || mp.monster.Kind.CanFly()) ||
 			c.T == HoledWallCell && mp.monster.Kind.Size() == MonsSmall) &&
 			(c.T != DoorCell || mp.monster.Kind.CanOpenDoors() || mp.destruct)
 	}

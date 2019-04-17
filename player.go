@@ -307,6 +307,10 @@ func (g *game) MovePlayer(pos position, ev event) error {
 			g.Fog(pos, 1, ev)
 			g.Stats.Digs++
 		}
+		if c.T == WaterCell {
+			g.MakeNoise(SwimNoise, pos)
+			g.Print("Shuh.")
+		}
 		if g.Player.Inventory.Body == CloakSmoke {
 			_, ok := g.Clouds[g.Player.Pos]
 			if !ok && g.Dungeon.Cell(g.Player.Pos).AllowsFog() {

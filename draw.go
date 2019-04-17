@@ -1428,6 +1428,12 @@ func (ui *gameui) DrawMonsterDescription(mons *monster) {
 	if mons.Kind.CanOpenDoors() {
 		s += " " + fmt.Sprint("They can open doors.")
 	}
+	if mons.Kind.CanFly() {
+		s += " " + fmt.Sprint("They can fly.")
+	}
+	if mons.Kind.CanSwim() {
+		s += " " + fmt.Sprint("They can swim.")
+	}
 	md := mons.Kind.MovementDelay()
 	switch { // XXX this can be improved
 	case md == 10:

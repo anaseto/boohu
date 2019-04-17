@@ -28,11 +28,12 @@ const (
 	BarrierCell
 	WindowCell
 	ChasmCell
+	WaterCell
 )
 
 func (c cell) IsPassable() bool {
 	switch c.T {
-	case WallCell, BarrelCell, TableCell, TreeCell, HoledWallCell, BarrierCell, WindowCell, StoryCell, ChasmCell:
+	case WallCell, BarrelCell, TableCell, TreeCell, HoledWallCell, BarrierCell, WindowCell, StoryCell, ChasmCell, WaterCell:
 		return false
 	default:
 		return true
@@ -45,6 +46,15 @@ func (c cell) IsLevitatePassable() bool {
 		return true
 	default:
 		return c.IsPassable()
+	}
+}
+
+func (c cell) IsSwimPassable() bool {
+	switch c.T {
+	case WaterCell:
+		return true
+	default:
+		return c.IsLevitatePassable()
 	}
 }
 
@@ -197,6 +207,8 @@ func (c cell) ShortDesc(g *game, pos position) (desc string) {
 		desc = "a window"
 	case ChasmCell:
 		desc = "a chasm"
+	case WaterCell:
+		desc = "shallow water"
 	}
 	return desc
 }
@@ -243,6 +255,8 @@ func (c cell) Desc(g *game, pos position) (desc string) {
 		desc = "A transparent window in the wall."
 	case ChasmCell:
 		desc = "A chasm. If you jump into it, you'll be seriously injured."
+	case WaterCell:
+		desc = "Shallow water."
 	}
 	if c.T.IsPlayerPassable() {
 		desc += " It is impassable."
@@ -255,6 +269,9 @@ func (c cell) Desc(g *game, pos position) (desc string) {
 	}
 	if c.T.IsDiggable() {
 		desc += " It is diggable by oric destructive magic."
+	}
+	if c.IsSwimPassable() {
+		desc += " It is possible to traverse by swimming. Swimming will make noise in a small range."
 	}
 	if c.BlocksRange() {
 		desc += " It blocks ranged attacks from foes."
@@ -308,6 +325,8 @@ func (c cell) Style(g *game, pos position) (r rune, fg uicolor) {
 		r, fg = 'Θ', ColorViolet
 	case ChasmCell:
 		r, fg = ':', ColorFgLOS
+	case WaterCell:
+		r, fg = '≈', ColorBlue
 	}
 	return r, fg
 }

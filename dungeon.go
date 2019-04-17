@@ -1084,9 +1084,18 @@ func (g *game) GenRoomTunnels(ml maplayout) {
 	dg.PlayerStartCell(g, places)
 	dg.ClearUnconnected(g)
 	if RandInt(10) > 0 {
-		dg.GenChasm()
+		var t terrain
+		if RandInt(5) > 1 {
+			t = ChasmCell
+		} else {
+			t = WaterCell
+		}
+		if g.Depth == WinDepth || g.Depth == MaxDepth {
+			t = WaterCell
+		}
+		dg.GenLake(t)
 		if RandInt(10) == 0 {
-			dg.GenChasm()
+			dg.GenLake(t)
 		}
 	}
 	if g.Depth < MaxDepth {
@@ -1656,7 +1665,7 @@ func (dg *dgen) RunCellularAutomataCave() bool {
 	return true
 }
 
-func (dg *dgen) GenChasm() {
+func (dg *dgen) GenLake(t terrain) {
 	walls := []position{}
 	for i := 0; i < DungeonNCells; i++ {
 		pos := idxtopos(i)
@@ -1690,7 +1699,7 @@ func (dg *dgen) GenChasm() {
 		return npos.valid() && dg.d.Cell(npos).T == WallCell && !dg.room[npos] && bestpos.Distance(npos) < 10+RandInt(10)
 	})
 	for pos := range conn {
-		d.SetCell(pos, ChasmCell)
+		d.SetCell(pos, t)
 	}
 }
 

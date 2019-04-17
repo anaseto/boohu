@@ -154,7 +154,17 @@ func (mk monsterKind) CanFly() bool {
 	}
 }
 
+func (mk monsterKind) CanSwim() bool {
+	switch mk {
+	case MonsBlinkingFrog, MonsVampire, MonsHound:
+		return true
+	default:
+		return false
+	}
+}
+
 func (mk monsterKind) CanAttackOnTree() bool {
+	// TODO: improve this
 	switch mk {
 	case MonsMirrorSpecter, MonsWingedMilfid, MonsEarthDragon, MonsExplosiveNadre, MonsBlinkingFrog:
 		return true
