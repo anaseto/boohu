@@ -160,7 +160,7 @@ func (sev *simpleEvent) Action(g *game) {
 			switch sev.EAction {
 			case LevitationEnd:
 				if g.Dungeon.Cell(g.Player.Pos).T == ChasmCell {
-					g.FallAbyss()
+					g.FallAbyss(DescendFall)
 				}
 			}
 		} else {

@@ -239,7 +239,7 @@ func (g *game) CollectGround() {
 	}
 }
 
-func (g *game) FallAbyss() {
+func (g *game) FallAbyss(style descendstyle) {
 	g.Player.HP -= 2
 	if g.Player.HP <= 0 {
 		g.Player.HP = 1
@@ -251,7 +251,7 @@ func (g *game) FallAbyss() {
 	if g.Player.Bananas >= 0 {
 		g.Player.Bananas--
 	}
-	g.Descend(true)
+	g.Descend(style)
 }
 
 func (g *game) MovePlayer(pos position, ev event) error {
@@ -286,7 +286,7 @@ func (g *game) MovePlayer(pos position, ev event) error {
 			g.ui.Flush()
 			jump := g.ui.PromptConfirmation()
 			if jump {
-				g.FallAbyss()
+				g.FallAbyss(DescendJump)
 				return nil
 			}
 			return errors.New(DoNothing)
