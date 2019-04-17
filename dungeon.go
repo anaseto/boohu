@@ -1083,7 +1083,12 @@ func (g *game) GenRoomTunnels(ml maplayout) {
 	dg.PutDoors(g)
 	dg.PlayerStartCell(g, places)
 	dg.ClearUnconnected(g)
-	dg.GenChasm()
+	if RandInt(10) > 0 {
+		dg.GenChasm()
+		if RandInt(10) == 0 {
+			dg.GenChasm()
+		}
+	}
 	if g.Depth < MaxDepth {
 		if g.Params.Blocked[g.Depth] {
 			dg.GenStairs(g, BlockedStair)
