@@ -178,7 +178,7 @@ func (g *game) Teleportation(ev event) {
 		if count > 1000 {
 			panic("Teleportation")
 		}
-		pos = g.FreeCell()
+		pos = g.FreePassableCell()
 		if pos.Distance(g.Player.Pos) < 15 && i < 1000 {
 			i++
 			continue

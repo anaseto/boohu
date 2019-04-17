@@ -270,7 +270,7 @@ func (cev *cloudEvent) Action(g *game) {
 		}
 		g.Dungeon.SetCell(cev.Pos, t)
 	case ObstructionProgression:
-		pos := g.FreeCell()
+		pos := g.FreePassableCell()
 		g.MagicalBarrierAt(pos, cev)
 		if g.Player.Sees(pos) {
 			g.Printf("You see an oric barrier appear out of thin air.")

@@ -471,7 +471,7 @@ func (m *monster) TeleportAway(g *game) {
 		if count > 1000 {
 			panic("TeleportOther")
 		}
-		pos = g.FreeCell()
+		pos = g.FreePassableCell()
 		if pos.Distance(m.Pos) < 15 && i < 1000 {
 			i++
 			continue

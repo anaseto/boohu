@@ -59,7 +59,7 @@ func (d *dungeon) WallAreaCount(area []position, pos position, radius int) int {
 	return count
 }
 
-func (d *dungeon) FreeCell() position {
+func (d *dungeon) FreePassableCell() position {
 	count := 0
 	for {
 		count++
@@ -151,7 +151,7 @@ func (d *dungeon) Connected(pos position, nf func(position) bool) (map[position]
 }
 
 func (d *dungeon) connex() bool {
-	pos := d.FreeCell()
+	pos := d.FreePassableCell()
 	conn, _ := d.Connected(pos, d.NotWallCell)
 	for i, c := range d.Cells {
 		if c.IsPassable() && !conn[idxtopos(i)] {

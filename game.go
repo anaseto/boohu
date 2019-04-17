@@ -85,7 +85,7 @@ type places struct {
 	Artifact position
 }
 
-func (g *game) FreeCell() position {
+func (g *game) FreePassableCell() position {
 	d := g.Dungeon
 	count := 0
 	for {
@@ -113,9 +113,9 @@ func (g *game) FreeCell() position {
 
 func (g *game) FreeCellForPlayer() position {
 	center := position{DungeonWidth / 2, DungeonHeight / 2}
-	bestpos := g.FreeCell()
+	bestpos := g.FreePassableCell()
 	for i := 0; i < 2; i++ {
-		pos := g.FreeCell()
+		pos := g.FreePassableCell()
 		if pos.Distance(center) > bestpos.Distance(center) {
 			bestpos = pos
 		}
