@@ -277,7 +277,15 @@ func (ui *gameui) WallExplosionAnimation(pos position) {
 	}
 }
 
-func (ui *gameui) BeamsAnimation(ray []position) {
+type beamstyle int
+
+const (
+	BeamSleeping beamstyle = iota
+	BeamLignification
+	BeamObstruction
+)
+
+func (ui *gameui) BeamsAnimation(ray []position, bs beamstyle) {
 	g := ui.g
 	if DisableAnimations {
 		return
@@ -285,10 +293,17 @@ func (ui *gameui) BeamsAnimation(ray []position) {
 	ui.DrawDungeonView(NormalMode)
 	time.Sleep(AnimDurShort)
 	// change colors depending on effect
-	colors := [2]uicolor{ColorFgSleepingMonster, ColorFgSlowedMonster}
+	var fg uicolor
+	switch bs {
+	case BeamSleeping:
+		fg = ColorFgSleepingMonster
+	case BeamLignification:
+		fg = ColorFgLignifiedMonster
+	case BeamObstruction:
+		fg = ColorFgMagicPlace
+	}
 	for j := 0; j < 3; j++ {
 		for i := len(ray) - 1; i >= 0; i-- {
-			fg := colors[RandInt(2)]
 			pos := ray[i]
 			_, _, bgColor := ui.PositionDrawing(pos)
 			mons := g.MonsterAt(pos)

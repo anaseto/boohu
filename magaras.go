@@ -487,7 +487,7 @@ func (g *game) EvokeSleeping(ev event) error {
 	} else {
 		g.Print("Two beams of sleeping emerge.")
 	}
-	g.ui.BeamsAnimation(targets)
+	g.ui.BeamsAnimation(targets, BeamSleeping)
 
 	return nil
 }
@@ -515,7 +515,7 @@ func (g *game) EvokeLignification(ev event) error {
 	} else {
 		g.Print("Two beams of lignification emerge.")
 	}
-	g.ui.BeamsAnimation(targets)
+	g.ui.BeamsAnimation(targets, BeamLignification)
 	return nil
 }
 
@@ -621,7 +621,7 @@ func (g *game) EvokeObstruction(ev event) error {
 		return errors.New("No suitable monsters.")
 	}
 	g.Print("Magical barriers emerged.")
-	g.ui.BeamsAnimation(targets)
+	g.ui.BeamsAnimation(targets, BeamObstruction)
 	return nil
 }
 
