@@ -307,7 +307,7 @@ func (g *game) MovePlayer(pos position, ev event) error {
 			g.Fog(pos, 1, ev)
 			g.Stats.Digs++
 		}
-		if c.T == WaterCell {
+		if c.T == WaterCell && !g.Player.HasStatus(StatusLevitation) {
 			g.MakeNoise(SwimNoise, pos)
 			g.Print("Shuh.")
 		}
