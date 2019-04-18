@@ -41,9 +41,9 @@ func (g *game) MakeMonstersAware() {
 func (g *game) MakeNoise(noise int, at position) {
 	dij := &noisePath{game: g}
 	nm := Dijkstra(dij, []position{at}, noise)
-	if at.Distance(g.Player.Pos)-noise < DefaultLOSRange && noise > 4 {
-		g.ui.LOSWavesAnimation(noise, WaveNoise, at)
-	}
+	//if at.Distance(g.Player.Pos)-noise < DefaultLOSRange && noise > 4 {
+	//g.ui.LOSWavesAnimation(noise, WaveNoise, at)
+	//}
 	for _, m := range g.Monsters {
 		if !m.Exists() {
 			continue
