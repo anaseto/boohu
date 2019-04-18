@@ -91,7 +91,9 @@ func (g *game) Dump() string {
 	}
 	fmt.Fprintf(buf, "\n")
 	fmt.Fprintf(buf, "Miscellaneous:\n")
-	//fmt.Fprintf(buf, "%d monsters died.\n", g.Stats.Killed)
+	if g.Stats.Killed > 0 {
+		fmt.Fprintf(buf, "%d monsters died.\n", g.Stats.Killed)
+	}
 	fmt.Fprintf(buf, "You spent %.1f turns in the Underground.\n", float64(g.Turn)/10)
 	maxDepth := Max(g.Depth, g.ExploredLevels)
 	s := "s"
@@ -112,8 +114,10 @@ func (g *game) Dump() string {
 	buf.WriteString(g.DumpDungeon())
 	fmt.Fprintf(buf, "└%s┘\n", strings.Repeat("─", DungeonWidth))
 	fmt.Fprintf(buf, "\n")
-	fmt.Fprintf(buf, g.DumpedKilledMonsters())
-	fmt.Fprintf(buf, "\n")
+	if g.Stats.Killed > 0 {
+		fmt.Fprintf(buf, g.DumpedKilledMonsters())
+		fmt.Fprintf(buf, "\n")
+	}
 	fmt.Fprintf(buf, "Timeline:\n")
 	fmt.Fprintf(buf, g.DumpStory())
 	fmt.Fprintf(buf, "\n")

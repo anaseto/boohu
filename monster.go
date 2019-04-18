@@ -535,6 +535,19 @@ func (m *monster) MoveTo(g *game, pos position) {
 	if recomputeLOS {
 		g.ComputeLOS()
 	}
+	c := g.Dungeon.Cell(pos)
+	if c.T == ChasmCell && !m.Kind.CanFly() || c.T == WaterCell && !m.Kind.CanSwim() && !m.Kind.CanFly() {
+		m.Dead = true
+		g.HandleKill(m)
+		if g.Player.Sees(m.Pos) {
+			switch c.T {
+			case ChasmCell:
+				g.Printf("%s falls into the abyss.", m.Kind.Definite(true))
+			case WaterCell:
+				g.Printf("%s drowns.", m.Kind.Definite(true))
+			}
+		}
+	}
 }
 
 func (m *monster) PlaceAt(g *game, pos position) {

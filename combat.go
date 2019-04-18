@@ -133,7 +133,7 @@ const (
 	DmgExtra  = 2
 )
 
-func (g *game) HandleKill(mons *monster, ev event) {
+func (g *game) HandleKill(mons *monster) {
 	g.Stats.Killed++
 	g.Stats.KilledMons[mons.Kind]++
 	if g.Dungeon.Cell(mons.Pos).T == DoorCell {
