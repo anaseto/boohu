@@ -173,7 +173,7 @@ func (mag magara) Desc(g *game) (desc string) {
 	case FogMagara:
 		desc = "creates a dense fog in a 2-range radius using harmonic energies."
 	case ShadowsMagara:
-		desc = "makes you detectable only by adjacent monsters when you're not in an lighted cell."
+		desc = "surrounds you by harmonic shadows, making you detectable only by adjacent monsters when you're not in an lighted cell."
 	case NoiseMagara:
 		desc = "tricks monsters in a 12-range area with harmonic magical sounds, making them go away from you for a few turns. It only works on monsters that are not already seeing you."
 	case ConfusionMagara:
