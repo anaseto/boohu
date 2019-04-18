@@ -419,10 +419,23 @@ func (m *monster) SeesPlayer(g *game) bool {
 	return m.Sees(g, g.Player.Pos) && g.Player.Sees(m.Pos)
 }
 
+func (m *monster) SeesLight(g *game, pos position) bool {
+	if !(m.LOS[pos] && m.Dir.InViewCone(m.Pos, pos)) {
+		return false
+	}
+	if m.State == Resting && m.Pos.Distance(pos) > 1 {
+		return false
+	}
+	return true
+}
+
 func (m *monster) Sees(g *game, pos position) bool {
 	var darkRange = 4
 	if g.Player.Inventory.Body == CloakShadows {
 		darkRange = 3
+	}
+	if g.Player.HasStatus(StatusShadows) {
+		darkRange = 1
 	}
 	const tableRange = 1
 	if !(m.LOS[pos] && m.Dir.InViewCone(m.Pos, pos)) {

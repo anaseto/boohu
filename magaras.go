@@ -16,6 +16,7 @@ const (
 	LevitationMagara
 	FireMagara
 	FogMagara
+	ShadowsMagara
 	NoiseMagara
 	ConfusionMagara
 	SleepingMagara
@@ -81,6 +82,8 @@ func (g *game) UseMagara(n int, ev event) (err error) {
 		err = g.EvokeFire(ev)
 	case FogMagara:
 		err = g.EvokeFog(ev)
+	case ShadowsMagara:
+		err = g.EvokeShadows(ev)
 	case NoiseMagara:
 		err = g.EvokeNoise(ev)
 	case ConfusionMagara:
@@ -128,6 +131,8 @@ func (mag magara) String() (desc string) {
 		desc = "magara of fire"
 	case FogMagara:
 		desc = "magara of fog"
+	case ShadowsMagara:
+		desc = "magara of shadows"
 	case NoiseMagara:
 		desc = "magara of noise"
 	case ConfusionMagara:
@@ -167,6 +172,8 @@ func (mag magara) Desc(g *game) (desc string) {
 		desc = "produces a small magical fire that will extend to neighbour flammable terrain. The smoke it generates will induce sleep in monsters. As a gawalt monkey, you resist sleepiness, but you will still feel slowed."
 	case FogMagara:
 		desc = "creates a dense fog in a 2-range radius using harmonic energies."
+	case ShadowsMagara:
+		desc = "makes you detectable only by adjacent monsters when you're not in an lighted cell."
 	case NoiseMagara:
 		desc = "tricks monsters in a 12-range area with harmonic magical sounds, making them go away from you for a few turns. It only works on monsters that are not already seeing you."
 	case ConfusionMagara:
@@ -415,6 +422,14 @@ func (g *game) Fog(at position, radius int, ev event) {
 		}
 	})
 	g.ComputeLOS()
+}
+
+func (g *game) EvokeShadows(ev event) error {
+	if !g.PutStatus(StatusShadows, DurationShadows) {
+		return errors.New("You are already surrounded by shadows.")
+	}
+	g.Print("You are surrounded by shadows.")
+	return nil
 }
 
 //func (g *game) EvokeBarriers(ev event) error {

@@ -53,8 +53,8 @@ const (
 	ConfusionEnd
 	NauseaEnd
 	DigEnd
-	ShadowsEnd
 	LevitationEnd
+	ShadowsEnd
 	ShaedraAnimation
 	ArtifactAnimation
 )
@@ -104,6 +104,7 @@ var endmsgs = [...]string{
 	NauseaEnd:        "You no longer feel sick.",
 	DigEnd:           "You no longer feel like an earth dragon.",
 	LevitationEnd:    "You no longer levitate.",
+	ShadowsEnd:       "You no longer are surrounded by shadows.",
 }
 
 var endstatuses = [...]status{
@@ -115,6 +116,7 @@ var endstatuses = [...]status{
 	NauseaEnd:        StatusNausea,
 	DigEnd:           StatusDig,
 	LevitationEnd:    StatusLevitation,
+	ShadowsEnd:       StatusShadows,
 }
 
 var statusEndActions = [...]simpleAction{
@@ -126,6 +128,7 @@ var statusEndActions = [...]simpleAction{
 	StatusNausea:        NauseaEnd,
 	StatusDig:           DigEnd,
 	StatusLevitation:    LevitationEnd,
+	StatusShadows:       ShadowsEnd,
 }
 
 func (sev *simpleEvent) Action(g *game) {
@@ -151,7 +154,7 @@ func (sev *simpleEvent) Action(g *game) {
 	case ArtifactAnimation:
 		g.ComputeLOS()
 		g.ui.TakingArtifactAnimation()
-	case SlowEnd, ExhaustionEnd, HasteEnd, LignificationEnd, ConfusionEnd, NauseaEnd, DigEnd, LevitationEnd:
+	case SlowEnd, ExhaustionEnd, HasteEnd, LignificationEnd, ConfusionEnd, NauseaEnd, DigEnd, LevitationEnd, ShadowsEnd:
 		g.Player.Statuses[endstatuses[sev.EAction]] -= DurationStatusStep
 		if g.Player.Statuses[endstatuses[sev.EAction]] <= 0 {
 			g.Player.Statuses[endstatuses[sev.EAction]] = 0
@@ -412,6 +415,7 @@ func (cev *cloudEvent) Renew(g *game, delay int) {
 
 const (
 	DurationSwiftness              = 50
+	DurationShadows                = 150
 	DurationLevitation             = 180
 	DurationShortSwiftness         = 30
 	DurationDigging                = 80
