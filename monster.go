@@ -624,9 +624,9 @@ func (m *monster) AttackAction(g *game, ev event) {
 func (m *monster) Explode(g *game, ev event) {
 	m.Dead = true
 	neighbors := m.Pos.ValidCardinalNeighbors()
-	g.MakeNoise(ExplosionNoise, m.Pos)
 	g.Printf("%s %s explodes with a loud boom.", g.ExplosionSound(), m.Kind.Definite(true))
 	g.ui.ExplosionAnimation(FireExplosion, m.Pos)
+	g.MakeNoise(ExplosionNoise, m.Pos)
 	for _, pos := range append(neighbors, m.Pos) {
 		c := g.Dungeon.Cell(pos)
 		if c.Flammable() {
@@ -1217,10 +1217,10 @@ func (m *monster) TormentBolt(g *game, ev event) bool {
 	}
 	g.MakeNoise(MagicCastNoise, m.Pos)
 	if RandInt(3) > 0 {
-		g.MakeNoise(MagicHitNoise, g.Player.Pos)
 		damage := g.Player.HP / 2
 		g.PrintfStyled("%s throws a bolt of torment at you.", logMonsterHit, m.Kind.Definite(true))
 		g.ui.MonsterProjectileAnimation(g.Ray(m.Pos), '*', ColorCyan)
+		g.MakeNoise(MagicHitNoise, g.Player.Pos)
 		m.InflictDamage(g, damage, 1)
 	} else {
 		g.Printf("You dodge the %s's bolt of torment.", m.Kind)
@@ -1324,13 +1324,13 @@ func (m *monster) ThrowJavelin(g *game, ev event) bool {
 	dmg := DmgNormal
 	clang := RandInt(4) == 0
 	noise := g.HitNoise(clang)
-	g.MakeNoise(noise, g.Player.Pos)
 	var sclang string
 	if clang {
 		sclang = g.ArmourClang()
 	}
 	g.Printf("%s throws %s at you (%d dmg).%s", m.Kind.Definite(true), Indefinite("javelin", false), dmg, sclang)
 	g.ui.MonsterJavelinAnimation(g.Ray(m.Pos), true)
+	g.MakeNoise(noise, g.Player.Pos)
 	m.InflictDamage(g, dmg, dmg)
 	m.ExhaustTime(g, 100+RandInt(50))
 	ev.Renew(g, m.Kind.AttackDelay())
@@ -1344,9 +1344,9 @@ func (m *monster) ThrowAcid(g *game, ev event) bool {
 	}
 	dmg := DmgNormal
 	noise := g.HitNoise(false) // no clang with acid projectiles
-	g.MakeNoise(noise, g.Player.Pos)
 	g.Printf("%s throws acid at you (%d dmg).", m.Kind.Definite(true), dmg)
 	g.ui.MonsterProjectileAnimation(g.Ray(m.Pos), '*', ColorGreen)
+	g.MakeNoise(noise, g.Player.Pos)
 	m.InflictDamage(g, dmg, dmg)
 	if g.PutStatus(StatusSlow, DurationSleepSlow) {
 		g.Print("The viscous substance slows you.")

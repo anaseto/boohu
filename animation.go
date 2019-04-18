@@ -89,6 +89,11 @@ func (ui *gameui) MonsterProjectileAnimation(ray []position, r rune, fg uicolor)
 	}
 }
 
+func (ui *gameui) WaveDrawAt(pos position, fg uicolor) {
+	r, _, bgColor := ui.PositionDrawing(pos)
+	ui.DrawAtPosition(pos, true, r, bgColor, fg)
+}
+
 func (ui *gameui) ExplosionDrawAt(pos position, fg uicolor) {
 	g := ui.g
 	_, _, bgColor := ui.PositionDrawing(pos)
@@ -118,7 +123,7 @@ func (ui *gameui) NoiseAnimation(noises []position) {
 	if DisableAnimations {
 		return
 	}
-	ui.LOSWavesAnimation(DefaultLOSRange, WaveMagicNoise)
+	ui.LOSWavesAnimation(DefaultLOSRange, WaveMagicNoise, ui.g.Player.Pos)
 	colors := []uicolor{ColorFgSleepingMonster, ColorFgMagicPlace}
 	for i := 0; i < 2; i++ {
 		for _, pos := range noises {
@@ -163,7 +168,7 @@ func (ui *gameui) ExplosionAnimation(es explosionStyle, pos position) {
 	}
 }
 
-func (g *game) Waves(maxCost int, ws wavestyle) (dists []int, cdists map[int][]int) {
+func (g *game) Waves(maxCost int, ws wavestyle, center position) (dists []int, cdists map[int][]int) {
 	var dij Dijkstrer
 	switch ws {
 	case WaveMagicNoise:
@@ -171,7 +176,7 @@ func (g *game) Waves(maxCost int, ws wavestyle) (dists []int, cdists map[int][]i
 	default:
 		dij = &noisePath{game: g}
 	}
-	nm := Dijkstra(dij, []position{g.Player.Pos}, maxCost)
+	nm := Dijkstra(dij, []position{center}, maxCost)
 	cdists = make(map[int][]int)
 	nm.iter(g.Player.Pos, func(n *node) {
 		pos := n.Pos
@@ -184,8 +189,8 @@ func (g *game) Waves(maxCost int, ws wavestyle) (dists []int, cdists map[int][]i
 	return dists, cdists
 }
 
-func (ui *gameui) LOSWavesAnimation(r int, ws wavestyle) {
-	dists, cdists := ui.g.Waves(r, ws)
+func (ui *gameui) LOSWavesAnimation(r int, ws wavestyle, center position) {
+	dists, cdists := ui.g.Waves(r, ws, center)
 	for _, d := range dists {
 		wave := cdists[d]
 		if len(wave) == 0 {
@@ -216,21 +221,21 @@ func (ui *gameui) WaveAnimation(wave []int, ws wavestyle) {
 		case WaveConfusion:
 			fg := ColorFgConfusedMonster
 			if ui.g.Player.Sees(pos) {
-				ui.ExplosionDrawAt(pos, fg)
+				ui.WaveDrawAt(pos, fg)
 			}
 		case WaveSlowing:
 			fg := ColorFgSlowedMonster
 			if ui.g.Player.Sees(pos) {
-				ui.ExplosionDrawAt(pos, fg)
+				ui.WaveDrawAt(pos, fg)
 			}
 		case WaveNoise:
 			fg := ColorFgWanderingMonster
 			if ui.g.Player.Sees(pos) {
-				ui.ExplosionDrawAt(pos, fg)
+				ui.WaveDrawAt(pos, fg)
 			}
 		case WaveMagicNoise:
 			fg := ColorFgMagicPlace
-			ui.ExplosionDrawAt(pos, fg)
+			ui.WaveDrawAt(pos, fg)
 		}
 	}
 	ui.Flush()
