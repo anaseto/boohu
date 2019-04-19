@@ -67,8 +67,9 @@ const (
 	MonsTinyHarpy
 	//MonsOgre
 	MonsOricCelmist
+	MonsHarmonicCelmist
 	//MonsBrizzia
-	MonsHound
+	MonsDog
 	//MonsGiantBee
 	MonsHighGuard
 	//MonsHydra
@@ -123,7 +124,7 @@ func (mk monsterKind) Ranged() bool {
 func (mk monsterKind) Smiting() bool {
 	switch mk {
 	//case MonsMirrorSpecter, MonsMindCelmist:
-	case MonsMirrorSpecter, MonsOricCelmist:
+	case MonsMirrorSpecter, MonsOricCelmist, MonsHarmonicCelmist:
 		return true
 	default:
 		return false
@@ -141,7 +142,7 @@ func (mk monsterKind) Peaceful() bool {
 
 func (mk monsterKind) CanOpenDoors() bool {
 	switch mk {
-	case MonsGuard, MonsHighGuard, MonsMadNixe, MonsOricCelmist, MonsLich, MonsVampire, MonsWingedMilfid:
+	case MonsGuard, MonsHighGuard, MonsMadNixe, MonsOricCelmist, MonsHarmonicCelmist, MonsLich, MonsVampire, MonsWingedMilfid:
 		return true
 	default:
 		return false
@@ -159,7 +160,7 @@ func (mk monsterKind) CanFly() bool {
 
 func (mk monsterKind) CanSwim() bool {
 	switch mk {
-	case MonsBlinkingFrog, MonsVampire, MonsHound:
+	case MonsBlinkingFrog, MonsVampire, MonsDog:
 		return true
 	default:
 		return false
@@ -260,12 +261,13 @@ var MonsData = []monsterData{
 	MonsGuard:     {10, MonsMedium, 'g', "guard", 3},
 	MonsTinyHarpy: {10, MonsMedium, 't', "tiny harpy", 3},
 	//MonsOgre:            {10, 2, 20, 3, 'O', "ogre", 7},
-	MonsOricCelmist: {10, MonsMedium, 'c', "oric celmist", 9},
-	MonsWorm:        {15, MonsSmall, 'w', "farmer worm", 4},
+	MonsOricCelmist:     {10, MonsMedium, 'o', "oric celmist", 9},
+	MonsHarmonicCelmist: {10, MonsMedium, 'h', "harmonic celmist", 9},
+	MonsWorm:            {15, MonsSmall, 'w', "farmer worm", 4},
 	//MonsBrizzia:         {15, 1, 10, 3, 'z', "brizzia", 6},
 	//MonsAcidMound:       {10, 1, 10, 2, 'a', "acid mound", 6},
-	MonsHound: {10, MonsMedium, 'h', "hound", 5},
-	MonsYack:  {10, MonsMedium, 'y', "yack", 5},
+	MonsDog:  {10, MonsMedium, 'd', "dog", 5},
+	MonsYack: {10, MonsMedium, 'y', "yack", 5},
 	//MonsGiantBee:        {5, 1, 10, 1, 'B', "giant bee", 6},
 	MonsHighGuard: {10, MonsMedium, 'G', "high guard", 5},
 	//MonsHydra:           {10, 1, 10, 4, 'H', "hydra", 10},
@@ -290,12 +292,13 @@ var monsDesc = []string{
 	MonsGuard:     "Guards patrol between buildings.",
 	MonsTinyHarpy: "Tiny harpies are little humanoid flying creatures. They are aggressive when hungry, but peaceful when satiated. This Underground harpy species eats fruits (including bananas) and other vegetables.",
 	//MonsOgre:            "Ogres are big clunky humanoids that can hit really hard.",
-	MonsOricCelmist: "Oric celmists are mages that can create magical barriers in cells adjacent to you, complicating your escape.",
-	MonsWorm:        "Farmer worms are ugly slow moving creatures. They furrow as they move, helping new foliage to grow.",
+	MonsOricCelmist:     "Oric celmists are mages that can create magical barriers in cells adjacent to you, complicating your escape.",
+	MonsHarmonicCelmist: "Harmonic celmists are mages specialized in manipulation of sound and light. They can illuminate you with harmonic light, making it more difficult to hide from them.",
+	MonsWorm:            "Farmer worms are ugly slow moving creatures. They furrow as they move, helping new foliage to grow.",
 	//MonsBrizzia:         "Brizzias are big slow moving biped creatures. They are quite hardy, and when hurt they can cause nausea, impeding the use of potions.",
 	//MonsAcidMound:       "Acid mounds are acidic creatures. They can temporarily corrode your equipment.",
-	MonsHound: "Hounds are fast moving carnivore quadrupeds. They can bark, and smell you.",
-	MonsYack:  "Yacks are quite large herbivorous quadrupeds. They tend to eat grass peacefully, but upon seing you they may attack, pushing you one cell away.",
+	MonsDog:  "Dogs are fast moving carnivore quadrupeds. They can bark, and smell you.",
+	MonsYack: "Yacks are quite large herbivorous quadrupeds. They tend to eat grass peacefully, but upon seing you they may attack, pushing you one cell away.",
 	//MonsGiantBee:        "Giant bees are fragile but extremely fast moving creatures. Their bite can sometimes enrage you.",
 	MonsHighGuard: "High guards watch over a particular location. They can throw javelins.",
 	//MonsHydra:           "Hydras are enormous creatures with four heads that can hit you each at once.",
@@ -330,6 +333,7 @@ const (
 	LoneHighGuard
 	LoneYack
 	LoneOricCelmist
+	LoneHarmonicCelmist
 	LoneSatowalgaPlant
 	LoneBlinkingFrog
 	LoneWorm
@@ -346,6 +350,7 @@ const (
 	PairGuard
 	PairYack
 	PairOricCelmist
+	PairHarmonicCelmist
 	PairVampire
 	PairNixe
 	PairExplosiveNadre
@@ -354,6 +359,7 @@ const (
 	SpecialLoneNixe
 	SpecialLoneMilfid
 	SpecialLoneOricCelmist
+	SpecialLoneHarmonicCelmist
 	SpecialLoneHighGuard
 )
 
@@ -365,35 +371,38 @@ type monsterBandData struct {
 }
 
 var MonsBands = []monsterBandData{
-	LoneGuard:              {Monster: MonsGuard},
-	LoneHighGuard:          {Monster: MonsHighGuard},
-	LoneYack:               {Monster: MonsYack},
-	LoneOricCelmist:        {Monster: MonsOricCelmist},
-	LoneSatowalgaPlant:     {Monster: MonsSatowalgaPlant},
-	LoneBlinkingFrog:       {Monster: MonsBlinkingFrog},
-	LoneWorm:               {Monster: MonsWorm},
-	LoneMirrorSpecter:      {Monster: MonsMirrorSpecter},
-	LoneHound:              {Monster: MonsHound},
-	LoneExplosiveNadre:     {Monster: MonsExplosiveNadre},
-	LoneWingedMilfid:       {Monster: MonsWingedMilfid},
-	LoneMadNixe:            {Monster: MonsMadNixe},
-	LoneTreeMushroom:       {Monster: MonsTreeMushroom},
-	LoneEarthDragon:        {Monster: MonsEarthDragon},
-	LoneButterfly:          {Monster: MonsButterfly},
-	LoneVampire:            {Monster: MonsVampire},
-	LoneHarpy:              {Monster: MonsTinyHarpy},
-	PairGuard:              {Band: true, Distribution: map[monsterKind]int{MonsGuard: 2}},
-	PairYack:               {Band: true, Distribution: map[monsterKind]int{MonsYack: 2}},
-	PairVampire:            {Band: true, Distribution: map[monsterKind]int{MonsVampire: 2}},
-	PairOricCelmist:        {Band: true, Distribution: map[monsterKind]int{MonsOricCelmist: 2}},
-	PairNixe:               {Band: true, Distribution: map[monsterKind]int{MonsMadNixe: 2}},
-	PairExplosiveNadre:     {Band: true, Distribution: map[monsterKind]int{MonsExplosiveNadre: 2}},
-	PairWingedMilfid:       {Band: true, Distribution: map[monsterKind]int{MonsWingedMilfid: 2}},
-	SpecialLoneVampire:     {Monster: MonsVampire},
-	SpecialLoneNixe:        {Monster: MonsMadNixe},
-	SpecialLoneMilfid:      {Monster: MonsWingedMilfid},
-	SpecialLoneOricCelmist: {Monster: MonsOricCelmist},
-	SpecialLoneHighGuard:   {Monster: MonsHighGuard},
+	LoneGuard:                  {Monster: MonsGuard},
+	LoneHighGuard:              {Monster: MonsHighGuard},
+	LoneYack:                   {Monster: MonsYack},
+	LoneOricCelmist:            {Monster: MonsOricCelmist},
+	LoneHarmonicCelmist:        {Monster: MonsHarmonicCelmist},
+	LoneSatowalgaPlant:         {Monster: MonsSatowalgaPlant},
+	LoneBlinkingFrog:           {Monster: MonsBlinkingFrog},
+	LoneWorm:                   {Monster: MonsWorm},
+	LoneMirrorSpecter:          {Monster: MonsMirrorSpecter},
+	LoneHound:                  {Monster: MonsDog},
+	LoneExplosiveNadre:         {Monster: MonsExplosiveNadre},
+	LoneWingedMilfid:           {Monster: MonsWingedMilfid},
+	LoneMadNixe:                {Monster: MonsMadNixe},
+	LoneTreeMushroom:           {Monster: MonsTreeMushroom},
+	LoneEarthDragon:            {Monster: MonsEarthDragon},
+	LoneButterfly:              {Monster: MonsButterfly},
+	LoneVampire:                {Monster: MonsVampire},
+	LoneHarpy:                  {Monster: MonsTinyHarpy},
+	PairGuard:                  {Band: true, Distribution: map[monsterKind]int{MonsGuard: 2}},
+	PairYack:                   {Band: true, Distribution: map[monsterKind]int{MonsYack: 2}},
+	PairVampire:                {Band: true, Distribution: map[monsterKind]int{MonsVampire: 2}},
+	PairOricCelmist:            {Band: true, Distribution: map[monsterKind]int{MonsOricCelmist: 2}},
+	PairHarmonicCelmist:        {Band: true, Distribution: map[monsterKind]int{MonsHarmonicCelmist: 2}},
+	PairNixe:                   {Band: true, Distribution: map[monsterKind]int{MonsMadNixe: 2}},
+	PairExplosiveNadre:         {Band: true, Distribution: map[monsterKind]int{MonsExplosiveNadre: 2}},
+	PairWingedMilfid:           {Band: true, Distribution: map[monsterKind]int{MonsWingedMilfid: 2}},
+	SpecialLoneVampire:         {Monster: MonsVampire},
+	SpecialLoneNixe:            {Monster: MonsMadNixe},
+	SpecialLoneMilfid:          {Monster: MonsWingedMilfid},
+	SpecialLoneOricCelmist:     {Monster: MonsOricCelmist},
+	SpecialLoneHarmonicCelmist: {Monster: MonsHarmonicCelmist},
+	SpecialLoneHighGuard:       {Monster: MonsHighGuard},
 }
 
 type monster struct {
@@ -801,7 +810,7 @@ func (m *monster) HandleWatching(g *game) {
 	if m.Watching+RandInt(2) < 4 {
 		m.Alternate()
 		m.Watching++
-		if m.Kind == MonsHound {
+		if m.Kind == MonsDog {
 			dij := &monPath{game: g, monster: m}
 			nm := Dijkstra(dij, []position{m.Pos}, 5)
 			if _, ok := nm.at(g.Player.Pos); ok {
@@ -1454,6 +1463,11 @@ func (m *monster) SmitingAttack(g *game, ev event) bool {
 		return m.CreateBarrier(g, ev)
 		//case MonsMindCelmist:
 		//return m.MindAttack(g, ev)
+	case MonsHarmonicCelmist:
+		if g.PutStatus(StatusIlluminated, DurationIlluminated) {
+			g.Print("The harmonic celmist casts a magical light on you.")
+			return true
+		}
 	}
 	return false
 }
@@ -1501,7 +1515,7 @@ func (m *monster) MakeHuntIfHurt(g *game) {
 		if m.State == Resting {
 			g.Printf("%s awakens.", m.Kind.Definite(true))
 		}
-		if m.Kind == MonsHound {
+		if m.Kind == MonsDog {
 			g.Printf("%s barks.", m.Kind.Definite(true))
 			g.MakeNoise(BarkNoise, m.Pos)
 		}
@@ -1524,7 +1538,7 @@ func (m *monster) MakeAware(g *game) {
 	} else if m.State == Wandering || m.State == Watching {
 		g.Printf("%s notices you.", m.Kind.Definite(true))
 	}
-	if m.State != Hunting && m.Kind == MonsHound {
+	if m.State != Hunting && m.Kind == MonsDog {
 		g.Printf("%s barks.", m.Kind.Definite(true))
 		g.MakeNoise(BarkNoise, m.Pos)
 	}

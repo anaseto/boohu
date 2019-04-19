@@ -674,7 +674,7 @@ const (
 	roomMilfids specialRoom = iota
 	roomNixes
 	roomVampires
-	roomOricCelmists
+	roomCelmists
 )
 
 func (sr specialRoom) Templates() (tpl []string) {
@@ -683,7 +683,7 @@ func (sr specialRoom) Templates() (tpl []string) {
 		tpl = append(tpl, RoomSpecialMilfids)
 	case roomVampires:
 		tpl = append(tpl, RoomSpecialVampires)
-	case roomOricCelmists:
+	case roomCelmists:
 		tpl = append(tpl, RoomSpecialOricCelmists)
 	case roomNixes:
 		tpl = append(tpl, RoomSpecialNixes)
@@ -692,8 +692,8 @@ func (sr specialRoom) Templates() (tpl []string) {
 }
 
 var roomSpecialLevelEarly = []specialRoom{roomMilfids, roomNixes}
-var roomSpecialLevelLater = []specialRoom{roomVampires, roomOricCelmists}
-var roomSpecialLevel = []specialRoom{roomMilfids, roomNixes, roomVampires, roomOricCelmists}
+var roomSpecialLevelLater = []specialRoom{roomVampires, roomCelmists}
+var roomSpecialLevel = []specialRoom{roomMilfids, roomNixes, roomVampires, roomCelmists}
 
 func (r *room) ComputeDimensions() {
 	x := 0
@@ -2026,7 +2026,7 @@ func (dg *dgen) PutMonsterBand(g *game, band monsterBand) bool {
 		bdinf = dg.BandInfoGuard(g, band, PlacePatrol)
 	case LoneSatowalgaPlant:
 		bdinf = dg.BandInfoOutsideGroundMiddle(g, band)
-	case SpecialLoneVampire, SpecialLoneNixe, SpecialLoneMilfid, SpecialLoneOricCelmist, SpecialLoneHighGuard:
+	case SpecialLoneVampire, SpecialLoneNixe, SpecialLoneMilfid, SpecialLoneOricCelmist, SpecialLoneHarmonicCelmist, SpecialLoneHighGuard:
 		if RandInt(2) == 0 {
 			bdinf = dg.BandInfoPatrol(g, band, PlacePatrolSpecial)
 		} else {
@@ -2094,7 +2094,7 @@ func (dg *dgen) GenMonsters(g *game) {
 	bandsHighGuard := []monsterBand{LoneHighGuard}
 	bandsAnimals := []monsterBand{LoneYack, LoneWorm, LoneHound, LoneBlinkingFrog, LoneExplosiveNadre, LoneHarpy}
 	bandsPlants := []monsterBand{LoneSatowalgaPlant}
-	bandsBipeds := []monsterBand{LoneOricCelmist, LoneMirrorSpecter, LoneWingedMilfid, LoneMadNixe, LoneVampire}
+	bandsBipeds := []monsterBand{LoneOricCelmist, LoneMirrorSpecter, LoneWingedMilfid, LoneMadNixe, LoneVampire, LoneHarmonicCelmist}
 	bandsBig := []monsterBand{LoneTreeMushroom, LoneEarthDragon}
 	// monster specific bands
 	bandNadre := []monsterBand{LoneExplosiveNadre}
@@ -2102,6 +2102,7 @@ func (dg *dgen) GenMonsters(g *game) {
 	bandYack := []monsterBand{LoneYack}
 	bandVampire := []monsterBand{LoneVampire}
 	bandOricCelmist := []monsterBand{LoneOricCelmist}
+	bandHarmonicCelmist := []monsterBand{LoneHarmonicCelmist}
 	bandMadNixe := []monsterBand{LoneMadNixe}
 	bandMirrorSpecter := []monsterBand{LoneMirrorSpecter}
 	bandTreeMushroom := []monsterBand{LoneTreeMushroom}
@@ -2113,6 +2114,7 @@ func (dg *dgen) GenMonsters(g *game) {
 	bandNixePair := []monsterBand{PairNixe}
 	bandVampirePair := []monsterBand{PairVampire}
 	bandOricCelmistPair := []monsterBand{PairOricCelmist}
+	bandHarmonicCelmistPair := []monsterBand{PairHarmonicCelmist}
 	// special bands
 	if g.Params.Special[g.Depth] {
 		switch dg.special {
@@ -2125,9 +2127,14 @@ func (dg *dgen) GenMonsters(g *game) {
 		case roomMilfids:
 			bandMilfids := []monsterBand{SpecialLoneMilfid}
 			dg.PutRandomBandN(g, bandMilfids, 2)
-		case roomOricCelmists:
-			bandOricCelmists := []monsterBand{SpecialLoneOricCelmist}
-			dg.PutRandomBandN(g, bandOricCelmists, 2)
+		case roomCelmists:
+			if RandInt(2) == 0 {
+				bandOricCelmists := []monsterBand{SpecialLoneOricCelmist}
+				dg.PutRandomBandN(g, bandOricCelmists, 2)
+			} else {
+				bandHarmonicCelmists := []monsterBand{SpecialLoneHarmonicCelmist}
+				dg.PutRandomBandN(g, bandHarmonicCelmists, 2)
+			}
 		default:
 			// XXX not used now
 			bandOricCelmists := []monsterBand{SpecialLoneOricCelmist}
@@ -2203,7 +2210,11 @@ func (dg *dgen) GenMonsters(g *game) {
 			dg.PutRandomBandN(g, bandsPlants, 1)
 		case 4:
 			dg.PutRandomBandN(g, bandsGuard, 4)
-			dg.PutRandomBandN(g, bandOricCelmist, 4)
+			if RandInt(2) == 0 {
+				dg.PutRandomBandN(g, bandOricCelmist, 4)
+			} else {
+				dg.PutRandomBandN(g, bandHarmonicCelmist, 4)
+			}
 			dg.PutRandomBandN(g, bandsPlants, 1)
 		}
 	case 5:
@@ -2367,11 +2378,24 @@ func (dg *dgen) GenMonsters(g *game) {
 			// 21
 			dg.PutRandomBandN(g, bandsGuard, 5)
 			dg.PutRandomBandN(g, bandsBig, 2)
-			dg.PutRandomBandN(g, bandsBipeds, 10)
+			if RandInt(3) == 0 {
+				if RandInt(2) == 0 {
+					dg.PutRandomBandN(g, bandOricCelmist, 5)
+				} else {
+					dg.PutRandomBandN(g, bandHarmonicCelmist, 5)
+				}
+				dg.PutRandomBandN(g, bandsBipeds, 5)
+			} else {
+				dg.PutRandomBandN(g, bandsBipeds, 10)
+			}
 			if RandInt(2) == 0 {
 				dg.PutRandomBandN(g, bandVampirePair, 1)
 			} else {
-				dg.PutRandomBandN(g, bandOricCelmistPair, 1)
+				if RandInt(2) == 0 {
+					dg.PutRandomBandN(g, bandOricCelmistPair, 1)
+				} else {
+					dg.PutRandomBandN(g, bandHarmonicCelmistPair, 1)
+				}
 			}
 			dg.PutRandomBandN(g, bandsAnimals, 2)
 		} else {

@@ -55,6 +55,7 @@ const (
 	DigEnd
 	LevitationEnd
 	ShadowsEnd
+	IlluminatedEnd
 	ShaedraAnimation
 	ArtifactAnimation
 )
@@ -105,6 +106,7 @@ var endmsgs = [...]string{
 	DigEnd:           "You no longer feel like an earth dragon.",
 	LevitationEnd:    "You no longer levitate.",
 	ShadowsEnd:       "You no longer are surrounded by shadows.",
+	IlluminatedEnd:   "You no longer illuminated.",
 }
 
 var endstatuses = [...]status{
@@ -117,6 +119,7 @@ var endstatuses = [...]status{
 	DigEnd:           StatusDig,
 	LevitationEnd:    StatusLevitation,
 	ShadowsEnd:       StatusShadows,
+	IlluminatedEnd:   StatusIlluminated,
 }
 
 var statusEndActions = [...]simpleAction{
@@ -129,6 +132,7 @@ var statusEndActions = [...]simpleAction{
 	StatusDig:           DigEnd,
 	StatusLevitation:    LevitationEnd,
 	StatusShadows:       ShadowsEnd,
+	StatusIlluminated:   IlluminatedEnd,
 }
 
 func (sev *simpleEvent) Action(g *game) {
@@ -154,7 +158,7 @@ func (sev *simpleEvent) Action(g *game) {
 	case ArtifactAnimation:
 		g.ComputeLOS()
 		g.ui.TakingArtifactAnimation()
-	case SlowEnd, ExhaustionEnd, HasteEnd, LignificationEnd, ConfusionEnd, NauseaEnd, DigEnd, LevitationEnd, ShadowsEnd:
+	case SlowEnd, ExhaustionEnd, HasteEnd, LignificationEnd, ConfusionEnd, NauseaEnd, DigEnd, LevitationEnd, ShadowsEnd, IlluminatedEnd:
 		g.Player.Statuses[endstatuses[sev.EAction]] -= DurationStatusStep
 		if g.Player.Statuses[endstatuses[sev.EAction]] <= 0 {
 			g.Player.Statuses[endstatuses[sev.EAction]] = 0
@@ -442,4 +446,5 @@ const (
 	DurationSmokingCloakFog        = 20
 	DurationMonsterExhaustion      = 100
 	DurationMonsterSatiation       = 400
+	DurationIlluminated            = 70
 )

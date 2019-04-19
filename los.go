@@ -394,7 +394,7 @@ func (g *game) ComputeNoise() {
 				g.Noise[pos] = true
 				g.Print("You hear a creep noise.")
 				count++
-			case MonsHound, MonsBlinkingFrog:
+			case MonsDog, MonsBlinkingFrog:
 				g.Noise[pos] = true
 				g.Print("You hear light footsteps.")
 				count++
@@ -444,7 +444,7 @@ func (m *monster) Sees(g *game, pos position) bool {
 	if m.State == Resting && m.Pos.Distance(pos) > 1 {
 		return false
 	}
-	if !g.Illuminated[pos.idx()] && m.Pos.Distance(pos) > darkRange {
+	if !g.Illuminated[pos.idx()] && !g.Player.HasStatus(StatusIlluminated) && m.Pos.Distance(pos) > darkRange {
 		return false
 	}
 	if g.Dungeon.Cell(pos).T == TableCell && m.Pos.Distance(pos) > tableRange {

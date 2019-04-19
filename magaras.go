@@ -425,6 +425,9 @@ func (g *game) Fog(at position, radius int, ev event) {
 }
 
 func (g *game) EvokeShadows(ev event) error {
+	if g.Player.HasStatus(StatusIlluminated) {
+		return errors.New("You cannot surround yourself by shadows while illuminated.")
+	}
 	if !g.PutStatus(StatusShadows, DurationShadows) {
 		return errors.New("You are already surrounded by shadows.")
 	}
