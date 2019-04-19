@@ -271,7 +271,7 @@ func (c cell) Desc(g *game, pos position) (desc string) {
 		desc += " It is diggable by oric destructive magic."
 	}
 	if c.IsSwimPassable() {
-		desc += " It is possible to traverse by swimming. Swimming will make noise in a small range."
+		desc += " It is possible to traverse by swimming."
 	}
 	if c.BlocksRange() {
 		desc += " It blocks ranged attacks from foes."

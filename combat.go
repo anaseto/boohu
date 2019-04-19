@@ -144,7 +144,6 @@ func (g *game) HandleKill(mons *monster) {
 
 const (
 	WallNoise           = 9
-	SwimNoise           = 5
 	TemporalWallNoise   = 5
 	ExplosionNoise      = 12
 	MagicHitNoise       = 5
