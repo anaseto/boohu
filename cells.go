@@ -326,7 +326,7 @@ func (c cell) Style(g *game, pos position) (r rune, fg uicolor) {
 	case ChasmCell:
 		r, fg = '◊', ColorFgLOS
 	case WaterCell:
-		r, fg = '≈', ColorBlue
+		r, fg = '≈', ColorFgLOS
 	}
 	return r, fg
 }
