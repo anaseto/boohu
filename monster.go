@@ -338,7 +338,7 @@ const (
 	LoneBlinkingFrog
 	LoneWorm
 	LoneMirrorSpecter
-	LoneHound
+	LoneDog
 	LoneExplosiveNadre
 	LoneWingedMilfid
 	LoneMadNixe
@@ -380,7 +380,7 @@ var MonsBands = []monsterBandData{
 	LoneBlinkingFrog:           {Monster: MonsBlinkingFrog},
 	LoneWorm:                   {Monster: MonsWorm},
 	LoneMirrorSpecter:          {Monster: MonsMirrorSpecter},
-	LoneHound:                  {Monster: MonsDog},
+	LoneDog:                    {Monster: MonsDog},
 	LoneExplosiveNadre:         {Monster: MonsExplosiveNadre},
 	LoneWingedMilfid:           {Monster: MonsWingedMilfid},
 	LoneMadNixe:                {Monster: MonsMadNixe},
@@ -1049,9 +1049,9 @@ func (m *monster) InvertFoliage(g *game) {
 	invert := false
 	c := g.Dungeon.Cell(m.Pos)
 	if c.T == GroundCell {
-		g.Dungeon.SetCell(m.Pos, FungusCell)
+		g.Dungeon.SetCell(m.Pos, FoliageCell)
 		invert = true
-	} else if c.T == FungusCell {
+	} else if c.T == FoliageCell {
 		g.Dungeon.SetCell(m.Pos, GroundCell)
 		invert = true
 	}

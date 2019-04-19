@@ -130,7 +130,7 @@ func (ch *chooser) Action(g *game, pos position) error {
 		mons := g.MonsterAt(npos)
 		var okFlam bool
 		switch c.T {
-		case FungusCell, DoorCell:
+		case FoliageCell, DoorCell:
 			okFlam = true
 		}
 		if ch.flammable && okFlam || mons.Exists() || nc.T == WallCell {
@@ -175,7 +175,7 @@ func (ch *chooser) flammableInWay(g *game, pos position) bool {
 			continue
 		}
 		switch g.Dungeon.Cell(rpos).T {
-		case FungusCell, DoorCell:
+		case FoliageCell, DoorCell:
 			return true
 		}
 	}

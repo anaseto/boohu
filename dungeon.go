@@ -774,7 +774,7 @@ func (r *room) Dig(dg *dgen) {
 			r.entries = append(r.entries, e)
 		case '"':
 			if pos.valid() {
-				dg.d.SetCell(pos, FungusCell)
+				dg.d.SetCell(pos, FoliageCell)
 			}
 		case 'H':
 			r.places = append(r.places, place{pos: pos, kind: PlaceStory})
@@ -1395,7 +1395,7 @@ func (dg *dgen) FoliageCell(g *game) position {
 			continue
 		}
 		c := dg.d.Cell(pos)
-		if c.T == FungusCell {
+		if c.T == FoliageCell {
 			return pos
 		}
 	}
@@ -1416,7 +1416,7 @@ func (dg *dgen) OutsideCell(g *game) position {
 			continue
 		}
 		c := dg.d.Cell(pos)
-		if !dg.room[pos] && (c.T == FungusCell || c.T == GroundCell) {
+		if !dg.room[pos] && (c.T == FoliageCell || c.T == GroundCell) {
 			return pos
 		}
 	}
@@ -1440,7 +1440,7 @@ func (dg *dgen) InsideCell(g *game) position {
 			continue
 		}
 		c := dg.d.Cell(pos)
-		if dg.room[pos] && (c.T == FungusCell || c.T == GroundCell) {
+		if dg.room[pos] && (c.T == FoliageCell || c.T == GroundCell) {
 			return pos
 		}
 	}
@@ -1781,7 +1781,7 @@ func (dg *dgen) Foliage(less bool) {
 	}
 	for i, c := range d.Cells {
 		if c.T == GroundCell {
-			dg.d.SetCell(idxtopos(i), FungusCell)
+			dg.d.SetCell(idxtopos(i), FoliageCell)
 		}
 	}
 }
@@ -2012,7 +2012,7 @@ func (dg *dgen) PutMonsterBand(g *game, band monsterBand) bool {
 	switch band {
 	case LoneYack, LoneWorm, PairYack:
 		bdinf = dg.BandInfoFoliage(g, band)
-	case LoneHound, LoneEarthDragon, LoneHarpy:
+	case LoneDog, LoneEarthDragon, LoneHarpy:
 		bdinf = dg.BandInfoOutsideGround(g, band)
 	case LoneBlinkingFrog, LoneExplosiveNadre, PairExplosiveNadre:
 		bdinf = dg.BandInfoOutside(g, band)
@@ -2092,7 +2092,7 @@ func (dg *dgen) GenMonsters(g *game) {
 	bandsGuard := []monsterBand{LoneGuard}
 	bandsButterfly := []monsterBand{LoneButterfly}
 	bandsHighGuard := []monsterBand{LoneHighGuard}
-	bandsAnimals := []monsterBand{LoneYack, LoneWorm, LoneHound, LoneBlinkingFrog, LoneExplosiveNadre, LoneHarpy}
+	bandsAnimals := []monsterBand{LoneYack, LoneWorm, LoneDog, LoneBlinkingFrog, LoneExplosiveNadre, LoneHarpy}
 	bandsPlants := []monsterBand{LoneSatowalgaPlant}
 	bandsBipeds := []monsterBand{LoneOricCelmist, LoneMirrorSpecter, LoneWingedMilfid, LoneMadNixe, LoneVampire, LoneHarmonicCelmist}
 	bandsBig := []monsterBand{LoneTreeMushroom, LoneEarthDragon}

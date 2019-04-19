@@ -68,7 +68,7 @@ func (g *game) DiagonalDifficult(from, to position) bool {
 			continue
 		}
 		switch g.Dungeon.Cell(pos).T {
-		case WallCell, FungusCell, HoledWallCell:
+		case WallCell, FoliageCell, HoledWallCell:
 			count++
 		}
 	}
@@ -109,10 +109,10 @@ func (g *game) losCost(from, pos, to position, rs raystyle) int {
 			}
 		}
 	}
-	if c.T == FungusCell || c.T == HoledWallCell {
+	if c.T == FoliageCell || c.T == HoledWallCell {
 		switch rs {
 		case TreePlayerRay:
-			if c.T == FungusCell {
+			if c.T == FoliageCell {
 				break
 			}
 			fallthrough
@@ -275,7 +275,7 @@ func (g *game) SeePosition(pos position) {
 			g.StopAuto()
 			g.DijkstraMapRebuild = true
 		}
-		if cld, ok := g.Clouds[pos]; ok && cld == CloudFire && okT && (t == FungusCell || t == DoorCell) {
+		if cld, ok := g.Clouds[pos]; ok && cld == CloudFire && okT && (t == FoliageCell || t == DoorCell) {
 			g.Printf("There are flames there.")
 			g.StopAuto()
 			g.DijkstraMapRebuild = true

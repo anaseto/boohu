@@ -11,7 +11,7 @@ const (
 	WallCell terrain = iota
 	GroundCell
 	DoorCell
-	FungusCell
+	FoliageCell
 	BarrelCell
 	StairCell
 	StoneCell
@@ -140,7 +140,7 @@ func (c cell) IsWall() bool {
 
 func (c cell) Flammable() bool {
 	switch c.T {
-	case FungusCell, DoorCell, BarrelCell, TableCell, TreeCell, WindowCell:
+	case FoliageCell, DoorCell, BarrelCell, TableCell, TreeCell, WindowCell:
 		return true
 	default:
 		return false
@@ -173,7 +173,7 @@ func (c cell) ShortDesc(g *game, pos position) (desc string) {
 		desc = "the ground"
 	case DoorCell:
 		desc = "a door"
-	case FungusCell:
+	case FoliageCell:
 		desc = "foliage"
 	case BarrelCell:
 		desc = "a barrel"
@@ -221,7 +221,7 @@ func (c cell) Desc(g *game, pos position) (desc string) {
 		desc = "This is just plain ground."
 	case DoorCell:
 		desc = "A closed door blocks your line of sight. Doors open automatically when you or a creature stand on them."
-	case FungusCell:
+	case FoliageCell:
 		desc = "Blue dense foliage grows in the Underground. It is difficult to see through."
 	case BarrelCell:
 		desc = "A barrel. You can hide yourself inside it when no creatures see you. It is a safe place for resting and recovering."
@@ -290,7 +290,7 @@ func (c cell) Style(g *game, pos position) (r rune, fg uicolor) {
 		r, fg = '.', ColorFgLOS
 	case DoorCell:
 		r, fg = '+', ColorFgPlace
-	case FungusCell:
+	case FoliageCell:
 		r, fg = '"', ColorFgLOS
 	case BarrelCell:
 		r, fg = '&', ColorFgObject

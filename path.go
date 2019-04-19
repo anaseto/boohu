@@ -110,7 +110,7 @@ func (pp *playerPath) Neighbors(pos position) []position {
 	nb := pp.neighbors[:0]
 	keep := func(npos position) bool {
 		t, okT := pp.game.TerrainKnowledge[npos]
-		if cld, ok := pp.game.Clouds[npos]; ok && cld == CloudFire && (!okT || t != FungusCell && t != DoorCell) {
+		if cld, ok := pp.game.Clouds[npos]; ok && cld == CloudFire && (!okT || t != FoliageCell && t != DoorCell) {
 			return false
 		}
 		return npos.valid() && d.Cell(npos).Explored && (d.Cell(npos).T.IsPlayerPassable() && !okT ||
@@ -184,7 +184,7 @@ func (ap *autoexplorePath) Neighbors(pos position) []position {
 	nb := ap.neighbors[:0]
 	keep := func(npos position) bool {
 		t, okT := ap.game.TerrainKnowledge[npos]
-		if cld, ok := ap.game.Clouds[npos]; ok && cld == CloudFire && (!okT || t != FungusCell && t != DoorCell) {
+		if cld, ok := ap.game.Clouds[npos]; ok && cld == CloudFire && (!okT || t != FoliageCell && t != DoorCell) {
 			// XXX little info leak
 			return false
 		}
