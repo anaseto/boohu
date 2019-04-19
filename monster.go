@@ -1494,7 +1494,7 @@ func (m *monster) Blink(g *game) {
 	m.MoveTo(g, npos)
 }
 
-func (m *monster) MakeHunt(g *game) {
+func (m *monster) MakeHunt(g *game) (noticed bool) {
 	if m.State != Hunting {
 		m.State = Hunting
 		g.Stats.NSpotted++
@@ -1504,8 +1504,10 @@ func (m *monster) MakeHunt(g *game) {
 			g.Stats.DUSpotted[g.Depth]++
 			m.Noticed = true
 		}
+		noticed = true
 	}
 	m.Target = g.Player.Pos
+	return noticed
 }
 
 func (m *monster) MakeHuntIfHurt(g *game) {
@@ -1538,11 +1540,11 @@ func (m *monster) MakeAware(g *game) {
 	} else if m.State == Wandering || m.State == Watching {
 		g.Printf("%s notices you.", m.Kind.Definite(true))
 	}
-	if m.State != Hunting && m.Kind == MonsDog {
+	noticed := m.MakeHunt(g)
+	if noticed && m.Kind == MonsDog {
 		g.Printf("%s barks.", m.Kind.Definite(true))
 		g.MakeNoise(BarkNoise, m.Pos)
 	}
-	m.MakeHunt(g)
 }
 
 func (m *monster) GatherBand(g *game) {
