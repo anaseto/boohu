@@ -926,7 +926,7 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 					fgColor = ColorFgSleepingMonster
 				} else if m.State == Hunting {
 					fgColor = ColorFgMonster
-				} else if m.Kind.Peaceful() {
+				} else if m.Peaceful(g) {
 					fgColor = ColorFgPlayer
 				} else {
 					fgColor = ColorFgWanderingMonster

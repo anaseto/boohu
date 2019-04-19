@@ -32,6 +32,7 @@ const (
 	MonsConfused monsterStatus = iota
 	MonsExhausted
 	MonsSlow
+	MonsSatiated
 	MonsLignified
 )
 
@@ -45,6 +46,8 @@ func (st monsterStatus) String() (text string) {
 		text = "exhausted"
 	case MonsSlow:
 		text = "slowed"
+	case MonsSatiated:
+		text = "satiated"
 	case MonsLignified:
 		text = "lignified"
 	}
@@ -61,7 +64,7 @@ const (
 	MonsBlinkingFrog
 	MonsWorm
 	MonsMirrorSpecter
-	//MonsTinyHarpy
+	MonsTinyHarpy
 	//MonsOgre
 	MonsOricCelmist
 	//MonsBrizzia
@@ -147,7 +150,7 @@ func (mk monsterKind) CanOpenDoors() bool {
 
 func (mk monsterKind) CanFly() bool {
 	switch mk {
-	case MonsWingedMilfid, MonsMirrorSpecter, MonsButterfly:
+	case MonsWingedMilfid, MonsMirrorSpecter, MonsButterfly, MonsTinyHarpy:
 		return true
 	default:
 		return false
@@ -254,8 +257,8 @@ type monsterData struct {
 }
 
 var MonsData = []monsterData{
-	MonsGuard: {10, MonsMedium, 'g', "guard", 3},
-	//MonsTinyHarpy:       {10, 1, 10, 2, 't', "tiny harpy", 4},
+	MonsGuard:     {10, MonsMedium, 'g', "guard", 3},
+	MonsTinyHarpy: {10, MonsMedium, 't', "tiny harpy", 3},
 	//MonsOgre:            {10, 2, 20, 3, 'O', "ogre", 7},
 	MonsOricCelmist: {10, MonsMedium, 'c', "oric celmist", 9},
 	MonsWorm:        {15, MonsSmall, 'w', "farmer worm", 4},
@@ -284,8 +287,8 @@ var MonsData = []monsterData{
 }
 
 var monsDesc = []string{
-	MonsGuard: "Guards patrol between buildings.",
-	//MonsTinyHarpy:       "Tiny harpies are little humanoid flying creatures. They blink away when hurt. They often appear in a group.",
+	MonsGuard:     "Guards patrol between buildings.",
+	MonsTinyHarpy: "Tiny harpies are little humanoid flying creatures. They are aggressive when hungry, but peaceful when satiated. This Underground harpy species eats fruits (including bananas) and other vegetables.",
 	//MonsOgre:            "Ogres are big clunky humanoids that can hit really hard.",
 	MonsOricCelmist: "Oric celmists are mages that can create magical barriers in cells adjacent to you, complicating your escape.",
 	MonsWorm:        "Farmer worms are ugly slow moving creatures. They furrow as they move, helping new foliage to grow.",
@@ -339,6 +342,7 @@ const (
 	LoneEarthDragon
 	LoneButterfly
 	LoneVampire
+	LoneHarpy
 	PairGuard
 	PairYack
 	PairOricCelmist
@@ -377,6 +381,7 @@ var MonsBands = []monsterBandData{
 	LoneEarthDragon:        {Monster: MonsEarthDragon},
 	LoneButterfly:          {Monster: MonsButterfly},
 	LoneVampire:            {Monster: MonsVampire},
+	LoneHarpy:              {Monster: MonsTinyHarpy},
 	PairGuard:              {Band: true, Distribution: map[monsterKind]int{MonsGuard: 2}},
 	PairYack:               {Band: true, Distribution: map[monsterKind]int{MonsYack: 2}},
 	PairVampire:            {Band: true, Distribution: map[monsterKind]int{MonsVampire: 2}},
@@ -840,10 +845,23 @@ func (m *monster) ComputePath(g *game) {
 	}
 }
 
+func (m *monster) Peaceful(g *game) bool {
+	if m.Kind.Peaceful() {
+		return true
+	}
+	switch m.Kind {
+	case MonsTinyHarpy:
+		if m.Status(MonsSatiated) || g.Player.Bananas == 0 {
+			return true
+		}
+	}
+	return false
+}
+
 func (m *monster) HandleEndPath(g *game) {
 	switch m.State {
 	case Wandering, Hunting:
-		if !m.Kind.Peaceful() {
+		if !m.Peaceful(g) {
 			if !m.SeesPlayer(g) {
 				m.StartWatching()
 				m.Alternate()
@@ -855,6 +873,23 @@ func (m *monster) HandleEndPath(g *game) {
 	g.Ev.Renew(g, m.MoveDelay(g))
 }
 
+func (m *monster) MakeWanderAt(target position) {
+	m.Target = target
+	if m.Kind == MonsSatowalgaPlant {
+		m.State = Hunting
+	} else {
+		m.State = Wandering
+	}
+}
+
+func (m *monster) MakeWander() {
+	if m.Kind == MonsSatowalgaPlant {
+		m.State = Watching
+	} else {
+		m.State = Wandering
+	}
+}
+
 func (m *monster) HandleMove(g *game) {
 	target := m.Path[len(m.Path)-2]
 	mons := g.MonsterAt(target)
@@ -864,7 +899,7 @@ func (m *monster) HandleMove(g *game) {
 	}
 	c := g.Dungeon.Cell(target)
 	switch {
-	case m.Kind.Peaceful() && target == g.Player.Pos:
+	case m.Peaceful(g) && target == g.Player.Pos:
 		m.Path = m.APath(g, m.Pos, m.Target)
 	case !mons.Exists():
 		if m.Kind == MonsEarthDragon && c.IsDestructible() {
@@ -908,11 +943,10 @@ func (m *monster) HandleMove(g *game) {
 	case m.State == Hunting && mons.State != Hunting:
 		r := RandInt(5)
 		if r == 0 {
-			if mons.Kind.Peaceful() {
+			if mons.Peaceful(g) {
 				mons.State = Wandering
 			} else {
-				mons.Target = m.Target
-				mons.State = Hunting
+				mons.MakeWanderAt(m.Target)
 				mons.GatherBand(g)
 			}
 		} else {
@@ -962,7 +996,7 @@ func (m *monster) HandleTurn(g *game, ev event) {
 	if m.HandleMonsSpecifics(g) {
 		return
 	}
-	if mpos.Distance(ppos) == 1 && g.Dungeon.Cell(ppos).T != BarrelCell && !m.Kind.Peaceful() {
+	if mpos.Distance(ppos) == 1 && g.Dungeon.Cell(ppos).T != BarrelCell && !m.Peaceful(g) {
 		if m.Status(MonsConfused) {
 			g.Printf("%s appears too confused to attack.", m.Kind.Definite(true))
 			ev.Renew(g, 10) // wait
@@ -1130,6 +1164,20 @@ func (m *monster) HitSideEffects(g *game, ev event) {
 		g.PlacePlayerAt(ompos)
 		g.Print("The flying milfid makes you swap positions.")
 		m.ExhaustTime(g, 50+RandInt(50))
+	case MonsTinyHarpy:
+		if m.Status(MonsSatiated) {
+			return
+		}
+		g.Player.Bananas--
+		if g.Player.Bananas < 0 {
+			g.Player.Bananas = 0
+		} else {
+			m.Statuses[MonsSatiated]++
+			g.PushEvent(&monsterEvent{ERank: g.Ev.Rank() + DurationMonsterSatiation, NMons: m.Index, EAction: MonsSatiatedEnd})
+			g.Print("The tiny harpy steals a banana from you.")
+			m.Target = m.NextTarget(g)
+			m.MakeWander()
+		}
 	}
 }
 
@@ -1464,16 +1512,10 @@ func (m *monster) MakeAware(g *game) {
 	if !m.SeesPlayer(g) {
 		return
 	}
-	if m.State == Resting {
-		// XXX maybe in some rare cases you could be able to move near them unnoticed
-		if RandInt(3) == 0 {
-			return
-		}
-	}
-	if m.Kind.Peaceful() {
+	if m.Peaceful(g) || m.Status(MonsSatiated) {
 		if m.State == Resting {
 			g.Printf("%s awakens.", m.Kind.Definite(true))
-			m.State = Wandering
+			m.MakeWander()
 		}
 		return
 	}

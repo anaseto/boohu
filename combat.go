@@ -60,14 +60,9 @@ func (g *game) MakeNoise(noise int, at position) {
 			continue
 		}
 		if m.SeesPlayer(g) {
-			m.MakeHunt(g)
+			m.MakeAware(g)
 		} else {
-			m.Target = at
-			if m.Kind == MonsSatowalgaPlant {
-				m.State = Hunting
-			} else {
-				m.State = Wandering
-			}
+			m.MakeWanderAt(at)
 		}
 		m.GatherBand(g)
 	}
@@ -87,7 +82,7 @@ func (g *game) AttractMonster(pos position) *monster {
 }
 
 func (g *game) Jump(mons *monster, ev event) error {
-	if mons.Kind.Peaceful() {
+	if mons.Peaceful(g) {
 		ompos := mons.Pos
 		mons.MoveTo(g, g.Player.Pos)
 		mons.Swapped = true

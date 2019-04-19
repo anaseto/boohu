@@ -179,6 +179,7 @@ const (
 	MonsConfusionEnd
 	MonsExhaustionEnd
 	MonsSlowEnd
+	MonsSatiatedEnd
 	MonsLignificationEnd
 )
 
@@ -233,6 +234,14 @@ func (mev *monsterEvent) Action(g *game) {
 			//(mons.Kind.Ranged() || mons.Kind.Smiting()) && mons.Pos.Distance(g.Player.Pos) > 1 {
 			//g.Printf("%s is ready to fire again.", mons.Kind.Definite(true))
 			//}
+		}
+	case MonsSatiatedEnd:
+		mons := g.Monsters[mev.NMons]
+		if mons.Exists() {
+			mons.Statuses[MonsSatiated]--
+			if g.Player.Sees(mons.Pos) {
+				g.Printf("%s is no longer satiated.", mons.Kind.Definite(true))
+			}
 		}
 	}
 }
@@ -432,4 +441,5 @@ const (
 	DurationObstructionProgression = 150
 	DurationSmokingCloakFog        = 20
 	DurationMonsterExhaustion      = 100
+	DurationMonsterSatiation       = 400
 )
