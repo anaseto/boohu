@@ -42,7 +42,7 @@ func (ui *gameui) TeleportAnimation(from, to position, showto bool) {
 	_, _, bgColort := ui.PositionDrawing(to)
 	ui.DrawAtPosition(from, true, 'Φ', ColorCyan, bgColorf)
 	ui.Flush()
-	time.Sleep(AnimDurMedium)
+	time.Sleep(AnimDurMediumLong)
 	if showto {
 		ui.DrawAtPosition(from, true, 'Φ', ColorBlue, bgColorf)
 		ui.DrawAtPosition(to, true, 'Φ', ColorCyan, bgColort)
@@ -84,7 +84,7 @@ func (ui *gameui) MonsterProjectileAnimation(ray []position, r rune, fg uicolor)
 		or, fgColor, bgColor := ui.PositionDrawing(pos)
 		ui.DrawAtPosition(pos, true, r, fg, bgColor)
 		ui.Flush()
-		time.Sleep(AnimDurShort)
+		time.Sleep(AnimDurMedium)
 		ui.DrawAtPosition(pos, true, or, fgColor, bgColor)
 	}
 }
@@ -516,6 +516,23 @@ func (ui *gameui) StatusEndAnimation() {
 	time.Sleep(AnimDurMediumLong)
 	ui.DrawAtPosition(g.Player.Pos, false, r, fg, bg)
 	ui.Flush()
+}
+
+func (ui *gameui) PushAnimation(path []position) {
+	if DisableAnimations {
+		return
+	}
+	if len(path) == 0 {
+		// should not happen
+		return
+	}
+	_, _, bg := ui.PositionDrawing(path[0])
+	for _, pos := range path[:len(path)-1] {
+		ui.DrawAtPosition(pos, false, '×', ColorFgPlayer, bg)
+	}
+	ui.DrawAtPosition(path[len(path)-1], false, '@', ColorFgPlayer, bg)
+	ui.Flush()
+	time.Sleep(AnimDurLong)
 }
 
 func (ui *gameui) MenuSelectedAnimation(m menu, ok bool) {

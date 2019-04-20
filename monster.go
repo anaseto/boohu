@@ -298,7 +298,7 @@ var monsDesc = []string{
 	//MonsBrizzia:         "Brizzias are big slow moving biped creatures. They are quite hardy, and when hurt they can cause nausea, impeding the use of potions.",
 	//MonsAcidMound:       "Acid mounds are acidic creatures. They can temporarily corrode your equipment.",
 	MonsDog:  "Dogs are fast moving carnivore quadrupeds. They can bark, and smell you.",
-	MonsYack: "Yacks are quite large herbivorous quadrupeds. They tend to eat grass peacefully, but upon seing you they may attack, pushing you one cell away.",
+	MonsYack: "Yacks are quite large herbivorous quadrupeds. They tend to eat grass peacefully, but upon seing you they may attack, pushing you up to 5 cells away.",
 	//MonsGiantBee:        "Giant bees are fragile but extremely fast moving creatures. Their bite can sometimes enrage you.",
 	MonsHighGuard: "High guards watch over a particular location. They can throw javelins.",
 	//MonsHydra:           "Hydras are enormous creatures with four heads that can hit you each at once.",
@@ -1157,13 +1157,9 @@ func (m *monster) HitSideEffects(g *game, ev event) {
 	//g.Print("You feel a sudden urge to kill things.")
 	//}
 	case MonsBlinkingFrog:
-		if RandInt(2) == 0 {
-			g.Blink(ev)
-		}
+		g.Blink(ev)
 	case MonsYack:
-		if RandInt(2) == 0 && m.PushPlayer(g) {
-			g.Print("The yack pushes you.")
-		}
+		m.PushPlayer(g)
 	case MonsWingedMilfid:
 		if m.Status(MonsExhausted) || g.Player.HasStatus(StatusLignification) {
 			break
@@ -1190,18 +1186,44 @@ func (m *monster) HitSideEffects(g *game, ev event) {
 	}
 }
 
-func (m *monster) PushPlayer(g *game) (pushed bool) {
+func (m *monster) PushPlayer(g *game) {
+	if g.Player.HasStatus(StatusLignification) {
+		return
+	}
 	dir := g.Player.Pos.Dir(m.Pos)
-	pos := g.Player.Pos.To(dir)
-	if !g.Player.HasStatus(StatusLignification) &&
-		pos.valid() && g.Dungeon.Cell(pos).IsPassable() {
-		mons := g.MonsterAt(pos)
-		if !mons.Exists() {
-			g.PlacePlayerAt(pos)
-			pushed = true
+	pos := g.Player.Pos
+	path := []position{pos}
+	i := 0
+	for {
+		i++
+		npos := pos.To(dir)
+		if !npos.valid() || g.Dungeon.Cell(npos).BlocksRange() {
+			break
+		}
+		mons := g.MonsterAt(npos)
+		if mons.Exists() {
+			continue
+		}
+		pos = npos
+		path = append(path, pos)
+		if i >= 5 {
+			break
 		}
 	}
-	return pushed
+	if pos == g.Player.Pos {
+		// TODO: do more interesting things, perhaps?
+		return
+	}
+	c := g.Dungeon.Cell(pos)
+	if c.T.IsPlayerPassable() {
+		g.PlacePlayerAt(pos)
+		g.Printf("%s pushes you.", m.Kind.Definite(true))
+		g.ui.PushAnimation(path)
+	} else if c.T == ChasmCell {
+		g.Printf("%s pushes you.", m.Kind.Definite(true))
+		g.ui.PushAnimation(path)
+		g.FallAbyss(DescendFall)
+	}
 }
 
 func (m *monster) RangedAttack(g *game, ev event) bool {
