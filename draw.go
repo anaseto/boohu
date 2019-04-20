@@ -394,70 +394,90 @@ func (ui *gameui) DrawWelcomeCommon() int {
 	ui.Clear()
 	col := 10
 	line := 5
-	rcol := col + 20
-	ColorText := ColorFgHPok
-	ui.DrawDark(fmt.Sprintf("       Harmonist %s", Version), col, line-2, ColorText, false)
-	ui.DrawDark("────│\\/\\/\\/\\/\\/\\/\\/│────", col, line, ColorText, false)
-	line++
-	ui.DrawDark("##", col, line, ColorFgDark, true)
-	ui.DrawLOS("#", col+2, line, ColorFgLOS, true)
-	ui.DrawLOS("#", col+3, line, ColorFgLOS, true)
-	ui.DrawDark("│              │", col+4, line, ColorText, false)
-	ui.DrawDark("####", rcol, line, ColorFgDark, true)
-	line++
-	ui.DrawDark("#.", col, line, ColorFgDark, true)
-	ui.DrawLOS(".", col+2, line, ColorFgLOS, true)
-	ui.DrawLOS(".", col+3, line, ColorFgLOS, true)
-	ui.DrawDark("│              │", col+4, line, ColorText, false)
-	ui.DrawDark(".", rcol, line, ColorFgDark, true)
-	ui.DrawDark(")", rcol+1, line, ColorFgBananas, true)
-	ui.DrawDark(".#", rcol+2, line, ColorFgDark, true)
-	line++
-	ui.DrawDark("##", col, line, ColorFgDark, true)
-	ui.DrawLOS("!", col+2, line, ColorFgObject, true)
-	ui.DrawLOS(".", col+3, line, ColorFgLOS, true)
-	ui.DrawDark("│              │", col+4, line, ColorText, false)
-	ui.DrawDark("│              │", col+4, line, ColorText, false)
-	ui.DrawDark(".###", rcol, line, ColorFgDark, true)
-	line++
-	ui.DrawDark(" #", col, line, ColorFgDark, true)
-	ui.DrawLOS("g", col+2, line, ColorFgMonster, true)
-	ui.DrawLOS("G", col+3, line, ColorFgMonster, true)
-	ui.DrawDark("│  HARMONIST   │", col+4, line, ColorText, false)
-	ui.DrawDark("##  ", rcol, line, ColorFgDark, true)
-	line++
-	ui.DrawLOS("#", col, line, ColorFgLOS, true)
-	ui.DrawLOS("#", col+1, line, ColorFgLOS, true)
-	ui.DrawLOS("D", col+2, line, ColorFgMonster, true)
-	ui.DrawLOS("g", col+3, line, ColorFgMonster, true)
-	ui.DrawDark("│              │", col+4, line, ColorText, false)
-	ui.DrawDark(".## ", rcol, line, ColorFgDark, true)
-	line++
-	ui.DrawLOS("#", col, line, ColorFgLOS, true)
-	ui.DrawLOS("@", col+1, line, ColorFgPlayer, true)
-	ui.DrawLOS("#", col+2, line, ColorFgLOS, true)
-	ui.DrawDark("#", col+3, line, ColorFgDark, true)
-	ui.DrawDark("│              │", col+4, line, ColorText, false)
-	ui.DrawDark("\".##", rcol, line, ColorFgDark, true)
-	line++
-	ui.DrawLOS("#", col, line, ColorFgLOS, true)
-	ui.DrawLOS(".", col+1, line, ColorFgLOS, true)
-	ui.DrawLOS("#", col+2, line, ColorFgLOS, true)
-	ui.DrawDark("#", col+3, line, ColorFgDark, true)
-	ui.DrawDark("│              │", col+4, line, ColorText, false)
-	ui.DrawDark("#.", rcol, line, ColorFgDark, true)
-	ui.DrawDark(">", rcol+2, line, ColorFgPlace, true)
-	ui.DrawDark("#", rcol+3, line, ColorFgDark, true)
-	line++
-	ui.DrawLOS("#", col, line, ColorFgLOS, true)
-	ui.DrawLOS("[", col+1, line, ColorFgObject, true)
-	ui.DrawLOS(".", col+2, line, ColorFgLOS, true)
-	ui.DrawDark("##", col+3, line, ColorFgDark, true)
-	ui.DrawDark("│              │", col+4, line, ColorFgHPok, false)
-	ui.DrawDark("\"\"##", rcol, line, ColorFgDark, true)
-	line++
-	ui.DrawDark("────│/\\/\\/\\/\\/\\/\\/\\│────", col, line, ColorText, false)
-	line++
+	p := &pencil{ui: ui, line: 4, basecol: 10}
+	p.NewLine()
+	p.DrawText(fmt.Sprintf("    Harmonist %s", Version))
+	p.NewLine()
+	p.DrawText(strings.Repeat("─", 23))
+	p.NewLine()
+	p.DrawDark(" #", ColorFgDark)
+	p.DrawLOS("##", ColorFgLOS)
+	p.DrawDark("###############", ColorViolet)
+	p.DrawDark("### ", ColorFgDark)
+	p.NewLine()
+	p.DrawDark("#.", ColorFgDark)
+	p.DrawLOS("..", ColorFgLOSLight)
+	p.DrawLOS("#", ColorViolet)
+	p.DrawText("  HARMONIST  ")
+	p.DrawDark("#", ColorViolet)
+	p.DrawDark(".", ColorFgDark)
+	p.DrawDark(")", ColorFgBananas)
+	p.DrawDark(".#", ColorFgDark)
+	p.NewLine()
+	p.DrawDark("#.", ColorFgDark)
+	p.DrawLOS("b", ColorFgPlayer)
+	p.DrawLOS(".", ColorFgLOSLight)
+	p.DrawLOS("####", ColorViolet)
+	p.DrawDark("###########", ColorViolet)
+	p.DrawDark(".## ", ColorFgDark)
+	p.NewLine()
+	p.DrawDark(" #", ColorFgDark)
+	p.DrawLOS("...", ColorFgLOSLight)
+	p.DrawLOS("...", ColorFgWanderingMonster)
+	p.DrawLOS("#", ColorFgLOS)
+	p.DrawDark("#", ColorFgDark)
+	p.DrawDark("π", ColorFgObject)
+	p.DrawDark(".", ColorFgDark)
+	p.DrawDark(">", ColorFgPlace)
+	p.DrawDark("##....", ColorFgDark)
+	p.DrawDark(".#  ", ColorFgDark)
+	p.NewLine()
+	p.DrawDark(" ", ColorFgDark)
+	p.DrawLOS("#", ColorFgLOS)
+	p.DrawLOS("..", ColorFgLOSLight)
+	p.DrawLOS(".", ColorFgWanderingMonster)
+	p.DrawLOS("g", ColorFgWanderingMonster)
+	p.DrawLOS("..+", ColorFgWanderingMonster)
+	p.DrawDark("..", ColorFgDark)
+	p.DrawDark("G", ColorFgWanderingMonster)
+	p.DrawDark("..", ColorFgDark)
+	p.DrawDark("+", ColorFgPlace)
+	p.DrawDark("....", ColorFgDark)
+	p.DrawDark(".#  ", ColorFgDark)
+	p.NewLine()
+	p.DrawLOS("#", ColorFgLOS)
+	p.DrawLOS("@", ColorFgPlayer)
+	p.DrawLOS(".", ColorFgLOSLight)
+	p.DrawLOS("#", ColorFgLOS)
+	p.DrawDark("≈", ColorFgDark)
+	p.DrawDark("♫", ColorFgWanderingMonster)
+	p.DrawDark("..##", ColorFgDark)
+	p.DrawDark("☼", ColorFgObject)
+	p.DrawDark(".", ColorFgDark)
+	p.DrawDark("&", ColorFgObject)
+	p.DrawDark("##..", ColorFgDark)
+	p.DrawDark("♣", ColorFgTree)
+	p.DrawDark(".\".##", ColorFgDark)
+	p.NewLine()
+	p.DrawLOS("#", ColorFgLOS)
+	p.DrawLOS(".", ColorFgLOSLight)
+	p.DrawLOS("#", ColorFgLOS)
+	p.DrawDark("#≈≈≈..##", ColorFgDark)
+	p.DrawDark("+", ColorFgPlace)
+	p.DrawDark("##..", ColorFgDark)
+	p.DrawDark("h", ColorFgWanderingMonster)
+	p.DrawDark("..#.", ColorFgDark)
+	p.DrawDark("_", ColorFgMagicPlace)
+	p.DrawDark("#", ColorFgDark)
+	p.NewLine()
+	p.DrawLOS("#", ColorFgLOS)
+	p.DrawLOS(".", ColorFgLOSLight)
+	p.DrawDark(".", ColorFgDark)
+	p.DrawDark("##≈≈≈...........\"\"##", ColorFgDark)
+	p.NewLine()
+	p.DrawText(strings.Repeat("─", 23))
+	p.NewLine()
+	line = p.line
 	line++
 	if runtime.GOARCH == "wasm" {
 		ui.DrawDark("- (P)lay", col-3, line, ColorFg, false)
@@ -489,7 +509,7 @@ func (ui *gameui) DrawColored(text string, x, y int, fg, bg uicolor) {
 	}
 }
 
-func (ui *gameui) DrawDark(text string, x, y int, fg uicolor, inmap bool) {
+func (ui *gameui) DrawDark(text string, x, y int, fg uicolor, inmap bool) int {
 	col := 0
 	for _, r := range text {
 		if inmap {
@@ -499,9 +519,34 @@ func (ui *gameui) DrawDark(text string, x, y int, fg uicolor, inmap bool) {
 		}
 		col++
 	}
+	return col
 }
 
-func (ui *gameui) DrawLOS(text string, x, y int, fg uicolor, inmap bool) {
+type pencil struct {
+	ui      *gameui
+	line    int
+	col     int
+	basecol int
+}
+
+func (p *pencil) DrawLOS(text string, fg uicolor) {
+	p.col += p.ui.DrawLOS(text, p.col, p.line, fg, true)
+}
+
+func (p *pencil) DrawDark(text string, fg uicolor) {
+	p.col += p.ui.DrawDark(text, p.col, p.line, fg, true)
+}
+
+func (p *pencil) DrawText(text string) {
+	p.col += p.ui.DrawDark(text, p.col, p.line, ColorGreen, false)
+}
+
+func (p *pencil) NewLine() {
+	p.line++
+	p.col = p.basecol
+}
+
+func (ui *gameui) DrawLOS(text string, x, y int, fg uicolor, inmap bool) int {
 	col := 0
 	for _, r := range text {
 		if inmap {
@@ -511,6 +556,7 @@ func (ui *gameui) DrawLOS(text string, x, y int, fg uicolor, inmap bool) {
 		}
 		col++
 	}
+	return col
 }
 
 func (ui *gameui) DrawKeysDescription(title string, actions []string) {
