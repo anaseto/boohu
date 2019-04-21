@@ -129,6 +129,34 @@ func (g *game) HasFreeExploredNeighbor(pos position) bool {
 	return false
 }
 
+func (dg *dgen) ComputeConnectedComponents(nf func(position) bool) {
+	dg.cc = make([]int, DungeonNCells)
+	index := 1
+	stack := []position{}
+	nb := make([]position, 0, 8)
+	for i, _ := range dg.d.Cells {
+		pos := idxtopos(i)
+		if dg.cc[i] != 0 || !nf(pos) {
+			continue
+		}
+		stack = append(stack[:0], pos)
+		count := 0
+		dg.cc[i] = index
+		for len(stack) > 0 {
+			pos = stack[len(stack)-1]
+			stack = stack[:len(stack)-1]
+			count++
+			nb = pos.CardinalNeighbors(nb, nf)
+			for _, npos := range nb {
+				if dg.cc[npos.idx()] != index {
+					dg.cc[npos.idx()] = index
+					stack = append(stack, npos)
+				}
+			}
+		}
+	}
+}
+
 func (d *dungeon) Connected(pos position, nf func(position) bool) (map[position]bool, int) {
 	conn := map[position]bool{}
 	stack := []position{pos}
@@ -248,6 +276,7 @@ type dgen struct {
 	spl     places
 	special specialRoom
 	layout  maplayout
+	cc      []int
 }
 
 func (dg *dgen) WallAreaCount(area []position, pos position, radius int) int {
@@ -1094,7 +1123,7 @@ func (g *game) GenRoomTunnels(ml maplayout) {
 			t = WaterCell
 		}
 		dg.GenLake(t)
-		if RandInt(10) == 0 {
+		if RandInt(5) == 0 {
 			dg.GenLake(t)
 		}
 	}
@@ -1109,6 +1138,9 @@ func (g *game) GenRoomTunnels(ml maplayout) {
 		dg.GenBarrel(g)
 	}
 	dg.AddSpecial(g, ml)
+	dg.ComputeConnectedComponents(func(pos position) bool {
+		return pos.valid() && g.Dungeon.Cell(pos).IsPassable()
+	})
 	dg.GenMonsters(g)
 }
 
@@ -1667,9 +1699,11 @@ func (dg *dgen) RunCellularAutomataCave() bool {
 
 func (dg *dgen) GenLake(t terrain) {
 	walls := []position{}
+	xshift := 10 + RandInt(5)
+	yshift := 5 + RandInt(3)
 	for i := 0; i < DungeonNCells; i++ {
 		pos := idxtopos(i)
-		if pos.X < 10 || pos.Y < 5 || pos.X > DungeonWidth-10 || pos.Y > DungeonHeight-5 {
+		if pos.X < xshift || pos.Y < yshift || pos.X > DungeonWidth-xshift || pos.Y > DungeonHeight-yshift {
 			continue
 		}
 		c := dg.d.Cell(pos)
@@ -1980,8 +2014,15 @@ func (dg *dgen) BandInfoOutside(g *game, band monsterBand) bandInfo {
 
 func (dg *dgen) BandInfoOutsideExplore(g *game, band monsterBand) bandInfo {
 	bandinfo := bandInfo{Kind: monsterBand(band)}
-	for i := 0; i < 5; i++ {
-		bandinfo.Path = append(bandinfo.Path, dg.OutsideCell(g))
+	bandinfo.Path = append(bandinfo.Path, dg.OutsideCell(g))
+	for i := 0; i < 4; i++ {
+		for j := 0; j < 100; j++ {
+			pos := dg.OutsideCell(g)
+			if dg.cc[pos.idx()] == dg.cc[bandinfo.Path[0].idx()] {
+				bandinfo.Path = append(bandinfo.Path, pos)
+				break
+			}
+		}
 	}
 	bandinfo.Beh = BehExplore
 	return bandinfo
@@ -1989,8 +2030,15 @@ func (dg *dgen) BandInfoOutsideExplore(g *game, band monsterBand) bandInfo {
 
 func (dg *dgen) BandInfoOutsideExploreButterfly(g *game, band monsterBand) bandInfo {
 	bandinfo := bandInfo{Kind: monsterBand(band)}
-	for i := 0; i < 10; i++ {
-		bandinfo.Path = append(bandinfo.Path, dg.OutsideCell(g))
+	bandinfo.Path = append(bandinfo.Path, dg.OutsideCell(g))
+	for i := 0; i < 9; i++ {
+		for j := 0; j < 100; j++ {
+			pos := dg.OutsideCell(g)
+			if dg.cc[pos.idx()] == dg.cc[bandinfo.Path[0].idx()] {
+				bandinfo.Path = append(bandinfo.Path, pos)
+				break
+			}
+		}
 	}
 	bandinfo.Beh = BehExplore
 	return bandinfo
