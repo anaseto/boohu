@@ -1400,7 +1400,7 @@ func (m *monster) NixeAttraction(g *game, ev event) bool {
 	g.MakeNoise(MagicCastNoise, m.Pos)
 	g.PrintfStyled("%s lures you to her.", logMonsterHit, m.Kind.Definite(true))
 	ray := g.Ray(m.Pos)
-	g.ui.MonsterProjectileAnimation(ray, 'θ', ColorCyan) // TODO: improve
+	g.ui.MonsterProjectileAnimation(ray, '*', ColorCyan)
 	if len(ray) > 1 {
 		// should always be the case
 		g.ui.TeleportAnimation(g.Player.Pos, ray[1], true)
