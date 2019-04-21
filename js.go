@@ -349,6 +349,9 @@ func (ui *gameui) Init() error {
 		}))
 	canvas.Call(
 		"addEventListener", "mousemove", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			if CenteredCamera {
+				return
+			}
 			e := args[0]
 			x, y := ui.GetMousePos(e)
 			if x != ui.mousepos.X || y != ui.mousepos.Y {

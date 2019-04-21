@@ -156,10 +156,15 @@ func (ui *gameui) PlayerTurnEvent(ev event) (err error, again, quit bool) {
 	switch in.key {
 	case "":
 		if in.mouse {
-			pos := position{X: in.mouseX, Y: in.mouseY}
+			var mpos position
+			if CenteredCamera {
+				mpos = ui.CameraTargetPosition(in.mouseX, in.mouseY, true)
+			} else {
+				mpos = position{in.mouseX, in.mouseY}
+			}
 			switch in.button {
 			case -1:
-				if in.mouseY == DungeonHeight {
+				if in.mouseY == ui.MapHeight() {
 					m, ok := ui.WhichButton(in.mouseX)
 					omh := ui.menuHover
 					if ok {
@@ -174,13 +179,13 @@ func (ui *gameui) PlayerTurnEvent(ev event) (err error, again, quit bool) {
 					break
 				}
 				ui.menuHover = -1
-				if in.mouseX >= DungeonWidth || in.mouseY >= DungeonHeight {
+				if in.mouseX >= ui.MapWidth() || in.mouseY >= ui.MapHeight() {
 					again = true
 					break
 				}
 				fallthrough
 			case 0:
-				if in.mouseY == DungeonHeight {
+				if in.mouseY == ui.MapHeight() {
 					m, ok := ui.WhichButton(in.mouseX)
 					if !ok {
 						again = true
@@ -191,10 +196,10 @@ func (ui *gameui) PlayerTurnEvent(ev event) (err error, again, quit bool) {
 						again = true
 					}
 					return err, again, quit
-				} else if in.mouseX >= DungeonWidth || in.mouseY >= DungeonHeight {
+				} else if in.mouseX >= ui.MapWidth() || in.mouseY >= ui.MapHeight() {
 					again = true
 				} else {
-					err, again, quit = ui.ExaminePos(ev, pos)
+					err, again, quit = ui.ExaminePos(ev, mpos)
 				}
 			case 2:
 				err, again, quit = ui.HandleKeyAction(runeKeyAction{k: KeyMenu})
@@ -244,7 +249,7 @@ func (ui *gameui) Scroll(n int) (m int, quit bool) {
 				if y > UIHeight {
 					break
 				}
-				n += y - (DungeonHeight+3)/2
+				n += y - (ui.MapHeight()+3)/2
 			}
 		}
 	}
@@ -324,9 +329,9 @@ func (ui *gameui) KeyMenuAction(n int) (m int, action keyConfigAction) {
 	case "\x1b", " ":
 		action = QuitKeyConfig
 	case "u":
-		n -= DungeonHeight / 2
+		n -= ui.MapHeight() / 2
 	case "d":
-		n += DungeonHeight / 2
+		n += ui.MapHeight() / 2
 	case "j", "2", "ArrowDown":
 		n++
 	case "k", "8", "ArrowUp":
@@ -339,7 +344,7 @@ func (ui *gameui) KeyMenuAction(n int) (m int, action keyConfigAction) {
 			x := in.mouseX
 			switch in.button {
 			case 0:
-				if x > DungeonWidth || y > DungeonHeight {
+				if x > DungeonWidth || y > ui.MapHeight() {
 					action = QuitKeyConfig
 				}
 			case 1:
@@ -364,7 +369,7 @@ func (ui *gameui) TargetModeEvent(targ Targeter, data *examineData) (err error, 
 		}
 		switch in.button {
 		case -1:
-			if in.mouseY == DungeonHeight {
+			if in.mouseY == ui.MapHeight() {
 				m, ok := ui.WhichButton(in.mouseX)
 				omh := ui.menuHover
 				if ok {
@@ -382,20 +387,25 @@ func (ui *gameui) TargetModeEvent(targ Targeter, data *examineData) (err error, 
 				break
 			}
 			ui.menuHover = -1
-			if in.mouseY >= DungeonHeight || in.mouseX >= DungeonWidth {
+			if in.mouseY >= ui.MapHeight() || in.mouseX >= ui.MapWidth() {
 				g.Targeting = InvalidPos
 				notarg = true
 				err = errors.New(DoNothing)
 				break
 			}
-			mpos := position{in.mouseX, in.mouseY}
+			var mpos position
+			if CenteredCamera {
+				mpos = ui.CameraTargetPosition(in.mouseX, in.mouseY, true)
+			} else {
+				mpos = position{in.mouseX, in.mouseY}
+			}
 			if g.Targeting == mpos {
 				break
 			}
 			g.Targeting = InvalidPos
 			fallthrough
 		case 0:
-			if in.mouseY == DungeonHeight {
+			if in.mouseY == ui.MapHeight() {
 				m, ok := ui.WhichButton(in.mouseX)
 				if !ok {
 					g.Targeting = InvalidPos
@@ -404,15 +414,21 @@ func (ui *gameui) TargetModeEvent(targ Targeter, data *examineData) (err error, 
 					break
 				}
 				err, again, quit, notarg = ui.CursorKeyAction(targ, runeKeyAction{k: m.Key(g)}, data)
-			} else if in.mouseX >= DungeonWidth || in.mouseY >= DungeonHeight {
+			} else if in.mouseX >= ui.MapWidth() || in.mouseY >= ui.MapHeight() {
 				g.Targeting = InvalidPos
 				notarg = true
 				err = errors.New(DoNothing)
 			} else {
-				again, notarg = ui.CursorMouseLeft(targ, position{X: in.mouseX, Y: in.mouseY}, data)
+				var mpos position
+				if CenteredCamera {
+					mpos = ui.CameraTargetPosition(in.mouseX, in.mouseY, true)
+				} else {
+					mpos = position{in.mouseX, in.mouseY}
+				}
+				again, notarg = ui.CursorMouseLeft(targ, mpos, data)
 			}
 		case 2:
-			if in.mouseY >= DungeonHeight || in.mouseX >= DungeonWidth {
+			if in.mouseY >= ui.MapHeight() || in.mouseX >= ui.MapWidth() {
 				err, again, quit, notarg = ui.CursorKeyAction(targ, runeKeyAction{k: KeyMenu}, data)
 			} else {
 				err, again, quit, notarg = ui.CursorKeyAction(targ, runeKeyAction{k: KeyDescription}, data)
@@ -1332,9 +1348,9 @@ loop:
 			if _, ok := targ.(*examiner); !ok {
 				st = " Targeting mode "
 			}
-			ui.DrawStyledTextLine(st, DungeonHeight+2, FooterLine)
+			ui.DrawStyledTextLine(st, ui.MapHeight()+2, FooterLine)
 		}
-		ui.SetCell(DungeonWidth, DungeonHeight, '┤', ColorFg, ColorBg)
+		ui.SetCell(DungeonWidth, ui.MapHeight(), '┤', ColorFg, ColorBg)
 		ui.Flush()
 		data.npos = pos
 		var notarg bool
@@ -1558,7 +1574,7 @@ func (ui *gameui) CriticalHPWarning() {
 	g := ui.g
 	g.PrintStyled("*** CRITICAL HP WARNING *** [(x) to continue]", logCritic)
 	ui.DrawDungeonView(NormalMode)
-	ui.WaitForContinue(DungeonHeight)
+	ui.WaitForContinue(ui.MapHeight())
 	g.Print("Ok. Be careful, then.")
 }
 

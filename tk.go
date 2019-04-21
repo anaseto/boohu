@@ -56,6 +56,9 @@ $can create image 0 0 -anchor nw -image gamescreen
 		ch <- uiInput{mouse: true, mouseX: (x - 1) / ui.width, mouseY: (y - 1) / ui.height, button: b - 1}
 	})
 	ui.ir.RegisterCommand("MouseMotion", func(x, y int) {
+		if CenteredCamera {
+			return
+		}
 		nx := (x - 1) / ui.width
 		ny := (y - 1) / ui.height
 		if nx != ui.mousepos.X || ny != ui.mousepos.Y {

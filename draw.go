@@ -722,6 +722,17 @@ func (ui *gameui) MonsterInfo(m *monster) string {
 
 var CenteredCamera bool
 
+func (ui *gameui) MapWidth() int {
+	if CenteredCamera {
+		return DefaultLOSRange*2 + 5
+	}
+	return DungeonWidth
+}
+
+func (ui *gameui) MapHeight() int {
+	return DungeonHeight
+}
+
 func (ui *gameui) InView(pos position, targeting bool) bool {
 	g := ui.g
 	if targeting {
@@ -733,17 +744,29 @@ func (ui *gameui) InView(pos position, targeting bool) bool {
 func (ui *gameui) CameraOffset(pos position, targeting bool) (int, int) {
 	g := ui.g
 	if targeting {
-		return pos.X + 39 - ui.cursor.X, pos.Y + 10 - ui.cursor.Y
+		return pos.X + ui.MapWidth()/2 - ui.cursor.X, pos.Y + ui.MapHeight()/2 - ui.cursor.Y
 	}
-	return pos.X + 39 - g.Player.Pos.X, pos.Y + 10 - g.Player.Pos.Y
+	return pos.X + ui.MapWidth()/2 - g.Player.Pos.X, pos.Y + ui.MapHeight()/2 - g.Player.Pos.Y
+}
+
+func (ui *gameui) CameraTargetPosition(x, y int, targeting bool) (pos position) {
+	g := ui.g
+	if targeting {
+		pos.X = x - ui.MapWidth()/2 + ui.cursor.X
+		pos.Y = y - ui.MapHeight()/2 + ui.cursor.Y
+		return pos
+	}
+	pos.X = x - ui.MapWidth()/2 + g.Player.Pos.X
+	pos.Y = y - ui.MapHeight()/2 - g.Player.Pos.Y
+	return pos
 }
 
 func (ui *gameui) InViewBorder(pos position, targeting bool) bool {
 	g := ui.g
 	if targeting {
-		return pos.DistanceY(ui.cursor) != 10 && pos.DistanceX(ui.cursor) != 39
+		return pos.DistanceY(ui.cursor) != ui.MapHeight()/2 && pos.DistanceX(ui.cursor) != ui.MapWidth()
 	}
-	return pos.DistanceY(g.Player.Pos) != 10 && pos.DistanceX(g.Player.Pos) != 39
+	return pos.DistanceY(g.Player.Pos) != ui.MapHeight()/2 && pos.DistanceX(g.Player.Pos) != ui.MapWidth()
 }
 
 func (ui *gameui) DrawAtPosition(pos position, targeting bool, r rune, fg, bg uicolor) {
@@ -760,6 +783,9 @@ func (ui *gameui) DrawAtPosition(pos position, targeting bool, r rune, fg, bg ui
 		if ui.InViewBorder(pos, targeting) && g.Dungeon.Border(pos) {
 			for _, opos := range pos.OutsideNeighbors() {
 				xo, yo := ui.CameraOffset(opos, targeting)
+				if xo < 0 || xo >= ui.MapWidth() || yo < 0 || yo >= ui.MapHeight() {
+					continue
+				}
 				ui.SetMapCell(xo, yo, '#', ColorFg, ColorBgBorder)
 			}
 		}
@@ -768,21 +794,34 @@ func (ui *gameui) DrawAtPosition(pos position, targeting bool, r rune, fg, bg ui
 	ui.SetMapCell(pos.X, pos.Y, r, fg, bg)
 }
 
-const BarCol = DungeonWidth + 2
-
 func (ui *gameui) DrawDungeonView(m uiMode) {
 	g := ui.g
 	ui.Clear()
 	d := g.Dungeon
-	for i := 0; i < DungeonWidth; i++ {
-		ui.SetCell(i, DungeonHeight, '─', ColorFg, ColorBg)
+	for i := 0; i < ui.MapWidth(); i++ {
+		ui.SetCell(i, ui.MapHeight(), '─', ColorFg, ColorBg)
 	}
-	for i := 0; i < DungeonHeight; i++ {
-		ui.SetCell(DungeonWidth, i, '│', ColorFg, ColorBg)
+	for i := 0; i < ui.MapHeight(); i++ {
+		ui.SetCell(ui.MapWidth(), i, '│', ColorFg, ColorBg)
 	}
-	ui.SetCell(DungeonWidth, DungeonHeight, '┘', ColorFg, ColorBg)
+	ui.SetCell(ui.MapWidth(), ui.MapHeight(), '┘', ColorFg, ColorBg)
+	if CenteredCamera {
+		for i := 0; i < DungeonWidth; i++ {
+			ui.SetCell(i, ui.MapHeight(), '─', ColorFg, ColorBg)
+		}
+		for i := 0; i < ui.MapHeight(); i++ {
+			ui.SetCell(DungeonWidth, i, '│', ColorFg, ColorBg)
+		}
+		ui.SetCell(DungeonWidth, ui.MapHeight(), '┘', ColorFg, ColorBg)
+	}
 	for i := range d.Cells {
 		pos := idxtopos(i)
+		if CenteredCamera {
+			x, y := ui.CameraOffset(pos, m == TargetingMode)
+			if x < 0 || x >= ui.MapWidth() || y < 0 || y >= ui.MapHeight() {
+				continue
+			}
+		}
 		r, fgColor, bgColor := ui.PositionDrawing(pos)
 		ui.DrawAtPosition(pos, m == TargetingMode, r, fgColor, bgColor)
 	}
@@ -808,33 +847,36 @@ func (ui *gameui) DrawDungeonView(m uiMode) {
 }
 
 func (ui *gameui) DrawKeysBasics(m uiMode) {
-	line := DungeonHeight - 2
+	line := ui.MapHeight() - 2
+	if CenteredCamera {
+		line = ui.MapHeight() - 7
+	}
 	if m == TargetingMode {
-		ui.SetCell(DungeonWidth+3, line, '↑', ColorFgPlayer, ColorBg)
-		ui.DrawColoredText("←↓→", DungeonWidth+2, line+1, ColorFgPlayer)
-		ui.SetCell(DungeonWidth+2, line+2, 'v', ColorFgPlayer, ColorBg)
-		ui.SetCell(DungeonWidth+2, line+3, 'x', ColorFgPlayer, ColorBg)
-		ui.SetCell(DungeonWidth+2, line+4, '?', ColorFgPlayer, ColorBg)
+		ui.SetCell(ui.MapWidth()+3, line, '↑', ColorFgPlayer, ColorBg)
+		ui.DrawColoredText("←↓→", ui.MapWidth()+2, line+1, ColorFgPlayer)
+		ui.SetCell(ui.MapWidth()+2, line+2, 'v', ColorFgPlayer, ColorBg)
+		ui.SetCell(ui.MapWidth()+2, line+3, 'x', ColorFgPlayer, ColorBg)
+		ui.SetCell(ui.MapWidth()+2, line+4, '?', ColorFgPlayer, ColorBg)
 		const margin = 6
-		ui.DrawText("move cursor", DungeonWidth+margin, line+1)
-		ui.DrawText("view info", DungeonWidth+margin, line+2)
-		ui.DrawText("close mode", DungeonWidth+margin, line+3)
-		ui.DrawText("examine help", DungeonWidth+margin, line+4)
+		ui.DrawText("move cursor", ui.MapWidth()+margin, line+1)
+		ui.DrawText("view info", ui.MapWidth()+margin, line+2)
+		ui.DrawText("close mode", ui.MapWidth()+margin, line+3)
+		ui.DrawText("examine help", ui.MapWidth()+margin, line+4)
 	} else if m == NormalMode {
-		ui.SetCell(DungeonWidth+3, line, '↑', ColorFgPlayer, ColorBg)
-		ui.DrawColoredText("←↓→", DungeonWidth+2, line+1, ColorFgPlayer)
-		ui.SetCell(DungeonWidth+2, line+2, 'v', ColorFgPlayer, ColorBg)
-		ui.SetCell(DungeonWidth+2, line+3, 'e', ColorFgPlayer, ColorBg)
-		ui.SetCell(DungeonWidth+2, line+4, 'i', ColorFgPlayer, ColorBg)
-		ui.SetCell(DungeonWidth+2, line+5, 'x', ColorFgPlayer, ColorBg)
-		ui.SetCell(DungeonWidth+2, line+6, '?', ColorFgPlayer, ColorBg)
+		ui.SetCell(ui.MapWidth()+3, line, '↑', ColorFgPlayer, ColorBg)
+		ui.DrawColoredText("←↓→", ui.MapWidth()+2, line+1, ColorFgPlayer)
+		ui.SetCell(ui.MapWidth()+2, line+2, 'v', ColorFgPlayer, ColorBg)
+		ui.SetCell(ui.MapWidth()+2, line+3, 'e', ColorFgPlayer, ColorBg)
+		ui.SetCell(ui.MapWidth()+2, line+4, 'i', ColorFgPlayer, ColorBg)
+		ui.SetCell(ui.MapWidth()+2, line+5, 'x', ColorFgPlayer, ColorBg)
+		ui.SetCell(ui.MapWidth()+2, line+6, '?', ColorFgPlayer, ColorBg)
 		const margin = 6
-		ui.DrawText("move/jump", DungeonWidth+margin, line+1)
-		ui.DrawText("evoke", DungeonWidth+margin, line+2)
-		ui.DrawText("interact", DungeonWidth+margin, line+3)
-		ui.DrawText("inventory", DungeonWidth+margin, line+4)
-		ui.DrawText("examine", DungeonWidth+margin, line+5)
-		ui.DrawText("command help", DungeonWidth+margin, line+6)
+		ui.DrawText("move/jump", ui.MapWidth()+margin, line+1)
+		ui.DrawText("evoke", ui.MapWidth()+margin, line+2)
+		ui.DrawText("interact", ui.MapWidth()+margin, line+3)
+		ui.DrawText("inventory", ui.MapWidth()+margin, line+4)
+		ui.DrawText("examine", ui.MapWidth()+margin, line+5)
+		ui.DrawText("command help", ui.MapWidth()+margin, line+6)
 	}
 }
 
@@ -844,30 +886,39 @@ func (ui *gameui) DrawLoading() {
 
 func (ui *gameui) DrawMessage(s string) {
 	ui.DrawDungeonView(NoFlushMode)
-	line := DungeonHeight - 2
-	ui.DrawColoredText(s, DungeonWidth+2, line+1, ColorCyan)
+	line := ui.MapHeight() - 2
+	if CenteredCamera {
+		line = ui.MapHeight() - 5
+	}
+	ui.DrawColoredText(s, ui.MapWidth()+2, line+1, ColorCyan)
 	ui.Flush()
 	time.Sleep(AnimDurShort)
 }
 
 func (ui *gameui) DrawSelectDescBasics() {
-	line := DungeonHeight - 2
-	ui.DrawColoredText("[a-z]", DungeonWidth+2, line+1, ColorFgPlayer)
-	ui.SetCell(DungeonWidth+2, line+2, '?', ColorFgPlayer, ColorBg)
-	ui.SetCell(DungeonWidth+2, line+3, 'x', ColorFgPlayer, ColorBg)
+	line := ui.MapHeight() - 2
+	if CenteredCamera {
+		line = ui.MapHeight() - 5
+	}
+	ui.DrawColoredText("[a-z]", ui.MapWidth()+2, line+1, ColorFgPlayer)
+	ui.SetCell(ui.MapWidth()+2, line+2, '?', ColorFgPlayer, ColorBg)
+	ui.SetCell(ui.MapWidth()+2, line+3, 'x', ColorFgPlayer, ColorBg)
 	const margin = 7
-	ui.DrawText("select", DungeonWidth+margin, line+1)
-	ui.DrawText("use/desc", DungeonWidth+margin, line+2)
-	ui.DrawText("close", DungeonWidth+margin, line+3)
+	ui.DrawText("select", ui.MapWidth()+margin, line+1)
+	ui.DrawText("use/desc", ui.MapWidth()+margin, line+2)
+	ui.DrawText("close", ui.MapWidth()+margin, line+3)
 }
 
 func (ui *gameui) DrawSelectBasics() {
-	line := DungeonHeight - 2
-	ui.DrawColoredText("[a-z]", DungeonWidth+2, line+1, ColorFgPlayer)
-	ui.SetCell(DungeonWidth+2, line+2, 'x', ColorFgPlayer, ColorBg)
+	line := ui.MapHeight() - 2
+	if CenteredCamera {
+		line = ui.MapHeight() - 5
+	}
+	ui.DrawColoredText("[a-z]", ui.MapWidth()+2, line+1, ColorFgPlayer)
+	ui.SetCell(ui.MapWidth()+2, line+2, 'x', ColorFgPlayer, ColorBg)
 	const margin = 7
-	ui.DrawText("select", DungeonWidth+margin, line+1)
-	ui.DrawText("close", DungeonWidth+margin, line+2)
+	ui.DrawText("select", ui.MapWidth()+margin, line+1)
+	ui.DrawText("close", ui.MapWidth()+margin, line+2)
 }
 
 func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolor) {
@@ -1036,6 +1087,7 @@ func (ui *gameui) DrawStatusBar(line int) {
 	if nWounds <= 0 {
 		nWounds = 0
 	}
+	BarCol := ui.MapWidth() + 2
 	ui.DrawColoredText("HP: ", BarCol, line, hpColor)
 	hp := g.Player.HP
 	if hp < 0 {
@@ -1128,7 +1180,7 @@ func (ui *gameui) DrawStatusLine() {
 	case 2:
 		mpColor = ColorFgMPpartial
 	}
-	line := DungeonHeight
+	line := ui.MapHeight()
 	col := 2
 	ui.DrawText(" ", col, line)
 	col++
@@ -1267,10 +1319,10 @@ func (ui *gameui) DrawLog(lines int) {
 			e := g.Log[ln]
 			fguicolor := ui.LogColor(e)
 			if e.Tick {
-				ui.DrawColoredText("•", 0, DungeonHeight+i, ColorYellow)
+				ui.DrawColoredText("•", 0, ui.MapHeight()+i, ColorYellow)
 				col += 2
 			}
-			ui.DrawColoredText(e.String(), col, DungeonHeight+i, fguicolor)
+			ui.DrawColoredText(e.String(), col, ui.MapHeight()+i, fguicolor)
 			col += utf8.RuneCountInString(e.String()) + 1
 		}
 		l--
@@ -1315,7 +1367,7 @@ const (
 
 func (ui *gameui) ChangeKeys() {
 	g := ui.g
-	lines := DungeonHeight
+	lines := ui.MapHeight()
 	nmax := len(configurableKeyActions) - lines
 	n := 0
 	s := 0
@@ -1412,7 +1464,7 @@ func (ui *gameui) DrawPreviousLogs() {
 	if ui.Small() {
 		bottom = 2
 	}
-	lines := DungeonHeight + bottom
+	lines := ui.MapHeight() + bottom
 	nmax := len(g.Log) - lines
 	n := nmax
 loop:
@@ -1429,7 +1481,7 @@ loop:
 			to = len(g.Log)
 		}
 		for i := 0; i < bottom; i++ {
-			ui.SetCell(DungeonWidth, DungeonHeight+i, '│', ColorFg, ColorBg)
+			ui.SetCell(DungeonWidth, ui.MapHeight()+i, '│', ColorFg, ColorBg)
 		}
 		for i := n; i < to; i++ {
 			e := g.Log[i]
@@ -1451,7 +1503,7 @@ loop:
 				ui.DrawColoredText(e.String(), 0, i-n, fguicolor)
 			}
 		}
-		for i := len(g.Log); i < DungeonHeight+bottom; i++ {
+		for i := len(g.Log); i < ui.MapHeight()+bottom; i++ {
 			ui.ClearLine(i - n)
 		}
 		ui.ClearLine(lines)
@@ -1581,8 +1633,8 @@ const (
 )
 
 func (ui *gameui) DrawInfoLine(text string) {
-	ui.ClearLineWithColor(DungeonHeight+1, ColorBgBorder)
-	ui.DrawColoredTextOnBG(text, 0, DungeonHeight+1, ColorBlue, ColorBgBorder)
+	ui.ClearLineWithColor(ui.MapHeight()+1, ColorBgBorder)
+	ui.DrawColoredTextOnBG(text, 0, ui.MapHeight()+1, ColorBlue, ColorBgBorder)
 }
 
 func (ui *gameui) DrawStyledTextLine(text string, lnum int, st linestyle) {
@@ -1656,7 +1708,7 @@ func (ui *gameui) SelectMagara(ev event) error {
 		magaras := g.Player.Magaras
 		ui.ClearLine(0)
 		if !ui.Small() {
-			ui.DrawColoredText(MenuEvoke.String(), MenuCols[MenuEvoke][0], DungeonHeight, ColorCyan)
+			ui.DrawColoredText(MenuEvoke.String(), MenuCols[MenuEvoke][0], ui.MapHeight(), ColorCyan)
 		}
 		if desc {
 			ui.DrawColoredText("Describe", 0, 0, ColorBlue)
@@ -1700,7 +1752,7 @@ func (ui *gameui) EquipMagara(ev event) error {
 		magaras := g.Player.Magaras
 		ui.ClearLine(0)
 		if !ui.Small() {
-			ui.DrawColoredText(MenuInteract.String(), MenuCols[MenuInteract][0], DungeonHeight, ColorCyan)
+			ui.DrawColoredText(MenuInteract.String(), MenuCols[MenuInteract][0], ui.MapHeight(), ColorCyan)
 		}
 		if desc {
 			ui.DrawColoredText("Describe", 0, 0, ColorBlue)
@@ -1750,7 +1802,7 @@ func (ui *gameui) SelectItem(ev event) error {
 	for {
 		ui.ClearLine(0)
 		if !ui.Small() {
-			ui.DrawColoredText(MenuInventory.String(), MenuCols[MenuInventory][0], DungeonHeight, ColorCyan)
+			ui.DrawColoredText(MenuInventory.String(), MenuCols[MenuInventory][0], ui.MapHeight(), ColorCyan)
 		}
 		ui.DrawColoredText("Inventory", 0, 0, ColorCyan)
 		col := utf8.RuneCountInString("Inventory")
@@ -1859,7 +1911,7 @@ func (ui *gameui) SelectAction(actions []keyAction, ev event) (keyAction, error)
 	for {
 		ui.ClearLine(0)
 		if !ui.Small() {
-			ui.DrawColoredText(MenuOther.String(), MenuCols[MenuOther][0], DungeonHeight, ColorCyan)
+			ui.DrawColoredText(MenuOther.String(), MenuCols[MenuOther][0], ui.MapHeight(), ColorCyan)
 		}
 		ui.DrawColoredText("Choose", 0, 0, ColorCyan)
 		col := utf8.RuneCountInString("Choose")
@@ -2021,7 +2073,7 @@ func (ui *gameui) SelectWizardMagic(actions []wizardAction) (wizardAction, error
 }
 
 func (ui *gameui) DrawMenus() {
-	line := DungeonHeight
+	line := ui.MapHeight()
 	for i, cols := range MenuCols[0 : len(MenuCols)-1] {
 		if cols[0] >= 0 {
 			if menu(i) == ui.menuHover {
