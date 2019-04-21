@@ -112,9 +112,10 @@ func (g *game) FreePassableCell() position {
 }
 
 func (g *game) FreeCellForPlayer() position {
+	// TODO: not used now, but could be for cases when you fall into the abyss
 	center := position{DungeonWidth / 2, DungeonHeight / 2}
 	bestpos := g.FreePassableCell()
-	for i := 0; i < 2; i++ {
+	for i := 0; i < 5; i++ {
 		pos := g.FreePassableCell()
 		if pos.Distance(center) > bestpos.Distance(center) {
 			bestpos = pos
@@ -163,7 +164,7 @@ func (g *game) FreeCellForBandMonster(pos position) position {
 			continue
 		}
 		mons := g.MonsterAt(pos)
-		if mons.Exists() {
+		if mons.Exists() || !g.Dungeon.Cell(pos).IsPassable() {
 			continue
 		}
 		return pos

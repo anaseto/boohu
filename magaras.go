@@ -233,7 +233,7 @@ func (g *game) BlinkPos() position {
 		if !b {
 			continue
 		}
-		if !g.Dungeon.Cell(pos).IsPassable() {
+		if !g.Dungeon.Cell(pos).T.IsPlayerPassable() {
 			continue
 		}
 		mons := g.MonsterAt(pos)
@@ -434,21 +434,6 @@ func (g *game) EvokeShadows(ev event) error {
 	g.Print("You are surrounded by shadows.")
 	return nil
 }
-
-//func (g *game) EvokeBarriers(ev event) error {
-//neighbors := g.Dungeon.FreeNeighbors(g.Player.Pos)
-//for _, pos := range neighbors {
-//mons := g.MonsterAt(pos)
-//if mons.Exists() {
-//continue
-//}
-//g.CreateMagicalBarrierAt(pos, ev)
-//}
-//g.Print("You feel surrounded by a magical barrier.")
-//g.ui.PlayerGoodEffectAnimation()
-//g.ComputeLOS()
-//return nil
-//}
 
 func (g *game) EvokeSlowing(ev event) error {
 	for _, mons := range g.Monsters {

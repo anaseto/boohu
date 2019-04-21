@@ -93,7 +93,7 @@ func (g *game) Jump(mons *monster, ev event) error {
 	pos := g.Player.Pos
 	for {
 		pos = pos.To(dir)
-		if !pos.valid() || !g.Dungeon.Cell(pos).IsPassable() {
+		if !pos.valid() || !g.Dungeon.Cell(pos).T.IsPlayerPassable() {
 			break
 		}
 		m := g.MonsterAt(pos)
@@ -101,7 +101,7 @@ func (g *game) Jump(mons *monster, ev event) error {
 			break
 		}
 	}
-	if !pos.valid() || !g.Dungeon.Cell(pos).IsPassable() {
+	if !pos.valid() || !g.Dungeon.Cell(pos).T.IsPlayerPassable() {
 		return errors.New("You cannot jump in that direction.")
 	}
 	if g.Player.HasStatus(StatusSlow) {

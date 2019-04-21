@@ -33,7 +33,7 @@ const (
 
 func (c cell) IsPassable() bool {
 	switch c.T {
-	case WallCell, BarrelCell, TableCell, TreeCell, HoledWallCell, BarrierCell, WindowCell, StoryCell, ChasmCell, WaterCell:
+	case WallCell, DoorCell, BarrelCell, TableCell, TreeCell, HoledWallCell, BarrierCell, WindowCell, StoryCell, ChasmCell, WaterCell:
 		return false
 	default:
 		return true
@@ -43,6 +43,15 @@ func (c cell) IsPassable() bool {
 func (c cell) IsLevitatePassable() bool {
 	switch c.T {
 	case ChasmCell:
+		return true
+	default:
+		return c.IsPassable()
+	}
+}
+
+func (c cell) IsDoorPassable() bool {
+	switch c.T {
+	case DoorCell:
 		return true
 	default:
 		return c.IsPassable()

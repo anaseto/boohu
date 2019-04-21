@@ -917,7 +917,7 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 		fgColor = ColorFgDark
 		bgColor = ColorBgDark
 	}
-	if g.ExclusionsMap[pos] && c.IsPassable() { // XXX IsPassable
+	if g.ExclusionsMap[pos] && c.T.IsPlayerPassable() { // XXX IsPassable
 		fgColor = ColorFgExcluded
 	}
 	if trkn, okTrkn := g.TerrainKnowledge[pos]; okTrkn && !g.Wizard {

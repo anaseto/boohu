@@ -283,7 +283,7 @@ func (g *game) SeePosition(pos position) {
 	}
 	if okT {
 		delete(g.TerrainKnowledge, pos)
-		if c.IsPassable() {
+		if c.T.IsPlayerPassable() {
 			delete(g.MagicalBarriers, pos)
 		}
 	}

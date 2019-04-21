@@ -153,24 +153,6 @@ func (fp *noisePath) Cost(from, to position) int {
 	return 1
 }
 
-type normalPath struct {
-	game      *game
-	neighbors [8]position
-}
-
-func (np *normalPath) Neighbors(pos position) []position {
-	nb := np.neighbors[:0]
-	d := np.game.Dungeon
-	keep := func(npos position) bool {
-		return npos.valid() && d.Cell(npos).IsPassable()
-	}
-	return pos.CardinalNeighbors(nb, keep)
-}
-
-func (np *normalPath) Cost(from, to position) int {
-	return 1
-}
-
 type autoexplorePath struct {
 	game      *game
 	neighbors [8]position
@@ -188,7 +170,7 @@ func (ap *autoexplorePath) Neighbors(pos position) []position {
 			// XXX little info leak
 			return false
 		}
-		return npos.valid() && (d.Cell(npos).IsPassable() && (!okT || t != WallCell)) &&
+		return npos.valid() && (d.Cell(npos).T.IsPlayerPassable() && (!okT || t != WallCell)) &&
 			!ap.game.ExclusionsMap[npos]
 	}
 	//if ap.game.Player.HasStatus(StatusConfusion) {
@@ -219,10 +201,10 @@ func (mp *monPath) Neighbors(pos position) []position {
 		}
 		c := d.Cell(npos)
 		return (c.IsPassable() || c.IsDestructible() && mp.destruct ||
+			c.T == DoorCell && (mp.monster.Kind.CanOpenDoors() || mp.destruct) ||
 			c.IsLevitatePassable() && mp.monster.Kind.CanFly() ||
 			c.IsSwimPassable() && (mp.monster.Kind.CanSwim() || mp.monster.Kind.CanFly()) ||
-			c.T == HoledWallCell && mp.monster.Kind.Size() == MonsSmall) &&
-			(c.T != DoorCell || mp.monster.Kind.CanOpenDoors() || mp.destruct)
+			c.T == HoledWallCell && mp.monster.Kind.Size() == MonsSmall)
 	}
 	ret := pos.CardinalNeighbors(nb, keep)
 	// shuffle so that monster movement is not unnaturally predictable

@@ -475,26 +475,6 @@ func (m *monster) Alternate() {
 	}
 }
 
-func (m *monster) AlternateConfusedPlacement(g *game) *position {
-	var neighbors []position
-	neighbors = g.Dungeon.CardinalFreeNeighbors(m.Pos)
-	npos := InvalidPos
-	for _, pos := range neighbors {
-		mons := g.MonsterAt(pos)
-		if mons.Exists() || g.Player.Pos == pos {
-			continue
-		}
-		npos = pos
-		if npos.Distance(g.Player.Pos) == 1 {
-			return &npos
-		}
-	}
-	if npos.valid() {
-		return &npos
-	}
-	return nil
-}
-
 func (m *monster) TeleportAway(g *game) {
 	pos := m.Pos
 	i := 0
@@ -600,24 +580,6 @@ func (m *monster) CorrectDir() {
 	}
 }
 
-func (m *monster) TeleportMonsterAway(g *game) bool {
-	neighbors := g.Dungeon.FreeNeighbors(m.Pos)
-	for _, pos := range neighbors {
-		if pos == m.Pos || RandInt(3) != 0 {
-			continue
-		}
-		mons := g.MonsterAt(pos)
-		if mons.Exists() {
-			if g.Player.Sees(m.Pos) {
-				g.Print("Marevor makes some strange gestures.")
-			}
-			mons.TeleportAway(g)
-			return true
-		}
-	}
-	return false
-}
-
 func (m *monster) AttackAction(g *game, ev event) {
 	m.Dir = g.Player.Pos.Dir(m.Pos)
 	m.CorrectDir()
@@ -686,7 +648,8 @@ func (m *monster) CanPass(g *game, pos position) bool {
 		return false
 	}
 	c := g.Dungeon.Cell(pos)
-	return c.IsPassable() || c.IsLevitatePassable() && m.Kind.CanFly() ||
+	return c.IsPassable() || c.IsDoorPassable() && m.Kind.CanOpenDoors() ||
+		c.IsLevitatePassable() && m.Kind.CanFly() ||
 		c.IsSwimPassable() && (m.Kind.CanSwim() || m.Kind.CanFly()) ||
 		c.T == HoledWallCell && m.Kind.Size() == MonsSmall
 }
@@ -1023,12 +986,6 @@ func (m *monster) HandleTurn(g *game, ev event) {
 		ev.Renew(g, 10) // wait
 		return
 	}
-	//if m.Kind == MonsMarevorHelith {
-	//if m.TeleportMonsterAway(g) {
-	//ev.Renew(g, movedelay)
-	//return
-	//}
-	//}
 	switch m.State {
 	case Watching:
 		m.HandleWatching(g)
@@ -1573,7 +1530,7 @@ func (m *monster) GatherBand(g *game) {
 	if !MonsBands[g.Bands[m.Band].Kind].Band {
 		return
 	}
-	dij := &normalPath{game: g}
+	dij := &noisePath{game: g}
 	nm := Dijkstra(dij, []position{m.Pos}, 4)
 	for _, mons := range g.Monsters {
 		if mons.Band == m.Band {

@@ -43,7 +43,7 @@ func (pos position) ValidCardinalNeighbors() []position {
 }
 
 func (d *dungeon) IsFreeCell(pos position) bool {
-	return pos.valid() && d.Cell(pos).IsPassable()
+	return pos.valid() && d.Cell(pos).T.IsPlayerPassable()
 }
 
 func (d *dungeon) NotWallCell(pos position) bool {

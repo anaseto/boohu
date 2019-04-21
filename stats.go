@@ -48,7 +48,7 @@ func (g *game) LevelStats() {
 	free := 0
 	exp := 0
 	for _, c := range g.Dungeon.Cells {
-		if !c.IsPassable() {
+		if c.IsWall() || c.T == ChasmCell {
 			continue
 		}
 		free++
