@@ -1043,6 +1043,8 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 				r = mons.Kind.Letter()
 				if mons.LastSeenState == Resting {
 					fgColor = ColorFgSleepingMonster
+				} else if mons.Kind == MonsButterfly {
+					fgColor = ColorFgPlayer
 				} else {
 					fgColor = ColorFgWanderingMonster
 				}
