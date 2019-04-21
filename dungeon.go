@@ -2099,6 +2099,7 @@ func (dg *dgen) GenMonsters(g *game) {
 	// monster specific bands
 	bandNadre := []monsterBand{LoneExplosiveNadre}
 	bandFrog := []monsterBand{LoneBlinkingFrog}
+	bandDog := []monsterBand{LoneDog}
 	bandYack := []monsterBand{LoneYack}
 	bandVampire := []monsterBand{LoneVampire}
 	bandOricCelmist := []monsterBand{LoneOricCelmist}
@@ -2182,7 +2183,11 @@ func (dg *dgen) GenMonsters(g *game) {
 		switch RandInt(5) {
 		case 0, 1:
 			// 5
-			dg.PutRandomBandN(g, bandsAnimals, 3)
+			if RandInt(3) == 0 {
+				dg.PutRandomBandN(g, bandDog, 3)
+			} else {
+				dg.PutRandomBandN(g, bandsAnimals, 3)
+			}
 			dg.PutRandomBandN(g, bandsPlants, 2)
 		case 2, 3:
 			// 4
@@ -2271,7 +2276,12 @@ func (dg *dgen) GenMonsters(g *game) {
 		if RandInt(2) == 0 {
 			// 18
 			dg.PutRandomBandN(g, bandsGuard, 4)
-			dg.PutRandomBandN(g, bandsAnimals, 6)
+			if RandInt(3) == 0 {
+				dg.PutRandomBandN(g, bandDog, 4)
+				dg.PutRandomBandN(g, bandsAnimals, 2)
+			} else {
+				dg.PutRandomBandN(g, bandsAnimals, 6)
+			}
 			dg.PutRandomBandN(g, bandsButterfly, 1)
 			dg.PutRandomBandN(g, bandsBig, 1)
 			dg.PutRandomBandN(g, bandsBipeds, 4)
