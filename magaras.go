@@ -181,9 +181,9 @@ func (mag magara) Desc(g *game) (desc string) {
 	case SlowingMagara:
 		desc = "induces slow movement and attack for monsters in sight by disturbing their senses with sound and light illusions."
 	case SleepingMagara:
-		desc = "induces deep sleeping and exhaustion for up to two random monsters in sight using hypnotic illusions."
+		desc = "induces deep sleeping and exhaustion for up to three random monsters you see in cardinal directions using hypnotic illusions."
 	case TeleportOtherMagara:
-		desc = "creates oric energy disturbances, teleporting up to two random monsters in sight."
+		desc = "creates oric energy disturbances, teleporting up to two random monsters you see in cardinal directions."
 	case SwappingMagara:
 		desc = "makes you swap positions with the farthest monster in sight. If there is more than one at the same distance, it will be chosen randomly."
 	case ObstructionMagara:
@@ -288,8 +288,23 @@ func (g *game) MonstersInLOS() []*monster {
 	return ms
 }
 
+func (g *game) MonstersInCardinalLOS() []*monster {
+	ms := []*monster{}
+	for _, mons := range g.Monsters {
+		if mons.Exists() && g.Player.Sees(mons.Pos) && (mons.Pos.X == g.Player.Pos.X || mons.Pos.Y == g.Player.Pos.Y) {
+			ms = append(ms, mons)
+		}
+	}
+	// shuffle before, because the order could be unnaturally predicted
+	for i := 0; i < len(ms); i++ {
+		j := i + RandInt(len(ms)-i)
+		ms[i], ms[j] = ms[j], ms[i]
+	}
+	return ms
+}
+
 func (g *game) EvokeTeleportOther(ev event) error {
-	ms := g.MonstersInLOS()
+	ms := g.MonstersInCardinalLOS()
 	if len(ms) == 0 {
 		return errors.New("There are no monsters in view.")
 	}
@@ -450,11 +465,11 @@ func (g *game) EvokeSlowing(ev event) error {
 }
 
 func (g *game) EvokeSleeping(ev event) error {
-	ms := g.MonstersInLOS()
+	ms := g.MonstersInCardinalLOS()
 	if len(ms) == 0 {
 		return errors.New("There are no monsters in view.")
 	}
-	max := 2
+	max := 3
 	if max > len(ms) {
 		max = len(ms)
 	}
