@@ -306,7 +306,7 @@ func (g *game) MonstersInCardinalLOS() []*monster {
 func (g *game) EvokeTeleportOther(ev event) error {
 	ms := g.MonstersInCardinalLOS()
 	if len(ms) == 0 {
-		return errors.New("There are no monsters in view.")
+		return errors.New("There are no targetable monsters.")
 	}
 	max := 2
 	if max > len(ms) {
@@ -467,7 +467,7 @@ func (g *game) EvokeSlowing(ev event) error {
 func (g *game) EvokeSleeping(ev event) error {
 	ms := g.MonstersInCardinalLOS()
 	if len(ms) == 0 {
-		return errors.New("There are no monsters in view.")
+		return errors.New("There are no targetable monsters.")
 	}
 	max := 3
 	if max > len(ms) {
