@@ -169,6 +169,11 @@ func (sev *simpleEvent) Action(g *game) {
 				if g.Dungeon.Cell(g.Player.Pos).T == ChasmCell {
 					g.FallAbyss(DescendFall)
 				}
+			case LignificationEnd:
+				g.Player.HPbonus -= LignificationHPbonus
+				if g.Player.HPbonus < 0 {
+					g.Player.HPbonus = 0
+				}
 			}
 		} else {
 			g.PushEvent(&simpleEvent{ERank: sev.Rank() + DurationStatusStep, EAction: sev.EAction})

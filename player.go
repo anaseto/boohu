@@ -392,10 +392,12 @@ func (g *game) PlacePlayerAt(pos position) {
 	g.MakeMonstersAware()
 }
 
+const LignificationHPbonus = 4
+
 func (g *game) EnterLignification(ev event) {
 	if g.PutStatus(StatusLignification, DurationLignificationPlayer) {
 		g.Print("You feel rooted to the ground.")
-		g.Player.HPbonus += 4
+		g.Player.HPbonus += LignificationHPbonus
 	}
 }
 
