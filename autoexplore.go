@@ -40,9 +40,6 @@ func (g *game) AllExplored() bool {
 		if !c.Explored {
 			return false
 		}
-		//if obj, ok := g.Objects[pos]; ok {
-		// TODO
-		//}
 	}
 	return true
 }
@@ -63,9 +60,6 @@ func (g *game) AutoexploreSources() []int {
 		if !c.Explored {
 			sources = append(sources, i)
 		}
-		//if obj, ok := g.Objects[pos]; ok {
-		// TODO
-		//}
 
 	}
 	return sources
