@@ -1161,12 +1161,15 @@ func (m *monster) PushPlayer(g *game) {
 	}
 	dir := g.Player.Pos.Dir(m.Pos)
 	pos := g.Player.Pos
+	npos := pos
 	path := []position{pos}
 	i := 0
 	for {
 		i++
-		npos := pos.To(dir)
+		npos = npos.To(dir)
+		path = append(path, npos)
 		if !npos.valid() || g.Dungeon.Cell(npos).BlocksRange() {
+			path = path[:len(path)-1]
 			break
 		}
 		mons := g.MonsterAt(npos)
@@ -1174,7 +1177,6 @@ func (m *monster) PushPlayer(g *game) {
 			continue
 		}
 		pos = npos
-		path = append(path, pos)
 		if i >= 5 {
 			break
 		}
