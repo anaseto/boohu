@@ -220,11 +220,16 @@ func (mp *monPath) Cost(from, to position) int {
 	mons := g.MonsterAt(to)
 	if !mons.Exists() {
 		c := g.Dungeon.Cell(to)
-		if mp.destruct && (!c.IsPassable() || c.T == DoorCell) && mp.monster.State != Hunting {
-			return 6
+		if mp.destruct && c.IsDestructible() {
+			return 5
 		}
 		if to == g.Player.Pos && mp.monster.Kind.Peaceful() {
-			return 4
+			switch mp.monster.Kind {
+			case MonsEarthDragon:
+				return 1
+			default:
+				return 4
+			}
 		}
 		return 1
 	}

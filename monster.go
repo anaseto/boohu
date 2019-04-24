@@ -133,7 +133,7 @@ func (mk monsterKind) Smiting() bool {
 
 func (mk monsterKind) Peaceful() bool {
 	switch mk {
-	case MonsButterfly:
+	case MonsButterfly, MonsEarthDragon:
 		return true
 	default:
 		return false
@@ -170,7 +170,7 @@ func (mk monsterKind) CanSwim() bool {
 func (mk monsterKind) CanAttackOnTree() bool {
 	// TODO: improve this
 	switch mk {
-	case MonsMirrorSpecter, MonsWingedMilfid, MonsEarthDragon, MonsExplosiveNadre, MonsBlinkingFrog:
+	case MonsMirrorSpecter, MonsWingedMilfid, MonsEarthDragon, MonsBlinkingFrog, MonsTinyHarpy:
 		return true
 	default:
 		return false
@@ -307,7 +307,7 @@ var monsDesc = []string{
 	MonsWingedMilfid:   "Winged milfids are fast moving humanoids that can fly over you and make you swap positions. They tend to be very agressive creatures.",
 	MonsBlinkingFrog:   "Blinking frogs are big frog-like creatures, whose bite can make you blink away. The science behind their attack is not clear, but many think it relies on some kind of oric deviation magic.",
 	MonsLich:           "Liches are non-living mages wearing a leather armour. They can throw a bolt of torment at you, halving your HP.",
-	MonsEarthDragon:    "Earth dragons are big and hardy creatures that wander in the Underground. It is said they can be credited for many of the tunnels.",
+	MonsEarthDragon:    "Earth dragons are big creatures from a dragon species that wander in the Underground. They are peaceful creatures, but they may hurt you inadvertently. They naturally emit powerful oric energies, allowing them to eat rocks and dig tunnels. Their oric energies can confuse you if you're close enough, for example if they hurt you or you jump over them.",
 	MonsMirrorSpecter:  "Mirror specters are very insubstantial creatures, which can absorb your mana.",
 	MonsExplosiveNadre: "Nadres are dragon-like biped creatures that are famous for exploding upon dying. Explosive nadres are a tiny nadre race that explodes upon attacking. The explosion confuses any adjacent creatures and occasionally destroys walls.",
 	MonsSatowalgaPlant: "Satowalga Plants are immobile bushes that throw slowing viscous acidic projectiles at you, halving the speed of your movements. They attack at half normal speed.",
@@ -872,7 +872,13 @@ func (m *monster) HandleMove(g *game) {
 	c := g.Dungeon.Cell(target)
 	switch {
 	case m.Peaceful(g) && target == g.Player.Pos:
-		m.Path = m.APath(g, m.Pos, m.Target)
+		switch m.Kind {
+		case MonsEarthDragon:
+			m.AttackAction(g, g.Ev)
+			return
+		default:
+			m.Path = m.APath(g, m.Pos, m.Target)
+		}
 	case !mons.Exists():
 		if m.Kind == MonsEarthDragon && c.IsDestructible() {
 			g.Dungeon.SetCell(target, GroundCell)
@@ -1113,6 +1119,12 @@ func (m *monster) HitSideEffects(g *game, ev event) {
 	//g.Player.Expire[StatusBerserk] = end
 	//g.Print("You feel a sudden urge to kill things.")
 	//}
+	case MonsEarthDragon:
+		if m.Status(MonsConfused) {
+			g.Printf("%s, confused, pushes you inadvertently.", m.Kind.Definite(true))
+			m.PushPlayer(g)
+		}
+		g.Confusion(ev)
 	case MonsBlinkingFrog:
 		g.Blink(ev)
 	case MonsYack:

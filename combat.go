@@ -82,7 +82,7 @@ func (g *game) AttractMonster(pos position) *monster {
 }
 
 func (g *game) Jump(mons *monster, ev event) error {
-	if mons.Peaceful(g) {
+	if mons.Peaceful(g) && mons.Kind != MonsEarthDragon {
 		ompos := mons.Pos
 		mons.MoveTo(g, g.Player.Pos)
 		mons.Swapped = true
@@ -112,6 +112,9 @@ func (g *game) Jump(mons *monster, ev event) error {
 	}
 	if !g.Player.HasStatus(StatusSwift) && g.Player.Inventory.Body != CloakAcrobat {
 		g.PutStatus(StatusExhausted, 50)
+	}
+	if mons.Kind == MonsEarthDragon {
+		g.Confusion(ev)
 	}
 	g.PlacePlayerAt(pos)
 	g.Stats.Jumps++

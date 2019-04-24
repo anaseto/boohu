@@ -2060,11 +2060,11 @@ func (dg *dgen) PutMonsterBand(g *game, band monsterBand) bool {
 	switch band {
 	case LoneYack, LoneWorm, PairYack:
 		bdinf = dg.BandInfoFoliage(g, band)
-	case LoneDog, LoneEarthDragon, LoneHarpy:
+	case LoneDog, LoneHarpy:
 		bdinf = dg.BandInfoOutsideGround(g, band)
 	case LoneBlinkingFrog, LoneExplosiveNadre, PairExplosiveNadre:
 		bdinf = dg.BandInfoOutside(g, band)
-	case LoneMirrorSpecter, LoneWingedMilfid, LoneVampire, PairWingedMilfid:
+	case LoneMirrorSpecter, LoneWingedMilfid, LoneVampire, PairWingedMilfid, LoneEarthDragon:
 		bdinf = dg.BandInfoOutsideExplore(g, band)
 	case LoneButterfly:
 		bdinf = dg.BandInfoOutsideExploreButterfly(g, band)
@@ -2382,6 +2382,7 @@ func (dg *dgen) GenMonsters(g *game) {
 					dg.PutRandomBandN(g, bandTreeMushroom, 6)
 				} else {
 					dg.PutRandomBandN(g, bandDragon, 6)
+					dg.PutRandomBandN(g, bandsAnimals, 2)
 				}
 			} else {
 				dg.PutRandomBandN(g, bandsBig, 6)
@@ -2395,10 +2396,11 @@ func (dg *dgen) GenMonsters(g *game) {
 			dg.PutRandomBandN(g, bandsAnimals, 8)
 			if RandInt(2) == 0 {
 				dg.PutRandomBandN(g, bandExplosiveNadrePair, 2)
+				dg.PutRandomBandN(g, bandsBig, 2)
 			} else {
-				dg.PutRandomBandN(g, bandYackPair, 2)
+				dg.PutRandomBandN(g, bandYackPair, 3)
+				dg.PutRandomBandN(g, bandsBig, 1)
 			}
-			dg.PutRandomBandN(g, bandsBig, 2)
 			dg.PutRandomBandN(g, bandsPlants, 5)
 		}
 	case 10:
@@ -2421,12 +2423,13 @@ func (dg *dgen) GenMonsters(g *game) {
 			if RandInt(3) == 0 {
 				dg.PutRandomBandN(g, bandsGuard, 4)
 				dg.PutRandomBandN(g, bandVampire, 5)
+				dg.PutRandomBandN(g, bandsBig, 2)
 			} else {
 				dg.PutRandomBandN(g, bandsGuard, 6)
 				dg.PutRandomBandN(g, bandsBipeds, 4)
+				dg.PutRandomBandN(g, bandsAnimals, 2)
 			}
 			dg.PutRandomBandN(g, bandsAnimals, 2)
-			dg.PutRandomBandN(g, bandsBig, 2)
 			dg.PutRandomBandN(g, bandsPlants, 1)
 		}
 	case 11:
@@ -2459,8 +2462,8 @@ func (dg *dgen) GenMonsters(g *game) {
 		} else {
 			// 18
 			dg.PutRandomBandN(g, bandsGuard, 7)
-			dg.PutRandomBandN(g, bandsBig, 2)
-			dg.PutRandomBandN(g, bandsBipeds, 5)
+			dg.PutRandomBandN(g, bandsBig, 1)
+			dg.PutRandomBandN(g, bandsBipeds, 6)
 			if RandInt(2) == 0 {
 				dg.PutRandomBandN(g, bandWingedMilfidPair, 1)
 			} else {
