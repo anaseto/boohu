@@ -255,19 +255,13 @@ func (g *game) FallAbyss(style descendstyle) {
 }
 
 func (g *game) MovePlayer(pos position, ev event) error {
-	//if g.Player.Dir != pos.Dir(g.Player.Pos) {
-	//g.Player.Dir = pos.Dir(g.Player.Pos)
-	//ev.Renew(g, 5)
-	//g.ComputeLOS() // TODO: not really needed
-	//return nil
-	//}
 	if !pos.valid() {
 		return errors.New("You cannot move there.")
 	}
 	c := g.Dungeon.Cell(pos)
 	if c.T == WallCell && !g.Player.HasStatus(StatusDig) {
 		return errors.New("You cannot move into a wall.")
-	} else if c.T == BarrierCell {
+	} else if c.T == BarrierCell && !g.Player.HasStatus(StatusLevitation) {
 		return errors.New("You cannot move into a magical barrier.")
 	} else if c.T == WindowCell && !g.Player.HasStatus(StatusDig) {
 		return errors.New("You cannot pass through the closed window.")

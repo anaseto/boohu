@@ -115,6 +115,7 @@ func (pp *playerPath) Neighbors(pos position) []position {
 		}
 		return npos.valid() && d.Cell(npos).Explored && (d.Cell(npos).T.IsPlayerPassable() && !okT ||
 			okT && t.IsPlayerPassable() ||
+			pp.game.Player.HasStatus(StatusLevitation) && (t == BarrierCell || t == ChasmCell) ||
 			pp.game.Player.HasStatus(StatusDig) && (d.Cell(npos).T.IsDiggable() && !okT || (okT && t.IsDiggable())))
 	}
 	nb = pos.CardinalNeighbors(nb, keep)
