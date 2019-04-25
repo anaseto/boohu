@@ -682,7 +682,7 @@ func (ui *gameui) DescribePosition(pos position, targ Targeter) {
 	}
 	if g.MonsterLOS[pos] {
 		desc += " (unhidden)"
-	} else if g.Illuminated[pos.idx()] {
+	} else if g.Illuminated[pos.idx()] && c.IsIlluminable() {
 		desc += " (lighted)"
 	}
 	g.InfoEntry = desc + "."
@@ -1056,7 +1056,7 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 			r = '♫'
 			fgColor = ColorFgMagicPlace
 		}
-		if fgColor == ColorFgLOS && g.Illuminated[pos.idx()] {
+		if fgColor == ColorFgLOS && g.Illuminated[pos.idx()] && c.IsIlluminable() {
 			fgColor = ColorFgLOSLight
 		}
 	}

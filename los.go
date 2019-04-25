@@ -136,7 +136,10 @@ const (
 	MonsterRay
 	TreePlayerRay
 	TargetingRay
+	LightRay
 )
+
+const LightRange = 6
 
 func (g *game) buildRayMap(from position, rs raystyle, rm rayMap) {
 	var wallcost int
@@ -145,6 +148,8 @@ func (g *game) buildRayMap(from position, rs raystyle, rm rayMap) {
 		wallcost = TreeRange
 	case MonsterRay:
 		wallcost = DefaultMonsterLOSRange
+	case LightRay:
+		wallcost = LightRange
 	default:
 		wallcost = g.LosRange()
 	}
@@ -451,10 +456,11 @@ func (m *monster) Sees(g *game, pos position) bool {
 	if m.State == Resting && m.Pos.Distance(pos) > 1 {
 		return false
 	}
-	if !g.Illuminated[pos.idx()] && !g.Player.HasStatus(StatusIlluminated) && m.Pos.Distance(pos) > darkRange {
+	c := g.Dungeon.Cell(pos)
+	if (!g.Illuminated[pos.idx()] && !g.Player.HasStatus(StatusIlluminated) || !c.IsIlluminable()) && m.Pos.Distance(pos) > darkRange {
 		return false
 	}
-	if g.Dungeon.Cell(pos).T == TableCell && m.Pos.Distance(pos) > tableRange {
+	if c.T == TableCell && m.Pos.Distance(pos) > tableRange {
 		return false
 	}
 	return true
@@ -493,7 +499,7 @@ func (g *game) ComputeMonsterLOS() {
 		g.Player.Statuses[StatusUnhidden] = 0
 		g.Player.Statuses[StatusHidden] = 1
 	}
-	if g.Illuminated[g.Player.Pos.idx()] {
+	if g.Illuminated[g.Player.Pos.idx()] && g.Dungeon.Cell(g.Player.Pos).IsIlluminable() {
 		g.Player.Statuses[StatusLight] = 1
 	} else {
 		g.Player.Statuses[StatusLight] = 0
@@ -505,18 +511,16 @@ func (g *game) ComputeLights() {
 	for i := 0; i < DungeonNCells; i++ {
 		g.Illuminated[i] = false
 	}
-	const lightrange = 6
 	for lpos, on := range g.Objects.Lights {
 		if !on {
 			continue
 		}
-		if lpos.Distance(g.Player.Pos) > DefaultLOSRange+lightrange && g.Dungeon.Cell(g.Player.Pos).T != TreeCell {
+		if lpos.Distance(g.Player.Pos) > DefaultLOSRange+LightRange && g.Dungeon.Cell(g.Player.Pos).T != TreeCell {
 			continue
 		}
-		g.buildRayMap(lpos, lightrange, g.RaysCache)
+		g.buildRayMap(lpos, LightRay, g.RaysCache)
 		for pos, n := range g.RaysCache {
-			c := g.Dungeon.Cell(pos)
-			if n.Cost < lightrange && c.IsIlluminable() {
+			if n.Cost < LightRange {
 				g.Illuminated[pos.idx()] = true
 			}
 		}
@@ -525,13 +529,12 @@ func (g *game) ComputeLights() {
 		if !mons.Exists() || mons.Kind != MonsButterfly {
 			continue
 		}
-		if mons.Pos.Distance(g.Player.Pos) > DefaultLOSRange+lightrange && g.Dungeon.Cell(g.Player.Pos).T != TreeCell {
+		if mons.Pos.Distance(g.Player.Pos) > DefaultLOSRange+LightRange && g.Dungeon.Cell(g.Player.Pos).T != TreeCell {
 			continue
 		}
-		g.buildRayMap(mons.Pos, lightrange, g.RaysCache)
+		g.buildRayMap(mons.Pos, LightRay, g.RaysCache)
 		for pos, n := range g.RaysCache {
-			c := g.Dungeon.Cell(pos)
-			if n.Cost < lightrange && c.IsIlluminable() {
+			if n.Cost < LightRange {
 				g.Illuminated[pos.idx()] = true
 			}
 		}
