@@ -187,7 +187,7 @@ func (mag magara) Desc(g *game) (desc string) {
 	case SwappingMagara:
 		desc = "makes you swap positions with the farthest monster in sight. If there is more than one at the same distance, it will be chosen randomly."
 	case ObstructionMagara:
-		desc = "creates temporal barriers with oric energy between you and up to 3 monsters."
+		desc = "creates temporal barriers with oric energy between you and monsters in sight."
 	case LignificationMagara:
 		desc = "liberates magical spores that lignify up to 2 monsters in view, so that they cannot move. The monsters can still fight."
 	}
@@ -592,17 +592,12 @@ func (g *game) EvokeFire(ev event) error {
 }
 
 func (g *game) EvokeObstruction(ev event) error {
-	ms := g.MonstersInLOS()
-	if len(ms) == 0 {
-		return errors.New("There are no monsters in view.")
-	}
-	max := 3
-	if max > len(ms) {
-		max = len(ms)
-	}
 	targets := []position{}
-	for i := 0; i < max; i++ {
-		ray := g.Ray(ms[i].Pos)
+	for _, mons := range g.Monsters {
+		if !mons.Exists() || !g.Player.Sees(mons.Pos) {
+			continue
+		}
+		ray := g.Ray(mons.Pos)
 		for i, pos := range ray[1:] {
 			if pos == g.Player.Pos {
 				break
@@ -621,7 +616,7 @@ func (g *game) EvokeObstruction(ev event) error {
 		}
 	}
 	if len(targets) == 0 {
-		return errors.New("No suitable monsters.")
+		return errors.New("No targetable monsters in view.")
 	}
 	g.Print("Magical barriers emerged.")
 	g.ui.BeamsAnimation(targets, BeamObstruction)

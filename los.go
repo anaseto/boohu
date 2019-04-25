@@ -17,7 +17,7 @@ func (g *game) bestParent(rm rayMap, from, pos position, rs raystyle) (position,
 	return b, rm[b].Cost + g.losCost(from, b, pos, rs)
 }
 
-func (g *game) DiagonalOpaque(from, to position) bool {
+func (g *game) DiagonalOpaque(from, to position, rs raystyle) bool {
 	var cache [2]position
 	p := cache[:0]
 	switch to.Dir(from) {
@@ -37,7 +37,13 @@ func (g *game) DiagonalOpaque(from, to position) bool {
 			count++
 			continue
 		}
-		if pos.valid() && g.Dungeon.Cell(pos).T == WallCell {
+		if !pos.valid() {
+			continue
+		}
+		c := g.Dungeon.Cell(pos)
+		if c.T == WallCell {
+			count++
+		} else if rs == TargetingRay && c.T == BarrierCell {
 			count++
 		}
 	}
@@ -85,7 +91,7 @@ func (g *game) losCost(from, pos, to position, rs raystyle) int {
 	default:
 		wallcost = g.LosRange()
 	}
-	if g.DiagonalOpaque(pos, to) {
+	if g.DiagonalOpaque(pos, to, rs) {
 		return wallcost
 	}
 	if from == pos {
@@ -129,6 +135,7 @@ const (
 	NormalPlayerRay raystyle = iota
 	MonsterRay
 	TreePlayerRay
+	TargetingRay
 )
 
 func (g *game) buildRayMap(from position, rs raystyle, rm rayMap) {
@@ -332,7 +339,7 @@ func (g *game) Ray(pos position) []position {
 	ray := []position{}
 	for pos != g.Player.Pos {
 		ray = append(ray, pos)
-		pos, _ = g.bestParent(g.Player.Rays, g.Player.Pos, pos, NormalPlayerRay)
+		pos, _ = g.bestParent(g.Player.Rays, g.Player.Pos, pos, TargetingRay)
 	}
 	return ray
 }

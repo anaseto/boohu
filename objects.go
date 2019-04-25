@@ -79,7 +79,7 @@ const (
 	FogStone
 	QueenStone
 	TreeStone
-	ObstructionStone
+	TeleportStone
 	MappingStone
 	SensingStone
 	// special
@@ -100,8 +100,8 @@ func (stn stone) String() (text string) {
 		text = "queenstone"
 	case TreeStone:
 		text = "tree stone"
-	case ObstructionStone:
-		text = "obstruction stone"
+	case TeleportStone:
+		text = "teleport stone"
 	case MappingStone:
 		text = "mapping stone"
 	case SensingStone:
@@ -124,8 +124,8 @@ func (stn stone) Desc(g *game) (text string) {
 		text = "Activating this magical stone will produce an harmonic sound confusing enemies in a quite large area. This can also attract monsters."
 	case TreeStone:
 		text = "Activating this magical stone will lignify monsters in sight."
-	case ObstructionStone:
-		text = "Activating this magical stone will create temporal oric-energy based barriers around all monsters in sight."
+	case TeleportStone:
+		text = "Activating this magical stone will teleport away monsters in sight."
 	case MappingStone:
 		text = "Activating this magical stone shows you the map layout and item locations in a wide area."
 	case SensingStone:
@@ -283,26 +283,18 @@ func (g *game) ActivateStone() (err error) {
 		if count == 0 {
 			err = errors.New("There are no monsters to confuse around.")
 		}
-	case ObstructionStone:
+	case TeleportStone:
+		g.Print("The stone releases oric energies.")
 		count := 0
 		for _, mons := range g.Monsters {
 			if !mons.Exists() || !g.Player.Sees(mons.Pos) {
 				continue
 			}
-			neighbors := g.Dungeon.FreeNeighbors(mons.Pos)
-			for _, pos := range neighbors {
-				m := g.MonsterAt(pos)
-				if m.Exists() || pos == g.Player.Pos {
-					continue
-				}
-				g.MagicalBarrierAt(pos, g.Ev)
-				count++
-			}
+			mons.TeleportAway(g)
+			count++
 		}
 		if count == 0 {
-			err = errors.New("There are no monsters to be surrounded by walls.")
-		} else {
-			g.Print("Walls appear around your foes.")
+			err = errors.New("There are no monsters in sight.")
 		}
 	case MappingStone:
 		err = g.MagicMapping(g.Ev, MappingDistance)
