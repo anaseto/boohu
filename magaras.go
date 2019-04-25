@@ -169,7 +169,7 @@ func (mag magara) Desc(g *game) (desc string) {
 	case LevitationMagara:
 		desc = "makes you levitate, allowing you to move over chasms."
 	case FireMagara:
-		desc = "produces a small magical fire that will extend to neighbour flammable terrain. The smoke it generates will induce sleep in monsters. As a gawalt monkey, you resist sleepiness, but you will still feel slowed."
+		desc = "throws small magical sparks at flammable terrain adjacent to you. The generated smoke will induce sleep in monsters. As a gawalt monkey, you resist sleepiness, but you will still feel slowed."
 	case FogMagara:
 		desc = "creates a dense fog in a 2-range radius using harmonic energies."
 	case ShadowsMagara:
@@ -583,11 +583,14 @@ func (g *game) EvokeConfusion(ev event) error {
 }
 
 func (g *game) EvokeFire(ev event) error {
-	if !g.Dungeon.Cell(g.Player.Pos).Flammable() {
-		return errors.New("You are not standing on flammable terrain.")
+	burnpos := g.Dungeon.CardinalFlammableNeighbors(g.Player.Pos)
+	if len(burnpos) == 0 {
+		return errors.New("You are not surrounded by any flammable terrain.")
 	}
-	g.Burn(g.Player.Pos, ev)
-	g.Print("A small fire appears.")
+	g.Print("Sparks emanate from the magara.")
+	for _, pos := range burnpos {
+		g.Burn(pos, ev)
+	}
 	return nil
 }
 

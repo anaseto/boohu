@@ -314,7 +314,7 @@ func (cev *cloudEvent) Action(g *game) {
 		}
 		//g.BurnCreature(cev.Pos, cev)
 		for _, pos := range g.Dungeon.FreeNeighbors(cev.Pos) {
-			if RandInt(5) > 0 {
+			if RandInt(4) == 0 {
 				continue
 			}
 			g.Burn(pos, cev)
@@ -418,7 +418,7 @@ func (g *game) Burn(pos position, ev event) {
 	g.Dungeon.SetCell(pos, GroundCell)
 	g.Clouds[pos] = CloudFire
 	if !g.Player.Sees(pos) {
-		// TODO: knowledge
+		g.UpdateKnowledge(pos, c.T)
 	} else {
 		g.ComputeLOS()
 	}

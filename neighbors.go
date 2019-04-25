@@ -69,3 +69,11 @@ func (d *dungeon) CardinalNonWallNeighbors(pos position) []position {
 	})
 	return nb
 }
+
+func (d *dungeon) CardinalFlammableNeighbors(pos position) []position {
+	nb := make([]position, 0, 4)
+	nb = pos.CardinalNeighbors(nb, func(npos position) bool {
+		return npos.valid() && d.Cell(npos).Flammable()
+	})
+	return nb
+}
