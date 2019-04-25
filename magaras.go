@@ -357,7 +357,7 @@ func (g *game) EvokeSwiftness(ev event) error {
 }
 
 func (g *game) EvokeLevitation(ev event) error {
-	if !g.PutStatus(StatusLevitation, DurationSwiftness) {
+	if !g.PutStatus(StatusLevitation, DurationLevitation) {
 		return errors.New("You are already levitating.")
 	}
 	g.Printf("You feel light.")
