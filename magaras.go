@@ -167,7 +167,7 @@ func (mag magara) Desc(g *game) (desc string) {
 	case SwiftnessMagara:
 		desc = "makes you move faster for a short time by filling you with energies."
 	case LevitationMagara:
-		desc = "makes you levitate, allowing you to move over chasms."
+		desc = "makes you levitate with oric energies, allowing you to move over chasms, as well as through oric barriers."
 	case FireMagara:
 		desc = "throws small magical sparks at flammable terrain adjacent to you. The generated smoke will induce sleep in monsters. As a gawalt monkey, you resist sleepiness, but you will still feel slowed."
 	case FogMagara:
