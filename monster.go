@@ -1518,14 +1518,14 @@ func (m *monster) MakeHuntIfHurt(g *game) {
 }
 
 func (m *monster) MakeAware(g *game) {
-	if !m.SeesPlayer(g) {
-		return
-	}
 	if m.Peaceful(g) || m.Status(MonsSatiated) {
-		if m.State == Resting {
+		if m.State == Resting && m.Pos.Distance(g.Player.Pos) == 1 {
 			g.Printf("%s awakens.", m.Kind.Definite(true))
 			m.MakeWander()
 		}
+		return
+	}
+	if !m.SeesPlayer(g) {
 		return
 	}
 	if m.State == Resting {
