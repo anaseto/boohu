@@ -130,8 +130,8 @@ func (rep *replay) PollEvent() (in repEvent) {
 			d = 2 * time.Second
 		}
 		d = d / rep.speed
-		if d <= 10*time.Millisecond {
-			d = 10 * time.Millisecond
+		if d <= 5*time.Millisecond {
+			d = 5 * time.Millisecond
 		}
 		t := time.NewTimer(d)
 		select {
