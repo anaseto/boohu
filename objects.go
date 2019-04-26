@@ -415,6 +415,9 @@ func (st story) ShortDesc(g *game, pos position) (desc string) {
 func (st story) Style(g *game) (r rune, fg uicolor) {
 	fg = ColorFgPlayer
 	switch st {
+	case NoStory:
+		fg = ColorFgLOS
+		r = '.'
 	case StoryShaedra:
 		r = 'H'
 	case StoryMarevor:
