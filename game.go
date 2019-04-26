@@ -76,6 +76,7 @@ type startParams struct {
 	Holes    map[int]bool
 	Stones   map[int]bool
 	Tables   map[int]bool
+	NoMagara map[int]bool
 }
 
 type places struct {
@@ -209,10 +210,8 @@ func (g *game) InitPlayer() {
 		NoMagara,
 	}
 	g.GeneratedMagaras = []magara{}
-	for i := 0; i < 2; i++ {
-		g.Player.Magaras[i] = g.RandomMagara()
-		g.GeneratedMagaras = append(g.GeneratedMagaras, g.Player.Magaras[i])
-	}
+	g.Player.Magaras[0] = g.RandomMagara()
+	g.GeneratedMagaras = append(g.GeneratedMagaras, g.Player.Magaras[0])
 	g.Player.Inventory.Misc = MarevorMagara
 	// Testing
 	//g.Player.Magaras[2] = NoiseMagara
@@ -312,6 +311,15 @@ func (g *game) InitFirstLevel() {
 		if RandInt(MaxDepth) == 0 {
 			g.Params.Tables[2+RandInt(MaxDepth-1)] = true
 		}
+	}
+	g.Params.NoMagara = map[int]bool{}
+	switch RandInt(3) {
+	case 0:
+		g.Params.NoMagara[4] = true
+	case 1:
+		g.Params.NoMagara[6] = true
+	case 2:
+		g.Params.NoMagara[8] = true
 	}
 	g.Params.Stones = map[int]bool{}
 	if RandInt(MaxDepth) > MaxDepth/2 {

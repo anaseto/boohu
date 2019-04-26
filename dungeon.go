@@ -1183,7 +1183,9 @@ func (dg *dgen) AddSpecial(g *game, ml maplayout) {
 	for i := 0; i < bananas; i++ {
 		dg.GenBanana(g)
 	}
-	dg.GenMagara(g)
+	if !g.Params.NoMagara[g.Depth] {
+		dg.GenMagara(g)
+	}
 	dg.GenItem(g)
 	dg.GenStones(g)
 	dg.GenLight(g)
