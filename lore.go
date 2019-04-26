@@ -153,7 +153,7 @@ never crossed my path again.”
 `,
 	`“Someone told me that was a good place to find bananas. I thought he was joking. But now that I'm here, I know he wasn't. The Undergrounds banana trees are so rare! They don't seem to even need a source of moonstone light. That's my chance to shine! I'll keep studying them as much as I can.”
 
-[The rest of the paper is full of signs you don't understand. It's not abrianese. You sigh: those saijits really make things complicated…]
+[The rest of the paper is full of signs you don't understand. It's not Abrianese. You sigh: those saijits really make things complicated…]
 `,
 	`“No rival for me to kill
 that's some kind of an ordeal,
@@ -172,9 +172,9 @@ if you want to say hello, it's this way, come on, come…”
 [You blink at the paper, surprised. A gawalt? A gawalt monkey like you wrote that? Then, you smile: I will, too, run like an arrow!]
 `,
 	`“Rather than being smashed and eaten,
-	gather your will, stop to think.
-	You won't have your legend written
-	but you'll still be able to drink.”
+gather your will, stop to think.
+You won't have your legend written
+but you'll still be able to drink.”
 
 [Fragment of the poem The Mouse And The Dragon, by Dak Limisur]
 `,
