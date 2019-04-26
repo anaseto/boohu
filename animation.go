@@ -603,7 +603,6 @@ func (ui *gameui) FreeingShaedraAnimation() {
 	ui.DrawAtPosition(g.Places.Marevor, false, 'Φ', ColorFgMagicPlace, bg)
 	ui.Flush()
 	time.Sleep(AnimDurLong)
-	g.Dungeon.SetCell(g.Places.Marevor, StoryCell)
 	g.Objects.Story[g.Places.Marevor] = StoryMarevor
 	g.PrintStyled("Marevor: “And what about the mission?”", logSpecial)
 	g.PrintStyled("Shaedra: “Pff, don't be reckless!”", logSpecial)
@@ -647,7 +646,6 @@ func (ui *gameui) TakingArtifactAnimation() {
 	ui.DrawAtPosition(g.Places.Marevor, false, 'Φ', ColorFgMagicPlace, bg)
 	ui.Flush()
 	time.Sleep(AnimDurLong)
-	g.Dungeon.SetCell(g.Places.Marevor, StoryCell)
 	g.Objects.Story[g.Places.Marevor] = StoryMarevor
 	g.PrintStyled("Marevor: “Great! Let's escape and find some bones to celebrate!”", logSpecial)
 	g.PrintStyled("Syu: “Sorry, but I prefer bananas!”", logSpecial)

@@ -233,7 +233,8 @@ func (g *game) BlinkPos() position {
 		if !b {
 			continue
 		}
-		if !g.Dungeon.Cell(pos).T.IsPlayerPassable() {
+		c := g.Dungeon.Cell(pos)
+		if !c.T.IsPlayerPassable() || c.T == StoryCell {
 			continue
 		}
 		mons := g.MonsterAt(pos)

@@ -373,15 +373,17 @@ func (sc scroll) Style(g *game) (r rune, fg uicolor) {
 type story int
 
 const (
-	NoStory story = iota
+	NoStory story = iota // just a normal ground cell but free
 	StoryShaedra
 	StoryMarevor
 	StoryArtifact
 	StoryArtifactSealed
 )
 
-func (st story) Desc(g *game) (desc string) {
+func (st story) Desc(g *game, pos position) (desc string) {
 	switch st {
+	case NoStory:
+		desc = cell{T: GroundCell}.Desc(g, pos)
 	case StoryShaedra:
 		desc = "Shaedra is the friend you came here to rescue, a human-like creature with claws, a ternian. Many other human-like creatures consider them as savages."
 	case StoryMarevor:
@@ -394,8 +396,10 @@ func (st story) Desc(g *game) (desc string) {
 	return desc
 }
 
-func (st story) ShortDesc(g *game) (desc string) {
+func (st story) ShortDesc(g *game, pos position) (desc string) {
 	switch st {
+	case NoStory:
+		desc = cell{T: GroundCell}.ShortDesc(g, pos)
 	case StoryShaedra:
 		desc = "Shaedra"
 	case StoryMarevor:

@@ -207,7 +207,7 @@ func (c cell) ShortDesc(g *game, pos position) (desc string) {
 	case ScrollCell:
 		desc = g.Objects.Scrolls[pos].ShortDesc(g)
 	case StoryCell:
-		desc = g.Objects.Story[pos].ShortDesc(g)
+		desc = g.Objects.Story[pos].ShortDesc(g, pos)
 	case ItemCell:
 		desc = g.Objects.Items[pos].ShortDesc(g)
 	case BarrierCell:
@@ -255,7 +255,7 @@ func (c cell) Desc(g *game, pos position) (desc string) {
 	case ScrollCell:
 		desc = g.Objects.Scrolls[pos].Desc(g)
 	case StoryCell:
-		desc = g.Objects.Story[pos].Desc(g)
+		desc = g.Objects.Story[pos].Desc(g, pos)
 	case ItemCell:
 		desc = g.Objects.Items[pos].Desc(g)
 	case BarrierCell:

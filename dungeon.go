@@ -812,9 +812,11 @@ func (r *room) Dig(dg *dgen) {
 		case 'M':
 			r.places = append(r.places, place{pos: pos, kind: PlaceStory})
 			dg.spl.Marevor = pos
+			dg.d.SetCell(pos, StoryCell)
 		case 'Δ':
 			r.places = append(r.places, place{pos: pos, kind: PlaceStory})
 			dg.spl.Monolith = pos
+			dg.d.SetCell(pos, StoryCell)
 		case 'A':
 			r.places = append(r.places, place{pos: pos, kind: PlaceStory})
 			dg.spl.Artifact = pos
@@ -1077,7 +1079,9 @@ func (g *game) GenRoomTunnels(ml maplayout) {
 			g.Places.Artifact = dg.spl.Artifact
 			g.Objects.Story[g.Places.Artifact] = StoryArtifactSealed
 			g.Places.Monolith = dg.spl.Monolith
+			g.Objects.Story[g.Places.Monolith] = NoStory
 			g.Places.Marevor = dg.spl.Marevor
+			g.Objects.Story[g.Places.Marevor] = NoStory
 			dg.GenRooms(roomBigTemplates, nspecial, PlacementRandom)
 			dg.GenRooms(roomNormalTemplates, 6, PlacementRandom)
 		} else {
@@ -1099,7 +1103,9 @@ func (g *game) GenRoomTunnels(ml maplayout) {
 			g.Places.Shaedra = dg.spl.Shaedra
 			g.Objects.Story[g.Places.Shaedra] = StoryShaedra
 			g.Places.Monolith = dg.spl.Monolith
+			g.Objects.Story[g.Places.Monolith] = NoStory
 			g.Places.Marevor = dg.spl.Marevor
+			g.Objects.Story[g.Places.Marevor] = NoStory
 			dg.GenRooms(roomBigTemplates, nspecial-1, PlacementRandom)
 			dg.GenRooms(roomNormalTemplates, 6, PlacementRandom)
 		} else {
