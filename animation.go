@@ -476,6 +476,7 @@ func (ui *gameui) WoundedAnimation() {
 	if DisableAnimations {
 		return
 	}
+	ui.DrawDungeonView(NoFlushMode)
 	r, _, bg := ui.PositionDrawing(g.Player.Pos)
 	ui.DrawAtPosition(g.Player.Pos, false, r, ColorFgHPwounded, bg)
 	ui.Flush()
@@ -510,6 +511,7 @@ func (ui *gameui) StatusEndAnimation() {
 	if DisableAnimations {
 		return
 	}
+	ui.DrawDungeonView(NoFlushMode)
 	r, fg, bg := ui.PositionDrawing(g.Player.Pos)
 	ui.DrawAtPosition(g.Player.Pos, false, r, ColorViolet, bg)
 	ui.Flush()
