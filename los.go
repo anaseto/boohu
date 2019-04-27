@@ -217,8 +217,24 @@ func (g *game) ComputeLOS() {
 		rs = TreePlayerRay
 	}
 	g.buildRayMap(g.Player.Pos, rs, g.Player.Rays)
+	nb := make([]position, 8)
 	for pos, n := range g.Player.Rays {
-		if c.T == TreeCell && g.Illuminated[pos.idx()] && (n.Cost < TreeRange) || n.Cost < g.LosRange() {
+		if n.Cost < DefaultLOSRange {
+			g.Player.LOS[pos] = true
+		} else if c.T == TreeCell && g.Illuminated[pos.idx()] && n.Cost < TreeRange {
+			if g.Dungeon.Cell(pos).T == WallCell {
+				// this is just an approximation, but ok in practice
+				nb = pos.Neighbors(nb, func(npos position) bool {
+					if !npos.valid() || !g.Illuminated[npos.idx()] || g.Dungeon.Cell(npos).IsWall() {
+						return false
+					}
+					node, ok := g.Player.Rays[npos]
+					return ok && node.Cost < TreeRange
+				})
+				if len(nb) == 0 {
+					continue
+				}
+			}
 			g.Player.LOS[pos] = true
 		}
 	}
