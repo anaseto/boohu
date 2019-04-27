@@ -186,4 +186,102 @@ but you'll still be able to drink.”
 
 [The page is rather long… Snorting, you stop reading. Crazy saijits, that's too much]
 `,
+	`“Let's see… You were a shoemaker, you have good ideals, you want to make a better world, you like sunny days and you love birds. Man… Why in the world do you want to join a clan like ours?”
+
+[Interview with an applicant for the Dark Dayoriah Clan]
+`,
+	`“I was pursued and used my magara of levitation to pass over the chasm… But I was so scared, I couldn't go on fast enough. I wound up falling, down and down. And there I am, deeper in the dungeon, hopeless as never before. And wounds hurt. Damn, they hurt.”
+
+[Fragment of an old diary signed Jiffy Low]
+`,
+	`“The ceremony didn't go as I expected. It wasn't a feast. It was a funeral. They half-buried me in a huge mound of mud, sang as if their throats were going to change into stone, and then they freed me, allowed me to wear their black tunic, and shared with me a cup of blood. It was my blood they were drinking. It was their blood I was drinking. I was them, they were me. That's the thinking of the Dark Dayoriah Clan: everyone is one, no one will be ever alone…”
+
+[Namyfar's thoughts about the infiltration of the Dayoriah Clan in the late 80' of the 55th century]
+`,
+	`“I seem to be a traitor. I just can't understand why. The Dayoriah Clan is chasing me, they say I was thinking too much and acting without permission… I'm scared. I don't want to lose my friends. But now I'm afraid of them… Just please, please, brethren, forgive me.”
+
+[Piece of paper signed with a blooded cross]
+`,
+	`“Believe me, mom, this Dayoriah clan will give me power. They have oric experts, and harmonists experts; their celmists are really good ones! Even from our village I've heard wonders about their learning, but that's above my expectations! They told me that they will train me, so I will give my best and definitely join them. I don't care if they are seen like demons by others. Strong, resilient, obstinate… They are just what I am looking for!”
+
+[Undelivered old letter signed: your son, Mel]
+`,
+	`“We'll be one,
+never alone,
+we'll be one,
+and always strong.”
+
+[Written words of an anonymous Dayoriah Clan member]
+`,
+	`“Please,
+please, forgive them all who thought they could run away from your wrath,
+Children of Dayoriah,
+take those poor souls in your heart and remember they could have become your brothers-in-arms.”
+
+[Dayoriah Clan's Prayer for the Taken Souls]
+`,
+	`“Yesterday in my heart
+a white flower has bloomed,
+it told me: don't cry now,
+for you're already doomed.”
+
+[Poem entitled: Don't let the bastards wear you down]
+`,
+	`“«Why? Why do you try so hard to save me?», the young apprentice asked, panting for breath. His hooded comrade didn't even look at him when he answered in a cold tone: «If I don't even try, I'll never be able to call you a friend.”
+
+[Piece of paper of a mangled novel]
+`,
+	`“Go on. Don't look behind.
+Nothing good you will find.
+There are nothing but ghosts,
+ghosts that will cost your life.”
+
+[Fragment of Ghosts of the Past, by Yaylin Ekath (5541-?)]
+`,
+	`“I was chasing a dog,
+	it then entered a pound,
+	I swam fast, I swam fast,
+	I left it soon behind.”
+
+[Piece of paper, The Mirol Man who Swam Faster than Dogs]
+`,
+	`“Now! Cut the branch of your life,
+	make it stronger, make it darker,
+	can't you see? Nothing bad happens,
+	you're just a bit more like us…”
+
+[Words written by a Dayoriah Clan Oric Celmist called Chuvitsan.]
+`,
+	`“That silly drow… I'm sick of him. During our watch, he kept on talking till I thought I'd get mad. He just doesn't understand what the Dayoriah Clan is. He talks about his children, his wife, his expectations, his dream about becoming one day a merchant… He didn't even realize I wasn't answering. Does he think everyone here is just as happy and dreamy as he is? So naïve it hurts me… Hope he will escape and survive. Otherwise, that poor guy will never become a merchant. Can't tell him, though.”
+
+[Thoughts of Xorom, an Elder Guard of the Dayoriah Clan]
+`,
+	`“Cling! clang! clong…! Are they water drops on a queenstone? It makes so much noise. Cling, clang, clong… I am so tired I could fell asleep even with that dreadful sound. But perhaps something wrong is happening over there. I will go and take a look.”
+
+[Mimi the Guard]
+`,
+	`“The thief that infiltrated our turf and tried to retrieve our new acquisition has been captured. However, it is possible she had an accomplice. Please be careful and stop every suspect.”
+
+[Order of a Dayoriah Clan's foreman, the paper is rather recent and you can't help but think the thief is actually Shaedra. So they did capture her! You have to hurry and save her.]
+`,
+	`“What have you done, young novice? You are but weak, useless, worthless, and you still want to eat with us, the Dayoriah Guards? You don't seem to understand your place. Just crawl, crawl until we just see in you a mere worm. Maybe then, you'll get some leftovers. The worm who would climb the ladder must begin at the bottom.”
+
+[Piece of paper wet with tears]
+`,
+	`“I've always lived in the Dayoriah Clan, so maybe I'm biased and the world is just as much rotten as my clan is… I want to believe it isn't. My clan was once a great place to live in. They were kind, they were wise. They just loved knowledge so badly they ended up doing people wrong, and just to learn more, they began to steal and experiment on relics, magaras, artifacts… and even people. I wish I could change them, but for now, all I can do is take care of my dear little granddaughter. I will teach her well.”
+
+[Old man Arifa's thoughts about the Dayoriah Clan]
+`,
+	`“Dear Uncle, I'm finally up and about! Training is hard, but after my illness, I'm more and more convinced it's necessary. Those great celmists who can control forces, illusions, lights and shadows, they definitely needed to work like demons to get so powerful. I won't lose to my peers. And I'll certainly catch up. No matter what.”
+
+[Letter to a man call «Uncle Baref», signed «Divel»]
+`,
+	`“A petal in darkness is showing at last
+revealing its color of violet and white,
+a little drop of water
+on the corner of its smile,
+recover the tears that were shed in the past.”
+
+[Poem by Amsalia Ruverg (4901-4945)]
+`,
 }
