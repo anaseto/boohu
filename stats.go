@@ -9,14 +9,12 @@ type stats struct {
 	ReceivedHits  int
 	Dodges        int
 	MagarasUsed   int
-	Evocations    int
 	UsedStones    int
 	UsedMagaras   map[magara]int
 	Damage        int
 	DExplPerc     [MaxDepth + 1]int
 	DSleepingPerc [MaxDepth + 1]int
 	DKilledPerc   [MaxDepth + 1]int
-	DLayout       [MaxDepth + 1]string
 	Burns         int
 	Digs          int
 	Rest          int
@@ -28,6 +26,7 @@ type stats struct {
 	NUSpotted     int
 	DSpotted      [MaxDepth + 1]int
 	DUSpotted     [MaxDepth + 1]int
+	Achievements  map[achievement]bool
 }
 
 func (g *game) TurnStats() {
@@ -73,3 +72,33 @@ func (g *game) LevelStats() {
 	g.Stats.DSleepingPerc[g.Depth] = smons * 100 / nmons
 	g.Stats.DKilledPerc[g.Depth] = kmons * 100 / nmons
 }
+
+type achievement string
+
+const (
+	NoAchievement        achievement = "Stupid Death"
+	AchBananaCollector               = "Banana Collector"
+	AchHarmonist                     = "Harmonist"
+	AchOricCelmist                   = "Oric Celmist"
+	AchUnstealthy                    = "Unstealthy Gawalt"
+	AchNoAlerts                      = "No Alerts"
+	AchPyromancer                    = "Pyromancer"
+	AchDestructor                    = "Destructor"
+	AchTeleport                      = "Teleport Maniac"
+	AchCloak                         = "Dressed Gawalt"
+	AchAmulet                        = "Protective Charm"
+	AchRescuedShaedra                = "Rescuer"
+	AchRetrievedArtifact             = "Artifact Finding"
+	AchAcrobat                       = "Acrobat"
+	AchTree                          = "Tree Climber"
+	AchTable                         = "Table Hiding"
+	AchHole                          = "Hole Crawler"
+	AchExtinguisher                  = "Light Extinguisher"
+	AchLoremaster                    = "Loremaster"
+	AchExplorer                      = "Explorer"
+	AchKiller                        = "Killer"
+	AchInsomnia                      = "Insomnia"
+	AchAntimagic                     = "Antimagic"
+	AchWinInsomnia                   = "Insomnia Win"
+	AchWinNoDamage                   = "Unhurt Win"
+)
