@@ -558,9 +558,11 @@ func (g *game) EquipItem() error {
 	case it.IsCloak():
 		oitem = g.Player.Inventory.Body
 		g.Player.Inventory.Body = it
+		AchCloak.Get(g)
 	case it.IsAmulet():
 		oitem = g.Player.Inventory.Neck
 		g.Player.Inventory.Neck = it
+		AchAmulet.Get(g)
 	}
 	if oitem != NoItem {
 		g.Objects.Items[g.Player.Pos] = oitem
