@@ -178,7 +178,7 @@ func (g *game) DetailedStatistics(w io.Writer) {
 	}
 	fmt.Fprintf(w, "\n")
 	fmt.Fprintf(w, hfmt, "Alerted monsters")
-	for i, n := range g.Stats.DUSpotted {
+	for i, n := range g.Stats.DUSpottedPerc {
 		if i == 0 {
 			continue
 		}

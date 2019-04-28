@@ -26,6 +26,7 @@ type stats struct {
 	NUSpotted      int
 	DSpotted       [MaxDepth + 1]int
 	DUSpotted      [MaxDepth + 1]int
+	DUSpottedPerc  [MaxDepth + 1]int
 	Achievements   map[achievement]bool
 	HarmonicMagUse int
 	OricMagUse     int
@@ -76,6 +77,7 @@ func (g *game) LevelStats() {
 	}
 	g.Stats.DSleepingPerc[g.Depth] = smons * 100 / nmons
 	g.Stats.DKilledPerc[g.Depth] = kmons * 100 / nmons
+	g.Stats.DUSpottedPerc[g.Depth] = g.Stats.DUSpotted[g.Depth] * 100 / nmons
 }
 
 type achievement string
