@@ -106,7 +106,7 @@ const (
 	AchRetrievedArtifact achievement = "Artifact Finding"
 	AchAcrobat           achievement = "Acrobat"
 	AchTree              achievement = "Tree Climber"
-	AchTable             achievement = "Table Hiding"
+	AchTable             achievement = "Under Table Gawalt"
 	AchHole              achievement = "Hole Crawler"
 	AchDoors             achievement = "Door Opener"
 	AchExtinguisher      achievement = "Light Extinguisher"
