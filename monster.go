@@ -1065,8 +1065,9 @@ func (m *monster) HitPlayer(g *game, ev event) {
 	switch g.Player.Inventory.Neck {
 	case AmuletConfusion:
 		m.EnterConfusion(g, ev)
-		g.Printf("You release some confusing gas against the %s.", m.Kind)
+		g.Printf("Your amulet releases confusing harmonies.", m.Kind)
 	case AmuletFog:
+		g.Print("Your amulet feels warm.")
 		g.SwiftFog(ev)
 	case AmuletObstruction:
 		opos := m.Pos
@@ -1077,8 +1078,10 @@ func (m *monster) HitPlayer(g *game, ev event) {
 			m.Exhaust(g)
 		}
 	case AmuletTeleport:
+		g.Print("Your amulet shines.")
 		m.TeleportAway(g)
 	case AmuletLignification:
+		g.Print("Your amulet glows.")
 		m.EnterLignification(g, ev)
 	}
 }
