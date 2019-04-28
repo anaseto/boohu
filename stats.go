@@ -104,13 +104,10 @@ const (
 	AchWinNoDamage       achievement = "Unhurt Win"
 )
 
-func (ach achievement) Print(g *game) {
-	g.PrintfStyled("Achievement: %s.", logSpecial, ach)
-}
-
 func (ach achievement) Get(g *game) {
 	if !g.Stats.Achievements[ach] {
 		g.Stats.Achievements[ach] = true
-		ach.Print(g)
+		g.PrintfStyled("Achievement: %s.", logSpecial, ach)
+		g.StoryPrintf("Achievement: %s.", ach)
 	}
 }
