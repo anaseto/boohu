@@ -227,7 +227,7 @@ for you're already doomed.”
 
 [Poem entitled: Don't let the bastards wear you down]
 `,
-	`“«Why? Why do you try so hard to save me?», the young apprentice asked, panting for breath. His hooded comrade didn't even look at him when he answered in a cold tone: «If I don't even try, I'll never be able to call you a friend.”
+	`“«Why? Why do you try so hard to save me?», the young apprentice asked, panting for breath. His hooded comrade didn't even look at him when he answered in a cold tone: «If I don't even try, I'll never be able to call you a friend.»”
 
 [Piece of paper of a mangled novel]
 `,
@@ -262,7 +262,7 @@ you're just a bit more like us…”
 `,
 	`“The thief that infiltrated our turf and tried to retrieve our new acquisition has been captured. However, it is possible she has an accomplice. Please be careful and stop every suspect.”
 
-[Order of a Dayoriah Clan's foreman, the paper is rather recent and you can't help but think the thief is actually Shaedra. So they did capture her! You have to hurry and save her.]
+[Order of a Dayoriah Clan's foreman, the paper is rather recent and you can't help but think the thief is actually Shaedra. So they really did capture her! You have to hurry and save her.]
 `,
 	`“What have you done, young novice? You are but weak, useless, worthless, and you still want to eat with us, the Dayoriah Guards? You don't seem to understand your place. Just crawl, crawl until we just see in you a mere worm. Maybe then, you'll get some leftovers. The worm who would climb the ladder must begin at the bottom.”
 
@@ -272,15 +272,15 @@ you're just a bit more like us…”
 
 [Old man Arifa's thoughts about the Dayoriah Clan]
 `,
-	`“Dear Uncle, I'm finally up and about! Training is hard, but after my illness, I'm more and more convinced it's necessary. Those great harmonist celmists who can control illusions, lights and shadows, they definitely needed to work like demons to get so powerful. I won't lose to my peers. And I'll certainly catch up. No matter what.”
+	`“Dear Uncle, I'm finally up and about! Training is hard, but after my illness, I'm more and more convinced it's necessary. Those great harmonic celmists who can control illusions, lights and shadows, they definitely needed to work like demons to get so powerful. I won't lose to my peers. And I'll certainly catch up. No matter what.”
 
-[Letter to a man call «Uncle Baref», signed «Divel»]
+[Letter to a man call “Uncle Baref”, signed “Divel”]
 `,
 	`“A petal in darkness is showing at last
 revealing its color of violet and white,
 a little drop of water
 on the corner of its smile,
-recover the tears that were shed in the past.”
+recovers the tears that were shed in the past.”
 
 [Poem by Amsalia Ruverg (4901-4945)]
 `,
