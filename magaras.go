@@ -140,6 +140,13 @@ func (g *game) UseMagara(n int, ev event) (err error) {
 			AchPyromancer.Get(g)
 		}
 	}
+	switch mag {
+	case TeleportMagara, TeleportOtherMagara, BlinkMagara, SwappingMagara:
+		g.Stats.OricTelUse++
+		if g.Stats.OricTelUse == 15 {
+			AchTeleport.Get(g)
+		}
+	}
 	// TODO: animation
 	g.Player.MP -= mag.MPCost(g)
 	g.StoryPrintf("You evoked your %s.", mag)

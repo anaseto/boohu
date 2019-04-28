@@ -30,6 +30,8 @@ type stats struct {
 	HarmonicMagUse int
 	OricMagUse     int
 	FireUse        int
+	DestructionUse int
+	OricTelUse     int
 }
 
 func (g *game) TurnStats() {
@@ -90,7 +92,7 @@ const (
 	AchStealthMaster     achievement = "Stealth Master"
 	AchPyromancer        achievement = "Pyromancer"
 	AchDestructor        achievement = "Destructor"
-	AchTeleport          achievement = "Teleport Maniac"
+	AchTeleport          achievement = "Oric Teleport Maniac"
 	AchCloak             achievement = "Dressed Gawalt"
 	AchAmulet            achievement = "Protective Charm"
 	AchRescuedShaedra    achievement = "Rescuer"
