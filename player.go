@@ -240,6 +240,9 @@ func (g *game) CollectGround() {
 	} else if c.T == DoorCell {
 		g.Print("You stand at the door.")
 	}
+	if c.T.ReachNotable() {
+		pos.Reach(g)
+	}
 }
 
 func (g *game) FallAbyss(style descendstyle) {

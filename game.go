@@ -361,6 +361,7 @@ func (g *game) InitLevelStructures() {
 	g.NoiseIllusion = map[position]bool{}
 	g.Clouds = map[position]cloud{}
 	g.MonsterLOS = map[position]bool{}
+	g.Stats.AtNotablePos = map[position]bool{}
 }
 
 func (g *game) InitLevel() {

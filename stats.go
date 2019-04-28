@@ -1,38 +1,43 @@
 package main
 
 type stats struct {
-	Story          []string
-	Killed         int
-	KilledMons     map[monsterKind]int
-	Moves          int
-	Jumps          int
-	ReceivedHits   int
-	Dodges         int
-	MagarasUsed    int
-	UsedStones     int
-	UsedMagaras    map[magara]int
-	Damage         int
-	DExplPerc      [MaxDepth + 1]int
-	DSleepingPerc  [MaxDepth + 1]int
-	DKilledPerc    [MaxDepth + 1]int
-	Burns          int
-	Digs           int
-	Rest           int
-	Turns          int
-	TWounded       int
-	TMWounded      int
-	TMonsLOS       int
-	NSpotted       int
-	NUSpotted      int
-	DSpotted       [MaxDepth + 1]int
-	DUSpotted      [MaxDepth + 1]int
-	DUSpottedPerc  [MaxDepth + 1]int
-	Achievements   map[achievement]bool
-	HarmonicMagUse int
-	OricMagUse     int
-	FireUse        int
-	DestructionUse int
-	OricTelUse     int
+	Story             []string
+	Killed            int
+	KilledMons        map[monsterKind]int
+	Moves             int
+	Jumps             int
+	ReceivedHits      int
+	Dodges            int
+	MagarasUsed       int
+	UsedStones        int
+	UsedMagaras       map[magara]int
+	Damage            int
+	DExplPerc         [MaxDepth + 1]int
+	DSleepingPerc     [MaxDepth + 1]int
+	DKilledPerc       [MaxDepth + 1]int
+	Burns             int
+	Digs              int
+	Rest              int
+	Turns             int
+	TWounded          int
+	TMWounded         int
+	TMonsLOS          int
+	NSpotted          int
+	NUSpotted         int
+	DSpotted          [MaxDepth + 1]int
+	DUSpotted         [MaxDepth + 1]int
+	DUSpottedPerc     [MaxDepth + 1]int
+	Achievements      map[achievement]bool
+	AtNotablePos      map[position]bool
+	HarmonicMagUse    int
+	OricMagUse        int
+	FireUse           int
+	DestructionUse    int
+	OricTelUse        int
+	ClimbedTree       int
+	TableHides        int
+	HoledWallsCrawled int
+	DoorsOpened       int
 }
 
 func (g *game) TurnStats() {
@@ -103,6 +108,7 @@ const (
 	AchTree              achievement = "Tree Climber"
 	AchTable             achievement = "Table Hiding"
 	AchHole              achievement = "Hole Crawler"
+	AchDoors             achievement = "Door Opener"
 	AchExtinguisher      achievement = "Light Extinguisher"
 	AchLoremaster        achievement = "Loremaster"
 	AchExplorer          achievement = "Explorer"
@@ -119,5 +125,44 @@ func (ach achievement) Get(g *game) {
 		g.Stats.Achievements[ach] = true
 		g.PrintfStyled("Achievement: %s.", logSpecial, ach)
 		g.StoryPrintf("Achievement: %s.", ach)
+	}
+}
+
+func (t terrain) ReachNotable() bool {
+	switch t {
+	case TreeCell, TableCell, HoledWallCell, DoorCell:
+		return true
+	default:
+		return false
+	}
+}
+
+func (pos position) Reach(g *game) {
+	if g.Stats.AtNotablePos[pos] {
+		return
+	}
+	g.Stats.AtNotablePos[pos] = true
+	c := g.Dungeon.Cell(pos)
+	switch c.T {
+	case TreeCell:
+		g.Stats.ClimbedTree++
+		if g.Stats.ClimbedTree == 12 {
+			AchTree.Get(g)
+		}
+	case TableCell:
+		g.Stats.TableHides++
+		if g.Stats.TableHides == 12 {
+			AchTable.Get(g)
+		}
+	case HoledWallCell:
+		g.Stats.HoledWallsCrawled++
+		if g.Stats.HoledWallsCrawled == 12 {
+			AchHole.Get(g)
+		}
+	case DoorCell:
+		g.Stats.DoorsOpened++
+		if g.Stats.DoorsOpened == 100 {
+			AchDoors.Get(g)
+		}
 	}
 }
