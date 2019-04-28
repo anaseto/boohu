@@ -217,6 +217,9 @@ func (g *game) CollectGround() {
 				g.Player.Bananas++
 				g.Dungeon.SetCell(pos, GroundCell)
 				delete(g.Objects.Bananas, pos)
+				if g.Player.Bananas == MaxBananas {
+					AchBananaCollector.Get(g)
+				}
 			}
 		case MagaraCell:
 			for i, mag := range g.Player.Magaras {

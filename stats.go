@@ -75,30 +75,42 @@ func (g *game) LevelStats() {
 
 type achievement string
 
+// Achievements.
 const (
 	NoAchievement        achievement = "Stupid Death"
-	AchBananaCollector               = "Banana Collector"
-	AchHarmonist                     = "Harmonist"
-	AchOricCelmist                   = "Oric Celmist"
-	AchUnstealthy                    = "Unstealthy Gawalt"
-	AchNoAlerts                      = "No Alerts"
-	AchPyromancer                    = "Pyromancer"
-	AchDestructor                    = "Destructor"
-	AchTeleport                      = "Teleport Maniac"
-	AchCloak                         = "Dressed Gawalt"
-	AchAmulet                        = "Protective Charm"
-	AchRescuedShaedra                = "Rescuer"
-	AchRetrievedArtifact             = "Artifact Finding"
-	AchAcrobat                       = "Acrobat"
-	AchTree                          = "Tree Climber"
-	AchTable                         = "Table Hiding"
-	AchHole                          = "Hole Crawler"
-	AchExtinguisher                  = "Light Extinguisher"
-	AchLoremaster                    = "Loremaster"
-	AchExplorer                      = "Explorer"
-	AchKiller                        = "Killer"
-	AchInsomnia                      = "Insomnia"
-	AchAntimagic                     = "Antimagic"
-	AchWinInsomnia                   = "Insomnia Win"
-	AchWinNoDamage                   = "Unhurt Win"
+	AchBananaCollector   achievement = "Banana Collector"
+	AchHarmonist         achievement = "Harmonist"
+	AchOricCelmist       achievement = "Oric Celmist"
+	AchUnstealthy        achievement = "Unstealthy Gawalt"
+	AchNoAlerts          achievement = "No Alerts"
+	AchPyromancer        achievement = "Pyromancer"
+	AchDestructor        achievement = "Destructor"
+	AchTeleport          achievement = "Teleport Maniac"
+	AchCloak             achievement = "Dressed Gawalt"
+	AchAmulet            achievement = "Protective Charm"
+	AchRescuedShaedra    achievement = "Rescuer"
+	AchRetrievedArtifact achievement = "Artifact Finding"
+	AchAcrobat           achievement = "Acrobat"
+	AchTree              achievement = "Tree Climber"
+	AchTable             achievement = "Table Hiding"
+	AchHole              achievement = "Hole Crawler"
+	AchExtinguisher      achievement = "Light Extinguisher"
+	AchLoremaster        achievement = "Loremaster"
+	AchExplorer          achievement = "Explorer"
+	AchKiller            achievement = "Killer"
+	AchInsomnia          achievement = "Insomnia"
+	AchAntimagic         achievement = "Antimagic"
+	AchWinInsomnia       achievement = "Insomnia Win"
+	AchWinNoDamage       achievement = "Unhurt Win"
 )
+
+func (ach achievement) Print(g *game) {
+	g.PrintfStyled("Achievement: %s.", logSpecial, ach)
+}
+
+func (ach achievement) Get(g *game) {
+	if !g.Stats.Achievements[ach] {
+		g.Stats.Achievements[ach] = true
+		ach.Print(g)
+	}
+}
