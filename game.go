@@ -254,7 +254,7 @@ func (g *game) InitFirstLevel() {
 		11: GenNothing,
 	}
 	g.Params.Lore = map[int]bool{}
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 7; i++ {
 		j := RandInt(MaxDepth)
 		if !g.Params.Lore[j] {
 			g.Params.Lore[j] = true
