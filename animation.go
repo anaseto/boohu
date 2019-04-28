@@ -623,6 +623,7 @@ func (ui *gameui) FreeingShaedraAnimation() {
 	g.Player.Magaras = append(g.Player.Magaras, NoMagara)
 	g.Player.Inventory.Misc = NoItem
 	g.PrintStyled("You have a new empty slot for a magara.", logSpecial)
+	AchRescuedShaedra.Get(g)
 }
 
 func (ui *gameui) TakingArtifactAnimation() {
@@ -660,4 +661,5 @@ func (ui *gameui) TakingArtifactAnimation() {
 	g.Dungeon.SetCell(g.Places.Marevor, GroundCell)
 	ui.DrawDungeonView(NoFlushMode)
 	ui.Flush()
+	AchRetrievedArtifact.Get(g)
 }
