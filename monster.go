@@ -1073,7 +1073,7 @@ func (m *monster) HitPlayer(g *game, ev event) {
 		m.Blink(g)
 		if opos != m.Pos {
 			g.MagicalBarrierAt(opos, ev)
-			g.Print("A temporal wall emerges.")
+			g.Print("The amulet releases an oric wind.")
 			m.Exhaust(g)
 		}
 	case AmuletTeleport:
