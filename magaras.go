@@ -134,6 +134,11 @@ func (g *game) UseMagara(n int, ev event) (err error) {
 		if g.Stats.OricMagUse == 15 {
 			AchOricCelmist.Get(g)
 		}
+	} else if mag == FireMagara {
+		g.Stats.FireUse++
+		if g.Stats.FireUse == 10 {
+			AchPyromancer.Get(g)
+		}
 	}
 	// TODO: animation
 	g.Player.MP -= mag.MPCost(g)

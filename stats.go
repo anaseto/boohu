@@ -29,6 +29,7 @@ type stats struct {
 	Achievements   map[achievement]bool
 	HarmonicMagUse int
 	OricMagUse     int
+	FireUse        int
 }
 
 func (g *game) TurnStats() {
