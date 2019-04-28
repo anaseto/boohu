@@ -564,7 +564,7 @@ func (g *game) EquipItem() error {
 	}
 	if oitem != NoItem {
 		g.Objects.Items[g.Player.Pos] = oitem
-		g.Printf("You equip %s, leaving %s on the ground.", it.ShortDesc(g), oitem.ShortDesc(g))
+		g.Printf("You equip %s, leaving %s.", it.ShortDesc(g), oitem.ShortDesc(g))
 		g.StoryPrintf("You equip %s, leaving %s.", it.ShortDesc(g), oitem.ShortDesc(g))
 	} else {
 		delete(g.Objects.Items, g.Player.Pos)
