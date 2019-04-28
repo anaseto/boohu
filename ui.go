@@ -1537,6 +1537,9 @@ func (ui *gameui) HandleWizardAction() error {
 
 func (ui *gameui) Death() {
 	g := ui.g
+	if len(g.Stats.Achievements) == 0 {
+		NoAchievement.Get(g)
+	}
 	g.Print("You die... [(x) to continue]")
 	ui.DrawDungeonView(NormalMode)
 	ui.WaitForContinue(-1)

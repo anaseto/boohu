@@ -82,7 +82,7 @@ type achievement string
 
 // Achievements.
 const (
-	NoAchievement        achievement = "Stupid Death"
+	NoAchievement        achievement = "Pitiful Death"
 	AchBananaCollector   achievement = "Banana Collector"
 	AchHarmonist         achievement = "Harmonist"
 	AchOricCelmist       achievement = "Oric Celmist"
@@ -109,6 +109,7 @@ const (
 	AchAntimagic         achievement = "Antimagic"
 	AchWinInsomnia       achievement = "Insomnia Win"
 	AchWinNoDamage       achievement = "Unhurt Win"
+	AchEscape            achievement = "Escape"
 )
 
 func (ach achievement) Get(g *game) {
