@@ -130,6 +130,7 @@ func (g *game) DetailedStatistics(w io.Writer) {
 	fmt.Fprintf(w, "Statistics:\n")
 	fmt.Fprintf(w, "You evoked magaras %d times, jumped %d times, and moved %d times.\n",
 		g.Stats.MagarasUsed, g.Stats.Jumps, g.Stats.Moves)
+	fmt.Fprintf(w, "You rested %d times.\n", g.Stats.Rest)
 	fmt.Fprintf(w, "You evoked %d oric magaras.\n", g.Stats.OricMagUse)
 	fmt.Fprintf(w, "You evoked %d harmonic magaras.\n", g.Stats.HarmonicMagUse)
 	fmt.Fprintf(w, "You got hit %d times.\n", g.Stats.ReceivedHits)
@@ -139,7 +140,7 @@ func (g *game) DetailedStatistics(w io.Writer) {
 	fmt.Fprintf(w, "You climbed %d trees.\n", g.Stats.ClimbedTree)
 	fmt.Fprintf(w, "You crawled through %d holed walls.\n", g.Stats.HoledWallsCrawled)
 	fmt.Fprintf(w, "You hid under %d tables.\n", g.Stats.TableHides)
-	fmt.Fprintf(w, "You rested %d times.\n", g.Stats.Rest)
+	fmt.Fprintf(w, "You opened %d doors.\n", g.Stats.DoorsOpened)
 	fmt.Fprintf(w, "There were %d fires.\n", g.Stats.Burns)
 	fmt.Fprintf(w, "There were %d destroyed walls.\n", g.Stats.Digs)
 	fmt.Fprintf(w, "You spent %.1f%% turns wounded.\n", float64(g.Stats.TWounded)*100/float64(g.Stats.Turns+1))
