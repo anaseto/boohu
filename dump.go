@@ -141,6 +141,7 @@ func (g *game) DetailedStatistics(w io.Writer) {
 	fmt.Fprintf(w, "You crawled through %d holed walls.\n", g.Stats.HoledWallsCrawled)
 	fmt.Fprintf(w, "You hid under %d tables.\n", g.Stats.TableHides)
 	fmt.Fprintf(w, "You opened %d doors.\n", g.Stats.DoorsOpened)
+	fmt.Fprintf(w, "You hid in %d barrels.\n", g.Stats.BarrelHides)
 	fmt.Fprintf(w, "There were %d fires.\n", g.Stats.Burns)
 	fmt.Fprintf(w, "There were %d destroyed walls.\n", g.Stats.Digs)
 	fmt.Fprintf(w, "You spent %.1f%% turns wounded.\n", float64(g.Stats.TWounded)*100/float64(g.Stats.Turns+1))

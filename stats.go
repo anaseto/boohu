@@ -38,6 +38,7 @@ type stats struct {
 	TableHides        int
 	HoledWallsCrawled int
 	DoorsOpened       int
+	BarrelHides       int
 }
 
 func (g *game) TurnStats() {
@@ -109,6 +110,7 @@ const (
 	AchTable             achievement = "Under Table Gawalt"
 	AchHole              achievement = "Hole Crawler"
 	AchDoors             achievement = "Door Opener"
+	AchBarrels           achievement = "Barrel Enthousiast"
 	AchExtinguisher      achievement = "Light Extinguisher"
 	AchLoremaster        achievement = "Loremaster"
 	AchExplorer          achievement = "Explorer"
@@ -130,7 +132,7 @@ func (ach achievement) Get(g *game) {
 
 func (t terrain) ReachNotable() bool {
 	switch t {
-	case TreeCell, TableCell, HoledWallCell, DoorCell:
+	case TreeCell, TableCell, HoledWallCell, DoorCell, BarrelCell:
 		return true
 	default:
 		return false
@@ -163,6 +165,11 @@ func (pos position) Reach(g *game) {
 		g.Stats.DoorsOpened++
 		if g.Stats.DoorsOpened == 100 {
 			AchDoors.Get(g)
+		}
+	case BarrelCell:
+		g.Stats.BarrelHides++
+		if g.Stats.BarrelHides == 20 {
+			AchBarrels.Get(g)
 		}
 	}
 }
