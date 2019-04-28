@@ -1498,6 +1498,9 @@ func (m *monster) MakeHunt(g *game) (noticed bool) {
 		if !m.Noticed {
 			g.Stats.NUSpotted++
 			g.Stats.DUSpotted[g.Depth]++
+			if g.Stats.DUSpotted[g.Depth] >= 90*len(g.Monsters)/100 {
+				AchUnstealthy.Get(g)
+			}
 			m.Noticed = true
 		}
 		noticed = true
