@@ -443,6 +443,19 @@ const (
 
 func (g *game) Descend(style descendstyle) bool {
 	g.LevelStats()
+	if g.Stats.DUSpotted[g.Depth] == 0 {
+		AchStealthNovice.Get(g)
+	}
+	if g.Depth >= 5 {
+		if g.Stats.DUSpotted[g.Depth] == 0 && g.Stats.DSpotted[g.Depth-1] < 3 && g.Stats.DSpotted[g.Depth-2] < 3 {
+			AchStealthInitiate.Get(g)
+		}
+	}
+	if g.Depth >= 8 {
+		if g.Stats.DUSpotted[g.Depth] == 0 && g.Stats.DUSpotted[g.Depth-1] == 0 && g.Stats.DSpotted[g.Depth-2] < 3 {
+			AchStealthMaster.Get(g)
+		}
+	}
 	c := g.Dungeon.Cell(g.Player.Pos)
 	if c.T == StairCell && g.Objects.Stairs[g.Player.Pos] == WinStair {
 		g.StoryPrint("You escaped!")
