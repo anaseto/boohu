@@ -1,32 +1,34 @@
 package main
 
 type stats struct {
-	Story         []string
-	Killed        int
-	KilledMons    map[monsterKind]int
-	Moves         int
-	Jumps         int
-	ReceivedHits  int
-	Dodges        int
-	MagarasUsed   int
-	UsedStones    int
-	UsedMagaras   map[magara]int
-	Damage        int
-	DExplPerc     [MaxDepth + 1]int
-	DSleepingPerc [MaxDepth + 1]int
-	DKilledPerc   [MaxDepth + 1]int
-	Burns         int
-	Digs          int
-	Rest          int
-	Turns         int
-	TWounded      int
-	TMWounded     int
-	TMonsLOS      int
-	NSpotted      int
-	NUSpotted     int
-	DSpotted      [MaxDepth + 1]int
-	DUSpotted     [MaxDepth + 1]int
-	Achievements  map[achievement]bool
+	Story          []string
+	Killed         int
+	KilledMons     map[monsterKind]int
+	Moves          int
+	Jumps          int
+	ReceivedHits   int
+	Dodges         int
+	MagarasUsed    int
+	UsedStones     int
+	UsedMagaras    map[magara]int
+	Damage         int
+	DExplPerc      [MaxDepth + 1]int
+	DSleepingPerc  [MaxDepth + 1]int
+	DKilledPerc    [MaxDepth + 1]int
+	Burns          int
+	Digs           int
+	Rest           int
+	Turns          int
+	TWounded       int
+	TMWounded      int
+	TMonsLOS       int
+	NSpotted       int
+	NUSpotted      int
+	DSpotted       [MaxDepth + 1]int
+	DUSpotted      [MaxDepth + 1]int
+	Achievements   map[achievement]bool
+	HarmonicMagUse int
+	OricMagUse     int
 }
 
 func (g *game) TurnStats() {

@@ -30,6 +30,24 @@ const (
 
 const NumMagaras = int(LignificationMagara)
 
+func (mag magara) Harmonic() bool {
+	switch mag {
+	case FogMagara, ShadowsMagara, NoiseMagara, ConfusionMagara, SleepingMagara, SlowingMagara:
+		return true
+	default:
+		return false
+	}
+}
+
+func (mag magara) Oric() bool {
+	switch mag {
+	case BlinkMagara, DigMagara, TeleportMagara, SwiftnessMagara, LevitationMagara, TeleportOtherMagara, SwappingMagara, ObstructionMagara:
+		return true
+	default:
+		return false
+	}
+}
+
 func (g *game) RandomMagara() (mag magara) {
 loop:
 	for {
@@ -106,6 +124,17 @@ func (g *game) UseMagara(n int, ev event) (err error) {
 	}
 	g.Stats.MagarasUsed++
 	g.Stats.UsedMagaras[mag]++
+	if mag.Harmonic() {
+		g.Stats.HarmonicMagUse++
+		if g.Stats.HarmonicMagUse == 10 {
+			AchHarmonist.Get(g)
+		}
+	} else if mag.Oric() {
+		g.Stats.OricMagUse++
+		if g.Stats.OricMagUse == 10 {
+			AchOricCelmist.Get(g)
+		}
+	}
 	// TODO: animation
 	g.Player.MP -= mag.MPCost(g)
 	g.StoryPrintf("You evoked your %s.", mag)
