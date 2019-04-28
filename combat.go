@@ -118,6 +118,9 @@ func (g *game) Jump(mons *monster, ev event) error {
 	}
 	g.PlacePlayerAt(pos)
 	g.Stats.Jumps++
+	if g.Stats.Jumps == 10 {
+		AchAcrobat.Get(g)
+	}
 	return nil
 }
 
