@@ -64,7 +64,11 @@ func (ui *gameui) ApplyToggleLayout() {
 		UIWidth = 80
 	} else {
 		UIHeight = 26
-		UIWidth = 100
+		if CenteredCamera {
+			UIWidth = 80
+		} else {
+			UIWidth = 100
+		}
 	}
 	ui.g.DrawBuffer = make([]UICell, UIWidth*UIHeight)
 	ui.Clear()

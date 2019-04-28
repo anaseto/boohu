@@ -405,7 +405,11 @@ func (ui *gameui) ApplyToggleLayoutWithClear(clear bool) {
 		UIWidth = 80
 	} else {
 		UIHeight = 26
-		UIWidth = 100
+		if CenteredCamera {
+			UIWidth = 80
+		} else {
+			UIWidth = 100
+		}
 	}
 	canvas := js.Global().Get("document").Call("getElementById", "gamecanvas")
 	canvas.Set("height", 24*UIHeight)

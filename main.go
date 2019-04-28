@@ -51,6 +51,9 @@ func main() {
 	ui := &gameui{}
 	g := &game{}
 	ui.g = g
+	if CenteredCamera {
+		UIWidth = 80
+	}
 	err := ui.Init()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "harmonist: %v\n", err)

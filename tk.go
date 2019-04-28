@@ -5,6 +5,7 @@ package main
 import (
 	"bytes"
 	"encoding/base64"
+	"fmt"
 	"image"
 	"image/draw"
 	"image/png"
@@ -29,11 +30,11 @@ type gameui struct {
 
 func (ui *gameui) Init() error {
 	ui.canvas = image.NewRGBA(image.Rect(0, 0, UIWidth*16, UIHeight*24))
-	ui.ir = gothic.NewInterpreter(`
+	ui.ir = gothic.NewInterpreter(fmt.Sprintf(`
 wm title . "Harmonist Tk"
 wm resizable . 0 0
-set width [expr {16 * 100}]
-set height [expr {24 * 26}]
+set width [expr {16 * %d}]
+set height [expr {24 * %d}]
 wm geometry . =${width}x$height
 set can [canvas .c -width $width -height $height -background #002b36]
 grid $can -row 0 -column 0
@@ -41,7 +42,7 @@ focus $can
 image create photo gamescreen -width $width -height $height -palette 256/256/256
 image create photo bufscreen -width $width -height $height -palette 256/256/256
 $can create image 0 0 -anchor nw -image gamescreen
-`)
+`, UIWidth, UIHeight))
 	ui.InitElements()
 	ui.ir.RegisterCommand("GetKey", func(c, keysym string) {
 		var s string
@@ -200,7 +201,11 @@ func (ui *gameui) ApplyToggleLayoutWithClear(clear bool) {
 	} else {
 		ui.ir.Eval("wm geometry . =${width}x$height")
 		UIHeight = 26
-		UIWidth = 100
+		if CenteredCamera {
+			UIWidth = 80
+		} else {
+			UIWidth = 100
+		}
 	}
 	ui.cache = make(map[UICell]*image.RGBA)
 	ui.g.DrawBuffer = make([]UICell, UIWidth*UIHeight)
