@@ -239,16 +239,16 @@ ghosts that will cost your life.”
 [Fragment of Ghosts of the Past, by Yaylin Ekath (5541-?)]
 `,
 	`“I was chasing a dog,
-	it then entered a pound,
-	I swam fast, I swam fast,
-	I left it soon behind.”
+it then entered a pound,
+I swam fast, I swam fast,
+I left it soon behind.”
 
 [Piece of paper, The Mirol Man who Swam Faster than Dogs]
 `,
 	`“Now! Cut the branch of your life,
-	make it stronger, make it darker,
-	can't you see? Nothing bad happens,
-	you're just a bit more like us…”
+make it stronger, make it darker,
+can't you see? Nothing bad happens,
+you're just a bit more like us…”
 
 [Words written by a Dayoriah Clan Oric Celmist called Chuvitsan.]
 `,
@@ -256,11 +256,11 @@ ghosts that will cost your life.”
 
 [Thoughts of Xorom, an Elder Guard of the Dayoriah Clan]
 `,
-	`“Cling! clang! clong…! Are they water drops on a queenstone? It makes so much noise. Cling, clang, clong… I am so tired I could fell asleep even with that dreadful sound. But perhaps something wrong is happening over there. I will go and take a look.”
+	`“Cling! clang! clong…! Are they water drops on a queenstone? It makes so much noise. Cling, clang, clong… I am so tired I could fall asleep even with that dreadful sound. But perhaps something wrong is happening over there. I will go and take a look.”
 
 [Mimi the Guard]
 `,
-	`“The thief that infiltrated our turf and tried to retrieve our new acquisition has been captured. However, it is possible she had an accomplice. Please be careful and stop every suspect.”
+	`“The thief that infiltrated our turf and tried to retrieve our new acquisition has been captured. However, it is possible she has an accomplice. Please be careful and stop every suspect.”
 
 [Order of a Dayoriah Clan's foreman, the paper is rather recent and you can't help but think the thief is actually Shaedra. So they did capture her! You have to hurry and save her.]
 `,
@@ -272,7 +272,7 @@ ghosts that will cost your life.”
 
 [Old man Arifa's thoughts about the Dayoriah Clan]
 `,
-	`“Dear Uncle, I'm finally up and about! Training is hard, but after my illness, I'm more and more convinced it's necessary. Those great celmists who can control forces, illusions, lights and shadows, they definitely needed to work like demons to get so powerful. I won't lose to my peers. And I'll certainly catch up. No matter what.”
+	`“Dear Uncle, I'm finally up and about! Training is hard, but after my illness, I'm more and more convinced it's necessary. Those great harmonist celmists who can control illusions, lights and shadows, they definitely needed to work like demons to get so powerful. I won't lose to my peers. And I'll certainly catch up. No matter what.”
 
 [Letter to a man call «Uncle Baref», signed «Divel»]
 `,
