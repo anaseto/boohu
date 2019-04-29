@@ -446,7 +446,7 @@ const (
 
 func (g *game) Descend(style descendstyle) bool {
 	g.LevelStats()
-	if g.Stats.DUSpotted[g.Depth] == 0 {
+	if g.Stats.DUSpotted[g.Depth] < 3 {
 		AchStealthNovice.Get(g)
 	}
 	if g.Depth >= 5 {
@@ -455,7 +455,8 @@ func (g *game) Descend(style descendstyle) bool {
 		}
 	}
 	if g.Depth >= 8 {
-		if g.Stats.DUSpotted[g.Depth] == 0 && g.Stats.DUSpotted[g.Depth-1] == 0 && g.Stats.DSpotted[g.Depth-2] < 3 {
+		if g.Stats.DUSpotted[g.Depth] == 0 && g.Stats.DUSpotted[g.Depth-1] == 0 && g.Stats.DSpotted[g.Depth-2] < 3 &&
+			g.Stats.DSpotted[g.Depth-3] < 3 {
 			AchStealthMaster.Get(g)
 		}
 	}
