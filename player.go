@@ -307,8 +307,14 @@ func (g *game) MovePlayer(pos position, ev event) error {
 			g.Fog(pos, 1, ev)
 			g.Stats.Digs++
 			g.Stats.DestructionUse++
-			if g.Stats.DestructionUse == 50 {
-				AchDestructor.Get(g)
+			if g.Stats.DestructionUse == 20 {
+				AchDestructorNovice.Get(g)
+			}
+			if g.Stats.DestructionUse == 40 {
+				AchDestructorInitiate.Get(g)
+			}
+			if g.Stats.DestructionUse == 60 {
+				AchDestructorMaster.Get(g)
 			}
 		}
 		if g.Player.Inventory.Body == CloakSmoke {
