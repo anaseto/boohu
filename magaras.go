@@ -127,13 +127,25 @@ func (g *game) UseMagara(n int, ev event) (err error) {
 	g.Stats.DMagaraUses[g.Depth]++
 	if mag.Harmonic() {
 		g.Stats.HarmonicMagUse++
-		if g.Stats.HarmonicMagUse == 15 {
-			AchHarmonist.Get(g)
+		if g.Stats.HarmonicMagUse == 7 {
+			AchHarmonistNovice.Get(g)
+		}
+		if g.Stats.HarmonicMagUse == 14 {
+			AchHarmonistInitiate.Get(g)
+		}
+		if g.Stats.HarmonicMagUse == 21 {
+			AchHarmonistMaster.Get(g)
 		}
 	} else if mag.Oric() {
 		g.Stats.OricMagUse++
-		if g.Stats.OricMagUse == 15 {
-			AchOricCelmist.Get(g)
+		if g.Stats.OricMagUse == 7 {
+			AchNoviceOricCelmist.Get(g)
+		}
+		if g.Stats.OricMagUse == 14 {
+			AchInitiateOricCelmist.Get(g)
+		}
+		if g.Stats.OricMagUse == 21 {
+			AchMasterOricCelmist.Get(g)
 		}
 	} else if mag == FireMagara {
 		g.Stats.FireUse++
