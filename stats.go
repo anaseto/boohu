@@ -70,6 +70,16 @@ func (g *game) LevelStats() {
 		}
 	}
 	g.Stats.DExplPerc[g.Depth] = exp * 100 / free
+	if g.Stats.DExplPerc[g.Depth] > 93 {
+		AchNoviceExplorer.Get(g)
+	}
+	if g.Depth >= 5 && g.Stats.DExplPerc[g.Depth] > 93 && g.Stats.DExplPerc[g.Depth-1] > 93 && g.Stats.DExplPerc[g.Depth-2] > 93 {
+		AchInitiateExplorer.Get(g)
+	}
+	if g.Depth >= 8 && g.Stats.DExplPerc[g.Depth] > 93 && g.Stats.DExplPerc[g.Depth-1] > 93 && g.Stats.DExplPerc[g.Depth-2] > 93 &&
+		g.Stats.DExplPerc[g.Depth-3] > 93 && g.Stats.DExplPerc[g.Depth-4] > 93 {
+		AchMasterExplorer.Get(g)
+	}
 	//g.Stats.DBurns[g.Depth] = g.Stats.CurBurns // XXX to avoid little dump info leak
 	nmons := len(g.Monsters)
 	kmons := 0
@@ -115,7 +125,9 @@ const (
 	AchBarrels           achievement = "Barrel Enthousiast"
 	AchExtinguisher      achievement = "Light Extinguisher"
 	AchLoremaster        achievement = "Loremaster"
-	AchExplorer          achievement = "Explorer"
+	AchNoviceExplorer    achievement = "Novice Explorer"
+	AchInitiateExplorer  achievement = "Initiate Explorer"
+	AchMasterExplorer    achievement = "Master Explorer"
 	AchKiller            achievement = "Killer"
 	AchInsomnia          achievement = "Insomnia"
 	AchAntimagic         achievement = "Antimagic"
