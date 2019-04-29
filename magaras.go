@@ -124,6 +124,7 @@ func (g *game) UseMagara(n int, ev event) (err error) {
 	}
 	g.Stats.MagarasUsed++
 	g.Stats.UsedMagaras[mag]++
+	g.Stats.DMagaraUses[g.Depth]++
 	if mag.Harmonic() {
 		g.Stats.HarmonicMagUse++
 		if g.Stats.HarmonicMagUse == 15 {

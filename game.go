@@ -497,6 +497,7 @@ func (g *game) ApplyRest() {
 	g.Player.HPbonus = 0
 	g.Player.MP = g.Player.MPMax()
 	g.Stats.Rest++
+	g.Stats.DRests[g.Depth]++
 	g.PrintStyled("You feel fresh again after eating banana and sleeping.", logStatusEnd)
 }
 

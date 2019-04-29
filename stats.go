@@ -9,15 +9,18 @@ type stats struct {
 	ReceivedHits      int
 	Dodges            int
 	MagarasUsed       int
+	DMagaraUses       [MaxDepth + 1]int
 	UsedStones        int
 	UsedMagaras       map[magara]int
 	Damage            int
+	DDamage           [MaxDepth + 1]int
 	DExplPerc         [MaxDepth + 1]int
 	DSleepingPerc     [MaxDepth + 1]int
 	DKilledPerc       [MaxDepth + 1]int
 	Burns             int
 	Digs              int
 	Rest              int
+	DRests            [MaxDepth + 1]int
 	Turns             int
 	TWounded          int
 	TMWounded         int

@@ -206,24 +206,39 @@ func (g *game) DetailedStatistics(w io.Writer) {
 		fmt.Fprintf(w, " %3d", n)
 	}
 	fmt.Fprintf(w, "\n")
-	//fmt.Fprintf(w, hfmt, "Dead monsters (%)")
-	//for i, n := range g.Stats.DKilledPerc {
-	//if i == 0 {
-	//continue
-	//}
-	//if i > maxDepth {
-	//break
-	//}
-	//fmt.Fprintf(w, " %3d", n)
-	//}
-	//fmt.Fprintf(w, "\n")
-	//fmt.Fprintf(w, "Legend:")
-	//for i, c := range []dungen{GenCaveMap, GenRoomMap, GenCellularAutomataCaveMap, GenCaveMapTree, GenRuinsMap, GenBSPMap} {
-	//if i == 4 {
-	//fmt.Fprintf(w, "\n       ")
-	//}
-	//fmt.Fprintf(w, " %s (%s)", c.Description(), c.String())
-	//}
+	fmt.Fprintf(w, hfmt, "Rests")
+	for i, n := range g.Stats.DRests {
+		if i == 0 {
+			continue
+		}
+		if i > maxDepth {
+			break
+		}
+		fmt.Fprintf(w, " %3d", n)
+	}
+	fmt.Fprintf(w, "\n")
+	fmt.Fprintf(w, hfmt, "Received damage")
+	for i, n := range g.Stats.DDamage {
+		if i == 0 {
+			continue
+		}
+		if i > maxDepth {
+			break
+		}
+		fmt.Fprintf(w, " %3d", n)
+	}
+	fmt.Fprintf(w, "\n")
+	fmt.Fprintf(w, hfmt, "Magara uses")
+	for i, n := range g.Stats.DMagaraUses {
+		if i == 0 {
+			continue
+		}
+		if i > maxDepth {
+			break
+		}
+		fmt.Fprintf(w, " %3d", n)
+	}
+	fmt.Fprintf(w, "\n")
 }
 
 func (g *game) DumpStory() string {

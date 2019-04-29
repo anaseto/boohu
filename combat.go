@@ -6,6 +6,7 @@ import "errors"
 
 func (g *game) DamagePlayer(damage int) {
 	g.Stats.Damage += damage
+	g.Stats.DDamage[g.Depth] += damage
 	g.Player.HPbonus -= damage
 	if g.Player.HPbonus < 0 {
 		g.Player.HP += g.Player.HPbonus
