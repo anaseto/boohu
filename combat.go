@@ -140,7 +140,9 @@ const (
 func (g *game) HandleKill(mons *monster) {
 	g.Stats.Killed++
 	g.Stats.KilledMons[mons.Kind]++
-	AchAssassin.Get(g)
+	if g.Player.Sees(mons.Pos) {
+		AchAssassin.Get(g)
+	}
 	if g.Dungeon.Cell(mons.Pos).T == DoorCell {
 		g.ComputeLOS()
 	}
