@@ -1841,6 +1841,9 @@ func (ui *gameui) ReadScroll() error {
 	case ScrollLore:
 		ui.DrawLore(sc.Text(ui.g))
 		ui.g.Stats.Lore[ui.g.Depth] = true
+		if len(ui.g.Stats.Lore) == 4 {
+			AchLoreStudent.Get(ui.g)
+		}
 		if len(ui.g.Stats.Lore) == len(ui.g.Params.Lore) {
 			AchLoremaster.Get(ui.g)
 		}

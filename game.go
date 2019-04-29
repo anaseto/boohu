@@ -449,6 +449,45 @@ func (g *game) Descend(style descendstyle) bool {
 	if g.Stats.DUSpotted[g.Depth] < 3 {
 		AchStealthNovice.Get(g)
 	}
+	if g.Depth >= 3 {
+		if g.Stats.DRests[g.Depth] == 0 && g.Stats.DRests[g.Depth-1] == 0 {
+			AchInsomniaNovice.Get(g)
+		}
+	}
+	if g.Depth >= 5 {
+		if g.Stats.DRests[g.Depth] == 0 && g.Stats.DRests[g.Depth-1] == 0 && g.Stats.DRests[g.Depth-2] == 0 &&
+			g.Stats.DRests[g.Depth-3] == 0 {
+			AchInsomniaInitiate.Get(g)
+		}
+	}
+	if g.Depth >= 8 {
+		if g.Stats.DRests[g.Depth] == 0 && g.Stats.DRests[g.Depth-1] == 0 && g.Stats.DRests[g.Depth-2] == 0 &&
+			g.Stats.DRests[g.Depth-3] == 0 && g.Stats.DRests[g.Depth-4] == 0 && g.Stats.DRests[g.Depth-5] == 0 {
+			AchInsomniaMaster.Get(g)
+		}
+	}
+	if g.Depth >= 3 {
+		if g.Stats.DMagaraUses[g.Depth] == 0 && g.Stats.DMagaraUses[g.Depth-1] == 0 {
+			AchAntimagicNovice.Get(g)
+		}
+	}
+	if g.Depth >= 5 {
+		if g.Stats.DMagaraUses[g.Depth] == 0 && g.Stats.DMagaraUses[g.Depth-1] == 0 && g.Stats.DMagaraUses[g.Depth-2] == 0 &&
+			g.Stats.DMagaraUses[g.Depth-3] == 0 {
+			AchAntimagicInitiate.Get(g)
+		}
+	}
+	if g.Depth >= 8 {
+		if g.Stats.DMagaraUses[g.Depth] == 0 && g.Stats.DMagaraUses[g.Depth-1] == 0 && g.Stats.DMagaraUses[g.Depth-2] == 0 &&
+			g.Stats.DMagaraUses[g.Depth-3] == 0 && g.Stats.DMagaraUses[g.Depth-4] == 0 && g.Stats.DMagaraUses[g.Depth-5] == 0 {
+			AchAntimagicMaster.Get(g)
+		}
+	}
+	if g.Depth >= 5 {
+		if g.Stats.DUSpotted[g.Depth] == 0 && g.Stats.DSpotted[g.Depth-1] < 3 && g.Stats.DSpotted[g.Depth-2] < 3 {
+			AchStealthInitiate.Get(g)
+		}
+	}
 	if g.Depth >= 5 {
 		if g.Stats.DUSpotted[g.Depth] == 0 && g.Stats.DSpotted[g.Depth-1] < 3 && g.Stats.DSpotted[g.Depth-2] < 3 {
 			AchStealthInitiate.Get(g)
