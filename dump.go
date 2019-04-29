@@ -131,8 +131,8 @@ func (g *game) DetailedStatistics(w io.Writer) {
 	fmt.Fprintf(w, "You evoked magaras %d times, jumped %d times, and moved %d times.\n",
 		g.Stats.MagarasUsed, g.Stats.Jumps, g.Stats.Moves)
 	fmt.Fprintf(w, "You rested %d times.\n", g.Stats.Rest)
-	fmt.Fprintf(w, "You evoked %d oric magaras.\n", g.Stats.OricMagUse)
-	fmt.Fprintf(w, "You evoked %d harmonic magaras.\n", g.Stats.HarmonicMagUse)
+	fmt.Fprintf(w, "You evoked %d times oric magaras.\n", g.Stats.OricMagUse)
+	fmt.Fprintf(w, "You evoked %d times harmonic magaras.\n", g.Stats.HarmonicMagUse)
 	fmt.Fprintf(w, "You got hit %d times.\n", g.Stats.ReceivedHits)
 	fmt.Fprintf(w, "You were spotted by %d monsters, %d times.\n", g.Stats.NUSpotted, g.Stats.NSpotted)
 	fmt.Fprintf(w, "You endured %d damage.\n", g.Stats.Damage)
