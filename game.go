@@ -241,6 +241,7 @@ func (g *game) InitFirstLevel() {
 	g.Stats.KilledMons = map[monsterKind]int{}
 	g.Stats.UsedMagaras = map[magara]int{}
 	g.Stats.Achievements = map[achievement]bool{}
+	g.Stats.Lore = map[int]bool{}
 	g.GenPlan = [MaxDepth + 1]genFlavour{ // XXX this is obsolete
 		1:  GenNothing,
 		2:  GenCloak,

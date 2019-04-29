@@ -1836,9 +1836,14 @@ func (ui *gameui) ReadScroll() error {
 	}
 	switch sc {
 	case ScrollBasics:
+		// XXX unused now
 		ui.DrawScrollBasics()
 	case ScrollLore:
 		ui.DrawLore(sc.Text(ui.g))
+		ui.g.Stats.Lore[ui.g.Depth] = true
+		if len(ui.g.Stats.Lore) == len(ui.g.Params.Lore) {
+			AchLoremaster.Get(ui.g)
+		}
 	default:
 		ui.DrawDescription(sc.Text(ui.g))
 	}
