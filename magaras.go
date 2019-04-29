@@ -149,8 +149,14 @@ func (g *game) UseMagara(n int, ev event) (err error) {
 		}
 	} else if mag == FireMagara {
 		g.Stats.FireUse++
-		if g.Stats.FireUse == 10 {
-			AchPyromancer.Get(g)
+		if g.Stats.FireUse == 4 {
+			AchPyromancerNovice.Get(g)
+		}
+		if g.Stats.FireUse == 8 {
+			AchPyromancerInitiate.Get(g)
+		}
+		if g.Stats.FireUse == 12 {
+			AchPyromancerMaster.Get(g)
 		}
 	}
 	switch mag {
