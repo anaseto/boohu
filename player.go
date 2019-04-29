@@ -408,6 +408,10 @@ func (g *game) EnterLignification(ev event) {
 func (g *game) ExtinguishFire() error {
 	g.Dungeon.SetCell(g.Player.Pos, ExtinguishedLightCell)
 	g.Objects.Lights[g.Player.Pos] = false
+	g.Stats.Extinguishments++
+	if g.Stats.Extinguishments >= 15 {
+		AchExtinguisher.Get(g)
+	}
 	g.Print("You extinguish the fire.")
 	g.Ev.Renew(g, 5)
 	return nil

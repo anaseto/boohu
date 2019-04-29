@@ -39,6 +39,7 @@ type stats struct {
 	HoledWallsCrawled int
 	DoorsOpened       int
 	BarrelHides       int
+	Extinguishments   int
 }
 
 func (g *game) TurnStats() {
