@@ -128,7 +128,7 @@ const (
 	AchNoviceExplorer    achievement = "Novice Explorer"
 	AchInitiateExplorer  achievement = "Initiate Explorer"
 	AchMasterExplorer    achievement = "Master Explorer"
-	AchKiller            achievement = "Killer"
+	AchAssassin          achievement = "Assassin"
 	AchInsomnia          achievement = "Insomnia"
 	AchAntimagic         achievement = "Antimagic"
 	AchWinInsomnia       achievement = "Insomnia Win"
