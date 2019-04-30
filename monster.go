@@ -1130,6 +1130,7 @@ func (m *monster) HitSideEffects(g *game, ev event) {
 		g.Confusion(ev)
 	case MonsBlinkingFrog:
 		g.Blink(ev)
+		g.Stats.TimesBlinked++
 	case MonsYack:
 		m.PushPlayer(g)
 	case MonsWingedMilfid:
@@ -1152,6 +1153,7 @@ func (m *monster) HitSideEffects(g *game, ev event) {
 			m.Statuses[MonsSatiated]++
 			g.PushEvent(&monsterEvent{ERank: g.Ev.Rank() + DurationMonsterSatiation, NMons: m.Index, EAction: MonsSatiatedEnd})
 			g.Print("The tiny harpy steals a banana from you.")
+			g.Stats.StolenBananas++
 			m.Target = m.NextTarget(g)
 			m.MakeWander()
 		}
@@ -1188,6 +1190,7 @@ func (m *monster) PushPlayer(g *game) {
 		// TODO: do more interesting things, perhaps?
 		return
 	}
+	g.Stats.TimesPushed++
 	c := g.Dungeon.Cell(pos)
 	if c.T.IsPlayerPassable() {
 		g.PlacePlayerAt(pos)

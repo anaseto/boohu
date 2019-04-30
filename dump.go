@@ -138,6 +138,15 @@ func (g *game) DetailedStatistics(w io.Writer) {
 	if g.Stats.Statuses[StatusIlluminated] > 0 {
 		fmt.Fprintf(w, "You were illuminated by an harmonic celmist %d times.\n", g.Stats.Statuses[StatusIlluminated])
 	}
+	if g.Stats.TimesPushed > 0 {
+		fmt.Fprintf(w, "You were pushed %d times.\n", g.Stats.TimesPushed)
+	}
+	if g.Stats.TimesBlinked > 0 {
+		fmt.Fprintf(w, "Blinking frogs made you blink %d times.\n", g.Stats.TimesBlinked)
+	}
+	if g.Stats.StolenBananas > 0 {
+		fmt.Fprintf(w, "Tiny harpies stole %d bananas from you.\n", g.Stats.StolenBananas)
+	}
 	fmt.Fprintf(w, "You were spotted by %d monsters, %d times.\n", g.Stats.NUSpotted, g.Stats.NSpotted)
 	fmt.Fprintf(w, "You endured %d damage.\n", g.Stats.Damage)
 	fmt.Fprintf(w, "You activated %d magical stones.\n", g.Stats.UsedStones)

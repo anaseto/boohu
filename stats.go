@@ -45,6 +45,9 @@ type stats struct {
 	Extinguishments   int
 	Lore              map[int]bool
 	Statuses          map[status]int
+	StolenBananas     int
+	TimesPushed       int
+	TimesBlinked      int
 }
 
 func (g *game) TurnStats() {
