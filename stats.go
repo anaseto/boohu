@@ -44,6 +44,7 @@ type stats struct {
 	BarrelHides       int
 	Extinguishments   int
 	Lore              map[int]bool
+	Statuses          map[status]int
 }
 
 func (g *game) TurnStats() {

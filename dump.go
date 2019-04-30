@@ -133,7 +133,11 @@ func (g *game) DetailedStatistics(w io.Writer) {
 	fmt.Fprintf(w, "You rested %d times.\n", g.Stats.Rest)
 	fmt.Fprintf(w, "You evoked %d times oric magaras.\n", g.Stats.OricMagUse)
 	fmt.Fprintf(w, "You evoked %d times harmonic magaras.\n", g.Stats.HarmonicMagUse)
-	fmt.Fprintf(w, "You got hit %d times.\n", g.Stats.ReceivedHits)
+	fmt.Fprintf(w, "You got hit %d times, confused %d times, slowed %d times.\n",
+		g.Stats.ReceivedHits, g.Stats.Statuses[StatusConfusion], g.Stats.Statuses[StatusSlow])
+	if g.Stats.Statuses[StatusIlluminated] > 0 {
+		fmt.Fprintf(w, "You were illuminated by an harmonic celmist %d times.\n", g.Stats.Statuses[StatusIlluminated])
+	}
 	fmt.Fprintf(w, "You were spotted by %d monsters, %d times.\n", g.Stats.NUSpotted, g.Stats.NSpotted)
 	fmt.Fprintf(w, "You endured %d damage.\n", g.Stats.Damage)
 	fmt.Fprintf(w, "You activated %d magical stones.\n", g.Stats.UsedStones)
