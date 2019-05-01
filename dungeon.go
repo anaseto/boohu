@@ -615,7 +615,7 @@ const (
 #########
 #HMΔ#_!_#
 ##|###|##
-+.P...P.+
++.G.P.G.+
 ##|###|##
 #_!_#_!_#
 #########
@@ -624,7 +624,7 @@ const (
 #########
 #_!_#_!_#
 ##|###|##
-+.P...P.+
++.G.P.G.+
 ##|###|##
 #_!_#HMΔ#
 #########
@@ -633,7 +633,7 @@ const (
 #########
 #_!_#_!_#
 ##|###|##
-+.P...P.+
++.G.P.G.+
 ##|###|##
 #HMΔ#_!_#
 #########
@@ -642,7 +642,7 @@ const (
 #########
 #_!_#HMΔ#
 ##|###|##
-+.P...P.+
++.G.P.G.+
 ##|###|##
 #_!_#_!_#
 #########
@@ -660,7 +660,7 @@ const (
 ??#.MΔ#??
 ?###|###?
 #!_#.#_!#
-+.P...P.+
++P.G.G.P+
 #>..P..>#
 ?###+###?
 `
@@ -771,6 +771,8 @@ const (
 	roomHarpies
 	roomTreeMushrooms
 	roomMirrorSpecters
+	roomShaedra
+	roomArtifact
 )
 
 func (sr specialRoom) Templates() (tpl []string) {
@@ -789,6 +791,10 @@ func (sr specialRoom) Templates() (tpl []string) {
 		tpl = append(tpl, RoomSpecialTreeMushrooms)
 	case roomMirrorSpecters:
 		tpl = append(tpl, RoomSpecialMirrorSpecters)
+	case roomShaedra:
+		tpl = roomCellTemplates
+	case roomArtifact:
+		tpl = roomArtifactTemplates
 	}
 	return tpl
 }
@@ -1131,15 +1137,6 @@ func (g *game) GenRoomTunnels(ml maplayout) {
 		dg.GenRooms(roomNormalTemplates, 5, PlacementRandom)
 	case RandomWalkTreeCave:
 		if g.Depth == MaxDepth {
-			var ok bool
-			if RandInt(3) > 0 {
-				ok, places = dg.GenRooms(roomArtifactTemplates, 1, PlacementEdge)
-			} else {
-				ok, places = dg.GenRooms(roomArtifactTemplates, 1, PlacementCenter)
-			}
-			if !ok {
-				panic("Artifact Room")
-			}
 			g.Objects.Story = map[position]story{}
 			g.Places.Artifact = dg.spl.Artifact
 			g.Objects.Story[g.Places.Artifact] = StoryArtifactSealed
@@ -1147,23 +1144,14 @@ func (g *game) GenRoomTunnels(ml maplayout) {
 			g.Objects.Story[g.Places.Monolith] = NoStory
 			g.Places.Marevor = dg.spl.Marevor
 			g.Objects.Story[g.Places.Marevor] = NoStory
-			dg.GenRooms(roomBigTemplates, nspecial, PlacementRandom)
-			dg.GenRooms(roomNormalTemplates, 6, PlacementRandom)
+			dg.GenRooms(roomBigTemplates, nspecial+1, PlacementRandom)
+			dg.GenRooms(roomNormalTemplates, 7, PlacementRandom)
 		} else {
 			dg.GenRooms(roomBigTemplates, nspecial, PlacementRandom)
 			dg.GenRooms(roomNormalTemplates, 7, PlacementRandom)
 		}
 	default:
 		if g.Depth == WinDepth {
-			var ok bool
-			if RandInt(3) > 0 {
-				ok, places = dg.GenRooms(roomCellTemplates, 1, PlacementEdge)
-			} else {
-				ok, places = dg.GenRooms(roomCellTemplates, 1, PlacementCenter)
-			}
-			if !ok {
-				panic("Shaedra Cell")
-			}
 			g.Objects.Story = map[position]story{}
 			g.Places.Shaedra = dg.spl.Shaedra
 			g.Objects.Story[g.Places.Shaedra] = StoryShaedra
@@ -1171,8 +1159,8 @@ func (g *game) GenRoomTunnels(ml maplayout) {
 			g.Objects.Story[g.Places.Monolith] = NoStory
 			g.Places.Marevor = dg.spl.Marevor
 			g.Objects.Story[g.Places.Marevor] = NoStory
-			dg.GenRooms(roomBigTemplates, nspecial-1, PlacementRandom)
-			dg.GenRooms(roomNormalTemplates, 6, PlacementRandom)
+			dg.GenRooms(roomBigTemplates, nspecial, PlacementRandom)
+			dg.GenRooms(roomNormalTemplates, 7, PlacementRandom)
 		} else {
 			dg.GenRooms(roomBigTemplates, nspecial-1, PlacementRandom)
 			dg.GenRooms(roomNormalTemplates, 7, PlacementRandom)
@@ -2270,6 +2258,18 @@ func (dg *dgen) GenMonsters(g *game) {
 		case roomTreeMushrooms:
 			bandTreeMushrooms := []monsterBand{SpecialLoneTreeMushroom}
 			dg.PutRandomBandN(g, bandTreeMushrooms, 2)
+		case roomShaedra:
+			if RandInt(3) > 0 {
+				dg.PutRandomBand(g, []monsterBand{SpecialLoneHighGuard})
+			} else {
+				dg.PutRandomBand(g, []monsterBand{SpecialLoneOricCelmist})
+			}
+		case roomArtifact:
+			if RandInt(3) > 0 {
+				dg.PutRandomBand(g, []monsterBand{SpecialLoneOricCelmist})
+			} else {
+				dg.PutRandomBand(g, []monsterBand{SpecialLoneHighGuard})
+			}
 		default:
 			// XXX not used now
 			bandOricCelmists := []monsterBand{SpecialLoneOricCelmist}

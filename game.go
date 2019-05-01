@@ -283,10 +283,10 @@ func (g *game) InitFirstLevel() {
 		roomVampires,
 		roomHarpies,
 		roomTreeMushrooms,
-		noSpecialRoom,
+		roomShaedra,
 		roomCelmists,
 		roomMirrorSpecters,
-		noSpecialRoom,
+		roomArtifact,
 	}
 	if RandInt(4) == 0 {
 		g.Params.Special[10], g.Params.Special[5] = g.Params.Special[5], g.Params.Special[10]
