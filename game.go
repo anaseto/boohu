@@ -69,7 +69,7 @@ type game struct {
 type startParams struct {
 	Lore     map[int]bool
 	Blocked  map[int]bool
-	Special  map[int]bool
+	Special  []specialRoom
 	Unstable map[int]bool
 	Windows  map[int]bool
 	Trees    map[int]bool
@@ -274,12 +274,28 @@ func (g *game) InitFirstLevel() {
 		// a second one sometimes!
 		g.Params.Blocked[2+RandInt(WinDepth-2)] = true
 	}
-	g.Params.Special = map[int]bool{}
-	if RandInt(WinDepth-2) > 0 {
-		g.Params.Special[3+RandInt(WinDepth-3)] = true
+	g.Params.Special = []specialRoom{
+		noSpecialRoom, // unused (depth 0)
+		noSpecialRoom,
+		noSpecialRoom,
+		roomMilfids,
+		roomCelmists,
+		roomVampires,
+		roomHarpies,
+		roomTreeMushrooms,
+		noSpecialRoom,
+		roomCelmists,
+		roomMirrorSpecters,
+		noSpecialRoom,
 	}
-	if RandInt(3) > 0 {
-		g.Params.Special[WinDepth+1+RandInt(MaxDepth-WinDepth-1)] = true
+	if RandInt(4) == 0 {
+		g.Params.Special[10], g.Params.Special[5] = g.Params.Special[5], g.Params.Special[10]
+	}
+	if RandInt(4) == 0 {
+		g.Params.Special[6], g.Params.Special[7] = g.Params.Special[7], g.Params.Special[6]
+	}
+	if RandInt(4) == 0 {
+		g.Params.Special[3], g.Params.Special[4] = g.Params.Special[4], g.Params.Special[3]
 	}
 	g.Params.Unstable = map[int]bool{}
 	if RandInt(MaxDepth) > MaxDepth/2 {

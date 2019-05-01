@@ -361,6 +361,8 @@ const (
 	SpecialLoneOricCelmist
 	SpecialLoneHarmonicCelmist
 	SpecialLoneHighGuard
+	SpecialLoneHarpy
+	SpecialLoneTreeMushroom
 )
 
 type monsterBandData struct {
@@ -403,6 +405,8 @@ var MonsBands = []monsterBandData{
 	SpecialLoneOricCelmist:     {Monster: MonsOricCelmist},
 	SpecialLoneHarmonicCelmist: {Monster: MonsHarmonicCelmist},
 	SpecialLoneHighGuard:       {Monster: MonsHighGuard},
+	SpecialLoneHarpy:           {Monster: MonsTinyHarpy},
+	SpecialLoneTreeMushroom:    {Monster: MonsTreeMushroom},
 }
 
 type monster struct {

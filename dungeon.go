@@ -375,9 +375,15 @@ const (
 ??#+#??`
 	RoomLittleColumnDiamond = `
 ??#+#??
-##_.!##
+#_..!##
 +.P#P.+
-##!.!##
+##!.._#
+??#+#??`
+	RoomLittleTreeDiamond = `
+??#+#??
+##!.._#
++.PTP.+
+#_..!##
 ??#+#??`
 	RoomRound = `
 ???##+##???
@@ -387,9 +393,17 @@ const (
 ##"._#_."##
 ??#".P."#??
 ???##+##???`
+	RoomRoundTree = `
+???##+##???
+??#".P."#??
+##"._._."##
++.P..T..P.+
+##"._._."##
+??#".P."#??
+???##+##???`
 )
 
-var roomNormalTemplates = []string{RoomSquare, RoomRoundSimple, RoomLittle, RoomLittleDiamond, RoomLittleColumnDiamond, RoomRound}
+var roomNormalTemplates = []string{RoomSquare, RoomRoundSimple, RoomLittle, RoomLittleDiamond, RoomLittleColumnDiamond, RoomRound, RoomLittleTreeDiamond, RoomRoundTree}
 
 const (
 	RoomBigColumns = `
@@ -403,9 +417,9 @@ const (
 	RoomBigGarden = `
 ?####?#++#?####?
 #""""##..##""""#
-#""""""!P""""""#
-#""""""P>""""""#
-#""""""!P""""""#
+#"T""".!P."""T"#
+#""""">P_>"""""#
+#"T""".!P."""T"#
 #""""##..##""""#
 ?####?#++#?####?`
 	RoomBigRooms = `
@@ -575,7 +589,7 @@ const (
 ???##+##???
 ??#>.P.>#??
 ##!.""".!##
-+.P"""""P.+
++.P""T""P.+
 ##!.""".!##
 ??#>.P.>#??
 ???##+##???`
@@ -686,7 +700,26 @@ const (
 ??.......?..-
 ????!.G...P??
 ????????-????`
-	RoomSpecialOricCelmists = `
+	RoomSpecialTreeMushrooms = `
+?????"--.???????
+???"""..G."""???
+???""?....!"""??
+??.....T>T..G..?
+?..G.T..!..T..P-
+-...!..T>T._"".-
+-P.???..G..""""?
+.-???????.-?????`
+	RoomSpecialHarpies = `
+?-????##??????
+?P???#..#?????
+?.???#G.>####?
+?.??#. .##.>#?
+?.?#.._....G.#
+-G........!..#
+??.#.G_.._#>#?
+??P?#.>###?#??
+??-??##???????`
+	RoomSpecialCelmists = `
 ?#############+##?
 #>#_.......>#.P._#
 #...G!#!G..##....#
@@ -695,15 +728,49 @@ const (
 ##..G!#!G..##....#
 #>.........>#.P._#
 ?#############+##?`
+	RoomSpecialCelmists2 = `
+?##+#########+##?
+#_#.....G.....#_#
+#..#!###|###!#..#
+#..###.>.>.###..#
++P.|.G.....G.|.P+
+#..###.>.>.###..#
+#..#!###|###!#..#
+#_#.....G.....#_#
+?##+#########+##?`
+	RoomSpecialCelmists3 = `
+##+###.---.###+##
++.P###..P..###P.+
+##.####|||####.##
+?#....G...G....#?
+??#!._#._.#_.!#??
+???#..G...G..#???
+????#!.....!#????
+?????#>#>#>#?????
+??????#?#?#??????`
+	RoomSpecialMirrorSpecters = `
+########-#########
+-P.....W.W......P-
+##W##_.#.#._###W##
+-P......G.......P-
+##W##..##W##.##W##
+#>.!W..W>!>W.W!.>#
+#.G.#..#.G.#.#.G.#
+#................#
+##################`
 )
 
 type specialRoom int
 
 const (
-	roomMilfids specialRoom = iota
+	noSpecialRoom specialRoom = iota
+	roomMilfids
 	roomNixes
 	roomVampires
 	roomCelmists
+	roomHarpies
+	roomTreeMushrooms
+	roomMirrorSpecters
 )
 
 func (sr specialRoom) Templates() (tpl []string) {
@@ -713,16 +780,18 @@ func (sr specialRoom) Templates() (tpl []string) {
 	case roomVampires:
 		tpl = append(tpl, RoomSpecialVampires)
 	case roomCelmists:
-		tpl = append(tpl, RoomSpecialOricCelmists)
+		tpl = append(tpl, RoomSpecialCelmists, RoomSpecialCelmists2, RoomSpecialCelmists3)
 	case roomNixes:
 		tpl = append(tpl, RoomSpecialNixes)
+	case roomHarpies:
+		tpl = append(tpl, RoomSpecialHarpies)
+	case roomTreeMushrooms:
+		tpl = append(tpl, RoomSpecialTreeMushrooms)
+	case roomMirrorSpecters:
+		tpl = append(tpl, RoomSpecialMirrorSpecters)
 	}
 	return tpl
 }
-
-var roomSpecialLevelEarly = []specialRoom{roomMilfids, roomNixes}
-var roomSpecialLevelLater = []specialRoom{roomVampires, roomCelmists}
-var roomSpecialLevel = []specialRoom{roomMilfids, roomNixes, roomVampires, roomCelmists}
 
 func (r *room) ComputeDimensions() {
 	x := 0
@@ -776,6 +845,14 @@ func (r *room) Dig(dg *dgen) {
 		case '#', '+':
 			if pos.valid() {
 				dg.d.SetCell(pos, WallCell)
+			}
+		case 'T':
+			if pos.valid() {
+				dg.d.SetCell(pos, TreeCell)
+			}
+		case 'W':
+			if pos.valid() {
+				dg.d.SetCell(pos, WindowCell)
 			}
 		}
 		switch c {
@@ -1039,26 +1116,14 @@ func (g *game) GenRoomTunnels(ml maplayout) {
 	}
 	var places []position
 	var nspecial = 4
-	if g.Params.Special[g.Depth] {
+	if sr := g.Params.Special[g.Depth]; sr != noSpecialRoom {
 		nspecial--
 		pl := PlacementEdge
 		if RandInt(2) == 0 {
 			pl = PlacementCenter
 		}
-		switch {
-		case g.Depth <= 5:
-			sr := roomSpecialLevelEarly[RandInt(len(roomSpecialLevelEarly))]
-			dg.special = sr
-			dg.GenRooms(sr.Templates(), 1, pl)
-		case g.Depth < WinDepth:
-			sr := roomSpecialLevelLater[RandInt(len(roomSpecialLevelLater))]
-			dg.special = sr
-			dg.GenRooms(sr.Templates(), 1, pl)
-		default:
-			sr := roomSpecialLevel[RandInt(len(roomSpecialLevel))]
-			dg.special = sr
-			dg.GenRooms(sr.Templates(), 1, pl)
-		}
+		dg.special = sr
+		dg.GenRooms(sr.Templates(), 1, pl)
 	}
 	switch ml {
 	case RandomWalkCave:
@@ -2082,8 +2147,9 @@ func (dg *dgen) PutMonsterBand(g *game, band monsterBand) bool {
 		bdinf = dg.BandInfoGuard(g, band, PlacePatrol)
 	case LoneSatowalgaPlant:
 		bdinf = dg.BandInfoOutsideGroundMiddle(g, band)
-	case SpecialLoneVampire, SpecialLoneNixe, SpecialLoneMilfid, SpecialLoneOricCelmist, SpecialLoneHarmonicCelmist, SpecialLoneHighGuard:
-		if RandInt(2) == 0 {
+	case SpecialLoneVampire, SpecialLoneNixe, SpecialLoneMilfid, SpecialLoneOricCelmist, SpecialLoneHarmonicCelmist, SpecialLoneHighGuard,
+		SpecialLoneHarpy, SpecialLoneTreeMushroom:
+		if RandInt(5) > 0 {
 			bdinf = dg.BandInfoPatrol(g, band, PlacePatrolSpecial)
 		} else {
 			bdinf = dg.BandInfoGuard(g, band, PlacePatrolSpecial)
@@ -2173,7 +2239,7 @@ func (dg *dgen) GenMonsters(g *game) {
 	bandOricCelmistPair := []monsterBand{PairOricCelmist}
 	bandHarmonicCelmistPair := []monsterBand{PairHarmonicCelmist}
 	// special bands
-	if g.Params.Special[g.Depth] {
+	if g.Params.Special[g.Depth] != noSpecialRoom {
 		switch dg.special {
 		case roomVampires:
 			bandVamps := []monsterBand{SpecialLoneVampire}
@@ -2185,13 +2251,25 @@ func (dg *dgen) GenMonsters(g *game) {
 			bandMilfids := []monsterBand{SpecialLoneMilfid}
 			dg.PutRandomBandN(g, bandMilfids, 2)
 		case roomCelmists:
-			if RandInt(2) == 0 {
+			switch RandInt(3) {
+			case 0:
 				bandOricCelmists := []monsterBand{SpecialLoneOricCelmist}
 				dg.PutRandomBandN(g, bandOricCelmists, 2)
-			} else {
+			case 1:
 				bandHarmonicCelmists := []monsterBand{SpecialLoneHarmonicCelmist}
 				dg.PutRandomBandN(g, bandHarmonicCelmists, 2)
+			case 2:
+				bandOricCelmists := []monsterBand{SpecialLoneOricCelmist}
+				bandHarmonicCelmists := []monsterBand{SpecialLoneHarmonicCelmist}
+				dg.PutRandomBandN(g, bandHarmonicCelmists, 1)
+				dg.PutRandomBandN(g, bandOricCelmists, 1)
 			}
+		case roomHarpies:
+			bandHarpies := []monsterBand{SpecialLoneHarpy}
+			dg.PutRandomBandN(g, bandHarpies, 2)
+		case roomTreeMushrooms:
+			bandTreeMushrooms := []monsterBand{SpecialLoneTreeMushroom}
+			dg.PutRandomBandN(g, bandTreeMushrooms, 2)
 		default:
 			// XXX not used now
 			bandOricCelmists := []monsterBand{SpecialLoneOricCelmist}
