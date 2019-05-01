@@ -846,36 +846,38 @@ func (ui *gameui) DrawDungeonView(m uiMode) {
 }
 
 func (ui *gameui) DrawKeysBasics(m uiMode) {
-	line := ui.MapHeight() - 2
+	line := ui.MapHeight() - 3
 	if CenteredCamera {
-		line = ui.MapHeight() - 7
+		line -= 5
 	}
 	if m == TargetingMode {
 		ui.SetCell(ui.MapWidth()+3, line, '↑', ColorFgPlayer, ColorBg)
-		ui.DrawColoredText("←↓→", ui.MapWidth()+2, line+1, ColorFgPlayer)
-		ui.SetCell(ui.MapWidth()+2, line+2, 'v', ColorFgPlayer, ColorBg)
-		ui.SetCell(ui.MapWidth()+2, line+3, 'x', ColorFgPlayer, ColorBg)
-		ui.SetCell(ui.MapWidth()+2, line+4, '?', ColorFgPlayer, ColorBg)
+		ui.DrawColoredText("←.→", ui.MapWidth()+2, line+1, ColorFgPlayer)
+		ui.DrawColoredText(" ↓ ", ui.MapWidth()+2, line+2, ColorFgPlayer)
+		ui.SetCell(ui.MapWidth()+2, line+3, 'v', ColorFgPlayer, ColorBg)
+		ui.SetCell(ui.MapWidth()+2, line+4, 'x', ColorFgPlayer, ColorBg)
+		ui.SetCell(ui.MapWidth()+2, line+5, '?', ColorFgPlayer, ColorBg)
 		const margin = 6
-		ui.DrawText("move cursor", ui.MapWidth()+margin, line+1)
-		ui.DrawText("view info", ui.MapWidth()+margin, line+2)
-		ui.DrawText("close mode", ui.MapWidth()+margin, line+3)
-		ui.DrawText("examine help", ui.MapWidth()+margin, line+4)
+		ui.DrawText("move cursor/go", ui.MapWidth()+margin, line+1)
+		ui.DrawText("view info", ui.MapWidth()+margin, line+3)
+		ui.DrawText("close mode", ui.MapWidth()+margin, line+4)
+		ui.DrawText("examine help", ui.MapWidth()+margin, line+5)
 	} else if m == NormalMode {
 		ui.SetCell(ui.MapWidth()+3, line, '↑', ColorFgPlayer, ColorBg)
-		ui.DrawColoredText("←↓→", ui.MapWidth()+2, line+1, ColorFgPlayer)
-		ui.SetCell(ui.MapWidth()+2, line+2, 'v', ColorFgPlayer, ColorBg)
-		ui.SetCell(ui.MapWidth()+2, line+3, 'e', ColorFgPlayer, ColorBg)
-		ui.SetCell(ui.MapWidth()+2, line+4, 'i', ColorFgPlayer, ColorBg)
-		ui.SetCell(ui.MapWidth()+2, line+5, 'x', ColorFgPlayer, ColorBg)
-		ui.SetCell(ui.MapWidth()+2, line+6, '?', ColorFgPlayer, ColorBg)
+		ui.DrawColoredText("←.→", ui.MapWidth()+2, line+1, ColorFgPlayer)
+		ui.DrawColoredText(" ↓ ", ui.MapWidth()+2, line+2, ColorFgPlayer)
+		ui.SetCell(ui.MapWidth()+2, line+3, 'v', ColorFgPlayer, ColorBg)
+		ui.SetCell(ui.MapWidth()+2, line+4, 'e', ColorFgPlayer, ColorBg)
+		ui.SetCell(ui.MapWidth()+2, line+5, 'i', ColorFgPlayer, ColorBg)
+		ui.SetCell(ui.MapWidth()+2, line+6, 'x', ColorFgPlayer, ColorBg)
+		ui.SetCell(ui.MapWidth()+2, line+7, '?', ColorFgPlayer, ColorBg)
 		const margin = 6
-		ui.DrawText("move/jump", ui.MapWidth()+margin, line+1)
-		ui.DrawText("evoke", ui.MapWidth()+margin, line+2)
-		ui.DrawText("interact", ui.MapWidth()+margin, line+3)
-		ui.DrawText("inventory", ui.MapWidth()+margin, line+4)
-		ui.DrawText("examine", ui.MapWidth()+margin, line+5)
-		ui.DrawText("command help", ui.MapWidth()+margin, line+6)
+		ui.DrawText("move/jump/wait", ui.MapWidth()+margin, line+1)
+		ui.DrawText("evoke", ui.MapWidth()+margin, line+3)
+		ui.DrawText("interact", ui.MapWidth()+margin, line+4)
+		ui.DrawText("inventory", ui.MapWidth()+margin, line+5)
+		ui.DrawText("examine", ui.MapWidth()+margin, line+6)
+		ui.DrawText("command help", ui.MapWidth()+margin, line+7)
 	}
 }
 
