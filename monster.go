@@ -263,7 +263,7 @@ var MonsData = []monsterData{
 	//MonsOgre:            {10, 2, 20, 3, 'O', "ogre", 7},
 	MonsOricCelmist:     {10, MonsMedium, 'o', "oric celmist", 9},
 	MonsHarmonicCelmist: {10, MonsMedium, 'h', "harmonic celmist", 9},
-	MonsWorm:            {15, MonsSmall, 'w', "farmer worm", 4},
+	MonsWorm:            {10, MonsSmall, 'w', "farmer worm", 4},
 	//MonsBrizzia:         {15, 1, 10, 3, 'z', "brizzia", 6},
 	//MonsAcidMound:       {10, 1, 10, 2, 'a', "acid mound", 6},
 	MonsDog:  {10, MonsMedium, 'd', "dog", 5},
@@ -283,7 +283,7 @@ var MonsData = []monsterData{
 	MonsMadNixe:        {10, MonsMedium, 'N', "mad nixe", 14},
 	//MonsMindCelmist:     {10, 1, 20, 2, 'c', "mind celmist", 12},
 	MonsVampire:      {10, MonsMedium, 'V', "vampire", 13},
-	MonsTreeMushroom: {15, MonsLarge, 'T', "tree mushroom", 16},
+	MonsTreeMushroom: {10, MonsLarge, 'T', "tree mushroom", 16},
 	//MonsMarevorHelith: {10, MonsMedium, 'M', "Marevor Helith", 18},
 	MonsButterfly: {10, MonsSmall, 'b', "kerejat", 2},
 }
