@@ -455,12 +455,6 @@ func (g *game) Descend(style descendstyle) bool {
 			AchInsomniaNovice.Get(g)
 		}
 	}
-	if g.Depth >= 4 {
-		if g.Stats.DRests[g.Depth] >= 1 && g.Stats.DRests[g.Depth-1] >= 1 && g.Stats.DRests[g.Depth-2] >= 1 &&
-			g.Stats.DRests[g.Depth-3] >= 1 {
-			AchSleepy.Get(g)
-		}
-	}
 	if g.Depth >= 5 {
 		if g.Stats.DRests[g.Depth] == 0 && g.Stats.DRests[g.Depth-1] == 0 && g.Stats.DRests[g.Depth-2] == 0 &&
 			g.Stats.DRests[g.Depth-3] == 0 {
@@ -545,6 +539,9 @@ func (g *game) ApplyRest() {
 	g.Stats.Rest++
 	g.Stats.DRests[g.Depth]++
 	g.PrintStyled("You feel fresh again after eating banana and sleeping.", logStatusEnd)
+	if g.Stats.Rest == 10 {
+		AchSleepy.Get(g)
+	}
 }
 
 func (g *game) AutoPlayer(ev event) bool {
