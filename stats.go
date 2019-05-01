@@ -148,6 +148,7 @@ const (
 	AchInsomniaNovice      achievement = "Insomnia Novice"
 	AchInsomniaInitiate    achievement = "Insomnia Initiate"
 	AchInsomniaMaster      achievement = "Insomnia Master"
+	AchSleepy              achievement = "Sleepy Gawalt"
 	AchAntimagicNovice     achievement = "Antimagic Novice"
 	AchAntimagicInitiate   achievement = "Antimagic Initiate"
 	AchAntimagicMaster     achievement = "Antimagic Master"
