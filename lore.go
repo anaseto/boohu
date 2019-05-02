@@ -28,7 +28,7 @@ I'll fight it again.”
 
 [Poem signed Wergal]
 `,
-	`“‘Now, now’, the doctor said shakingly. ‘I won't let you die this early, good warrior. Know why? Because, if you die right now, we'll die together’.
+	`“«Now, now», the doctor said shakingly. «I won't let you die this early, good warrior. Know why? Because, if you die right now, we'll die together».
 
 No one answered.”
 
@@ -252,7 +252,7 @@ you're just a bit more like us…”
 
 [Words written by a Dayoriah Clan Oric Celmist called Chuvitsan.]
 `,
-	`“That silly drow… I'm sick of him. During our watch, he kept on talking till I thought I'd get mad. He just doesn't understand what the Dayoriah Clan is. He talks about his children, his wife, his expectations, his dream about becoming one day a merchant… He didn't even realize I wasn't answering. Does he think everyone here is just as happy and dreamy as he is? So naïve it hurts me… Hope he will escape and survive. Otherwise, that poor guy will never become a merchant. Can't tell him, though.”
+	`“That silly drow… I'm sick of him. During our watch, he kept on talking till I thought I'd get mad. He just doesn't understand what the Dayoriah Clan is. He talks about his children, his wife, his expectations, his dream about becoming one day a merchant… He didn't even realize I wasn't answering. Does he think everyone here is just as happy and dreamy as he is? So naive it hurts me… Hope he will escape and survive. Otherwise, that poor guy will never become a merchant. Can't tell him, though.”
 
 [Thoughts of Xorom, an Elder Guard of the Dayoriah Clan]
 `,
