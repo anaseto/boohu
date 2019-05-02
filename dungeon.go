@@ -1230,7 +1230,7 @@ func (dg *dgen) AddSpecial(g *game, ml maplayout) {
 		dg.GenBarrierStone(g)
 	}
 	bananas := 2
-	if ml == RandomWalkTreeCave && g.Depth < MaxDepth {
+	if ml == RandomWalkTreeCave && g.Depth < MaxDepth || g.Depth == 5 || g.Depth == 8 {
 		bananas--
 	}
 	for i := 0; i < bananas; i++ {
