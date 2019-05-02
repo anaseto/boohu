@@ -729,7 +729,8 @@ var CenteredCamera bool
 
 func (ui *gameui) MapWidth() int {
 	if CenteredCamera {
-		return DefaultLOSRange*2 + 5
+		//return DefaultLOSRange*2 + 5
+		return 55
 	}
 	return DungeonWidth
 }
