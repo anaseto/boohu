@@ -1241,8 +1241,7 @@ func (dg *dgen) AddSpecial(g *game, ml maplayout) {
 	}
 	dg.GenItem(g)
 	dg.GenStones(g)
-	dg.GenLight(g)
-	ntables := 3
+	ntables := 4
 	switch ml {
 	case AutomataCave, RandomWalkCave:
 		if RandInt(3) == 0 {
@@ -1261,9 +1260,10 @@ func (dg *dgen) AddSpecial(g *game, ml maplayout) {
 	if g.Params.Tables[g.Depth] {
 		ntables += 2 + RandInt(2)
 	}
-	for i := 0; i < 3+RandInt(2); i++ {
+	for i := 0; i < ntables; i++ {
 		dg.GenTable(g)
 	}
+	dg.GenLight(g)
 	ntrees := 1
 	switch ml {
 	case AutomataCave:
@@ -1348,6 +1348,8 @@ func (dg *dgen) GenLight(g *game) {
 		if pos != InvalidPos {
 			g.Dungeon.SetCell(pos, LightCell)
 			lights = append(lights, pos)
+		} else if RandInt(10) > 0 {
+			i--
 		}
 	}
 	for _, pos := range lights {
