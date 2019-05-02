@@ -311,9 +311,9 @@ func (ui *gameui) BeamsAnimation(ray []position, bs beamstyle) {
 			if RandInt(2) == 0 {
 				r = '×'
 			}
-			if mons.Exists() {
-				r = '√'
-			}
+			//if mons.Exists() {
+			//r = '√'
+			//}
 			//ui.DrawAtPosition(pos, true, r, fg, bgColor)
 			ui.DrawAtPosition(pos, true, r, bgColor, fg)
 		}
