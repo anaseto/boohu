@@ -168,9 +168,10 @@ func (mk monsterKind) CanSwim() bool {
 }
 
 func (mk monsterKind) CanAttackOnTree() bool {
-	// TODO: improve this
-	switch mk {
-	case MonsMirrorSpecter, MonsWingedMilfid, MonsEarthDragon, MonsBlinkingFrog, MonsTinyHarpy:
+	switch {
+	case mk.Size() == MonsLarge:
+		return true
+	case mk.CanFly():
 		return true
 	default:
 		return false
