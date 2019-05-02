@@ -352,6 +352,11 @@ const (
 	LoneHarpy
 	PairGuard
 	PairYack
+	PairFrog
+	PairDog
+	PairTreeMushroom
+	PairSatowalga
+	PairWorm
 	PairOricCelmist
 	PairHarmonicCelmist
 	PairVampire
@@ -362,6 +367,7 @@ const (
 	SpecialLoneNixe
 	SpecialLoneMilfid
 	SpecialLoneOricCelmist
+	SpecialArtifactBand
 	SpecialLoneHarmonicCelmist
 	SpecialLoneHighGuard
 	SpecialLoneHarpy
@@ -397,12 +403,18 @@ var MonsBands = []monsterBandData{
 	LoneHarpy:                  {Monster: MonsTinyHarpy},
 	PairGuard:                  {Band: true, Distribution: map[monsterKind]int{MonsGuard: 2}},
 	PairYack:                   {Band: true, Distribution: map[monsterKind]int{MonsYack: 2}},
+	PairFrog:                   {Band: true, Distribution: map[monsterKind]int{MonsBlinkingFrog: 2}},
+	PairDog:                    {Band: true, Distribution: map[monsterKind]int{MonsDog: 2}},
+	PairTreeMushroom:           {Band: true, Distribution: map[monsterKind]int{MonsTreeMushroom: 2}},
+	PairSatowalga:              {Band: true, Distribution: map[monsterKind]int{MonsSatowalgaPlant: 2}},
+	PairWorm:                   {Band: true, Distribution: map[monsterKind]int{MonsWorm: 2}},
 	PairVampire:                {Band: true, Distribution: map[monsterKind]int{MonsVampire: 2}},
 	PairOricCelmist:            {Band: true, Distribution: map[monsterKind]int{MonsOricCelmist: 2}},
 	PairHarmonicCelmist:        {Band: true, Distribution: map[monsterKind]int{MonsHarmonicCelmist: 2}},
 	PairNixe:                   {Band: true, Distribution: map[monsterKind]int{MonsMadNixe: 2}},
 	PairExplosiveNadre:         {Band: true, Distribution: map[monsterKind]int{MonsExplosiveNadre: 2}},
 	PairWingedMilfid:           {Band: true, Distribution: map[monsterKind]int{MonsWingedMilfid: 2}},
+	SpecialArtifactBand:        {Band: true, Distribution: map[monsterKind]int{MonsOricCelmist: 1, MonsHighGuard: 1}},
 	SpecialLoneVampire:         {Monster: MonsVampire},
 	SpecialLoneNixe:            {Monster: MonsMadNixe},
 	SpecialLoneMilfid:          {Monster: MonsWingedMilfid},
