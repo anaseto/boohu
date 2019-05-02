@@ -1242,7 +1242,7 @@ func (dg *dgen) AddSpecial(g *game, ml maplayout) {
 	dg.GenItem(g)
 	dg.GenStones(g)
 	dg.GenLight(g)
-	ntables := 2
+	ntables := 3
 	switch ml {
 	case AutomataCave, RandomWalkCave:
 		if RandInt(3) == 0 {
