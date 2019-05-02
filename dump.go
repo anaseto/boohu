@@ -67,7 +67,6 @@ func (g *game) Dump() string {
 		fmt.Fprint(buf, "You rescued Shaedra.\n")
 	}
 	if g.LiberatedArtifact {
-		fmt.Fprint(buf, "\n")
 		fmt.Fprint(buf, "You recovered the Gem Portal Artifact.\n")
 	}
 	fmt.Fprintf(buf, "\n")
