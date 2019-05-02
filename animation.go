@@ -286,7 +286,6 @@ const (
 )
 
 func (ui *gameui) BeamsAnimation(ray []position, bs beamstyle) {
-	g := ui.g
 	if DisableAnimations {
 		return
 	}
@@ -306,7 +305,6 @@ func (ui *gameui) BeamsAnimation(ray []position, bs beamstyle) {
 		for i := len(ray) - 1; i >= 0; i-- {
 			pos := ray[i]
 			_, _, bgColor := ui.PositionDrawing(pos)
-			mons := g.MonsterAt(pos)
 			r := '*'
 			if RandInt(2) == 0 {
 				r = '×'

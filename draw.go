@@ -640,6 +640,9 @@ func (ui *gameui) DescribePosition(pos position, targ Targeter) {
 	switch {
 	case !g.Dungeon.Cell(pos).Explored:
 		desc = "You do not know what is in there."
+		if g.Noise[pos] || g.NoiseIllusion[pos] {
+			desc += " Noise."
+		}
 		g.InfoEntry = desc
 		return
 	case !targ.Reachable(g, pos):
@@ -685,6 +688,9 @@ func (ui *gameui) DescribePosition(pos position, targ Targeter) {
 		desc += " (lighted)"
 	}
 	g.InfoEntry = desc + "."
+	if g.Noise[pos] || g.NoiseIllusion[pos] {
+		desc = " Noise."
+	}
 }
 
 func (ui *gameui) ViewPositionDescription(pos position) {
