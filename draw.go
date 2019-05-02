@@ -666,7 +666,7 @@ func (ui *gameui) DescribePosition(pos position, targ Targeter) {
 	if cld, ok := g.Clouds[pos]; ok && g.Player.Sees(pos) {
 		if cld == CloudFire {
 			desc = ui.AddComma(see, desc)
-			desc += fmt.Sprintf("burning flames")
+			desc += fmt.Sprintf("magic flames")
 		} else if cld == CloudNight {
 			desc = ui.AddComma(see, desc)
 			desc += fmt.Sprintf("night clouds")
