@@ -249,7 +249,7 @@ func (c cell) Desc(g *game, pos position) (desc string) {
 	case TableCell:
 		desc = "You can hide under the table so that only adjacent creatures can see you. Most creatures cannot walk accross the table."
 	case TreeCell:
-		desc = "Underground banana trees grow with nearly no light sources. Their rare bananas are very appreciated by many creatures, specially some harpy species. You may find some bananas dropped by them while exploring. You can climb trees to see farther. Moreover, only big and flying creatures will be able to attack you while you stand on a tree. The top is never illuminated."
+		desc = "Underground banana trees grow with nearly no light sources. Their rare bananas are very appreciated by many creatures, specially some harpy species. You may find some bananas dropped by them while exploring. You can climb trees to see farther. Moreover, only big, flying or jumping creatures will be able to attack you while you stand on a tree. The top is never illuminated."
 	case HoledWallCell:
 		desc = "Only very small creatures can pass there. It is difficult to see through."
 	case ScrollCell:
