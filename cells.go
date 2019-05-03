@@ -273,13 +273,13 @@ func (c cell) Desc(g *game, pos position) (desc string) {
 	if c.Flammable() {
 		desc += " It is flammable."
 	}
-	if c.IsLevitatePassable() {
+	if c.IsLevitatePassable() && !c.IsPlayerPassable() {
 		desc += " It can be traversed with levitation."
 	}
-	if c.T.IsDiggable() {
+	if c.T.IsDiggable() && !c.IsPlayerPassable() {
 		desc += " It is diggable by oric destructive magic."
 	}
-	if c.IsSwimPassable() {
+	if c.IsSwimPassable() && !c.IsPlayerPassable() {
 		desc += " It is possible to traverse by swimming."
 	}
 	if c.BlocksRange() {
