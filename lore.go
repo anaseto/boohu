@@ -2,18 +2,18 @@ package main
 
 var LoreMessages = []string{
 	`“Below and above, left or right,
-there's no way to flee, there's no way to hide,
-no hope, no rest, no friend, no might,
-my eyes are hurting, life is no lie.”
+ there's no way to flee, there's no way to hide,
+ no hope, no rest, no friend, no might,
+ my eyes are hurting, life is no lie.”
 
 [Diary of Kaashtriman Deez Meir]
 `,
 	`“This is the place where I come from,
-this is my dark kingdom,
-here I abide, far from the night,
-far from the light, far from the sky.
-And there I'll die.
-I won't retire.”
+ this is my dark kingdom,
+ here I abide, far from the night,
+ far from the light, far from the sky.
+ And there I'll die.
+ I won't retire.”
 
 [Fragment of the Ballad of the Dark Orc]
 `,
@@ -22,9 +22,9 @@ I won't retire.”
 [Blood-stained piece of paper, Anonym]
 `,
 	`“If flowers are gone,
-I'll seed them again,
-If darkness has won
-I'll fight it again.”
+ I'll seed them again,
+ If darkness has won
+ I'll fight it again.”
 
 [Poem signed Wergal]
 `,
@@ -35,22 +35,22 @@ No one answered.”
 [Fragment of the Tales of the horrific maid, by Kow Yhers]
 `,
 	`“I don't mind if you die
-I don't mind if I die,
-it's so boring to die
-when you don't give a damn.”
+ I don't mind if I die,
+ it's so boring to die
+ when you don't give a damn.”
 
 [Fragment of the Foul-mouthed Fool's Tricky Poems]
 `,
 	`“I am the son of Joy and Hope,
-I've lost them both,
-I'm orphan now.”
+ I've lost them both,
+ I'm orphan now.”
 
 [Piece of yellow paper, Anonym]
 `,
 	`“I love her smile, her eyes, her soul,
-I love her cheerful mind and might,
-I will protect her with my life,
-she will be freed, I will stand last.”
+ I love her cheerful mind and might,
+ I will protect her with my life,
+ she will be freed, I will stand last.”
 
 [Fragment of a message signed Knight Firo of Ombay]
 `,
@@ -59,15 +59,15 @@ she will be freed, I will stand last.”
 [Fragment of the Scientist's diary]
 `,
 	`“For this beam of peace I saw once in my life
-I will hold my promise and cling to my last days,
-I will raise this old knife, and then… come what may.”
+ I will hold my promise and cling to my last days,
+ I will raise this old knife, and then… come what may.”
 
 [Fragment of Hope springs eternal, by Mowsh Rasadekarda]
 `,
 	`“Someone told me once these words:
-whenever I cross your path,
-something unexpected comes.
-I couldn't refrain a smile.”
+ whenever I cross your path,
+ something unexpected comes.
+ I couldn't refrain a smile.”
 
 [Very old piece of paper signed Marevor Helith]
 `,
@@ -78,19 +78,19 @@ I'm happy. I don't hate monsters. They were the only living creatures that could
 [White paper signed Marevor Helith]
 `,
 	`“If you want to revive
-don't be hasty,
-there's a way to thrive,
-but the method, my dear,
-is so, so nasty.”
+ don't be hasty,
+ there's a way to thrive,
+ but the method, my dear,
+ is so, so nasty.”
 
 [Fragment of Beware of eternal life, by Marevor Helith]
 `,
 	`“I love life, I love hope,
-y'all up there, listen up!
-I won't ever give up.
-If I'm lying down there,
-don't be fooled,
-I'm just taking a break.”
+ y'all up there, listen up!
+ I won't ever give up.
+ If I'm lying down there,
+ don't be fooled,
+ I'm just taking a break.”
 
 [Fragment of Red-Snake Naran's Diary]
 `,
@@ -103,9 +103,9 @@ I'm just taking a break.”
 [Piece of paper signed La Sciuro]
 `,
 	`“Bless the shadows, curse the lights,
-don't be hasty, all's alright,
-you can save yourself tomorrow
-as long as you do not die.”
+ don't be hasty, all's alright,
+ you can save yourself tomorrow
+ as long as you do not die.”
 
 [Green piece of paper, seems to be a piece of advice for someone]
 `,
@@ -134,18 +134,18 @@ After so many days… guess I'd be better off not coming back.”
 [Notes signed: He who doesn't remember got to be a dungeon ward]
 `,
 	`“Earth is warm and sun is bright,
-I will never lose your sight.
-Even deep in the Undergrounds,
-I will have you in my heart,
-deep down in my sunny past.”
+ I will never lose your sight.
+ Even deep in the Undergrounds,
+ I will have you in my heart,
+ deep down in my sunny past.”
 
 [Slightly burned piece of paper signed: The Wizard who can't resign]
 `,
 	`“Come on, move and make my day.
-Just try! Take my life away.
-You will be doomed anyway.
-Those monsters who went astray
-never crossed my path again.”
+ Just try! Take my life away.
+ You will be doomed anyway.
+ Those monsters who went astray
+ never crossed my path again.”
 
 [Text engraved in the stone floor with fierceness, signed: the Frightening One]
 `,
@@ -162,9 +162,9 @@ never crossed my path again.”
 [The rest of the paper is full of signs you don't understand. It's not Abrianese. You sigh: those saijits really make things complicated…]
 `,
 	`“No rival for me to kill
-that's some kind of an ordeal,
-no one's life for me to steal
-please, come back, and pay the bill.”
+ that's some kind of an ordeal,
+ no one's life for me to steal
+ please, come back, and pay the bill.”
 
 [Fragment of a poem entitled The Greedy Raven, the rest of the letters have faded]
 `,
@@ -178,9 +178,9 @@ if you want to say hello, it's this way, come on, come…”
 [You blink at the paper, surprised. A gawalt? A gawalt monkey like you wrote that? Then, you smile: I will, too, run like an arrow!]
 `,
 	`“Rather than being smashed and eaten,
-gather your will, stop to think.
-You won't have your legend written
-but you'll still be able to drink.”
+ gather your will, stop to think.
+ You won't have your legend written
+ but you'll still be able to drink.”
 
 [Fragment of the poem The Mouse And The Dragon, by Dak Limisur]
 `,
@@ -215,23 +215,20 @@ It was my blood they were drinking. It was their blood I was drinking. I was the
 [Undelivered old letter signed: your son, Mel]
 `,
 	`“We'll be one,
-never alone,
-we'll be one,
-and always strong.”
+ never alone,
+ we'll be one,
+ and always strong.”
 
 [Written words of an anonymous Dayoriah Clan member]
 `,
-	`“Please,
-please, forgive them all who thought they could run away from your wrath,
-Children of Dayoriah,
-take those poor souls in your heart and remember they could have become your brothers-in-arms.”
+	`“Please, please, forgive them all who thought they could run away from your wrath, Children of Dayoriah! Take those poor souls in your heart and remember they could have become your brothers-in-arms.”
 
 [Dayoriah Clan's Prayer for the Taken Souls]
 `,
 	`“Yesterday in my heart
-a white flower has bloomed,
-it told me: don't cry now,
-for you're already doomed.”
+ a white flower has bloomed,
+ it told me: don't cry now,
+ for you're already doomed.”
 
 [Poem entitled: Don't let the bastards wear you down]
 `,
@@ -240,23 +237,23 @@ for you're already doomed.”
 [Piece of paper of a mangled novel]
 `,
 	`“Go on. Don't look behind.
-Nothing good you will find.
-There are nothing but ghosts,
-ghosts that will cost your life.”
+ Nothing good you will find.
+ There are nothing but ghosts,
+ ghosts that will cost your life.”
 
 [Fragment of Ghosts of the Past, by Yaylin Ekath (5541-?)]
 `,
 	`“I was chasing a dog,
-it then entered a pound,
-I swam fast, I swam fast,
-I left it soon behind.”
+ it then entered a pound,
+ I swam fast, I swam fast,
+ I left it soon behind.”
 
 [Piece of paper, The Mirol Man who Swam Faster than Dogs]
 `,
 	`“Now! Cut the branch of your life,
-make it stronger, make it darker,
-can't you see? Nothing bad happens,
-you're just a bit more like us…”
+ make it stronger, make it darker,
+ can't you see? Nothing bad happens,
+ you're just a bit more like us…”
 
 [Words written by a Dayoriah Clan Oric Celmist called Chuvitsan.]
 `,
@@ -291,10 +288,10 @@ I wish I could change them, but for now, all I can do is take care of my dear li
 [Letter to a man call “Uncle Baref”, signed “Divel”]
 `,
 	`“A petal in darkness is showing at last
-revealing its color of violet and white,
-a little drop of water
-on the corner of its smile,
-recovers the tears that were shed in the past.”
+ revealing its color of violet and white,
+ a little drop of water
+ on the corner of its smile,
+ recovers the tears that were shed in the past.”
 
 [Poem by Amsalia Ruverg (4901-4945)]
 `,

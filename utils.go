@@ -69,7 +69,7 @@ func formatText(text string, width int) string {
 	start := true
 	for _, c := range text {
 		if c == ' ' || c == '\n' {
-			if wlen == 0 && c == ' ' {
+			if wlen == 0 && c == ' ' && !start {
 				continue
 			}
 			if col+wlen > width {
@@ -96,9 +96,8 @@ func formatText(text string, width int) string {
 				wantspace = true
 			}
 			continue
-		} else {
-			start = false
 		}
+		start = false
 		wordbuf.WriteRune(c)
 		wlen++
 	}
