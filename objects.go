@@ -533,7 +533,7 @@ func (it item) Desc(g *game) (desc string) {
 	case AmuletObstruction:
 		desc = "uses a magical barrier to blow away monsters that critically hit you."
 	case MarevorMagara:
-		desc = "magara was given to you by Marevor Helith so that he can create an escape portal when you reach Shaedra. Its sister magara, the Gem Portal Artifact, also crafted by Marevor, is the artifact that was stolen and that Shaedra was trying to retrieve before being captured. This magara needs a lot of time to recharge, so you'll only be able to use it once."
+		desc = "magara was given to you by Marevor Helith so that he can create an escape portal when you reach Shaedra. Its sister magara, the Gem Portal Artifact, also crafted by Marevor, is the artifact that was stolen and that Shaedra was trying to retrieve before being captured.\n\nThis magara needs a lot of time to recharge, so you'll only be able to use it once."
 	}
 	return "The " + it.ShortDesc(g) + " " + desc
 }
