@@ -615,7 +615,7 @@ func (ui *gameui) ExamineHelp() {
 	})
 }
 
-const TextWidth = DungeonWidth - 2
+const TextWidth = 72
 
 func (ui *gameui) WizardInfo() {
 	//g := ui.g
@@ -697,7 +697,7 @@ func (ui *gameui) DescribePosition(pos position, targ Targeter) {
 func (ui *gameui) ViewPositionDescription(pos position) {
 	g := ui.g
 	if !g.Dungeon.Cell(pos).Explored {
-		ui.DrawDescription("This place is unknown to you.")
+		ui.DrawDescription("This place is unknown to you.", "Position Description")
 		return
 	}
 	mons := g.MonsterAt(pos)
@@ -706,7 +706,7 @@ func (ui *gameui) ViewPositionDescription(pos position) {
 		ui.DrawMonsterDescription(mons)
 		ui.SetCursor(pos)
 	} else {
-		ui.DrawDescription(g.Dungeon.Cell(pos).Desc(g, pos))
+		ui.DrawDescription(g.Dungeon.Cell(pos).Desc(g, pos), "Position Description")
 	}
 }
 
@@ -1554,17 +1554,18 @@ func (ui *gameui) DrawMonsterDescription(mons *monster) {
 	case md < 10:
 		s += " " + fmt.Sprint("They move fast.")
 	}
-	ui.DrawDescription(s)
+	ui.DrawDescription(s, "Monster Description")
 }
 
-func (ui *gameui) DrawDescription(desc string) {
+func (ui *gameui) DrawDescription(desc string, title string) {
 	ui.DrawDungeonView(NoFlushMode)
 	desc = formatText(desc, TextWidth)
-	lines := strings.Count(desc, "\n")
+	lines := strings.Count(desc, "\n") + 1
 	for i := 0; i <= lines+2; i++ {
 		ui.ClearLine(i)
 	}
-	ui.DrawText(desc, 0, 0)
+	ui.DrawStyledTextLine(fmt.Sprintf(" %s ", title), 0, HeaderLine)
+	ui.DrawText(desc, (DungeonWidth-TextWidth)/2, 1)
 	ui.DrawTextLine(" press (x) to continue ", lines+2)
 	ui.Flush()
 	ui.WaitForContinue(lines + 2)
@@ -1590,7 +1591,7 @@ func (ui *gameui) DrawLore(desc string) {
 		for i := lines; i <= lines+l; i++ {
 			ui.ClearLine(i)
 		}
-		ui.DrawText(s, 0, lines)
+		ui.DrawText(s, (DungeonWidth-TextWidth)/2, lines)
 		lines += l
 	}
 	ui.ClearLine(lines + 1)
@@ -1746,7 +1747,7 @@ func (ui *gameui) SelectMagara(ev event) error {
 			ui.Flush()
 			time.Sleep(75 * time.Millisecond)
 			if desc {
-				ui.DrawDescription(magaras[index].Desc(g))
+				ui.DrawDescription(magaras[index].Desc(g), "Magara Description")
 				continue
 			}
 			err = g.UseMagara(index, ev)
@@ -1790,7 +1791,7 @@ func (ui *gameui) EquipMagara(ev event) error {
 			ui.Flush()
 			time.Sleep(75 * time.Millisecond)
 			if desc {
-				ui.DrawDescription(magaras[index].Desc(g))
+				ui.DrawDescription(magaras[index].Desc(g), "Magara Description")
 				continue
 			}
 			err = g.EquipMagara(index, ev)
@@ -1832,7 +1833,7 @@ func (ui *gameui) SelectItem(ev event) error {
 			ui.InventoryItem(index, index+1, items[index], ColorYellow, parts[index])
 			ui.Flush()
 			time.Sleep(75 * time.Millisecond)
-			ui.DrawDescription(items[index].Desc(g))
+			ui.DrawDescription(items[index].Desc(g), "Item Description")
 			continue
 		}
 		return err
@@ -1858,7 +1859,7 @@ func (ui *gameui) ReadScroll() error {
 			AchLoremaster.Get(ui.g)
 		}
 	default:
-		ui.DrawDescription(sc.Text(ui.g))
+		ui.DrawDescription(sc.Text(ui.g), "Story Message")
 	}
 	ui.g.Print("You read the message.")
 	return errors.New(DoNothing)
