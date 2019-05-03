@@ -62,6 +62,8 @@ func newGame(ui *gameui) {
 	} else if err != nil {
 		g.InitLevel()
 		g.Printf("Error loading saved game… starting new game. (%v)", err)
+	} else {
+		ui.DrawBufferInit()
 	}
 	g.ui = ui
 	g.EventLoop()

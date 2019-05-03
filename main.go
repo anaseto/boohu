@@ -81,6 +81,8 @@ func main() {
 		g.InitLevel()
 		g.PrintfStyled("Error: %v", logError, err)
 		g.PrintStyled("Could not load saved game… starting new game.", logError)
+	} else {
+		ui.DrawBufferInit()
 	}
 	g.ui = ui
 	g.EventLoop()
