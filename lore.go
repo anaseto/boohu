@@ -71,7 +71,9 @@ I couldn't refrain a smile.”
 
 [Very old piece of paper signed Marevor Helith]
 `,
-	`“Here I am, I, Marevor Helith the nakrus, the former necromancer, roaming, surrounded by the shadows that had seen me changing into a living dead so long ago. I'm happy. I don't hate monsters. They were the only living creatures that could see me without cringing in a long, long time. Their presence soothed me during my transformation and my early dead life. I even enjoy them being there during my random walks through those corridors, in this lovely peaceful dungeon. Yacks, nixes, nadres, vampires… To all of you, guys, I'll be always grateful!”
+	`“Here I am, I, Marevor Helith the nakrus, the former necromancer, roaming, surrounded by the shadows that had seen me changing into a living dead so long ago.
+
+I'm happy. I don't hate monsters. They were the only living creatures that could see me without cringing in a long, long time. Their presence soothed me during my transformation and my early dead life. I even enjoy them being there during my random walks through those corridors, in this lovely peaceful dungeon. Yacks, nixes, nadres, vampires… To all of you, guys, I'll be always grateful!”
 
 [White paper signed Marevor Helith]
 `,
@@ -111,7 +113,9 @@ as long as you do not die.”
 
 “Beware, you mortal, you'll be next.”
 `,
-	`“It was so beautiful! All over the place, in Kaendra valley, flowers were blooming, red, blue, white and yellow. The breeze was tousling my hair like a gentle god. My cat, on the threshold, was meowing. My children were running down the hill. And then, everything was gone. I just can't believe it was a dream. I wanted so much to be back home and be far from this damned dungeon… I know that, if I keep fighting, I'll die for sure. From now on, I will hide. And I will get out of here from sure. Home is waiting for me.”
+	`“It was so beautiful! All over the place, in Kaendra valley, flowers were blooming, red, blue, white and yellow. The breeze was tousling my hair like a gentle god. My cat, on the threshold, was meowing. My children were running down the hill. And then, everything was gone.
+
+I just can't believe it was a dream. I wanted so much to be back home and be far from this damned dungeon… I know that, if I keep fighting, I'll die for sure. From now on, I will hide. And I will get out of here from sure. Home is waiting for me.”
 
 [A long page written in a rather hurried way. It is accompanied by the drawings of two children, most likely the author's]
 `,
@@ -123,7 +127,9 @@ as long as you do not die.”
 
 [Blue piece of paper]
 `,
-	`“I was sent here to do something very urgent. That's why I was given so much help, my Elders told me to be cautious and not to use my sword if I could avoid it. I felt honoured and proud when I left. The only thing is… after I fell off the stairs, I don't remember a thing of what I'm supposed to do. After so many days… guess I'd be better off not coming back.”
+	`“I was sent here to do something very urgent. That's why I was given so much help, my Elders told me to be cautious and not to use my sword if I could avoid it. I felt honoured and proud when I left. The only thing is… after I fell off the stairs, I don't remember a thing of what I'm supposed to do.
+
+After so many days… guess I'd be better off not coming back.”
 
 [Notes signed: He who doesn't remember got to be a dungeon ward]
 `,
@@ -194,7 +200,9 @@ but you'll still be able to drink.”
 
 [Fragment of an old diary signed Jiffy Low]
 `,
-	`“The ceremony didn't go as I expected. It wasn't a feast. It was a funeral. They half-buried me in a huge mound of mud, sang as if their throats were going to change into stone, and then they freed me, allowed me to wear their black tunic, and shared with me a cup of blood. It was my blood they were drinking. It was their blood I was drinking. I was them, they were me. That's the thinking of the Dark Dayoriah Clan: everyone is one, no one will be ever alone…”
+	`“The ceremony didn't go as I expected. It wasn't a feast. It was a funeral. They half-buried me in a huge mound of mud, sang as if their throats were going to change into stone, and then they freed me, allowed me to wear their black tunic, and shared with me a cup of blood.
+
+It was my blood they were drinking. It was their blood I was drinking. I was them, they were me. That's the thinking of the Dark Dayoriah Clan: everyone is one, no one will be ever alone…”
 
 [Namyfar's thoughts about the infiltration of the Dayoriah Clan in the late 80' of the 55th century]
 `,
@@ -252,7 +260,9 @@ you're just a bit more like us…”
 
 [Words written by a Dayoriah Clan Oric Celmist called Chuvitsan.]
 `,
-	`“That silly drow… I'm sick of him. During our watch, he kept on talking till I thought I'd get mad. He just doesn't understand what the Dayoriah Clan is. He talks about his children, his wife, his expectations, his dream about becoming one day a merchant… He didn't even realize I wasn't answering. Does he think everyone here is just as happy and dreamy as he is? So naive it hurts me… Hope he will escape and survive. Otherwise, that poor guy will never become a merchant. Can't tell him, though.”
+	`“That silly drow… I'm sick of him. During our watch, he kept on talking till I thought I'd get mad. He just doesn't understand what the Dayoriah Clan is. He talks about his children, his wife, his expectations, his dream about becoming one day a merchant… He didn't even realize I wasn't answering.
+
+Does he think everyone here is just as happy and dreamy as he is? So naive it hurts me… Hope he will escape and survive. Otherwise, that poor guy will never become a merchant. Can't tell him, though.”
 
 [Thoughts of Xorom, an Elder Guard of the Dayoriah Clan]
 `,
@@ -264,11 +274,15 @@ you're just a bit more like us…”
 
 [Order of a Dayoriah Clan's foreman, the paper is rather recent and you can't help but think the thief is actually Shaedra. So they really did capture her! You have to hurry and save her.]
 `,
-	`“What have you done, young novice? You are but weak, useless, worthless, and you still want to eat with us, the Dayoriah Guards? You don't seem to understand your place. Just crawl, crawl until we just see in you a mere worm. Maybe then, you'll get some leftovers. The worm who would climb the ladder must begin at the bottom.”
+	`“What have you done, young novice? You are but weak, useless, worthless, and you still want to eat with us, the Dayoriah Guards? You don't seem to understand your place. Just crawl, crawl until we just see in you a mere worm. Maybe then, you'll get some leftovers.
+
+The worm who would climb the ladder must begin at the bottom.”
 
 [Piece of paper wet with tears]
 `,
-	`“I've always lived in the Dayoriah Clan, so maybe I'm biased and the world is just as much rotten as my clan is… I want to believe it isn't. My clan was once a great place to live in. They were kind, they were wise. They just loved knowledge so badly they ended up doing people wrong, and just to learn more, they began to steal and experiment on relics, magaras, artifacts… and even people. I wish I could change them, but for now, all I can do is take care of my dear little granddaughter. I will teach her well.”
+	`“I've always lived in the Dayoriah Clan, so maybe I'm biased and the world is just as much rotten as my clan is… I want to believe it isn't. My clan was once a great place to live in. They were kind, they were wise. They just loved knowledge so badly they ended up doing people wrong, and just to learn more, they began to steal and experiment on relics, magaras, artifacts… and even people.
+
+I wish I could change them, but for now, all I can do is take care of my dear little granddaughter. I will teach her well.”
 
 [Old man Arifa's thoughts about the Dayoriah Clan]
 `,
