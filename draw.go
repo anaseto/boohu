@@ -678,11 +678,9 @@ func (ui *gameui) DescribePosition(pos position, targ Targeter) {
 			desc = ui.AddComma(see, desc)
 			desc += fmt.Sprintf("a dense fog")
 		}
-	} else if desc == "" {
-		// TODO: wrong knowledge
-		desc = ui.AddComma(see, desc)
-		desc += fmt.Sprintf("%s", g.Dungeon.Cell(pos).ShortDesc(g, pos))
 	}
+	desc = ui.AddComma(see, desc)
+	desc += fmt.Sprintf("%s", c.ShortDesc(g, pos))
 	if g.MonsterLOS[pos] {
 		desc += " (unhidden)"
 	} else if g.Illuminated[pos.idx()] && c.IsIlluminable() {
