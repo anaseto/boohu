@@ -357,7 +357,7 @@ func (sc scroll) Text(g *game) (desc string) {
 }
 
 func (sc scroll) Desc(g *game) (desc string) {
-	desc = "A message. It can be read by using the interact key (by default “e”)."
+	desc = "A message. It can be read."
 	return desc
 }
 
