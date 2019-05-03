@@ -69,24 +69,24 @@ func formatText(text string, width int) string {
 	start := true
 	for _, c := range text {
 		if c == ' ' || c == '\n' {
-			if c == ' ' {
-				if wlen == 0 {
-					continue
-				}
-				if col+wlen > width {
-					if wantspace {
-						pbuf.WriteRune('\n')
-						col = 0
-					}
-				} else if wantspace || start {
-					pbuf.WriteRune(' ')
-					col++
-				}
+			if wlen == 0 && c == ' ' {
+				continue
 			}
-			pbuf.Write(wordbuf.Bytes())
-			col += wlen
-			wordbuf.Reset()
-			wlen = 0
+			if col+wlen > width {
+				if wantspace {
+					pbuf.WriteRune('\n')
+					col = 0
+				}
+			} else if wantspace || start {
+				pbuf.WriteRune(' ')
+				col++
+			}
+			if wlen > 0 {
+				pbuf.Write(wordbuf.Bytes())
+				col += wlen
+				wordbuf.Reset()
+				wlen = 0
+			}
 			if c == '\n' {
 				pbuf.WriteRune('\n')
 				col = 0
