@@ -92,7 +92,7 @@ func formatText(text string, width int) string {
 				col = 0
 				wantspace = false
 				start = true
-			} else {
+			} else if !start {
 				wantspace = true
 			}
 			continue
