@@ -270,7 +270,7 @@ Does he think everyone here is just as happy and dreamy as he is? So naive it hu
 
 [Mimi the Guard]
 `,
-	`“The thief that infiltrated our turf and tried to retrieve our new acquisition has been captured. However, it is possible she has an accomplice. Please be careful and stop every suspect.”
+	`“The thief that infiltrated our turf and tried to retrieve our new acquisition has been captured. However, it is possible that she has an accomplice. Please be careful and stop every suspect.”
 
 [Order of a Dayoriah Clan's foreman, the paper is rather recent and you can't help but think the thief is actually Shaedra. So they really did capture her! You have to hurry and save her.]
 `,
