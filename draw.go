@@ -1557,7 +1557,7 @@ func (ui *gameui) DrawMonsterDescription(mons *monster) {
 
 func (ui *gameui) DrawDescription(desc string, title string) {
 	ui.DrawDungeonView(NoFlushMode)
-	desc = formatText(desc, TextWidth)
+	desc = formatText(strings.TrimSpace(desc), TextWidth)
 	lines := strings.Count(desc, "\n") + 1
 	for i := 0; i <= lines+2; i++ {
 		ui.ClearLine(i)
@@ -1567,35 +1567,6 @@ func (ui *gameui) DrawDescription(desc string, title string) {
 	ui.DrawTextLine(" press (x) to continue ", lines+2)
 	ui.Flush()
 	ui.WaitForContinue(lines + 2)
-	ui.DrawDungeonView(NoFlushMode)
-}
-
-func (ui *gameui) DrawLore(desc string) {
-	ui.DrawDungeonView(NoFlushMode)
-	desc = strings.TrimSpace(desc)
-	slines := strings.Split(desc, "\n")
-	lines := 0
-	indent := false
-	for j, s := range slines {
-		if j == 0 && len(s) > 0 && strings.HasPrefix(s, "“") {
-			indent = true
-		}
-		s = strings.Replace(s, "\n", "", -1)
-		s = formatText(s, TextWidth)
-		if indent && len(s) > 0 && s[0] != '\n' && !strings.HasPrefix(s, "“") && s[0] != '[' {
-			s = " " + s
-		}
-		l := strings.Count(s, "\n") + 1
-		for i := lines; i <= lines+l; i++ {
-			ui.ClearLine(i)
-		}
-		ui.DrawText(s, (DungeonWidth-TextWidth)/2, lines)
-		lines += l
-	}
-	ui.ClearLine(lines + 1)
-	ui.DrawTextLine(" press (x) to continue ", lines+1)
-	ui.Flush()
-	ui.WaitForContinue(lines + 1)
 	ui.DrawDungeonView(NoFlushMode)
 }
 
@@ -1848,7 +1819,7 @@ func (ui *gameui) ReadScroll() error {
 		// XXX unused now
 		ui.DrawScrollBasics()
 	case ScrollLore:
-		ui.DrawLore(sc.Text(ui.g))
+		ui.DrawDescription(sc.Text(ui.g), "Lore Message")
 		ui.g.Stats.Lore[ui.g.Depth] = true
 		if len(ui.g.Stats.Lore) == 4 {
 			AchLoreStudent.Get(ui.g)

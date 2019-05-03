@@ -66,19 +66,22 @@ func formatText(text string, width int) string {
 	col := 0
 	wantspace := false
 	wlen := 0
+	start := true
 	for _, c := range text {
 		if c == ' ' || c == '\n' {
-			if wlen == 0 {
-				continue
-			}
-			if col+wlen > width {
-				if wantspace {
-					pbuf.WriteRune('\n')
-					col = 0
+			if c == ' ' {
+				if wlen == 0 {
+					continue
 				}
-			} else if wantspace {
-				pbuf.WriteRune(' ')
-				col++
+				if col+wlen > width {
+					if wantspace {
+						pbuf.WriteRune('\n')
+						col = 0
+					}
+				} else if wantspace || start {
+					pbuf.WriteRune(' ')
+					col++
+				}
 			}
 			pbuf.Write(wordbuf.Bytes())
 			col += wlen
@@ -86,13 +89,15 @@ func formatText(text string, width int) string {
 			wlen = 0
 			if c == '\n' {
 				pbuf.WriteRune('\n')
-				pbuf.WriteRune('\n')
 				col = 0
 				wantspace = false
+				start = true
 			} else {
 				wantspace = true
 			}
 			continue
+		} else {
+			start = false
 		}
 		wordbuf.WriteRune(c)
 		wlen++
