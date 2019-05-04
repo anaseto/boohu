@@ -1040,11 +1040,11 @@ const (
 	PlacementEdge
 )
 
-func (dg *dgen) GenRooms(templates []string, n int, pl placement) (ok bool, ps []position) {
+func (dg *dgen) GenRooms(templates []string, n int, pl placement) (ps []position, ok bool) {
 	ok = true
 	for i := 0; i < n; i++ {
 		var r *room
-		count := 200
+		count := 250
 		var pos position
 		var tpl string
 		for r == nil && count > 0 {
@@ -1071,7 +1071,7 @@ func (dg *dgen) GenRooms(templates []string, n int, pl placement) (ok bool, ps [
 			ok = false
 		}
 	}
-	return ok, ps
+	return ps, ok
 }
 
 func (dg *dgen) ConnectRooms() {
@@ -1129,7 +1129,21 @@ func (g *game) GenRoomTunnels(ml maplayout) {
 			pl = PlacementCenter
 		}
 		dg.special = sr
-		dg.GenRooms(sr.Templates(), 1, pl)
+		var ok bool
+		count := 0
+		for {
+			places, ok = dg.GenRooms(sr.Templates(), 1, pl)
+			count++
+			if count > 100 {
+				if g.Depth == WinDepth || g.Depth == MaxDepth {
+					panic("special room")
+				}
+				break
+			}
+			if ok {
+				break
+			}
+		}
 	}
 	switch ml {
 	case RandomWalkCave:
@@ -1394,6 +1408,7 @@ loop:
 		for _, pos := range places {
 			if r.pos.Distance(pos) < far && dg.rooms[i].pos.Distance(pos) >= far {
 				r = dg.rooms[i]
+				dg.rooms[len(dg.rooms)-1], dg.rooms[i] = dg.rooms[i], dg.rooms[len(dg.rooms)-1]
 				break loop
 			}
 		}
