@@ -64,11 +64,13 @@ loop:
 }
 
 func (ui *gameui) PromptConfirmation() bool {
+	// TODO: this cannot be done with the mouse
 	for {
 		in := ui.PollEvent()
 		switch in.key {
 		case "Y", "y":
 			return true
+		case "":
 		default:
 			return false
 		}
