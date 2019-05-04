@@ -261,7 +261,7 @@ func (c cell) Desc(g *game, pos position) (desc string) {
 	case ItemCell:
 		desc = g.Objects.Items[pos].Desc(g)
 	case BarrierCell:
-		desc = "A temporal magical barrier."
+		desc = "A temporal magical barrier created by oric energies. It may have been created by an oric magara or an oric celmist. Sometimes, natural oric energies may produce such barriers too in energetically unstable Underground areas."
 	case WindowCell:
 		desc = "A transparent window in the wall."
 	case ChasmCell:
