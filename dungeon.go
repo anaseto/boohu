@@ -1417,8 +1417,28 @@ loop:
 	if g.Depth > 1 {
 		return
 	}
-	itpos := r.RandomPlace(PlaceItem)
-	// TODO: make the player only start in rooms with enough places
+	itpos := InvalidPos
+	neighbors := g.Dungeon.FreeNeighbors(g.Player.Pos)
+	for i := 0; i < len(neighbors); i++ {
+		j := RandInt(len(neighbors) - i)
+		neighbors[i], neighbors[j] = neighbors[j], neighbors[i]
+	}
+loopnb:
+	for _, npos := range neighbors {
+		c := g.Dungeon.Cell(npos)
+		if c.IsGround() {
+			for _, pl := range r.places {
+				if npos == pl.pos {
+					continue loopnb
+				}
+			}
+			itpos = npos
+			break
+		}
+	}
+	if itpos == InvalidPos {
+		itpos = r.RandomPlace(PlaceItem)
+	}
 	if itpos == InvalidPos {
 		itpos = r.RandomPlaces(PlaceSpecialOrStatic)
 		if itpos == InvalidPos {
