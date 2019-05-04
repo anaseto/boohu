@@ -1535,28 +1535,32 @@ loop:
 
 func (ui *gameui) DrawMonsterDescription(mons *monster) {
 	s := mons.Kind.Desc()
-	s += " " + fmt.Sprintf("Their size is %s.", mons.Kind.Size())
+	var info string
+	info += fmt.Sprintf("Their size is %s.", mons.Kind.Size())
 	if mons.Kind.Peaceful() {
-		s += " " + fmt.Sprint("They are peaceful.")
+		info += " " + fmt.Sprint("They are peaceful.")
 	}
 	if mons.Kind.CanOpenDoors() {
-		s += " " + fmt.Sprint("They can open doors.")
+		info += " " + fmt.Sprint("They can open doors.")
 	}
 	if mons.Kind.CanFly() {
-		s += " " + fmt.Sprint("They can fly.")
+		info += " " + fmt.Sprint("They can fly.")
 	}
 	if mons.Kind.CanSwim() {
-		s += " " + fmt.Sprint("They can swim.")
+		info += " " + fmt.Sprint("They can swim.")
 	}
 	md := mons.Kind.MovementDelay()
 	switch { // XXX this can be improved
 	case md == 10:
 	case md >= 20:
-		s += " " + fmt.Sprint("They move very slowly.")
+		info += " " + fmt.Sprint("They move very slowly.")
 	case md > 10:
-		s += " " + fmt.Sprint("They move slowly.")
+		info += " " + fmt.Sprint("They move slowly.")
 	case md < 10:
-		s += " " + fmt.Sprint("They move fast.")
+		info += " " + fmt.Sprint("They move fast.")
+	}
+	if info != "" {
+		s += "\n\n" + info
 	}
 	ui.DrawDescription(s, "Monster Description")
 }
