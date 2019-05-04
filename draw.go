@@ -694,9 +694,15 @@ func (ui *gameui) DescribePosition(pos position, targ Targeter) {
 
 func (ui *gameui) ViewPositionDescription(pos position) {
 	g := ui.g
-	if !g.Dungeon.Cell(pos).Explored {
+	c := g.Dungeon.Cell(pos)
+	title := "Terrain Description"
+	if !c.Explored {
 		ui.DrawDescription("This place is unknown to you.", "Terrain Description")
 		return
+	}
+	switch c.T {
+	case BananaCell, ScrollCell, StoryCell, ItemCell:
+		title = "Object Description"
 	}
 	mons := g.MonsterAt(pos)
 	if mons.Exists() && g.Player.Sees(mons.Pos) {
@@ -704,7 +710,7 @@ func (ui *gameui) ViewPositionDescription(pos position) {
 		ui.DrawMonsterDescription(mons)
 		ui.SetCursor(pos)
 	} else {
-		ui.DrawDescription(g.Dungeon.Cell(pos).Desc(g, pos), "Terrain Description")
+		ui.DrawDescription(g.Dungeon.Cell(pos).Desc(g, pos), title)
 	}
 }
 
