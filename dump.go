@@ -264,7 +264,7 @@ func (g *game) DetailedStatistics(w io.Writer) {
 	}
 	sort.Strings(achvs)
 	for _, achv := range achvs {
-		fmt.Fprintf(w, "- %s (turn %d)\n", achv, g.Stats.Achievements[achievement(achv)])
+		fmt.Fprintf(w, "- %s (turn %d)\n", achv, g.Stats.Achievements[achievement(achv)]/10)
 	}
 }
 
