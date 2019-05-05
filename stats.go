@@ -152,7 +152,6 @@ const (
 	AchAntimagicNovice     achievement = "Antimagic Novice"
 	AchAntimagicInitiate   achievement = "Antimagic Initiate"
 	AchAntimagicMaster     achievement = "Antimagic Master"
-	AchEscape              achievement = "Escape"
 )
 
 func (ach achievement) Get(g *game) {
