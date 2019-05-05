@@ -1559,7 +1559,7 @@ func (ui *gameui) Win() {
 	if g.Wizard {
 		g.Print("You escape by the magic portal! **WIZARD** [(x) to continue]")
 	} else {
-		g.Print("You escape by the magic portal! You win. [(x) to continue]")
+		g.Print("You escape by the magic portal! [(x) to continue]")
 	}
 	ui.DrawDungeonView(NormalMode)
 	ui.WaitForContinue(-1)

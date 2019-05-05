@@ -65,9 +65,14 @@ func (g *game) Dump() string {
 	if g.LiberatedShaedra {
 		fmt.Fprint(buf, "\n")
 		fmt.Fprint(buf, "You rescued Shaedra.\n")
+	} else {
+		fmt.Fprint(buf, "\n")
+		fmt.Fprint(buf, "You did not rescue Shaedra.\n")
 	}
 	if g.LiberatedArtifact {
 		fmt.Fprint(buf, "You recovered the Gem Portal Artifact.\n")
+	} else {
+		fmt.Fprint(buf, "You did not recover the Gem Portal Artifact.\n")
 	}
 	fmt.Fprintf(buf, "\n")
 	fmt.Fprintf(buf, "You have %d/%d HP, %d/%d MP and %d/%d bananas.\n", g.Player.HP, g.Player.HPMax(), g.Player.MP, g.Player.MPMax(), g.Player.Bananas, MaxBananas)
