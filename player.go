@@ -300,8 +300,8 @@ func (g *game) MovePlayer(pos position, ev event) error {
 		} else if c.T == HoledWallCell {
 			g.Print("You crawl under the wall.")
 		}
-		if c.T == WallCell {
-			g.Dungeon.SetCell(pos, GroundCell)
+		if c.T.IsDiggable() && c.T != HoledWallCell {
+			g.Dungeon.SetCell(pos, RubbleCell)
 			g.MakeNoise(WallNoise, pos)
 			g.Print(g.CrackSound())
 			g.Fog(pos, 1, ev)

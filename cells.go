@@ -31,6 +31,7 @@ const (
 	WindowCell
 	ChasmCell
 	WaterCell
+	RubbleCell
 )
 
 func (c cell) IsPassable() bool {
@@ -98,7 +99,7 @@ func (t terrain) IsPlayerPassable() bool {
 
 func (t terrain) IsDiggable() bool {
 	switch t {
-	case WallCell, WindowCell:
+	case WallCell, WindowCell, HoledWallCell:
 		return true
 	default:
 		return false
@@ -125,7 +126,7 @@ func (c cell) Hides() bool {
 
 func (c cell) IsIlluminable() bool {
 	switch c.T {
-	case WallCell, BarrelCell, TableCell, TreeCell, HoledWallCell, BarrierCell, WindowCell, ChasmCell:
+	case WallCell, BarrelCell, TableCell, TreeCell, HoledWallCell, BarrierCell, WindowCell, ChasmCell, RubbleCell:
 		return false
 	}
 	return true
@@ -220,6 +221,8 @@ func (c cell) ShortDesc(g *game, pos position) (desc string) {
 		desc = "a chasm"
 	case WaterCell:
 		desc = "shallow water"
+	case RubbleCell:
+		desc = "rubblestone"
 	}
 	return desc
 }
@@ -268,6 +271,8 @@ func (c cell) Desc(g *game, pos position) (desc string) {
 		desc = "A chasm. If you jump into it, you'll be seriously injured."
 	case WaterCell:
 		desc = "Shallow water."
+	case RubbleCell:
+		desc = "Rubblestone is a collection of rocks broken into smaller stones."
 	}
 	var autodesc string
 	if !c.T.IsPlayerPassable() {
@@ -342,6 +347,8 @@ func (c cell) Style(g *game, pos position) (r rune, fg uicolor) {
 		r, fg = '◊', ColorFgLOS
 	case WaterCell:
 		r, fg = '≈', ColorFgLOS
+	case RubbleCell:
+		r, fg = '^', ColorFgLOS
 	}
 	return r, fg
 }

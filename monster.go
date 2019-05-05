@@ -638,7 +638,11 @@ func (m *monster) Explode(g *game, ev event) {
 		} else if g.Player.Pos == pos {
 			m.InflictDamage(g, 1, 1)
 		} else if c.IsDestructible() && RandInt(3) > 0 {
-			g.Dungeon.SetCell(pos, GroundCell)
+			if c.T.IsDiggable() {
+				g.Dungeon.SetCell(pos, RubbleCell)
+			} else {
+				g.Dungeon.SetCell(pos, GroundCell)
+			}
 			if c.T == BarrelCell {
 				delete(g.Objects.Barrels, pos)
 			}
@@ -902,7 +906,7 @@ func (m *monster) HandleMove(g *game) {
 		}
 	case !mons.Exists():
 		if m.Kind == MonsEarthDragon && c.IsDestructible() {
-			g.Dungeon.SetCell(target, GroundCell)
+			g.Dungeon.SetCell(target, RubbleCell)
 			if c.T == BarrelCell {
 				delete(g.Objects.Barrels, target)
 			}
