@@ -1512,7 +1512,7 @@ func (m *monster) AbsorbMana(g *game, ev event) bool {
 }
 
 func (m *monster) Blink(g *game) {
-	npos := g.BlinkPos()
+	npos := g.BlinkPos(true)
 	if !npos.valid() || npos == g.Player.Pos || npos == m.Pos {
 		return
 	}

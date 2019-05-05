@@ -274,7 +274,7 @@ func (g *game) Blink(ev event) {
 	if g.Player.HasStatus(StatusLignification) {
 		return
 	}
-	npos := g.BlinkPos()
+	npos := g.BlinkPos(false)
 	if !npos.valid() {
 		// should not happen
 		g.Print("You could not blink.")
@@ -286,7 +286,7 @@ func (g *game) Blink(ev event) {
 	g.PlacePlayerAt(npos)
 }
 
-func (g *game) BlinkPos() position {
+func (g *game) BlinkPos(mpassable bool) position {
 	losPos := []position{}
 	for pos, b := range g.Player.LOS {
 		// TODO: skip if not seen?
@@ -294,7 +294,7 @@ func (g *game) BlinkPos() position {
 			continue
 		}
 		c := g.Dungeon.Cell(pos)
-		if !c.T.IsPlayerPassable() || c.T == StoryCell {
+		if !c.T.IsPlayerPassable() || mpassable && !c.IsPassable() || c.T == StoryCell {
 			continue
 		}
 		mons := g.MonsterAt(pos)

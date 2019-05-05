@@ -69,19 +69,6 @@ func (g *game) MakeNoise(noise int, at position) {
 	}
 }
 
-func (g *game) AttractMonster(pos position) *monster {
-	dir := pos.Dir(g.Player.Pos)
-	for cpos := pos.To(dir); g.Player.LOS[cpos]; cpos = cpos.To(dir) {
-		mons := g.MonsterAt(cpos)
-		if mons.Exists() {
-			mons.MoveTo(g, pos)
-			g.ui.TeleportAnimation(cpos, pos, false)
-			return mons
-		}
-	}
-	return nil
-}
-
 func (g *game) Jump(mons *monster, ev event) error {
 	if mons.Peaceful(g) && mons.Kind != MonsEarthDragon {
 		ompos := mons.Pos
