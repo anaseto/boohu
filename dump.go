@@ -331,6 +331,16 @@ func (g *game) SimplifedDump(err error) string {
 	} else {
 		fmt.Fprintf(buf, "You are exploring depth %d of Hareka's Underground.\n", g.Depth)
 	}
+	if g.LiberatedShaedra {
+		fmt.Fprint(buf, "You rescued Shaedra.\n")
+	} else {
+		fmt.Fprint(buf, "You did not rescue Shaedra.\n")
+	}
+	if g.LiberatedArtifact {
+		fmt.Fprint(buf, "You recovered the Gem Portal Artifact.\n")
+	} else {
+		fmt.Fprint(buf, "You did not recover the Gem Portal Artifact.\n")
+	}
 	fmt.Fprintf(buf, "You spent %.1f turns in the Underground.\n", float64(g.Turn)/10)
 	maxDepth := Max(g.Depth, g.ExploredLevels)
 	s := "s"
