@@ -262,7 +262,7 @@ type monsterData struct {
 
 var MonsData = []monsterData{
 	MonsGuard:     {10, MonsMedium, 'g', "guard", 3},
-	MonsTinyHarpy: {10, MonsMedium, 't', "tiny harpy", 3},
+	MonsTinyHarpy: {10, MonsSmall, 't', "tiny harpy", 3},
 	//MonsOgre:            {10, 2, 20, 3, 'O', "ogre", 7},
 	MonsOricCelmist:     {10, MonsMedium, 'o', "oric celmist", 9},
 	MonsHarmonicCelmist: {10, MonsMedium, 'h', "harmonic celmist", 9},
