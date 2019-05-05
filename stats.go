@@ -30,7 +30,7 @@ type stats struct {
 	DSpotted          [MaxDepth + 1]int
 	DUSpotted         [MaxDepth + 1]int
 	DUSpottedPerc     [MaxDepth + 1]int
-	Achievements      map[achievement]bool
+	Achievements      map[achievement]int
 	AtNotablePos      map[position]bool
 	HarmonicMagUse    int
 	OricMagUse        int
@@ -156,8 +156,8 @@ const (
 )
 
 func (ach achievement) Get(g *game) {
-	if !g.Stats.Achievements[ach] {
-		g.Stats.Achievements[ach] = true
+	if g.Stats.Achievements[ach] == 0 {
+		g.Stats.Achievements[ach] = g.Turn
 		g.PrintfStyled("Achievement: %s.", logSpecial, ach)
 		g.StoryPrintf("Achievement: %s.", ach)
 	}

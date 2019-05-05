@@ -256,6 +256,16 @@ func (g *game) DetailedStatistics(w io.Writer) {
 		fmt.Fprintf(w, " %3d", n)
 	}
 	fmt.Fprintf(w, "\n")
+	fmt.Fprintf(w, "\n")
+	fmt.Fprintf(w, "Achievements:\n")
+	achvs := []string{}
+	for achv, _ := range g.Stats.Achievements {
+		achvs = append(achvs, string(achv))
+	}
+	sort.Strings(achvs)
+	for _, achv := range achvs {
+		fmt.Fprintf(w, "- %s (turn %d)\n", achv, g.Stats.Achievements[achievement(achv)])
+	}
 }
 
 func (g *game) DumpStory() string {
