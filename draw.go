@@ -885,8 +885,8 @@ func (ui *gameui) DrawKeysBasics(m uiMode) {
 		ui.SetCell(ui.MapWidth()+2, line+7, '?', ColorFgPlayer, ColorBg)
 		const margin = 6
 		ui.DrawText("move/jump/wait", ui.MapWidth()+margin, line+1)
-		ui.DrawText("evoke", ui.MapWidth()+margin, line+3)
-		ui.DrawText("interact", ui.MapWidth()+margin, line+4)
+		ui.DrawText("interact", ui.MapWidth()+margin, line+3)
+		ui.DrawText("evoke", ui.MapWidth()+margin, line+4)
 		ui.DrawText("inventory", ui.MapWidth()+margin, line+5)
 		ui.DrawText("examine", ui.MapWidth()+margin, line+6)
 		ui.DrawText("command help", ui.MapWidth()+margin, line+7)
