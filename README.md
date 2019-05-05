@@ -11,12 +11,15 @@ progression.
 
 *Your friend Shaedra got captured by nasty people from the Dayoriah Clan while
 she was trying to retrieve a powerful magara artifact that was stolen from the
-great magara-specialist Marevor Helith. As a gawalt monkey, you don't
-understand much why people complicate so much their lives caring about
-artifacts and the like, but one thing is clear: you have to rescue your friend,
-somewhere to be found in this Underground area controlled by the Dayoriah Clan.
-If what you heard the guards say is true, Shaedra's imprisoned on the eighth
-floor. You are small and have good night vision, so you hope the infiltration
+great magara-specialist Marevor Helith.*
+
+*As a gawalt monkey, you don't understand much why people complicate so much
+their lives caring about artifacts and the like, but one thing is clear: you
+have to rescue your friend, somewhere to be found in this Underground area
+controlled by the Dayoriah Clan.  If what you heard the guards say is true,
+Shaedra's imprisoned on the eighth floor.*
+
+*You are small and have good night vision, so you hope the infiltration
 will go smoothly...*
 
 TODO: update the rest of the README.md when there is a website for the new game.
