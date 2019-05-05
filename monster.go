@@ -553,8 +553,8 @@ func (m *monster) MoveTo(g *game, pos position) {
 	c := g.Dungeon.Cell(pos)
 	if c.T == ChasmCell && !m.Kind.CanFly() || c.T == WaterCell && !m.Kind.CanSwim() && !m.Kind.CanFly() {
 		m.Dead = true
-		g.HandleKill(m)
 		if g.Player.Sees(m.Pos) {
+			g.HandleKill(m)
 			switch c.T {
 			case ChasmCell:
 				g.Printf("%s falls into the abyss.", m.Kind.Definite(true))
