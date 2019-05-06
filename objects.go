@@ -78,6 +78,7 @@ const (
 	BarrelStone
 	FogStone
 	QueenStone
+	NightStone
 	TreeStone
 	TeleportStone
 	MappingStone
@@ -98,6 +99,8 @@ func (stn stone) String() (text string) {
 		text = "fog stone"
 	case QueenStone:
 		text = "queenstone"
+	case NightStone:
+		text = "night stone"
 	case TreeStone:
 		text = "tree stone"
 	case TeleportStone:
@@ -122,6 +125,8 @@ func (stn stone) Desc(g *game) (text string) {
 		text = "Activating this magical stone will produce fog in a 4-radius area using harmonic energies."
 	case QueenStone:
 		text = "Activating this magical stone will produce an harmonic sound confusing enemies in a quite large area. This can also attract monsters."
+	case NightStone:
+		text = "Activating this magical stone will produce hypnotic harmonic sounds and illusions inducing sleep in all the monsters in sight."
 	case TreeStone:
 		text = "Activating this magical stone will lignify monsters in sight."
 	case TeleportStone:
@@ -159,11 +164,135 @@ func (g *game) UseStone(pos position) {
 	g.Print("The stone becomes inert.")
 }
 
+func (g *game) ActivateStone() (err error) {
+	stn, ok := g.Objects.Stones[g.Player.Pos]
+	if !ok {
+		return errors.New("No stone to activate here.")
+	}
+	oppos := g.Player.Pos
+	switch stn {
+	case InertStone:
+		err = errors.New("The stone is inert.")
+	case BarrelStone:
+		g.Print("The stone teleports you away.")
+		g.TeleportToBarrel()
+	case FogStone:
+		g.Print("The stone releases fog.")
+		g.Fog(g.Player.Pos, FogStoneDistance, g.Ev)
+	case QueenStone:
+		g.ActivateQueenStone()
+	case NightStone:
+		err = g.ActivateNightStone()
+	case TreeStone:
+		err = g.ActivateTreeStone()
+	case TeleportStone:
+		err = g.ActivateTeleportStone()
+	case MappingStone:
+		err = g.MagicMapping(g.Ev, MappingDistance)
+	case SensingStone:
+		err = g.Sensing(g.Ev)
+	case SealStone:
+		err = g.BarrierStone(g.Ev)
+	}
+	if err != nil {
+		return err
+	}
+	g.UseStone(oppos)
+	g.Ev.Renew(g, 5)
+	return nil
+}
+
 const (
 	FogStoneDistance   = 4
-	QueenStoneDistance = 12
+	QueenStoneDistance = 15
 	MappingDistance    = 32
 )
+
+func (g *game) ActivateQueenStone() {
+	g.MakeNoise(QueenStoneNoise, g.Player.Pos)
+	dij := &noisePath{game: g}
+	nm := Dijkstra(dij, []position{g.Player.Pos}, QueenStoneDistance)
+	targets := []*monster{}
+	for _, m := range g.Monsters {
+		if !m.Exists() {
+			continue
+		}
+		if m.State == Resting {
+			continue
+		}
+		_, ok := nm.at(m.Pos)
+		if !ok {
+			continue
+		}
+		targets = append(targets, m)
+	}
+	g.Print("The stone releases confusing sounds.")
+	g.ui.LOSWavesAnimation(DefaultLOSRange, WaveMagicNoise, g.Player.Pos)
+	for _, m := range targets {
+		m.EnterConfusion(g, g.Ev)
+	}
+}
+
+func (g *game) ActivateNightStone() error {
+	targets := []*monster{}
+	for _, mons := range g.Monsters {
+		if !mons.Exists() || !g.Player.Sees(mons.Pos) {
+			continue
+		}
+		if mons.State != Resting {
+			targets = append(targets, mons)
+		}
+	}
+	if len(targets) == 0 {
+		return errors.New("There are no suitable monsters in sight.")
+	}
+	g.Print("The stone releases hypnotic harmonies.")
+	g.ui.LOSWavesAnimation(DefaultLOSRange, WaveSleeping, g.Player.Pos)
+	for _, mons := range targets {
+		g.Printf("%s falls asleep.", mons.Kind.Definite(true))
+		mons.State = Resting
+		mons.Dir = NoDir
+		mons.ExhaustTime(g, 40+RandInt(10))
+	}
+	return nil
+}
+
+func (g *game) ActivateTreeStone() error {
+	targets := []*monster{}
+	for _, mons := range g.Monsters {
+		if !mons.Exists() || !g.Player.Sees(mons.Pos) {
+			continue
+		}
+		targets = append(targets, mons)
+	}
+	if len(targets) == 0 {
+		return errors.New("There are no suitable monsters in sight.")
+	}
+	g.Print("The stone releases magical spores.")
+	g.ui.LOSWavesAnimation(DefaultLOSRange, WaveSleeping, g.Player.Pos)
+	for _, mons := range targets {
+		mons.EnterLignification(g, g.Ev)
+	}
+	return nil
+}
+
+func (g *game) ActivateTeleportStone() error {
+	targets := []*monster{}
+	for _, mons := range g.Monsters {
+		if !mons.Exists() || !g.Player.Sees(mons.Pos) {
+			continue
+		}
+		targets = append(targets, mons)
+	}
+	if len(targets) == 0 {
+		return errors.New("There are no suitable monsters in sight.")
+	}
+	g.Print("The stone releases oric teleport energies.")
+	for _, mons := range targets {
+		mons.TeleportAway(g)
+	}
+	return nil
+}
 
 func (g *game) TeleportToBarrel() {
 	barrels := []position{}
@@ -235,79 +364,6 @@ func (g *game) BarrierStone(ev event) error {
 		}
 	}
 	g.Print("You feel oric energies dissipating.")
-	return nil
-}
-
-func (g *game) ActivateStone() (err error) {
-	stn, ok := g.Objects.Stones[g.Player.Pos]
-	if !ok {
-		return errors.New("No stone to activate here.")
-	}
-	oppos := g.Player.Pos
-	switch stn {
-	case InertStone:
-		err = errors.New("Stone is inert.")
-	case BarrelStone:
-		g.Print("You teleport away.")
-		g.TeleportToBarrel()
-	case FogStone:
-		g.Fog(g.Player.Pos, FogStoneDistance, g.Ev)
-		g.Print("You are surrounded by fog.")
-	case QueenStone:
-		g.MakeNoise(QueenStoneNoise, g.Player.Pos)
-		dij := &noisePath{game: g}
-		nm := Dijkstra(dij, []position{g.Player.Pos}, QueenStoneDistance)
-		for _, m := range g.Monsters {
-			if !m.Exists() {
-				continue
-			}
-			if m.State == Resting {
-				continue
-			}
-			_, ok := nm.at(m.Pos)
-			if !ok {
-				continue
-			}
-			m.EnterConfusion(g, g.Ev)
-		}
-		g.Print("The stone releases a confusing sound.")
-	case TreeStone:
-		count := 0
-		for _, mons := range g.Monsters {
-			if !mons.Exists() || !g.Player.Sees(mons.Pos) {
-				continue
-			}
-			mons.EnterLignification(g, g.Ev)
-			count++
-		}
-		if count == 0 {
-			err = errors.New("There are no monsters to confuse around.")
-		}
-	case TeleportStone:
-		g.Print("The stone releases oric energies.")
-		count := 0
-		for _, mons := range g.Monsters {
-			if !mons.Exists() || !g.Player.Sees(mons.Pos) {
-				continue
-			}
-			mons.TeleportAway(g)
-			count++
-		}
-		if count == 0 {
-			err = errors.New("There are no monsters in sight.")
-		}
-	case MappingStone:
-		err = g.MagicMapping(g.Ev, MappingDistance)
-	case SensingStone:
-		err = g.Sensing(g.Ev)
-	case SealStone:
-		err = g.BarrierStone(g.Ev)
-	}
-	if err != nil {
-		return err
-	}
-	g.UseStone(oppos)
-	g.Ev.Renew(g, 5)
 	return nil
 }
 

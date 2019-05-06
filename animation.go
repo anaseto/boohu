@@ -207,6 +207,8 @@ const (
 	WaveNoise
 	WaveConfusion
 	WaveSlowing
+	WaveTree
+	WaveSleeping
 )
 
 func (ui *gameui) WaveAnimation(wave []int, ws wavestyle) {
@@ -223,8 +225,18 @@ func (ui *gameui) WaveAnimation(wave []int, ws wavestyle) {
 			if ui.g.Player.Sees(pos) {
 				ui.WaveDrawAt(pos, fg)
 			}
+		case WaveSleeping:
+			fg := ColorFgSleepingMonster
+			if ui.g.Player.Sees(pos) {
+				ui.WaveDrawAt(pos, fg)
+			}
 		case WaveSlowing:
 			fg := ColorFgSlowedMonster
+			if ui.g.Player.Sees(pos) {
+				ui.WaveDrawAt(pos, fg)
+			}
+		case WaveTree:
+			fg := ColorFgLignifiedMonster
 			if ui.g.Player.Sees(pos) {
 				ui.WaveDrawAt(pos, fg)
 			}
