@@ -47,12 +47,12 @@ func (st stair) Desc(g *game) (desc string) {
 			desc += " If you're courageous enough, you may skip this portal and continue going deeper in the dungeon, to find Marevor's magara, finishing Shaedra's failed mission."
 		}
 	case NormalStair:
-		desc = "Stairs lead to the next level of the Underground. There's no way back. Monsters do not follow you."
+		desc = "Stairs lead to the next level of Dayoriah Clan's Underground area. You will not be able to come back, because an oric barrier seals the stairs when they are traversed by intruders. The upside of this is that ennemies cannot follow you either."
 		if g.Depth == WinDepth {
 			desc += " You may want to take those after freeing Shaedra from her cell."
 		}
 	case BlockedStair:
-		desc = "Stairs lead to the next level of the Underground. There's no way back. Monsters do not follow you. These are blocked by a magical barrier that you have to disable by activating a corresponding stone of barrier."
+		desc = "Stairs lead to the next level of the Underground. These are sealed by an oric magical barrier that you have to disable by activating a corresponding stone of barrier. You will not be able to come back, because an oric barrier seals the stairs again when they are traversed by intruders. The upside of this is that ennemies cannot follow you either."
 	}
 	return desc
 }
