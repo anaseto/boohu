@@ -269,7 +269,7 @@ func (g *game) ActivateTreeStone() error {
 		return errors.New("There are no suitable monsters in sight.")
 	}
 	g.Print("The stone releases magical spores.")
-	g.ui.LOSWavesAnimation(DefaultLOSRange, WaveSleeping, g.Player.Pos)
+	g.ui.LOSWavesAnimation(DefaultLOSRange, WaveTree, g.Player.Pos)
 	for _, mons := range targets {
 		mons.EnterLignification(g, g.Ev)
 	}
