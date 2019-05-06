@@ -701,8 +701,10 @@ func (ui *gameui) ViewPositionDescription(pos position) {
 		return
 	}
 	switch c.T {
-	case BananaCell, ScrollCell, StoryCell, ItemCell:
+	case BananaCell, ScrollCell, ItemCell:
 		title = "Object Description"
+	case StoryCell:
+		title = "Special Description"
 	}
 	mons := g.MonsterAt(pos)
 	if mons.Exists() && g.Player.Sees(mons.Pos) {
