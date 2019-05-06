@@ -382,11 +382,13 @@ func (g *game) InitLevelStructures() {
 	g.Stats.AtNotablePos = map[position]bool{}
 }
 
+var Testing = false
+
 func (g *game) InitLevel() {
 	// Starting data
 	if g.Depth == 0 {
 		g.InitFirstLevel()
-	} else {
+	} else if !Testing {
 		g.ui.DrawLoading()
 	}
 

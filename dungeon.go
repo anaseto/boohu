@@ -265,7 +265,7 @@ func (rs roomSlice) Less(i, j int) bool {
 	jpos := rs[j].pos
 	jpos.X += rs[j].w / 2
 	jpos.Y += rs[j].h / 2
-	return rs[i].special && !rs[j].special || ipos.Distance(center) <= jpos.Distance(center)
+	return rs[i].special || !rs[j].special && ipos.Distance(center) <= jpos.Distance(center)
 }
 
 type dgen struct {
@@ -681,6 +681,17 @@ const (
 ##_#.......#_##
 ??#!...P...!#??
 ???####+####???`
+	RoomSpecialVampiresVRev = `
+???####+####???
+??#!...P...!#??
+##_#.......#_##
++.P.........P.+
+#..#.G...G.#..#
+#.....#!#.....#
+#..#...>...#..#
+#!...G.#.G...!#
+?##>.......>##?
+???#########???`
 	RoomSpecialNixes = `
 ?#####+#####?
 #>.G.#.#.G.>#
@@ -701,6 +712,26 @@ const (
 ??.......?..-
 ????!.G...P??
 ????????-????`
+	RoomSpecialMilfidsVRev = `
+????????-????
+????!.G...P??
+??.......?..-
+?.?._#>#.??.?
+-P.G.>#>G...?
+?.?.?#>#.?.??
+??..!?G._?..?
+???......P.??
+?????????-???`
+	RoomSpecialMilfidsRev = `
+???-?????????
+??.P......???
+?..?_.G?!..??
+??.?.#>#?.?.?
+?...G>#>.G.P-
+?.??.#>#_.?.?
+-..?.......??
+??P...G.!????
+????-????????`
 	RoomSpecialTreeMushrooms = `
 ?????"--.???????
 ???"""..G."""???
@@ -710,6 +741,24 @@ const (
 -...!..T>T._"".-
 -P.???..G..""""?
 .-???????.-?????`
+	RoomSpecialTreeMushroomsVRev = `
+.-???????.-?????
+-P.???..G..""""?
+-...!..T>T._"".-
+?..G.T..!..T..P-
+??.....T>T..G..?
+???""?....!"""??
+???"""..G."""???
+?????"--.???????`
+	RoomSpecialTreeMushroomsRev = `
+???????.--"?????
+???""".G.."""???
+??"""!....?""???
+?..G..T>T.....??
+-P..T..!..T.G..?
+-.""_.T>T..!...-
+?""""..G..???.P-
+?????-.???????-.`
 	RoomSpecialHarpies = `
 ?-????##??????
 ?P???#..#?????
@@ -720,6 +769,36 @@ const (
 ??.#.G_.._#>#?
 ??P?#.>###?#??
 ??-??##???????`
+	RoomSpecialHarpiesVRev = `
+??-??##???????
+??P?#.>###?#??
+??.#.G_.._#>#?
+-G........!..#
+?.?#.._....G.#
+?.??#...##.>#?
+?.???#G.>####?
+?P???#..#?????
+?-????##??????`
+	RoomSpecialHarpiesRev = `
+??????##????-?
+?????#..#???P?
+?####>.G#???.?
+?#>.##...#??.?
+#.G...._..#?.?
+#..!........G-
+?#>#_.._G.#.??
+??#?###>.#?P??
+???????##??-??`
+	RoomSpecialHarpiesRevVRev = `
+???????##??-??
+??#?###>.#?P??
+?#>#_.._G.#.??
+#..!........G-
+#.G...._..#?.?
+?#>.##...#??.?
+?####>.G#???.?
+?????#..#???P?
+??????##????-?`
 	RoomSpecialCelmists = `
 ?#############+##?
 #>#_.......>#.P._#
@@ -729,6 +808,15 @@ const (
 ##..G!#!G..##....#
 #>.........>#.P._#
 ?#############+##?`
+	RoomSpecialCelmistsRev = `
+?##+#############?
+#_.P.#>......._#>#
+#....##..G!#!G...#
++P...|....###....#
++P...|....###..._#
+#....##..G!#!G..##
+#_.P.#>.........>#
+?##+#############?`
 	RoomSpecialCelmists2 = `
 ?##+#########+##?
 #_#.....G.....#_#
@@ -749,6 +837,16 @@ const (
 ????#!.....!#????
 ?????#>#>#>#?????
 ??????#?#?#??????`
+	RoomSpecialCelmists3Rev = `
+??????#?#?#??????
+?????#>#>#>#?????
+????#!.....!#????
+???#..G...G..#???
+??#!._#._.#_.!#??
+?#....G...G....#?
+##|##W#|||#W##|##
++.P|....P....|P.+
+########-########`
 	RoomSpecialMirrorSpecters = `
 ########-#########
 -P.....W.W......P-
@@ -759,6 +857,16 @@ const (
 #.G.#..#.G.#.#.G.#
 #................#
 ##################`
+	RoomSpecialMirrorSpecters2 = `
+##################
+#................#
+#.G.#..#.G.#.#.G.#
+#>.!W..W>!>W.W!.>#
+##W##..##W##.##W##
+-P......G.......P-
+##W##_.#.#._###W##
+-P.....W.W......P-
+########-#########`
 )
 
 type specialRoom int
@@ -779,19 +887,19 @@ const (
 func (sr specialRoom) Templates() (tpl []string) {
 	switch sr {
 	case roomMilfids:
-		tpl = append(tpl, RoomSpecialMilfids)
+		tpl = append(tpl, RoomSpecialMilfids, RoomSpecialMilfidsRev, RoomSpecialMilfidsVRev)
 	case roomVampires:
-		tpl = append(tpl, RoomSpecialVampires)
+		tpl = append(tpl, RoomSpecialVampires, RoomSpecialVampiresVRev)
 	case roomCelmists:
-		tpl = append(tpl, RoomSpecialCelmists, RoomSpecialCelmists2, RoomSpecialCelmists3)
+		tpl = append(tpl, RoomSpecialCelmists, RoomSpecialCelmistsRev, RoomSpecialCelmists2, RoomSpecialCelmists3, RoomSpecialCelmists3Rev)
 	case roomNixes:
 		tpl = append(tpl, RoomSpecialNixes)
 	case roomHarpies:
-		tpl = append(tpl, RoomSpecialHarpies)
+		tpl = append(tpl, RoomSpecialHarpies, RoomSpecialHarpiesRev, RoomSpecialHarpiesVRev, RoomSpecialHarpiesRevVRev)
 	case roomTreeMushrooms:
-		tpl = append(tpl, RoomSpecialTreeMushrooms)
+		tpl = append(tpl, RoomSpecialTreeMushrooms, RoomSpecialTreeMushroomsRev, RoomSpecialTreeMushroomsVRev)
 	case roomMirrorSpecters:
-		tpl = append(tpl, RoomSpecialMirrorSpecters)
+		tpl = append(tpl, RoomSpecialMirrorSpecters, RoomSpecialMirrorSpecters2)
 	case roomShaedra:
 		tpl = roomCellTemplates
 	case roomArtifact:
@@ -2042,19 +2150,20 @@ func (dg *dgen) BandInfoGuard(g *game, band monsterBand, pl placeKind) bandInfo 
 loop:
 	for pos == InvalidPos {
 		count++
-		if count > 3000 {
+		if count > 1000 {
 			pos = dg.InsideCell(g)
 			break
 		}
-		for i := 0; i < 10; i++ {
+		for i := 0; i < 20; i++ {
 			r := dg.rooms[RandInt(len(dg.rooms)-1)]
 			for _, e := range r.places {
 				if e.kind == PlaceSpecialStatic {
 					pos = r.RandomPlace(pl)
-					if pos != InvalidPos {
-						break loop
-					}
+					break
 				}
+			}
+			if pos != InvalidPos {
+				break loop
 			}
 		}
 		r := dg.rooms[RandInt(len(dg.rooms)-1)]
@@ -2071,9 +2180,8 @@ func (dg *dgen) BandInfoGuardSpecial(g *game, band monsterBand) bandInfo {
 	count := 0
 	for _, r := range dg.rooms {
 		count++
-		if count > 5 {
-			pos = dg.InsideCell(g)
-			break
+		if count > 1 {
+			panic("guard special")
 		}
 		pos = r.RandomPlace(PlacePatrolSpecial)
 		if pos != InvalidPos {
@@ -2120,9 +2228,8 @@ func (dg *dgen) BandInfoPatrolSpecial(g *game, band monsterBand) bandInfo {
 	count := 0
 	for _, r := range dg.rooms {
 		count++
-		if count > 5 {
-			pos = dg.InsideCell(g)
-			break
+		if count > 1 {
+			panic("patrol special")
 		}
 		pos = r.RandomPlace(PlacePatrolSpecial)
 		if pos != InvalidPos {
@@ -2133,9 +2240,8 @@ func (dg *dgen) BandInfoPatrolSpecial(g *game, band monsterBand) bandInfo {
 	count = 0
 	for _, r := range dg.rooms {
 		count++
-		if count > 5 {
-			target = dg.InsideCell(g)
-			break
+		if count > 1 {
+			panic("patrol special")
 		}
 		target = r.RandomPlace(PlacePatrolSpecial)
 		if target != InvalidPos {

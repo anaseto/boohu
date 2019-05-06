@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-var Rounds = 100
+var Rounds = 50
 
 func (d *dungeon) String() string {
 	b := &bytes.Buffer{}

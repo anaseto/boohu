@@ -1090,7 +1090,8 @@ func (m *monster) HitPlayer(g *game, ev event) {
 	switch g.Player.Inventory.Neck {
 	case AmuletConfusion:
 		m.EnterConfusion(g, ev)
-		g.Printf("Your amulet releases confusing harmonies.", m.Kind)
+		// TODO: maybe affect all monsters in sight?
+		g.Printf("Your amulet releases confusing harmonies.")
 	case AmuletFog:
 		g.Print("Your amulet feels warm.")
 		g.SwiftFog(ev)
