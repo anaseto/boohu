@@ -586,7 +586,7 @@ func (ui *gameui) DrawKeysDescription(title string, actions []string) {
 func (ui *gameui) KeysHelp() {
 	ui.DrawKeysDescription("Basic Commands", []string{
 		"Move/Jump", "arrows or wasd or hjkl or mouse left",
-		"Wait a turn", "“.” or 5 or mouse left on @",
+		"Wait a turn", "“.” or 5 or enter or mouse left on @",
 		"Interact (Equip/Descend/Rest...)", "e",
 		"Evoke/Zap magara", "v or z",
 		"Inventory", "i",

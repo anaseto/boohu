@@ -267,6 +267,12 @@ func (ui *gameui) GetPos(i int) (int, int) {
 }
 
 func (ui *gameui) Select(l int) (index int, alternate bool, err error) {
+	if ui.itemHover >= 1 && ui.itemHover <= l {
+		ui.ColorLine(ui.itemHover, ColorYellow)
+		ui.Flush()
+	} else {
+		ui.itemHover = -1
+	}
 	for {
 		in := ui.PollEvent()
 		r := ui.ReadKey(in.key)
@@ -276,7 +282,35 @@ func (ui *gameui) Select(l int) (index int, alternate bool, err error) {
 		case in.key == "?":
 			return -1, true, nil
 		case 97 <= r && int(r) < 97+l:
+			if ui.itemHover >= 1 && ui.itemHover <= l {
+				ui.ColorLine(ui.itemHover, ColorFg)
+			}
+			ui.itemHover = int(r-97) + 1
 			return int(r - 97), false, nil
+		case in.key == "2" && ui.itemHover < l:
+			oih := ui.itemHover
+			ui.itemHover++
+			if ui.itemHover < 1 {
+				ui.itemHover = 1
+			}
+			if oih > 0 && oih <= l {
+				ui.ColorLine(oih, ColorFg)
+			}
+			ui.ColorLine(ui.itemHover, ColorYellow)
+			ui.Flush()
+		case in.key == "8" && ui.itemHover > 1:
+			oih := ui.itemHover
+			ui.itemHover--
+			if oih > 0 && oih <= l {
+				ui.ColorLine(oih, ColorFg)
+			}
+			ui.ColorLine(ui.itemHover, ColorYellow)
+			ui.Flush()
+		case in.key == "." && ui.itemHover >= 1 && ui.itemHover <= l:
+			if ui.itemHover >= 1 && ui.itemHover <= l {
+				ui.ColorLine(ui.itemHover, ColorFg)
+			}
+			return ui.itemHover - 1, false, nil
 		case in.key == "" && in.mouse:
 			y := in.mouseY
 			x := in.mouseX
@@ -285,7 +319,7 @@ func (ui *gameui) Select(l int) (index int, alternate bool, err error) {
 				oih := ui.itemHover
 				if y <= 0 || y > l || x >= DungeonWidth {
 					ui.itemHover = -1
-					if oih != -1 {
+					if oih > 0 {
 						ui.ColorLine(oih, ColorFg)
 						ui.Flush()
 					}
@@ -296,7 +330,7 @@ func (ui *gameui) Select(l int) (index int, alternate bool, err error) {
 				}
 				ui.itemHover = y
 				ui.ColorLine(y, ColorYellow)
-				if oih != -1 {
+				if oih > 0 {
 					ui.ColorLine(oih, ColorFg)
 				}
 				ui.Flush()

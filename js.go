@@ -447,7 +447,7 @@ func (ui *gameui) PollEvent() (in uiInput) {
 	switch in.key {
 	case "Escape", "Space":
 		in.key = "\x1b"
-	case "Enter":
+	case "Enter", "\r", "\n":
 		in.key = "."
 	case "ArrowLeft":
 		in.key = "4"
