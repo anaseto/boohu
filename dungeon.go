@@ -244,6 +244,7 @@ type room struct {
 	entries []rentry
 	places  []place
 	kind    string
+	special bool
 }
 
 func roomDistance(r1, r2 *room) int {
@@ -264,7 +265,7 @@ func (rs roomSlice) Less(i, j int) bool {
 	jpos := rs[j].pos
 	jpos.X += rs[j].w / 2
 	jpos.Y += rs[j].h / 2
-	return ipos.Distance(center) <= jpos.Distance(center)
+	return rs[i].special && !rs[j].special || ipos.Distance(center) <= jpos.Distance(center)
 }
 
 type dgen struct {
@@ -713,7 +714,7 @@ const (
 ?-????##??????
 ?P???#..#?????
 ?.???#G.>####?
-?.??#. .##.>#?
+?.??#...##.>#?
 ?.?#.._....G.#
 -G........!..#
 ??.#.G_.._#>#?
@@ -1065,6 +1066,10 @@ func (dg *dgen) GenRooms(templates []string, n int, pl placement) (ps []position
 			r = dg.NewRoom(pos, tpl)
 		}
 		if r != nil {
+			switch pl {
+			case PlacementCenter, PlacementEdge:
+				r.special = true
+			}
 			dg.rooms = append(dg.rooms, r)
 			ps = append(ps, pos)
 		} else {
@@ -2060,6 +2065,26 @@ loop:
 	return bandinfo
 }
 
+func (dg *dgen) BandInfoGuardSpecial(g *game, band monsterBand) bandInfo {
+	bandinfo := bandInfo{Kind: monsterBand(band)}
+	pos := InvalidPos
+	count := 0
+	for _, r := range dg.rooms {
+		count++
+		if count > 5 {
+			pos = dg.InsideCell(g)
+			break
+		}
+		pos = r.RandomPlace(PlacePatrolSpecial)
+		if pos != InvalidPos {
+			break
+		}
+	}
+	bandinfo.Path = append(bandinfo.Path, pos)
+	bandinfo.Beh = BehGuard
+	return bandinfo
+}
+
 func (dg *dgen) BandInfoPatrol(g *game, band monsterBand, pl placeKind) bandInfo {
 	bandinfo := bandInfo{Kind: monsterBand(band)}
 	pos := InvalidPos
@@ -2082,6 +2107,40 @@ func (dg *dgen) BandInfoPatrol(g *game, band monsterBand, pl placeKind) bandInfo
 			break
 		}
 		target = dg.rooms[RandInt(len(dg.rooms)-1)].RandomPlace(pl)
+	}
+	bandinfo.Path = append(bandinfo.Path, pos)
+	bandinfo.Path = append(bandinfo.Path, target)
+	bandinfo.Beh = BehPatrol
+	return bandinfo
+}
+
+func (dg *dgen) BandInfoPatrolSpecial(g *game, band monsterBand) bandInfo {
+	bandinfo := bandInfo{Kind: monsterBand(band)}
+	pos := InvalidPos
+	count := 0
+	for _, r := range dg.rooms {
+		count++
+		if count > 5 {
+			pos = dg.InsideCell(g)
+			break
+		}
+		pos = r.RandomPlace(PlacePatrolSpecial)
+		if pos != InvalidPos {
+			break
+		}
+	}
+	target := InvalidPos
+	count = 0
+	for _, r := range dg.rooms {
+		count++
+		if count > 5 {
+			target = dg.InsideCell(g)
+			break
+		}
+		target = r.RandomPlace(PlacePatrolSpecial)
+		if target != InvalidPos {
+			break
+		}
 	}
 	bandinfo.Path = append(bandinfo.Path, pos)
 	bandinfo.Path = append(bandinfo.Path, target)
@@ -2175,9 +2234,9 @@ func (dg *dgen) PutMonsterBand(g *game, band monsterBand) bool {
 	case SpecialLoneVampire, SpecialLoneNixe, SpecialLoneMilfid, SpecialLoneOricCelmist, SpecialLoneHarmonicCelmist, SpecialLoneHighGuard,
 		SpecialLoneHarpy, SpecialLoneTreeMushroom, SpecialLoneMirrorSpecter:
 		if RandInt(5) > 0 {
-			bdinf = dg.BandInfoPatrol(g, band, PlacePatrolSpecial)
+			bdinf = dg.BandInfoPatrolSpecial(g, band)
 		} else {
-			bdinf = dg.BandInfoGuard(g, band, PlacePatrolSpecial)
+			bdinf = dg.BandInfoGuardSpecial(g, band)
 		}
 	default:
 		bdinf = dg.BandInfoPatrol(g, band, PlacePatrol)
