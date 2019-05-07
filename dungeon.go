@@ -929,6 +929,9 @@ func (dg *dgen) NewRoom(rpos position, kind string) *room {
 	drev := 2
 	if r.w > r.h {
 		drev += r.w - r.h
+		if drev > 5 {
+			drev = 5
+		}
 	}
 	if RandInt(drev) == 0 {
 		switch RandInt(4) {
