@@ -1570,6 +1570,9 @@ func (dg *dgen) FoliageCell(g *game) position {
 		x := RandInt(DungeonWidth)
 		y := RandInt(DungeonHeight)
 		pos := position{x, y}
+		if pos.Distance(g.Player.Pos) < DefaultLOSRange {
+			continue
+		}
 		mons := g.MonsterAt(pos)
 		if mons.Exists() {
 			continue
