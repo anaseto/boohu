@@ -475,7 +475,7 @@ func (st story) Style(g *game) (r rune, fg uicolor) {
 		fg = ColorFgLOS
 		r = '.'
 	case StoryShaedra:
-		r = 'H'
+		r = 'S'
 	case StoryMarevor:
 		r = 'M'
 	case StoryArtifact:

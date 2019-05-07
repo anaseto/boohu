@@ -614,7 +614,7 @@ var roomBigTemplates = []string{RoomBigColumns, RoomBigGarden, RoomColumns, Room
 const (
 	CellShaedra1 = `
 #########
-#HMΔ#_!_#
+#SMΔ#_!_#
 ##|###|##
 +.G.P.G.+
 ##|###|##
@@ -627,7 +627,7 @@ const (
 ##|###|##
 +.G.P.G.+
 ##|###|##
-#_!_#HMΔ#
+#_!_#SMΔ#
 #########
 `
 	CellShaedra3 = `
@@ -636,12 +636,12 @@ const (
 ##|###|##
 +.G.P.G.+
 ##|###|##
-#HMΔ#_!_#
+#SMΔ#_!_#
 #########
 `
 	CellShaedra4 = `
 #########
-#_!_#HMΔ#
+#_!_#SMΔ#
 ##|###|##
 +.G.P.G.+
 ##|###|##
@@ -997,7 +997,7 @@ func (r *room) Dig(dg *dgen) {
 			if pos.valid() {
 				dg.d.SetCell(pos, FoliageCell)
 			}
-		case 'H':
+		case 'S':
 			r.places = append(r.places, place{pos: pos, kind: PlaceStory})
 			dg.spl.Shaedra = pos
 			dg.d.SetCell(pos, StoryCell)
