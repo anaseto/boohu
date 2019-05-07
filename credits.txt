@@ -1,30 +1,15 @@
-This file lists some great influences for many Boohu features.
+Boohu has been a source of inspiration for quite a few things in Harmonist,
+which should come as no surprise given that Harmonist is originally derived
+from the same code: LOS functionality is similar (for example for dense
+foliage, doors, ...)., many monsters/tiles/items are similar, length of the
+game is similar too, and both games take place in the same world. The core
+mechanics are very different, though, and lore is much more developed in
+Harmonist.
 
+See credits.txt in Boohu repository to see games that influenced directly
+Boohu.
 -----------------------------------------------------------------------
-DCSS is a source of inspiration for many things.
-
-Statuses: berserk, swift, agile, slow, exhaustion, lignification,
-corrosion, teletransportation, as well as a deeply positional confusion
-status from this tavern thread:
-
-	https://crawl.develz.org/tavern/viewtopic.php?f=17&t=24108&sid=cb465fe78aba3b9074a32efc2a835d80#p318813
-
-Many potions also come from there (sometimes replacing a scroll).
------------------------------------------------------------------------
-Brogue inspired spear/halberd attack pattern, as well as the axe/battle
-axe one (similar to DCSS, but no distinction between primary and
-secondary targets). Acid mounds also come from there. Dense foliage was
-inspired by Brogue's. It shares with Boohu a non-XP system, though Boohu
-does not have potions of strengh/life nor enchant scrolls: only
-aptitudes and immutable items.
------------------------------------------------------------------------
-There are two features inspired from Tome4, more precisely from minmay's
-Harbinger class (ligthning whip uses the ligthning arc idea), and from
-nsrr's white monk class (har-kar guantlets make a swift strike
-passively).
------------------------------------------------------------------------
-Automatic doors are inspired from Cogmind, but are open only if there is
-someone right on the door.
------------------------------------------------------------------------
-Magical stones are inspired from TGGW's pillars, even though the mechanics and
-effects are very different.
+Harmonist takes some inspiration from various non-roguelike stealth-games,
+though mainly for some simple mechanics (like cone of view for monsters from
+Commandos/Shadow Tactics-like games, or hiding in items like in Ghost of a
+Tale).
