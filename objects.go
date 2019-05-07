@@ -373,6 +373,7 @@ const (
 	ScrollBasics scroll = iota
 	ScrollStory
 	ScrollExtended
+	ScrollDayoriahMessage
 	ScrollLore
 )
 
@@ -380,10 +381,10 @@ func (sc scroll) ShortDesc(g *game) (desc string) {
 	switch sc {
 	case ScrollBasics:
 		desc = "the basics scroll"
-	case ScrollStory, ScrollExtended:
-		desc = "a story message"
-	default:
+	case ScrollLore:
 		desc = "a message"
+	default:
+		desc = "a story message"
 	}
 	return desc
 }
@@ -396,6 +397,10 @@ func (sc scroll) Text(g *game) (desc string) {
 		desc = "Your friend Shaedra got captured by nasty people from the Dayoriah Clan while she was trying to retrieve a powerful magara artifact that was stolen from the great magara-specialist Marevor Helith.\n\nAs a gawalt monkey, you don't understand much why people complicate so much their lives caring about artifacts and the like, but one thing is clear: you have to rescue your friend, somewhere to be found in this Underground area controlled by the Dayoriah Clan. If what you heard the guards say is true, Shaedra's imprisoned on the eighth floor.\n\nYou are small and have good night vision, so you hope the infiltration will go smoothly..."
 	case ScrollExtended:
 		desc = "Now that Shaedra's back to safety, you can either follow her advice, and get away from here too using the monolith portal, or you can finish the original mission: going deeper to find Marevor's powerful magara, before the Dayoriah Clan does bad experiments with it. You honestly didn't understand why it was dangerous, but Shaedra and Marevor had seemed truly concerned.\n\nMarevor said that he'll be able to create a new portal for you when you activate the artifact upon finding it."
+	case ScrollDayoriahMessage:
+		desc = `“The thief that infiltrated our turf and tried to retrieve our new acquisition has been captured. However, it is possible that she has an accomplice. Please be careful and stop every suspect.”
+
+[Order of a Dayoriah Clan's foreman, the paper is rather recent and you can't help but think the thief is actually Shaedra. So they really did capture her! You have to hurry and save her.]`
 	case ScrollLore:
 		i, ok := g.Objects.Lore[g.Player.Pos]
 		if !ok {

@@ -267,10 +267,6 @@ Does he think everyone here is just as happy and dreamy as he is? So naive it hu
 
 [Mimi the Guard]
 `,
-	`“The thief that infiltrated our turf and tried to retrieve our new acquisition has been captured. However, it is possible that she has an accomplice. Please be careful and stop every suspect.”
-
-[Order of a Dayoriah Clan's foreman, the paper is rather recent and you can't help but think the thief is actually Shaedra. So they really did capture her! You have to hurry and save her.]
-`,
 	`“What have you done, young novice? You are but weak, useless, worthless, and you still want to eat with us, the Dayoriah Guards? You don't seem to understand your place. Just crawl, crawl until we just see in you a mere worm. Maybe then, you'll get some leftovers.
 
 The worm who would climb the ladder must begin at the bottom.”

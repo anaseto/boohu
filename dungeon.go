@@ -1527,7 +1527,9 @@ loop:
 		}
 	}
 	g.Player.Pos = r.RandomPlace(PlacePatrol)
-	if g.Depth > 1 {
+	switch g.Depth {
+	case 1, 4:
+	default:
 		return
 	}
 	itpos := InvalidPos
@@ -1559,7 +1561,12 @@ loopnb:
 		}
 	}
 	g.Dungeon.SetCell(itpos, ScrollCell)
-	g.Objects.Scrolls[itpos] = ScrollStory
+	switch g.Depth {
+	case 1:
+		g.Objects.Scrolls[itpos] = ScrollStory
+	case 4:
+		g.Objects.Scrolls[itpos] = ScrollDayoriahMessage
+	}
 }
 
 func (dg *dgen) GenBanana(g *game) {
