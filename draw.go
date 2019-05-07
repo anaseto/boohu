@@ -983,7 +983,7 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 		fgColor = ColorFgDark
 		bgColor = ColorBgDark
 	}
-	if g.ExclusionsMap[pos] && c.T.IsPlayerPassable() { // XXX IsPassable
+	if g.ExclusionsMap[pos] && c.T.IsPlayerPassable() {
 		fgColor = ColorFgExcluded
 	}
 	if trkn, okTrkn := g.TerrainKnowledge[pos]; okTrkn && !g.Wizard {
@@ -1552,7 +1552,7 @@ func (ui *gameui) DrawMonsterDescription(mons *monster) {
 		info += " " + fmt.Sprint("They can swim.")
 	}
 	md := mons.Kind.MovementDelay()
-	switch { // XXX this can be improved
+	switch { // XXX this is no more useful: all monsters move at the same speed
 	case md == 10:
 	case md >= 20:
 		info += " " + fmt.Sprint("They move very slowly.")
@@ -1827,9 +1827,6 @@ func (ui *gameui) ReadScroll() error {
 		return errors.New("Internal error: no scroll found")
 	}
 	switch sc {
-	case ScrollBasics:
-		// XXX unused now
-		ui.DrawScrollBasics()
 	case ScrollLore:
 		ui.DrawDescription(sc.Text(ui.g), "Lore Message")
 		ui.g.Stats.Lore[ui.g.Depth] = true
@@ -1844,48 +1841,6 @@ func (ui *gameui) ReadScroll() error {
 	}
 	ui.g.Print("You read the message.")
 	return errors.New(DoNothing)
-}
-
-func (ui *gameui) DrawScrollBasics() {
-	// XXX remove?
-	ui.DrawDungeonView(NoFlushMode)
-	const margin = 5
-	l := 0
-	ui.ClearLine(l)
-	ui.DrawColoredText("Tutorial scroll: Basic commands", 1, l, ColorYellow)
-	l++
-	ui.ClearLine(l)
-	l++
-	ui.ClearLine(l)
-	ui.SetCell(2, l, '↑', ColorFgPlayer, ColorBg)
-	l++
-	ui.ClearLine(l)
-	ui.DrawColoredText("←↓→", 1, l, ColorFgPlayer)
-	ui.DrawText("Use the arrows to move around or jump over a monster.", margin, l-1)
-	l++
-	ui.ClearLine(l)
-	ui.DrawText("Jumping leaves you exhausted, unable to jump again for a few turns.", margin, l-1)
-	l += 2
-	ui.ClearLine(l - 1)
-	ui.ClearLine(l)
-	ui.SetCell(1, l, 'e', ColorFgPlayer, ColorBg)
-	ui.DrawText("You can interact with an object in your cell using the “e” key.", margin, l)
-	l++
-	ui.ClearLine(l)
-	ui.DrawText("Examples: read scroll, descend stairs, rest in barrel, ...", margin, l)
-	l++
-	ui.ClearLine(l)
-	ui.SetCell(1, l, 'v', ColorFgPlayer, ColorBg)
-	ui.DrawText("Evoke a magical magaras with “v”.", margin, l)
-	l++
-	ui.ClearLine(l)
-	ui.SetCell(1, l, '?', ColorFgPlayer, ColorBg)
-	ui.DrawText("You can see the key bindings for other actions by pressing “?”.", margin, l)
-
-	ui.DrawTextLine(" press (x) to continue ", l+2)
-	ui.Flush()
-	ui.WaitForContinue(l + 2)
-	ui.DrawDungeonView(NoFlushMode)
 }
 
 func (ui *gameui) ActionItem(i, lnum int, ka keyAction, fg uicolor) {

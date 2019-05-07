@@ -370,8 +370,7 @@ func (g *game) BarrierStone(ev event) error {
 type scroll int
 
 const (
-	ScrollBasics scroll = iota
-	ScrollStory
+	ScrollStory scroll = iota
 	ScrollExtended
 	ScrollDayoriahMessage
 	ScrollLore
@@ -379,8 +378,6 @@ const (
 
 func (sc scroll) ShortDesc(g *game) (desc string) {
 	switch sc {
-	case ScrollBasics:
-		desc = "the basics scroll"
 	case ScrollLore:
 		desc = "a message"
 	default:
@@ -391,8 +388,6 @@ func (sc scroll) ShortDesc(g *game) (desc string) {
 
 func (sc scroll) Text(g *game) (desc string) {
 	switch sc {
-	case ScrollBasics:
-		desc = "the basics scroll"
 	case ScrollStory:
 		desc = "Your friend Shaedra got captured by nasty people from the Dayoriah Clan while she was trying to retrieve a powerful magara artifact that was stolen from the great magara-specialist Marevor Helith.\n\nAs a gawalt monkey, you don't understand much why people complicate so much their lives caring about artifacts and the like, but one thing is clear: you have to rescue your friend, somewhere to be found in this Underground area controlled by the Dayoriah Clan. If what you heard the guards say is true, Shaedra's imprisoned on the eighth floor.\n\nYou are small and have good night vision, so you hope the infiltration will go smoothly..."
 	case ScrollExtended:

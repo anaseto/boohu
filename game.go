@@ -243,7 +243,7 @@ func (g *game) InitFirstLevel() {
 	g.Stats.Achievements = map[achievement]int{}
 	g.Stats.Lore = map[int]bool{}
 	g.Stats.Statuses = map[status]int{}
-	g.GenPlan = [MaxDepth + 1]genFlavour{ // XXX this is obsolete
+	g.GenPlan = [MaxDepth + 1]genFlavour{
 		1:  GenNothing,
 		2:  GenCloak,
 		3:  GenNothing,
