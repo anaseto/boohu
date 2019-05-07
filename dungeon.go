@@ -348,10 +348,10 @@ func (dg *dgen) ConnectRoomsShortestPath(i, j int) bool {
 }
 
 const (
-	RoomSquare = `
-?###+###?
-#_.....!#
-+..P!P..+
+	RoomAlmostSquare = `
+?###+##??
+#_.....#?
++..P!P.!#
 #!....._#
 ?###+###?`
 	RoomSquareBis = `
@@ -410,12 +410,12 @@ const (
 ???##+##???`
 )
 
-var roomNormalTemplates = []string{RoomSquare, RoomSquareBis, RoomRoundSimple, RoomLittle, RoomLittleDiamond, RoomLittleColumnDiamond, RoomRound, RoomLittleTreeDiamond, RoomRoundTree}
+var roomNormalTemplates = []string{RoomAlmostSquare, RoomSquareBis, RoomRoundSimple, RoomLittle, RoomLittleDiamond, RoomLittleColumnDiamond, RoomRound, RoomLittleTreeDiamond, RoomRoundTree}
 
 const (
 	RoomBigColumns = `
 ?####?#++#?####?
-#!.._##..##>..!#
+#!.._##..##!..>#
 ##.P........P.##
 +...._####_....+
 ##.P........P.##
@@ -463,15 +463,15 @@ const (
 ?##########+##
 `
 	RoomHome3 = `
-?###############?
-#>....|.........#
-#..P.!##|##!.P..+
-######!...!#....#
-+....|.P>._###|##
-######!...!#!...#
-#!...>##|##..P..+
-#..P......|.....#
-?###############?
+?#############?
+#>P.|.........#
+#..!##|##!.P..+
+####!...!#....#
++..|.P>._###|##
+####!...!#!...#
+#!.>##|##..P..+
+#.P.....|.....#
+?#############?
 `
 	RoomHome4 = `
 ?############?
@@ -484,9 +484,9 @@ const (
 ?###+########?
 `
 	RoomHome5 = `
-?????#########?
-????#!...>#..!#
-####>.....!#..#
+????##########?
+??###!...>#..!#
+?###>.....!#..#
 #P.#...P._.#.P+
 +..#_......#..+
 #..####|####..#
