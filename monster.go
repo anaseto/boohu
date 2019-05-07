@@ -1362,7 +1362,7 @@ func (m *monster) CreateBarrier(g *game, ev event) bool {
 	// TODO: add noise?
 	dir := g.Player.Pos.Dir(m.Pos)
 	candidates := g.BarrierCandidates(g.Player.Pos, dir)
-	wall := false
+	done := false
 	for _, pos := range candidates {
 		c := g.Dungeon.Cell(pos)
 		mons := g.MonsterAt(pos)
@@ -1370,16 +1370,26 @@ func (m *monster) CreateBarrier(g *game, ev event) bool {
 			continue
 		}
 		g.MagicalBarrierAt(pos, ev)
-		wall = true
+		done = true
 		g.Print("The oric celmist creates a barrier.")
 		break
 	}
-	if !wall {
+	if !done {
 		return false
 	}
 	ev.Renew(g, m.Kind.AttackDelay())
 	m.Exhaust(g)
 	return true
+}
+
+func (m *monster) Illuminate(g *game, ev event) bool {
+	if g.PutStatus(StatusIlluminated, DurationIlluminated) {
+		g.Print("The harmonic celmist casts a magical light on you.")
+		ev.Renew(g, m.Kind.AttackDelay())
+		m.Exhaust(g)
+		return true
+	}
+	return false
 }
 
 func (m *monster) VampireSpit(g *game, ev event) bool {
@@ -1497,10 +1507,7 @@ func (m *monster) SmitingAttack(g *game, ev event) bool {
 		//case MonsMindCelmist:
 		//return m.MindAttack(g, ev)
 	case MonsHarmonicCelmist:
-		if g.PutStatus(StatusIlluminated, DurationIlluminated) {
-			g.Print("The harmonic celmist casts a magical light on you.")
-			return true
-		}
+		return m.Illuminate(g, ev)
 	}
 	return false
 }
