@@ -350,10 +350,16 @@ func (dg *dgen) ConnectRoomsShortestPath(i, j int) bool {
 const (
 	RoomSquare = `
 ?###+###?
-#_..!.._#
-+..!P!..+
-#_..!.._#
+#_.....!#
++..P!P..+
+#!....._#
 ?###+###?`
+	RoomSquareBis = `
+?##?#+##?
+#_!#!.._#
+#..|.P.P+
+#_!#!.._#
+?##?#+##?`
 	RoomRoundSimple = `
 ??#+#??
 ?#!.!#?
@@ -366,11 +372,11 @@ const (
 ?#+#?
 #_._#
 +.P.+
-#_._#
+#_.!#
 ?#+#?`
 	RoomLittleDiamond = `
 ??#+#??
-##_._##
+##!._##
 +..P..+
 ##_._##
 ??#+#??`
@@ -389,7 +395,7 @@ const (
 	RoomRound = `
 ???##+##???
 ??#".P."#??
-##"._#_."##
+##".!#_."##
 +.P.###.P.+
 ##"._#_."##
 ??#".P."#??
@@ -399,17 +405,17 @@ const (
 ??#".P."#??
 ##"._._."##
 +.P..T..P.+
-##"._._."##
+##"._.!."##
 ??#".P."#??
 ???##+##???`
 )
 
-var roomNormalTemplates = []string{RoomSquare, RoomRoundSimple, RoomLittle, RoomLittleDiamond, RoomLittleColumnDiamond, RoomRound, RoomLittleTreeDiamond, RoomRoundTree}
+var roomNormalTemplates = []string{RoomSquare, RoomSquareBis, RoomRoundSimple, RoomLittle, RoomLittleDiamond, RoomLittleColumnDiamond, RoomRound, RoomLittleTreeDiamond, RoomRoundTree}
 
 const (
 	RoomBigColumns = `
 ?####?#++#?####?
-#!..>##..##>..!#
+#!.._##..##>..!#
 ##.P........P.##
 +...._####_....+
 ##.P........P.##
@@ -417,15 +423,15 @@ const (
 ?####?#++#?####?`
 	RoomBigGarden = `
 ?####?#++#?####?
-#""""##..##""""#
-#"T""".!P."""T"#
-#""""">P_>"""""#
-#"T""".!P."""T"#
-#""""##..##""""#
+#""""##..##....#
+#"T""".!P...~~.#
+#""""">P_>.~~~.#
+#"T""".!P...~~"#
+#""""##..##..""#
 ?####?#++#?####?`
 	RoomBigRooms = `
 ?####?#++#?####?
-#>..!##..##!..>#
+#_..!##..##!..>#
 #"""..#..#.."""#
 #"""P.|..|.P"""#
 #"""..#..#.."""#
@@ -478,13 +484,13 @@ const (
 ?###+########?
 `
 	RoomHome5 = `
-?######+######?
-#_...........!#
+?????#########?
+????#!...>#..!#
+####>.....!#..#
+#P.#...P._.#.P+
++..#_......#..+
 #..####|####..#
-+P.#!..P..>#.P+
-+..#>..P..!#..+
-#..####|####..#
-#!..........._#
+#!.....P....._#
 ?######+######?
 `
 	RoomCaban = `
@@ -533,11 +539,11 @@ const (
 ?????-???????`
 	RoomRoundColumns = `
 ???##+##???
-??#_..._#??
-##!.#P#.!##
+??#!...!#??
+##_.#P#._##
 +...P>P...+
-##!.#P#.!##
-??#_..._#??
+##_.#P#._##
+??#!...!#??
 ???##+##???`
 	RoomTriangle = `
 ?????#?????
@@ -557,19 +563,33 @@ const (
 +...P.!#
 #+#####?`
 	RoomCircleDouble = `
-???####+####???
-??#""..P..""#??
-?#""..#|#..""#?
-#"""!#!P!#!"""#
-#"._#.....#_."#
-#..#..>#>..#..#
-+.P|P.###.P|P.+
-#..#..>#>..#..#
-#"._#.....#_."#
-#"""!#!P!#!"""#
-?#""..#|#..""#?
-??#""..P..""#??
-???####+####???`
+???####+#???
+??#""..P#???
+?#""..#|#???
+#"""!#!P!#??
+#.._#.....#?
+#..#..>#>..#
++.P|P.###.P#
+#..#.._#>..#
+#"._#.....##
+#"""!#!P!#!#
+?#""..#|#..#
+??#"...P..#?
+???####+##??`
+	RoomGardenHome = `
+???#######???
+??#.#>#>#.#??
+?#!...P...!#?
+#...#._.#...#
+#_........._#
+######|######
++.....P..#_>#
++.......#!..#
+#######|#...#
+#""""..P|.P.#
+?#"T"...#...+
+??#""".!#!..#
+???#######+#?`
 	RoomAltar = `
 #+#??#######??#+#
 +P_##>..!..>##_P+
@@ -579,7 +599,7 @@ const (
 ???#####+#####???`
 	RoomRoundGarden = `
 ???##+##???
-??#>.P.>#??
+??#_.P.>#??
 ##!.""".!##
 +.P""T""P.+
 ##!.""".!##
@@ -595,12 +615,12 @@ const (
 ?###############?
 #""""".>!>."""""#
 +...P...P...P...+
-#""""".>!>."""""#
+#"""""._!>."""""#
 ?###############?`
 )
 
 var roomBigTemplates = []string{RoomBigColumns, RoomBigGarden, RoomColumns, RoomRoundColumns, RoomRoundGarden, RoomLongHall,
-	RoomGardenHall, RoomHome1, RoomHome2, RoomHome3, RoomHome4, RoomHome5, RoomTriangle, RoomSpiraling, RoomAltar, RoomCircleDouble, RoomBigRooms, RoomCaban, RoomDolmen, RoomRuins, RoomPillars}
+	RoomGardenHall, RoomHome1, RoomHome2, RoomHome3, RoomHome4, RoomHome5, RoomTriangle, RoomSpiraling, RoomAltar, RoomCircleDouble, RoomGardenHome, RoomBigRooms, RoomCaban, RoomDolmen, RoomRuins, RoomPillars}
 
 const (
 	CellShaedra = `
@@ -897,6 +917,10 @@ func (r *room) Dig(dg *dgen) {
 		case '"':
 			if pos.valid() {
 				dg.d.SetCell(pos, FoliageCell)
+			}
+		case '~':
+			if pos.valid() {
+				dg.d.SetCell(pos, WaterCell)
 			}
 		case 'S':
 			r.places = append(r.places, place{pos: pos, kind: PlaceStory})
