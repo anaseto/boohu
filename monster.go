@@ -76,7 +76,7 @@ const (
 	//MonsSkeletonWarrior
 	//MonsSpider
 	MonsWingedMilfid
-	MonsLich
+	//MonsLich
 	MonsEarthDragon
 	//MonsAcidMound
 	MonsExplosiveNadre
@@ -114,7 +114,7 @@ func (mk monsterKind) Dangerousness() int {
 func (mk monsterKind) Ranged() bool {
 	switch mk {
 	//case MonsLich, MonsCyclop, MonsHighGuard, MonsSatowalgaPlant, MonsMadNixe, MonsVampire, MonsTreeMushroom:
-	case MonsLich, MonsHighGuard, MonsSatowalgaPlant, MonsMadNixe, MonsVampire, MonsTreeMushroom:
+	case MonsHighGuard, MonsSatowalgaPlant, MonsMadNixe, MonsVampire, MonsTreeMushroom:
 		return true
 	default:
 		return false
@@ -142,7 +142,7 @@ func (mk monsterKind) Peaceful() bool {
 
 func (mk monsterKind) CanOpenDoors() bool {
 	switch mk {
-	case MonsGuard, MonsHighGuard, MonsMadNixe, MonsOricCelmist, MonsHarmonicCelmist, MonsLich, MonsVampire, MonsWingedMilfid:
+	case MonsGuard, MonsHighGuard, MonsMadNixe, MonsOricCelmist, MonsHarmonicCelmist, MonsVampire, MonsWingedMilfid:
 		return true
 	default:
 		return false
@@ -276,9 +276,9 @@ var MonsData = []monsterData{
 	//MonsHydra:           {10, 1, 10, 4, 'H', "hydra", 10},
 	//MonsSkeletonWarrior: {10, 1, 10, 3, 'S', "skeleton warrior", 6},
 	//MonsSpider:          {10, 1, 10, 2, 's', "spider", 6},
-	MonsWingedMilfid:   {10, MonsMedium, 'W', "winged milfid", 6},
-	MonsBlinkingFrog:   {10, MonsMedium, 'F', "blinking frog", 6},
-	MonsLich:           {10, MonsMedium, 'L', "lich", 15},
+	MonsWingedMilfid: {10, MonsMedium, 'W', "winged milfid", 6},
+	MonsBlinkingFrog: {10, MonsMedium, 'F', "blinking frog", 6},
+	//MonsLich:           {10, MonsMedium, 'L', "lich", 15},
 	MonsEarthDragon:    {10, MonsLarge, 'D', "earth dragon", 20},
 	MonsMirrorSpecter:  {10, MonsMedium, 'm', "mirror specter", 11},
 	MonsExplosiveNadre: {10, MonsMedium, 'n', "explosive nadre", 8},
@@ -307,9 +307,9 @@ var monsDesc = []string{
 	//MonsHydra:           "Hydras are enormous creatures with four heads that can hit you each at once.",
 	//MonsSkeletonWarrior: "Skeleton warriors are good fighters, clad in chain mail.",
 	//MonsSpider:          "Spiders are fast moving fragile creatures, whose bite can confuse you.",
-	MonsWingedMilfid:   "Winged milfids are fast moving humanoids that can fly over you and make you swap positions. They tend to be very agressive creatures.",
-	MonsBlinkingFrog:   "Blinking frogs are big frog-like creatures, whose bite can make you blink away. The science behind their attack is not clear, but many think it relies on some kind of oric deviation magic. They can jump to attack from below.",
-	MonsLich:           "Liches are non-living mages wearing a leather armour. They can throw a bolt of torment at you, halving your HP.",
+	MonsWingedMilfid: "Winged milfids are fast moving humanoids that can fly over you and make you swap positions. They tend to be very agressive creatures.",
+	MonsBlinkingFrog: "Blinking frogs are big frog-like creatures, whose bite can make you blink away. The science behind their attack is not clear, but many think it relies on some kind of oric deviation magic. They can jump to attack from below.",
+	//MonsLich:           "Liches are non-living mages wearing a leather armour. They can throw a bolt of torment at you, halving your HP.",
 	MonsEarthDragon:    "Earth dragons are big creatures from a dragon species that wander in the Underground. They are peaceful creatures, but they may hurt you inadvertently, pushing you up to 6 tiles away (3 if confused). They naturally emit powerful oric energies, allowing them to eat rocks and dig tunnels. Their oric energies can confuse you if you're close enough, for example if they hurt you or you jump over them.",
 	MonsMirrorSpecter:  "Mirror specters are very insubstantial creatures, which can absorb your mana.",
 	MonsExplosiveNadre: "Nadres are dragon-like biped creatures that are famous for exploding upon dying. Explosive nadres are a tiny nadre race that explodes upon attacking. The explosion confuses any adjacent creatures and occasionally destroys walls.",
@@ -1265,8 +1265,8 @@ func (m *monster) RangedAttack(g *game, ev event) bool {
 		return false
 	}
 	switch m.Kind {
-	case MonsLich:
-		return m.TormentBolt(g, ev)
+	//case MonsLich:
+	//return m.TormentBolt(g, ev)
 	case MonsHighGuard:
 		return m.ThrowJavelin(g, ev)
 	case MonsSatowalgaPlant:
@@ -1300,27 +1300,27 @@ func (m *monster) RangeBlocked(g *game) bool {
 	return false
 }
 
-func (m *monster) TormentBolt(g *game, ev event) bool {
-	blocked := m.RangeBlocked(g)
-	if blocked {
-		return false
-	}
-	g.MakeNoise(MagicCastNoise, m.Pos)
-	if RandInt(3) > 0 {
-		damage := g.Player.HP / 2
-		g.PrintfStyled("%s throws a bolt of torment at you.", logMonsterHit, m.Kind.Definite(true))
-		g.ui.MonsterProjectileAnimation(g.Ray(m.Pos), '*', ColorCyan)
-		g.MakeNoise(MagicHitNoise, g.Player.Pos)
-		m.InflictDamage(g, damage, 1)
-	} else {
-		g.Printf("You dodge the %s's bolt of torment.", m.Kind)
-		g.ui.MonsterProjectileAnimation(g.Ray(m.Pos), '*', ColorCyan)
-		// TODO: hit monster behind?
-	}
-	m.Exhaust(g)
-	ev.Renew(g, m.Kind.AttackDelay())
-	return true
-}
+//func (m *monster) TormentBolt(g *game, ev event) bool {
+//blocked := m.RangeBlocked(g)
+//if blocked {
+//return false
+//}
+//g.MakeNoise(MagicCastNoise, m.Pos)
+//if RandInt(3) > 0 {
+//damage := g.Player.HP / 2
+//g.PrintfStyled("%s throws a bolt of torment at you.", logMonsterHit, m.Kind.Definite(true))
+//g.ui.MonsterProjectileAnimation(g.Ray(m.Pos), '*', ColorCyan)
+//g.MakeNoise(MagicHitNoise, g.Player.Pos)
+//m.InflictDamage(g, damage, 1)
+//} else {
+//g.Printf("You dodge the %s's bolt of torment.", m.Kind)
+//g.ui.MonsterProjectileAnimation(g.Ray(m.Pos), '*', ColorCyan)
+//// TODO: hit monster behind?
+//}
+//m.Exhaust(g)
+//ev.Renew(g, m.Kind.AttackDelay())
+//return true
+//}
 
 func (g *game) BarrierCandidates(pos position, todir direction) []position {
 	candidates := pos.ValidCardinalNeighbors()
