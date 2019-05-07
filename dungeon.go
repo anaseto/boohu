@@ -337,7 +337,7 @@ func (dg *dgen) ConnectRoomsShortestPath(i, j int) bool {
 			panic(fmt.Sprintf("position %v from %v to %v", pos, e1pos, e2pos))
 		}
 		t := dg.d.Cell(pos).T
-		if t == WallCell || t == ChasmCell {
+		if t == WallCell || t == ChasmCell || t == GroundCell || t == FoliageCell {
 			dg.d.SetCell(pos, GroundCell)
 			dg.tunnel[pos] = true
 		}
@@ -918,6 +918,10 @@ func (r *room) Dig(dg *dgen) {
 			if pos.valid() {
 				dg.d.SetCell(pos, FoliageCell)
 			}
+		case ',':
+			if pos.valid() {
+				dg.d.SetCell(pos, CavernCell)
+			}
 		case '~':
 			if pos.valid() {
 				dg.d.SetCell(pos, WaterCell)
@@ -1282,6 +1286,19 @@ func (g *game) GenRoomTunnels(ml maplayout) {
 		return pos.valid() && g.Dungeon.Cell(pos).IsPassable()
 	})
 	dg.GenMonsters(g)
+	dg.PutCavernCells(g)
+
+}
+
+func (dg *dgen) PutCavernCells(g *game) {
+	d := dg.d
+	// TODO: improve handling and placement of this
+	for i, c := range d.Cells {
+		pos := idxtopos(i)
+		if c.T == GroundCell && !dg.room[pos] && !dg.tunnel[pos] {
+			d.SetCell(pos, CavernCell)
+		}
+	}
 }
 
 func (dg *dgen) ClearUnconnected(g *game) {

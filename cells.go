@@ -32,6 +32,7 @@ const (
 	ChasmCell
 	WaterCell
 	RubbleCell
+	CavernCell
 )
 
 func (c cell) IsPassable() bool {
@@ -161,7 +162,7 @@ func (c cell) Flammable() bool {
 
 func (c cell) IsGround() bool {
 	switch c.T {
-	case GroundCell:
+	case GroundCell, CavernCell:
 		return true
 	default:
 		return false
@@ -182,7 +183,7 @@ func (c cell) ShortDesc(g *game, pos position) (desc string) {
 	case WallCell:
 		desc = "a wall"
 	case GroundCell:
-		desc = "the ground"
+		desc = "paved ground"
 	case DoorCell:
 		desc = "a door"
 	case FoliageCell:
@@ -223,6 +224,8 @@ func (c cell) ShortDesc(g *game, pos position) (desc string) {
 		desc = "shallow water"
 	case RubbleCell:
 		desc = "rubblestone"
+	case CavernCell:
+		desc = "cave ground"
 	}
 	return desc
 }
@@ -232,7 +235,7 @@ func (c cell) Desc(g *game, pos position) (desc string) {
 	case WallCell:
 		desc = "A wall is a pile of rocks."
 	case GroundCell:
-		desc = "This is just plain ground."
+		desc = "This is paved ground."
 	case DoorCell:
 		desc = "A closed door blocks your line of sight. Doors open automatically when you or a creature stand on them."
 	case FoliageCell:
@@ -273,6 +276,8 @@ func (c cell) Desc(g *game, pos position) (desc string) {
 		desc = "Shallow water."
 	case RubbleCell:
 		desc = "Rubblestone is a collection of rocks broken into smaller stones."
+	case CavernCell:
+		desc = "This is natural cave ground."
 	}
 	var autodesc string
 	if !c.T.IsPlayerPassable() {
@@ -349,6 +354,8 @@ func (c cell) Style(g *game, pos position) (r rune, fg uicolor) {
 		r, fg = '≈', ColorFgLOS
 	case RubbleCell:
 		r, fg = '^', ColorFgLOS
+	case CavernCell:
+		r, fg = ',', ColorFgLOS
 	}
 	return r, fg
 }
