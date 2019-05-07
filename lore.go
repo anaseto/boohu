@@ -166,7 +166,7 @@ After so many days… guess I'd be better off not coming back.”
  no one's life for me to steal
  please, come back, and pay the bill.”
 
-[Fragment of a poem entitled The Greedy Raven, the rest of the letters have faded]
+[Fragment of a poem entitled The Greedy Raven, the rest of the letters have faded.]
 `,
 	`“If you want to live on, run away and go home,
 if you want to say hello, it's this way, come on, come…”
