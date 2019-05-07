@@ -548,15 +548,6 @@ const (
 +..P...P..+
 ##_..P.._##
 ??###+###??`
-	RoomRevTriangle = `
-??###+###??
-##_..P.._##
-+..P...P..+
-##!.#.#.!##
-??#_..._#??
-???#!.!#???
-????#>#????
-?????#?????`
 	RoomSpiraling = `
 ?#####+#
 #!.P...+
@@ -609,39 +600,12 @@ const (
 )
 
 var roomBigTemplates = []string{RoomBigColumns, RoomBigGarden, RoomColumns, RoomRoundColumns, RoomRoundGarden, RoomLongHall,
-	RoomGardenHall, RoomHome1, RoomHome2, RoomHome3, RoomHome4, RoomHome5, RoomTriangle, RoomRevTriangle, RoomSpiraling, RoomAltar, RoomCircleDouble, RoomBigRooms, RoomCaban, RoomDolmen, RoomRuins, RoomPillars}
+	RoomGardenHall, RoomHome1, RoomHome2, RoomHome3, RoomHome4, RoomHome5, RoomTriangle, RoomSpiraling, RoomAltar, RoomCircleDouble, RoomBigRooms, RoomCaban, RoomDolmen, RoomRuins, RoomPillars}
 
 const (
-	CellShaedra1 = `
+	CellShaedra = `
 #########
 #SMΔ#_!_#
-##|###|##
-+.G.P.G.+
-##|###|##
-#_!_#_!_#
-#########
-`
-	CellShaedra2 = `
-#########
-#_!_#_!_#
-##|###|##
-+.G.P.G.+
-##|###|##
-#_!_#SMΔ#
-#########
-`
-	CellShaedra3 = `
-#########
-#_!_#_!_#
-##|###|##
-+.G.P.G.+
-##|###|##
-#SMΔ#_!_#
-#########
-`
-	CellShaedra4 = `
-#########
-#_!_#SMΔ#
 ##|###|##
 +.G.P.G.+
 ##|###|##
@@ -652,7 +616,7 @@ const (
 
 // TODO: add indestructible walls?
 
-var roomCellTemplates = []string{CellShaedra1, CellShaedra2, CellShaedra3, CellShaedra4}
+var roomCellTemplates = []string{CellShaedra}
 
 const (
 	RoomArtifact = `
@@ -681,17 +645,6 @@ const (
 ##_#.......#_##
 ??#!...P...!#??
 ???####+####???`
-	RoomSpecialVampiresVRev = `
-???####+####???
-??#!...P...!#??
-##_#.......#_##
-+.P.........P.+
-#..#.G...G.#..#
-#.....#!#.....#
-#..#...>...#..#
-#!...G.#.G...!#
-?##>.......>##?
-???#########???`
 	RoomSpecialNixes = `
 ?#####+#####?
 #>.G.#.#.G.>#
@@ -712,26 +665,6 @@ const (
 ??.......?..-
 ????!.G...P??
 ????????-????`
-	RoomSpecialMilfidsVRev = `
-????????-????
-????!.G...P??
-??.......?..-
-?.?._#>#.??.?
--P.G.>#>G...?
-?.?.?#>#.?.??
-??..!?G._?..?
-???......P.??
-?????????-???`
-	RoomSpecialMilfidsRev = `
-???-?????????
-??.P......???
-?..?_.G?!..??
-??.?.#>#?.?.?
-?...G>#>.G.P-
-?.??.#>#_.?.?
--..?.......??
-??P...G.!????
-????-????????`
 	RoomSpecialTreeMushrooms = `
 ?????"--.???????
 ???"""..G."""???
@@ -741,24 +674,6 @@ const (
 -...!..T>T._"".-
 -P.???..G..""""?
 .-???????.-?????`
-	RoomSpecialTreeMushroomsVRev = `
-.-???????.-?????
--P.???..G..""""?
--...!..T>T._"".-
-?..G.T..!..T..P-
-??.....T>T..G..?
-???""?....!"""??
-???"""..G."""???
-?????"--.???????`
-	RoomSpecialTreeMushroomsRev = `
-???????.--"?????
-???""".G.."""???
-??"""!....?""???
-?..G..T>T.....??
--P..T..!..T.G..?
--.""_.T>T..!...-
-?""""..G..???.P-
-?????-.???????-.`
 	RoomSpecialHarpies = `
 ?-????##??????
 ?P???#..#?????
@@ -769,36 +684,6 @@ const (
 ??.#.G_.._#>#?
 ??P?#.>###?#??
 ??-??##???????`
-	RoomSpecialHarpiesVRev = `
-??-??##???????
-??P?#.>###?#??
-??.#.G_.._#>#?
--G........!..#
-?.?#.._....G.#
-?.??#...##.>#?
-?.???#G.>####?
-?P???#..#?????
-?-????##??????`
-	RoomSpecialHarpiesRev = `
-??????##????-?
-?????#..#???P?
-?####>.G#???.?
-?#>.##...#??.?
-#.G...._..#?.?
-#..!........G-
-?#>#_.._G.#.??
-??#?###>.#?P??
-???????##??-??`
-	RoomSpecialHarpiesRevVRev = `
-???????##??-??
-??#?###>.#?P??
-?#>#_.._G.#.??
-#..!........G-
-#.G...._..#?.?
-?#>.##...#??.?
-?####>.G#???.?
-?????#..#???P?
-??????##????-?`
 	RoomSpecialCelmists = `
 ?#############+##?
 #>#_.......>#.P._#
@@ -808,15 +693,6 @@ const (
 ##..G!#!G..##....#
 #>.........>#.P._#
 ?#############+##?`
-	RoomSpecialCelmistsRev = `
-?##+#############?
-#_.P.#>......._#>#
-#....##..G!#!G...#
-+P...|....###....#
-+P...|....###..._#
-#....##..G!#!G..##
-#_.P.#>.........>#
-?##+#############?`
 	RoomSpecialCelmists2 = `
 ?##+#########+##?
 #_#.....G.....#_#
@@ -837,16 +713,6 @@ const (
 ????#!.....!#????
 ?????#>#>#>#?????
 ??????#?#?#??????`
-	RoomSpecialCelmists3Rev = `
-??????#?#?#??????
-?????#>#>#>#?????
-????#!.....!#????
-???#..G...G..#???
-??#!._#._.#_.!#??
-?#....G...G....#?
-##|##W#|||#W##|##
-+.P|....P....|P.+
-########-########`
 	RoomSpecialMirrorSpecters = `
 ########-#########
 -P.....W.W......P-
@@ -857,16 +723,6 @@ const (
 #.G.#..#.G.#.#.G.#
 #................#
 ##################`
-	RoomSpecialMirrorSpecters2 = `
-##################
-#................#
-#.G.#..#.G.#.#.G.#
-#>.!W..W>!>W.W!.>#
-##W##..##W##.##W##
--P......G.......P-
-##W##_.#.#._###W##
--P.....W.W......P-
-########-#########`
 )
 
 type specialRoom int
@@ -887,19 +743,19 @@ const (
 func (sr specialRoom) Templates() (tpl []string) {
 	switch sr {
 	case roomMilfids:
-		tpl = append(tpl, RoomSpecialMilfids, RoomSpecialMilfidsRev, RoomSpecialMilfidsVRev)
+		tpl = append(tpl, RoomSpecialMilfids)
 	case roomVampires:
-		tpl = append(tpl, RoomSpecialVampires, RoomSpecialVampiresVRev)
+		tpl = append(tpl, RoomSpecialVampires)
 	case roomCelmists:
-		tpl = append(tpl, RoomSpecialCelmists, RoomSpecialCelmistsRev, RoomSpecialCelmists2, RoomSpecialCelmists3, RoomSpecialCelmists3Rev)
+		tpl = append(tpl, RoomSpecialCelmists, RoomSpecialCelmists2, RoomSpecialCelmists3)
 	case roomNixes:
 		tpl = append(tpl, RoomSpecialNixes)
 	case roomHarpies:
-		tpl = append(tpl, RoomSpecialHarpies, RoomSpecialHarpiesRev, RoomSpecialHarpiesVRev, RoomSpecialHarpiesRevVRev)
+		tpl = append(tpl, RoomSpecialHarpies)
 	case roomTreeMushrooms:
-		tpl = append(tpl, RoomSpecialTreeMushrooms, RoomSpecialTreeMushroomsRev, RoomSpecialTreeMushroomsVRev)
+		tpl = append(tpl, RoomSpecialTreeMushrooms)
 	case roomMirrorSpecters:
-		tpl = append(tpl, RoomSpecialMirrorSpecters, RoomSpecialMirrorSpecters2)
+		tpl = append(tpl, RoomSpecialMirrorSpecters)
 	case roomShaedra:
 		tpl = roomCellTemplates
 	case roomArtifact:
@@ -909,19 +765,64 @@ func (sr specialRoom) Templates() (tpl []string) {
 }
 
 func (r *room) ComputeDimensions() {
-	x := 0
-	y := 0
-	for _, c := range r.kind {
-		if c == '\n' {
-			if x > r.w {
-				r.w = x
-			}
-			x = 0
-			y++
-		}
-		x++
+	lines := strings.Split(r.kind, "\n")
+	r.w = len([]rune(lines[0]))
+	r.h = len(lines)
+}
+
+func (r *room) VRev() {
+	lines := strings.Split(r.kind, "\n")
+	for i, j := 0, len(lines)-1; i < j; i, j = i+1, j-1 {
+		lines[i], lines[j] = lines[j], lines[i]
 	}
-	r.h = y + 1
+	r.kind = strings.Join(lines, "\n")
+}
+
+func (r *room) DRev() {
+	lines := strings.Split(r.kind, "\n")
+	runelines := make([][]rune, len(lines))
+	for i, s := range lines {
+		runelines[i] = []rune(s)
+	}
+	nrunes := make([]rune, 0, len(r.kind))
+	for x := 0; x < r.w; x++ {
+		for y := 0; y < r.h; y++ {
+			nrunes = append(nrunes, runelines[y][x])
+		}
+		nrunes = append(nrunes, '\n')
+	}
+	r.kind = strings.TrimSpace(string(nrunes))
+	r.h, r.w = r.w, r.h
+}
+
+func (r *room) DVRev() {
+	r.DRev()
+	r.VRev()
+}
+
+func (r *room) VDRev() {
+	r.VRev()
+	r.DRev()
+}
+
+func (r *room) VDVRev() {
+	r.VRev()
+	r.DRev()
+	r.VRev()
+}
+
+func (r *room) DVDRev() {
+	r.DRev()
+	r.VRev()
+	r.DRev()
+}
+
+func (r *room) DVDVRev() {
+	// TODO: optimize? (it's just reverse string)
+	r.DRev()
+	r.VRev()
+	r.DRev()
+	r.VRev()
 }
 
 func (r *room) HasSpace(dg *dgen) bool {
@@ -1025,6 +926,32 @@ func (dg *dgen) NewRoom(rpos position, kind string) *room {
 	r := &room{pos: rpos, kind: kind}
 	r.kind = strings.TrimSpace(r.kind)
 	r.ComputeDimensions()
+	drev := 2
+	if r.w > r.h {
+		drev += r.w - r.h
+	}
+	if RandInt(drev) == 0 {
+		switch RandInt(4) {
+		case 0:
+			r.DRev()
+		case 1:
+			r.VDVRev()
+		case 2:
+			r.VDRev()
+		case 3:
+			r.DVRev()
+		}
+	} else {
+		switch RandInt(4) {
+		case 0:
+			r.VRev()
+		case 1:
+			r.DVDRev()
+		case 2:
+			r.DVDVRev()
+		case 3:
+		}
+	}
 	if !r.HasSpace(dg) {
 		return nil
 	}
