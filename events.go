@@ -445,7 +445,7 @@ const (
 	DurationConfusion              = 120
 	DurationConfusionPlayer        = 50
 	DurationLignification          = 120
-	DurationLignificationPlayer    = 30
+	DurationLignificationPlayer    = 40
 	DurationMagicalBarrier         = 150
 	DurationObstructionProgression = 150
 	DurationSmokingCloakFog        = 20
