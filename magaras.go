@@ -41,7 +41,7 @@ func (mag magara) Harmonic() bool {
 
 func (mag magara) Oric() bool {
 	switch mag {
-	case BlinkMagara, DigMagara, TeleportMagara, SwiftnessMagara, LevitationMagara, TeleportOtherMagara, SwappingMagara, ObstructionMagara:
+	case BlinkMagara, DigMagara, TeleportMagara, LevitationMagara, TeleportOtherMagara, SwappingMagara, ObstructionMagara:
 		return true
 	default:
 		return false
@@ -219,13 +219,13 @@ func (mag magara) Desc(g *game) (desc string) {
 	case NoMagara:
 		desc = "can be used for a new magara."
 	case BlinkMagara:
-		desc = "makes you blink away within your line of sight. The rod is more susceptible to send you to the cells thar are most far from you."
+		desc = "makes you blink away within your line of sight by using an oric energy disturbance. The rod is more susceptible to send you to the cells that are most far from you."
 	case DigMagara:
 		desc = "makes you dig walls by walking into them like an earth dragon thanks to destructive oric magic."
 	case TeleportMagara:
 		desc = "creates an oric energy disturbance, making you teleport far away on the same level."
 	case SwiftnessMagara:
-		desc = "makes you move faster for a short time by filling you with energies."
+		desc = "makes you move faster for a short time by giving a boost to your jaipu energies."
 	case LevitationMagara:
 		desc = "makes you levitate with oric energies, allowing you to move over chasms, as well as through oric barriers."
 	case FireMagara:

@@ -437,7 +437,7 @@ const (
 	DurationLevitation             = 180
 	DurationShortSwiftness         = 30
 	DurationDigging                = 80
-	DurationSlow                   = 150
+	DurationSlow                   = 170
 	DurationSleepSlow              = 40
 	DurationCloudProgression       = 10
 	DurationFog                    = 150
