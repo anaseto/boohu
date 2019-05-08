@@ -1963,9 +1963,9 @@ func (dg *dgen) Foliage(less bool) {
 	// walls will become foliage
 	d := &dungeon{}
 	d.Cells = make([]cell, DungeonNCells)
-	limit := 43
+	limit := 45
 	if less {
-		limit = 40
+		limit = 43
 	}
 	for i := range d.Cells {
 		r := RandInt(100)

@@ -89,14 +89,17 @@ func (tp *tunnelPath) Cost(from, to position) int {
 		return 50
 	}
 	cost := 1
+	c := tp.dg.d.Cell(from)
 	if tp.dg.room[from] {
-		cost += 5
+		cost += 7
+	} else if !tp.dg.tunnel[from] && c.T != GroundCell {
+		cost++
 	}
-	if tp.dg.d.Cell(from).IsPassable() {
+	if c.IsPassable() {
 		return cost
 	}
 	wc := tp.dg.WallAreaCount(tp.area[:0], from, 1)
-	return cost + 9 - wc
+	return cost + 8 - wc
 }
 
 func (tp *tunnelPath) Estimation(from, to position) int {
