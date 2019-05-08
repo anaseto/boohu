@@ -13,3 +13,8 @@ Harmonist takes some inspiration from various non-roguelike stealth-games,
 though mainly for some simple mechanics (like cone of view for monsters from
 Commandos/Shadow Tactics-like games, or hiding in items like in Ghost of a
 Tale).
+-----------------------------------------------------------------------
+Also, reading stuff about roguelikes here and there, in particular in the
+/r/roguelikedev subreddit where I've been sharing updates on the game, has
+without a doubt greatly influenced Harmonist in many ways, from UI ideas to
+gameplay ones.
