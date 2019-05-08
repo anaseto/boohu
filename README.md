@@ -1,6 +1,5 @@
 **This sealth branch is an experiment for a stealth focused variant of Boohu.
-In case it actually becomes something, it would be a different game
-(Harmonist).**
+It's going to be called Harmonist. Work in progress.**
 
 Harmonist is a stealth coffee-break roguelike game.  The game has a heavy focus
 on tactical positioning, light and noise mechanisms, making use of various
