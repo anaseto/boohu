@@ -1045,11 +1045,11 @@ func (m *monster) InvertFoliage(g *game) {
 	}
 	invert := false
 	c := g.Dungeon.Cell(m.Pos)
-	if c.T == GroundCell {
+	if c.T == CavernCell {
 		g.Dungeon.SetCell(m.Pos, FoliageCell)
 		invert = true
 	} else if c.T == FoliageCell {
-		g.Dungeon.SetCell(m.Pos, GroundCell)
+		g.Dungeon.SetCell(m.Pos, CavernCell)
 		invert = true
 	}
 	if invert {
