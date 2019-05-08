@@ -247,7 +247,7 @@ func (mp *monPath) Cost(from, to position) int {
 	if mons.Status(MonsLignified) {
 		return 8
 	}
-	return 4
+	return 6
 }
 
 func (mp *monPath) Estimation(from, to position) int {
