@@ -44,6 +44,15 @@ func (c cell) IsPassable() bool {
 	}
 }
 
+func (c cell) IsNormalPatrolWay() bool {
+	switch c.T {
+	case GroundCell, ScrollCell, DoorCell, StairCell, LightCell, ItemCell, ExtinguishedLightCell, StoneCell, MagaraCell:
+		return true
+	default:
+		return false
+	}
+}
+
 func (c cell) IsLevitatePassable() bool {
 	switch c.T {
 	case ChasmCell:

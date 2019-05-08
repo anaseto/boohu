@@ -239,6 +239,9 @@ func (mp *monPath) Cost(from, to position) int {
 				return 4
 			}
 		}
+		if mp.monster.Kind.Patrolling() && mp.monster.State != Hunting && !c.IsNormalPatrolWay() {
+			return 4
+		}
 		return 1
 	}
 	if mons.Status(MonsLignified) {
