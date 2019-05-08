@@ -95,7 +95,7 @@ func (g *game) losCost(from, pos, to position, rs raystyle) int {
 		return wallcost
 	}
 	if from == pos {
-		if g.DiagonalDifficult(pos, to) {
+		if rs != TreePlayerRay && g.DiagonalDifficult(pos, to) {
 			return wallcost - 1
 		}
 		return to.Distance(pos) - 1
@@ -282,7 +282,6 @@ func (m *monster) ComputeLOS(g *game) {
 			}
 		}
 	}
-	//g.ComputeLights() // XXX maybe we can get without this for monsters, it shouldn't be very player-visible
 }
 
 func (g *game) SeePosition(pos position) {
