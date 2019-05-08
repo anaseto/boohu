@@ -248,7 +248,7 @@ func (c cell) Desc(g *game, pos position) (desc string) {
 	case DoorCell:
 		desc = "A closed door blocks your line of sight. Doors open automatically when you or a creature stand on them."
 	case FoliageCell:
-		desc = "Blue dense foliage grows in the Underground. It is difficult to see through."
+		desc = "Blue dense foliage grows in Hareka's Underground. It is difficult to see through."
 	case BarrelCell:
 		desc = "A barrel. You can hide yourself inside it when no creatures see you. It is a safe place for resting and recovering."
 	case StoneCell:

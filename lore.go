@@ -135,7 +135,7 @@ After so many days… guess I'd be better off not coming back.”
 `,
 	`“Earth is warm and sun is bright,
  I will never lose your sight.
- Even deep in the Undergrounds,
+ Even deep in the Underground,
  I will have you in my heart,
  deep down in my sunny past.”
 
@@ -157,7 +157,7 @@ After so many days… guess I'd be better off not coming back.”
 
 [Piece of thick paper, anonym]
 `,
-	`“Someone told me that was a good place to find bananas. I thought he was joking. But now that I'm here, I know he wasn't. The Undergrounds banana trees are so rare! They don't seem to even need a source of moonstone light. That's my chance to shine! I'll keep studying them as much as I can.”
+	`“Someone told me that was a good place to find bananas. I thought he was joking. But now that I'm here, I know he wasn't. The Underground banana trees are so rare! They don't seem to even need a source of moonstone light. That's my chance to shine! I'll keep studying them as much as I can.”
 
 [The rest of the paper is full of signs you don't understand. It's not Abrianese. You sigh: those saijits really make things complicated…]
 `,
