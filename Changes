@@ -1,3 +1,22 @@
 v0.1-dev
 
 First release of Harmonist: Dayoriah Clan Infiltration.
+
+Features:
+
+- Short coffee-break runs (around half an hour).
+- 8 levels deep dungeon (+ 3 optional levels), 3 distinct map generators, 19
+  monsters, 6 magical cloaks, 6 magical amulets, and 16 magaras (evokable
+  magical items).
+- Both graphical tiles (web or Tk) and terminal ASCII versions. Animations.
+  Simple controls.  Mouse support.  Mouse-friendly 100x26 layout, and
+  traditional compact 80x24 layout.  Automatic recording for later replay.
+- Light and noise stealth mechanics. Monster footsteps can be heared.
+- A main story narrative, and many short lore texts.
+- No XP, no upstairs, no automatic regeneration, no grinding/farming.
+- Fully destructible terrain (wall destruction, foliage fire).
+- Simplified inventory management (e.g. no more than one cloak or amulet).
+- Many terrain features: dense foliage, doors, tables, barrels, windows, holes
+  in the walls, trees, chasm, …
+- 9 distinct magical stones that may be activated once with some special
+  magical effect.
