@@ -89,6 +89,8 @@ palette is used. Configurations are available for most terminal emulators,
 otherwise, colors may have to be configured manually to one's liking in
 the terminal emulator options.
 
+Check also the other color options.
+
 Documentation
 -------------
 
