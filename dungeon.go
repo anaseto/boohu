@@ -1580,12 +1580,12 @@ func (dg *dgen) OutsideGroundCell(g *game) position {
 	}
 }
 
-func (dg *dgen) OutsideGroundMiddleCell(g *game) position {
+func (dg *dgen) OutsideCavernMiddleCell(g *game) position {
 	count := 0
 	for {
 		count++
 		if count > 2000 {
-			panic("OutsideGroundMiddleCell")
+			panic("OutsideCavernMiddleCell")
 		}
 		x := RandInt(DungeonWidth)
 		y := RandInt(DungeonHeight)
@@ -1595,7 +1595,34 @@ func (dg *dgen) OutsideGroundMiddleCell(g *game) position {
 			continue
 		}
 		c := dg.d.Cell(pos)
-		if c.T == GroundCell && !dg.room[pos] && !dg.d.HasTooManyWallNeighbors(pos) {
+		if c.T == GroundCell && count < 400 || c.T == FoliageCell && count < 350 {
+			continue
+		}
+		if (c.IsGround() || c.T == FoliageCell) && !dg.room[pos] && !dg.d.HasTooManyWallNeighbors(pos) {
+			return pos
+		}
+	}
+}
+
+func (dg *dgen) SatowalgaCell(g *game) position {
+	count := 0
+	for {
+		count++
+		if count > 2000 {
+			panic("SatowalgaCell")
+		}
+		x := RandInt(DungeonWidth)
+		y := RandInt(DungeonHeight)
+		pos := position{x, y}
+		mons := g.MonsterAt(pos)
+		if mons.Exists() {
+			continue
+		}
+		c := dg.d.Cell(pos)
+		if c.T == GroundCell && count < 400 {
+			continue
+		}
+		if c.IsGround() && !dg.room[pos] && !dg.d.HasTooManyWallNeighbors(pos) {
 			return pos
 		}
 	}
@@ -1776,7 +1803,7 @@ func (dg *dgen) GenTable(g *game) {
 }
 
 func (dg *dgen) GenTree(g *game) {
-	pos := dg.OutsideGroundMiddleCell(g)
+	pos := dg.OutsideCavernMiddleCell(g)
 	g.Dungeon.SetCell(pos, TreeCell)
 }
 
@@ -2242,9 +2269,9 @@ func (dg *dgen) BandInfoOutsideGround(g *game, band monsterBand) bandInfo {
 	return bandinfo
 }
 
-func (dg *dgen) BandInfoOutsideGroundMiddle(g *game, band monsterBand) bandInfo {
+func (dg *dgen) BandInfoSatowalga(g *game, band monsterBand) bandInfo {
 	bandinfo := bandInfo{Kind: monsterBand(band)}
-	bandinfo.Path = append(bandinfo.Path, dg.OutsideGroundMiddleCell(g))
+	bandinfo.Path = append(bandinfo.Path, dg.SatowalgaCell(g))
 	bandinfo.Beh = BehWander
 	return bandinfo
 }
@@ -2317,7 +2344,7 @@ func (dg *dgen) PutMonsterBand(g *game, band monsterBand) bool {
 	case LoneHighGuard:
 		bdinf = dg.BandInfoGuard(g, band, PlacePatrol)
 	case LoneSatowalgaPlant:
-		bdinf = dg.BandInfoOutsideGroundMiddle(g, band)
+		bdinf = dg.BandInfoSatowalga(g, band)
 	case SpecialLoneVampire, SpecialLoneNixe, SpecialLoneMilfid, SpecialLoneOricCelmist, SpecialLoneHarmonicCelmist, SpecialLoneHighGuard,
 		SpecialLoneHarpy, SpecialLoneTreeMushroom, SpecialLoneMirrorSpecter:
 		if RandInt(5) > 0 {
