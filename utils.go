@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"math/rand"
 	"strings"
+	"time"
 )
 
 func Abs(x int) int {
@@ -11,6 +12,10 @@ func Abs(x int) int {
 		return -x
 	}
 	return x
+}
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
 }
 
 func RandInt(n int) int {
