@@ -6,7 +6,7 @@ func (ui *gameui) ApplyToggleTiles() {
 }
 
 func (ui *gameui) PostConfig() {
-	if gameConfig.Small {
+	if GameConfig.Small {
 		UIHeight = 24
 		UIWidth = 80
 	}

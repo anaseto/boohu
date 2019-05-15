@@ -1272,12 +1272,12 @@ func InRuneSlice(r rune, s []rune) bool {
 
 func (ui *gameui) RunesForKeyAction(k keyAction) string {
 	runes := []rune{}
-	for r, ka := range gameConfig.RuneNormalModeKeys {
+	for r, ka := range GameConfig.RuneNormalModeKeys {
 		if k == ka && !InRuneSlice(r, runes) {
 			runes = append(runes, r)
 		}
 	}
-	for r, ka := range gameConfig.RuneTargetModeKeys {
+	for r, ka := range GameConfig.RuneTargetModeKeys {
 		if k == ka && !InRuneSlice(r, runes) {
 			runes = append(runes, r)
 		}
@@ -1364,14 +1364,14 @@ loop:
 			CustomKeys = true
 			ka := configurableKeyActions[s]
 			if ka.NormalModeKey() {
-				gameConfig.RuneNormalModeKeys[r] = ka
+				GameConfig.RuneNormalModeKeys[r] = ka
 			} else {
-				delete(gameConfig.RuneNormalModeKeys, r)
+				delete(GameConfig.RuneNormalModeKeys, r)
 			}
 			if ka.TargetingModeKey() {
-				gameConfig.RuneTargetModeKeys[r] = ka
+				GameConfig.RuneTargetModeKeys[r] = ka
 			} else {
-				delete(gameConfig.RuneTargetModeKeys, r)
+				delete(GameConfig.RuneTargetModeKeys, r)
 			}
 			err := g.SaveConfig()
 			if err != nil {
@@ -1839,12 +1839,12 @@ func (ui *gameui) HandleSettingAction() error {
 	case setKeys:
 		ui.ChangeKeys()
 	case invertLOS:
-		gameConfig.DarkLOS = !gameConfig.DarkLOS
+		GameConfig.DarkLOS = !GameConfig.DarkLOS
 		err := g.SaveConfig()
 		if err != nil {
 			g.Print(err.Error())
 		}
-		if gameConfig.DarkLOS {
+		if GameConfig.DarkLOS {
 			ApplyDarkLOS()
 		} else {
 			ApplyLightLOS()

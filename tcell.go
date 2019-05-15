@@ -69,8 +69,8 @@ func (ui *gameui) Flush() {
 }
 
 func (ui *gameui) ApplyToggleLayout() {
-	gameConfig.Small = !gameConfig.Small
-	if gameConfig.Small {
+	GameConfig.Small = !GameConfig.Small
+	if GameConfig.Small {
 		ui.Clear()
 		ui.Flush()
 		UIHeight = 24
@@ -84,7 +84,7 @@ func (ui *gameui) ApplyToggleLayout() {
 }
 
 func (ui *gameui) Small() bool {
-	return gameConfig.Small || SmallScreen
+	return GameConfig.Small || SmallScreen
 }
 
 func (ui *gameui) Interrupt() {

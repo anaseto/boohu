@@ -80,7 +80,7 @@ bind .c <ButtonPress> {
 	SolarizedPalette()
 	ui.HideCursor()
 	settingsActions = append(settingsActions, toggleTiles)
-	gameConfig.Tiles = true
+	GameConfig.Tiles = true
 	return nil
 }
 
@@ -185,8 +185,8 @@ func (ui *gameui) ApplyToggleLayout() {
 }
 
 func (ui *gameui) ApplyToggleLayoutWithClear(clear bool) {
-	gameConfig.Small = !gameConfig.Small
-	if gameConfig.Small {
+	GameConfig.Small = !GameConfig.Small
+	if GameConfig.Small {
 		ui.ir.Eval("wm geometry . =1280x576")
 		if clear {
 			ui.Clear()

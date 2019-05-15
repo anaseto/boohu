@@ -11,7 +11,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/gopherjs/gopherwasm/js"
+	"syscall/js"
 )
 
 func main() {
@@ -21,9 +21,9 @@ func main() {
 		log.Fatalf("boohu: %v\n", err)
 	}
 	defer ui.Close()
-	gameConfig.Tiles = true
+	GameConfig.Tiles = true
 	LinkColors()
-	gameConfig.DarkLOS = true
+	GameConfig.DarkLOS = true
 	ApplyDarkLOS()
 	for {
 		newGame(ui)
@@ -35,14 +35,13 @@ func newGame(ui *gameui) {
 	ui.g = g
 	load, err := g.LoadConfig()
 	if load && err != nil {
-		log.Println("Error loading config file.")
+		log.Printf("Error loading config: %v\n", err)
 	} else if load {
 		CustomKeys = true
 	}
 	ApplyConfig()
 	ui.PostConfig()
 	if runtime.GOARCH != "wasm" {
-		//if true { // TODO
 		ui.DrawWelcome()
 	} else {
 		again := ui.HandleStartMenu()
@@ -56,6 +55,8 @@ func newGame(ui *gameui) {
 	} else if err != nil {
 		g.InitLevel()
 		g.Printf("Error loading saved game… starting new game. (%v)", err)
+	} else {
+		ui.DrawBufferInit()
 	}
 	g.ui = ui
 	g.EventLoop()
@@ -81,13 +82,13 @@ func (ui *gameui) HandleStartMenu() (again bool) {
 				log.Printf("Load replay: %v", err)
 				return true
 			}
-			small := gameConfig.Small
-			gameConfig.Small = true
+			small := GameConfig.Small
+			GameConfig.Small = true
 			ui.ApplyToggleLayoutWithClear(false)
 			ui.RestartDrawBuffers()
 			ui.Replay()
 			if small {
-				gameConfig.Small = false
+				GameConfig.Small = false
 				ui.ApplyToggleLayoutWithClear(false)
 			}
 			return true
@@ -114,7 +115,10 @@ type gameui struct {
 
 func (ui *gameui) InitElements() error {
 	canvas := js.Global().Get("document").Call("getElementById", "gamecanvas")
-	canvas.Call("addEventListener", "contextmenu", js.NewEventCallback(js.PreventDefault, func(e js.Value) {
+	canvas.Call("addEventListener", "contextmenu", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		e := args[0]
+		e.Call("preventDefault")
+		return nil
 	}), false)
 	canvas.Call("setAttribute", "tabindex", "1")
 	ui.ctx = canvas.Call("getContext", "2d")
@@ -188,7 +192,7 @@ func (g *game) SaveConfig() error {
 	if runtime.GOARCH != "wasm" {
 		return nil
 	}
-	conf, err := gameConfig.ConfigSave()
+	conf, err := GameConfig.ConfigSave()
 	if err != nil {
 		SaveError = err.Error()
 		return err
@@ -276,7 +280,10 @@ func (g *game) LoadConfig() (bool, error) {
 	if err != nil {
 		return true, err
 	}
-	gameConfig = *c
+	if c.Version != GameConfig.Version {
+		return true, errors.New("Version mismatch, could not load old custom configuration.")
+	}
+	GameConfig = *c
 	return true, nil
 }
 
@@ -315,33 +322,48 @@ func (g *game) WriteDump() error {
 
 func (ui *gameui) Init() error {
 	canvas := js.Global().Get("document").Call("getElementById", "gamecanvas")
-	canvas.Call(
-		"addEventListener", "keypress", js.NewEventCallback(0, func(e js.Value) {
+	js.Global().Get("document").Call(
+		"addEventListener", "keydown", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			e := args[0]
+			if !e.Get("ctrlKey").Bool() && !e.Get("metaKey").Bool() {
+				e.Call("preventDefault")
+			} else {
+				return nil
+			}
 			s := e.Get("key").String()
+			if s == "F11" {
+				screenfull := js.Global().Get("screenfull")
+				if screenfull.Get("enabled").Bool() {
+					screenfull.Call("request", canvas)
+				}
+				return nil
+			}
 			if s == "Unidentified" {
 				s = e.Get("code").String()
 			}
 			ch <- uiInput{key: s}
-		}))
-	js.Global().Get("document").Call(
-		"addEventListener", "keypress", js.NewEventCallback(0, func(e js.Value) {
-			if !e.Get("ctrlKey").Bool() && !e.Get("metaKey").Bool() && js.Global().Get("Object").Call("is", js.Global().Get("document").Get("activeElement"), canvas).Bool() {
-				e.Call("preventDefault")
-			}
+			return nil
 		}))
 	canvas.Call(
-		"addEventListener", "mousedown", js.NewEventCallback(0, func(e js.Value) {
+		"addEventListener", "mousedown", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			e := args[0]
 			x, y := ui.GetMousePos(e)
 			ch <- uiInput{mouse: true, mouseX: x, mouseY: y, button: e.Get("button").Int()}
+			return nil
 		}))
 	canvas.Call(
-		"addEventListener", "mousemove", js.NewEventCallback(0, func(e js.Value) {
+		"addEventListener", "mousemove", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			if CenteredCamera {
+				return nil
+			}
+			e := args[0]
 			x, y := ui.GetMousePos(e)
 			if x != ui.mousepos.X || y != ui.mousepos.Y {
 				ui.mousepos.X = x
 				ui.mousepos.Y = y
 				ch <- uiInput{mouse: true, mouseX: x, mouseY: y, button: -1}
 			}
+			return nil
 		}))
 	ui.menuHover = -1
 	ui.InitElements()
@@ -357,6 +379,8 @@ var interrupt chan bool
 func init() {
 	ch = make(chan uiInput, 100)
 	interrupt = make(chan bool)
+	Flushdone = make(chan bool)
+	ReqFrame = make(chan bool)
 }
 
 func (ui *gameui) Close() {
@@ -364,12 +388,19 @@ func (ui *gameui) Close() {
 }
 
 func (ui *gameui) Flush() {
-	js.Global().Get("window").Call("requestAnimationFrame", js.NewEventCallback(0, ui.FlushCallback))
+	ReqFrame <- true
+	<-Flushdone
+}
+
+func (ui *gameui) ReqAnimFrame() {
+	<-ReqFrame
+	js.Global().Get("window").Call("requestAnimationFrame",
+		js.FuncOf(func(this js.Value, args []js.Value) interface{} { ui.FlushCallback(args[0]); return nil }))
 }
 
 func (ui *gameui) ApplyToggleLayoutWithClear(clear bool) {
-	gameConfig.Small = !gameConfig.Small
-	if gameConfig.Small {
+	GameConfig.Small = !GameConfig.Small
+	if GameConfig.Small {
 		if clear {
 			ui.Clear()
 			ui.Flush()
@@ -394,12 +425,16 @@ func (ui *gameui) ApplyToggleLayout() {
 	ui.ApplyToggleLayoutWithClear(true)
 }
 
-func (ui *gameui) FlushCallback(obj js.Value) {
+var Flushdone chan bool
+var ReqFrame chan bool
+
+func (ui *gameui) FlushCallback(t js.Value) {
 	ui.DrawLogFrame()
 	for _, cdraw := range ui.g.DrawLog[len(ui.g.DrawLog)-1].Draws {
 		cell := cdraw.Cell
 		ui.Draw(cell, cdraw.X, cdraw.Y)
 	}
+	Flushdone <- true
 }
 
 func (ui *gameui) PollEvent() (in uiInput) {
@@ -410,7 +445,7 @@ func (ui *gameui) PollEvent() (in uiInput) {
 	switch in.key {
 	case "Escape", "Space":
 		in.key = "\x1b"
-	case "Enter":
+	case "Enter", "\r", "\n":
 		in.key = "."
 	case "ArrowLeft":
 		in.key = "4"

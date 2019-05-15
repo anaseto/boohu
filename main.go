@@ -59,7 +59,7 @@ func main() {
 	defer ui.Close()
 
 	LinkColors()
-	gameConfig.DarkLOS = true
+	GameConfig.DarkLOS = true
 
 	load, err := g.LoadConfig()
 	if load && err != nil {

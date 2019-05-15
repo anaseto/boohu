@@ -107,7 +107,7 @@ func (g *game) SaveConfig() error {
 		return err
 	}
 	saveFile := filepath.Join(dataDir, "config.gob")
-	data, err := gameConfig.ConfigSave()
+	data, err := GameConfig.ConfigSave()
 	if err != nil {
 		g.Print(err.Error())
 		return err
@@ -139,7 +139,7 @@ func (g *game) LoadConfig() (bool, error) {
 	if err != nil {
 		return true, err
 	}
-	gameConfig = *c
+	GameConfig = *c
 	return true, nil
 }
 
