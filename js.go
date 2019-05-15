@@ -25,6 +25,11 @@ func main() {
 	LinkColors()
 	GameConfig.DarkLOS = true
 	ApplyDarkLOS()
+	go func() {
+		for {
+			ui.ReqAnimFrame()
+		}
+	}()
 	for {
 		newGame(ui)
 	}
