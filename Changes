@@ -1,6 +1,6 @@
 v0.13-dev
 
-+ Some improvements for the browser version.
++ Some improvements for the browser version based on Harmonist code.
 + Fix rare crash in Tk version at startup.
 
 -----------------------------------------------------------------------------
