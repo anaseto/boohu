@@ -21,7 +21,7 @@ func (g *game) Autoexplore(ev event) error {
 	g.BuildAutoexploreMap(sources)
 	n, finished := g.NextAuto()
 	if finished || n == nil {
-		return errors.New("You cannot reach safely some places.")
+		return errors.New("You cannot reach some places safely.")
 	}
 	g.Autoexploring = true
 	g.AutoHalt = false
