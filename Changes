@@ -4,6 +4,8 @@ v0.13-dev
 + Fix rare crash in Tk version at startup.
 + use simpler math/rand, because we don't need crypto secure random numbers,
   and this works faster, specially on some platforms.
++ Fix unintuitive interaction between dancing rapier and tiny harpies blinking.
++ New tile for doors, backported from Harmonist.
 
 -----------------------------------------------------------------------------
 v0.12.0 2018-12-19
