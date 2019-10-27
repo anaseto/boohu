@@ -204,7 +204,7 @@ func (g *game) AttackMonster(mons *monster, ev event) {
 	case g.Player.Weapon == DancingRapier:
 		ompos := mons.Pos
 		g.HitMonster(DmgPhysical, g.Player.Attack(), mons, ev)
-		if g.Player.HasStatus(StatusLignification) || mons.Status(MonsLignified) {
+		if g.Player.HasStatus(StatusLignification) || mons.Status(MonsLignified) || mons.Kind == MonsTinyHarpy {
 			break
 		}
 		dir := ompos.Dir(g.Player.Pos)
