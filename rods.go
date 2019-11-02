@@ -342,8 +342,6 @@ func (g *game) EvokeRodLightning(ev event) error {
 		return npos.valid() && d.Cell(npos).T != WallCell
 	})
 	stack := []position{}
-	g.MakeNoise(MagicCastNoise, g.Player.Pos)
-	g.Print("Whoosh! Lightning emerges straight out of the rod.")
 	for _, pos := range nb {
 		mons := g.MonsterAt(pos)
 		if !mons.Exists() {
@@ -355,6 +353,8 @@ func (g *game) EvokeRodLightning(ev event) error {
 	if len(stack) == 0 {
 		return errors.New("There are no adjacent monsters.")
 	}
+	g.MakeNoise(MagicCastNoise, g.Player.Pos)
+	g.Print("Whoosh! Lightning emerges straight out of the rod.")
 	var pos position
 	targets := []position{}
 	for len(stack) > 0 {

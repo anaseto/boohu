@@ -7,6 +7,7 @@ v0.13-dev
 + Fix unintuitive interaction between dancing rapier and tiny harpies blinking.
 + New tile for doors, backported from Harmonist.
 + Update wasm version to latest API.
++ Do not print rod of lightning message when no targets.
 
 -----------------------------------------------------------------------------
 v0.12.0 2018-12-19
