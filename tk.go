@@ -223,7 +223,7 @@ func (ui *gameui) PollEvent() (in uiInput) {
 	case in.interrupt = <-interrupt:
 	}
 	switch in.key {
-	case "Enter":
+	case "KP_Enter", "Return", "\r", "\n":
 		in.key = "."
 	case "Left", "KP_Left":
 		in.key = "4"

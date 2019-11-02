@@ -8,6 +8,7 @@ v0.13-dev
 + New tile for doors, backported from Harmonist.
 + Update wasm version to latest API.
 + Do not print rod of lightning message when no targets.
++ You can now use arrow keys in menus too. Backported from Harmonist.
 
 -----------------------------------------------------------------------------
 v0.12.0 2018-12-19
