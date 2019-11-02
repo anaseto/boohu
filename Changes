@@ -6,6 +6,7 @@ v0.13-dev
   and this works faster, specially on some platforms.
 + Fix unintuitive interaction between dancing rapier and tiny harpies blinking.
 + New tile for doors, backported from Harmonist.
++ Update wasm version to latest API.
 
 -----------------------------------------------------------------------------
 v0.12.0 2018-12-19

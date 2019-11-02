@@ -147,11 +147,11 @@ func (ui *gameui) Draw(cell UICell, x, y int) {
 		ctx := canvas.Call("getContext", "2d")
 		ctx.Set("imageSmoothingEnabled", false)
 		buf := getImage(cell).Pix
-		ta := js.TypedArrayOf(buf)
-		ca := js.Global().Get("Uint8ClampedArray").New(ta)
+		ua := js.Global().Get("Uint8Array").New(js.ValueOf(len(buf)))
+		js.CopyBytesToJS(ua, buf)
+		ca := js.Global().Get("Uint8ClampedArray").New(ua)
 		imgdata := js.Global().Get("ImageData").New(ca, 16, 24)
 		ctx.Call("putImageData", imgdata, 0, 0)
-		ta.Release()
 		ui.cache[cell] = canvas
 	}
 	ui.ctx.Call("drawImage", canvas, x*ui.width, ui.height*y)
