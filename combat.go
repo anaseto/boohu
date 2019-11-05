@@ -286,6 +286,9 @@ func (g *game) HarKarAttack(mons *monster, ev event) {
 			}
 			g.HitMonster(DmgPhysical, g.Player.Attack(), m, ev)
 		}
+		if !pos.valid() || g.Dungeon.Cell(pos).T != FreeCell {
+			return
+		}
 		g.PlacePlayerAt(pos)
 		behind := pos.To(dir)
 		m := g.MonsterAt(behind)
