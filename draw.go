@@ -692,7 +692,7 @@ func (ui *gameui) DescribePosition(pos position, targ Targeter) {
 	case okStair:
 		if strt == WinStair {
 			desc = ui.AddComma(see, desc)
-			desc += fmt.Sprintf("glowing stairs")
+			desc += fmt.Sprintf("glowing monolith")
 		} else {
 			desc = ui.AddComma(see, desc)
 			desc += fmt.Sprintf("stairs downwards")
@@ -744,9 +744,9 @@ func (ui *gameui) ViewPositionDescription(pos position) {
 		ui.DrawDescription(eq.Desc())
 	} else if strt, ok := g.Stairs[pos]; ok {
 		if strt == WinStair {
-			desc := "These shiny-looking stairs are in fact a magical monolith. It is said they were made some centuries ago by Marevor Helith. They will lead you back to your village."
+			desc := "This magical monolith will teleport you back to your village. It is said such monoliths were made some centuries ago by Marevor Helith. You can use it like stairs."
 			if g.Depth < MaxDepth {
-				desc += " Note that this is not the last floor, so you may want to find a normal stair and continue collecting simellas, if you're courageous enough."
+				desc += " Note that this is not the last floor, so you may want to find a stair and continue collecting simellas, if you're courageous enough."
 			}
 			ui.DrawDescription(desc)
 		} else {
@@ -973,6 +973,7 @@ func (ui *gameui) PositionDrawing(pos position) (r rune, fgColor, bgColor uicolo
 			r = '>'
 			if strt == WinStair {
 				fgColor = ColorFgMagicPlace
+				r = 'Δ'
 			} else {
 				fgColor = ColorFgPlace
 			}

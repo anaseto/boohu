@@ -337,8 +337,11 @@ func (g *game) DumpDungeon() string {
 					r = eq.Letter()
 				} else if rd, ok := g.Rods[pos]; ok {
 					r = rd.Letter()
-				} else if _, ok := g.Stairs[pos]; ok {
+				} else if strt, ok := g.Stairs[pos]; ok {
 					r = '>'
+					if strt == WinStair {
+						r = 'Δ'
+					}
 				} else if _, ok := g.MagicalStones[pos]; ok {
 					r = '_'
 				} else if _, ok := g.Simellas[pos]; ok {
