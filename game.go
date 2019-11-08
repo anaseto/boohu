@@ -788,13 +788,13 @@ func (g *game) FrundisInLevel() bool {
 func (g *game) Descend() bool {
 	g.LevelStats()
 	if strt, ok := g.Stairs[g.Player.Pos]; ok && strt == WinStair {
-		g.StoryPrint("You escaped!")
+		g.StoryPrint("Escaped!")
 		g.ExploredLevels = g.Depth
 		g.Depth = -1
 		return true
 	}
 	g.Print("You descend deeper in the dungeon.")
-	g.StoryPrint("You descended deeper in the dungeon.")
+	g.StoryPrint("Descended deeper in the dungeon.")
 	g.Depth++
 	g.DepthPlayerTurn = 0
 	g.Boredom = 0

@@ -50,7 +50,7 @@ func (s stone) Description() (text string) {
 }
 
 func (g *game) UseStone(pos position) {
-	g.StoryPrintf("You activated a %s.", g.MagicalStones[pos])
+	g.StoryPrintf("Activated a %s.", g.MagicalStones[pos])
 	g.MagicalStones[pos] = InertStone
 	g.Stats.UsedStones++
 	g.Print("The stone becomes inert.")

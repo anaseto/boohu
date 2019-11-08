@@ -17,7 +17,7 @@ type consumable interface {
 
 func (g *game) UseConsumable(c consumable) {
 	g.Player.Consumables[c]--
-	g.StoryPrintf("You used %s.", Indefinite(c.String(), false))
+	g.StoryPrintf("Used %s.", Indefinite(c.String(), false))
 	if g.Player.Consumables[c] <= 0 {
 		delete(g.Player.Consumables, c)
 	}
@@ -251,7 +251,7 @@ func (g *game) QuaffDescent(ev event) error {
 	}
 	g.Printf("You quaff the %s. You fall through the ground.", DescentPotion)
 	g.LevelStats()
-	g.StoryPrint("You descended deeper into the dungeon.")
+	g.StoryPrint("Descended deeper into the dungeon.")
 	g.Depth++
 	g.DepthPlayerTurn = 0
 	g.InitLevel()
@@ -720,7 +720,7 @@ func (ar armour) Equip(g *game) {
 	oar := g.Player.Armour
 	g.Player.Armour = ar
 	if !g.FoundEquipables[ar] {
-		g.StoryPrintf("You found and put on %s.", ar.StringIndefinite())
+		g.StoryPrintf("Found and put on %s.", ar.StringIndefinite())
 		g.FoundEquipables[ar] = true
 	}
 	g.Printf("You put the %s on and leave your %s.", ar, oar)
@@ -834,7 +834,7 @@ func (wp weapon) Equip(g *game) {
 	owp := g.Player.Weapon
 	g.Player.Weapon = wp
 	if !g.FoundEquipables[wp] {
-		g.StoryPrintf("You found and took %s.", Indefinite(wp.String(), false))
+		g.StoryPrintf("Found and took %s.", Indefinite(wp.String(), false))
 		g.FoundEquipables[wp] = true
 	}
 	g.Printf("You take the %s and leave your %s.", wp, owp)
@@ -1023,7 +1023,7 @@ func (sh shield) Equip(g *game) {
 	osh := g.Player.Shield
 	g.Player.Shield = sh
 	if !g.FoundEquipables[sh] {
-		g.StoryPrintf("You found and put on %s.", Indefinite(sh.String(), false))
+		g.StoryPrintf("Found and put on %s.", Indefinite(sh.String(), false))
 		g.FoundEquipables[sh] = true
 	}
 	if osh != NoShield {

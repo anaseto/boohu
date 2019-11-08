@@ -132,9 +132,9 @@ func (mk monsterKind) Desc() string {
 func (mk monsterKind) SeenStoryText() (text string) {
 	switch mk {
 	case MonsMarevorHelith:
-		text = "You saw Marevor."
+		text = "Saw Marevor."
 	default:
-		text = fmt.Sprintf("You saw %s.", Indefinite(mk.String(), false))
+		text = fmt.Sprintf("Saw %s.", Indefinite(mk.String(), false))
 	}
 	return text
 }
@@ -1783,7 +1783,7 @@ func (m *monster) TeleportPlayer(g *game, ev event) {
 	acc := RandInt(m.Accuracy)
 	if acc > evasion {
 		g.Print("Marevor pushes you through a monolith.")
-		g.StoryPrint("Marevor pushed you through a monolith.")
+		g.StoryPrint("Pushed by Marevor through a monolith.")
 		g.Teleportation(ev)
 	} else if RandInt(2) == 0 {
 		g.Print("Marevor inadvertently goes into a monolith.")

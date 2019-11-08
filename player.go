@@ -359,7 +359,7 @@ func (g *game) CollectGround() {
 		g.DijkstraMapRebuild = true
 		delete(g.Rods, pos)
 		g.Printf("You take a %s.", r)
-		g.StoryPrintf("You found and took a %s.", r)
+		g.StoryPrintf("Found and took a %s.", r)
 	}
 	if eq, ok := g.Equipables[pos]; ok {
 		g.Printf("You are standing over %s.", Indefinite(eq.String(), false))

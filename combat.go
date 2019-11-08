@@ -543,7 +543,7 @@ func (g *game) HandleKill(mons *monster, ev event) {
 		g.ComputeLOS()
 	}
 	if mons.Kind.Dangerousness() > 10 {
-		g.StoryPrintf("You killed %s.", mons.Kind.Indefinite(false))
+		g.StoryPrintf("Killed %s.", mons.Kind.Indefinite(false))
 	}
 }
 
