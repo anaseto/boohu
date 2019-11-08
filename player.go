@@ -350,8 +350,10 @@ func (g *game) CollectGround() {
 		delete(g.Collectables, pos)
 		if c.Quantity > 1 {
 			g.Printf("You take %d %s.", c.Quantity, c.Consumable.Plural())
+			g.StoryPrintf("Took %d %s.", c.Quantity, c.Consumable.Plural())
 		} else {
 			g.Printf("You take %s.", Indefinite(c.Consumable.String(), false))
+			g.StoryPrintf("Took %s.", Indefinite(c.Consumable.String(), false))
 		}
 	}
 	if r, ok := g.Rods[pos]; ok {

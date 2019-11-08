@@ -13,7 +13,7 @@ v0.13-dev
 + You can now use arrow keys in menus too. Backported from Harmonist.
 + Fix interaction between har-kar gauntlets and tiny harpies in a pathological
   case.
-+ Improvements in character dump.
++ Improvements in character dump. Mainly ideas from Harmonist.
 
 -----------------------------------------------------------------------------
 v0.12.0 2018-12-19

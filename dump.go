@@ -177,7 +177,7 @@ func (g *game) Dump() string {
 	fmt.Fprintf(buf, "Miscellaneous:\n")
 	fmt.Fprintf(buf, "You collected %d simellas.\n", g.Player.Simellas)
 	fmt.Fprintf(buf, "You killed %d monsters.\n", g.Stats.Killed)
-	fmt.Fprintf(buf, "You spent %.1f turns in the Underground.\n", float64(g.Turn)/10)
+	fmt.Fprintf(buf, "You spent %d turns in the Underground.\n", g.Turn/10)
 	maxDepth := Max(g.Depth, g.ExploredLevels)
 	s := "s"
 	if maxDepth == 1 {
@@ -221,9 +221,9 @@ func (g *game) DetailedStatistics(w io.Writer) {
 	fmt.Fprintf(w, "There were %d fires.\n", g.Stats.Burns)
 	fmt.Fprintf(w, "There were %d destroyed walls.\n", g.Stats.Digs)
 	fmt.Fprintf(w, "You rested %d times (%d interruptions).\n", g.Stats.Rest, g.Stats.RestInterrupt)
-	fmt.Fprintf(w, "You spent %.1f%% turns wounded.\n", float64(g.Stats.TWounded)*100/float64(g.Stats.Turns+1))
-	fmt.Fprintf(w, "You spent %.1f%% turns with monsters in sight.\n", float64(g.Stats.TMonsLOS)*100/float64(g.Stats.Turns+1))
-	fmt.Fprintf(w, "You spent %.1f%% turns wounded with monsters in sight.\n", float64(g.Stats.TMWounded)*100/float64(g.Stats.Turns+1))
+	fmt.Fprintf(w, "You spent %d%% turns wounded.\n", g.Stats.TWounded*100/(g.Stats.Turns+1))
+	fmt.Fprintf(w, "You spent %d%% turns with monsters in sight.\n", g.Stats.TMonsLOS*100/(g.Stats.Turns+1))
+	fmt.Fprintf(w, "You spent %d%% turns wounded with monsters in sight.\n", g.Stats.TMWounded*100/(g.Stats.Turns+1))
 	maxDepth := Max(g.Depth-1, g.ExploredLevels)
 	if g.Player.HP <= 0 {
 		maxDepth++
@@ -388,7 +388,7 @@ func (g *game) SimplifedDump(err error) string {
 	}
 	fmt.Fprintf(buf, "You collected %d simellas.\n", g.Player.Simellas)
 	fmt.Fprintf(buf, "You killed %d monsters.\n", g.Stats.Killed)
-	fmt.Fprintf(buf, "You spent %.1f turns in the Underground.\n", float64(g.Turn)/10)
+	fmt.Fprintf(buf, "You spent %.0f turns in the Underground.\n", float64(g.Turn)/10)
 	maxDepth := Max(g.Depth, g.ExploredLevels)
 	s := "s"
 	if maxDepth == 1 {

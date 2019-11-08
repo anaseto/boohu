@@ -1,6 +1,9 @@
 package main
 
-import "container/heap"
+import (
+	"container/heap"
+	"fmt"
+)
 
 var Version string = "v0.12"
 
@@ -335,6 +338,15 @@ func (g *game) InitPlayer() {
 		g.Player.Consumables[AccuracyPotion] = 1
 	}
 	r := g.RandomRod()
+	items := r.String()
+	for c, n := range g.Player.Consumables {
+		if n == 1 {
+			items += ", " + c.String()
+		} else {
+			items += fmt.Sprintf(", %d %s", n, c.Plural())
+		}
+	}
+	g.StoryPrintf("Started with %s", items)
 	g.Player.Rods = map[rod]rodProps{r: rodProps{r.MaxCharge() - 1}}
 	g.Player.Statuses = map[status]int{}
 	g.Player.Expire = map[status]int{}
