@@ -1598,9 +1598,9 @@ func (ui *gameui) Win() {
 		g.PrintfStyled("Error removing save file: %v", logError, err)
 	}
 	if g.Wizard {
-		g.Print("You escape by the magic stairs! **WIZARD** --press esc or space to continue--")
+		g.Print("You escape by the magic portal! **WIZARD** --press esc or space to continue--")
 	} else {
-		g.Print("You escape by the magic stairs! You win. --press esc or space to continue--")
+		g.Print("You escape by the magic portal! You win. --press esc or space to continue--")
 	}
 	ui.DrawDungeonView(NormalMode)
 	ui.WaitForContinue(-1)
