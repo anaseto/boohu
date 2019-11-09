@@ -14,6 +14,8 @@ v0.13-dev
 + Fix interaction between har-kar gauntlets and tiny harpies in a pathological
   case.
 + Improvements in character dump. Mainly ideas from Harmonist.
++ Allow (x) to close/continue as well as an alternative to space and esc, and
+  hint to that first.  Backported from Harmonist. More portable for browsers.
 
 -----------------------------------------------------------------------------
 v0.12.0 2018-12-19

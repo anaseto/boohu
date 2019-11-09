@@ -409,6 +409,6 @@ func (g *game) SimplifedDump(err error) string {
 		}
 	}
 	fmt.Fprintf(buf, "\n\n")
-	fmt.Fprintf(buf, "───Press esc or space to quit───")
+	fmt.Fprintf(buf, "───Press (x) to quit───")
 	return buf.String()
 }

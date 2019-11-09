@@ -47,7 +47,7 @@ loop:
 		in := ui.PollEvent()
 		r := ui.KeyToRuneKeyAction(in)
 		switch r {
-		case '\x1b', ' ':
+		case '\x1b', ' ', 'x', 'X':
 			break loop
 		}
 		if in.mouse && in.button == -1 {
@@ -221,7 +221,7 @@ func (ui *gameui) PlayerTurnEvent(ev event) (err error, again, quit bool) {
 func (ui *gameui) Scroll(n int) (m int, quit bool) {
 	in := ui.PollEvent()
 	switch in.key {
-	case "Escape", "\x1b", " ":
+	case "Escape", "\x1b", " ", "x", "X":
 		quit = true
 	case "u", "9", "b":
 		n -= 12
@@ -270,7 +270,7 @@ func (ui *gameui) Select(l int) (index int, alternate bool, err error) {
 		in := ui.PollEvent()
 		r := ui.ReadKey(in.key)
 		switch {
-		case in.key == "\x1b" || in.key == "Escape" || in.key == " " || in.key == "x":
+		case in.key == "\x1b" || in.key == "Escape" || in.key == " " || in.key == "x" || in.key == "X":
 			return -1, false, errors.New(DoNothing)
 		case in.key == "?":
 			return -1, true, nil
@@ -358,7 +358,7 @@ func (ui *gameui) KeyMenuAction(n int) (m int, action keyConfigAction) {
 	switch string(r) {
 	case "a":
 		action = ChangeKeys
-	case "\x1b", " ":
+	case "\x1b", " ", "x", "X":
 		action = QuitKeyConfig
 	case "u":
 		n -= DungeonHeight / 2
@@ -392,7 +392,7 @@ func (ui *gameui) TargetModeEvent(targ Targeter, data *examineData) (err error, 
 	again = true
 	in := ui.PollEvent()
 	switch in.key {
-	case "\x1b", "Escape", " ":
+	case "\x1b", "Escape", " ", "x", "X":
 		g.Targeting = InvalidPos
 		notarg = true
 	case "":
@@ -471,7 +471,7 @@ func (ui *gameui) ReadRuneKey() rune {
 	for {
 		in := ui.PollEvent()
 		switch in.key {
-		case "\x1b", "Escape", " ":
+		case "\x1b", "Escape", " ", "x", "X":
 			return 0
 		case "Enter":
 			return '.'
@@ -614,7 +614,7 @@ var CustomKeys bool
 
 func FixedRuneKey(r rune) bool {
 	switch r {
-	case ' ', '?', '=':
+	case ' ', '?', '=', '.', '\x1b', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'x', 'X':
 		return true
 	default:
 		return false
@@ -914,6 +914,8 @@ func ApplyDefaultKeyBindings() {
 		'e':    KeyExclude,
 		' ':    KeyEscape,
 		'\x1b': KeyEscape,
+		'x':    KeyEscape,
+		'X':    KeyEscape,
 		'?':    KeyHelp,
 	}
 	CustomKeys = false
@@ -1583,7 +1585,7 @@ func (ui *gameui) HandleWizardAction() error {
 
 func (ui *gameui) Death() {
 	g := ui.g
-	g.Print("You die... --press esc or space to continue--")
+	g.Print("You die... [(x) to continue]")
 	ui.DrawDungeonView(NormalMode)
 	ui.WaitForContinue(-1)
 	err := g.WriteDump()
@@ -1598,9 +1600,9 @@ func (ui *gameui) Win() {
 		g.PrintfStyled("Error removing save file: %v", logError, err)
 	}
 	if g.Wizard {
-		g.Print("You escape by the magic portal! **WIZARD** --press esc or space to continue--")
+		g.Print("You escape by the magic portal! **WIZARD** [(x) to continue]")
 	} else {
-		g.Print("You escape by the magic portal! You win. --press esc or space to continue--")
+		g.Print("You escape by the magic portal! You win. [(x) to continue]")
 	}
 	ui.DrawDungeonView(NormalMode)
 	ui.WaitForContinue(-1)
@@ -1618,7 +1620,7 @@ func (ui *gameui) Dump(err error) {
 
 func (ui *gameui) CriticalHPWarning() {
 	g := ui.g
-	g.PrintStyled("*** CRITICAL HP WARNING *** --press esc or space to continue--", logCritic)
+	g.PrintStyled("*** CRITICAL HP WARNING *** [(x) to continue]", logCritic)
 	ui.DrawDungeonView(NormalMode)
 	ui.WaitForContinue(DungeonHeight)
 	g.Print("Ok. Be careful, then.")
@@ -1632,7 +1634,7 @@ func (ui *gameui) Quit() bool {
 	if quit {
 		err := g.RemoveSaveFile()
 		if err != nil {
-			g.PrintfStyled("Error removing save file: %v ——press any key to quit——", logError, err)
+			g.PrintfStyled("Error removing save file: %v [press any key to quit]", logError, err)
 			ui.DrawDungeonView(NormalMode)
 			ui.PressAnyKey()
 		}

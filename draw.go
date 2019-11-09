@@ -519,7 +519,7 @@ func (ui *gameui) DrawKeysDescription(title string, actions []string) {
 		ui.DrawColoredTextOnBG(fmt.Sprintf(" %-36s %s", actions[i], actions[i+1]), 0, i/2+1, ColorFg, bg)
 	}
 	lines := 1 + len(actions)/2
-	ui.DrawTextLine(" press esc or space to continue ", lines)
+	ui.DrawTextLine(" press (x) to continue ", lines)
 	ui.Flush()
 
 	ui.WaitForContinue(lines)
@@ -588,7 +588,7 @@ func (ui *gameui) CharacterInfo() {
 		ui.ClearLine(i)
 	}
 	ui.DrawText(desc, 0, 0)
-	escspace := " press esc or space to continue "
+	escspace := " press (x) to continue "
 	if lines+2 >= DungeonHeight {
 		ui.DrawTextLine(escspace, lines+2)
 		ui.SetCell(DungeonWidth, lines+2, '┘', ColorFg, ColorBg)
@@ -1333,7 +1333,7 @@ loop:
 			}
 		}
 		ui.ClearLine(lines)
-		ui.DrawStyledTextLine(" add key (a) up/down (arrows/u/d) reset (R) quit (esc or space) ", lines, FooterLine)
+		ui.DrawStyledTextLine(" add key (a) up/down (arrows/u/d) reset (R) quit (x) ", lines, FooterLine)
 		ui.Flush()
 
 		var action keyConfigAction
@@ -1440,7 +1440,7 @@ loop:
 			ui.ClearLine(i - n)
 		}
 		ui.ClearLine(lines)
-		s := fmt.Sprintf(" half-page up/down (u/d) quit (esc or space) — (%d/%d) \n", len(g.Log)-to, len(g.Log))
+		s := fmt.Sprintf(" half-page up/down (u/d) quit (x) — (%d/%d) \n", len(g.Log)-to, len(g.Log))
 		ui.DrawStyledTextLine(s, lines, FooterLine)
 		ui.Flush()
 		var quit bool
@@ -1470,7 +1470,7 @@ func (ui *gameui) DrawDescription(desc string) {
 		ui.ClearLine(i)
 	}
 	ui.DrawText(desc, 0, 0)
-	ui.DrawTextLine(" press esc or space to continue ", lines+2)
+	ui.DrawTextLine(" press (x) to continue ", lines+2)
 	ui.Flush()
 	ui.WaitForContinue(lines + 2)
 	ui.DrawDungeonView(NoFlushMode)
@@ -1601,7 +1601,7 @@ func (ui *gameui) SelectProjectile(ev event) error {
 		for i, c := range cs {
 			ui.ConsumableItem(i, i+1, c, ColorFg)
 		}
-		ui.DrawTextLine(" press esc or space to cancel ", len(cs)+1)
+		ui.DrawTextLine(" press (x) to cancel ", len(cs)+1)
 		ui.Flush()
 		index, alt, err := ui.Select(len(cs))
 		if alt {
@@ -1643,7 +1643,7 @@ func (ui *gameui) SelectPotion(ev event) error {
 		for i, c := range cs {
 			ui.ConsumableItem(i, i+1, c, ColorFg)
 		}
-		ui.DrawTextLine(" press esc or space to cancel ", len(cs)+1)
+		ui.DrawTextLine(" press (x) to cancel ", len(cs)+1)
 		ui.Flush()
 		index, alt, err := ui.Select(len(cs))
 		if alt {
@@ -1697,7 +1697,7 @@ func (ui *gameui) SelectRod(ev event) error {
 		for i, r := range rs {
 			ui.RodItem(i, i+1, r, ColorFg)
 		}
-		ui.DrawTextLine(" press esc or space to cancel ", len(rs)+1)
+		ui.DrawTextLine(" press (x) to cancel ", len(rs)+1)
 		ui.Flush()
 		index, alt, err := ui.Select(len(rs))
 		if alt {
@@ -1750,7 +1750,7 @@ func (ui *gameui) SelectAction(actions []keyAction, ev event) (keyAction, error)
 		for i, r := range actions {
 			ui.ActionItem(i, i+1, r, ColorFg)
 		}
-		ui.DrawTextLine(" press esc or space to cancel ", len(actions)+1)
+		ui.DrawTextLine(" press (x) to cancel ", len(actions)+1)
 		ui.Flush()
 		index, alt, err := ui.Select(len(actions))
 		if alt {
@@ -1812,7 +1812,7 @@ func (ui *gameui) SelectConfigure(actions []setting) (setting, error) {
 		for i, r := range actions {
 			ui.ConfItem(i, i+1, r, ColorFg)
 		}
-		ui.DrawTextLine(" press esc or space to cancel ", len(actions)+1)
+		ui.DrawTextLine(" press (x) to cancel ", len(actions)+1)
 		ui.Flush()
 		index, alt, err := ui.Select(len(actions))
 		if alt {
@@ -1881,7 +1881,7 @@ func (ui *gameui) SelectWizardMagic(actions []wizardAction) (wizardAction, error
 		for i, r := range actions {
 			ui.WizardItem(i, i+1, r, ColorFg)
 		}
-		ui.DrawTextLine(" press esc or space to cancel ", len(actions)+1)
+		ui.DrawTextLine(" press (x) to cancel ", len(actions)+1)
 		ui.Flush()
 		index, alt, err := ui.Select(len(actions))
 		if alt {
