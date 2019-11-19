@@ -22,6 +22,7 @@ func main() {
 	}
 	defer ui.Close()
 	GameConfig.Tiles = true
+	GameConfig.Version = Version
 	LinkColors()
 	GameConfig.DarkLOS = true
 	ApplyDarkLOS()
@@ -327,6 +328,7 @@ func (g *game) WriteDump() error {
 
 func (ui *gameui) Init() error {
 	canvas := js.Global().Get("document").Call("getElementById", "gamecanvas")
+	gamediv := js.Global().Get("document").Call("getElementById", "gamediv")
 	js.Global().Get("document").Call(
 		"addEventListener", "keydown", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			e := args[0]
@@ -339,7 +341,7 @@ func (ui *gameui) Init() error {
 			if s == "F11" {
 				screenfull := js.Global().Get("screenfull")
 				if screenfull.Get("enabled").Bool() {
-					screenfull.Call("request", canvas)
+					screenfull.Call("toggle", gamediv)
 				}
 				return nil
 			}
