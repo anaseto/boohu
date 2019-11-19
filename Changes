@@ -1,4 +1,4 @@
-v0.13-dev
+v0.13 2019-11-19
 
 + Some improvements for the browser version based on Harmonist code.
 + Fix rare crash in Tk version at startup.

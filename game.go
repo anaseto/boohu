@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-var Version string = "v0.12"
+var Version string = "v0.13"
 
 type game struct {
 	Dungeon             *dungeon
