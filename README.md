@@ -4,7 +4,7 @@ short games, almost no character building, and a simplified inventory.
 
 *Every year, the elders send someone to collect medicinal simella plants in the
 Underground.  This year, the honor fell upon you, and so here you are.
-According to the elders, deep in the Underground, magical stairs will lead you
+According to the elders, deep in the Underground, a magical monolith will lead you
 back to your village.  Along the way, you will collect simellas, as well as
 various items that will help you deal with monsters, which you may
 fight or flee...*

@@ -566,7 +566,7 @@ func (ui *gameui) CharacterInfo() {
 	ui.DrawDungeonView(NoFlushMode)
 
 	b := bytes.Buffer{}
-	b.WriteString(formatText("Every year, the elders send someone to collect medicinal simella plants in the Underground.  This year, the honor fell upon you, and so here you are.  According to the elders, deep in the Underground, magical stairs will lead you back to your village.", TextWidth))
+	b.WriteString(formatText("Every year, the elders send someone to collect medicinal simella plants in the Underground.  This year, the honor fell upon you, and so here you are.  According to the elders, deep in the Underground, a magical monolith will lead you back to your village.", TextWidth))
 	b.WriteString("\n\n")
 	b.WriteString(formatText(
 		fmt.Sprintf("You are wielding %s. %s", Indefinite(g.Player.Weapon.String(), false), g.Player.Weapon.Desc()), TextWidth))
@@ -752,7 +752,7 @@ func (ui *gameui) ViewPositionDescription(pos position) {
 		} else {
 			desc := "Stairs lead to the next level of the Underground. There's no way back. Monsters do not follow you."
 			if g.Depth == WinDepth {
-				desc += " If you're afraid, you could instead just win by taking the magical stairs somewhere in the same map."
+				desc += " If you're afraid, you could instead just win by taking the magical monolith somewhere in the same map."
 			}
 			ui.DrawDescription(desc)
 		}
