@@ -62,8 +62,14 @@ func main() {
 	GameConfig.DarkLOS = true
 
 	load, err := g.LoadConfig()
+	var cfgerrstr string
+	var cfgreseterr string
 	if load && err != nil {
-		g.Print("Error loading config file.")
+		cfgerrstr = fmt.Sprintf("Error loading config: %s", err.Error())
+		err = g.SaveConfig()
+		if err != nil {
+			cfgreseterr = fmt.Sprintf("Error resetting config: %s", err.Error())
+		}
 	} else if load {
 		CustomKeys = true
 	}
@@ -77,6 +83,14 @@ func main() {
 		g.InitLevel()
 		g.PrintfStyled("Error: %v", logError, err)
 		g.PrintStyled("Could not load saved game… starting new game.", logError)
+	} else {
+		ui.DrawBufferInit()
+	}
+	if cfgerrstr != "" {
+		g.PrintStyled(cfgerrstr, logError)
+	}
+	if cfgreseterr != "" {
+		g.PrintStyled(cfgreseterr, logError)
 	}
 	g.ui = ui
 	g.EventLoop()

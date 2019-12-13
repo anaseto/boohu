@@ -42,6 +42,10 @@ func newGame(ui *gameui) {
 	load, err := g.LoadConfig()
 	if load && err != nil {
 		log.Printf("Error loading config: %v\n", err)
+		err = g.SaveConfig()
+		if err != nil {
+			log.Printf("Error resetting config: %v\n", err)
+		}
 	} else if load {
 		CustomKeys = true
 	}
@@ -348,14 +352,18 @@ func (ui *gameui) Init() error {
 			if s == "Unidentified" {
 				s = e.Get("code").String()
 			}
-			ch <- uiInput{key: s}
+			if len(ch) < cap(ch) {
+				ch <- uiInput{key: s}
+			}
 			return nil
 		}))
 	canvas.Call(
 		"addEventListener", "mousedown", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			e := args[0]
 			x, y := ui.GetMousePos(e)
-			ch <- uiInput{mouse: true, mouseX: x, mouseY: y, button: e.Get("button").Int()}
+			if len(ch) < cap(ch) {
+				ch <- uiInput{mouse: true, mouseX: x, mouseY: y, button: e.Get("button").Int()}
+			}
 			return nil
 		}))
 	canvas.Call(
@@ -368,7 +376,9 @@ func (ui *gameui) Init() error {
 			if x != ui.mousepos.X || y != ui.mousepos.Y {
 				ui.mousepos.X = x
 				ui.mousepos.Y = y
-				ch <- uiInput{mouse: true, mouseX: x, mouseY: y, button: -1}
+				if len(ch) < cap(ch) {
+					ch <- uiInput{mouse: true, mouseX: x, mouseY: y, button: -1}
+				}
 			}
 			return nil
 		}))
@@ -384,7 +394,7 @@ var ch chan uiInput
 var interrupt chan bool
 
 func init() {
-	ch = make(chan uiInput, 100)
+	ch = make(chan uiInput, 5)
 	interrupt = make(chan bool)
 	Flushdone = make(chan bool)
 	ReqFrame = make(chan bool)
