@@ -47,43 +47,46 @@ const (
 
 const NumPotions = int(DreamPotion) + 1
 
-func (p potion) String() (text string) {
-	text = "potion"
+func (p potion) Name() (text string) {
 	switch p {
 	case HealWoundsPotion:
-		text += " of heal wounds"
+		text += "heal wounds"
 	case TeleportationPotion:
-		text += " of teleportation"
+		text += "teleportation"
 	case DescentPotion:
-		text += " of descent"
+		text += "descent"
 	case MagicMappingPotion:
-		text += " of magic mapping"
+		text += "magic mapping"
 	case MagicPotion:
-		text += " of refill magic"
+		text += "refill magic"
 	case BerserkPotion:
-		text += " of berserk"
+		text += "berserk"
 	case SwiftnessPotion:
-		text += " of swiftness"
+		text += "swiftness"
 	case LignificationPotion:
-		text += " of lignification"
+		text += "lignification"
 	case WallPotion:
-		text += " of walls"
+		text += "walls"
 	case CBlinkPotion:
-		text += " of controlled blink"
+		text += "controlled blink"
 	case DigPotion:
-		text += " of digging"
+		text += "digging"
 	case SwapPotion:
-		text += " of swapping"
+		text += "swapping"
 	case ShadowsPotion:
-		text += " of shadows"
+		text += "shadows"
 	case TormentPotion:
-		text += " of torment explosion"
+		text += "torment explosion"
 	case AccuracyPotion:
-		text += " of accuracy"
+		text += "accuracy"
 	case DreamPotion:
-		text += " of dreams"
+		text += "dreams"
 	}
 	return text
+}
+
+func (p potion) String() string {
+	return "potion of " + p.Name()
 }
 
 func (p potion) Plural() (text string) {

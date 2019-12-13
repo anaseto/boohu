@@ -568,6 +568,7 @@ const (
 	KeyNextStairs
 	KeyMenuCommandHelp
 	KeyMenuTargetingHelp
+	KeyInventory
 )
 
 var configurableKeyActions = [...]keyAction{
@@ -608,7 +609,9 @@ var configurableKeyActions = [...]keyAction{
 	KeyNextStairs,
 	KeyDescription,
 	KeyTarget,
-	KeyExclude}
+	KeyExclude,
+	KeyInventory,
+}
 
 var CustomKeys bool
 
@@ -647,7 +650,8 @@ func (k keyAction) NormalModeKey() bool {
 		KeyQuit,
 		KeyConfigure,
 		KeyWizard,
-		KeyWizardInfo:
+		KeyWizardInfo,
+		KeyInventory:
 		return true
 	default:
 		return false
@@ -732,6 +736,8 @@ func (k keyAction) NormalModeDescription() (text string) {
 		text = "Wizard (debug) mode information"
 	case KeyMenu:
 		text = "Action Menu"
+	case KeyInventory:
+		text = "See Inventory"
 	}
 	return text
 }
@@ -856,6 +862,7 @@ func ApplyDefaultKeyBindings() {
 		',': KeyEquip,
 		'q': KeyDrink,
 		'd': KeyDrink,
+		'i': KeyInventory,
 		't': KeyThrow,
 		'f': KeyThrow,
 		'v': KeyEvoke,
@@ -1016,6 +1023,9 @@ func (ui *gameui) HandleKey(rka runeKeyAction) (err error, again bool, quit bool
 	case KeyEquip:
 		err = g.Equip(g.Ev)
 		ui.MenuSelectedAnimation(MenuInteract, err == nil)
+	case KeyInventory:
+		ui.ViewAll()
+		again = true
 	case KeyDrink:
 		err = ui.SelectPotion(g.Ev)
 		err = ui.CleanError(err)

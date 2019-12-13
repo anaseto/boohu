@@ -538,6 +538,7 @@ func (ui *gameui) KeysHelp() {
 		"Quaff/Drink potion", "q or d",
 		"Throw/Fire item", "t or f",
 		"Evoke/Zap rod", "v or z",
+		"Inventory summary", `i`,
 		"View Character and Quest Information", `% or C`,
 		"View previous messages", "m",
 		"Write game statistics to file", "#",
@@ -1716,6 +1717,67 @@ func (ui *gameui) SelectRod(ev event) error {
 		}
 		return err
 	}
+}
+
+func (ui *gameui) AbbreviatedItem(lnum, col int, name string, q int) {
+	bg := ui.ListItemBG(lnum)
+	if col == 0 {
+		ui.ClearLineWithColor(lnum, bg)
+	}
+	ui.DrawColoredTextOnBG(fmt.Sprintf("- %s (%d)", name, q), col, lnum, ColorFg, bg)
+}
+
+func (ui *gameui) ViewAllTitle(lnum, col int, name string) {
+	bg := ui.ListItemBG(lnum)
+	if col == 0 {
+		ui.ClearLineWithColor(lnum, bg)
+	}
+	ui.DrawColoredTextOnBG(name, col, lnum, ColorYellow, bg)
+}
+
+func (ui *gameui) NextCell(lnum, col int) (int, int) {
+	if lnum >= DungeonHeight-1 {
+		lnum = 0
+		col = DungeonWidth / 2
+	} else {
+		lnum++
+	}
+	return lnum, col
+}
+
+func (ui *gameui) ViewAll() {
+	g := ui.g
+	sr := g.SortedRods()
+	lnum := 0
+	col := 0
+	ui.ViewAllTitle(lnum, col, "Rods")
+	lnum, col = ui.NextCell(lnum, col)
+	for _, c := range sr {
+		ui.AbbreviatedItem(lnum, col, c.Name(), ui.g.Player.Rods[c].Charge)
+		lnum, col = ui.NextCell(lnum, col)
+	}
+	ui.ViewAllTitle(lnum, col, "Projectiles")
+	lnum, col = ui.NextCell(lnum, col)
+	sp := g.SortedProjectiles()
+	for _, c := range sp {
+		ui.AbbreviatedItem(lnum, col, c.String(), g.Player.Consumables[c])
+		lnum, col = ui.NextCell(lnum, col)
+	}
+	ui.ViewAllTitle(lnum, col, "Potions")
+	lnum, col = ui.NextCell(lnum, col)
+	sp = g.SortedPotions()
+	for _, c := range sp {
+		p := c.(potion)
+		ui.AbbreviatedItem(lnum, col, p.Name(), g.Player.Consumables[c])
+		lnum, col = ui.NextCell(lnum, col)
+	}
+	lmax := lnum
+	if col != 0 {
+		lmax = DungeonHeight
+	}
+	ui.DrawTextLine(" press (x) to cancel ", lmax)
+	ui.Flush()
+	ui.WaitForContinue(lmax)
 }
 
 func (ui *gameui) ActionItem(i, lnum int, ka keyAction, fg uicolor) {

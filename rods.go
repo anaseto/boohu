@@ -29,37 +29,41 @@ func (r rod) Letter() rune {
 	return '/'
 }
 
-func (r rod) String() string {
+func (r rod) Name() string {
 	var text string
 	switch r {
 	case RodDigging:
-		text = "rod of digging"
+		text = "digging"
 	case RodBlink:
-		text = "rod of blinking"
+		text = "blinking"
 	case RodTeleportOther:
-		text = "rod of teleport other"
+		text = "teleport other"
 	case RodFog:
-		text = "rod of fog"
+		text = "fog"
 	case RodFireBall:
-		text = "rod of fireball"
+		text = "fireball"
 	case RodFireBolt:
-		text = "rod of fire bolt"
+		text = "fire bolt"
 	case RodLightning:
-		text = "rod of lightning"
+		text = "lightning"
 	case RodObstruction:
-		text = "rod of obstruction"
+		text = "obstruction"
 	case RodShatter:
-		text = "rod of shatter"
+		text = "shatter"
 	case RodSleeping:
-		text = "rod of sleeping"
+		text = "sleeping"
 	case RodLignification:
-		text = "rod of lignification"
+		text = "lignification"
 	case RodHope:
-		text = "rod of last hope"
+		text = "last hope"
 	case RodSwapping:
-		text = "rod of swapping"
+		text = "swapping"
 	}
 	return text
+}
+
+func (r rod) String() string {
+	return "rod of " + r.Name()
 }
 
 func (r rod) Desc() string {
