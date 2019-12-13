@@ -323,6 +323,7 @@ func (ui *gameui) WoundedAnimation() {
 	if DisableAnimations {
 		return
 	}
+	ui.DrawDungeonView(NoFlushMode)
 	r, _, bg := ui.PositionDrawing(g.Player.Pos)
 	ui.DrawAtPosition(g.Player.Pos, false, r, ColorFgHPwounded, bg)
 	ui.Flush()
@@ -339,7 +340,7 @@ func (ui *gameui) DrinkingPotionAnimation() {
 	if DisableAnimations {
 		return
 	}
-	ui.DrawDungeonView(NormalMode)
+	ui.DrawDungeonView(NoFlushMode)
 	time.Sleep(50 * time.Millisecond)
 	r, fg, bg := ui.PositionDrawing(g.Player.Pos)
 	ui.DrawAtPosition(g.Player.Pos, false, r, ColorGreen, bg)
@@ -357,12 +358,11 @@ func (ui *gameui) StatusEndAnimation() {
 	if DisableAnimations {
 		return
 	}
-	r, fg, bg := ui.PositionDrawing(g.Player.Pos)
+	ui.DrawDungeonView(NoFlushMode)
+	r, _, bg := ui.PositionDrawing(g.Player.Pos)
 	ui.DrawAtPosition(g.Player.Pos, false, r, ColorViolet, bg)
 	ui.Flush()
 	time.Sleep(100 * time.Millisecond)
-	ui.DrawAtPosition(g.Player.Pos, false, r, fg, bg)
-	ui.Flush()
 }
 
 func (ui *gameui) MenuSelectedAnimation(m menu, ok bool) {
