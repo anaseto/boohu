@@ -1073,7 +1073,7 @@ func (sh shield) Desc() (text string) {
 	case EarthShield:
 		text = "An earth shield offers great protection, but impact sound can disintegrate nearby walls."
 	case BashingShield:
-		text = "A bashing shield can block an attack and push the ennemy away."
+		text = "A bashing shield can block an attack and push the enemy away."
 	case FireShield:
 		text = "A fire shield can block an attack, sometimes burning nearby foliage."
 	}
