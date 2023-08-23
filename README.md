@@ -1,3 +1,5 @@
+**Migrated to https://codeberg.org/anaseto/boohu because of new 2FA requirement**
+
 Break Out Of Hareka's Underground (Boohu) is a roguelike game mainly inspired
 from DCSS and its tavern, with some ideas from Brogue, but aiming for very
 short games, almost no character building, and a simplified inventory.
